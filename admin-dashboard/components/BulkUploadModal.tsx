@@ -33,24 +33,20 @@ export default function BulkUploadModal({ onClose }: { onClose: () => void }) {
         worksheet?.eachRow((row, rowNumber) => {
           if (rowNumber === 1) return; // Skip Header
 
-          // Mapping your exact flat format
+          // Updated mapping to ensure cells match your actual Excel layout
           jsonData.push({
-            stream: row.getCell(1).text,
-            section: row.getCell(2).text,
-            subject: row.getCell(3).text,
-            chapter: row.getCell(4).text,
+            stream: row.getCell(1).text, // Should be "HSC"
+            section: row.getCell(2).text, // Should be "Science"
+            subject: row.getCell(3).text, // Should be "রসায়ন ১ম পত্র"
+            chapter: row.getCell(4).text, // Should be "ল্যাবরেটরীর নিরাপদ ব্যবহার"
             topic: row.getCell(5).text,
-            question: row.getCell(6).text,
+            question: row.getCell(6).text, // THE ACTUAL QUESTION TEXT
             option1: row.getCell(7).text,
             option2: row.getCell(8).text,
             option3: row.getCell(9).text,
             option4: row.getCell(10).text,
             answer: row.getCell(11).text,
-            explanation: row.getCell(12).text || '',
-            difficulty: row.getCell(13).text || 'Medium',
-            examType: row.getCell(14).text || '',
-            institute: row.getCell(15).text || '',
-            year: row.getCell(16).text || '',
+            explanation: row.getCell(12).text,
           });
         });
 
