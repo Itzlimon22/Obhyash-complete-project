@@ -1,12 +1,11 @@
-'use client'; // 👈 IMPORTANT for Next.js
+'use client';
 
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs'; // 🔒 Secure alternative
 import { createClient } from '@supabase/supabase-js';
-import { Upload, X, FileText, CheckCircle, Loader2 } from 'lucide-react';
+import { Upload, X, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 
-// Initialize Supabase Client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -18,104 +17,79 @@ export default function BulkUploadModal({ onClose }: { onClose: () => void }) {
   const [logs, setLogs] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
 
-  // Helper: Normalize Data
-  const normalizeQuestion = (raw: any) => {
-    const options = [
-      raw.option1 || raw.Option1 || raw.options?.[0],
-      raw.option2 || raw.Option2 || raw.options?.[1],
-      raw.option3 || raw.Option3 || raw.options?.[2],
-      raw.option4 || raw.Option4 || raw.options?.[3],
-    ].filter(Boolean);
-
-    let answer = raw.answer || raw.Answer;
-    if (answer === 'option1') answer = options[0];
-    if (answer === 'option2') answer = options[1];
-    if (answer === 'option3') answer = options[2];
-    if (answer === 'option4') answer = options[3];
-
-    return {
-      question: raw.question || raw.Question,
-      explanation: raw.explanation || raw.Explanation || '',
-      difficulty: raw.difficulty || raw.Difficulty || 'Medium',
-      subject: raw.subject || raw.Subject || 'General',
-      chapter: raw.chapter || raw.Chapter || 'General',
-      topic: raw.topic || raw.Topic || '1',
-      options: options,
-      answer: answer,
-      examType: raw.examType || raw.ExamType || '',
-    };
-  };
-
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  // --- 1. SECURE FILE PARSING WITH EXCELJS ---
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
+    const workbook = new ExcelJS.Workbook();
     const reader = new FileReader();
 
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
-        let rawData = [];
-        if (file.name.endsWith('.json')) {
-          rawData = JSON.parse(e.target?.result as string);
-        } else {
-          const workbook = XLSX.read(e.target?.result, { type: 'binary' });
-          rawData = XLSX.utils.sheet_to_json(
-            workbook.Sheets[workbook.SheetNames[0]],
-          );
-        }
-        setParsedQuestions(rawData.map(normalizeQuestion));
+        const buffer = e.target?.result as ArrayBuffer;
+        await workbook.xlsx.load(buffer);
+        const worksheet = workbook.getWorksheet(1);
+        const jsonData: any[] = [];
+
+        worksheet?.eachRow((row, rowNumber) => {
+          if (rowNumber === 1) return; // Skip Header
+
+          // Mapping your exact flat format
+          jsonData.push({
+            stream: row.getCell(1).text,
+            section: row.getCell(2).text,
+            subject: row.getCell(3).text,
+            chapter: row.getCell(4).text,
+            topic: row.getCell(5).text,
+            question: row.getCell(6).text,
+            option1: row.getCell(7).text,
+            option2: row.getCell(8).text,
+            option3: row.getCell(9).text,
+            option4: row.getCell(10).text,
+            answer: row.getCell(11).text,
+            explanation: row.getCell(12).text || '',
+            difficulty: row.getCell(13).text || 'Medium',
+            examType: row.getCell(14).text || '',
+            institute: row.getCell(15).text || '',
+            year: row.getCell(16).text || '',
+          });
+        });
+
+        setParsedQuestions(jsonData);
         setStep(2);
       } catch (err: any) {
-        alert('Error parsing file: ' + err.message);
+        alert(
+          'Parsing failed. Ensure your Excel follows the 16-column template.',
+        );
       }
     };
-
-    file.name.endsWith('.json')
-      ? reader.readAsText(file)
-      : reader.readAsBinaryString(file);
+    reader.readAsArrayBuffer(file);
   }, []);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
-        '.xlsx',
-      ],
-      'text/csv': ['.csv'],
-      'application/json': ['.json'],
-    },
-  });
-
+  // --- 2. THE UPLOAD LOGIC ---
   const handleUpload = async () => {
     setUploading(true);
-    setLogs(['Starting upload...']);
-    const BATCH_SIZE = 200;
-    let successCount = 0;
+    setLogs(['🚀 Starting secure upload...']);
 
     try {
-      // In Next.js, we don't always have a logged-in user on the client instantly,
-      // so we use a placeholder or handle auth separately.
-      const userId = '00000000-0000-0000-0000-000000000000';
+      // We pass the flat array directly.
+      // The Edge Function we built handles the mapping to options tables.
+      const { data, error } = await supabase.functions.invoke(
+        'bulk-upload-questions',
+        {
+          body: parsedQuestions,
+        },
+      );
 
-      for (let i = 0; i < parsedQuestions.length; i += BATCH_SIZE) {
-        const batch = parsedQuestions.slice(i, i + BATCH_SIZE);
-        setLogs((prev) => [
-          ...prev,
-          `Uploading batch ${i + 1} - ${i + batch.length}...`,
-        ]);
+      if (error) throw error;
 
-        const { data, error } = await supabase.functions.invoke(
-          'bulk-upload-questions',
-          {
-            body: { questions: batch, userId: userId },
-          },
-        );
-
-        if (error) throw error;
-        successCount += data.count || 0;
-      }
-      setLogs((prev) => [...prev, `✅ DONE! Added ${successCount} questions.`]);
+      setLogs((prev) => [
+        ...prev,
+        `✅ Success! Added ${parsedQuestions.length} questions.`,
+      ]);
       setTimeout(() => {
-        if (confirm('Success! Close?')) onClose();
-      }, 500);
+        alert('Upload complete!');
+        onClose();
+      }, 1000);
     } catch (err: any) {
       setLogs((prev) => [...prev, `❌ Error: ${err.message}`]);
     } finally {
@@ -123,95 +97,163 @@ export default function BulkUploadModal({ onClose }: { onClose: () => void }) {
     }
   };
 
+  // --- 3. EDITABLE CELL HANDLER ---
+  const handleEdit = (index: number, key: string, value: string) => {
+    const updated = [...parsedQuestions];
+    updated[index][key] = value;
+    setParsedQuestions(updated);
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
+        '.xlsx',
+      ],
+    },
+  });
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 text-black">
-      <div className="bg-white w-full max-w-4xl h-[80vh] rounded-xl shadow-2xl flex flex-col">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 text-slate-800">
+      <div className="bg-white w-full max-w-5xl h-[85vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-bold">Bulk Upload</h2>
-          <button onClick={onClose}>
-            <X className="text-gray-500" />
+        <div className="flex justify-between items-center px-6 py-4 border-b bg-slate-50">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">
+              Bulk Upload Center
+            </h2>
+            <p className="text-xs text-slate-500">
+              Supported: .xlsx (Excel) only
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-slate-200 rounded-full transition-colors"
+          >
+            <X className="w-5 h-5 text-slate-500" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+        {/* Main Area */}
+        <div className="flex-1 overflow-hidden flex flex-col p-6 space-y-4">
           {step === 1 ? (
             <div
               {...getRootProps()}
-              className={`border-3 border-dashed rounded-xl h-full flex flex-col items-center justify-center cursor-pointer ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'}`}
+              className={`flex-1 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-blue-400'}`}
             >
               <input {...getInputProps()} />
-              <Upload className="w-16 h-16 text-gray-400 mb-4" />
-              <p className="text-lg text-gray-600">
-                Drag & Drop Excel, CSV, or JSON
+              <div className="bg-blue-100 p-4 rounded-full mb-4">
+                <Upload className="w-10 h-10 text-blue-600" />
+              </div>
+              <p className="text-lg font-medium">
+                Drop your Question Bank here
               </p>
+              <p className="text-sm text-slate-400">or click to browse files</p>
             </div>
           ) : (
-            <div className="flex flex-col h-full">
-              <div className="flex justify-between mb-4">
-                <span className="font-semibold">
-                  Previewing {parsedQuestions.length} Questions
-                </span>
-                <button onClick={() => setStep(1)} className="text-blue-600">
-                  Change File
-                </button>
-              </div>
-              <div className="flex-1 border rounded bg-white overflow-auto mb-4">
-                <table className="w-full text-sm text-left">
-                  <thead className="bg-gray-100 sticky top-0">
+            <>
+              {/* Editable Table */}
+              <div className="flex-1 border rounded-xl overflow-auto bg-white shadow-inner">
+                <table className="w-full text-sm border-separate border-spacing-0">
+                  <thead className="bg-slate-100 sticky top-0 z-10">
                     <tr>
-                      <th className="p-3">Question</th>
-                      <th className="p-3">Subject</th>
-                      <th className="p-3">Answer</th>
+                      <th className="p-3 border-b text-left">
+                        Question (Editable)
+                      </th>
+                      <th className="p-3 border-b text-left">Subject</th>
+                      <th className="p-3 border-b text-left">Answer</th>
+                      <th className="p-3 border-b text-left">Institute</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {parsedQuestions.slice(0, 50).map((q, i) => (
-                      <tr key={i} className="border-b">
-                        <td className="p-3 truncate max-w-xs">{q.question}</td>
-                        <td className="p-3">{q.subject}</td>
-                        <td className="p-3 text-green-600">{q.answer}</td>
+                    {parsedQuestions.map((q, i) => (
+                      <tr key={i} className="hover:bg-slate-50">
+                        <td className="p-2 border-b">
+                          <textarea
+                            className="w-full bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded p-1 resize-none h-12"
+                            value={q.question}
+                            onChange={(e) =>
+                              handleEdit(i, 'question', e.target.value)
+                            }
+                          />
+                        </td>
+                        <td className="p-2 border-b">
+                          <input
+                            className="w-full bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded p-1"
+                            value={q.subject}
+                            onChange={(e) =>
+                              handleEdit(i, 'subject', e.target.value)
+                            }
+                          />
+                        </td>
+                        <td className="p-2 border-b">
+                          <select
+                            className="bg-transparent border-none text-blue-600 font-medium cursor-pointer"
+                            value={q.answer}
+                            onChange={(e) =>
+                              handleEdit(i, 'answer', e.target.value)
+                            }
+                          >
+                            <option value="option1">Option 1</option>
+                            <option value="option2">Option 2</option>
+                            <option value="option3">Option 3</option>
+                            <option value="option4">Option 4</option>
+                          </select>
+                        </td>
+                        <td className="p-2 border-b">
+                          <input
+                            className="w-full bg-transparent border-none text-slate-500"
+                            value={q.institute}
+                            onChange={(e) =>
+                              handleEdit(i, 'institute', e.target.value)
+                            }
+                            placeholder="Optional"
+                          />
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-              {logs.length > 0 && (
-                <div className="bg-gray-900 text-green-400 p-3 rounded text-xs mb-4 h-32 overflow-auto">
-                  {logs.map((l, i) => (
-                    <div key={i}>
-                      {'>'} {l}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+
+              {/* Console Logs */}
+              <div className="h-24 bg-slate-900 rounded-lg p-3 font-mono text-[10px] text-emerald-400 overflow-y-auto shadow-lg">
+                {logs.map((log, i) => (
+                  <div key={i}>{`> ${log}`}</div>
+                ))}
+              </div>
+            </>
           )}
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t bg-white flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
-          >
-            Cancel
-          </button>
-          {step === 2 && (
+        <div className="px-6 py-4 bg-slate-50 border-t flex justify-between items-center">
+          <p className="text-sm text-slate-500">
+            {step === 2 &&
+              `${parsedQuestions.length} questions ready for processing`}
+          </p>
+          <div className="flex gap-3">
             <button
-              onClick={handleUpload}
-              disabled={uploading}
-              className={`flex items-center gap-2 px-6 py-2 rounded text-white ${uploading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
+              onClick={onClose}
+              className="px-5 py-2 text-slate-600 font-medium hover:bg-slate-200 rounded-lg transition-all"
             >
-              {uploading ? (
-                <Loader2 className="animate-spin w-4 h-4" />
-              ) : (
-                <CheckCircle className="w-4 h-4" />
-              )}{' '}
-              Upload
+              Cancel
             </button>
-          )}
+            {step === 2 && (
+              <button
+                onClick={handleUpload}
+                disabled={uploading}
+                className={`flex items-center gap-2 px-8 py-2 rounded-lg text-white font-bold shadow-lg transition-all ${uploading ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 active:scale-95'}`}
+              >
+                {uploading ? (
+                  <Loader2 className="animate-spin w-4 h-4" />
+                ) : (
+                  <CheckCircle className="w-4 h-4" />
+                )}
+                {uploading ? 'Processing...' : 'Deploy Questions'}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

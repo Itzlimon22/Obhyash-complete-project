@@ -1,57 +1,47 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-// 1. CORS Headers (Allows your dashboard to talk to this function)
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 serve(async (req) => {
-  // 2. Handle Browser Pre-flight Check
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   }
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
   try {
-    // 3. Initialize Supabase Client
-    // ✅ CORRECT: We ask for the VARIABLE NAME, not the URL itself.
-    // Supabase automatically injects these values when you deploy.
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
+    const rawData = await req.json() // This is the array from your Admin Dashboard
 
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variables.");
+    for (const q of rawData) {
+      // 1. Upsert Subject
+      const { data: sub } = await supabase.from('subjects').upsert({ name: q.subject }, { onConflict: 'name' }).select().single()
+      
+      // 2. Upsert Chapter
+      const { data: chap } = await supabase.from('chapters').upsert({ name: q.chapter, subject_id: sub.id }, { onConflict: 'name,subject_id' }).select().single()
+
+      // 3. Insert Question (with optional fields)
+      const { data: quest } = await supabase.from('questions').insert({
+        chapter_id: chap.id,
+        question_text: q.question,
+        explanation: q.explanation || null,
+        difficulty: q.difficulty || 'Medium',
+        exam_type: q.examType || null,
+        institute: q.institute || null,
+        year: q.year || null
+      }).select().single()
+
+      // 4. Insert Options
+      const options = [
+        { question_id: quest.id, option_text: q.option1, is_correct: q.answer === 'option1', order: 1 },
+        { question_id: quest.id, option_text: q.option2, is_correct: q.answer === 'option2', order: 2 },
+        { question_id: quest.id, option_text: q.option3, is_correct: q.answer === 'option3', order: 3 },
+        { question_id: quest.id, option_text: q.option4, is_correct: q.answer === 'option4', order: 4 },
+      ]
+      await supabase.from('options').insert(options)
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // 4. Parse the Input Data
-    const { questions, userId } = await req.json();
-
-    if (!questions || !Array.isArray(questions)) {
-      throw new Error("Invalid input: 'questions' must be an array.");
-    }
-
-    // 5. Call the Database Logic (SQL Function)
-    const { data, error } = await supabase.rpc('bulk_upload_questions', {
-      questions_payload: questions,
-      admin_id: userId || null // Handle case where userId might be missing
-    });
-
-    if (error) throw error;
-
-    // 6. Return Success
-    return new Response(JSON.stringify(data), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
-    });
-
-  } catch (error: any) {
-    // 7. Return Error
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 400,
-    });
+    return new Response(JSON.stringify({ message: "Upload Complete" }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), { status: 400, headers: corsHeaders })
   }
-});
+})
