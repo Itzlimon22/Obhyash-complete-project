@@ -2,7 +2,7 @@
 
 The Obyash Admin Dashboard now features a high-performance, AI-assisted pipeline for migrating educational content from Excel/JSON to the production database. This system is designed specifically for Engineering and Science content, supporting complex formulas and localized text.
 
----
+## **App Link :** [text](https://obhyash-app.vercel.app/)
 
 ## 🛠 System Architecture
 
