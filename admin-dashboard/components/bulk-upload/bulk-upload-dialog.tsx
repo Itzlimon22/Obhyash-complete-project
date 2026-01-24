@@ -21,7 +21,7 @@ import { findClosestMatch } from '@/lib/utils/fuzzy-match';
 import { normalizeTopic, normalizeAnswer } from '@/lib/utils/normalization';
 import { Subject, Chapter, QuestionFormData } from '@/lib/types';
 import { subjects as allSubjectsData } from '@/lib/data';
-import { addQuestionsInBulk } from '@/ai/flows/manage-questions';
+// import { addQuestionsInBulk } from '@/ai/flows/manage-questions'; // <-- Not needed for direct upload
 import { reviewQuestionWithAI } from '@/ai/flows/review-question-flow';
 
 // UI Components
@@ -155,46 +155,56 @@ export default function BulkUploadDialog({
     });
   };
 
+  // ✅ FIXED UPLOAD LOGIC
   const handleUpload = async () => {
     if (parsedData.length === 0) return;
     setUploading(true);
-    setLogs(['🚀 Starting batch upload...']);
-
-    const BATCH_SIZE = 100;
-    let totalAdded = 0;
-    const uploadFailures: any[] = [];
+    setLogs(['🚀 Starting upload...']);
 
     try {
-      for (let i = 0; i < parsedData.length; i += BATCH_SIZE) {
-        const batch = parsedData.slice(i, i + BATCH_SIZE);
-        try {
-          const result = await addQuestionsInBulk({
-            questions: batch,
-            userId: 'user_id_here', // Replace with dynamic Auth ID
-          });
-          if (result.success) totalAdded += result.count;
-        } catch (err: any) {
-          uploadFailures.push({
-            batch: i / BATCH_SIZE,
-            error: err.message,
-            data: batch,
-          });
-        }
-      }
+      // 1. Flatten the data structure to match Supabase columns
+      const finalPayload = parsedData.map((q) => ({
+        stream: q.stream,
+        section: q.section,
+        subject: q.subject,
+        chapter: q.chapter,
+        topic: q.topic,
+        question: q.question,
+        // Flatten array back to individual columns
+        option1: q.options[0] || '',
+        option2: q.options[1] || '',
+        option3: q.options[2] || '',
+        option4: q.options[3] || '',
+        answer: q.answer,
+        explanation: q.explanation,
+        difficulty: q.difficulty,
+        examType: q.examType,
+        institute: q.institute,
+        year: q.year,
+      }));
 
-      setFailedData((prev) => [...prev, ...uploadFailures]);
+      // 2. Direct insert to avoid backend "map is not a function" error
+      const { error } = await supabase.from('questions').insert(finalPayload);
 
+      if (error) throw error;
+
+      setLogs((prev) => [...prev, '✅ Upload successful!']);
       toast({
-        title: totalAdded > 0 ? 'Success' : 'Upload Failed',
-        description: `${totalAdded} questions deployed. ${uploadFailures.length} batches failed.`,
+        title: 'Success',
+        description: `${parsedData.length} questions deployed successfully.`,
       });
 
-      if (totalAdded > 0) {
-        onSuccess();
-        setTimeout(onClose, 2000);
-      }
+      onSuccess();
+      setTimeout(onClose, 2000);
     } catch (err: any) {
+      console.error(err);
       setLogs((prev) => [...prev, `❌ Critical Error: ${err.message}`]);
+      setFailedData((prev) => [...prev, { error: err.message }]);
+      toast({
+        title: 'Upload Failed',
+        description: err.message,
+        variant: 'destructive',
+      });
     } finally {
       setUploading(false);
     }
@@ -480,4 +490,3 @@ export default function BulkUploadDialog({
     </div>
   );
 }
-// FORCE UPDATE: V1.1
