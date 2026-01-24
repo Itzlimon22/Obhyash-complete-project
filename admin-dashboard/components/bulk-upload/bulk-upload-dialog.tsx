@@ -105,7 +105,8 @@ export default function BulkUploadDialog({
           topic: normalizeTopic(chapterData, row.topic),
           question: row.question || '',
           options: options,
-          answer: normalizeAnswer(row, options),
+          // If answer is passed as text (from JSON pre-processing) use it, otherwise normalize
+          answer: row.answer || normalizeAnswer(row, options),
           explanation: row.explanation || '',
           difficulty:
             (row.difficulty as 'Easy' | 'Medium' | 'Hard') || 'Medium',
@@ -201,37 +202,86 @@ export default function BulkUploadDialog({
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(await file.arrayBuffer());
-    const worksheet = workbook.getWorksheet(1);
-    let raw: any[] = [];
-    worksheet?.eachRow((row, rowNumber) => {
-      if (rowNumber === 1) return;
-      const v = Array.isArray(row.values) ? row.values.slice(1) : [];
-      raw.push({
-        stream: v[0],
-        section: v[1],
-        subject: v[2],
-        chapter: v[3],
-        topic: v[4],
-        question: v[5],
-        option1: v[6],
-        option2: v[7],
-        option3: v[8],
-        option4: v[9],
-        answer: v[10],
-        explanation: v[11],
-        difficulty: v[12],
-        examType: v[13],
-        institute: v[14],
-        year: v[15],
+
+    // 🟢 HANDLE JSON FILES
+    if (file.name.endsWith('.json') || file.type === 'application/json') {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const jsonRaw = JSON.parse(e.target?.result as string);
+          // Ensure it's an array
+          const rawArray = Array.isArray(jsonRaw) ? jsonRaw : [jsonRaw];
+
+          // Map your specific JSON format to expected format
+          // Specifically converts "answer": "option3" -> "Actual Answer Text"
+          const normalizedRaw = rawArray.map((item: any) => {
+            let realAnswer = item.answer;
+            if (item.answer === 'option1') realAnswer = item.option1;
+            else if (item.answer === 'option2') realAnswer = item.option2;
+            else if (item.answer === 'option3') realAnswer = item.option3;
+            else if (item.answer === 'option4') realAnswer = item.option4;
+
+            return {
+              ...item,
+              answer: realAnswer,
+              year: item.year // Pass year as-is for processing by processParsedData
+            };
+          });
+
+          setParsedData(processParsedData(normalizedRaw));
+          setStep(2);
+          toast({ title: "Success", description: `Loaded ${rawArray.length} questions from JSON` });
+        } catch (err) {
+          console.error(err);
+          toast({ title: "Error", description: "Invalid JSON format", variant: "destructive" });
+        }
+      };
+      reader.readAsText(file);
+      return;
+    }
+
+    // 🟢 HANDLE EXCEL FILES
+    try {
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(await file.arrayBuffer());
+      const worksheet = workbook.getWorksheet(1);
+      let raw: any[] = [];
+      worksheet?.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return;
+        const v = Array.isArray(row.values) ? row.values.slice(1) : [];
+        raw.push({
+          stream: v[0],
+          section: v[1],
+          subject: v[2],
+          chapter: v[3],
+          topic: v[4],
+          question: v[5],
+          option1: v[6],
+          option2: v[7],
+          option3: v[8],
+          option4: v[9],
+          answer: v[10],
+          explanation: v[11],
+          difficulty: v[12],
+          examType: v[13],
+          institute: v[14],
+          year: v[15],
+        });
       });
-    });
-    setParsedData(processParsedData(raw));
-    setStep(2);
+      setParsedData(processParsedData(raw));
+      setStep(2);
+    } catch (err) {
+      toast({ title: 'Error', description: 'Could not parse Excel file', variant: 'destructive' });
+    }
   }, []);
 
-  const { getRootProps, getInputProps } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps } = useDropzone({ 
+    onDrop,
+    accept: {
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'application/json': ['.json'] 
+    }
+  });
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -261,10 +311,10 @@ export default function BulkUploadDialog({
                 <Upload className="w-10 h-10 text-blue-600" />
               </div>
               <p className="font-semibold text-slate-700">
-                Click or drag Excel file here
+                Click or drag Excel or JSON file here
               </p>
               <p className="text-sm text-slate-400 mt-1">
-                Supports standard 16-column engineering format
+                Supports standard 16-column Excel or JSON format
               </p>
             </div>
           ) : (
