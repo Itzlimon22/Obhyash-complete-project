@@ -224,16 +224,23 @@ export default function BulkUploadDialog({
             return {
               ...item,
               answer: realAnswer,
-              year: item.year // Pass year as-is for processing by processParsedData
+              year: item.year, // Pass year as-is for processing by processParsedData
             };
           });
 
           setParsedData(processParsedData(normalizedRaw));
           setStep(2);
-          toast({ title: "Success", description: `Loaded ${rawArray.length} questions from JSON` });
+          toast({
+            title: 'Success',
+            description: `Loaded ${rawArray.length} questions from JSON`,
+          });
         } catch (err) {
           console.error(err);
-          toast({ title: "Error", description: "Invalid JSON format", variant: "destructive" });
+          toast({
+            title: 'Error',
+            description: 'Invalid JSON format',
+            variant: 'destructive',
+          });
         }
       };
       reader.readAsText(file);
@@ -271,16 +278,22 @@ export default function BulkUploadDialog({
       setParsedData(processParsedData(raw));
       setStep(2);
     } catch (err) {
-      toast({ title: 'Error', description: 'Could not parse Excel file', variant: 'destructive' });
+      toast({
+        title: 'Error',
+        description: 'Could not parse Excel file',
+        variant: 'destructive',
+      });
     }
   }, []);
 
-  const { getRootProps, getInputProps } = useDropzone({ 
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: {
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-      'application/json': ['.json'] 
-    }
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
+        '.xlsx',
+      ],
+      'application/json': ['.json'],
+    },
   });
 
   return (
@@ -467,3 +480,4 @@ export default function BulkUploadDialog({
     </div>
   );
 }
+// FORCE UPDATE: V1.1
