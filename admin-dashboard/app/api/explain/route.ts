@@ -29,7 +29,7 @@ export async function POST(req: Request) {
           'Access-Control-Allow-Methods': 'POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
         },
-      },
+      }
     );
   } catch (error: any) {
     console.error('Gemini Error:', error);
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
           'Access-Control-Allow-Methods': 'POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
         },
-      },
+      }
     );
   }
 } // <--- THIS BRACE IS CRITICAL. IT SEPARATES POST FROM OPTIONS.
@@ -57,6 +57,6 @@ export async function OPTIONS() {
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
       },
-    },
+    }
   );
 }
