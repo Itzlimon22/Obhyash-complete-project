@@ -20,7 +20,8 @@ import {
 import { findClosestMatch } from '@/lib/utils/fuzzy-match';
 import { normalizeTopic, normalizeAnswer } from '@/lib/utils/normalization';
 import { Subject, Chapter, QuestionFormData, Topic } from '@/lib/types';
-import { subjects as allSubjectsData } from '@/lib/data';
+import { hscSubjects as allSubjectsData } from '@/lib/data/hsc';
+
 // import { addQuestionsInBulk } from '@/ai/flows/manage-questions'; // <-- Not needed for direct upload
 import { reviewQuestionWithAI } from '@/ai/flows/review-question-flow';
 
@@ -70,9 +71,13 @@ export default function BulkUploadDialog({
     URL.revokeObjectURL(url);
   };
 
+  // Inside bulk-upload-dialog.tsx
+
   const processParsedData = (rawData: any[]): QuestionFormData[] => {
+    console.log('🔍 Processing matching logic for', rawData.length, 'rows...');
+
     return rawData
-      .map((row): QuestionFormData => {
+      .map((row, index): QuestionFormData => {
         const options = [
           String(row.option1 || ''),
           String(row.option2 || ''),
@@ -80,54 +85,65 @@ export default function BulkUploadDialog({
           String(row.option4 || ''),
         ].filter(Boolean);
 
-        // 1. Find Subject & ID
-        const correctedSubject =
-          findClosestMatch(
-            row.subject,
-            allSubjectsData.map((s: Subject) => s.name),
-          ) || row.subject;
+        // --- 1. MATCH SUBJECT ---
+        // We look for the closest name in your 'allSubjectsData' list
+        const possibleSubjects = allSubjectsData.map((s: Subject) => s.name);
+        const matchedSubjectName =
+          findClosestMatch(row.subject, possibleSubjects) || row.subject;
 
-        const subjectData = allSubjectsData.find(
-          (s: Subject) => s.name === correctedSubject,
+        const subjectObj = allSubjectsData.find(
+          (s: Subject) => s.name === matchedSubjectName,
         );
 
-        // 2. Find Chapter & ID
-        const correctedChapter =
-          findClosestMatch(
-            row.chapter,
-            subjectData?.chapters.map((c: Chapter) => c.name) || [],
-          ) || row.chapter;
+        // DEBUG: Warn if subject ID is missing
+        if (!subjectObj?.id) {
+          console.warn(
+            `[Row ${index + 1}] ❌ ID MISSING for Subject: "${row.subject}". Closest match: "${matchedSubjectName}"`,
+          );
+        }
 
-        const chapterData = subjectData?.chapters.find(
-          (c: Chapter) => c.name === correctedChapter,
+        // --- 2. MATCH CHAPTER ---
+        const possibleChapters =
+          subjectObj?.chapters.map((c: Chapter) => c.name) || [];
+        const matchedChapterName =
+          findClosestMatch(row.chapter, possibleChapters) || row.chapter;
+
+        const chapterObj = subjectObj?.chapters.find(
+          (c: Chapter) => c.name === matchedChapterName,
         );
 
-        // 3. Find Topic & ID
-        // First, normalize the text string (fix spelling errors)
-        const normalizedTopicName = normalizeTopic(chapterData, row.topic);
+        // DEBUG: Warn if chapter ID is missing (only if subject was found)
+        if (subjectObj && !chapterObj?.id) {
+          console.warn(
+            `[Row ${index + 1}] ❌ ID MISSING for Chapter: "${row.chapter}" inside "${matchedSubjectName}"`,
+          );
+        }
 
-        // Then, find the actual Topic Object to get its ID
-        const topicData = chapterData?.topics.find(
-          (t: Topic) => t.name === normalizedTopicName,
+        // --- 3. MATCH TOPIC ---
+        // Normalize both the input and the list to handle "Topic 1" vs "topic-1"
+        const normalizedInputTopic = normalizeTopic(chapterObj, row.topic);
+        const topicObj = chapterObj?.topics.find(
+          (t: Topic) =>
+            // Try strict match OR fuzzy normalized match
+            t.name === row.topic || t.name === normalizedInputTopic,
         );
 
         return {
           stream: row.stream || 'HSC',
           section: row.section || 'Science',
 
-          // Names (for UI display)
-          subject: correctedSubject,
-          chapter: correctedChapter,
-          topic: normalizedTopicName,
+          // Text Names (What you see in the UI)
+          subject: matchedSubjectName,
+          chapter: matchedChapterName,
+          topic: normalizedInputTopic,
 
-          // 👇 IDs (for Database linking)
-          subject_id: subjectData?.id || null,
-          chapter_id: chapterData?.id || null,
-          topic_id: topicData?.id || null,
+          // IDs (The most important part for the Exam App!)
+          subject_id: subjectObj?.id || null, // <--- This must not be null
+          chapter_id: chapterObj?.id || null, // <--- This must not be null
+          topic_id: topicObj?.id || null, // <--- This must not be null
 
           question: row.question || '',
           options: options,
-          // If answer is passed as text (from JSON pre-processing) use it, otherwise normalize
           answer: row.answer || normalizeAnswer(row, options),
           explanation: row.explanation || '',
           difficulty:
@@ -146,7 +162,7 @@ export default function BulkUploadDialog({
               ?.map(Number) || [],
         };
       })
-      .filter((q) => q.question && q.subject && q.options.length === 4);
+      .filter((q) => q.question && q.options.length === 4);
   };
 
   const handleAiReview = async () => {
