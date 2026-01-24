@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { Upload, LayoutDashboard } from 'lucide-react';
-import BulkUploadModal from '@/components/BulkUploadModal'; // Use @ if your path alias is set up, otherwise use '../components/BulkUploadModal'
+// ✅ FIXED: Imported the correct component name from the correct path
+import BulkUploadDialog from '@/components/bulk-upload/bulk-upload-dialog';
 
 export default function AdminDashboard() {
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -39,7 +40,13 @@ export default function AdminDashboard() {
 
       {/* Modal */}
       {showUploadModal && (
-        <BulkUploadModal onClose={() => setShowUploadModal(false)} />
+        <BulkUploadDialog
+          onClose={() => setShowUploadModal(false)}
+          onSuccess={() => {
+            console.log('Upload success! Refreshing data...');
+            // You can add logic here later to re-fetch the 'Total Questions' count
+          }}
+        />
       )}
     </div>
   );
