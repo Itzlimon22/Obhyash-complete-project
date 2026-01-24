@@ -19,7 +19,7 @@ import {
 // Internal Utils & Types
 import { findClosestMatch } from '@/lib/utils/fuzzy-match';
 import { normalizeTopic, normalizeAnswer } from '@/lib/utils/normalization';
-import { Subject, Chapter, QuestionFormData } from '@/lib/types';
+import { Subject, Chapter, QuestionFormData, Topic } from '@/lib/types';
 import { subjects as allSubjectsData } from '@/lib/data';
 // import { addQuestionsInBulk } from '@/ai/flows/manage-questions'; // <-- Not needed for direct upload
 import { reviewQuestionWithAI } from '@/ai/flows/review-question-flow';
@@ -80,29 +80,51 @@ export default function BulkUploadDialog({
           String(row.option4 || ''),
         ].filter(Boolean);
 
+        // 1. Find Subject & ID
         const correctedSubject =
           findClosestMatch(
             row.subject,
             allSubjectsData.map((s: Subject) => s.name),
           ) || row.subject;
+
         const subjectData = allSubjectsData.find(
           (s: Subject) => s.name === correctedSubject,
         );
+
+        // 2. Find Chapter & ID
         const correctedChapter =
           findClosestMatch(
             row.chapter,
             subjectData?.chapters.map((c: Chapter) => c.name) || [],
           ) || row.chapter;
+
         const chapterData = subjectData?.chapters.find(
           (c: Chapter) => c.name === correctedChapter,
+        );
+
+        // 3. Find Topic & ID
+        // First, normalize the text string (fix spelling errors)
+        const normalizedTopicName = normalizeTopic(chapterData, row.topic);
+
+        // Then, find the actual Topic Object to get its ID
+        const topicData = chapterData?.topics.find(
+          (t: Topic) => t.name === normalizedTopicName,
         );
 
         return {
           stream: row.stream || 'HSC',
           section: row.section || 'Science',
+
+          // Names (for UI display)
           subject: correctedSubject,
           chapter: correctedChapter,
-          topic: normalizeTopic(chapterData, row.topic),
+          topic: normalizedTopicName,
+
+          // 👇 IDs (for Database linking)
+          subject_id: subjectData?.id || null,
+          chapter_id: chapterData?.id || null,
+          topic_id: topicData?.id || null,
+
           question: row.question || '',
           options: options,
           // If answer is passed as text (from JSON pre-processing) use it, otherwise normalize
@@ -170,6 +192,11 @@ export default function BulkUploadDialog({
         chapter: q.chapter,
         topic: q.topic,
         question: q.question,
+
+        // 👇 ADD THESE LINES to send the IDs to Supabase
+        subject_id: q.subject_id,
+        chapter_id: q.chapter_id,
+        topic_id: q.topic_id,
         // Flatten array back to individual columns
         option1: q.options[0] || '',
         option2: q.options[1] || '',

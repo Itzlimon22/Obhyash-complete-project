@@ -35,4 +35,7 @@ export interface QuestionFormData {
   examType: string[];
   institute?: string[];
   year?: number[];
+  subject_id?: string | null;  // 👈 Add this
+  chapter_id?: string | null;  // 👈 Add this
+  topic_id?: string | null;
 }
