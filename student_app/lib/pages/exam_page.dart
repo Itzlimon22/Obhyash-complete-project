@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:student_app/main.dart'; // Supabase client
 import 'package:student_app/theme.dart'; // Theme & Spacing
 import 'package:student_app/widgets/primary_button.dart';
