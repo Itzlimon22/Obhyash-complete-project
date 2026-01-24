@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Upload, LayoutDashboard } from 'lucide-react';
 // ✅ FIXED: Imported the correct component name from the correct path
 import BulkUploadDialog from '@/components/bulk-upload/bulk-upload-dialog';
+import SeedDatabaseButton from '@/components/seed-database-button';
 
 export default function AdminDashboard() {
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -48,6 +49,8 @@ export default function AdminDashboard() {
           }}
         />
       )}
+
+      <SeedDatabaseButton />
     </div>
   );
 }

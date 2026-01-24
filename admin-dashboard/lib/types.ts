@@ -1,7 +1,11 @@
+import { LucideIcon } from 'lucide-react';
+
+export type GroupType = 'General' | 'Science' | 'Arts' | 'Commerce';
+
 export interface Topic {
   id: string;
   name: string;
-  serial: number | string;
+  serial: number;
 }
 
 export interface Chapter {
@@ -13,9 +17,10 @@ export interface Chapter {
 export interface Subject {
   id: string;
   name: string;
+  icon: LucideIcon;
+  group: GroupType;
   chapters: Chapter[];
 }
-
 export interface QuestionFormData {
   stream: string;
   section: string;
