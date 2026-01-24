@@ -177,13 +177,20 @@ export default function BulkUploadDialog({
     });
   };
 
-  // ✅ FIXED UPLOAD LOGIC
   const handleUpload = async () => {
     if (parsedData.length === 0) return;
     setUploading(true);
     setLogs(['🚀 Starting upload...']);
 
     try {
+      // DEBUG: Check if IDs exist in the first item
+      console.log('First Question Payload Check:', {
+        q: parsedData[0].question,
+        s_id: parsedData[0].subject_id,
+        c_id: parsedData[0].chapter_id,
+        t_id: parsedData[0].topic_id,
+      });
+
       // 1. Flatten the data structure to match Supabase columns
       const finalPayload = parsedData.map((q) => ({
         stream: q.stream,
@@ -193,10 +200,11 @@ export default function BulkUploadDialog({
         topic: q.topic,
         question: q.question,
 
-        // 👇 ADD THESE LINES to send the IDs to Supabase
-        subject_id: q.subject_id,
-        chapter_id: q.chapter_id,
-        topic_id: q.topic_id,
+        // 👇 THIS SECTION IS CRITICAL (Ensure these are mapped)
+        subject_id: q.subject_id || null,
+        chapter_id: q.chapter_id || null,
+        topic_id: q.topic_id || null,
+
         // Flatten array back to individual columns
         option1: q.options[0] || '',
         option2: q.options[1] || '',
@@ -210,7 +218,7 @@ export default function BulkUploadDialog({
         year: q.year,
       }));
 
-      // 2. Direct insert to avoid backend "map is not a function" error
+      // 2. Direct insert
       const { error } = await supabase.from('questions').insert(finalPayload);
 
       if (error) throw error;
