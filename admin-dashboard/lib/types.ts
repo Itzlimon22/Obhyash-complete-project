@@ -24,17 +24,17 @@ export interface Subject {
   chapters: Chapter[];
 }
 
-// --- 2. NEW Question Types (The Fix) ---
+// --- 2. Question Types (Fixed) ---
 
 // ✅ Export this so other files can find it
 export interface QuestionOption {
-  id: string;        // "A", "B", "C", "D"
+  id: string;        // "a", "b", "c", "d"
   text: string;      // "Newton"
   isCorrect: boolean; // true/false
 }
 
 export interface QuestionFormData {
-  // IDs
+  // IDs (Optional because they might be generated later)
   subject_id?: string | null;
   chapter_id?: string | null;
   topic_id?: string | null;
@@ -47,18 +47,24 @@ export interface QuestionFormData {
   chapter: string;
   topic: string;
 
+  // Content
   question: string;
-  
-  // ✅ New Structure
+  image_url?: string; // ✅ Added to support R2 Image Uploads
+
+  // ✅ New Structure: Array of Option Objects
   options: QuestionOption[]; 
   
-  // ❌ 'answer' is REMOVED from here because it's now inside 'options'
-  
+  // Explanation & Categorization
   explanation: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  examType: string[];
-  institute: string[];
-  year: number[];
+  
+  // ⚠️ FIX: Changed these from Arrays to Strings to match the Form Inputs
+  difficulty: string; 
+  examType: string;   // Was string[], now string (e.g., "HSC, Admission")
+  institute: string;  // Was string[], now string (e.g., "BUET")
+  year: string;       // Was number[], now string (e.g., "2024")
+
+  // System
   status?: 'pending' | 'approved' | 'rejected';
   created_at?: string;
+  created_by?: string;
 }
