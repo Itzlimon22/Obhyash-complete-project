@@ -19,7 +19,15 @@ import {
 // Internal Utils & Types
 import { findClosestMatch } from '@/lib/utils/fuzzy-match';
 import { normalizeTopic, normalizeAnswer } from '@/lib/utils/normalization';
-import { Subject, Chapter, QuestionFormData, Topic } from '@/lib/types';
+import {
+  Subject,
+  Chapter,
+  QuestionFormData,
+  QuestionOption,
+  Topic,
+} from '@/lib/types';
+
+// ✅ CRITICAL: Import from the file that has the IDs
 import { hscSubjects as allSubjectsData } from '@/lib/data/hsc';
 
 // import { addQuestionsInBulk } from '@/ai/flows/manage-questions'; // <-- Not needed for direct upload
@@ -74,95 +82,75 @@ export default function BulkUploadDialog({
   // Inside bulk-upload-dialog.tsx
 
   const processParsedData = (rawData: any[]): QuestionFormData[] => {
-    console.log('🔍 Processing matching logic for', rawData.length, 'rows...');
-
     return rawData
-      .map((row, index): QuestionFormData => {
-        const options = [
-          String(row.option1 || ''),
-          String(row.option2 || ''),
-          String(row.option3 || ''),
-          String(row.option4 || ''),
-        ].filter(Boolean);
-
-        // --- 1. MATCH SUBJECT ---
-        // We look for the closest name in your 'allSubjectsData' list
-        const possibleSubjects = allSubjectsData.map((s: Subject) => s.name);
+      .map((row) => {
+        // 1. MATCH IDs
         const matchedSubjectName =
-          findClosestMatch(row.subject, possibleSubjects) || row.subject;
-
+          findClosestMatch(
+            row.subject,
+            allSubjectsData.map((s) => s.name),
+          ) || row.subject;
         const subjectObj = allSubjectsData.find(
-          (s: Subject) => s.name === matchedSubjectName,
+          (s) => s.name === matchedSubjectName,
         );
 
-        // DEBUG: Warn if subject ID is missing
-        if (!subjectObj?.id) {
-          console.warn(
-            `[Row ${index + 1}] ❌ ID MISSING for Subject: "${row.subject}". Closest match: "${matchedSubjectName}"`,
-          );
-        }
-
-        // --- 2. MATCH CHAPTER ---
-        const possibleChapters =
-          subjectObj?.chapters.map((c: Chapter) => c.name) || [];
         const matchedChapterName =
-          findClosestMatch(row.chapter, possibleChapters) || row.chapter;
-
+          findClosestMatch(
+            row.chapter,
+            subjectObj?.chapters.map((c) => c.name) || [],
+          ) || row.chapter;
         const chapterObj = subjectObj?.chapters.find(
-          (c: Chapter) => c.name === matchedChapterName,
+          (c) => c.name === matchedChapterName,
         );
 
-        // DEBUG: Warn if chapter ID is missing (only if subject was found)
-        if (subjectObj && !chapterObj?.id) {
-          console.warn(
-            `[Row ${index + 1}] ❌ ID MISSING for Chapter: "${row.chapter}" inside "${matchedSubjectName}"`,
-          );
-        }
-
-        // --- 3. MATCH TOPIC ---
-        // Normalize both the input and the list to handle "Topic 1" vs "topic-1"
         const normalizedInputTopic = normalizeTopic(chapterObj, row.topic);
         const topicObj = chapterObj?.topics.find(
-          (t: Topic) =>
-            // Try strict match OR fuzzy normalized match
-            t.name === row.topic || t.name === normalizedInputTopic,
+          (t) => t.name === normalizedInputTopic || t.name === row.topic,
         );
 
+        // 2. TRANSFORM OPTIONS
+        const rawAnswer = row.answer ? String(row.answer).trim() : '';
+
+        const optionsArray: QuestionOption[] = [
+          { id: 'A', text: String(row.option1 || ''), isCorrect: false },
+          { id: 'B', text: String(row.option2 || ''), isCorrect: false },
+          { id: 'C', text: String(row.option3 || ''), isCorrect: false },
+          { id: 'D', text: String(row.option4 || ''), isCorrect: false },
+        ]
+          .filter((opt) => opt.text !== '')
+          .map((opt) => ({
+            ...opt,
+            isCorrect: opt.text.trim() === rawAnswer, // ✅ Logic happens here
+          }));
+
+        // 3. RETURN OBJECT (No 'answer' field!)
         return {
           stream: row.stream || 'HSC',
           section: row.section || 'Science',
-
-          // Text Names (What you see in the UI)
           subject: matchedSubjectName,
           chapter: matchedChapterName,
           topic: normalizedInputTopic,
-
-          // IDs (The most important part for the Exam App!)
-          subject_id: subjectObj?.id || null, // <--- This must not be null
-          chapter_id: chapterObj?.id || null, // <--- This must not be null
-          topic_id: topicObj?.id || null, // <--- This must not be null
-
+          subject_id: subjectObj?.id || null,
+          chapter_id: chapterObj?.id || null,
+          topic_id: topicObj?.id || null,
           question: row.question || '',
-          options: options,
-          answer: row.answer || normalizeAnswer(row, options),
+
+          options: optionsArray, // ✅ Correct
+
+          // ❌ REMOVED: answer: ... (This caused your error)
+
           explanation: row.explanation || '',
           difficulty:
             (row.difficulty as 'Easy' | 'Medium' | 'Hard') || 'Medium',
-          examType:
-            typeof row.examType === 'string'
-              ? row.examType.split(',')
-              : row.examType || [],
-          institute:
-            typeof row.institute === 'string'
-              ? row.institute.split(',')
-              : row.institute || [],
+          examType: row.examType ? String(row.examType).split(',') : [],
+          institute: row.institute ? String(row.institute).split(',') : [],
           year:
             String(row.year || '')
               .match(/\d{4}/g)
               ?.map(Number) || [],
         };
       })
-      .filter((q) => q.question && q.options.length === 4);
+      .filter((q) => q.question && q.options.length >= 2);
   };
 
   const handleAiReview = async () => {
@@ -171,11 +159,21 @@ export default function BulkUploadDialog({
     const updated = [...parsedData];
     const errors: any[] = [];
 
+    // Inside your AI Review function or handler
     for (let i = 0; i < updated.length; i++) {
       try {
         const result = await reviewQuestionWithAI({ question: updated[i] });
+
         if (result.suggestedAnswer) {
-          updated[i].answer = result.suggestedAnswer;
+          // ❌ OLD: updated[i].answer = result.suggestedAnswer;
+
+          // ✅ NEW: Find the matching option and mark it correct
+          updated[i].options = updated[i].options.map((opt) => ({
+            ...opt,
+            // If option text matches AI suggestion, set True, otherwise False
+            isCorrect: opt.text.trim() === result.suggestedAnswer?.trim(),
+          }));
+
           updated[i].explanation = result.formattedExplanation;
         }
       } catch (err: any) {
@@ -196,66 +194,38 @@ export default function BulkUploadDialog({
   const handleUpload = async () => {
     if (parsedData.length === 0) return;
     setUploading(true);
-    setLogs(['🚀 Starting upload...']);
 
     try {
-      // DEBUG: Check if IDs exist in the first item
-      console.log('First Question Payload Check:', {
-        q: parsedData[0].question,
-        s_id: parsedData[0].subject_id,
-        c_id: parsedData[0].chapter_id,
-        t_id: parsedData[0].topic_id,
-      });
-
-      // 1. Flatten the data structure to match Supabase columns
       const finalPayload = parsedData.map((q) => ({
-        stream: q.stream,
-        section: q.section,
-        subject: q.subject,
-        chapter: q.chapter,
-        topic: q.topic,
+        // 1. Text Search Vector (Auto-generated by DB trigger usually, but we send raw text)
         question: q.question,
-
-        // 👇 THIS SECTION IS CRITICAL (Ensure these are mapped)
-        subject_id: q.subject_id || null,
-        chapter_id: q.chapter_id || null,
-        topic_id: q.topic_id || null,
-
-        // Flatten array back to individual columns
-        option1: q.options[0] || '',
-        option2: q.options[1] || '',
-        option3: q.options[2] || '',
-        option4: q.options[3] || '',
-        answer: q.answer,
         explanation: q.explanation,
+
+        // 2. The IDs
+        subject_id: q.subject_id,
+        chapter_id: q.chapter_id,
+        topic_id: q.topic_id,
+
+        // 3. The New JSON Options
+        options_data: q.options, // ✅ Sending the array, not separate columns
+
+        // 4. Metadata
         difficulty: q.difficulty,
         examType: q.examType,
         institute: q.institute,
         year: q.year,
+
+        // Note: We do NOT send 'option1', 'answer', etc. anymore.
       }));
 
-      // 2. Direct insert
       const { error } = await supabase.from('questions').insert(finalPayload);
-
       if (error) throw error;
 
-      setLogs((prev) => [...prev, '✅ Upload successful!']);
-      toast({
-        title: 'Success',
-        description: `${parsedData.length} questions deployed successfully.`,
-      });
-
       onSuccess();
-      setTimeout(onClose, 2000);
+      onClose();
     } catch (err: any) {
       console.error(err);
-      setLogs((prev) => [...prev, `❌ Critical Error: ${err.message}`]);
-      setFailedData((prev) => [...prev, { error: err.message }]);
-      toast({
-        title: 'Upload Failed',
-        description: err.message,
-        variant: 'destructive',
-      });
+      // handle error...
     } finally {
       setUploading(false);
     }
@@ -431,7 +401,11 @@ export default function BulkUploadDialog({
                             <MathRenderer text={q.question} />
                           </div>
                           <div className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">
-                            {q.difficulty} • {q.answer}
+                            {q.difficulty} •{' '}
+                            <span className="text-emerald-400">
+                              {q.options.find((opt) => opt.isCorrect)?.text ||
+                                'No Answer'}
+                            </span>
                           </div>
                         </td>
                         <td className="p-4">

@@ -19,7 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { QuestionFormData } from '@/lib/types';
+// ✅ Import QuestionOption to handle the array types
+import { QuestionFormData, QuestionOption } from '@/lib/types';
 import { MathRenderer } from '@/components/math-renderer';
 
 interface QuestionFormDialogProps {
@@ -35,33 +36,48 @@ export function QuestionFormDialog({
   question,
   onSubmit,
 }: QuestionFormDialogProps) {
-  // Use QuestionFormData type to resolve 'any' errors
   const [formData, setFormData] = useState<QuestionFormData | null>(null);
 
   useEffect(() => {
     if (question) {
-      setFormData({ ...question });
+      // Deep copy to avoid mutating props directly
+      setFormData(JSON.parse(JSON.stringify(question)));
     }
   }, [question]);
 
   if (!formData) return null;
 
   const handleUpdate = async () => {
+    if (!formData) return;
     const success = await onSubmit(formData);
     if (success) {
       onOpenChange(false);
     }
   };
 
-  const updateOption = (index: number, value: string) => {
+  // ✅ New Logic: Update the text of a specific option
+  const updateOptionText = (index: number, text: string) => {
     const newOptions = [...formData.options];
-    newOptions[index] = value;
+    newOptions[index] = { ...newOptions[index], text };
     setFormData({ ...formData, options: newOptions });
   };
 
+  // ✅ New Logic: Handle "Radio Button" behavior for correct answer
+  const setCorrectOption = (selectedId: string) => {
+    const newOptions = formData.options.map((opt) => ({
+      ...opt,
+      // Set true only if IDs match, otherwise false
+      isCorrect: opt.id === selectedId,
+    }));
+    setFormData({ ...formData, options: newOptions });
+  };
+
+  // Helper to get current correct option ID for the Select component
+  const currentCorrectId = formData.options.find((o) => o.isCorrect)?.id || '';
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto text-black">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto text-black bg-white">
         <DialogHeader>
           <DialogTitle>Edit Question & Metadata</DialogTitle>
         </DialogHeader>
@@ -110,35 +126,51 @@ export function QuestionFormDialog({
             </div>
           </div>
 
-          {/* Options Grid */}
+          {/* ✅ Options Grid (Updated for Object Array) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {formData.options.map((opt, i) => (
-              <div key={i} className="space-y-1">
-                <Label className="text-xs">Option {i + 1}</Label>
-                <Input
-                  value={opt}
-                  onChange={(e) => updateOption(i, e.target.value)}
-                />
+              <div key={opt.id || i} className="space-y-1">
+                <Label className="text-xs flex justify-between">
+                  <span>Option {opt.id}</span>
+                  {opt.isCorrect && (
+                    <span className="text-emerald-600 font-bold text-[10px]">
+                      (Correct Answer)
+                    </span>
+                  )}
+                </Label>
+                <div className="flex gap-2">
+                  <div className="flex items-center justify-center w-8 h-10 bg-gray-100 rounded text-sm font-bold text-gray-500">
+                    {opt.id}
+                  </div>
+                  <Input
+                    value={opt.text}
+                    onChange={(e) => updateOptionText(i, e.target.value)}
+                    className={
+                      opt.isCorrect
+                        ? 'border-emerald-500 ring-1 ring-emerald-500'
+                        : ''
+                    }
+                  />
+                </div>
               </div>
             ))}
           </div>
 
-          {/* Answer Selection */}
+          {/* ✅ Answer Selection (Updated logic) */}
           <div className="space-y-2">
             <Label className="text-emerald-600 font-bold">
               Correct Answer Selection
             </Label>
-            <Select
-              value={formData.answer}
-              onValueChange={(val) => setFormData({ ...formData, answer: val })}
-            >
+            <Select value={currentCorrectId} onValueChange={setCorrectOption}>
               <SelectTrigger>
                 <SelectValue placeholder="Select correct option" />
               </SelectTrigger>
               <SelectContent>
-                {formData.options.map((opt, i) => (
-                  <SelectItem key={i} value={opt}>
-                    {opt || `Empty Option ${i + 1}`}
+                {formData.options.map((opt) => (
+                  <SelectItem key={opt.id} value={opt.id}>
+                    <span className="font-bold mr-2">{opt.id}.</span>
+                    {opt.text.substring(0, 30)}
+                    {opt.text.length > 30 && '...'}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -154,11 +186,12 @@ export function QuestionFormDialog({
                 setFormData({ ...formData, explanation: e.target.value })
               }
               placeholder="Provide solution steps using LaTeX..."
+              className="min-h-[100px]"
             />
           </div>
         </div>
 
-        <DialogFooter className="sticky bottom-0 bg-white pt-4">
+        <DialogFooter className="sticky bottom-0 bg-white pt-4 border-t border-gray-100">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
