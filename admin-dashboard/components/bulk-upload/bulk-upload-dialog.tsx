@@ -63,6 +63,9 @@ export default function BulkUploadDialog({
     q: QuestionFormData;
     i: number;
   } | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<string>('');
+  const [selectedChapter, setSelectedChapter] = useState<string>('');
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
   const { toast } = useToast();
 
@@ -84,73 +87,64 @@ export default function BulkUploadDialog({
   const processParsedData = (rawData: any[]): QuestionFormData[] => {
     return rawData
       .map((row) => {
-        // 1. MATCH IDs
-        const matchedSubjectName =
-          findClosestMatch(
-            row.subject,
-            allSubjectsData.map((s) => s.name),
-          ) || row.subject;
-        const subjectObj = allSubjectsData.find(
-          (s) => s.name === matchedSubjectName,
-        );
+        // 1. MATCH IDs (Use provided subject/chapter from row or fallback to selection)
+        const matchedSubjectName = row.subject?.toString() || '';
+        const matchedChapterName = row.chapter?.toString() || '';
 
-        const matchedChapterName =
-          findClosestMatch(
-            row.chapter,
-            subjectObj?.chapters.map((c) => c.name) || [],
-          ) || row.chapter;
-        const chapterObj = subjectObj?.chapters.find(
-          (c) => c.name === matchedChapterName,
-        );
+        // 2. PARSE OPTIONS (Ensure they map to your new Object structure)
+        const options: QuestionOption[] = [
+          { id: 'a', text: row.optionA?.toString() || '', isCorrect: false },
+          { id: 'b', text: row.optionB?.toString() || '', isCorrect: false },
+          { id: 'c', text: row.optionC?.toString() || '', isCorrect: false },
+          { id: 'd', text: row.optionD?.toString() || '', isCorrect: false },
+        ].map((opt) => ({
+          ...opt,
+          // Check if this option matches the "correctAnswer" column (e.g., "A" or "Option A")
+          isCorrect:
+            row.correctAnswer?.toString().toLowerCase().trim() === opt.id ||
+            row.correctAnswer?.toString().trim() === opt.text,
+        }));
 
-        const normalizedInputTopic = normalizeTopic(chapterObj, row.topic);
-        const topicObj = chapterObj?.topics.find(
-          (t) => t.name === normalizedInputTopic || t.name === row.topic,
-        );
-
-        // 2. TRANSFORM OPTIONS
-        const rawAnswer = row.answer ? String(row.answer).trim() : '';
-
-        const optionsArray: QuestionOption[] = [
-          { id: 'A', text: String(row.option1 || ''), isCorrect: false },
-          { id: 'B', text: String(row.option2 || ''), isCorrect: false },
-          { id: 'C', text: String(row.option3 || ''), isCorrect: false },
-          { id: 'D', text: String(row.option4 || ''), isCorrect: false },
-        ]
-          .filter((opt) => opt.text !== '')
-          .map((opt) => ({
-            ...opt,
-            isCorrect: opt.text.trim() === rawAnswer, // ✅ Logic happens here
-          }));
-
-        // 3. RETURN OBJECT (No 'answer' field!)
+        // 3. CONSTRUCT THE DATA (Fixing the Type Errors here)
         return {
-          stream: row.stream || 'HSC',
-          section: row.section || 'Science',
+          // IDs
+          subject_id: selectedSubject,
+          chapter_id: selectedChapter,
+          topic_id: selectedTopic || null,
+
+          // Metadata Strings
+          stream: row.stream?.toString() || '',
+          section: row.section?.toString() || '',
           subject: matchedSubjectName,
           chapter: matchedChapterName,
-          topic: normalizedInputTopic,
-          subject_id: subjectObj?.id || null,
-          chapter_id: chapterObj?.id || null,
-          topic_id: topicObj?.id || null,
-          question: row.question || '',
+          topic: row.topic?.toString() || '',
 
-          options: optionsArray, // ✅ Correct
+          // Content
+          question: row.question?.toString() || '',
+          options: options, // ✅ Now strictly QuestionOption[]
+          explanation: row.explanation?.toString() || '',
 
-          // ❌ REMOVED: answer: ... (This caused your error)
+          // ⚠️ FIX: Convert CSV arrays/numbers to Single Strings
+          difficulty: row.difficulty?.toString() || 'Medium',
 
-          explanation: row.explanation || '',
-          difficulty:
-            (row.difficulty as 'Easy' | 'Medium' | 'Hard') || 'Medium',
-          examType: row.examType ? String(row.examType).split(',') : [],
-          institute: row.institute ? String(row.institute).split(',') : [],
-          year:
-            String(row.year || '')
-              .match(/\d{4}/g)
-              ?.map(Number) || [],
-        };
+          // If CSV has "HSC, Admission", keep it. If array, join it.
+          examType: Array.isArray(row.examType)
+            ? row.examType.join(', ')
+            : row.examType?.toString() || '',
+
+          institute: Array.isArray(row.institute)
+            ? row.institute.join(', ')
+            : row.institute?.toString() || '',
+
+          // Ensure year is a string "2024", not number 2024
+          year: Array.isArray(row.year)
+            ? row.year.join(', ')
+            : row.year?.toString() || '',
+
+          status: 'pending',
+        } as QuestionFormData;
       })
-      .filter((q) => q.question && q.options.length >= 2);
+      .filter((q) => q.question); // Remove empty rows
   };
 
   const handleAiReview = async () => {
