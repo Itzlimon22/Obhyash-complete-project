@@ -202,9 +202,10 @@ export default function QuestionsPage() {
     toast,
   ]);
 
+  // ✅ CORRECT: Empty array [] means "Run only once when I enter the page"
   useEffect(() => {
     fetchQuestions();
-  }, [fetchQuestions]);
+  }, []);
 
   // Reset page and selection when filters change
   useEffect(() => {

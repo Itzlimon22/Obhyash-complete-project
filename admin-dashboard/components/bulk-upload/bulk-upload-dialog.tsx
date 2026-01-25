@@ -91,14 +91,16 @@ export default function BulkUploadDialog({
         const matchedSubjectName = findValue(row, ['subject', 'Subject']) || '';
         const matchedChapterName = findValue(row, ['chapter', 'Chapter']) || '';
 
-        // 2. PARSE OPTIONS (Smart Search)
-        // Looks for: "Option A", "optionA", "A", "a"
+        // 2. PARSE OPTIONS (Updated for numeric/text variations)
         const optA = findValue(row, [
           'optionA',
           'Option A',
           'OptionA',
           'A',
           'a',
+          'option1',
+          'Option 1',
+          '1',
         ]);
         const optB = findValue(row, [
           'optionB',
@@ -106,6 +108,9 @@ export default function BulkUploadDialog({
           'OptionB',
           'B',
           'b',
+          'option2',
+          'Option 2',
+          '2',
         ]);
         const optC = findValue(row, [
           'optionC',
@@ -113,6 +118,9 @@ export default function BulkUploadDialog({
           'OptionC',
           'C',
           'c',
+          'option3',
+          'Option 3',
+          '3',
         ]);
         const optD = findValue(row, [
           'optionD',
@@ -120,9 +128,12 @@ export default function BulkUploadDialog({
           'OptionD',
           'D',
           'd',
+          'option4',
+          'Option 4',
+          '4',
         ]);
 
-        // 3. PARSE IMAGES FOR OPTIONS (New Feature)
+        // 3. PARSE IMAGES FOR OPTIONS
         const imgA = findValue(row, ['optionA_image', 'Image A', 'Img A']);
         const imgB = findValue(row, ['optionB_image', 'Image B', 'Img B']);
         const imgC = findValue(row, ['optionC_image', 'Image C', 'Img C']);
@@ -135,7 +146,7 @@ export default function BulkUploadDialog({
           { id: 'd', text: optD, image_url: imgD, isCorrect: false },
         ].map((opt) => ({
           ...opt,
-          // Check correct answer against both 'A' and 'Actual Text'
+          // Check correct answer against 'A', '1', 'Option A', and the actual text
           isCorrect:
             findValue(row, [
               'correctAnswer',
@@ -164,7 +175,6 @@ export default function BulkUploadDialog({
           topic: findValue(row, ['topic', 'Topic']),
 
           question: findValue(row, ['question', 'Question', 'q']),
-          // ✅ Catch the main question image
           image_url: findValue(row, [
             'image',
             'image_url',
@@ -179,15 +189,12 @@ export default function BulkUploadDialog({
             'Explanation',
             'Solution',
           ]),
-          // ✅ Catch explanation image
           explanation_image_url: findValue(row, [
             'explanation_image',
             'Explanation Image',
           ]),
 
           difficulty: findValue(row, ['difficulty', 'Difficulty']) || 'Medium',
-
-          // Handle Array/String conversion safely
           examType: findValue(row, ['examType', 'Exam Type']),
           institute: findValue(row, ['institute', 'Institute']),
           year: findValue(row, ['year', 'Year']),
@@ -195,7 +202,7 @@ export default function BulkUploadDialog({
           status: 'pending',
         } as QuestionFormData;
       })
-      .filter((q) => q.question || q.image_url); // Keep if it has text OR image
+      .filter((q) => q.question || q.image_url);
   };
 
   const handleAiReview = async () => {
