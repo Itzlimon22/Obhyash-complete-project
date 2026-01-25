@@ -148,8 +148,8 @@ export default function QuestionsPage() {
   const fetchQuestions = useCallback(async () => {
     setLoading(true);
     try {
-      const from = currentPage * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
+      const from = currentPage * 20;
+      const to = from + 19;
 
       let query = supabase
         .from('questions')
@@ -157,13 +157,25 @@ export default function QuestionsPage() {
         .order('created_at', { ascending: false })
         .range(from, to);
 
-      if (activeTab !== 'all') query = query.eq('status', activeTab);
-      if (debouncedSearch)
+      // 1. Filter by Status
+      if (activeTab !== 'all') {
+        query = query.eq('status', activeTab);
+      }
+
+      // 2. Filter by Search Text (Only if text exists)
+      if (debouncedSearch && debouncedSearch.trim() !== '') {
         query = query.textSearch('search_vector', debouncedSearch);
-      if (selectedSubject !== 'all')
+      }
+
+      // 3. Filter by Subject
+      if (selectedSubject !== 'all') {
         query = query.eq('subject_id', selectedSubject);
-      if (selectedDifficulty !== 'all')
+      }
+
+      // 4. Filter by Difficulty
+      if (selectedDifficulty !== 'all') {
         query = query.eq('difficulty', selectedDifficulty);
+      }
 
       const { data, error, count } = await query;
       if (error) throw error;
@@ -171,6 +183,7 @@ export default function QuestionsPage() {
       setQuestions(data || []);
       setTotalCount(count || 0);
     } catch (err: any) {
+      console.error('Fetch error:', err);
       toast({
         title: 'Fetch Error',
         description: err.message,
@@ -179,6 +192,7 @@ export default function QuestionsPage() {
     } finally {
       setLoading(false);
     }
+    // ✅ Added currentPage to the dependencies to stop the loop
   }, [
     activeTab,
     debouncedSearch,
@@ -310,7 +324,7 @@ export default function QuestionsPage() {
           </Button>
           <Button
             className="bg-red-500 hover:bg-red-600 gap-2"
-            onClick={() => setIsAddOpen(true)} // ✅ Add this line
+            onClick={() => setIsAddOpen(true)} // ✅ This triggers the modal
           >
             <Plus className="w-4 h-4" /> Add Question
           </Button>

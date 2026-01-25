@@ -194,48 +194,42 @@ export default function BulkUploadDialog({
   const handleUpload = async () => {
     if (parsedData.length === 0) return;
     setUploading(true);
-    setLogs(['🚀 Starting upload...']);
+    setLogs(['🚀 Verifying admin session...']);
 
     try {
-      // 1. Get Current User (Admin) ID
+      // 1. Get Session instead of just User for better reliability
       const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
-      if (authError || !user) {
-        throw new Error('You must be logged in to upload questions.');
+      if (sessionError || !session) {
+        throw new Error('Session expired. Please log out and log back in.');
       }
 
-      // 2. Prepare Payload
+      const userId = session.user.id;
+      setLogs((prev) => [...prev, '✅ Session verified. Preparing payload...']);
+
+      // 2. Prepare Payload with the verified ID
       const finalPayload = parsedData.map((q) => ({
-        // --- Metadata ---
         stream: q.stream,
         section: q.section,
         subject: q.subject,
         chapter: q.chapter,
         topic: q.topic,
-
-        // --- IDs ---
         subject_id: q.subject_id,
         chapter_id: q.chapter_id,
         topic_id: q.topic_id,
-
-        // --- Question Data ---
         question: q.question,
-        options_data: q.options, // ✅ Correct JSONB column
+        options_data: q.options,
         explanation: q.explanation,
         difficulty: q.difficulty,
         examType: q.examType,
         institute: q.institute,
         year: q.year,
-
-        // --- Audit & Workflow ---
-        created_by: user.id,
-        status: 'pending', // 👈 ADDED: This ensures it goes to your new "Pending" tab!
+        status: 'pending', // Connects to your new workflow
+        created_by: userId, // ✅ Using verified ID from session
       }));
-
-      console.log('Payload Preview:', finalPayload[0]);
 
       // 3. Insert into Supabase
       const { error } = await supabase.from('questions').insert(finalPayload);
@@ -261,8 +255,6 @@ export default function BulkUploadDialog({
     } finally {
       setUploading(false);
     }
-
-    // ❌ DELETED: The dead code block that was here previously
   };
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
