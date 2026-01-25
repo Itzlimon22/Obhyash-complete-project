@@ -196,8 +196,9 @@ export default function QuestionsPage() {
   useEffect(() => {
     setCurrentPage(0);
     setSelectedIds([]);
+    // Ensure loading starts immediately when filters change
+    setLoading(true);
   }, [activeTab, debouncedSearch, selectedSubject, selectedDifficulty]);
-
   // --- ACTIONS ---
   const handleBulkStatusUpdate = async (newStatus: string) => {
     if (selectedIds.length === 0) return;
@@ -309,7 +310,7 @@ export default function QuestionsPage() {
           </Button>
           <Button
             className="bg-red-500 hover:bg-red-600 gap-2"
-            onClick={() => setIsAddOpen(true)}
+            onClick={() => setIsAddOpen(true)} // ✅ Add this line
           >
             <Plus className="w-4 h-4" /> Add Question
           </Button>
@@ -571,14 +572,26 @@ export default function QuestionsPage() {
           isOpen={isAddOpen}
           onOpenChange={setIsAddOpen}
           onSubmit={async (data) => {
-            const { error } = await supabase
-              .from('questions')
-              .insert([{ ...data, status: 'approved' }]);
+            const { error } = await supabase.from('questions').insert([
+              {
+                ...data,
+                status: 'approved',
+                created_by: (await supabase.auth.getUser()).data.user?.id,
+              },
+            ]);
+
             if (!error) {
               fetchQuestions();
               setIsAddOpen(false);
+              toast({ title: 'Success', description: 'Question created.' });
               return true;
             }
+
+            toast({
+              title: 'Error',
+              description: error.message,
+              variant: 'destructive',
+            });
             return false;
           }}
         />
