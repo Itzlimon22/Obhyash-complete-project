@@ -1,6 +1,7 @@
 'use client';
 
 import { Bell } from 'lucide-react';
+import { UserNav } from './user-nav'; // 👈 Import the new component
 
 export function Header() {
   return (
@@ -13,13 +14,8 @@ export function Header() {
             9+
           </span>
         </button>
-
-        {/* User Avatar */}
-        <div className="flex items-center gap-3 cursor-pointer">
-          <div className="w-9 h-9 rounded-full bg-[#1f1f23] flex items-center justify-center text-white font-medium border border-white/10 hover:border-white/30 transition-colors">
-            A
-          </div>
-        </div>
+        {/* User Profile Dropdown */}
+        <UserNav /> {/* 👈 Replaces the static 'A' div */}
       </div>
     </header>
   );
