@@ -60,4 +60,5 @@ export interface QuestionFormData {
   institute: string[];
   year: number[];
   status?: 'pending' | 'approved' | 'rejected';
+  created_at?: string;
 }

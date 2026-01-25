@@ -209,34 +209,33 @@ export default function BulkUploadDialog({
 
       // 2. Prepare Payload
       const finalPayload = parsedData.map((q) => ({
-        // --- The Missing Text Fields ---
-        stream: q.stream, // e.g. "HSC"
-        section: q.section, // e.g. "Science"
-        subject: q.subject, // e.g. "রসায়ন ১ম পত্র" (Text Name)
-        chapter: q.chapter, // e.g. "ল্যাবরেটরীর নিরাপদ ব্যবহার" (Text Name)
-        topic: q.topic, // e.g. "1"
+        // --- Metadata ---
+        stream: q.stream,
+        section: q.section,
+        subject: q.subject,
+        chapter: q.chapter,
+        topic: q.topic,
 
-        // --- The IDs (Critical for Relations) ---
+        // --- IDs ---
         subject_id: q.subject_id,
         chapter_id: q.chapter_id,
         topic_id: q.topic_id,
 
-        // --- The Question Data ---
+        // --- Question Data ---
         question: q.question,
-        options_data: q.options, // The JSONB array
+        options_data: q.options, // ✅ Correct JSONB column
         explanation: q.explanation,
-
-        // --- Metadata ---
         difficulty: q.difficulty,
         examType: q.examType,
         institute: q.institute,
         year: q.year,
 
-        // --- Audit Field ---
-        created_by: user.id, // ✅ Fixes the empty created_by field
+        // --- Audit & Workflow ---
+        created_by: user.id,
+        status: 'pending', // 👈 ADDED: This ensures it goes to your new "Pending" tab!
       }));
 
-      console.log('Payload Preview:', finalPayload[0]); // Debugging
+      console.log('Payload Preview:', finalPayload[0]);
 
       // 3. Insert into Supabase
       const { error } = await supabase.from('questions').insert(finalPayload);
@@ -246,7 +245,7 @@ export default function BulkUploadDialog({
       setLogs((prev) => [...prev, '✅ Upload successful!']);
       toast({
         title: 'Success',
-        description: `${parsedData.length} questions deployed successfully.`,
+        description: `${parsedData.length} questions sent to Pending queue.`,
       });
 
       onSuccess();
@@ -262,6 +261,8 @@ export default function BulkUploadDialog({
     } finally {
       setUploading(false);
     }
+
+    // ❌ DELETED: The dead code block that was here previously
   };
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
