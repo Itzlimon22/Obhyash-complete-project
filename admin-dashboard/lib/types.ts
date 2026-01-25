@@ -38,6 +38,7 @@ export interface QuestionFormData {
   subject_id?: string | null;
   chapter_id?: string | null;
   topic_id?: string | null;
+  id?: string;
 
   // Metadata
   stream: string;
@@ -58,4 +59,5 @@ export interface QuestionFormData {
   examType: string[];
   institute: string[];
   year: number[];
+  status?: 'pending' | 'approved' | 'rejected';
 }
