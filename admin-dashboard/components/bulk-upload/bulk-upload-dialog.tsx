@@ -13,24 +13,12 @@ import {
   Trash2,
   Wand2,
   Download,
-  AlertCircle,
+  ImageIcon,
 } from 'lucide-react';
 
 // Internal Utils & Types
-import { findClosestMatch } from '@/lib/utils/fuzzy-match';
-import { normalizeTopic, normalizeAnswer } from '@/lib/utils/normalization';
-import {
-  Subject,
-  Chapter,
-  QuestionFormData,
-  QuestionOption,
-  Topic,
-} from '@/lib/types';
-
-// ✅ CRITICAL: Import from the file that has the IDs
-import { hscSubjects as allSubjectsData } from '@/lib/data/hsc';
-
-// import { addQuestionsInBulk } from '@/ai/flows/manage-questions'; // <-- Not needed for direct upload
+import { QuestionFormData, QuestionOption } from '@/lib/types';
+import { hscSubjects as allSubjectsData } from '@/lib/data/hsc'; // ✅ Keep your specific data import
 import { reviewQuestionWithAI } from '@/ai/flows/review-question-flow';
 
 // UI Components
@@ -39,6 +27,7 @@ import { Progress } from '@/components/ui/progress';
 import { MathRenderer } from '@/components/math-renderer';
 import { QuestionFormDialog } from './question-form-dialog';
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -69,7 +58,6 @@ export default function BulkUploadDialog({
 
   const { toast } = useToast();
 
-  // Helper to download logs
   const downloadErrorLogs = () => {
     const blob = new Blob([JSON.stringify(failedData, null, 2)], {
       type: 'application/json',
@@ -82,69 +70,132 @@ export default function BulkUploadDialog({
     URL.revokeObjectURL(url);
   };
 
-  // Inside bulk-upload-dialog.tsx
+  // ✅ HELPER: Smart Case-Insensitive Search
+  const findValue = (row: any, possibleKeys: string[]): string => {
+    const rowKeys = Object.keys(row);
+    for (const target of possibleKeys) {
+      const foundKey = rowKeys.find(
+        (k) => k.toLowerCase().trim() === target.toLowerCase().trim(),
+      );
+      if (foundKey && row[foundKey]) {
+        return row[foundKey].toString().trim();
+      }
+    }
+    return '';
+  };
 
   const processParsedData = (rawData: any[]): QuestionFormData[] => {
     return rawData
       .map((row) => {
-        // 1. MATCH IDs (Use provided subject/chapter from row or fallback to selection)
-        const matchedSubjectName = row.subject?.toString() || '';
-        const matchedChapterName = row.chapter?.toString() || '';
+        // 1. MATCH IDs
+        const matchedSubjectName = findValue(row, ['subject', 'Subject']) || '';
+        const matchedChapterName = findValue(row, ['chapter', 'Chapter']) || '';
 
-        // 2. PARSE OPTIONS (Ensure they map to your new Object structure)
+        // 2. PARSE OPTIONS (Smart Search)
+        // Looks for: "Option A", "optionA", "A", "a"
+        const optA = findValue(row, [
+          'optionA',
+          'Option A',
+          'OptionA',
+          'A',
+          'a',
+        ]);
+        const optB = findValue(row, [
+          'optionB',
+          'Option B',
+          'OptionB',
+          'B',
+          'b',
+        ]);
+        const optC = findValue(row, [
+          'optionC',
+          'Option C',
+          'OptionC',
+          'C',
+          'c',
+        ]);
+        const optD = findValue(row, [
+          'optionD',
+          'Option D',
+          'OptionD',
+          'D',
+          'd',
+        ]);
+
+        // 3. PARSE IMAGES FOR OPTIONS (New Feature)
+        const imgA = findValue(row, ['optionA_image', 'Image A', 'Img A']);
+        const imgB = findValue(row, ['optionB_image', 'Image B', 'Img B']);
+        const imgC = findValue(row, ['optionC_image', 'Image C', 'Img C']);
+        const imgD = findValue(row, ['optionD_image', 'Image D', 'Img D']);
+
         const options: QuestionOption[] = [
-          { id: 'a', text: row.optionA?.toString() || '', isCorrect: false },
-          { id: 'b', text: row.optionB?.toString() || '', isCorrect: false },
-          { id: 'c', text: row.optionC?.toString() || '', isCorrect: false },
-          { id: 'd', text: row.optionD?.toString() || '', isCorrect: false },
+          { id: 'a', text: optA, image_url: imgA, isCorrect: false },
+          { id: 'b', text: optB, image_url: imgB, isCorrect: false },
+          { id: 'c', text: optC, image_url: imgC, isCorrect: false },
+          { id: 'd', text: optD, image_url: imgD, isCorrect: false },
         ].map((opt) => ({
           ...opt,
-          // Check if this option matches the "correctAnswer" column (e.g., "A" or "Option A")
+          // Check correct answer against both 'A' and 'Actual Text'
           isCorrect:
-            row.correctAnswer?.toString().toLowerCase().trim() === opt.id ||
-            row.correctAnswer?.toString().trim() === opt.text,
+            findValue(row, [
+              'correctAnswer',
+              'Correct Answer',
+              'Answer',
+              'ans',
+            ]).toLowerCase() === opt.id ||
+            findValue(row, [
+              'correctAnswer',
+              'Correct Answer',
+              'Answer',
+              'ans',
+            ]) === opt.text,
         }));
 
-        // 3. CONSTRUCT THE DATA (Fixing the Type Errors here)
+        // 4. CONSTRUCT DATA
         return {
-          // IDs
           subject_id: selectedSubject,
           chapter_id: selectedChapter,
           topic_id: selectedTopic || null,
 
-          // Metadata Strings
-          stream: row.stream?.toString() || '',
-          section: row.section?.toString() || '',
+          stream: findValue(row, ['stream', 'Stream']),
+          section: findValue(row, ['section', 'Section']),
           subject: matchedSubjectName,
           chapter: matchedChapterName,
-          topic: row.topic?.toString() || '',
+          topic: findValue(row, ['topic', 'Topic']),
 
-          // Content
-          question: row.question?.toString() || '',
-          options: options, // ✅ Now strictly QuestionOption[]
-          explanation: row.explanation?.toString() || '',
+          question: findValue(row, ['question', 'Question', 'q']),
+          // ✅ Catch the main question image
+          image_url: findValue(row, [
+            'image',
+            'image_url',
+            'Question Image',
+            'Img',
+          ]),
 
-          // ⚠️ FIX: Convert CSV arrays/numbers to Single Strings
-          difficulty: row.difficulty?.toString() || 'Medium',
+          options: options,
 
-          // If CSV has "HSC, Admission", keep it. If array, join it.
-          examType: Array.isArray(row.examType)
-            ? row.examType.join(', ')
-            : row.examType?.toString() || '',
+          explanation: findValue(row, [
+            'explanation',
+            'Explanation',
+            'Solution',
+          ]),
+          // ✅ Catch explanation image
+          explanation_image_url: findValue(row, [
+            'explanation_image',
+            'Explanation Image',
+          ]),
 
-          institute: Array.isArray(row.institute)
-            ? row.institute.join(', ')
-            : row.institute?.toString() || '',
+          difficulty: findValue(row, ['difficulty', 'Difficulty']) || 'Medium',
 
-          // Ensure year is a string "2024", not number 2024
-          year: Array.isArray(row.year)
-            ? row.year.join(', ')
-            : row.year?.toString() || '',
+          // Handle Array/String conversion safely
+          examType: findValue(row, ['examType', 'Exam Type']),
+          institute: findValue(row, ['institute', 'Institute']),
+          year: findValue(row, ['year', 'Year']),
 
           status: 'pending',
         } as QuestionFormData;
       })
-      .filter((q) => q.question); // Remove empty rows
+      .filter((q) => q.question || q.image_url); // Keep if it has text OR image
   };
 
   const handleAiReview = async () => {
@@ -153,21 +204,15 @@ export default function BulkUploadDialog({
     const updated = [...parsedData];
     const errors: any[] = [];
 
-    // Inside your AI Review function or handler
     for (let i = 0; i < updated.length; i++) {
       try {
         const result = await reviewQuestionWithAI({ question: updated[i] });
 
         if (result.suggestedAnswer) {
-          // ❌ OLD: updated[i].answer = result.suggestedAnswer;
-
-          // ✅ NEW: Find the matching option and mark it correct
           updated[i].options = updated[i].options.map((opt) => ({
             ...opt,
-            // If option text matches AI suggestion, set True, otherwise False
             isCorrect: opt.text.trim() === result.suggestedAnswer?.trim(),
           }));
-
           updated[i].explanation = result.formattedExplanation;
         }
       } catch (err: any) {
@@ -191,20 +236,15 @@ export default function BulkUploadDialog({
     setLogs(['🚀 Verifying admin session...']);
 
     try {
-      // 1. Get Session instead of just User for better reliability
       const {
         data: { session },
         error: sessionError,
       } = await supabase.auth.getSession();
-
-      if (sessionError || !session) {
-        throw new Error('Session expired. Please log out and log back in.');
-      }
+      if (sessionError || !session) throw new Error('Session expired.');
 
       const userId = session.user.id;
       setLogs((prev) => [...prev, '✅ Session verified. Preparing payload...']);
 
-      // 2. Prepare Payload with the verified ID
       const finalPayload = parsedData.map((q) => ({
         stream: q.stream,
         section: q.section,
@@ -215,25 +255,25 @@ export default function BulkUploadDialog({
         chapter_id: q.chapter_id,
         topic_id: q.topic_id,
         question: q.question,
-        options_data: q.options,
+        image_url: q.image_url, // ✅ Pass image URL
+        options_data: q.options, // ✅ Pass options with their images
         explanation: q.explanation,
+        explanation_image_url: q.explanation_image_url, // ✅ Pass explanation image
         difficulty: q.difficulty,
         examType: q.examType,
         institute: q.institute,
         year: q.year,
-        status: 'pending', // Connects to your new workflow
-        created_by: userId, // ✅ Using verified ID from session
+        status: 'pending',
+        created_by: userId,
       }));
 
-      // 3. Insert into Supabase
       const { error } = await supabase.from('questions').insert(finalPayload);
-
       if (error) throw error;
 
       setLogs((prev) => [...prev, '✅ Upload successful!']);
       toast({
         title: 'Success',
-        description: `${parsedData.length} questions sent to Pending queue.`,
+        description: `${parsedData.length} questions deployed.`,
       });
 
       onSuccess();
@@ -253,43 +293,22 @@ export default function BulkUploadDialog({
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
-
-    // 🟢 HANDLE JSON FILES
     if (file.name.endsWith('.json') || file.type === 'application/json') {
       const reader = new FileReader();
       reader.onload = async (e) => {
         try {
           const jsonRaw = JSON.parse(e.target?.result as string);
-          // Ensure it's an array
           const rawArray = Array.isArray(jsonRaw) ? jsonRaw : [jsonRaw];
-
-          // Map your specific JSON format to expected format
-          // Specifically converts "answer": "option3" -> "Actual Answer Text"
-          const normalizedRaw = rawArray.map((item: any) => {
-            let realAnswer = item.answer;
-            if (item.answer === 'option1') realAnswer = item.option1;
-            else if (item.answer === 'option2') realAnswer = item.option2;
-            else if (item.answer === 'option3') realAnswer = item.option3;
-            else if (item.answer === 'option4') realAnswer = item.option4;
-
-            return {
-              ...item,
-              answer: realAnswer,
-              year: item.year, // Pass year as-is for processing by processParsedData
-            };
-          });
-
-          setParsedData(processParsedData(normalizedRaw));
+          setParsedData(processParsedData(rawArray));
           setStep(2);
           toast({
             title: 'Success',
-            description: `Loaded ${rawArray.length} questions from JSON`,
+            description: `Loaded ${rawArray.length} questions`,
           });
         } catch (err) {
-          console.error(err);
           toast({
             title: 'Error',
-            description: 'Invalid JSON format',
+            description: 'Invalid JSON',
             variant: 'destructive',
           });
         }
@@ -298,40 +317,38 @@ export default function BulkUploadDialog({
       return;
     }
 
-    // 🟢 HANDLE EXCEL FILES
     try {
       const workbook = new ExcelJS.Workbook();
       await workbook.xlsx.load(await file.arrayBuffer());
       const worksheet = workbook.getWorksheet(1);
       let raw: any[] = [];
+
+      // ✅ Improved Excel Parsing: Get headers from Row 1 to use as keys
+      const headers: string[] = [];
+      worksheet?.getRow(1).eachCell((cell, colNumber) => {
+        headers[colNumber] = cell.text;
+      });
+
       worksheet?.eachRow((row, rowNumber) => {
         if (rowNumber === 1) return;
-        const v = Array.isArray(row.values) ? row.values.slice(1) : [];
-        raw.push({
-          stream: v[0],
-          section: v[1],
-          subject: v[2],
-          chapter: v[3],
-          topic: v[4],
-          question: v[5],
-          option1: v[6],
-          option2: v[7],
-          option3: v[8],
-          option4: v[9],
-          answer: v[10],
-          explanation: v[11],
-          difficulty: v[12],
-          examType: v[13],
-          institute: v[14],
-          year: v[15],
+
+        // Construct an object where keys are the headers from row 1
+        const rowData: any = {};
+        row.eachCell((cell, colNumber) => {
+          if (headers[colNumber]) {
+            rowData[headers[colNumber]] = cell.text; // map "Option A" -> value
+          }
         });
+        raw.push(rowData);
       });
+
       setParsedData(processParsedData(raw));
       setStep(2);
     } catch (err) {
+      console.error(err);
       toast({
         title: 'Error',
-        description: 'Could not parse Excel file',
+        description: 'Could not parse Excel',
         variant: 'destructive',
       });
     }
@@ -350,6 +367,7 @@ export default function BulkUploadDialog({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white w-full max-w-5xl h-[85vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl">
+        {/* Header */}
         <div className="p-6 border-b flex justify-between items-center bg-slate-50">
           <div>
             <h2 className="text-xl font-bold text-slate-800">
@@ -364,6 +382,7 @@ export default function BulkUploadDialog({
           </Button>
         </div>
 
+        {/* Content */}
         <div className="flex-1 p-6 overflow-hidden bg-white">
           {step === 1 ? (
             <div
@@ -377,9 +396,6 @@ export default function BulkUploadDialog({
               <p className="font-semibold text-slate-700">
                 Click or drag Excel or JSON file here
               </p>
-              <p className="text-sm text-slate-400 mt-1">
-                Supports standard 16-column Excel or JSON format
-              </p>
             </div>
           ) : (
             <div className="h-full flex flex-col gap-4">
@@ -387,7 +403,7 @@ export default function BulkUploadDialog({
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
                   <div className="flex justify-between text-xs mb-2">
                     <span className="font-medium text-blue-700">
-                      Gemini AI Fact-Checking...
+                      AI Fact-Checking...
                     </span>
                     <span>{Math.round(aiProgress)}%</span>
                   </div>
@@ -395,7 +411,7 @@ export default function BulkUploadDialog({
                 </div>
               )}
 
-              <div className="flex-1 border rounded-xl overflow-hidden shadow-sm">
+              <div className="flex-1 border rounded-xl overflow-hidden shadow-sm overflow-y-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-50 border-b sticky top-0 z-10">
                     <tr>
@@ -403,7 +419,7 @@ export default function BulkUploadDialog({
                         Question Content
                       </th>
                       <th className="p-4 text-left font-semibold text-slate-600">
-                        Subject/Chapter
+                        Context
                       </th>
                       <th className="p-4 text-right font-semibold text-slate-600">
                         Actions
@@ -417,15 +433,35 @@ export default function BulkUploadDialog({
                         className="hover:bg-slate-50 transition-colors"
                       >
                         <td className="p-4 max-w-md">
+                          {/* ✅ PREVIEW FIX: Show Question Image */}
+                          {q.image_url && (
+                            <div className="mb-2 relative h-20 w-32 border rounded overflow-hidden">
+                              <Image
+                                src={q.image_url}
+                                alt="Q"
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          )}
+
                           <div className="truncate font-medium text-slate-800">
                             <MathRenderer text={q.question} />
                           </div>
-                          <div className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">
-                            {q.difficulty} •{' '}
-                            <span className="text-emerald-400">
-                              {q.options.find((opt) => opt.isCorrect)?.text ||
-                                'No Answer'}
-                            </span>
+
+                          {/* ✅ PREVIEW FIX: Show Options Info */}
+                          <div className="flex gap-2 mt-2">
+                            {q.options.map((opt) => (
+                              <div
+                                key={opt.id}
+                                className={`text-[10px] px-2 py-1 rounded border ${opt.isCorrect ? 'bg-emerald-100 border-emerald-300 text-emerald-700 font-bold' : 'bg-slate-50 text-slate-500'}`}
+                              >
+                                {opt.id.toUpperCase()}
+                                {opt.image_url && (
+                                  <ImageIcon className="inline w-3 h-3 ml-1" />
+                                )}
+                              </div>
+                            ))}
                           </div>
                         </td>
                         <td className="p-4">
@@ -441,19 +477,19 @@ export default function BulkUploadDialog({
                             variant="ghost"
                             size="icon"
                             onClick={() => setEditingQuestion({ q, i })}
-                            className="text-blue-600 hover:text-blue-700"
+                            className="text-blue-600"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-red-500 hover:text-red-600"
                             onClick={() =>
                               setParsedData((prev) =>
                                 prev.filter((_, idx) => idx !== i),
                               )
                             }
+                            className="text-red-500"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -464,18 +500,20 @@ export default function BulkUploadDialog({
                 </table>
               </div>
 
+              {/* Logs */}
               <div className="h-24 bg-slate-900 text-emerald-400 p-3 font-mono text-[10px] rounded-lg overflow-auto shadow-inner border border-slate-800">
                 {logs.length === 0
                   ? '> Initialized system... awaiting action'
                   : logs.map((l, i) => <div key={i}>{`> ${l}`}</div>)}
                 {failedData.length > 0 && (
-                  <div className="text-red-400">{`> Found ${failedData.length} issues during processing.`}</div>
+                  <div className="text-red-400">{`> Found ${failedData.length} issues.`}</div>
                 )}
               </div>
             </div>
           )}
         </div>
 
+        {/* Footer */}
         <div className="p-4 border-t flex justify-between items-center bg-slate-50">
           <div>
             {failedData.length > 0 && (
@@ -483,10 +521,9 @@ export default function BulkUploadDialog({
                 variant="outline"
                 size="sm"
                 onClick={downloadErrorLogs}
-                className="text-red-600 border-red-200 hover:bg-red-50"
+                className="text-red-600 border-red-200"
               >
-                <Download className="mr-2 h-4 w-4" /> Download Error Log (
-                {failedData.length})
+                <Download className="mr-2 h-4 w-4" /> Error Log
               </Button>
             )}
           </div>

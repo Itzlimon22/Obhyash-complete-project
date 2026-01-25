@@ -1,3 +1,4 @@
+// File: lib/types.ts
 import { LucideIcon } from 'lucide-react';
 
 // --- 1. Static Content Types ---
@@ -28,8 +29,9 @@ export interface Subject {
 
 // ✅ Export this so other files can find it
 export interface QuestionOption {
-  id: string;        // "a", "b", "c", "d"
-  text: string;      // "Newton"
+  id: string;         // "a", "b", "c", "d"
+  text: string;       // "Newton"
+  image_url?: string; // ✅ NEW: Support images for options (A, B, C, D)
   isCorrect: boolean; // true/false
 }
 
@@ -49,13 +51,14 @@ export interface QuestionFormData {
 
   // Content
   question: string;
-  image_url?: string; // ✅ Added to support R2 Image Uploads
+  image_url?: string; // Main Question Image
 
   // ✅ New Structure: Array of Option Objects
   options: QuestionOption[]; 
   
   // Explanation & Categorization
   explanation: string;
+  explanation_image_url?: string; // ✅ NEW: Support image for explanation
   
   // ⚠️ FIX: Changed these from Arrays to Strings to match the Form Inputs
   difficulty: string; 
