@@ -1,6 +1,6 @@
-// File: lib/widgets/exam/exam_setup_form.dart
 import 'package:flutter/material.dart';
-import '../../models/exam_types.dart'; // Ensure this path is correct
+import 'package:supabase_flutter/supabase_flutter.dart'; // ✅ Added for DB
+import '../../models/exam_types.dart';
 
 class ExamSetupForm extends StatefulWidget {
   final Function(ExamConfig) onStartExam;
@@ -18,11 +18,13 @@ class ExamSetupForm extends StatefulWidget {
 
 class _ExamSetupFormState extends State<ExamSetupForm> {
   // --- STATE ---
-  String? _selectedSubject;
+  String?
+  _selectedSubject; // Stores Subject NAME now (for simplicity in config)
+  String? _selectedChapter;
+  String? _selectedTopic;
+
   final List<String> _selectedExamTypes = ['Academic'];
 
-  final TextEditingController _chaptersController = TextEditingController();
-  final TextEditingController _topicsController = TextEditingController();
   final TextEditingController _questionCountController = TextEditingController(
     text: '20',
   );
@@ -30,20 +32,19 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
     text: '20',
   );
 
-  String _selectedDifficulty = 'Mixed'; // Maps to Difficulty enum
+  String _selectedDifficulty = 'Mixed';
   final double _negativeMarking = 0.25;
 
-  // --- DATA ---
-  final List<Map<String, String>> _subjects = [
-    {'id': 'Physics', 'label': 'পদার্থবিজ্ঞান (Physics)'},
-    {'id': 'Chemistry', 'label': 'রসায়ন (Chemistry)'},
-    {'id': 'Math', 'label': 'উচ্চতর গণিত (Higher Math)'},
-    {'id': 'Biology', 'label': 'জীববিজ্ঞান (Biology)'},
-    {'id': 'Bangla', 'label': 'বাংলা (Bangla)'},
-    {'id': 'English', 'label': 'English'},
-    {'id': 'GK', 'label': 'সাধারণ জ্ঞান (General Knowledge)'},
-  ];
+  // --- DYNAMIC DATA ---
+  List<Map<String, dynamic>> _subjectsData = [];
+  List<Map<String, dynamic>> _chaptersData = [];
+  List<Map<String, dynamic>> _topicsData = [];
 
+  bool _loadingSubjects = true;
+  bool _loadingChapters = false;
+  bool _loadingTopics = false;
+
+  // --- STATIC OPTIONS ---
   final List<String> _examTypeOptions = [
     'Academic',
     'Medical Admission',
@@ -52,6 +53,101 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
     'Main Book',
     'Mixed',
   ];
+
+  final List<String> _difficulties = ['Easy', 'Medium', 'Hard', 'Mixed'];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSubjects();
+  }
+
+  // --- DATA FETCHING ---
+
+  Future<void> _fetchSubjects() async {
+    try {
+      final response = await Supabase.instance.client
+          .from('subjects')
+          .select('id, name')
+          .order('name', ascending: true);
+
+      if (mounted) {
+        setState(() {
+          _subjectsData = List<Map<String, dynamic>>.from(response);
+          _loadingSubjects = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("Error fetching subjects: $e");
+      if (mounted) setState(() => _loadingSubjects = false);
+    }
+  }
+
+  Future<void> _fetchChapters(String subjectName) async {
+    setState(() {
+      _loadingChapters = true;
+      _chaptersData = [];
+      _selectedChapter = null;
+      _topicsData = [];
+      _selectedTopic = null;
+    });
+
+    try {
+      final subject = _subjectsData.firstWhere(
+        (e) => e['name'] == subjectName,
+        orElse: () => {},
+      );
+      if (subject.isEmpty) return;
+
+      final response = await Supabase.instance.client
+          .from('chapters')
+          .select('id, name')
+          .eq('subject_id', subject['id'])
+          .order('name', ascending: true);
+
+      if (mounted) {
+        setState(() {
+          _chaptersData = List<Map<String, dynamic>>.from(response);
+          _loadingChapters = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("Error fetching chapters: $e");
+      if (mounted) setState(() => _loadingChapters = false);
+    }
+  }
+
+  Future<void> _fetchTopics(String chapterName) async {
+    setState(() {
+      _loadingTopics = true;
+      _topicsData = [];
+      _selectedTopic = null;
+    });
+
+    try {
+      final chapter = _chaptersData.firstWhere(
+        (e) => e['name'] == chapterName,
+        orElse: () => {},
+      );
+      if (chapter.isEmpty) return;
+
+      final response = await Supabase.instance.client
+          .from('topics')
+          .select('id, name')
+          .eq('chapter_id', chapter['id'])
+          .order('name', ascending: true);
+
+      if (mounted) {
+        setState(() {
+          _topicsData = List<Map<String, dynamic>>.from(response);
+          _loadingTopics = false;
+        });
+      }
+    } catch (e) {
+      debugPrint("Error fetching topics: $e");
+      if (mounted) setState(() => _loadingTopics = false);
+    }
+  }
 
   // --- LOGIC ---
   void _toggleExamType(String type) {
@@ -69,21 +165,11 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
   void _handleSubmit() {
     if (_selectedSubject == null) return;
 
-    // Find the label for the subject ID
-    final subjectLabel = _subjects.firstWhere(
-      (s) => s['id'] == _selectedSubject,
-      orElse: () => {'label': _selectedSubject!},
-    )['label'];
-
     final config = ExamConfig(
-      subject: subjectLabel!,
-      examType: _selectedExamTypes.join(' + '),
-      chapters: _chaptersController.text.isNotEmpty
-          ? _chaptersController.text
-          : 'All',
-      topics: _topicsController.text.isNotEmpty
-          ? _topicsController.text
-          : 'General',
+      subject: _selectedSubject!,
+      examType: _selectedExamTypes.join(','), // CSV for backend
+      chapters: _selectedChapter ?? 'All',
+      topics: _selectedTopic ?? 'All',
       difficulty: _selectedDifficulty,
       questionCount: int.tryParse(_questionCountController.text) ?? 20,
       durationMinutes: int.tryParse(_durationController.text) ?? 20,
@@ -101,27 +187,22 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
         color: isDark ? Colors.grey[400] : Colors.grey[600],
       ),
       filled: true,
-      fillColor: isDark
-          ? const Color(0xFF121212)
-          : Colors.grey[50], // slate-800/50 : slate-50
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 12,
-      ), // Reduced Padding
+      fillColor: isDark ? const Color(0xFF121212) : Colors.grey[50],
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10), // 12 -> 10
+        borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide(
           color: isDark ? Colors.white10 : Colors.grey.shade300,
         ),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10), // 12 -> 10
+        borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide(
           color: isDark ? Colors.white10 : Colors.grey.shade300,
         ),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10), // 12 -> 10
+        borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(color: Colors.indigo, width: 2),
       ),
     );
@@ -133,7 +214,7 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
     final textColor = isDark ? Colors.white : Colors.black87;
 
     return Container(
-      padding: const EdgeInsets.all(20), // 24 -> 20
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -172,42 +253,98 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
           ),
           const SizedBox(height: 32),
 
-          // 1. Subject Dropdown
-          DropdownButtonFormField<String>(
-            value: _selectedSubject,
-            items: _subjects.map((s) {
-              return DropdownMenuItem(value: s['id'], child: Text(s['label']!));
-            }).toList(),
-            onChanged: (val) => setState(() => _selectedSubject = val),
-            decoration: _inputDecoration("বিষয়", isDark),
-            dropdownColor: isDark ? const Color(0xFF121212) : Colors.white,
-            style: TextStyle(color: textColor, fontSize: 16),
-          ),
+          // 1. SUBJECT Dropdown (Fetched from DB)
+          _loadingSubjects
+              ? const Center(child: CircularProgressIndicator())
+              : DropdownButtonFormField<String>(
+                  value: _selectedSubject,
+                  items: _subjectsData.map((s) {
+                    return DropdownMenuItem(
+                      value: s['name'].toString(),
+                      child: Text(s['name'].toString()),
+                    );
+                  }).toList(),
+                  onChanged: (val) {
+                    setState(() => _selectedSubject = val);
+                    if (val != null) _fetchChapters(val);
+                  },
+                  decoration: _inputDecoration("বিষয় (Subject)", isDark),
+                  dropdownColor: isDark
+                      ? const Color(0xFF121212)
+                      : Colors.white,
+                  style: TextStyle(color: textColor, fontSize: 16),
+                ),
           const SizedBox(height: 24),
 
-          // 2. Chapters & Topics
+          // 2. Chapters & Topics (Dynamic)
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Chapter Dropdown
               Expanded(
-                child: TextField(
-                  controller: _chaptersController,
-                  style: TextStyle(color: textColor),
-                  decoration: _inputDecoration("অধ্যায় (উদাঃ গতি)", isDark),
-                ),
+                child: _loadingChapters
+                    ? const Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : DropdownButtonFormField<String>(
+                        value: _selectedChapter,
+                        items: _chaptersData.map((c) {
+                          return DropdownMenuItem(
+                            value: c['name'].toString(),
+                            child: Text(c['name'].toString()),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          setState(() => _selectedChapter = val);
+                          if (val != null) _fetchTopics(val);
+                        },
+                        decoration: _inputDecoration("অধ্যায়", isDark),
+                        dropdownColor: isDark
+                            ? const Color(0xFF121212)
+                            : Colors.white,
+                        style: TextStyle(color: textColor, fontSize: 14),
+                        isExpanded: true,
+                      ),
               ),
               const SizedBox(width: 16),
+
+              // Topic Dropdown
               Expanded(
-                child: TextField(
-                  controller: _topicsController,
-                  style: TextStyle(color: textColor),
-                  decoration: _inputDecoration("টপিক (ঐচ্ছিক)", isDark),
-                ),
+                child: _loadingTopics
+                    ? const Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : DropdownButtonFormField<String>(
+                        value: _selectedTopic,
+                        items: _topicsData.map((t) {
+                          return DropdownMenuItem(
+                            value: t['name'].toString(),
+                            child: Text(t['name'].toString()),
+                          );
+                        }).toList(),
+                        onChanged: (val) =>
+                            setState(() => _selectedTopic = val),
+                        decoration: _inputDecoration("টপিক", isDark),
+                        dropdownColor: isDark
+                            ? const Color(0xFF121212)
+                            : Colors.white,
+                        style: TextStyle(color: textColor, fontSize: 14),
+                        isExpanded: true,
+                      ),
               ),
             ],
           ),
           const SizedBox(height: 24),
 
-          // 3. Exam Types (Multi-select Chips)
+          // 3. Exam Types
           Text(
             "পরীক্ষার ধরণ",
             style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
@@ -223,14 +360,14 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12, // 16 -> 12
-                    vertical: 8, // 12 -> 8
+                    horizontal: 12,
+                    vertical: 8,
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? (isDark
-                              ? const Color(0xFF312E81) // Indigo 900
-                              : const Color(0xFFE0E7FF)) // Indigo 100
+                              ? const Color(0xFF312E81)
+                              : const Color(0xFFE0E7FF))
                         : (isDark ? const Color(0xFF121212) : Colors.white),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
@@ -239,49 +376,14 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
                           : (isDark ? Colors.white10 : Colors.grey.shade300),
                       width: isSelected ? 1.5 : 1,
                     ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: Colors.indigo.withOpacity(0.2),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : [],
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Checkbox visual
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        width: 20,
-                        height: 20,
-                        margin: const EdgeInsets.only(right: 8),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? Colors.indigo
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(
-                            6,
-                          ), // Softer corners
-                          border: Border.all(
-                            color: isSelected
-                                ? Colors.indigo
-                                : (isDark
-                                      ? Colors.grey[600]!
-                                      : Colors.grey[400]!),
-                            width: 1.5,
-                          ),
-                        ),
-                        child: isSelected
-                            ? const Icon(
-                                Icons.check,
-                                size: 14,
-                                color: Colors.white,
-                              )
-                            : null,
-                      ),
+                      if (isSelected) ...[
+                        const Icon(Icons.check, size: 14, color: Colors.indigo),
+                        const SizedBox(width: 6),
+                      ],
                       Text(
                         type,
                         style: TextStyle(
@@ -328,12 +430,9 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
           // 5. Difficulty
           DropdownButtonFormField<String>(
             value: _selectedDifficulty,
-            items: const [
-              DropdownMenuItem(value: 'Mixed', child: Text('মিশ্র (Mixed)')),
-              DropdownMenuItem(value: 'Easy', child: Text('সহজ (Easy)')),
-              DropdownMenuItem(value: 'Medium', child: Text('মধ্যম (Medium)')),
-              DropdownMenuItem(value: 'Hard', child: Text('কঠিন (Hard)')),
-            ],
+            items: _difficulties
+                .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                .toList(),
             onChanged: (val) => setState(() => _selectedDifficulty = val!),
             decoration: _inputDecoration("কঠিনতার স্তর", isDark),
             dropdownColor: isDark ? const Color(0xFF121212) : Colors.white,
@@ -342,28 +441,16 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
           const SizedBox(height: 32),
 
           // 6. Submit Button
-          // 6. Submit Button (Gradient)
           Container(
-            height: 48, // 56 -> 48
+            height: 48,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              gradient:
-                  (widget.isLoading ||
-                      _selectedSubject == null ||
-                      _selectedExamTypes.isEmpty)
+              gradient: (widget.isLoading || _selectedSubject == null)
                   ? null
                   : const LinearGradient(
-                      colors: [
-                        Color(0xFF4F46E5),
-                        Color(0xFF4338CA),
-                      ], // Indigo 600 -> 700
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF4F46E5), Color(0xFF4338CA)],
                     ),
-              boxShadow:
-                  (widget.isLoading ||
-                      _selectedSubject == null ||
-                      _selectedExamTypes.isEmpty)
+              boxShadow: (widget.isLoading || _selectedSubject == null)
                   ? []
                   : [
                       BoxShadow(
@@ -374,14 +461,11 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
                     ],
             ),
             child: ElevatedButton(
-              onPressed:
-                  (widget.isLoading ||
-                      _selectedSubject == null ||
-                      _selectedExamTypes.isEmpty)
+              onPressed: (widget.isLoading || _selectedSubject == null)
                   ? null
                   : _handleSubmit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent, // Transparent for Gradient
+                backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
@@ -401,9 +485,8 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
                         Text(
                           "পরীক্ষা শুরু করুন",
                           style: TextStyle(
-                            fontSize: 16, // 18 -> 16
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
                           ),
                         ),
                       ],

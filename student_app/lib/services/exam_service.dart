@@ -9,32 +9,55 @@ class ExamService {
   final _supabase = Supabase.instance.client;
 
   // 🔴 REPLACE with your actual Next.js Admin URL (Use 10.0.2.2 for Android Emulator)
+  // For Production, change this to: "https://your-vercel-app.app/api/upload-url"
   final String _nextJsApiUrl = "http://10.0.2.2:3000/api/upload-url";
 
   // ------------------------------------------------------------------
-  // 1. FETCH QUESTIONS (Exam Creation)
+  // 1. FETCH QUESTIONS (Updated with Filters)
   // ------------------------------------------------------------------
   Future<List<Question>> fetchExamQuestions(ExamConfig config) async {
     try {
-      // ✅ Select columns matching YOUR specific schema
-      final response = await _supabase
+      // 1. Start Building the Query
+      var query = _supabase
           .from('questions')
           .select(
-            'id, question, options_data, correct_answer_index, points, explanation',
-          )
-          .eq('subject', config.subject);
+            'id, question, options_data, correct_answer_index, points, explanation, subject, chapter, topic, difficulty',
+          );
 
+      // 2. Apply Subject Filter (Mandatory)
+      query = query.eq('subject', config.subject);
+
+      // 3. Apply Chapter Filter (If specific chapter selected)
+      if (config.chapters != 'All' && config.chapters.isNotEmpty) {
+        query = query.eq('chapter', config.chapters);
+      }
+
+      // 4. Apply Topic Filter (If specific topic selected)
+      if (config.topics != 'All' &&
+          config.topics != 'General' &&
+          config.topics.isNotEmpty) {
+        query = query.eq('topic', config.topics);
+      }
+
+      // 5. Apply Difficulty Filter (If not Mixed)
+      if (config.difficulty != 'Mixed') {
+        query = query.eq('difficulty', config.difficulty);
+      }
+
+      // 6. Execute Query
+      final response = await query;
       final data = List<Map<String, dynamic>>.from(response);
 
       if (data.isEmpty) {
-        print("⚠️ No questions found for ${config.subject}");
+        print(
+          "⚠️ No questions found for config: ${config.subject} / ${config.chapters}",
+        );
         return [];
       }
 
       // ✅ Map Database -> Flutter Model
       final questions = data.map((json) {
         // --- PARSING YOUR SPECIFIC JSON OPTIONS ---
-        // DB Format: [{"id": "A", "text": null}, {"id": "B", "text": "Answer"}]
         List<String> options = [];
 
         if (json['options_data'] != null) {
@@ -55,7 +78,7 @@ class ExamService {
 
         return Question(
           id: json['id'].hashCode, // Convert UUID to Int ID
-          text: json['question'] ?? 'No Question', // Map 'question' -> 'text'
+          text: json['question'] ?? 'No Question',
           options: options,
           correctAnswerIndex: json['correct_answer_index'] ?? 0,
           points: json['points'] ?? 1,
@@ -64,7 +87,10 @@ class ExamService {
       }).toList();
 
       questions.shuffle();
-      return questions.take(config.questionCount).toList();
+      // Ensure we don't try to take more questions than available
+      return questions
+          .take(min(config.questionCount, questions.length))
+          .toList();
     } catch (e) {
       print("❌ Error fetching questions: $e");
       return [];
