@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-// ✅ Import your content pages
 import '../widgets/dashboard_content.dart';
-// import '../pages/all_exams_page.dart'; // Create these later
-// import '../pages/students_page.dart';
+import '../pages/exam_page.dart'; // ✅ Import Exam Page
+import '../pages/exam_history_page.dart'; // ✅ Import History Page
 import '../main.dart';
 import '../theme.dart';
 
@@ -15,21 +14,21 @@ class DashboardLayout extends StatefulWidget {
 
 class _DashboardLayoutState extends State<DashboardLayout> {
   bool _isSidebarOpen = true;
-  int _selectedIndex = 0; // Tracks which page is active
+  int _selectedIndex = 0;
 
-  // ✅ Define your pages here
+  // ✅ Updated Pages List
   final List<Widget> _pages = [
-    const DashboardContent(), // Index 0
-    const Center(child: Text("All Exams Page")), // Index 1 (Placeholder)
-    const Center(child: Text("OMR Uploads Page")), // Index 2 (Placeholder)
-    const Center(child: Text("Students List Page")), // Index 3 (Placeholder)
-    const Center(child: Text("Settings Page")), // Index 4 (Placeholder)
+    const DashboardContent(), // 0. Overview
+    const ExamPage(), // 1. Create Exam (Mock Exam)
+    const ExamHistoryPage(), // 2. History / OMR Center (Results)
+    const Center(child: Text("Students List Page")), // 3. Placeholder
+    const Center(child: Text("Settings Page")), // 4. Placeholder
   ];
 
   final List<String> _titles = [
     "Overview",
-    "All Exams",
-    "OMR Center",
+    "Create Exam", // Updated Title
+    "Exam History", // Updated Title
     "Students",
     "Settings",
   ];
@@ -47,7 +46,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
 
       // 1. Sticky Header
       appBar: AppBar(
-        title: Text(_titles[_selectedIndex]), // Dynamic Title
+        title: Text(_titles[_selectedIndex]),
         backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0,
@@ -57,17 +56,11 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                 onPressed: () =>
                     setState(() => _isSidebarOpen = !_isSidebarOpen),
               )
-            : null,
-
-        // ✅ NEW: Restore the buttons here
+            : null, // Mobile uses Drawer auto-icon
         actions: [
-          // 1. Theme Toggle
+          // Theme Toggle
           IconButton(
-            icon: Icon(
-              Theme.of(context).brightness == Brightness.dark
-                  ? Icons.light_mode
-                  : Icons.dark_mode,
-            ),
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
             onPressed: () {
               final current = ThemeNotifier.themeMode.value;
               ThemeNotifier.themeMode.value = current == ThemeMode.light
@@ -75,8 +68,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                   : ThemeMode.light;
             },
           ),
-
-          // 2. Notification Icon with Red Dot
+          // Notification
           Stack(
             alignment: Alignment.topRight,
             children: [
@@ -91,22 +83,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
               ),
             ],
           ),
-
-          // 3. User Avatar (Optional)
-          const Padding(
-            padding: EdgeInsets.only(right: 16, left: 8),
-            child: CircleAvatar(
-              radius: 16,
-              backgroundColor: AppTheme.primary,
-              child: Text(
-                "A",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
+          const SizedBox(width: 16),
         ],
       ),
 
@@ -118,7 +95,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                 selectedIndex: _selectedIndex,
                 onItemTapped: (index) {
                   setState(() => _selectedIndex = index);
-                  Navigator.pop(context); // Close drawer on mobile
+                  Navigator.pop(context);
                 },
               ),
             ),
@@ -149,7 +126,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
               ),
             ),
 
-          // Main Content Area (Switches based on selection)
+          // Main Content
           Expanded(child: _pages[_selectedIndex]),
         ],
       ),
@@ -189,19 +166,19 @@ class _SidebarContent extends StatelessWidget {
             children: [
               _SidebarItem(
                 icon: Icons.dashboard_outlined,
-                label: "Dashboard",
+                label: "Overview",
                 isActive: selectedIndex == 0,
                 onTap: () => onItemTapped(0),
               ),
               _SidebarItem(
-                icon: Icons.assignment_outlined,
-                label: "Exams",
+                icon: Icons.edit_note, // Changed Icon for Exam
+                label: "Create Exam",
                 isActive: selectedIndex == 1,
                 onTap: () => onItemTapped(1),
               ),
               _SidebarItem(
-                icon: Icons.camera_alt_outlined,
-                label: "OMR Uploads",
+                icon: Icons.history, // Changed Icon for History
+                label: "History & Results",
                 isActive: selectedIndex == 2,
                 onTap: () => onItemTapped(2),
               ),
