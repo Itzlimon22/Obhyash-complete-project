@@ -49,9 +49,22 @@ class MyApp extends StatelessWidget {
           // 3. Tell Flutter which one to use right now
           themeMode: currentMode,
 
-          home: supabase.auth.currentSession == null
-              ? const LoginPage()
-              : const HomePage(),
+          home: StreamBuilder<AuthState>(
+            stream: Supabase.instance.client.auth.onAuthStateChange,
+            builder: (context, snapshot) {
+              final session = snapshot.data?.session;
+              // Keep checking session locally if stream is waiting, or use the stream data
+              final hasSession =
+                  session != null ||
+                  Supabase.instance.client.auth.currentSession != null;
+
+              if (hasSession) {
+                return const HomePage();
+              } else {
+                return const LoginPage();
+              }
+            },
+          ),
         );
       },
     );

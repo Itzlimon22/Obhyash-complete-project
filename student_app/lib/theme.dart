@@ -23,11 +23,17 @@ class AppTheme {
 
   // Text Colors
   static const Color textMain = Colors.white;
-  static const Color textLight = Color(0xFF9CA3AF); // Grey
+  static const Color textLight = Color(
+    0xFF9CA3AF,
+  ); // Light Grey (For Dark Mode)
+  static const Color textSecondaryLight = Color(
+    0xFF4B5563,
+  ); // Darker Grey (For Light Mode)
 
   // Backgrounds
-  static const Color background = Color(0xFF0B0D10);
-  static const Color surface = Color(0xFF151921);
+  // Backgrounds
+  static const Color background = Color(0xFF000000); // Pure Black
+  static const Color surface = Color(0xFF121212); // Neutral Dark Grey
 
   // Dashboard Accents
   static const Color cardArchive = Color(0xFFD97706);
@@ -43,7 +49,7 @@ class AppTheme {
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    scaffoldBackgroundColor: const Color(0xFFF3F4F6),
+    scaffoldBackgroundColor: const Color(0xFFFAF9F6), // Bookish White
 
     colorScheme: const ColorScheme.light(
       primary: primary,
@@ -52,10 +58,20 @@ class AppTheme {
       error: error,
     ),
 
-    textTheme: GoogleFonts.poppinsTextTheme(ThemeData.light().textTheme),
+    textTheme: GoogleFonts.poppinsTextTheme(ThemeData.light().textTheme)
+        .apply(
+          bodyColor: const Color(0xFF1F2937),
+          displayColor: const Color(0xFF1F2937),
+        )
+        .copyWith(
+          bodySmall: GoogleFonts.poppins(
+            color: textSecondaryLight,
+          ), // Adaptive Secondary
+          titleSmall: GoogleFonts.poppins(color: textSecondaryLight),
+        ),
 
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFFF3F4F6),
+      backgroundColor: Color(0xFFFAF9F6),
       elevation: 0,
       iconTheme: IconThemeData(color: Color(0xFF1F2937)),
       titleTextStyle: TextStyle(
@@ -70,15 +86,20 @@ class AppTheme {
       color: Colors.white,
       elevation: 2,
       shadowColor: Colors.black.withOpacity(0.05),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ), // 12 -> 10
     ),
 
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: Colors.white,
-      contentPadding: const EdgeInsets.all(AppSpacing.md),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 12,
+      ), // Compact Input
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10), // 12 -> 10
         borderSide: BorderSide(color: Colors.grey.shade300),
       ),
     ),
@@ -99,9 +120,14 @@ class AppTheme {
       error: error,
     ),
 
-    textTheme: GoogleFonts.poppinsTextTheme(
-      ThemeData.dark().textTheme,
-    ).apply(bodyColor: Colors.white, displayColor: Colors.white),
+    textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme)
+        .apply(bodyColor: Colors.white, displayColor: Colors.white)
+        .copyWith(
+          bodySmall: GoogleFonts.poppins(
+            color: textLight,
+          ), // Light Grey for Dark Mode
+          titleSmall: GoogleFonts.poppins(color: textLight),
+        ),
 
     appBarTheme: const AppBarTheme(
       backgroundColor: background,
@@ -119,7 +145,7 @@ class AppTheme {
       color: surface,
       elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10), // 12 -> 10
         side: BorderSide(color: Colors.white.withOpacity(0.08)),
       ),
     ),
@@ -127,9 +153,9 @@ class AppTheme {
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: surface,
-      contentPadding: const EdgeInsets.all(AppSpacing.md),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10), // 12 -> 10
         borderSide: BorderSide.none,
       ),
       hintStyle: const TextStyle(color: textLight),

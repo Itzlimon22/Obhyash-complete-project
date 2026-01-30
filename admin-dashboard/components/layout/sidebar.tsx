@@ -19,6 +19,7 @@ import {
   ChevronDown,
   ChevronRight,
   PanelLeftClose,
+  ClipboardCheck,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -39,6 +40,11 @@ const menuItems = [
     subItems: [
       { label: 'All Exams', href: '/exams' },
       { label: 'Create Exam', href: '/exams/create' },
+      {
+        name: 'OMR Reviews',
+        href: '/omr-reviews', // The path we created in Step 2
+        icon: ClipboardCheck, // Or any icon like <FaClipboardCheck />
+      },
     ],
   },
   { icon: Flag, label: 'Reports', href: '/reports' },

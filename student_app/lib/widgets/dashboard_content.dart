@@ -1,8 +1,12 @@
+// File: lib/widgets/dashboard_content.dart
 import 'package:flutter/material.dart';
-import 'package:student_app/theme.dart';
-import 'package:student_app/widgets/dashboard_grid.dart';
-import 'package:student_app/widgets/section_header.dart';
-import 'package:student_app/widgets/progress_card.dart'; // Imports our ProgressCard
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../pages/exam_page.dart';
+import '../pages/subject_report_page.dart';
+import 'dashboard_grid.dart'; // ✅ Import the Grid
+import 'progress_card.dart';
+import '../core/dashboard_constants.dart';
+import '../theme.dart';
 
 class DashboardContent extends StatefulWidget {
   const DashboardContent({super.key});
@@ -12,160 +16,307 @@ class DashboardContent extends StatefulWidget {
 }
 
 class _DashboardContentState extends State<DashboardContent> {
-  // ✅ 0 = Group Subjects, 1 = General Subjects
-  int _selectedTabIndex = 0;
+  String _userStream = 'Loading...';
+  String _userName = 'Student';
+  bool _isLoading = true;
 
-  // Data for "Group Subjects" (Science)
-  final List<String> groupSubjects = [
-    "পদার্থবিজ্ঞান ১ম পত্র",
-    "পদার্থবিজ্ঞান ২য় পত্র",
-    "রসায়ন ১ম পত্র",
-    "রসায়ন ২য় পত্র",
-    "উচ্চতর গণিত ১ম পত্র",
-    "উচ্চতর গণিত ২য় পত্র",
-    "জীববিজ্ঞান ১ম পত্র",
-    "জীববিজ্ঞান ২য় পত্র",
-  ];
-
-  // Data for "General Subjects" (Common)
-  final List<String> generalSubjects = [
-    "বাংলা ১ম পত্র",
-    "বাংলা ২য় পত্র",
-    "English 1st Paper",
-    "English 2nd Paper",
-    "ICT",
-  ];
+  // Variable to store real data
+  Map<String, Map<String, dynamic>> _realProgressStats = {};
 
   @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+    _fetchProgressStats();
+  }
+
+  // --- 1. DATA FETCHING LOGIC (Kept exactly as your code) ---
+  Future<void> _fetchUserData() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user != null) {
+      try {
+        final data = await Supabase.instance.client
+            .from('profiles')
+            .select('stream, full_name')
+            .eq('id', user.id)
+            .single();
+
+        if (mounted) {
+          setState(() {
+            _userStream = data['stream'] ?? 'HSC';
+            _userName = data['full_name'] ?? 'Student';
+            _isLoading = false;
+          });
+        }
+      } catch (e) {
+        if (mounted) setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _fetchProgressStats() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+
+    try {
+      final response = await Supabase.instance.client
+          .from('results')
+          .select('subject, score, wrong_count, correct_count, total_questions')
+          .eq('user_id', user.id);
+
+      final List<dynamic> data = response as List<dynamic>;
+      Map<String, Map<String, dynamic>> calculatedStats = {};
+
+      for (var session in data) {
+        String subject = session['subject'] ?? 'Unknown';
+
+        if (!calculatedStats.containsKey(subject)) {
+          calculatedStats[subject] = {
+            'correct': 0,
+            'wrong': 0,
+            'skipped': 0,
+            'total': 0,
+            'percentage': 0.0,
+          };
+        }
+
+        int correct = (session['correct_count'] as num?)?.toInt() ?? 0;
+        int wrong = (session['wrong_count'] as num?)?.toInt() ?? 0;
+        int total = (session['total_questions'] as num?)?.toInt() ?? 0;
+        int skipped = total - (correct + wrong);
+        if (skipped < 0) skipped = 0;
+
+        calculatedStats[subject]!['correct'] += correct;
+        calculatedStats[subject]!['wrong'] += wrong;
+        calculatedStats[subject]!['skipped'] += skipped;
+        calculatedStats[subject]!['total'] += total;
+      }
+
+      calculatedStats.forEach((key, value) {
+        if (value['total'] > 0) {
+          value['percentage'] = value['correct'] / value['total'];
+        }
+      });
+
+      if (mounted) {
+        setState(() {
+          _realProgressStats = calculatedStats;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching stats: $e');
+    }
+  }
+
+  // --- 2. UI BUILD ---
+  @override
   Widget build(BuildContext context) {
-    // ✅ Decide which list to show based on the tab
-    final currentSubjects = _selectedTabIndex == 0
-        ? groupSubjects
-        : generalSubjects;
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --- SECTION A: TODAY'S SCHEDULE ---
-          SectionHeader(
-            title: "Today's Schedule",
-            actionText: "Go to Routine →",
-            onActionTap: () {},
+          // A. HEADER
+          _buildHeader(),
+          const SizedBox(height: AppSpacing.lg),
+
+          // B. DAILY EXAM CARD (Hero Section)
+          _buildDailyExamCard(),
+          const SizedBox(height: AppSpacing.xl),
+
+          // C. QUICK ACTIONS (The New Dashboard Grid)
+          Text(
+            "Quick Actions",
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardTheme.color,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Theme.of(context).dividerColor.withOpacity(0.1),
+          const SizedBox(height: AppSpacing.md),
+          const DashboardGrid(), // ✅ Using the modular grid here
+
+          const SizedBox(height: AppSpacing.xl),
+
+          // D. PROGRESS REPORT SECTION
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "সাবজেক্ট ভিত্তিক রিপোর্ট",
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.calendar_today,
-                  color: AppTheme.textLight.withOpacity(0.5),
-                  size: 32,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  "No tasks scheduled for today.",
-                  style: TextStyle(color: AppTheme.textLight),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: AppSpacing.xl),
-
-          // --- SECTION B: QUICK ACCESS GRID ---
-          const DashboardGrid(),
-
-          const SizedBox(height: AppSpacing.xl),
-
-          // --- SECTION C: PROGRESS REPORT ---
-          const SectionHeader(title: "প্রোগ্রেস রিপোর্ট"),
-          const Text(
-            "আপনার বিষয়ভিত্তিক অগ্রগতি দেখুন।",
-            style: TextStyle(color: AppTheme.textLight, fontSize: 12),
+              // Option to add a "View All" button here if needed
+            ],
           ),
           const SizedBox(height: AppSpacing.md),
+          _buildProgressSection(),
 
-          // ✅ Interactive Toggle Buttons
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardTheme.color,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.white.withOpacity(0.05)),
-            ),
-            child: Row(
-              children: [
-                Expanded(child: _buildSegmentButton("Group Subjects", 0)),
-                Expanded(child: _buildSegmentButton("General Subjects", 1)),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-
-          // ✅ Dynamic Grid based on Selection
-          LayoutBuilder(
-            builder: (context, constraints) {
-              return Wrap(
-                spacing: AppSpacing.md,
-                runSpacing: AppSpacing.md,
-                children: currentSubjects.map((subject) {
-                  return _buildGridItem(constraints, subject);
-                }).toList(),
-              );
-            },
-          ),
-
-          const SizedBox(height: 80),
+          const SizedBox(height: 40),
         ],
       ),
     );
   }
 
-  Widget _buildGridItem(BoxConstraints constraints, String title) {
-    final double width = (constraints.maxWidth - AppSpacing.md) / 2;
-    return SizedBox(
-      width: width,
-      // ✅ Using our new Collapsible Card
-      child: ProgressCard(subject: title),
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Hello, $_userName 👋",
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        Text(
+          "Goal: $_userStream Admission",
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).textTheme.bodySmall?.color,
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildSegmentButton(String text, int index) {
-    final isActive = _selectedTabIndex == index;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedTabIndex = index;
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          // Active = Light White background, Inactive = Transparent
-          color: isActive ? Colors.white.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
+  Widget _buildDailyExamCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppTheme.primary,
+            const Color(0xFF4F46E5),
+          ], // Slight gradient
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: isActive ? Colors.white : AppTheme.textLight,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  "🔥 LIVE NOW",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              const Text(
+                "Ends in 20m",
+                style: TextStyle(color: Colors.white70, fontSize: 12),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            "Daily Model Test: Physics",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            "Topic: Vector & Dynamics",
+            style: TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ExamPage()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: AppTheme.primary,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                "Start Exam",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressSection() {
+    // Only show subjects relevant to the user's stream
+    final relevantSubjects = getSubjectsForStream(_userStream);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? Colors.white10 : Colors.grey.shade100,
         ),
+      ),
+      child: Column(
+        children: relevantSubjects.map((subject) {
+          final String engName = subject['name'];
+          final String name = bengaliSubjectNames[engName] ?? engName;
+
+          final stats =
+              _realProgressStats[engName] ??
+              {'percentage': 0.0, 'correct': 0, 'wrong': 0, 'skipped': 0};
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: ProgressCard(
+              subject: name,
+              progress: stats['percentage'],
+              correct: stats['correct'].toString(),
+              wrong: stats['wrong'].toString(),
+              skipped: stats['skipped'].toString(),
+              onViewDetails: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => SubjectReportPage(subjectName: name),
+                  ),
+                );
+              },
+            ),
+          );
+        }).toList(),
       ),
     );
   }

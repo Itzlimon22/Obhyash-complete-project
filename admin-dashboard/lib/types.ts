@@ -29,8 +29,8 @@ export interface Subject {
 
 // ✅ Export this so other files can find it
 export interface QuestionOption {
-  id: string;         // "a", "b", "c", "d"
-  text: string;       // "Newton"
+  id: string;       // "a", "b", "c", "d"
+  text: string;     // "Newton"
   image_url?: string; // ✅ NEW: Support images for options (A, B, C, D)
   isCorrect: boolean; // true/false
 }
@@ -70,4 +70,48 @@ export interface QuestionFormData {
   status?: 'pending' | 'approved' | 'rejected';
   created_at?: string;
   created_by?: string;
+}
+
+// --- 3. OMR & Exam Result Types (NEW - Added for Admin Dashboard) ---
+
+/**
+ * Represents a simplified question structure used specifically for 
+ * Exam Results and OMR processing.
+ */
+export interface Question {
+  id: number;
+  text: string;
+  options: string[]; // Simple string array for OMR display
+  correctAnswerIndex: number;
+  points: number;
+  explanation?: string;
+}
+
+export type UserAnswers = Record<number, number>;
+
+/**
+ * Represents a single student's exam submission (Digital or OMR).
+ */
+export interface ExamResult {
+  id: string;
+  subject: string;
+  examType?: string;
+  date: string; // ISO String
+  score: number;
+  totalMarks: number;
+  totalQuestions: number;
+  correctCount: number;
+  wrongCount: number;
+  timeTaken: number; // Seconds
+  negativeMarking: number;
+  
+  // OMR / Status Fields
+  status?: 'pending' | 'evaluated' | 'rejected';
+  rejectionReason?: string;
+  submissionType: 'digital' | 'script';
+  scriptImageData?: string; // Base64 string or URL of the uploaded OMR
+  
+  // Answers Data
+  userAnswers?: Record<number, number>; // Map of { questionId: optionIndex }
+  questions?: Question[]; // The questions included in this specific exam result
 }

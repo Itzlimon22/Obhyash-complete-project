@@ -1,10 +1,16 @@
+// File: lib/pages/home_page.dart
 import 'package:flutter/material.dart';
 import 'package:student_app/layout/responsive_layout.dart';
 import 'package:student_app/theme.dart';
 import 'package:student_app/widgets/app_drawer.dart';
 import 'package:student_app/widgets/dashboard_content.dart';
 import 'package:student_app/widgets/custom_bottom_nav.dart';
-import 'package:student_app/main.dart'; // Import to access ThemeNotifier
+import 'package:student_app/main.dart';
+import 'package:student_app/widgets/dashboard_layout.dart'; // ✅ The Master Layout
+
+// ✅ Import your real pages
+import 'exam_history_page.dart';
+import 'exam/script_uploader_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,94 +20,75 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
+  // Mobile specific state
+  int _mobileSelectedIndex = 0;
 
-  void _onItemTapped(int index) {
+  // ✅ Define the pages for Mobile Bottom Nav
+  // (Order must match your CustomBottomNav items)
+  final List<Widget> _mobilePages = [
+    const DashboardContent(), // Index 0: Home
+    const ExamHistoryPage(), // Index 1: History / Exams
+    const ScriptUploaderPage(), // Index 2: OMR Upload
+    const Center(child: Text("Profile Page")), // Index 3: Profile (Placeholder)
+  ];
+
+  void _onMobileItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      _mobileSelectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Helper to check current theme mode
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return ResponsiveLayout(
       // -----------------------------------------------------------------------
       // 📱 MOBILE LAYOUT
       // -----------------------------------------------------------------------
       mobileBody: Scaffold(
-        // ✅ FIX 1: Use Theme colors instead of hard-coded Hex codes
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-
         drawer: const AppDrawer(isMobile: true),
 
         appBar: AppBar(
-          // ✅ FIX 2: Let the Theme handle the colors (defined in theme.dart)
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           elevation: 0,
           title: Text(
-            "Home",
-            // ✅ FIX 3: Dynamic text color
-            style: TextStyle(
-              color: isDark ? Colors.white : const Color(0xFF1F2937),
-              fontWeight: FontWeight.bold,
-            ),
+            // ✅ Dynamic Title based on selected page
+            _mobileSelectedIndex == 0
+                ? "Home"
+                : _mobileSelectedIndex == 1
+                ? "History"
+                : _mobileSelectedIndex == 2
+                ? "Upload OMR"
+                : "Profile",
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
-          iconTheme: IconThemeData(
-            color: isDark ? Colors.white : const Color(0xFF1F2937),
-          ),
-          actions: _buildAppBarActions(),
+          actions: _buildAppBarActions(context),
         ),
 
-        body: _selectedIndex == 0
-            ? const DashboardContent()
-            : Center(
-                child: Text(
-                  "Page Index: $_selectedIndex",
-                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                ),
-              ),
+        // ✅ Page Switching Logic
+        // If the index is valid, show the page, else show a fallback
+        body: _mobileSelectedIndex < _mobilePages.length
+            ? _mobilePages[_mobileSelectedIndex]
+            : const Center(child: Text("Page Not Found")),
 
         bottomNavigationBar: CustomBottomNav(
-          selectedIndex: _selectedIndex,
-          onItemTapped: _onItemTapped,
+          selectedIndex: _mobileSelectedIndex,
+          onItemTapped: _onMobileItemTapped,
         ),
       ),
 
       // -----------------------------------------------------------------------
-      // 💻 WEB LAYOUT
+      // 💻 DESKTOP LAYOUT
       // -----------------------------------------------------------------------
-      desktopBody: Scaffold(
-        body: Row(
-          children: [
-            const AppDrawer(isMobile: false),
-            VerticalDivider(
-              width: 1,
-              color: isDark
-                  ? Colors.white.withOpacity(0.1)
-                  : Colors.grey.shade300,
-            ),
-            Expanded(
-              child: Scaffold(
-                appBar: AppBar(
-                  automaticallyImplyLeading: false,
-                  title: const Text("Home"),
-                  actions: _buildAppBarActions(),
-                ),
-                body: const DashboardContent(),
-              ),
-            ),
-          ],
-        ),
-      ),
+      // ✅ Uses the Master DashboardLayout we created earlier
+      desktopBody: const DashboardLayout(),
     );
   }
 
-  List<Widget> _buildAppBarActions() {
+  List<Widget> _buildAppBarActions(BuildContext context) {
     return [
-      // ✅ Toggle Button (Temporary, to test the switch)
       IconButton(
         icon: Icon(
           Theme.of(context).brightness == Brightness.dark
@@ -115,14 +102,6 @@ class _HomePageState extends State<HomePage> {
               : ThemeMode.light;
         },
       ),
-
-      IconButton(
-        onPressed: () {},
-        icon: const Icon(
-          Icons.local_fire_department,
-          color: AppTheme.cardArchive,
-        ),
-      ),
       Stack(
         alignment: Alignment.topRight,
         children: [
@@ -130,24 +109,14 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {},
             icon: const Icon(Icons.notifications_outlined),
           ),
-          const Positioned(
+          Positioned(
             right: 12,
             top: 12,
             child: CircleAvatar(radius: 4, backgroundColor: AppTheme.error),
           ),
         ],
       ),
-      const Padding(
-        padding: EdgeInsets.only(right: 16, left: 8),
-        child: CircleAvatar(
-          radius: 16,
-          backgroundColor: AppTheme.primary,
-          child: Text(
-            "A",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-        ),
-      ),
+      const SizedBox(width: 8),
     ];
   }
 }

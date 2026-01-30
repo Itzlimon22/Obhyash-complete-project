@@ -7,6 +7,7 @@ class ProgressCard extends StatefulWidget {
   final String correct;
   final String wrong;
   final String skipped;
+  final VoidCallback? onViewDetails;
 
   const ProgressCard({
     super.key,
@@ -15,6 +16,7 @@ class ProgressCard extends StatefulWidget {
     this.correct = "0",
     this.wrong = "0",
     this.skipped = "0",
+    this.onViewDetails,
   });
 
   @override
@@ -46,8 +48,8 @@ class _ProgressCardState extends State<ProgressCard> {
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             // Highlight border when expanded
-            color: _isExpanded 
-                ? AppTheme.primary.withOpacity(0.5) 
+            color: _isExpanded
+                ? AppTheme.primary.withOpacity(0.5)
                 : Colors.white.withOpacity(0.05),
           ),
         ),
@@ -75,17 +77,21 @@ class _ProgressCardState extends State<ProgressCard> {
                   children: [
                     Text(
                       "${(widget.progress * 100).toInt()}%",
-                      style: TextStyle(color: AppTheme.textLight, fontSize: 12),
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                     const SizedBox(width: 4),
                     // ✅ Rotate arrow based on state
                     AnimatedRotation(
                       turns: _isExpanded ? 0.5 : 0, // 180 degree flip
                       duration: const Duration(milliseconds: 200),
-                      child: Icon(Icons.keyboard_arrow_down, color: AppTheme.textLight, size: 16),
+                      child: Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Theme.of(context).textTheme.bodySmall?.color,
+                        size: 16,
+                      ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
 
@@ -101,9 +107,37 @@ class _ProgressCardState extends State<ProgressCard> {
                 children: [
                   _buildStat(context, AppTheme.success, "সঠিক", widget.correct),
                   _buildStat(context, AppTheme.error, "ভুল", widget.wrong),
-                  _buildStat(context, AppTheme.secondary, "স্কিপড", widget.skipped),
+                  _buildStat(
+                    context,
+                    AppTheme.secondary,
+                    "স্কিপড",
+                    widget.skipped,
+                  ),
                 ],
               ),
+
+              if (widget.onViewDetails != null) ...[
+                const SizedBox(height: 16),
+                Divider(height: 1, color: Colors.white.withOpacity(0.05)),
+                TextButton(
+                  onPressed: widget.onViewDetails,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "বিস্তারিত রিপোর্ট দেখো",
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.arrow_forward,
+                        size: 14,
+                        color: Theme.of(context).textTheme.bodySmall?.color,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ],
         ),
@@ -111,20 +145,25 @@ class _ProgressCardState extends State<ProgressCard> {
     );
   }
 
-  Widget _buildStat(BuildContext context, Color color, String label, String value) {
+  Widget _buildStat(
+    BuildContext context,
+    Color color,
+    String label,
+    String value,
+  ) {
     return Row(
       children: [
         Container(
-          width: 8, height: 8,
+          width: 8,
+          height: 8,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 6),
         Text(
           "$value $label",
-          style: const TextStyle(
-            color: AppTheme.textLight, 
-            fontSize: 11, 
-            fontWeight: FontWeight.w500
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.w500,
+            fontSize: 11,
           ),
         ),
       ],

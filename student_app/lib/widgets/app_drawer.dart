@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:student_app/theme.dart';
 
-class AppDrawer extends StatelessWidget {
-  final bool isMobile; // ✅ Add this flag
+import '../widgets/exam/mock_exam_setup_page.dart';
 
-  const AppDrawer({
-    super.key,
-    this.isMobile = true, // Default to mobile behavior
-  });
+class AppDrawer extends StatelessWidget {
+  final bool isMobile;
+
+  const AppDrawer({super.key, this.isMobile = true});
 
   @override
   Widget build(BuildContext context) {
-    // On Web, we want a plain Container. On Mobile, the standard Drawer look.
     final content = Column(
       children: [
         // 1. Logo Area
@@ -36,7 +34,7 @@ class AppDrawer extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              if (isMobile) // Only show close icon on mobile
+              if (isMobile)
                 Icon(
                   Icons.menu_open,
                   color: AppTheme.textLight.withOpacity(0.5),
@@ -54,10 +52,30 @@ class AppDrawer extends StatelessWidget {
               _buildMenuItem(
                 context,
                 Icons.menu_book_rounded,
-                "আমার পড়ালেখা",
+                "আমার পড়ালেখা",
                 false,
               ),
-              _buildMenuItem(context, Icons.edit_document, "মক এক্সাম", false),
+
+              // ✅ UPDATED: Mock Exam Button with Navigation Logic
+              _buildMenuItem(
+                context,
+                Icons.edit_document,
+                "মক এক্সাম",
+                false,
+                onTap: () {
+                  // 1. Close Drawer (if mobile)
+                  if (isMobile) Navigator.pop(context);
+
+                  // 2. Navigate to the Setup Page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MockExamSetupPage(),
+                    ), // ✅ Points to the new page import
+                  );
+                },
+              ),
+
               _buildMenuItem(
                 context,
                 Icons.sports_kabaddi,
@@ -120,51 +138,83 @@ class AppDrawer extends StatelessWidget {
       ],
     );
 
-    // If it's Web, return just the colored box. If Mobile, return the Drawer widget.
     if (!isMobile) {
-      return Container(
-        width: 280, // Fixed width for Sidebar
-        color: AppTheme.background,
-        child: content,
-      );
+      return Container(width: 280, color: AppTheme.background, child: content);
     }
 
-    return Drawer(backgroundColor: AppTheme.background, child: content);
+    return Drawer(
+      backgroundColor: AppTheme.background,
+      elevation: 0,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(0),
+          bottomRight: Radius.circular(0),
+        ),
+      ),
+      child: content,
+    );
   }
 
+  // ✅ UPDATED: Modern Pill-Shaped Menu Item
   Widget _buildMenuItem(
     BuildContext context,
     IconData icon,
     String title,
-    bool isSelected,
-  ) {
+    bool isSelected, {
+    VoidCallback? onTap,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      margin: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 4,
+      ), // Increased side margin
       decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFF1F2937) : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
+        color: isSelected
+            // Active: Indigo Tint (Light) / Darker Indigo (Dark)
+            ? (isDark ? const Color(0xFF1E1B4B) : const Color(0xFFEEF2FF))
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(12), // Softer corners
+        border: isSelected
+            ? Border.all(
+                color: isDark
+                    ? const Color(0xFF4338CA)
+                    : const Color(0xFFC7D2FE),
+              )
+            : Border.all(color: Colors.transparent),
       ),
       child: ListTile(
-        visualDensity: const VisualDensity(vertical: -2),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+        dense: true,
         leading: Icon(
           icon,
-          color: isSelected ? Colors.white : AppTheme.textLight,
+          color: isSelected
+              ? (isDark
+                    ? const Color(0xFF818CF8)
+                    : const Color(0xFF4F46E5)) // Indigo-400 : Indigo-600
+              : (isDark ? Colors.grey[400] : Colors.grey[600]),
           size: 22,
         ),
         title: Text(
           title,
           style: TextStyle(
-            color: isSelected ? Colors.white : AppTheme.textLight,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            color: isSelected
+                ? (isDark ? Colors.white : const Color(0xFF312E81))
+                : (isDark ? Colors.grey[300] : Colors.grey[700]),
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             fontSize: 14,
+            letterSpacing: 0.3,
           ),
         ),
-        onTap: () {
-          // ✅ CRITICAL FIX: Only close drawer if we are on Mobile
-          if (isMobile) {
-            Navigator.pop(context);
-          }
-        },
+        // Use the passed onTap if exists, otherwise use default close logic
+        onTap:
+            onTap ??
+            () {
+              if (isMobile) {
+                Navigator.pop(context);
+              }
+            },
       ),
     );
   }
