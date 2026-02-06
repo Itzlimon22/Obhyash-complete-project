@@ -1,16 +1,20 @@
 import React from 'react';
-import { LayoutDashboard, FileEdit, History, Trophy, Menu } from 'lucide-react';
+import {
+  LayoutDashboard,
+  FileEdit,
+  History,
+  Trophy,
+  PieChart,
+} from 'lucide-react';
 
 interface MobileBottomNavProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  onMenuClick: () => void;
 }
 
 const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   activeTab,
   onTabChange,
-  onMenuClick,
 }) => {
   const items = [
     {
@@ -32,6 +36,11 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       id: 'leaderboard',
       label: 'Rank',
       icon: Trophy,
+    },
+    {
+      id: 'analysis',
+      label: 'Analysis',
+      icon: PieChart,
     },
   ];
 
@@ -56,20 +65,9 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               `}
             >
               <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-
-              {/* Optional: Tooltip or Label if needed, but icon-only is cleaner for floating nav */}
-              {/* <span className="sr-only">{item.label}</span> */}
             </button>
           );
         })}
-
-        {/* Menu Button */}
-        <button
-          onClick={onMenuClick}
-          className="relative flex items-center justify-center w-12 h-12 rounded-xl text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all duration-300"
-        >
-          <Menu size={20} strokeWidth={2} />
-        </button>
       </div>
     </div>
   );

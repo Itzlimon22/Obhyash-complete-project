@@ -210,25 +210,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           >
             {/* Left: Mobile Toggle & Title */}
             <div className="flex items-center gap-4">
-              <div
-                className="p-2 -ml-2 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg lg:hidden cursor-pointer transition-colors"
-                onClick={() => setIsSidebarOpen(true)}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                  />
-                </svg>
-              </div>
+              {/* Mobile Sidebar Toggle Removed */}
               <h1
                 className={`font-bold text-neutral-800 dark:text-white tracking-tight flex items-center gap-2 truncate ${simpleHeader ? 'text-base' : 'text-lg md:text-xl'}`}
               >
@@ -437,11 +419,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
         </main>
 
         {!simpleHeader && (
-          <MobileBottomNav
-            activeTab={activeTab}
-            onTabChange={onTabChange}
-            onMenuClick={() => setIsSidebarOpen(true)}
-          />
+          <MobileBottomNav activeTab={activeTab} onTabChange={onTabChange} />
         )}
       </div>
     </div>
