@@ -144,18 +144,18 @@ const Dashboard: React.FC<DashboardProps> = ({
         <div className="grid grid-cols-2 gap-3 md:gap-4">
           <button
             onClick={onMockExamClick}
-            className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-rose-50/50 dark:from-neutral-900 dark:to-neutral-800/50 p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(225,29,72,0.1)] dark:shadow-none border border-rose-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-3 hover:border-rose-200 dark:hover:border-rose-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
+            className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-rose-50/50 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(225,29,72,0.1)] dark:shadow-none border border-rose-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-rose-200 dark:hover:border-rose-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
           >
-            <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-rose-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-rose-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
 
-            <div className="w-12 h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-rose-100 dark:border-neutral-700 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-105 transition-transform relative z-10">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-rose-100 dark:border-neutral-700 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-105 transition-transform relative z-10">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.8}
                 stroke="currentColor"
-                className="w-6 h-6"
+                className="w-5 h-5 md:w-6 md:h-6"
               >
                 <path
                   strokeLinecap="round"
@@ -165,7 +165,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               </svg>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+              <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
                 মক পরীক্ষা
               </h3>
             </div>
@@ -173,18 +173,18 @@ const Dashboard: React.FC<DashboardProps> = ({
 
           <button
             onClick={onHistoryClick}
-            className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-neutral-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 flex flex-col justify-center items-center gap-3 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all text-center h-full group active:scale-[0.98] duration-200"
+            className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-neutral-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all text-center h-full group active:scale-[0.98] duration-200"
           >
-            <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-neutral-100/30 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-neutral-100/30 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
 
-            <div className="w-12 h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-neutral-100 dark:border-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-400 group-hover:scale-105 transition-transform relative z-10">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-neutral-100 dark:border-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-400 group-hover:scale-105 transition-transform relative z-10">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.8}
                 stroke="currentColor"
-                className="w-6 h-6"
+                className="w-5 h-5 md:w-6 md:h-6"
               >
                 <path
                   strokeLinecap="round"
@@ -194,7 +194,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               </svg>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
+              <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                 ইতিহাস
               </h3>
             </div>
@@ -202,18 +202,18 @@ const Dashboard: React.FC<DashboardProps> = ({
 
           <button
             onClick={onLeaderboardClick}
-            className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-amber-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(245,158,11,0.1)] dark:shadow-none border border-amber-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-3 hover:border-amber-200 dark:hover:border-amber-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
+            className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-amber-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(245,158,11,0.1)] dark:shadow-none border border-amber-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-amber-200 dark:hover:border-amber-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
           >
-            <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-amber-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-amber-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
 
-            <div className="w-12 h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-amber-100 dark:border-neutral-700 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform relative z-10">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-amber-100 dark:border-neutral-700 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform relative z-10">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.8}
                 stroke="currentColor"
-                className="w-6 h-6"
+                className="w-5 h-5 md:w-6 md:h-6"
               >
                 <path
                   strokeLinecap="round"
@@ -223,7 +223,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               </svg>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+              <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                 লিডারবোর্ড
               </h3>
             </div>
@@ -231,18 +231,18 @@ const Dashboard: React.FC<DashboardProps> = ({
 
           <button
             onClick={() => {}}
-            className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-cyan-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(6,182,212,0.1)] dark:shadow-none border border-cyan-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-3 hover:border-cyan-200 dark:hover:border-cyan-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
+            className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-cyan-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(6,182,212,0.1)] dark:shadow-none border border-cyan-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-cyan-200 dark:hover:border-cyan-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
           >
-            <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-cyan-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+            <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-cyan-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
 
-            <div className="w-12 h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-cyan-100 dark:border-neutral-700 flex items-center justify-center text-cyan-600 dark:text-cyan-400 group-hover:scale-105 transition-transform relative z-10">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-cyan-100 dark:border-neutral-700 flex items-center justify-center text-cyan-600 dark:text-cyan-400 group-hover:scale-105 transition-transform relative z-10">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={1.8}
                 stroke="currentColor"
-                className="w-6 h-6"
+                className="w-5 h-5 md:w-6 md:h-6"
               >
                 <path
                   strokeLinecap="round"
@@ -257,7 +257,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               </svg>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+              <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
                 এনালাইসিস
               </h3>
             </div>

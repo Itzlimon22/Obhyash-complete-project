@@ -273,12 +273,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const getSidebarClasses = () => {
     // Replaced 'bg-paper-100' with 'bg-gray-100' and 'bg-obsidian-900' with 'bg-black' for standard Tailwind support
     const baseClasses =
-      'fixed top-0 left-0 z-50 h-screen transition-all duration-300 flex flex-col bg-white border-r border-neutral-200 dark:bg-black dark:border-neutral-800';
+      'fixed top-0 left-0 z-[60] h-screen transition-all duration-300 flex flex-col bg-white border-r border-neutral-200 dark:bg-black dark:border-neutral-800';
 
     if (isMobile) {
-      return `${baseClasses} w-64 ${isOpen ? 'tranneutral-x-0 shadow-2xl' : '-tranneutral-x-full'}`;
+      return `${baseClasses} w-72 ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`;
     } else {
-      return `${baseClasses} tranneutral-x-0 ${isOpen ? 'w-64' : 'w-20'}`;
+      return `${baseClasses} translate-x-0 ${isOpen ? 'w-64' : 'w-20'}`;
     }
   };
 

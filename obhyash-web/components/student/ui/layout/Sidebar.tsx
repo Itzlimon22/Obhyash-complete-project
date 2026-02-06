@@ -97,8 +97,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       <aside
         className={`
-        fixed lg:static top-0 left-0 h-full bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 z-50 transition-all duration-300 ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] transform shadow-xl lg:shadow-none flex flex-col justify-between
-        ${isOpen ? 'tranneutral-x-0 w-64' : '-tranneutral-x-full lg:tranneutral-x-0'}
+        fixed lg:static top-0 left-0 h-full bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 z-[60] transition-all duration-300 ease-[cubic-bezier(0.25, 0.8, 0.25, 1)] transform shadow-xl lg:shadow-none flex flex-col justify-between
+        ${isOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0'}
         ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}
       `}
       >

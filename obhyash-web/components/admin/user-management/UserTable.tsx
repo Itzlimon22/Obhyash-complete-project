@@ -112,7 +112,8 @@ const UserTable: React.FC<UserTableProps> = ({
         <table className="w-full">
           <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800">
             <tr>
-              <th className="px-6 py-4 text-left">
+            <tr>
+              <th className="px-4 md:px-6 py-3 md:py-4 text-left">
                 <input
                   type="checkbox"
                   checked={
@@ -122,28 +123,28 @@ const UserTable: React.FC<UserTableProps> = ({
                   className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                 />
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+              <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                 User
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+              <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                 Contact
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+              <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                 Role
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+              <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+              <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                 Institute
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+              <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                 Exams
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+              <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                 Joined
               </th>
-              <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+              <th className="px-4 md:px-6 py-3 md:py-4 text-right text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -163,7 +164,7 @@ const UserTable: React.FC<UserTableProps> = ({
                   }
                 }}
               >
-                <td className="px-6 py-4">
+                <td className="px-4 md:px-6 py-3 md:py-4">
                   <input
                     type="checkbox"
                     checked={selectedUsers.has(user.id)}
@@ -171,9 +172,9 @@ const UserTable: React.FC<UserTableProps> = ({
                     className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
                   />
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center text-white font-semibold text-xs md:text-sm shadow-md">
                       {user.name?.charAt(0).toUpperCase() || 'U'}
                     </div>
                     <div>
@@ -189,7 +190,7 @@ const UserTable: React.FC<UserTableProps> = ({
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-4 md:px-6 py-3 md:py-4">
                   <div className="space-y-1">
                     {user.email && (
                       <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
@@ -205,7 +206,7 @@ const UserTable: React.FC<UserTableProps> = ({
                     )}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                   <span
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${getRoleColor(
                       user.role,
@@ -217,7 +218,7 @@ const UserTable: React.FC<UserTableProps> = ({
                     {user.role}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                   <span
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusColor(
                       user.status,
@@ -235,7 +236,7 @@ const UserTable: React.FC<UserTableProps> = ({
                     {user.status}
                   </span>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-4 md:px-6 py-3 md:py-4">
                   <p className="text-sm text-neutral-900 dark:text-white">
                     {user.institute || 'N/A'}
                   </p>
@@ -245,18 +246,18 @@ const UserTable: React.FC<UserTableProps> = ({
                     </p>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                   <p className="text-sm font-semibold text-neutral-900 dark:text-white">
                     {user.exams_taken || 0}
                   </p>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                   <div className="flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-400">
                     <Calendar className="w-3.5 h-3.5" />
                     {new Date(user.created_at).toLocaleDateString()}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">
+                <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap text-right">
                   <div className="relative inline-block">
                     <button
                       onClick={(e) => {

@@ -18,8 +18,21 @@ const hindSiliguri = Hind_Siliguri({
 });
 
 export const metadata: Metadata = {
-  title: 'Obhyash Admin',
-  description: 'Admin Portal for Student Management',
+  title: 'Obhyash',
+  description: 'Smart Exam Platform',
+  manifest: '/manifest.json',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false, // Prevents zooming for app-like feel
+  },
+  themeColor: '#e11d48',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Obhyash',
+  },
 };
 
 export default function RootLayout({

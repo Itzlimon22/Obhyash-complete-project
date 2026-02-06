@@ -98,7 +98,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full h-16 bg-paper-50/80 dark:bg-obsidian-950/80 backdrop-blur-md border-b border-paper-200 dark:border-obsidian-800 flex items-center justify-between px-6 transition-colors duration-300">
+    <header className="sticky top-0 z-30 w-full h-16 bg-paper-50/80 dark:bg-obsidian-950/80 backdrop-blur-md border-b border-paper-200 dark:border-obsidian-800 flex items-center justify-between px-4 md:px-6 transition-colors duration-300">
       {/* LEFT: Mobile Toggle, Search, Breadcrumbs */}
       <div className="flex items-center gap-4 flex-1">
         <button

@@ -99,6 +99,10 @@
 
 /* --- 2. CUSTOM STYLES (From Latest File) --- */
 
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 /* Noise Texture Overlay for paper feel */
 body::after {
   content: '';
