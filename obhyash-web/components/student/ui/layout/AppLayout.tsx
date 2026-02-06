@@ -1,0 +1,451 @@
+﻿import React, { useState, ReactNode, useRef, useEffect } from 'react';
+import Sidebar from './Sidebar';
+import MobileBottomNav from './MobileBottomNav';
+import { UserProfile, Notification } from '@/lib/types';
+import {
+  getNotifications,
+  getUnreadNotificationCount,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+} from '@/services/database';
+import NotificationBell from '../notifications/NotificationBell';
+import NotificationDropdown from '../notifications/NotificationDropdown';
+import UserAvatar from '../common/UserAvatar';
+import { supabase } from '@/services/database';
+import { toast } from 'sonner';
+
+interface AppLayoutProps {
+  children: ReactNode;
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  onLogout: () => void;
+  toggleTheme: () => void;
+  isDarkMode: boolean;
+  title?: string;
+  noPadding?: boolean;
+  simpleHeader?: boolean;
+  customHeader?: ReactNode;
+  user?: UserProfile;
+}
+
+const AppLayout: React.FC<AppLayoutProps> = ({
+  children,
+  activeTab,
+  onTabChange,
+  onLogout,
+  toggleTheme,
+  isDarkMode,
+  title = 'ড্যাশবোর্ড',
+  noPadding = false,
+  simpleHeader = false,
+  customHeader,
+  user,
+}) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // Dropdown States
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+
+  // Notification State
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+
+  const profileRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileOpen(false);
+      }
+      if (
+        notifRef.current &&
+        !notifRef.current.contains(event.target as Node)
+      ) {
+        setIsNotifOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  // Fetch notifications on mount & Subscribe to Realtime
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!user?.id) return;
+
+      setNotificationsLoading(true);
+      try {
+        const notifs = await getNotifications();
+        setNotifications(notifs);
+
+        const count = await getUnreadNotificationCount();
+        setUnreadCount(count);
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+      } finally {
+        setNotificationsLoading(false);
+      }
+    };
+
+    fetchNotifications();
+
+    // Real-time Subscription
+    if (user?.id) {
+      const channel = supabase
+        .channel('realtime-notifications')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload) => {
+            console.log('🔔 New Notification:', payload.new);
+
+            // Add new notification to state
+            const newNotif = payload.new as Notification;
+            setNotifications((prev) => [newNotif, ...prev]);
+            setUnreadCount((prev) => prev + 1);
+
+            // Play Sound (Optional - can be added later)
+            // const audio = new Audio('/notification.mp3');
+            // audio.play().catch(e => console.log('Audio play failed', e));
+
+            // Show Toast
+            toast.info(newNotif.title, {
+              description: newNotif.message,
+              duration: 5000,
+              icon: '🔔',
+            });
+          },
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user?.id]);
+
+  // Notification Handlers
+  const handleNotificationClick = async (notification: Notification) => {
+    if (!user?.id) return;
+
+    // Mark as read if unread
+    if (!notification.is_read) {
+      try {
+        await markNotificationAsRead(notification.id);
+
+        // Update local state
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.id === notification.id ? { ...n, is_read: true } : n,
+          ),
+        );
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+      } catch (error) {
+        console.error('Failed to mark notification as read:', error);
+      }
+    }
+
+    // Navigate if there's an action URL
+    if (notification.action_url) {
+      window.location.href = notification.action_url;
+    }
+
+    // Close dropdown
+    setIsNotifOpen(false);
+  };
+
+  const handleMarkAllAsRead = async () => {
+    if (!user?.id) return;
+
+    try {
+      await markAllNotificationsAsRead();
+
+      // Update local state
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Failed to mark all notifications as read:', error);
+    }
+  };
+
+  const handleViewAllNotifications = () => {
+    setIsNotifOpen(false);
+    onTabChange('notifications'); // Navigate to notifications page if you have one
+  };
+
+  return (
+    <div className="h-screen w-full bg-[#fafaf9] dark:bg-[#0c0a09] flex transition-colors overflow-hidden font-sans">
+      <Sidebar
+        activeTab={activeTab}
+        onTabChange={onTabChange}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        onLogout={onLogout}
+        isCollapsed={isCollapsed}
+        toggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        isDarkMode={isDarkMode}
+        toggleTheme={toggleTheme}
+        user={user}
+      />
+
+      <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+        {/* Header - Custom or Default */}
+        {customHeader ? (
+          <div className="sticky top-0 z-30 shrink-0">{customHeader}</div>
+        ) : (
+          <header
+            className={`${simpleHeader ? 'h-14' : 'h-16'} bg-white/80 dark:bg-[#0c0a09]/80 backdrop-blur-md border-b border-neutral-200/60 dark:border-neutral-800/60 flex items-center justify-between px-4 md:px-8 z-30 shrink-0 sticky top-0 transition-all duration-300`}
+          >
+            {/* Left: Mobile Toggle & Title */}
+            <div className="flex items-center gap-4">
+              <div
+                className="p-2 -ml-2 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg lg:hidden cursor-pointer transition-colors"
+                onClick={() => setIsSidebarOpen(true)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                  />
+                </svg>
+              </div>
+              <h1
+                className={`font-bold text-neutral-800 dark:text-white tracking-tight flex items-center gap-2 truncate ${simpleHeader ? 'text-base' : 'text-lg md:text-xl'}`}
+              >
+                {title}
+              </h1>
+            </div>
+
+            {/* Right: Actions */}
+            <div className="flex items-center gap-3 md:gap-5">
+              {/* Streak Icon - Desktop */}
+              <div
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-orange-50 dark:bg-orange-900/10 rounded-full border border-orange-100 dark:border-orange-900/20 group cursor-help transition-all hover:border-orange-200"
+                title="Daily Streak"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.177 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span className="text-xs font-bold text-orange-600 dark:text-orange-400 tabular-nums">
+                  12 Days
+                </span>
+              </div>
+
+              {/* Notification System */}
+              <div className="relative" ref={notifRef}>
+                <NotificationBell
+                  unreadCount={unreadCount}
+                  onClick={() => setIsNotifOpen((prev) => !prev)}
+                  isOpen={isNotifOpen}
+                />
+
+                {isNotifOpen && (
+                  <NotificationDropdown
+                    notifications={notifications}
+                    onNotificationClick={handleNotificationClick}
+                    onMarkAllAsRead={handleMarkAllAsRead}
+                    onViewAll={handleViewAllNotifications}
+                    isLoading={notificationsLoading}
+                  />
+                )}
+              </div>
+
+              {/* Profile Dropdown */}
+              <div
+                className="relative pl-2 border-l border-neutral-200 dark:border-neutral-800"
+                ref={profileRef}
+              >
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center gap-2 focus:outline-none group"
+                >
+                  <UserAvatar
+                    user={user}
+                    size="md"
+                    className="ring-2 ring-transparent group-hover:ring-rose-100 dark:group-hover:ring-rose-900"
+                  />
+                </button>
+
+                {isProfileOpen && user && (
+                  <div className="absolute right-0 top-14 w-72 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl shadow-xl shadow-neutral-200/50 dark:shadow-black/50 z-50 overflow-hidden animate-fade-in origin-top-right">
+                    {/* User Header */}
+                    <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/30 dark:bg-neutral-800/20">
+                      <div className="flex items-center gap-3">
+                        <UserAvatar user={user} size="md" />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-bold text-neutral-900 dark:text-white truncate">
+                            {user.name}
+                          </h4>
+                          <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">
+                            {user.institute}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-2 space-y-1">
+                      <button
+                        onClick={() => {
+                          setIsProfileOpen(false);
+                          onTabChange('profile');
+                        }}
+                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-4 h-4 text-neutral-400"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                          />
+                        </svg>
+                        আমার প্রোফাইল
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsProfileOpen(false);
+                          onTabChange('subscription');
+                        }}
+                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-4 h-4 text-neutral-400"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"
+                          />
+                        </svg>
+                        সাবস্ক্রিপশন ও বিলিং
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsProfileOpen(false);
+                          onTabChange('settings');
+                        }}
+                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-4 h-4 text-neutral-400"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.996.946 1.821 1.891 2.222m0 0c.337.141.693.242 1.057.29a5 5 0 1 1 0-10c-.364.048-.72.15-1.057.29m0 0a3.995 3.995 0 0 1-1.891-2.22m3.614 7.66C15.794 13.91 15 12.98 15 11.97v-1.743a4 4 0 0 1 2.29-3.68 9 9 0 0 0-4.58-1.508A9 9 0 0 0 12 5.053"
+                          />
+                        </svg>
+                        সেটিংস
+                      </button>
+
+                      <div className="h-px bg-neutral-100 dark:bg-neutral-800 my-1"></div>
+
+                      <div className="px-3 py-2 flex items-center justify-between">
+                        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                          ডার্ক মোড
+                        </span>
+                        <button
+                          onClick={toggleTheme}
+                          className={`w-9 h-5 rounded-full relative transition-colors ${isDarkMode ? 'bg-rose-600' : 'bg-neutral-200 dark:bg-neutral-700'}`}
+                        >
+                          <div
+                            className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${isDarkMode ? 'tranneutral-x-4' : 'tranneutral-x-0'}`}
+                          ></div>
+                        </button>
+                      </div>
+
+                      <div className="h-px bg-neutral-100 dark:bg-neutral-800 my-1"></div>
+
+                      <button
+                        onClick={onLogout}
+                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 transition-colors"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-4 h-4"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
+                          />
+                        </svg>
+                        লগ আউট
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </header>
+        )}
+
+        {/* Content */}
+        <main
+          className={`flex-1 overflow-y-auto ${noPadding ? '' : 'p-4 md:p-8'} pb-24 lg:pb-8 relative scroll-smooth`}
+        >
+          {children}
+        </main>
+
+        {!simpleHeader && (
+          <MobileBottomNav
+            activeTab={activeTab}
+            onTabChange={onTabChange}
+            onMenuClick={() => setIsSidebarOpen(true)}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AppLayout;
