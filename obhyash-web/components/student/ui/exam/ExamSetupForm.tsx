@@ -138,7 +138,8 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     if (!subject) return;
 
     onStartExam({
-      subject: subjectLabel,
+      subject: subject,
+      subjectLabel: subjectLabel,
       examType: examTypes.join(' + '),
       chapters: chapters || 'All',
       topics: topics || 'General',
@@ -160,6 +161,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
     const details: ExamDetails = {
       subject: finalSubject,
+      subjectLabel: finalSubject,
       examType: omrIsBlank ? '' : 'Practice Exam',
       chapters: finalChapter,
       topics: finalTopic,

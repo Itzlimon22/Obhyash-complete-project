@@ -7,7 +7,6 @@ import {
   NEGATIVE_MARKING_OPTIONS,
 } from '@/lib/constants';
 import { Difficulty } from '@/lib/types';
-
 interface ExamSettingsProps {
   examTypes: string[];
   setExamTypes: React.Dispatch<React.SetStateAction<string[]>>;
