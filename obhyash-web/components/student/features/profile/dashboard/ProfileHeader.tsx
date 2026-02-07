@@ -15,7 +15,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEdit }) => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Handle File Selection
+  // Handle File Selectionn
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
