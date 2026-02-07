@@ -126,6 +126,31 @@ export const useExamEngine = () => {
     }
   };
 
+  /**
+   * Starts a custom exam with a predefined set of questions (e.g., for Practice mode).
+   */
+  const startCustomExam = (
+    customQuestions: Question[],
+    customDetails: ExamDetails,
+  ) => {
+    setErrorDetails('');
+    setAppState(AppState.LOADING);
+    setIsOmrMode(false);
+    setSelectedScript(null);
+
+    try {
+      setQuestions(customQuestions);
+      setExamDetails(customDetails);
+      setUserAnswers({});
+      setFlaggedQuestions(new Set());
+      setAppState(AppState.INSTRUCTIONS);
+    } catch (e: unknown) {
+      console.error(e);
+      setErrorDetails('Failed to start custom exam.');
+      setAppState(AppState.ERROR);
+    }
+  };
+
   const beginTimer = () => {
     if (examDetails) {
       setTimeLeft(examDetails.durationMinutes * 60);
@@ -309,6 +334,7 @@ export const useExamEngine = () => {
     setExamHistory,
     errorDetails,
     startExam,
+    startCustomExam,
     beginTimer,
     submitExam,
   };

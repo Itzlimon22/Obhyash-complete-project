@@ -25,6 +25,7 @@ import SubjectReportView from '@/components/student/features/dashboard/SubjectRe
 import LeaderboardView from '@/components/student/features/dashboard/LeaderboardView';
 import UserProfileView from '@/components/student/features/dashboard/UserProfileView';
 import AnalysisView from '@/components/student/features/dashboard/AnalysisView';
+import { PracticeDashboard } from '@/components/student/features/practice/PracticeDashboard';
 
 // Profile Features
 import MyProfileView from '@/components/student/ui/profile/MyProfileView';
@@ -83,6 +84,7 @@ export default function StudentRoot({
     setQuestions,
     setExamDetails,
     setTimeTaken,
+    startCustomExam,
   } = engine;
 
   // --- Global User State ---
@@ -311,6 +313,17 @@ export default function StudentRoot({
       return (
         <AppLayout activeTab="" {...commonLayoutProps} title="সেটিংস">
           <SettingsView user={currentUser!} onSave={handleProfileUpdate} />
+        </AppLayout>
+      );
+    }
+
+    if (activeTab === 'practice') {
+      return (
+        <AppLayout activeTab={activeTab} {...commonLayoutProps} title="অনুশীলন">
+          <PracticeDashboard
+            history={examHistory}
+            onStartPractice={startCustomExam}
+          />
         </AppLayout>
       );
     }
