@@ -33,7 +33,7 @@ import SubscriptionView from '@/components/student/ui/profile/SubscriptionView';
 import SettingsView from '@/components/student/ui/profile/SettingsView';
 
 // Exam Features
-import ExamSetupForm from '@/components/student/ui/ExamSetupForm';
+import { ExamSetupContainer } from '@/components/student/features/exam/setup/ExamSetupContainer';
 import InstructionsView from '@/components/student/ui/InstructionsView';
 import ExamRunner from '@/components/student/features/exam/ExamRunner';
 
@@ -242,7 +242,7 @@ export default function StudentRoot({
           {...commonLayoutProps}
           title="নতুন পরীক্ষা"
         >
-          <ExamSetupForm onStartExam={startExam} isLoading={false} />
+          <ExamSetupContainer onStartExam={startExam} isLoading={false} />
         </AppLayout>
       );
     }
@@ -323,6 +323,7 @@ export default function StudentRoot({
           <PracticeDashboard
             history={examHistory}
             onStartPractice={startCustomExam}
+            onNavigateToMock={() => setActiveTab('setup')}
           />
         </AppLayout>
       );

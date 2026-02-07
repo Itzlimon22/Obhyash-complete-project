@@ -5,6 +5,7 @@ import QuestionCard from '@/components/student/ui/exam/QuestionCard';
 interface PracticeDashboardProps {
   history: ExamResult[];
   onStartPractice: (questions: Question[], details: ExamDetails) => void;
+  onNavigateToMock: () => void;
 }
 
 type Tab = 'mistakes' | 'bookmarks';
@@ -12,6 +13,7 @@ type Tab = 'mistakes' | 'bookmarks';
 export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   history,
   onStartPractice,
+  onNavigateToMock,
 }) => {
   const [activeTab, setActiveTab] = useState<Tab>('mistakes');
   const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(
@@ -184,7 +186,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
             </p>
             {/* Call to Action for Empty State */}
             <button
-              onClick={() => (window.location.href = '/dashboard?tab=setup')} // Directing to mock setup
+              onClick={onNavigateToMock}
               className="px-6 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold shadow hover:bg-indigo-700 transition-colors"
             >
               নতুন পরীক্ষা দিন
