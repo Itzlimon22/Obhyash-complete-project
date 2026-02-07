@@ -1,7 +1,9 @@
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { UserProfile } from '@/lib/types';
-import { uploadAvatar, getAvatarUrl } from '@/services/storage-service';
+import { uploadAvatar } from '@/services/storage-service';
+import { updateUserProfile } from '@/services/user-service';
+import { toast } from 'sonner';
 import UserAvatar from '../../common/UserAvatar';
 
 interface ProfileHeaderProps {
@@ -31,11 +33,17 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEdit }) => {
       const { url } = await uploadAvatar(file);
       console.log('Avatar uploaded to:', url);
 
-      // TODO: Call API to update user profile with new `url`
-      // updateUserProfile({ avatarUrl: url });
+      // Call API to update user profile with new `url`
+      const result = await updateUserProfile({ ...user, avatarUrl: url });
+
+      if (result.success) {
+        toast.success('প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে');
+      } else {
+        throw new Error(result.error);
+      }
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      alert('ছবি আপলোড করতে সমস্যা হয়েছে।');
+      toast.error('ছবি আপলোড করতে সমস্যা হয়েছে।');
       // Revert preview on error
       setAvatarPreview(user.avatarUrl);
     } finally {
