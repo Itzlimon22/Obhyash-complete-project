@@ -88,15 +88,25 @@ export const markNotificationAsRead = async (
 ): Promise<boolean> => {
   if (isSupabaseConfigured() && supabase) {
     try {
+      // Try RPC first
       const { error } = await supabase.rpc('mark_notification_read', {
         p_notification_id: notificationId,
       });
 
-      if (error) {
-        console.error('Error marking notification as read:', error);
+      if (!error) return true;
+
+      console.warn('RPC failed, falling back to direct update:', error.message);
+
+      // Fallback: Direct Update
+      const { error: updateError } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', notificationId);
+
+      if (updateError) {
+        console.error('Error marking notification as read:', updateError);
         return false;
       }
-
       return true;
     } catch (error) {
       console.error('Failed to mark notification as read:', error);
@@ -113,14 +123,35 @@ export const markNotificationAsRead = async (
 export const markAllNotificationsAsRead = async (): Promise<boolean> => {
   if (isSupabaseConfigured() && supabase) {
     try {
+      // Try RPC first
       const { error } = await supabase.rpc('mark_all_notifications_read');
 
-      if (error) {
-        console.error('Error marking all notifications as read:', error);
+      if (!error) {
+        console.log('✅ All notifications marked as read (RPC)');
+        return true;
+      }
+
+      console.warn('RPC failed, falling back to direct update:', error.message);
+
+      // Get current user
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return false;
+
+      // Fallback: Direct Update
+      const { error: updateError } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+
+      if (updateError) {
+        console.error('Error marking all notifications as read:', updateError);
         return false;
       }
 
-      console.log('✅ All notifications marked as read');
+      console.log('✅ All notifications marked as read (Direct)');
       return true;
     } catch (error) {
       console.error('Failed to mark all notifications as read:', error);

@@ -106,7 +106,8 @@ export type UserAnswers = Record<string | number, number>;
 // ==========================================
 
 export interface ExamConfig {
-  subject: string;
+  subject: string; // The ID/English name for DB filtering
+  subjectLabel: string; // The display name for UI
   examType: string; // Daily, Weekly, Model Test
   chapters: string; // Comma separated IDs or names
   topics: string;
@@ -117,7 +118,8 @@ export interface ExamConfig {
 }
 
 export interface ExamDetails {
-  subject: string;
+  subject: string; // The ID
+  subjectLabel: string; // The display name
   examType: string;
   chapters: string;
   topics: string;
@@ -141,6 +143,7 @@ export interface ExamResult {
 
   // Exam Info
   subject: string;
+  subjectLabel?: string;
   examType?: string;
   date: string;
 
@@ -227,6 +230,8 @@ export interface User {
   enrolledExams: number;
   lastActive: string;
   recentExams: ExamHistory[];
+  streakCount?: number;
+  lastStreakDate?: string;
 }
 
 export interface UserProfile extends Partial<User> {
@@ -244,6 +249,8 @@ export interface UserProfile extends Partial<User> {
   stream?: string;
   createdAt?: string; // Mapped from DB created_at
   bio?: string;
+  streakCount?: number;
+  lastStreakDate?: string;
 }
 
 // ==========================================

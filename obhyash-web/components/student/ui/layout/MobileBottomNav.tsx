@@ -1,20 +1,15 @@
-import React from 'react';
-import {
-  LayoutDashboard,
-  FileEdit,
-  History,
-  Trophy,
-  PieChart,
-} from 'lucide-react';
+import { LayoutDashboard, FileEdit, History, Trophy, Menu } from 'lucide-react';
 
 interface MobileBottomNavProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  onMenuClick: () => void;
 }
 
 const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   activeTab,
   onTabChange,
+  onMenuClick,
 }) => {
   const items = [
     {
@@ -24,7 +19,7 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     },
     {
       id: 'setup',
-      label: 'Exam', // Changed from 'Setup' to 'Exam' for better clarity
+      label: 'Exam',
       icon: FileEdit,
     },
     {
@@ -38,9 +33,10 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       icon: Trophy,
     },
     {
-      id: 'analysis',
-      label: 'Analysis',
-      icon: PieChart,
+      id: 'menu',
+      label: 'Menu',
+      icon: Menu,
+      action: 'menu',
     },
   ];
 
@@ -54,7 +50,13 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           return (
             <button
               key={item.id}
-              onClick={() => onTabChange(item.id)}
+              onClick={() => {
+                if (item.action === 'menu') {
+                  onMenuClick();
+                } else {
+                  onTabChange(item.id);
+                }
+              }}
               className={`
                 relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300
                 ${

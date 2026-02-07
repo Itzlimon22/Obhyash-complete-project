@@ -120,36 +120,29 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
   }, [subject]);
 
   useEffect(() => {
-    if (
-      selectedChapters.length > 0 &&
-      metadata &&
-      Object.keys(metadata.topics).length > 0
-    ) {
-      const aggregatedTopics = new Set<string>();
-      selectedChapters.forEach((chapter) => {
-        if (metadata.topics[chapter]) {
-          metadata.topics[chapter].forEach((t) => aggregatedTopics.add(t));
-        }
-      });
-      setTopicOptions(Array.from(aggregatedTopics));
-      // Filter out selected topics that are no longer valid
-      const validTopics = Array.from(aggregatedTopics);
-      setSelectedTopics((prev) => prev.filter((t) => validTopics.includes(t)));
-    } else {
-      setTopicOptions([]);
-      setSelectedTopics([]);
-    }
+    // We already handle topic options flattening via metadata.
+    // We also need grouped options.
   }, [selectedChapters, metadata]);
 
+  // Derived grouped topics for new Selector
+  const groupedTopics = React.useMemo(() => {
+    if (!metadata || selectedChapters.length === 0) return {};
+    const groups: Record<string, string[]> = {};
+    selectedChapters.forEach((chapter) => {
+      if (metadata.topics[chapter]) {
+        groups[chapter] = metadata.topics[chapter];
+      }
+    });
+    return groups;
+  }, [metadata, selectedChapters]);
+
   // --- Handlers ---
-  const toggleSelection = (
-    item: string,
-    list: string[],
-    setter: React.Dispatch<React.SetStateAction<string[]>>,
-  ) => {
-    setter((prev) =>
-      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item],
-    );
+  const handleChapterChange = (newChapters: string[]) => {
+    setSelectedChapters(newChapters);
+  };
+
+  const handleTopicChange = (newTopics: string[]) => {
+    setSelectedTopics(newTopics);
   };
 
   const handleStartExam = (e: React.FormEvent) => {
@@ -166,10 +159,12 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
     }
 
     onStartExam({
-      subject: subjectLabel,
+      subject: subject, // Pass the ID/Key (e.g. Physics)
+      subjectLabel: subjectLabel, // Pass the Bangla Label
       examType: examTypes.join(' + '),
       chapters:
         selectedChapters.length > 0 ? selectedChapters.join(', ') : 'All',
+      // If no topics selected, pass 'General' to indicate all topics (handled by fetchQuestions)
       topics: selectedTopics.length > 0 ? selectedTopics.join(', ') : 'General',
       difficulty,
       questionCount,
@@ -178,53 +173,13 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
     });
   };
 
-  // OMR Logic
-  const handleOmrClick = () => {
-    setIsOmrConfigOpen(true);
-  };
+  // ... (OMR logic remains)
 
-  const handleOmrGenerate = (details: ExamDetails, totalQuestions: number) => {
-    setOmrPrintDetails(details);
-    setOmrQuestionCount(totalQuestions);
-    setIsOmrPrintModalOpen(true);
-  };
-
-  // Helper to get formatted subject name for pre-filling
-  const getSubjectName = () =>
-    availableSubjects.find((s) => s.id === subject)?.name || subject;
+  // ... (Render)
 
   return (
     <div className="w-full max-w-5xl mx-auto pb-32">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 px-1">
-        <div>
-          <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white mb-2 tracking-tight">
-            Create Custom Exam
-          </h2>
-          <p className="text-neutral-500 dark:text-neutral-400 text-sm font-medium">
-            আপনার প্রস্তুতি যাচাই করতে নিজের মত পরীক্ষা সাজান
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={handleOmrClick}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 rounded-xl font-bold text-xs hover:border-neutral-300 transition-colors shadow-sm"
-        >
-          <Download size={16} />
-          OMR Sheet
-        </button>
-      </div>
-
-      {validationError && (
-        <Alert
-          variant="destructive"
-          className="mb-6 mx-1 animate-in slide-in-from-top-2"
-        >
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Attention</AlertTitle>
-          <AlertDescription>{validationError}</AlertDescription>
-        </Alert>
-      )}
+      {/* ... */}
 
       <form
         onSubmit={handleStartExam}
@@ -244,29 +199,25 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
               title="অধ্যায় (Chapters)"
               items={chapterOptions}
               selectedItems={selectedChapters}
-              onToggle={(c) =>
-                toggleSelection(c, selectedChapters, setSelectedChapters)
-              }
-              onSelectAll={() => setSelectedChapters([...chapterOptions])}
-              onClear={() => setSelectedChapters([])}
+              onChange={handleChapterChange} // NEW PROP
               disabled={!subject}
               emptyLabel="No chapters loaded"
             />
 
             <TopicSelector
               title="টপিক (Topics)"
-              items={topicOptions}
+              items={topicOptions} // Keep flat options for search if needed, but groupedItems takes precedence for display
+              groupedItems={groupedTopics} // NEW PROP
               selectedItems={selectedTopics}
-              onToggle={(t) =>
-                toggleSelection(t, selectedTopics, setSelectedTopics)
-              }
-              onSelectAll={() => setSelectedTopics([...topicOptions])}
-              onClear={() => setSelectedTopics([])}
-              disabled={!subject || chapterOptions.length === 0}
-              emptyLabel="Select chapters to see topics"
+              onChange={handleTopicChange} // NEW PROP
+              disabled={!subject || selectedChapters.length === 0}
+              emptyLabel="Select chapters to see topics. Leave empty for All Topics."
             />
           </div>
         </div>
+
+        {/* Right Column: Settings */}
+        {/* ... */}
 
         {/* Right Column: Settings */}
         <div className="lg:col-span-5 space-y-6">

@@ -220,9 +220,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
             {/* Right: Actions */}
             <div className="flex items-center gap-3 md:gap-5">
-              {/* Streak Icon - Desktop */}
+              {/* Streak Icon */}
               <div
-                className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-orange-50 dark:bg-orange-900/10 rounded-full border border-orange-100 dark:border-orange-900/20 group cursor-help transition-all hover:border-orange-200"
+                className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1 md:py-1.5 bg-orange-50 dark:bg-orange-900/10 rounded-full border border-orange-100 dark:border-orange-900/20 group cursor-help transition-all hover:border-orange-200"
                 title="Daily Streak"
               >
                 <svg
@@ -238,7 +238,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                   />
                 </svg>
                 <span className="text-xs font-bold text-orange-600 dark:text-orange-400 tabular-nums">
-                  12 Days
+                  {user?.streakCount || 0} Days
                 </span>
               </div>
 
@@ -257,6 +257,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                     onMarkAllAsRead={handleMarkAllAsRead}
                     onViewAll={handleViewAllNotifications}
                     isLoading={notificationsLoading}
+                    onClose={() => setIsNotifOpen(false)}
                   />
                 )}
               </div>
@@ -419,7 +420,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({
         </main>
 
         {!simpleHeader && (
-          <MobileBottomNav activeTab={activeTab} onTabChange={onTabChange} />
+          <MobileBottomNav
+            activeTab={activeTab}
+            onTabChange={onTabChange}
+            onMenuClick={() => setIsSidebarOpen(true)}
+          />
         )}
       </div>
     </div>

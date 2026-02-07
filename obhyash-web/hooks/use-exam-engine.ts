@@ -101,6 +101,7 @@ export const useExamEngine = () => {
       setQuestions(generatedQuestions);
       setExamDetails({
         subject: config.subject,
+        subjectLabel: config.subjectLabel,
         examType: config.examType,
         chapters: config.chapters,
         topics: config.topics,
@@ -194,6 +195,7 @@ export const useExamEngine = () => {
       const newResult: ExamResult = {
         id: resultId,
         subject: examDetails?.subject || 'Unknown',
+        subjectLabel: examDetails?.subjectLabel,
         examType: examDetails?.examType,
         date: new Date().toISOString(),
         score: 0,

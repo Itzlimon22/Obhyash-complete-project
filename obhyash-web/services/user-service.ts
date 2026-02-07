@@ -48,6 +48,8 @@ export const getUserProfile = async (
           name: data.name || 'User',
           level: data.level || 'Beginner',
           bio: data.bio || '',
+          streakCount: data.streak_count || 0,
+          lastStreakDate: data.last_streak_date || null,
         };
       }
       if (error) console.error('Error fetching user profile:', error);
@@ -94,6 +96,8 @@ export const updateUserProfile = async (
       ssc_board: user.ssc_board,
       ssc_passing_year: user.ssc_passing_year,
       optional_subject: user.optional_subject,
+      streak_count: user.streakCount || 0,
+      last_streak_date: user.lastStreakDate || null,
       updated_at: new Date().toISOString(),
     };
 

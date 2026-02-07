@@ -136,7 +136,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
             Zenith পরীক্ষা
           </h1>
           <p className="text-xs md:text-sm text-neutral-600 dark:text-neutral-400 font-medium truncate max-w-[150px] md:max-w-[200px]">
-            {details.subject}
+            {details.subjectLabel || details.subject}
           </p>
         </div>
       </div>

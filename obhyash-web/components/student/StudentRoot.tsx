@@ -98,6 +98,20 @@ export default function StudentRoot({
     if (initialUser) setCurrentUser(initialUser);
   }, [initialUser]);
 
+  // Streak System Check
+  useEffect(() => {
+    const handleStreak = async () => {
+      if (!currentUser) return;
+      const { checkAndUpdateStreak } =
+        await import('@/services/streak-service');
+      const updatedUser = await checkAndUpdateStreak(currentUser);
+      if (updatedUser) {
+        setCurrentUser(updatedUser);
+      }
+    };
+    handleStreak();
+  }, [currentUser?.id]);
+
   // Fetch Exam History from Database
   useEffect(() => {
     const fetchHistory = async () => {
@@ -262,6 +276,7 @@ export default function StudentRoot({
               setUserAnswers(res.userAnswers || {});
               setExamDetails({
                 subject: res.subject,
+                subjectLabel: res.subjectLabel || res.subject,
                 examType: res.examType || '',
                 chapters: '',
                 topics: '',

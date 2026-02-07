@@ -87,6 +87,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
 
     const details: ExamDetails = {
       subject: 'অনুশীলন',
+      subjectLabel: 'অনুশীলন',
       examType:
         activeTab === 'mistakes' ? 'Mistakes Review' : 'Bookmarks Review',
       chapters: 'Mixed',
