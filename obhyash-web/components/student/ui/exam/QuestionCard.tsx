@@ -13,6 +13,7 @@ interface QuestionCardProps {
   // New props for History/Review mode
   showFeedback?: boolean;
   readOnly?: boolean;
+  showAnswer?: boolean;
 }
 
 const BANGLA_INDICES = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ'];
@@ -27,6 +28,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   isOmrMode = false,
   showFeedback = false,
   readOnly = false,
+  showAnswer = false,
 }) => {
   const isAnswered = selectedOptionIndex !== undefined;
 
@@ -164,6 +166,12 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                 // Non-selected wrong options fade out slightly
                 bgClass = 'bg-neutral-50 dark:bg-neutral-800/40 opacity-70';
               }
+            } else if (showAnswer && isCorrect) {
+              // Show correct answer in Review/Practice mode without user selection
+              bgClass = 'bg-emerald-50 dark:bg-emerald-900/10';
+              borderClass = 'border-emerald-400 dark:border-emerald-500/50';
+              iconBorder = 'border-emerald-500 text-emerald-600';
+              iconText = '✓';
             } else if (isSelected) {
               bgClass = 'bg-indigo-50 dark:bg-indigo-900/20';
               borderClass =

@@ -20,11 +20,12 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
 
   // --- Process Data ---
   const { mistakes, bookmarks } = useMemo(() => {
+    // 1. Deduplication using Maps (Already implemented in previous step, ensuring it persists)
     const mistakeMap = new Map<string, Question>();
     const bookmarkMap = new Map<string, Question>();
 
     history.forEach((result) => {
-      // 1. Process Mistakes: Questions where user answer != correct answer
+      // Process Mistakes
       if (result.questions && result.userAnswers) {
         result.questions.forEach((q) => {
           const userAns = result.userAnswers?.[q.id];
@@ -33,16 +34,13 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
             userAns !== q.correctAnswerIndex &&
             q.correctAnswerIndex !== undefined
           ) {
+            // Only add if not already present (Map handles this by key)
             mistakeMap.set(q.id, q);
           }
         });
       }
 
-      // 2. Process Bookmarks: Using flaggedQuestions logic
-      // Assuming flaggedQuestions store indices or IDs.
-      // Based on ExamRunner, flaggedQuestions is Set<number> (indices).
-      // But result.flaggedQuestions is number[].
-      // We need to map index back to question.
+      // Process Bookmarks
       if (result.questions && result.flaggedQuestions) {
         result.flaggedQuestions.forEach((idx) => {
           const q = result.questions?.[idx];
@@ -92,12 +90,12 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       chapters: 'Mixed',
       topics: 'Mixed',
       totalQuestions: questionsToPractice.length,
-      durationMinutes: questionsToPractice.length * 2, // 2 mins per question default
+      durationMinutes: questionsToPractice.length * 2,
       totalMarks: questionsToPractice.reduce(
         (acc, q) => acc + (q.points || 1),
         0,
       ),
-      negativeMarking: 0, // No negative marking for practice
+      negativeMarking: 0,
     };
 
     onStartPractice(questionsToPractice, details);
@@ -105,14 +103,12 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
 
   const toggleSelectAll = () => {
     if (currentSelection.size === currentList.length) {
-      // Deselect all in current list
       setSelectedQuestions((prev) => {
         const next = new Set(prev);
         currentList.forEach((q) => next.delete(q.id));
         return next;
       });
     } else {
-      // Select all in current list
       setSelectedQuestions((prev) => {
         const next = new Set(prev);
         currentList.forEach((q) => next.add(q.id));
@@ -181,11 +177,18 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
             <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">
               কোনো তথ্য পাওয়া যায়নি
             </h3>
-            <p className="text-neutral-500 text-sm max-w-md">
+            <p className="text-neutral-500 text-sm max-w-md mb-6">
               {activeTab === 'mistakes'
                 ? 'আপনি এখনো কোনো পরীক্ষায় কোনো প্রশ্ন ভুল করেননি।'
                 : 'আপনি এখনো কোনো প্রশ্ন বুকমার্ক করেননি।'}
             </p>
+            {/* Call to Action for Empty State */}
+            <button
+              onClick={() => (window.location.href = '/dashboard?tab=setup')} // Directing to mock setup
+              className="px-6 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold shadow hover:bg-indigo-700 transition-colors"
+            >
+              নতুন পরীক্ষা দিন
+            </button>
           </div>
         ) : (
           <div className="flex flex-col h-full">
@@ -254,12 +257,13 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                       </div>
                       <QuestionCard
                         question={question}
-                        selectedOptionIndex={undefined}
-                        isFlagged={false}
+                        selectedOptionIndex={question.correctAnswerIndex} // Show correct answer visually for learning
+                        isFlagged={activeTab === 'bookmarks'}
                         onSelectOption={() => {}}
                         onToggleFlag={() => {}}
                         onReport={() => {}}
                         readOnly={true}
+                        showAnswer={true} // Enhance visual feedback
                       />
                       {/* Overlay to intercept clicks for selection */}
                       <div className="absolute inset-0 z-10" />
