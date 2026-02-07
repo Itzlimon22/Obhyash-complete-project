@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
-import { printOMRSheet } from '@/services/printService';
+import { printQuestionPaper, printOMRSheet } from '@/services/print-service';
 import { getSubjectMetadata, SubjectMetadata } from '@/services/database';
 import {
   EXAM_TYPE_OPTIONS,

@@ -7,7 +7,7 @@ import { UserProfile, AppState, ExamResult } from '@/lib/types';
 import {
   printQuestionPaper,
   printResultWithExplanations,
-} from '@/services/printService';
+} from '@/services/print-service';
 import { updateUserProfile } from '@/services/database';
 import { calculateLevel } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/client';

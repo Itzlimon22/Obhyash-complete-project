@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
-import { uploadFile } from '@/services/storageService';
+import { uploadScriptImage } from '@/services/storage-service';
 
 interface ScriptUploaderProps {
   isOpen: boolean;
@@ -59,7 +59,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
       setIsUploading(true);
       try {
         // 1. Upload to R2/Supabase
-        await uploadFile(file, 'scripts');
+        await uploadScriptImage(file);
 
         // 2. Convert to Base64 for Gemini Analysis (Keep existing logic for analysis)
         const reader = new FileReader();

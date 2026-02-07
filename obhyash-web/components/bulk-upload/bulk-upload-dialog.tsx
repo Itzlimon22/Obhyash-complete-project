@@ -24,7 +24,7 @@ import { reviewQuestionWithAI } from '@/ai/flows/review-question-flow';
 // UI Components
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { MathRenderer } from '@/components/math-renderer';
+import { MathRenderer } from '@/components/common/MathRenderer';
 import { QuestionFormDialog } from './question-form-dialog';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';

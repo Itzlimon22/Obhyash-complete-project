@@ -12,7 +12,8 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
-import { User as UserType } from '@/hooks/useUserManagement';
+import { useUserManagement } from '@/hooks/use-user-management';
+import { User as UserType } from '@/lib/types';
 
 interface EditUserModalProps {
   user?: Partial<UserType>;
@@ -167,7 +168,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                   <select
                     value={formData.role}
                     onChange={(e) =>
-                      setFormData({ ...formData, role: e.target.value })
+                      setFormData({ ...formData, role: e.target.value as any })
                     }
                     className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
                   >
@@ -186,7 +187,10 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                   <select
                     value={formData.status}
                     onChange={(e) =>
-                      setFormData({ ...formData, status: e.target.value })
+                      setFormData({
+                        ...formData,
+                        status: e.target.value as any,
+                      })
                     }
                     className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
                   >

@@ -22,7 +22,10 @@ import {
   Database,
   ArrowRight,
 } from 'lucide-react';
-import { StatCard, DatabaseToolsSection } from '@/components/dashboard-widgets';
+import {
+  StatCard,
+  DatabaseToolsSection,
+} from '@/components/admin/dashboard/DashboardWidgets';
 import { StatData } from '@/lib/types';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';

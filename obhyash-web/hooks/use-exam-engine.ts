@@ -7,10 +7,21 @@ import {
   ExamResult,
   ExamConfig,
 } from '@/lib/types';
-import { fetchExamQuestions } from '../services/examService';
-import { evaluateOMRScript } from '../services/geminiService';
+import { fetchExamQuestions } from '../services/exam-service.legacy';
+import { evaluateOMRScript } from '../services/gemini-service';
 import { saveExamResult } from '../services/database';
 
+/**
+ * Core hook for the Exam Engine logic.
+ * Manages the entire lifecycle of an exam:
+ * - Fetching questions
+ * - Timer management
+ * - state transitions (IDLE -> LOADING -> INST -> ACTIVE -> SUBMITTED)
+ * - Answer tracking and scoring
+ * - OMR evaluation integration
+ *
+ * @returns An object containing all exam state and control functions.
+ */
 export const useExamEngine = () => {
   // --- Core State Variables ---
   const [appState, setAppState] = useState<AppState>(AppState.IDLE);
@@ -73,6 +84,12 @@ export const useExamEngine = () => {
     return { finalScore, correctCount, wrongCount };
   };
 
+  /**
+   * Initializes and starts a new exam session.
+   * Fetches questions based on the provided configuration.
+   *
+   * @param config - Configuration for the exam (subject, topics, duration, etc.)
+   */
   const startExam = async (config: ExamConfig) => {
     setErrorDetails('');
     setAppState(AppState.LOADING);
@@ -116,6 +133,14 @@ export const useExamEngine = () => {
     }
   };
 
+  /**
+   * Submits the current exam attempt.
+   * Handles both digital submission (calculating score immediately)
+   * and OMR submission (triggering AI evaluation).
+   *
+   * @param manualSubmit - Whether this was triggered manually by the user (vs timer expiry).
+   * @returns The result of the submission or a flag indicating further action needed (e.g. upload script).
+   */
   const submitExam = useCallback(
     async (manualSubmit = false) => {
       // OMR Check

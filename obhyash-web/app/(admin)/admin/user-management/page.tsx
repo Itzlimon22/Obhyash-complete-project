@@ -11,9 +11,10 @@ import {
   Crown,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { User } from '@/lib/types';
 
 // Hook
-import { useUserManagement, User } from '@/hooks/useUserManagement';
+import { useUserManagement } from '@/hooks/use-user-management';
 
 // Components
 import ActivityLogModal from '@/components/admin/user-management/ActivityLogModal';
@@ -126,8 +127,8 @@ export default function UserManagementPage() {
             user.role,
             user.status,
             user.institute || '',
-            user.exams_taken,
-            new Date(user.created_at).toLocaleDateString(),
+            user.enrolledExams,
+            new Date(user.lastActive).toLocaleDateString(),
           ].join(','),
         ),
       ].join('\n');
@@ -338,7 +339,7 @@ export default function UserManagementPage() {
         {/* Reusing existing Modals */}
         {showDetailsModal && detailsUser && (
           <DetailsModal
-            user={detailsUser as any} // temporary cast while unifying types
+            user={detailsUser}
             isOpen={showDetailsModal}
             onClose={() => setShowDetailsModal(false)}
           />
@@ -365,7 +366,7 @@ export default function UserManagementPage() {
 
         {showSubscriptionModal && subscriptionUser && (
           <ManageSubscriptionModal
-            user={subscriptionUser as any}
+            user={subscriptionUser}
             isOpen={showSubscriptionModal}
             onClose={() => setShowSubscriptionModal(false)}
             onUpdate={() => fetchUsers()}

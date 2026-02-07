@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2 } from 'lucide-react';
-import { MathRenderer } from '@/components/math-renderer';
+import { MathRenderer } from '@/components/common/MathRenderer';
 import { QuestionFormData } from '@/lib/types';
 
 interface ReviewTableProps {

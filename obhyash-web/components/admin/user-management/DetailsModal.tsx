@@ -10,7 +10,7 @@ import {
   Layers,
   GraduationCap,
 } from 'lucide-react';
-import { User as UserType } from '@/hooks/useUserManagement';
+import { User as UserType } from '@/lib/types';
 
 interface DetailsModalProps {
   user: UserType;
@@ -120,37 +120,28 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
                 Account Stats
               </h4>
               <div className="space-y-3">
-                <div className="flex items-center gap-3 text-neutral-600 dark:text-neutral-400">
-                  <Calendar className="w-5 h-5 text-neutral-400" />
-                  <span>
-                    Joined: {new Date(user.created_at).toLocaleDateString()}
+                <div className="flex items-center justify-between py-2 border-b border-neutral-100 dark:border-neutral-800">
+                  <span className="text-sm text-neutral-500">Joined</span>
+                  <span className="text-sm font-medium">
+                    {new Date(user.lastActive).toLocaleDateString()}
                   </span>
                 </div>
-                <div className="flex items-center gap-3 text-neutral-600 dark:text-neutral-400">
-                  <Shield className="w-5 h-5 text-neutral-400" />
-                  <span>Exams Taken: {user.exams_taken}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Subscription */}
-            <div className="space-y-4">
-              <h4 className="text-sm font-semibold text-neutral-900 dark:text-white uppercase tracking-wider border-b border-neutral-200 dark:border-neutral-800 pb-2">
-                Subscription
-              </h4>
-              <div className="bg-neutral-50 dark:bg-neutral-800 p-4 rounded-xl">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                    Current Plan
+                <div className="flex items-center justify-between py-2 border-b border-neutral-100 dark:border-neutral-800">
+                  <span className="text-sm text-neutral-500">Exams Taken</span>
+                  <span className="text-sm font-medium">
+                    {user.enrolledExams}
                   </span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-neutral-100 dark:border-neutral-800">
+                  <span className="text-sm text-neutral-500">Subscription</span>
                   <span
-                    className={`px-2 py-0.5 rounded text-xs font-bold ${
-                      user.subscription?.plan === 'Premium'
-                        ? 'bg-amber-100 text-amber-700'
-                        : 'bg-neutral-200 text-neutral-700'
+                    className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                      user.subscription?.plan === 'Pro'
+                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                        : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
                     }`}
                   >
-                    {user.subscription?.plan || 'Free'}
+                    {user.subscription?.plan}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">

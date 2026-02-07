@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { UserProfile } from '@/lib/types';
-import { uploadFile } from '@/services/storageService';
+import { uploadAvatar, getAvatarUrl } from '@/services/storage-service';
 
 interface ProfileHeaderProps {
   user: UserProfile;
@@ -26,7 +26,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEdit }) => {
     setIsUploading(true);
 
     try {
-      const { url } = await uploadFile(file, 'avatars');
+      const { url } = await uploadAvatar(file);
       console.log('Avatar uploaded to:', url);
     } catch (error) {
       console.error('Error uploading avatar:', error);

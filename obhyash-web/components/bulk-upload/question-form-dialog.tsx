@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { QuestionFormData } from '@/lib/types';
-import { MathRenderer } from '@/components/math-renderer';
+import { MathRenderer } from '@/components/common/MathRenderer';
 import { ImageUploader } from '@/components/ui/image-uploader';
 import { Trash2, ImageIcon } from 'lucide-react'; // ✅ Added Icons
 

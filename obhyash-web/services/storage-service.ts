@@ -50,3 +50,28 @@ export const uploadFile = async (
     throw error;
   }
 };
+
+/**
+ * Helper to upload user avatar images.
+ * Wraps uploadFile with the 'avatars' bucket.
+ *
+ * @param file - The image file to upload.
+ */
+export const uploadAvatar = async (file: File) => {
+  return uploadFile(file, 'avatars');
+};
+
+/**
+ * Helper to upload OMR script images.
+ * Wraps uploadFile with the 'scripts' bucket.
+ *
+ * @param file - The image file to upload.
+ */
+export const uploadScriptImage = async (file: File) => {
+  return uploadFile(file, 'scripts');
+};
+
+export const getAvatarUrl = (path: string | null | undefined) => {
+  if (!path) return '/placeholder-avatar.png'; // Default placeholder
+  return path;
+};

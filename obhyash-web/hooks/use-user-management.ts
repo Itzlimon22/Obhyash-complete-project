@@ -2,34 +2,39 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 import { FilterState } from '@/components/admin/user-management/AdvancedFilterBar';
+import { User } from '@/lib/types';
 
-export interface User {
-  id: string;
-  name: string | null;
-  email: string | null;
-  phone: string | null;
-  role: string;
-  status: string;
-  avatar_url: string | null;
-  institute: string | null;
-  division: string | null;
-  batch: string | null;
-  exams_taken: number;
-  created_at: string;
-  subscription: {
-    plan: string;
-    status: string;
-  };
-}
-
+/**
+ * Custom hook for managing user data in the Admin Panel.
+ * Handles fetching, filtering, searching, and bulk actions for users.
+ *
+ * @returns An object containing user data, loading states, filter controls, and action handlers.
+ */
 export function useUserManagement() {
+  // --- State Management ---
+
+  /** Full list of users fetched from the database */
   const [users, setUsers] = useState<User[]>([]);
+
+  /** Filtered list of users based on search and filter criteria */
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+
+  /** Loading state for initial fetch */
   const [isLoading, setIsLoading] = useState(true);
+
+  /** Loading state for manual refresh */
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  /** Search query string (name, email, phone) */
   const [searchQuery, setSearchQuery] = useState('');
+
+  /** Filter by user role (e.g., 'Student', 'Teacher', 'Admin') */
   const [roleFilter, setRoleFilter] = useState<string>('all');
+
+  /** Filter by user status (e.g., 'Active', 'Inactive') */
   const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  /** Complex advanced filters */
   const [advancedFilters, setAdvancedFilters] = useState<FilterState>({
     lastActiveRange: 'all',
     minExams: 0,
@@ -50,6 +55,12 @@ export function useUserManagement() {
     filterUsers();
   }, [searchQuery, roleFilter, statusFilter, users, advancedFilters]);
 
+  /**
+   * Fetches the latest list of users from Supabase.
+   * Maps the raw database response to the global User type.
+   *
+   * @param showToast - Whether to show a success toast on completion.
+   */
   const fetchUsers = async (showToast = false) => {
     if (showToast) setIsRefreshing(true);
     const supabase = createClient();
@@ -60,7 +71,40 @@ export function useUserManagement() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setUsers(data || []);
+
+      // Map DB fields to User type
+      const mappedUsers: User[] = (data || []).map((u: any) => ({
+        id: u.id,
+        name: u.name || '',
+        email: u.email || '',
+        phone: u.phone,
+        role: u.role || 'Student',
+        status: u.status || 'Active',
+        avatarUrl: u.avatar_url,
+        institute: u.institute,
+        division: u.division,
+        batch: u.batch,
+        enrolledExams: u.exams_taken || 0, // Map exams_taken to enrolledExams
+        lastActive: u.created_at, // Using created_at as proxy for now if last_active missing
+        subscription: u.subscription || {
+          plan: 'Free',
+          status: 'Active',
+          expiry: '',
+        },
+        recentExams: [], // Placeholder
+        goal: u.goal,
+        target: u.target,
+        stream: u.stream,
+        ssc_roll: u.ssc_roll,
+        ssc_reg: u.ssc_reg,
+        ssc_board: u.ssc_board,
+        ssc_passing_year: u.ssc_passing_year,
+        level: u.level,
+        xp: u.xp,
+        avatarColor: u.avatar_color,
+      }));
+
+      setUsers(mappedUsers);
       if (showToast) toast.success('Users refreshed successfully');
     } catch (error) {
       console.error('Failed to fetch users:', error);
@@ -95,7 +139,7 @@ export function useUserManagement() {
     if (advancedFilters.lastActiveRange !== 'all') {
       const now = new Date();
       filtered = filtered.filter((user) => {
-        const userDate = new Date(user.created_at);
+        const userDate = new Date(user.lastActive);
         const diffDays =
           (now.getTime() - userDate.getTime()) / (1000 * 3600 * 24);
 
@@ -110,8 +154,8 @@ export function useUserManagement() {
     if (advancedFilters.minExams > 0 || advancedFilters.maxExams < 10000) {
       filtered = filtered.filter(
         (u) =>
-          u.exams_taken >= advancedFilters.minExams &&
-          u.exams_taken <= advancedFilters.maxExams,
+          u.enrolledExams >= advancedFilters.minExams &&
+          u.enrolledExams <= advancedFilters.maxExams,
       );
     }
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { UserProfile } from '@/lib/types';
-import { uploadFile } from '@/services/storageService';
+import { uploadAvatar, getAvatarUrl } from '@/services/storage-service';
 import UserAvatar from '../../common/UserAvatar';
 
 interface ProfileHeaderProps {
@@ -28,7 +28,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEdit }) => {
 
     try {
       // Upload to 'avatars' bucket via storage service (handles Supabase or R2)
-      const { url } = await uploadFile(file, 'avatars');
+      const { url } = await uploadAvatar(file);
       console.log('Avatar uploaded to:', url);
 
       // TODO: Call API to update user profile with new `url`

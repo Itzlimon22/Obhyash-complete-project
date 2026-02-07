@@ -2,16 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Calendar, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
-
-interface User {
-  id: string;
-  name: string | null;
-  subscription?: {
-    plan: string;
-    expiry?: string;
-    status: string;
-  };
-}
+import { User } from '@/lib/types';
 
 interface ManageSubscriptionModalProps {
   isOpen: boolean;

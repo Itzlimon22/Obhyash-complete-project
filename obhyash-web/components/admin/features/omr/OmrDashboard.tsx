@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { ExamResult } from '@/lib/types'; // Adjust path if needed
-import { evaluateOMRScript } from '@/services/geminiService'; // Adjust path
+import { evaluateOMRScript } from '@/services/gemini-service'; // Adjust path
 import { supabase } from '@/lib/utils/supabase'; // ✅ Import Supabase
 
 interface OmrDashboardProps {
@@ -97,7 +97,10 @@ export default function OmrDashboard({ initialData }: OmrDashboardProps) {
       alert(`Evaluation Complete! Saved Score: ${finalScore.toFixed(2)}`);
     } catch (error: unknown) {
       console.error(error);
-      alert('Evaluation Failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      alert(
+        'Evaluation Failed: ' +
+          (error instanceof Error ? error.message : 'Unknown error'),
+      );
     } finally {
       setProcessingId(null);
     }

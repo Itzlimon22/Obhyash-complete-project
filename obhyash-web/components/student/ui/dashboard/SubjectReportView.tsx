@@ -13,7 +13,7 @@ import {
 } from 'recharts';
 import { ExamResult } from '@/lib/types';
 import { getSubjectAnalysis, SubjectAnalysis } from '@/services/database';
-import { printSubjectReport } from '@/services/printService';
+import { printSubjectReport } from '@/services/print-service';
 import { supabase } from '@/services/core';
 
 interface SubjectReportViewProps {

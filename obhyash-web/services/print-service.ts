@@ -1,25 +1,32 @@
-import { 
-  Question, 
-  ExamDetails, 
-  UserAnswers, 
-  Invoice, 
-  UserProfile, 
-  SubjectAnalysis // ✅ Imported from central types, not local database
-} from "@/lib/types";
+import {
+  Question,
+  ExamDetails,
+  UserAnswers,
+  Invoice,
+  UserProfile,
+  SubjectAnalysis, // ✅ Imported from central types, not local database
+} from '@/lib/types';
 import katex from 'katex';
 
 // Helper to render LaTeX
 const renderLatex = (text: string): string => {
   if (!text) return '';
   const parts = text.split(/(\$[^$]+\$)/g);
-  return parts.map(part => {
-    if (part.startsWith('$') && part.endsWith('$')) {
-      try {
-        return katex.renderToString(part.slice(1, -1), { throwOnError: false, displayMode: false });
-      } catch { return part; }
-    }
-    return part;
-  }).join('');
+  return parts
+    .map((part) => {
+      if (part.startsWith('$') && part.endsWith('$')) {
+        try {
+          return katex.renderToString(part.slice(1, -1), {
+            throwOnError: false,
+            displayMode: false,
+          });
+        } catch {
+          return part;
+        }
+      }
+      return part;
+    })
+    .join('');
 };
 
 // Helper to render Image from R2/Supabase
@@ -30,7 +37,17 @@ const renderImage = (imageUrl?: string) => {
           </div>`;
 };
 
-export const printQuestionPaper = (details: ExamDetails, questions: Question[]) => {
+/**
+ * Generates and prints a question paper for a given exam.
+ * Opens a new window with formatted HTML including LaTeX rendering and image support.
+ *
+ * @param details - The metadata for the exam (subject, type, duration, etc.)
+ * @param questions - The list of questions to include in the paper.
+ */
+export const printQuestionPaper = (
+  details: ExamDetails,
+  questions: Question[],
+) => {
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
 
@@ -72,7 +89,9 @@ export const printQuestionPaper = (details: ExamDetails, questions: Question[]) 
           </table>
         </div>
         <div class="content-wrapper">
-          ${questions.map((q, idx) => `
+          ${questions
+            .map(
+              (q, idx) => `
             <div class="question-item">
               <div class="q-header">
                 <span style="min-width:25px">${idx + 1}.</span>
@@ -82,15 +101,21 @@ export const printQuestionPaper = (details: ExamDetails, questions: Question[]) 
                 <span style="font-size:9pt;margin-left:5px">[${q.points}]</span>
               </div>
               <ul class="options-list">
-                ${q.options.map((opt, oIdx) => `
+                ${q.options
+                  .map(
+                    (opt, oIdx) => `
                   <li class="option-item">
                     <span style="font-weight:bold;margin-right:5px">(${['a', 'b', 'c', 'd'][oIdx]})</span>
                     <span>${renderLatex(opt)}</span>
                   </li>
-                `).join('')}
+                `,
+                  )
+                  .join('')}
               </ul>
             </div>
-          `).join('')}
+          `,
+            )
+            .join('')}
         </div>
         <script>setTimeout(() => { window.print(); }, 800);</script>
       </body>
@@ -103,9 +128,14 @@ export const printQuestionPaper = (details: ExamDetails, questions: Question[]) 
 export const printOMRSheet = (details: ExamDetails, totalQuestions: number) => {
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
-  
+
   // QR Code remains as a Public API call (No database needed for this)
-  const qrData = JSON.stringify({ s: details.subject, t: details.examType, m: details.totalMarks, q: totalQuestions });
+  const qrData = JSON.stringify({
+    s: details.subject,
+    t: details.examType,
+    m: details.totalMarks,
+    q: totalQuestions,
+  });
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
 
   const htmlContent = `
@@ -265,9 +295,13 @@ export const printOMRSheet = (details: ExamDetails, totalQuestions: number) => {
 
             <div class="sheet-body">
                 <div class="watermark">OBHYASH</div>
-                ${[0, 1, 2, 3].map(col => `
+                ${[0, 1, 2, 3]
+                  .map(
+                    (col) => `
                     <div class="column">
-                        ${Array(25).fill(0).map((_, row) => {
+                        ${Array(25)
+                          .fill(0)
+                          .map((_, row) => {
                             const qNum = col * 25 + row + 1;
                             const opacity = qNum <= totalQuestions ? 1 : 0.15;
                             return `
@@ -281,9 +315,12 @@ export const printOMRSheet = (details: ExamDetails, totalQuestions: number) => {
                                     </div>
                                 </div>
                             `;
-                        }).join('')}
+                          })
+                          .join('')}
                     </div>
-                `).join('')}
+                `,
+                  )
+                  .join('')}
             </div>
 
             <div class="footer">
@@ -311,14 +348,20 @@ export const printOMRSheet = (details: ExamDetails, totalQuestions: number) => {
   printWindow.document.close();
 };
 
-export const printResultWithExplanations = (details: ExamDetails, questions: Question[], userAnswers: UserAnswers) => {
-   const printWindow = window.open('', '_blank');
-   if (!printWindow) return;
-   
-   // Calculate score for the report
-   const score = Object.values(userAnswers).filter((ua, idx) => questions[idx] && questions[idx].correctAnswerIndex === ua).length;
+export const printResultWithExplanations = (
+  details: ExamDetails,
+  questions: Question[],
+  userAnswers: UserAnswers,
+) => {
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return;
 
-   const htmlContent = `
+  // Calculate score for the report
+  const score = Object.values(userAnswers).filter(
+    (ua, idx) => questions[idx] && questions[idx].correctAnswerIndex === ua,
+  ).length;
+
+  const htmlContent = `
     <!DOCTYPE html>
     <html lang="bn">
       <head>
@@ -363,14 +406,19 @@ export const printResultWithExplanations = (details: ExamDetails, questions: Que
           </table>
         </div>
         <div class="content-wrapper">
-          ${questions.map((q, idx) => {
-            const userAns = userAnswers[q.id];
-            const isCorrect = userAns === q.correctAnswerIndex;
-            const isSkipped = userAns === undefined;
-            const userAnsLabel = isSkipped ? 'Skipped' : ['a', 'b', 'c', 'd'][userAns];
-            const correctAnsLabel = ['a', 'b', 'c', 'd'][q.correctAnswerIndex];
-            
-            return `
+          ${questions
+            .map((q, idx) => {
+              const userAns = userAnswers[q.id];
+              const isCorrect = userAns === q.correctAnswerIndex;
+              const isSkipped = userAns === undefined;
+              const userAnsLabel = isSkipped
+                ? 'Skipped'
+                : ['a', 'b', 'c', 'd'][userAns];
+              const correctAnsLabel = ['a', 'b', 'c', 'd'][
+                q.correctAnswerIndex
+              ];
+
+              return `
             <div class="question-item">
               <div class="q-header">
                 <span style="min-width:25px">${idx + 1}.</span>
@@ -380,12 +428,16 @@ export const printResultWithExplanations = (details: ExamDetails, questions: Que
                 <span style="font-size:9pt;margin-left:5px">[${q.points}]</span>
               </div>
               <ul class="options-list">
-                ${q.options.map((opt, oIdx) => `
+                ${q.options
+                  .map(
+                    (opt, oIdx) => `
                   <li class="option-item">
                     <span style="font-weight:bold;margin-right:5px">(${['a', 'b', 'c', 'd'][oIdx]})</span>
                     <span>${renderLatex(opt)}</span>
                   </li>
-                `).join('')}
+                `,
+                  )
+                  .join('')}
               </ul>
               <div class="solution-box">
                  <div class="sol-row">
@@ -403,15 +455,17 @@ export const printResultWithExplanations = (details: ExamDetails, questions: Que
                  </div>
               </div>
             </div>
-          `}).join('')}
+          `;
+            })
+            .join('')}
         </div>
         <script>setTimeout(() => { window.print(); }, 800);</script>
       </body>
     </html>
    `;
-   
-   printWindow.document.write(htmlContent);
-   printWindow.document.close();
+
+  printWindow.document.write(htmlContent);
+  printWindow.document.close();
 };
 
 export const printSubjectReport = (subject: string, stats: SubjectAnalysis) => {
@@ -457,7 +511,15 @@ export const printSubjectReport = (subject: string, stats: SubjectAnalysis) => {
 
         <h2>Mistakes Log</h2>
         <div class="mistake-list">
-           ${stats.mistakes.map((m: { examDate: string; examName: string; question: Question; userAns: number; correctAns: number }) => `
+           ${stats.mistakes
+             .map(
+               (m: {
+                 examDate: string;
+                 examName: string;
+                 question: Question;
+                 userAns: number;
+                 correctAns: number;
+               }) => `
               <div class="mistake-item">
                  <div class="meta">${new Date(m.examDate).toLocaleDateString()} - ${m.examName}</div>
                  <p><strong>Q:</strong> ${renderLatex(m.question.question)}</p>
@@ -465,7 +527,9 @@ export const printSubjectReport = (subject: string, stats: SubjectAnalysis) => {
                  <p style="color:green">Correct Answer: ${renderLatex(m.question.options[m.correctAns])}</p>
                  <p style="font-size:12px; font-style:italic; margin-top:5px; color:#475569">Exp: ${renderLatex(m.question.explanation || '')}</p>
               </div>
-           `).join('')}
+           `,
+             )
+             .join('')}
         </div>
         <script>setTimeout(() => { window.print(); }, 1000);</script>
       </body>

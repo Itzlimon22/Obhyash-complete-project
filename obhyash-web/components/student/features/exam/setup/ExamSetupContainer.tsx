@@ -4,18 +4,35 @@ import React, { useState, useEffect } from 'react';
 import { SubjectSelector } from './SubjectSelector';
 import { TopicSelector } from './TopicSelector';
 import { ExamSettings } from './ExamSettings';
-import { ExamConfig, Difficulty } from '@/lib/types';
-import { printOMRSheet, ExamDetails } from '@/services/printService';
+import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
+import { printQuestionPaper, printOMRSheet } from '@/services/print-service';
 import { getSubjectMetadata, SubjectMetadata } from '@/services/database';
 import { toast } from 'sonner';
 import { AlertCircle, Zap, Download } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
+/**
+ * Props for the ExamSetupContainer component.
+ */
 interface ExamSetupContainerProps {
+  /** Callback function triggered when the user starts the exam with valid configuration. */
   onStartExam: (config: ExamConfig) => void;
+  /** Loading state indicating if the exam initialization is in progress. */
   isLoading: boolean;
 }
 
+/**
+ * ExamSetupContainer Component
+ *
+ * Orchestrates the exam configuration process. It handles:
+ * - Fetching available subjects based on user profile.
+ * - cascading selection logic (Subject -> Chapters -> Topics).
+ * - Exam settings configuration (Type, Difficulty, Question Count, Duration, Negative Marking).
+ * - OMR Sheet generation and download.
+ * - Validation and submission of the exam configuration.
+ *
+ * @param props - {@link ExamSetupContainerProps}
+ */
 export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
   onStartExam,
   isLoading,

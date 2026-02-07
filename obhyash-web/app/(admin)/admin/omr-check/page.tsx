@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/services/database'; // Or use createClient from utils if simpler
 import { ExamResult } from '@/lib/types';
-import { evaluateOMRScript } from '@/services/geminiService';
+import { evaluateOMRScript } from '@/services/gemini-service';
 import { toast } from 'sonner';
 
 // Extended type to include user details

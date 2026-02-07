@@ -18,7 +18,8 @@ import {
   Crown,
   Clock,
 } from 'lucide-react';
-import { User } from '@/hooks/useUserManagement';
+import { User } from '@/lib/types'; // Assuming User type is in types.ts
+import { useUserManagement } from '@/hooks/use-user-management';
 import { toast } from 'sonner';
 
 interface UserTableProps {
@@ -112,7 +113,6 @@ const UserTable: React.FC<UserTableProps> = ({
         <table className="w-full">
           <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800">
             <tr>
-            <tr>
               <th className="px-4 md:px-6 py-3 md:py-4 text-left">
                 <input
                   type="checkbox"
@@ -182,7 +182,7 @@ const UserTable: React.FC<UserTableProps> = ({
                         {user.name || 'Unnamed User'}
                       </p>
                       <p className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
-                        {user.subscription?.plan === 'Premium' && (
+                        {user.subscription?.plan === 'Pro' && (
                           <Crown className="w-3 h-3 text-amber-500" />
                         )}
                         {user.subscription?.plan || 'Free'} Plan
@@ -248,13 +248,13 @@ const UserTable: React.FC<UserTableProps> = ({
                 </td>
                 <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                   <p className="text-sm font-semibold text-neutral-900 dark:text-white">
-                    {user.exams_taken || 0}
+                    {user.enrolledExams || 0}
                   </p>
                 </td>
                 <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap">
                   <div className="flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-400">
                     <Calendar className="w-3.5 h-3.5" />
-                    {new Date(user.created_at).toLocaleDateString()}
+                    {new Date(user.lastActive).toLocaleDateString()}
                   </div>
                 </td>
                 <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap text-right">

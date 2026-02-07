@@ -24,32 +24,56 @@ import {
   UserAnswers,
   UserProfile,
 } from '@/lib/types';
-import { printQuestionPaper, printOMRSheet } from '@/services/printService';
+import { printQuestionPaper, printOMRSheet } from '@/services/print-service';
 
+/**
+ * Props for the ExamRunner component.
+ * Manages the state and interaction for an active exam session.
+ */
 interface ExamRunnerProps {
+  /** Current state of the application (e.g., ACTIVE, TIMEOUT, COMPLETED) */
   appState: AppState;
+  /** Logic and metadata for the current exam */
   examDetails: ExamDetails | null;
+  /** List of questions for the exam */
   questions: Question[];
+  /** Map of question IDs to user selected option indices */
   userAnswers: UserAnswers;
+  /** State setter for user answers */
   setUserAnswers: React.Dispatch<React.SetStateAction<UserAnswers>>;
+  /** Set of question IDs marked for review */
   flaggedQuestions: Set<number>;
+  /** State setter for flagged questions */
   setFlaggedQuestions: React.Dispatch<React.SetStateAction<Set<number>>>;
+  /** Remaining time in seconds */
   timeLeft: number;
+  /** Grace period time remaining in seconds (for OMR upload) */
   graceTimeLeft: number;
+  /** Whether the exam is in OMR (Offline) mode */
   isOmrMode: boolean;
+  /** Toggle function for OMR mode */
   setIsOmrMode: (mode: boolean) => void;
+  /** The selected OMR script file and its base64 representation */
   selectedScript: { file: File; base64: string } | null;
+  /** Setter for the selected OMR script */
   setSelectedScript: (script: { file: File; base64: string } | null) => void;
+  /** Function to handle exam submission */
   onSubmit: (manual?: boolean) => void;
+  /** Function to handle exit (unused in this component but passed down) */
   onExit: () => void;
+  /** Function to reattempt exam after timeout */
   onTimeoutReattempt: () => void;
+  /** Function to cancel exam after timeout */
   onTimeoutCancel: () => void;
+  /** Function to update application state */
   setAppState: (state: AppState) => void;
+  /** State object for navigation warning modal */
   navWarning: {
     isOpen: boolean;
     targetTab: string | null;
     action: 'tab' | 'logout';
   };
+  /** Setter for navigation warning state */
   setNavWarning: React.Dispatch<
     React.SetStateAction<{
       isOpen: boolean;
@@ -57,14 +81,32 @@ interface ExamRunnerProps {
       action: 'tab' | 'logout';
     }>
   >;
+  /** Function to confirm navigation away from exam */
   confirmNavigation: () => void;
+  /** Currently logged-in user profile */
   currentUser: UserProfile | null;
+  /** Handler for tab navigation */
   handleTabChange: (tab: string) => void;
+  /** Handler for logout action */
   handleLogoutClick: () => void;
+  /** Handler to toggle theme */
   toggleTheme: () => void;
+  /** Current theme state */
   isDarkMode: boolean;
 }
 
+/**
+ * ExamRunner Component
+ *
+ * The main container for the exam taking interface. It handles:
+ * - Render of the ExamHeader with timer and mode toggles.
+ * - Listing of QuestionCards.
+ * - Sticky footer for submission (Digital or OMR).
+ * - Modal management (Timeout, Confirmation, Upload, Report).
+ * - Responsive layout adaptation.
+ *
+ * @param props - {@link ExamRunnerProps}
+ */
 const ExamRunner: React.FC<ExamRunnerProps> = ({
   appState,
   examDetails,

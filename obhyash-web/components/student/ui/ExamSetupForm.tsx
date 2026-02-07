@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
-import { printOMRSheet } from '@/services/printService';
+import { printQuestionPaper, printOMRSheet } from '@/services/print-service';
 
 interface ExamSetupFormProps {
   onStartExam: (config: ExamConfig) => void;

@@ -11,17 +11,40 @@ import {
 import { cn } from '@/lib/utils';
 // Sheet component imports removed as they were unused and the module does not exist
 
+/**
+ * Props for the TopicSelector component.
+ */
 interface TopicSelectorProps {
+  /** Title of the selector (e.g., "Chapters", "Topics"). */
   title: string;
+  /** List of all available items to select from. */
   items: string[];
+  /** List of currently selected items. */
   selectedItems: string[];
+  /** Callback to toggle selection of a single item. */
   onToggle: (item: string) => void;
+  /** Callback to select all available items. */
   onSelectAll: () => void;
+  /** Callback to clear all selections. */
   onClear: () => void;
+  /** Whether the selector interaction is disabled. */
   disabled?: boolean;
+  /** Text to display when the list is empty or no items match search. */
   emptyLabel?: string;
 }
 
+/**
+ * TopicSelector Component
+ *
+ * A reusable component for selecting multiple items from a list.
+ * Features:
+ * - Mobile-responsive modal/drawer interface.
+ * - Search functionality to filter items.
+ * - "Select All" and "Clear" convenience actions.
+ * - Visual feedback for selection state.
+ *
+ * @param props - {@link TopicSelectorProps}
+ */
 export const TopicSelector: React.FC<TopicSelectorProps> = ({
   title,
   items,

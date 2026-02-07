@@ -21,7 +21,7 @@ import {
   submitManualPayment,
   getUserActiveSubscription,
 } from '@/services/database';
-import { printInvoice } from '@/services/printService';
+import { printInvoice } from '@/services/print-service';
 
 const SubscriptionView: React.FC = () => {
   // State
