@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
 import { OmrPrintModal } from '@/components/student/features/omr/OmrPrintModal';
+import { TopicSelector } from '@/components/student/features/exam/setup/TopicSelector';
 import { toast } from 'sonner';
 
 interface ExamSetupFormProps {
@@ -12,6 +13,11 @@ interface Subject {
   id: string;
   label: string;
   icon: string;
+}
+
+interface Item {
+  id: string;
+  name: string;
 }
 
 const STATIC_SUBJECT_ICONS: Record<string, string> = {
@@ -49,15 +55,21 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 }) => {
   // --- New State for Database Data ---
   const [availableSubjects, setAvailableSubjects] = useState<Subject[]>([]);
+  const [availableChapters, setAvailableChapters] = useState<Item[]>([]);
+  const [availableTopics, setAvailableTopics] = useState<Item[]>([]);
   const [isFetchingData, setIsFetchingData] = useState(true);
 
   // Form State
   const [subject, setSubject] = useState('');
-  const [activeStep, setActiveStep] = useState(1); // 1: Subject, 2: Config
+  // const [activeStep, setActiveStep] = useState(1); // 1: Subject, 2: Config (Unused currently)
 
   const [examTypes, setExamTypes] = useState<string[]>(['Academic']);
-  const [chapters, setChapters] = useState('');
-  const [topics, setTopics] = useState('');
+  const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+
+  // Derived strings for API compatibility
+  const chapters = selectedChapters.join(',') || '';
+  const topics = selectedTopics.join(',') || '';
 
   const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.Mixed);
   const [questionCount, setQuestionCount] = useState<number>(20);
@@ -119,6 +131,59 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
     fetchSubjects();
   }, []);
+
+  // --- EFFECT: Fetch Chapters when Subject changes ---
+  useEffect(() => {
+    if (!subject) {
+      setAvailableChapters([]);
+      setAvailableTopics([]);
+      setSelectedChapters([]);
+      setSelectedTopics([]);
+      return;
+    }
+
+    const fetchChapters = async () => {
+      try {
+        const { getChapters } = await import('@/services/database');
+        const chaptersData = await getChapters(subject);
+        setAvailableChapters(chaptersData);
+        // Clear dependent selections
+        setSelectedChapters([]);
+        setAvailableTopics([]);
+        setSelectedTopics([]);
+      } catch (error) {
+        console.error('Failed to fetch chapters:', error);
+        toast.error('অধ্যায় লোড করা যাচ্ছে না।');
+      }
+    };
+
+    fetchChapters();
+  }, [subject]);
+
+  // --- EFFECT: Fetch Topics when Chapters change ---
+  useEffect(() => {
+    // If no chapters selected, we might want to show ALL topics or NONE.
+    // For now, let's show topics if specific chapters are selected.
+    if (selectedChapters.length === 0) {
+      setAvailableTopics([]);
+      setSelectedTopics([]);
+      return;
+    }
+
+    const fetchTopics = async () => {
+      try {
+        const { getTopics } = await import('@/services/database');
+        // Fetch topics for ALL selected chapters
+        const topicsData = await getTopics(selectedChapters);
+        setAvailableTopics(topicsData);
+        setSelectedTopics([]); // Reset topic selection when chapters change (or preserve if possible, but safer to reset)
+      } catch (error) {
+        console.error('Failed to fetch topics:', error);
+      }
+    };
+
+    fetchTopics();
+  }, [selectedChapters]);
 
   const toggleExamType = (typeId: string) => {
     setExamTypes((prev) => {
@@ -307,62 +372,46 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 </label>
                 <div className="space-y-4">
                   <div className="relative">
-                    <span className="absolute left-4 top-3.5 text-neutral-400">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
-                        className="w-5 h-5"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
-                        />
-                      </svg>
-                    </span>
-                    <input
-                      type="text"
-                      value={chapters}
-                      onChange={(e) => setChapters(e.target.value)}
-                      placeholder="নির্দিষ্ট অধ্যায়ের নাম লিখুন..."
-                      className="w-full pl-12 pr-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-neutral-400 font-medium"
+                    <TopicSelector
+                      title="অধ্যায় (Chapters)"
+                      items={availableChapters.map((c) => c.name)} // Pass names for display
+                      selectedItems={availableChapters
+                        .filter((c) => selectedChapters.includes(c.id))
+                        .map((c) => c.name)}
+                      onChange={(names) => {
+                        // Map back names to IDs
+                        // NOTE: This assumes names are unique per subject, which is generally true but IDs are safer.
+                        // TopicSelector currently works with strings.
+                        // If we want to use IDs, TopicSelector needs to handle value vs label.
+                        // For now, let's map names back to IDs.
+                        const newIds = availableChapters
+                          .filter((c) => names.includes(c.name))
+                          .map((c) => c.id);
+                        setSelectedChapters(newIds);
+                      }}
+                      emptyLabel="No chapters found"
+                      disabled={!subject}
                     />
                   </div>
                   <div className="relative">
-                    <span className="absolute left-4 top-3.5 text-neutral-400">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
-                        className="w-5 h-5"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6 6h.008v.008H6V6Z"
-                        />
-                      </svg>
-                    </span>
-                    <input
-                      type="text"
-                      value={topics}
-                      onChange={(e) => setTopics(e.target.value)}
-                      placeholder="নির্দিষ্ট টপিক লিখুন..."
-                      className="w-full pl-12 pr-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-neutral-400 font-medium"
+                    <TopicSelector
+                      title="টপিক (Topics)"
+                      items={availableTopics.map((t) => t.name)}
+                      selectedItems={availableTopics
+                        .filter((t) => selectedTopics.includes(t.id))
+                        .map((t) => t.name)}
+                      onChange={(names) => {
+                        const newIds = availableTopics
+                          .filter((t) => names.includes(t.name))
+                          .map((t) => t.id);
+                        setSelectedTopics(newIds);
+                      }}
+                      emptyLabel="No topics found (Select chapters first)"
+                      disabled={selectedChapters.length === 0}
                     />
                   </div>
                   <p className="text-xs text-neutral-400 pl-1">
-                    * খালি রাখলে পুরো বইয়ের ওপর পরীক্ষা হবে
+                    * অধ্যায় নির্বাচন করলে সেই অধ্যায়ের টপিক আসবে
                   </p>
                 </div>
               </div>
