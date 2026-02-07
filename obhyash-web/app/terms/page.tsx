@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Flame, ArrowLeft, ShieldCheck, FileText, Scale } from 'lucide-react';
+import { Flame, ArrowLeft, Scale } from 'lucide-react';
 
 export default function TermsPage() {
   return (
@@ -60,10 +60,10 @@ export default function TermsPage() {
             <div className="pl-11 prose dark:prose-invert prose-slate max-w-none">
               <p>
                 Obhyash অ্যাপ বা ওয়েবসাইট ব্যবহার করে একাউন্ট তৈরি বা
-                সাবস্ক্রিপশন কেনার মাধ্যমে আপনি আমাদের এই "Terms of Service" এবং
-                "Privacy Policy"-র সাথে আইনিভাবে চুক্তিবদ্ধ হচ্ছেন। আপনি যদি এই
-                শর্তাবলীর কোনো অংশের সাথে দ্বিমত পোষণ করেন, তবে অনুগহ করে আমাদের
-                সেবা ব্যবহার থেকে বিরত থাকুন।
+                সাবস্ক্রিপশন কেনার মাধ্যমে আপনি আমাদের এই &ldquo;Terms of
+                Service&rdquo; এবং &ldquo;Privacy Policy&rdquo;-র সাথে আইনিভাবে
+                চুক্তিবদ্ধ হচ্ছেন। আপনি যদি এই শর্তাবলীর কোনো অংশের সাথে দ্বিমত
+                পোষণ করেন, তবে অনুগহ করে আমাদের সেবা ব্যবহার থেকে বিরত থাকুন।
               </p>
             </div>
           </div>

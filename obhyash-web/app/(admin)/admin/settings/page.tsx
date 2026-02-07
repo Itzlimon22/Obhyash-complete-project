@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import {
-  Settings,
   Shield,
   Bell,
   Monitor,
@@ -15,18 +15,43 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function AdminSettingsPage() {
-  const [activeTab, setActiveTab] = useState<
-    'general' | 'security' | 'notifications'
-  >('general');
-  const [loading, setLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+type TabId = 'general' | 'security' | 'notifications';
 
-  // Load initial settings
-  useEffect(() => {
+const TabButton = ({
+  id,
+  label,
+  icon: Icon,
+  activeTab,
+  setActiveTab,
+}: {
+  id: TabId;
+  label: string;
+  icon: LucideIcon;
+  activeTab: TabId;
+  setActiveTab: (id: TabId) => void;
+}) => (
+  <button
+    onClick={() => setActiveTab(id)}
+    className={`flex items-center gap-3 px-6 py-4 text-sm font-medium transition-all border-b-2 
+      ${
+        activeTab === id
+          ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/10'
+          : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-obsidian-800'
+      }`}
+  >
+    <Icon size={18} />
+    {label}
+  </button>
+);
+
+export default function AdminSettingsPage() {
+  const [activeTab, setActiveTab] = useState<TabId>('general');
+  const [loading, setLoading] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window === 'undefined') return true;
     const savedTheme = localStorage.getItem('theme');
-    setIsDarkMode(savedTheme !== 'light');
-  }, []);
+    return savedTheme !== 'light';
+  });
 
   const handleSave = () => {
     setLoading(true);
@@ -47,29 +72,6 @@ export default function AdminSettingsPage() {
       localStorage.setItem('theme', 'light');
     }
   };
-
-  const TabButton = ({
-    id,
-    label,
-    icon: Icon,
-  }: {
-    id: typeof activeTab;
-    label: string;
-    icon: any;
-  }) => (
-    <button
-      onClick={() => setActiveTab(id)}
-      className={`flex items-center gap-3 px-6 py-4 text-sm font-medium transition-all border-b-2 
-        ${
-          activeTab === id
-            ? 'border-brand-500 text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/10'
-            : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-obsidian-800'
-        }`}
-    >
-      <Icon size={18} />
-      {label}
-    </button>
-  );
 
   return (
     <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500">
@@ -101,9 +103,27 @@ export default function AdminSettingsPage() {
       <div className="bg-white dark:bg-obsidian-900 rounded-2xl shadow-sm border border-paper-200 dark:border-obsidian-800 overflow-hidden min-h-[500px]">
         {/* Tabs */}
         <div className="flex border-b border-paper-200 dark:border-obsidian-800 overflow-x-auto">
-          <TabButton id="general" label="General" icon={Monitor} />
-          <TabButton id="security" label="Security" icon={Shield} />
-          <TabButton id="notifications" label="Notifications" icon={Bell} />
+          <TabButton
+            id="general"
+            label="General"
+            icon={Monitor}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
+          <TabButton
+            id="security"
+            label="Security"
+            icon={Shield}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
+          <TabButton
+            id="notifications"
+            label="Notifications"
+            icon={Bell}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
         </div>
 
         {/* Tab Content */}

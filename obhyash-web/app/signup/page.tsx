@@ -164,9 +164,10 @@ export default function SignupPage() {
 
         setSuccess(true);
       }
-    } catch (err: any) {
-      console.error('Signup Error:', err);
-      setError(err.message || 'Something went wrong');
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error('Signup Error:', error);
+      setError(error.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }

@@ -105,7 +105,7 @@ export default function BulkUploadPage() {
         router.push('/admin/question-management');
       } else {
         alert(
-          `Import failed: ${result.errors.map((e) => e.message || JSON.stringify(e)).join(', ')}`,
+          `Import failed: ${result.errors.map((e: unknown) => (e instanceof Error ? e.message : JSON.stringify(e))).join(', ')}`,
         );
       }
     } catch (error) {

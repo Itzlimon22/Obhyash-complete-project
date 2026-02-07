@@ -60,11 +60,11 @@ export default function ReportsPage() {
       questionsData?.forEach((q) => questionsMap.set(q.id, q as Question));
 
       // 3. Combine Data
-      const formattedReports: Report[] = reportsData.map((r: any) => ({
+      const formattedReports: Report[] = reportsData.map((r) => ({
         id: r.id,
         questionId: r.question_id,
         questionPreview: questionsMap.get(r.question_id) || ({} as Question),
-        reporterName: r.reporter?.name || 'Unknown User',
+        reporterName: (r.reporter as { name: string } | null)?.name || 'Unknown User',
         reason: r.reason,
         description: r.description,
         status: r.status,

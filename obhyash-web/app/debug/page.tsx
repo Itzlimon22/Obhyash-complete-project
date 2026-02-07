@@ -1,10 +1,22 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { getUserProfile, getSubjects } from '@/services/database';
+import { UserProfile } from '@/lib/types';
 
 export default function DebugPage() {
-  const [user, setUser] = useState<any>(null);
-  const [subjects, setSubjects] = useState<any[]>([]);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [subjects, setSubjects] = useState<
+    {
+      id: string;
+      name: string;
+      label?: string;
+      icon?: string;
+      group?: string;
+      division?: string;
+      stream?: string;
+      name_en?: string;
+    }[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,7 +46,7 @@ export default function DebugPage() {
       <h1 className="text-xl font-bold">Debug Info</h1>
 
       <section className="border p-4 rounded bg-slate-50">
-        <h2 className="font-bold mb-2">User Profile (getUserProfile('me'))</h2>
+        <h2 className="font-bold mb-2">User Profile (getUserProfile(&apos;me&apos;))</h2>
         <pre className="whitespace-pre-wrap break-all">
           {JSON.stringify(user, null, 2)}
         </pre>

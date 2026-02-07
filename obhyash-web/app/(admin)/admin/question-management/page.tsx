@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Plus,
@@ -56,27 +56,20 @@ export default function QuestionManagementPage() {
   const [previewData, setPreviewData] = useState<Question | null>(null);
 
   // Stats
-  const [stats, setStats] = useState({
-    total: 0,
-    approved: 0,
-    pending: 0,
-    rejected: 0,
-  });
+  const stats = useMemo(
+    () => ({
+      total: totalCount,
+      approved: questions.filter((q) => q.status === 'Approved').length,
+      pending: questions.filter((q) => q.status === 'Pending').length,
+      rejected: questions.filter((q) => q.status === 'Rejected').length,
+    }),
+    [questions, totalCount],
+  );
 
   // Initial load
   useEffect(() => {
     fetchQuestions();
   }, [fetchQuestions]);
-
-  // Calculate stats from questions
-  useEffect(() => {
-    setStats({
-      total: totalCount,
-      approved: questions.filter((q) => q.status === 'Approved').length,
-      pending: questions.filter((q) => q.status === 'Pending').length,
-      rejected: questions.filter((q) => q.status === 'Rejected').length,
-    });
-  }, [questions, totalCount]);
 
   const handleEdit = (q: Question) => {
     setEditingData(q);

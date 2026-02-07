@@ -143,7 +143,7 @@ export const generateExamQuestions = async (
  */
 export const evaluateOMRScript = async (
   base64Image: string,
-  questions: Question[],
+  questions: Pick<Question, 'id'>[],
 ): Promise<UserAnswers> => {
   if (!process.env.API_KEY) {
     throw new Error('API Key missing');

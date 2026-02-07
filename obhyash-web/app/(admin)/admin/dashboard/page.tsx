@@ -48,6 +48,20 @@ interface DashboardStats {
   examGrowth: number;
 }
 
+interface User {
+  id: string;
+  name: string | null;
+  created_at: string;
+}
+
+interface ExamResult {
+  id: string;
+  created_at: string;
+  users: {
+    name: string;
+  }[] | null;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
 
@@ -196,7 +210,7 @@ export default function DashboardPage() {
       const activities: RecentActivity[] = [];
 
       if (recentUsersResult.data) {
-        recentUsersResult.data.forEach((user: any) => {
+        recentUsersResult.data.forEach((user: User) => {
           activities.push({
             id: user.id,
             type: 'user',
@@ -208,11 +222,11 @@ export default function DashboardPage() {
       }
 
       if (recentExamsResult.data) {
-        recentExamsResult.data.forEach((exam: any) => {
+        recentExamsResult.data.forEach((exam: ExamResult) => {
           activities.push({
             id: exam.id,
             type: 'exam',
-            message: `${exam.users?.name || 'A user'} completed an exam`,
+            message: `${exam.users?.[0]?.name || 'A user'} completed an exam`,
             timestamp: exam.created_at,
             icon: 'exam',
           });

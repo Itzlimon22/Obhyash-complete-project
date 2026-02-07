@@ -17,7 +17,6 @@ import {
   Calendar,
   TrendingUp,
   FileText,
-  AlertCircle,
   RefreshCw,
   Plus,
   Edit,
@@ -175,16 +174,21 @@ export default function SubscriptionsPage() {
       if (showToast) {
         toast.success('Data refreshed successfully');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to fetch data:', error);
 
       // Show specific error message
-      const errorMessage = error?.message || 'Failed to load subscription data';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to load subscription data';
       toast.error(errorMessage);
 
       // If tables don't exist, show helpful message
       if (
-        error?.code === '42P01' ||
+        (error instanceof Object &&
+          'code' in error &&
+          error.code === '42P01') ||
         errorMessage.includes('relation') ||
         errorMessage.includes('does not exist')
       ) {
@@ -406,9 +410,11 @@ export default function SubscriptionsPage() {
 
       toast.success('Plan deleted successfully');
       fetchData();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to delete plan:', error);
-      toast.error(error.message || 'Failed to delete plan');
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to delete plan',
+      );
     }
   };
 
@@ -427,27 +433,30 @@ export default function SubscriptionsPage() {
             'Date',
           ].join(',')
         : ['User', 'Email', 'Plan', 'Started', 'Expires', 'Status'].join(','),
-      ...data.map((item: any) =>
-        activeTab === 'requests'
-          ? [
-              item.user?.name || 'N/A',
-              item.user?.email || 'N/A',
-              item.plan_name,
-              item.amount,
-              item.payment_method,
-              item.transaction_id || 'N/A',
-              item.status,
-              new Date(item.requested_at).toLocaleDateString(),
-            ].join(',')
-          : [
-              item.user?.name || 'N/A',
-              item.user?.email || 'N/A',
-              item.plan?.display_name || 'N/A',
-              new Date(item.started_at).toLocaleDateString(),
-              new Date(item.expires_at).toLocaleDateString(),
-              item.is_active ? 'Active' : 'Expired',
-            ].join(','),
-      ),
+      ...data.map((item) => {
+        if (activeTab === 'requests' && 'plan_name' in item) {
+          const req = item as PaymentRequest;
+          return [
+            req.user?.name || 'N/A',
+            req.user?.email || 'N/A',
+            req.plan_name,
+            req.amount,
+            req.payment_method,
+            req.transaction_id || 'N/A',
+            req.status,
+            new Date(req.requested_at).toLocaleDateString(),
+          ].join(',');
+        }
+        const sub = item as SubscriptionHistory;
+        return [
+          sub.user?.name || 'N/A',
+          sub.user?.email || 'N/A',
+          sub.plan?.display_name || 'N/A',
+          new Date(sub.started_at).toLocaleDateString(),
+          new Date(sub.expires_at).toLocaleDateString(),
+          sub.is_active ? 'Active' : 'Expired',
+        ].join(',');
+      }),
     ].join('\n');
 
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -633,7 +642,7 @@ export default function SubscriptionsPage() {
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
               className={`flex items-center gap-2 px-6 py-3 text-sm font-semibold border-b-2 transition-colors ${
                 activeTab === tab.id
                   ? 'border-rose-600 text-rose-600 dark:text-rose-400'
@@ -1356,7 +1365,7 @@ export default function SubscriptionsPage() {
                   Extend Subscription
                 </h3>
                 <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">
-                  Add days to {extendingSubscription.user?.name}'s current plan.
+                  Add days to {extendingSubscription.user?.name}&apos;s current plan.
                 </p>
 
                 <div className="bg-neutral-50 dark:bg-neutral-800 p-4 rounded-xl mb-4">

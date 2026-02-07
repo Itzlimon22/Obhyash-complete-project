@@ -47,6 +47,32 @@ interface TopPerformer {
   examsCompleted: number;
 }
 
+interface ExamResult {
+  users: {
+    id: string;
+  } | null;
+}
+
+interface ExamResultWithUserId {
+  user_id: string;
+}
+
+interface UserRecord {
+  created_at: string;
+}
+
+interface ExamData {
+  score: number;
+  created_at: string;
+  subject: string;
+}
+
+interface UserFromDatabase {
+  id: string;
+  name: string;
+  exams_taken: number;
+}
+
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
   const [isLoading, setIsLoading] = useState(true);
@@ -98,11 +124,11 @@ export default function AnalyticsPage() {
 
       const { data: activeUsersData } = await supabase
         .from('exam_results')
-        .select('users(id)')
+        .select('user_id')
         .gte('created_at', startDate.toISOString());
 
       const uniqueActiveUsers = new Set(
-        activeUsersData?.map((e: any) => e.users?.id).filter(Boolean),
+        activeUsersData?.map((e: ExamResultWithUserId) => e.user_id).filter(Boolean),
       );
 
       const totalExams = exams?.length || 0;
@@ -127,7 +153,7 @@ export default function AnalyticsPage() {
         { scores: number[]; students: Set<string> }
       >();
 
-      exams?.forEach((exam: any) => {
+      exams?.forEach((exam: ExamData) => {
         const subject = exam.subject || 'Unknown';
         if (!subjectMap.has(subject)) {
           subjectMap.set(subject, { scores: [], students: new Set() });
@@ -157,7 +183,7 @@ export default function AnalyticsPage() {
         .order('created_at', { ascending: true });
 
       const growthMap = new Map<string, number>();
-      allUsers?.forEach((user: any) => {
+      allUsers?.forEach((user: UserRecord) => {
         const date = new Date(user.created_at).toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',
@@ -182,7 +208,7 @@ export default function AnalyticsPage() {
         .limit(5);
 
       setTopPerformers(
-        topUsers?.map((user: any) => ({
+        topUsers?.map((user: UserFromDatabase) => ({
           id: user.id,
           name: user.name || 'Anonymous',
           score: 0,

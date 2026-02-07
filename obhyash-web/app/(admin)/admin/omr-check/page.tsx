@@ -8,12 +8,48 @@ import { evaluateOMRScript } from '@/services/gemini-service';
 import { toast } from 'sonner';
 
 // Extended type to include user details
-interface AdminExamResult extends ExamResult {
+interface AdminExamResult extends Omit<ExamResult, 'questions'> {
+  user?: {
+    name: string;
+    email: string;
+  };
+  questions: OMRQuestion[];
+}
+
+// Type for raw database response with snake_case
+interface RawExamResultFromDB {
+  id: string;
+  subject: string;
+  exam_type: string;
+  date: string;
+  score: number;
+  total_marks: number;
+  total_questions: number;
+  correct_count: number;
+  wrong_count: number;
+  time_taken: number;
+  negative_marking: number;
+  submission_type: string;
+  status: string;
+  rejection_reason?: string;
+  script_image_data?: string;
+  questions: Array<{ id: string; correctAnswerIndex: number; points?: number }>;
+  user_answers: Record<string, string | number | null>;
   user?: {
     name: string;
     email: string;
   };
 }
+
+// Simplified question type for OMR evaluation
+interface OMRQuestion {
+  id: string;
+  correctAnswerIndex: number;
+  points?: number;
+}
+
+// Type for questions from database (only fields we need)
+type DBQuestion = Pick<OMRQuestion, 'id' | 'correctAnswerIndex' | 'points'>;
 
 export default function OmrCheckPage() {
   const [submissions, setSubmissions] = useState<AdminExamResult[]>([]);
@@ -52,29 +88,47 @@ export default function OmrCheckPage() {
         // Supabase returns snake_case by default unless we alias.
         // We should double check column names in DB.
         // Assuming current types match. If not, map them:
-        const mapped: AdminExamResult[] = data.map((d: any) => ({
-          id: d.id,
-          subject: d.subject,
-          examType: d.exam_type, // Map if needed
-          date: d.date,
-          score: d.score,
-          totalMarks: d.total_marks,
-          totalQuestions: d.total_questions,
-          correctCount: d.correct_count,
-          wrongCount: d.wrong_count,
-          timeTaken: d.time_taken,
-          negativeMarking: d.negative_marking,
-          submissionType: d.submission_type,
-          status: d.status,
-          rejectionReason: d.rejection_reason,
-          scriptImageData: d.script_image_data,
-          questions: d.questions, // JSONB
-          userAnswers: d.user_answers, // JSONB
-          user: d.user, // Join result
-        }));
+        const mapped = data.map((d: RawExamResultFromDB): AdminExamResult => {
+          const result: AdminExamResult = {
+            id: d.id,
+            subject: d.subject,
+            examType: d.exam_type, // Map if needed
+            date: d.date,
+            score: d.score,
+            totalMarks: d.total_marks,
+            totalQuestions: d.total_questions,
+            correctCount: d.correct_count,
+            wrongCount: d.wrong_count,
+            timeTaken: d.time_taken,
+            negativeMarking: d.negative_marking,
+            submissionType: d.submission_type as 'script' | 'digital',
+            status: d.status as
+              | 'pending'
+              | 'evaluated'
+              | 'rejected'
+              | undefined,
+            rejectionReason: d.rejection_reason,
+            scriptImageData: d.script_image_data,
+            questions: d.questions as OMRQuestion[],
+            userAnswers: Object.entries(d.user_answers).reduce(
+              (acc, [key, val]) => {
+                if (typeof val === 'number') {
+                  return {
+                    ...acc,
+                    [key]: val,
+                  };
+                }
+                return acc;
+              },
+              {} as Record<string, number>,
+            ),
+            user: d.user, // Join result
+          };
+          return result;
+        });
         setSubmissions(mapped);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching OMR submissions:', error);
       toast.error('তথ্য লোড করতে সমস্যা হয়েছে');
     } finally {
@@ -144,9 +198,11 @@ export default function OmrCheckPage() {
       );
       fetchSubmissions(); // Refresh list
       setViewingScript(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Evaluation failed:', error);
-      toast.error(error.message || 'মূল্যায়ন ব্যর্থ হয়েছে');
+      toast.error(
+        error instanceof Error ? error.message : 'মূল্যায়ন ব্যর্থ হয়েছে',
+      );
     } finally {
       setProcessingId(null);
     }
@@ -174,7 +230,7 @@ export default function OmrCheckPage() {
       fetchSubmissions();
       setViewingScript(null);
       setShowRejectInput(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Rejection failed:', error);
       toast.error('বাতিল করা যায়নি');
     }

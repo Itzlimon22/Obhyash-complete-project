@@ -87,7 +87,7 @@ export default function NewQuestionPage() {
           getSubjects(),
           getExamTypes(),
         ]);
-        setSubjects(subs as any);
+        setSubjects(subs);
         setExamTypes(types);
       } catch (error) {
         console.error('Failed to load subjects/exam types:', error);
@@ -115,7 +115,9 @@ export default function NewQuestionPage() {
               topic: question.topic || '',
               stream: question.stream || 'HSC',
               division: question.division || 'Science',
-              difficulty: (question.difficulty as any) || 'Medium',
+              difficulty:
+                (question.difficulty as QuestionFormData['difficulty']) ||
+                'Medium',
               examType: question.examType || 'Academic',
               institutes: question.institutes || [],
               years: question.years || [],
@@ -168,7 +170,10 @@ export default function NewQuestionPage() {
     }
   }, [formData.chapter]);
 
-  const handleChange = (field: keyof QuestionFormData, value: any) => {
+  const handleChange = (
+    field: keyof QuestionFormData,
+    value: QuestionFormData[keyof QuestionFormData],
+  ) => {
     setFormData((prev) => {
       const updated = { ...prev, [field]: value };
       // Reset dependent fields
@@ -499,7 +504,10 @@ export default function NewQuestionPage() {
                   <select
                     value={formData.difficulty}
                     onChange={(e) =>
-                      handleChange('difficulty', e.target.value as any)
+                      handleChange(
+                        'difficulty',
+                        e.target.value as QuestionFormData['difficulty'],
+                      )
                     }
                     className={selectClassName}
                   >

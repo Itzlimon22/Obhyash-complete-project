@@ -13,14 +13,13 @@ interface DashboardClientProps {
 export default function DashboardClient({ user }: DashboardClientProps) {
   const router = useRouter();
   const supabase = createClient();
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
-  useEffect(() => {
-    const stored = localStorage.getItem('theme') as 'light' | 'dark';
-    if (stored) {
-      setTheme(stored);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('theme') as 'light' | 'dark';
+      return stored || 'light';
     }
-  }, []);
+    return 'light';
+  });
 
   // Load theme from local storage or preference
   useEffect(() => {
