@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { UserProfile, ExamResult } from '@/lib/types';
+import { calculateActivityStats } from '@/lib/stats-utils';
 import SubjectStat from './SubjectStat';
 
 interface UserProfileViewProps {
@@ -27,16 +28,32 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
   onBack,
   onSubjectClick,
 }) => {
-  // Mock Data generation for the chart
-  const data = [
-    { name: 'সোম', you: 0, opponent: 0 },
-    { name: 'মঙ্গল', you: 0, opponent: 0 },
-    { name: 'বুধ', you: 0, opponent: 0 },
-    { name: 'বৃহঃ', you: 0, opponent: 0 },
-    { name: 'শুক্র', you: 5, opponent: 5 },
-    { name: 'শনি', you: 15, opponent: user.xp > 3000 ? 25 : 10 },
-    { name: 'রবি', you: 30, opponent: user.xp > 3000 ? 58 : 20 },
-  ];
+  // Comparison Chart Data
+  const data = useMemo(() => {
+    // 1. My Stats (You) - From actual history if available
+    const myStats = calculateActivityStats(history);
+
+    // 2. Opponent Stats (User Profile) - From recentExams
+    // If recentExams is not available on user object (it should be on User interface but maybe not UserProfile)
+    // UserProfile extends Partial<User>, so check if recentExams exists.
+    // If not, we might need to fallback to empty or fetch it.
+    // Assuming user.recentExams exists or we treat it as empty.
+    // Actually UserProfile interface in types.ts doesn't explicitly have recentExams, but User does.
+    // Let's check types.ts again. UserProfile extends Partial<User>.
+    // So distinct properties are optional.
+    const opponentHistory = (user as any).recentExams || [];
+    const opponentStats = calculateActivityStats(opponentHistory);
+
+    // Merge them by day name
+    return myStats.map((myDay) => {
+      const oppDay = opponentStats.find((d) => d.name === myDay.name);
+      return {
+        name: myDay.name,
+        you: myDay.xp,
+        opponent: oppDay ? oppDay.xp : 0,
+      };
+    });
+  }, [history, user]);
 
   // Calculate Subject Stats dynamically matching SubjectData interface for SubjectStat component
   const subjectStats = useMemo(() => {
@@ -87,14 +104,10 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
     }
 
     // Fallback / Mock data for other users to show UI structure
-    return [
-      { name: 'পদার্থবিজ্ঞান', correct: 15, wrong: 5, skipped: 0, total: 20 },
-      { name: 'রসায়ন', correct: 12, wrong: 8, skipped: 0, total: 20 },
-      { name: 'উচ্চতর গণিত', correct: 18, wrong: 2, skipped: 0, total: 20 },
-      { name: 'জীববিজ্ঞান', correct: 10, wrong: 5, skipped: 5, total: 20 },
-      { name: 'English', correct: 13, wrong: 7, skipped: 0, total: 20 },
-      { name: 'সাধারণ জ্ঞান', correct: 18, wrong: 0, skipped: 2, total: 20 },
-    ];
+    // Fallback if no history or not current user
+    // Ideally we'd show the user's actual subject stats if we had them.
+    // Since we don't calculate them for others yet, return empty to hide the chart or show "No Data"
+    return [];
   }, [user.isCurrentUser, history]);
 
   return (

@@ -1,6 +1,17 @@
-
 import type { Subject } from '../types';
-import { BookOpen, FlaskConical, Atom, Sigma, Dna, Laptop, Globe, Briefcase, BarChart3, Landmark, History } from 'lucide-react';
+import {
+  BookOpen,
+  FlaskConical,
+  Atom,
+  Sigma,
+  Dna,
+  Laptop,
+  Globe,
+  Briefcase,
+  BarChart3,
+  Landmark,
+  History,
+} from 'lucide-react';
 
 export const sscSubjects: Subject[] = [
   // General Subjects
@@ -10,8 +21,8 @@ export const sscSubjects: Subject[] = [
     icon: BookOpen,
     group: 'General',
     chapters: [
-        { id: 'ssc-ban1-ch1', name: 'গদ্য', topics: [] },
-        { id: 'ssc-ban1-ch2', name: 'পদ্য', topics: [] },
+      { id: 'ssc-ban1-ch1', name: 'গদ্য', topics: [] },
+      { id: 'ssc-ban1-ch2', name: 'পদ্য', topics: [] },
     ],
   },
   {
@@ -35,7 +46,11 @@ export const sscSubjects: Subject[] = [
       { id: 'ssc-ban2-ch13', name: 'উক্তি', topics: [] },
       { id: 'ssc-ban2-ch14', name: 'বাক্যের যোগ্যতা', topics: [] },
       { id: 'ssc-ban2-ch15', name: 'বিরাম চিহ্ন', topics: [] },
-      { id: 'ssc-ban2-ch16', name: 'ভাষার অপপ্রয়োগ ও শুদ্ধ প্রয়োগ', topics: [] },
+      {
+        id: 'ssc-ban2-ch16',
+        name: 'ভাষার অপপ্রয়োগ ও শুদ্ধ প্রয়োগ',
+        topics: [],
+      },
       { id: 'ssc-ban2-ch17', name: 'নির্মিতি', topics: [] },
     ],
   },
@@ -57,7 +72,11 @@ export const sscSubjects: Subject[] = [
       { id: 'ssc-eng1-ch10', name: 'Dreams', topics: [] },
       { id: 'ssc-eng1-ch11', name: 'Renewable Energy', topics: [] },
       { id: 'ssc-eng1-ch12', name: 'Roots', topics: [] },
-      { id: 'ssc-eng1-ch13', name: 'Media and Modes of E-communication', topics: [] },
+      {
+        id: 'ssc-eng1-ch13',
+        name: 'Media and Modes of E-communication',
+        topics: [],
+      },
       { id: 'ssc-eng1-ch14', name: 'Bangladeshi Cuisine', topics: [] },
     ],
   },
@@ -67,8 +86,16 @@ export const sscSubjects: Subject[] = [
     icon: BookOpen,
     group: 'General',
     chapters: [
-      { id: 'ssc-eng2-ch1', name: 'Gap filling activities with prepositions', topics: [] },
-      { id: 'ssc-eng2-ch2', name: 'Gap filling activities without clues', topics: [] },
+      {
+        id: 'ssc-eng2-ch1',
+        name: 'Gap filling activities with prepositions',
+        topics: [],
+      },
+      {
+        id: 'ssc-eng2-ch2',
+        name: 'Gap filling activities without clues',
+        topics: [],
+      },
       { id: 'ssc-eng2-ch3', name: 'Substitution table', topics: [] },
       { id: 'ssc-eng2-ch4', name: 'Right forms of verbs', topics: [] },
       { id: 'ssc-eng2-ch5', name: 'Narrative style', topics: [] },
@@ -104,7 +131,11 @@ export const sscSubjects: Subject[] = [
       { id: 'ssc-math-ch12', name: 'দুই চলকবিশিষ্ট সরল সহসমীকরণ', topics: [] },
       { id: 'ssc-math-ch13', name: 'সসীম ধারা', topics: [] },
       { id: 'ssc-math-ch14', name: 'অনুপাত, সদৃশতা ও প্রতিসমতা', topics: [] },
-      { id: 'ssc-math-ch15', name: 'ক্ষেত্রফল সম্পর্কিত উপপাদ্য ও সম্পাদ্য', topics: [] },
+      {
+        id: 'ssc-math-ch15',
+        name: 'ক্ষেত্রফল সম্পর্কিত উপপাদ্য ও সম্পাদ্য',
+        topics: [],
+      },
       { id: 'ssc-math-ch16', name: 'পরিমিতি', topics: [] },
       { id: 'ssc-math-ch17', name: 'পরিসংখ্যান', topics: [] },
     ],
@@ -115,22 +146,58 @@ export const sscSubjects: Subject[] = [
     icon: Globe,
     group: 'General',
     chapters: [
-      { id: 'ssc-bgs-ch1', name: 'পূর্ব বাংলার আন্দোলন ও জাতীয়তাবাদের উথান', topics: [] },
+      {
+        id: 'ssc-bgs-ch1',
+        name: 'পূর্ব বাংলার আন্দোলন ও জাতীয়তাবাদের উথান',
+        topics: [],
+      },
       { id: 'ssc-bgs-ch2', name: 'স্বাধীন বাংলাদেশ', topics: [] },
       { id: 'ssc-bgs-ch3', name: 'সৌরজগত ও ভূমণ্ডল', topics: [] },
       { id: 'ssc-bgs-ch4', name: 'বাংলাদেশের ভূপ্রকৃতি ও জলবায়ু', topics: [] },
-      { id: 'ssc-bgs-ch5', name: 'বাংলাদেশের নদনদী ও প্রাকৃতিক সম্পদ', topics: [] },
+      {
+        id: 'ssc-bgs-ch5',
+        name: 'বাংলাদেশের নদনদী ও প্রাকৃতিক সম্পদ',
+        topics: [],
+      },
       { id: 'ssc-bgs-ch6', name: 'রাষ্ট্র, নাগরিকতা ও আইন', topics: [] },
-      { id: 'ssc-bgs-ch7', name: 'বাংলাদেশ সরকারের বিভিন্ন অঙ্গ ও প্রশাসন ব্যবস্থা', topics: [] },
+      {
+        id: 'ssc-bgs-ch7',
+        name: 'বাংলাদেশ সরকারের বিভিন্ন অঙ্গ ও প্রশাসন ব্যবস্থা',
+        topics: [],
+      },
       { id: 'ssc-bgs-ch8', name: 'বাংলাদেশের গণতন্ত্র ও নির্বাচন', topics: [] },
       { id: 'ssc-bgs-ch9', name: 'জাতিসংঘ ও বাংলাদেশ', topics: [] },
-      { id: 'ssc-bgs-ch10', name: 'জাতীয় সম্পদ ও অর্থনৈতিক ব্যবস্থা', topics: [] },
-      { id: 'ssc-bgs-ch11', name: 'অর্থনৈতিক নির্দেশকসমূহ ও বাংলাদেশের অর্থনীতির প্রকৃতি', topics: [] },
-      { id: 'ssc-bgs-ch12', name: 'বাংলাদেশ সরকারের অর্থ ও ব্যাংক ব্যবস্থা', topics: [] },
-      { id: 'ssc-bgs-ch13', name: 'বাংলাদেশের উন্নয়ন ও সরকারের ভূমিকা', topics: [] },
-      { id: 'ssc-bgs-ch14', name: 'পারিবারিক কাঠামো ও সামাজিকীকরণ', topics: [] },
+      {
+        id: 'ssc-bgs-ch10',
+        name: 'জাতীয় সম্পদ ও অর্থনৈতিক ব্যবস্থা',
+        topics: [],
+      },
+      {
+        id: 'ssc-bgs-ch11',
+        name: 'অর্থনৈতিক নির্দেশকসমূহ ও বাংলাদেশের অর্থনীতির প্রকৃতি',
+        topics: [],
+      },
+      {
+        id: 'ssc-bgs-ch12',
+        name: 'বাংলাদেশ সরকারের অর্থ ও ব্যাংক ব্যবস্থা',
+        topics: [],
+      },
+      {
+        id: 'ssc-bgs-ch13',
+        name: 'বাংলাদেশের উন্নয়ন ও সরকারের ভূমিকা',
+        topics: [],
+      },
+      {
+        id: 'ssc-bgs-ch14',
+        name: 'পারিবারিক কাঠামো ও সামাজিকীকরণ',
+        topics: [],
+      },
       { id: 'ssc-bgs-ch15', name: 'বাংলাদেশের সামাজিক পরিবর্তন', topics: [] },
-      { id: 'ssc-bgs-ch16', name: 'বাংলাদেশের সামাজিক সমস্যা ও এর প্রতিকার', topics: [] },
+      {
+        id: 'ssc-bgs-ch16',
+        name: 'বাংলাদেশের সামাজিক সমস্যা ও এর প্রতিকার',
+        topics: [],
+      },
     ],
   },
   {
@@ -151,8 +218,16 @@ export const sscSubjects: Subject[] = [
     icon: Laptop,
     group: 'General',
     chapters: [
-      { id: 'ssc-ict-ch1', name: 'তথ্য ও যোগাযোগ প্রযুক্তি এবং আমাদের বাংলাদেশ', topics: [] },
-      { id: 'ssc-ict-ch2', name: 'কম্পিউটার ও কম্পিউটার ব্যবহারকারীর নিরাপত্তা', topics: [] },
+      {
+        id: 'ssc-ict-ch1',
+        name: 'তথ্য ও যোগাযোগ প্রযুক্তি এবং আমাদের বাংলাদেশ',
+        topics: [],
+      },
+      {
+        id: 'ssc-ict-ch2',
+        name: 'কম্পিউটার ও কম্পিউটার ব্যবহারকারীর নিরাপত্তা',
+        topics: [],
+      },
       { id: 'ssc-ict-ch3', name: 'আমার শিক্ষায় ইন্টারনেট', topics: [] },
       { id: 'ssc-ict-ch4', name: 'আমার লেখালেখি ও হিসাব', topics: [] },
       { id: 'ssc-ict-ch5', name: 'মাল্টিমিডিয়া ও গ্রাফিক্স', topics: [] },
@@ -178,7 +253,11 @@ export const sscSubjects: Subject[] = [
       { id: 'ssc-phy-ch10', name: 'স্থির তড়িৎ', topics: [] },
       { id: 'ssc-phy-ch11', name: 'চল তড়িৎ', topics: [] },
       { id: 'ssc-phy-ch12', name: 'তড়িতের চৌম্বক ক্রিয়া', topics: [] },
-      { id: 'ssc-phy-ch13', name: 'আধুনিক পদার্থবিজ্ঞান ও ইলেকট্রনিক্স', topics: [] },
+      {
+        id: 'ssc-phy-ch13',
+        name: 'আধুনিক পদার্থবিজ্ঞান ও ইলেকট্রনিক্স',
+        topics: [],
+      },
       { id: 'ssc-phy-ch14', name: 'জীবন বাঁচাতে পদার্থবিজ্ঞান', topics: [] },
     ],
   },
@@ -251,11 +330,11 @@ export const sscSubjects: Subject[] = [
     id: 'ssc-accounting',
     name: 'SSC হিসাববিজ্ঞান',
     icon: BarChart3,
-    group: 'Commerce',
+    group: 'Business Studies',
     chapters: [
       { id: 'ssc-acc-ch1', name: 'হিসাববিজ্ঞান পরিচিতি', topics: [] },
       { id: 'ssc-acc-ch2', name: 'লেনদেন', topics: [] },
-      { id: 'ssc-acc-ch3', name: 'দু\'তরফা দাখিলা পদ্ধতি', topics: [] },
+      { id: 'ssc-acc-ch3', name: "দু'তরফা দাখিলা পদ্ধতি", topics: [] },
       { id: 'ssc-acc-ch4', name: 'মূলধন ও মুনাফা জাতীয় লেনদেন', topics: [] },
       { id: 'ssc-acc-ch5', name: 'হিসাব', topics: [] },
       { id: 'ssc-acc-ch6', name: 'জাবেদা', topics: [] },
@@ -263,15 +342,23 @@ export const sscSubjects: Subject[] = [
       { id: 'ssc-acc-ch8', name: 'নগদান বই', topics: [] },
       { id: 'ssc-acc-ch9', name: 'রেওয়ামিল', topics: [] },
       { id: 'ssc-acc-ch10', name: 'আর্থিক বিবরণী', topics: [] },
-      { id: 'ssc-acc-ch11', name: 'পণ্য ক্রয়, বিক্রয়, পরিবহন ও ফেরত সংক্রান্ত হিসাব', topics: [] },
-      { id: 'ssc-acc-ch12', name: 'পারিবারিক ও আত্মকর্মসংস্থানমূলক উদ্যোগের হিসাব', topics: [] },
-    ]
+      {
+        id: 'ssc-acc-ch11',
+        name: 'পণ্য ক্রয়, বিক্রয়, পরিবহন ও ফেরত সংক্রান্ত হিসাব',
+        topics: [],
+      },
+      {
+        id: 'ssc-acc-ch12',
+        name: 'পারিবারিক ও আত্মকর্মসংস্থানমূলক উদ্যোগের হিসাব',
+        topics: [],
+      },
+    ],
   },
   {
     id: 'ssc-business-ent',
     name: 'SSC ব্যবসায় উদ্যোগ',
     icon: Briefcase,
-    group: 'Commerce',
+    group: 'Business Studies',
     chapters: [
       { id: 'ssc-be-ch1', name: 'ব্যবসায় পরিচিতি', topics: [] },
       { id: 'ssc-be-ch2', name: 'ব্যবসায় উদ্যোগ ও উদ্যোক্তা', topics: [] },
@@ -280,18 +367,34 @@ export const sscSubjects: Subject[] = [
       { id: 'ssc-be-ch5', name: 'ব্যবসায়ের আইনগত দিক', topics: [] },
       { id: 'ssc-be-ch6', name: 'ব্যবসায় পরিকল্পনা', topics: [] },
       { id: 'ssc-be-ch7', name: 'বাংলাদেশের শিল্প', topics: [] },
-      { id: 'ssc-be-ch8', name: 'ব্যবসায় প্রতিষ্ঠানের ব্যবস্থাপনা', topics: [] },
+      {
+        id: 'ssc-be-ch8',
+        name: 'ব্যবসায় প্রতিষ্ঠানের ব্যবস্থাপনা',
+        topics: [],
+      },
       { id: 'ssc-be-ch9', name: 'বিপণন', topics: [] },
-      { id: 'ssc-be-ch10', name: 'ব্যবসায় উদ্যোগ উন্নয়নে সহায়ক সেবা', topics: [] },
-      { id: 'ssc-be-ch11', name: 'ব্যবসায়ে নৈতিকতা ও সামাজিক দায়বদ্ধতা', topics: [] },
-      { id: 'ssc-be-ch12', name: 'সফল উদ্যোক্তাদের জীবনীর থেকে শিক্ষণীয়', topics: [] },
-    ]
+      {
+        id: 'ssc-be-ch10',
+        name: 'ব্যবসায় উদ্যোগ উন্নয়নে সহায়ক সেবা',
+        topics: [],
+      },
+      {
+        id: 'ssc-be-ch11',
+        name: 'ব্যবসায়ে নৈতিকতা ও সামাজিক দায়বদ্ধতা',
+        topics: [],
+      },
+      {
+        id: 'ssc-be-ch12',
+        name: 'সফল উদ্যোক্তাদের জীবনীর থেকে শিক্ষণীয়',
+        topics: [],
+      },
+    ],
   },
   {
     id: 'ssc-finance-banking',
     name: 'SSC ফিন্যান্স ও ব্যাংকিং',
     icon: Landmark,
-    group: 'Commerce',
+    group: 'Business Studies',
     chapters: [
       { id: 'ssc-fb-ch1', name: 'অর্থায়ন ও ব্যবসায় অর্থায়ন', topics: [] },
       { id: 'ssc-fb-ch2', name: 'অর্থের সময়ের মূল্য', topics: [] },
@@ -304,43 +407,87 @@ export const sscSubjects: Subject[] = [
       { id: 'ssc-fb-ch9', name: 'বাণিজ্যিক ব্যাংক', topics: [] },
       { id: 'ssc-fb-ch10', name: 'ইলেকট্রনিক ব্যাংকিং', topics: [] },
       { id: 'ssc-fb-ch11', name: 'ব্যাংকের আমানত', topics: [] },
-      { id: 'ssc-fb-ch12', name: 'বৈদেশিক বিনিময় ও বৈদেশিক মুদ্রা', topics: [] },
+      {
+        id: 'ssc-fb-ch12',
+        name: 'বৈদেশিক বিনিময় ও বৈদেশিক মুদ্রা',
+        topics: [],
+      },
       { id: 'ssc-fb-ch13', name: 'বিমা সম্পর্কে প্রাথমিক ধারণা', topics: [] },
-    ]
+    ],
   },
   // Arts Group
   {
     id: 'ssc-history-bd',
     name: 'SSC বাংলাদেশের ইতিহাস ও বিশ্ব সভ্যতা',
     icon: History,
-    group: 'Arts',
+    group: 'Humanities',
     chapters: [
       { id: 'ssc-hist-ch1', name: 'ইতিহাস পরিচিতি', topics: [] },
       { id: 'ssc-hist-ch2', name: 'বিশ্ব সভ্যতা', topics: [] },
       { id: 'ssc-hist-ch3', name: 'প্রাচীন বাংলার জনপদ', topics: [] },
-      { id: 'ssc-hist-ch4', name: 'প্রাচীন বাংলার রাজনৈতিক ইতিহাস', topics: [] },
-      { id: 'ssc-hist-ch5', name: 'মধ্যযুগের বাংলার রাজনৈতিক ইতিহাস', topics: [] },
-      { id: 'ssc-hist-ch6', name: 'মধ্যযুগের বাংলার সামাজিক, অর্থনৈতিক ও সাংস্কৃতিক ইতিহাস', topics: [] },
+      {
+        id: 'ssc-hist-ch4',
+        name: 'প্রাচীন বাংলার রাজনৈতিক ইতিহাস',
+        topics: [],
+      },
+      {
+        id: 'ssc-hist-ch5',
+        name: 'মধ্যযুগের বাংলার রাজনৈতিক ইতিহাস',
+        topics: [],
+      },
+      {
+        id: 'ssc-hist-ch6',
+        name: 'মধ্যযুগের বাংলার সামাজিক, অর্থনৈতিক ও সাংস্কৃতিক ইতিহাস',
+        topics: [],
+      },
       { id: 'ssc-hist-ch7', name: 'মুঘল আমল', topics: [] },
-      { id: 'ssc-hist-ch8', name: 'ঔপনিবেশিক যুগ ও বাংলার স্বাধীনতা সংগ্রাম', topics: [] },
-      { id: 'ssc-hist-ch9', name: 'ইংরেজ শাসনামলে বাংলার প্রতিরোধ, স্বাধিকার ও স্বাধীনতা আন্দোলন', topics: [] },
+      {
+        id: 'ssc-hist-ch8',
+        name: 'ঔপনিবেশিক যুগ ও বাংলার স্বাধীনতা সংগ্রাম',
+        topics: [],
+      },
+      {
+        id: 'ssc-hist-ch9',
+        name: 'ইংরেজ শাসনামলে বাংলার প্রতিরোধ, স্বাধিকার ও স্বাধীনতা আন্দোলন',
+        topics: [],
+      },
       { id: 'ssc-hist-ch10', name: 'স্বাধীন বাংলাদেশ', topics: [] },
-      { id: 'ssc-hist-ch11', name: 'ভাষা আন্দোলন ও পরবর্তী রাজনৈতিক ঘটনাপ্রবাহ', topics: [] },
-      { id: 'ssc-hist-ch12', name: 'সামরিক শাসন এবং স্বাধিকার আন্দোলন', topics: [] },
-      { id: 'ssc-hist-ch13', name: 'সত্তরের নির্বাচন এবং মুক্তিযুদ্ধ', topics: [] },
-      { id: 'ssc-hist-ch14', name: 'বঙ্গবন্ধু শেখ মুজিবুর রহমানের শাসনকাল', topics: [] },
-    ]
+      {
+        id: 'ssc-hist-ch11',
+        name: 'ভাষা আন্দোলন ও পরবর্তী রাজনৈতিক ঘটনাপ্রবাহ',
+        topics: [],
+      },
+      {
+        id: 'ssc-hist-ch12',
+        name: 'সামরিক শাসন এবং স্বাধিকার আন্দোলন',
+        topics: [],
+      },
+      {
+        id: 'ssc-hist-ch13',
+        name: 'সত্তরের নির্বাচন এবং মুক্তিযুদ্ধ',
+        topics: [],
+      },
+      {
+        id: 'ssc-hist-ch14',
+        name: 'বঙ্গবন্ধু শেখ মুজিবুর রহমানের শাসনকাল',
+        topics: [],
+      },
+    ],
   },
   {
     id: 'ssc-geography',
     name: 'SSC ভূগোল ও পরিবেশ',
     icon: Globe,
-    group: 'Arts',
+    group: 'Humanities',
     chapters: [
       { id: 'ssc-geo-ch1', name: 'ভূগোল ও পরিবেশ', topics: [] },
       { id: 'ssc-geo-ch2', name: 'মহাবিশ্ব ও আমাদের পৃথিবী', topics: [] },
       { id: 'ssc-geo-ch3', name: 'মানচিত্র পঠন ও ব্যবহার', topics: [] },
-      { id: 'ssc-geo-ch4', name: 'পৃথিবীর অভ্যন্তরীণ ও বাহ্যিক গঠন', topics: [] },
+      {
+        id: 'ssc-geo-ch4',
+        name: 'পৃথিবীর অভ্যন্তরীণ ও বাহ্যিক গঠন',
+        topics: [],
+      },
       { id: 'ssc-geo-ch5', name: 'বায়ুমণ্ডল', topics: [] },
       { id: 'ssc-geo-ch6', name: 'বারিমণ্ডল', topics: [] },
       { id: 'ssc-geo-ch7', name: 'জনসংখ্যা', topics: [] },
@@ -348,16 +495,24 @@ export const sscSubjects: Subject[] = [
       { id: 'ssc-geo-ch9', name: 'সম্পদ ও অর্থনৈতিক কার্যাবলি', topics: [] },
       { id: 'ssc-geo-ch10', name: 'বাংলাদেশের ভৌগোলিক বিবরণ', topics: [] },
       { id: 'ssc-geo-ch11', name: 'বাংলাদেশের সম্পদ ও শিল্প', topics: [] },
-      { id: 'ssc-geo-ch12', name: 'বাংলাদেশের যোগাযোগ ব্যবস্থা ও বাণিজ্য', topics: [] },
-      { id: 'ssc-geo-ch13', name: 'বাংলাদেশের উন্নয়ন কর্মকাণ্ড ও পরিবেশের ভারসাম্য', topics: [] },
+      {
+        id: 'ssc-geo-ch12',
+        name: 'বাংলাদেশের যোগাযোগ ব্যবস্থা ও বাণিজ্য',
+        topics: [],
+      },
+      {
+        id: 'ssc-geo-ch13',
+        name: 'বাংলাদেশের উন্নয়ন কর্মকাণ্ড ও পরিবেশের ভারসাম্য',
+        topics: [],
+      },
       { id: 'ssc-geo-ch14', name: 'বাংলাদেশের প্রাকৃতিক দুর্যোগ', topics: [] },
-    ]
+    ],
   },
   {
     id: 'ssc-civics',
     name: 'SSC পৌরনীতি ও নাগরিকতা',
     icon: Landmark,
-    group: 'Arts',
+    group: 'Humanities',
     chapters: [
       { id: 'ssc-civics-ch1', name: 'পৌরনীতি ও নাগরিকতা', topics: [] },
       { id: 'ssc-civics-ch2', name: 'নাগরিক ও নাগরিকতা', topics: [] },
@@ -365,31 +520,61 @@ export const sscSubjects: Subject[] = [
       { id: 'ssc-civics-ch4', name: 'রাষ্ট্র ও সরকার ব্যবস্থা', topics: [] },
       { id: 'ssc-civics-ch5', name: 'সংবিধান', topics: [] },
       { id: 'ssc-civics-ch6', name: 'বাংলাদেশের সরকার ব্যবস্থা', topics: [] },
-      { id: 'ssc-civics-ch7', name: 'গণতন্ত্রে রাজনৈতিক দল ও নির্বাচন', topics: [] },
-      { id: 'ssc-civics-ch8', name: 'বাংলাদেশের স্থানীয় সরকার ব্যবস্থা', topics: [] },
-      { id: 'ssc-civics-ch9', name: 'নাগরিক সমস্যা ও আমাদের করণীয়', topics: [] },
-      { id: 'ssc-civics-ch10', name: 'স্বাধীন বাংলাদেশের অভ্যুদয়ে নাগরিক চেতনা', topics: [] },
-      { id: 'ssc-civics-ch11', name: 'বাংলাদেশ ও আন্তর্জাতিক সংগঠন', topics: [] },
-    ]
+      {
+        id: 'ssc-civics-ch7',
+        name: 'গণতন্ত্রে রাজনৈতিক দল ও নির্বাচন',
+        topics: [],
+      },
+      {
+        id: 'ssc-civics-ch8',
+        name: 'বাংলাদেশের স্থানীয় সরকার ব্যবস্থা',
+        topics: [],
+      },
+      {
+        id: 'ssc-civics-ch9',
+        name: 'নাগরিক সমস্যা ও আমাদের করণীয়',
+        topics: [],
+      },
+      {
+        id: 'ssc-civics-ch10',
+        name: 'স্বাধীন বাংলাদেশের অভ্যুদয়ে নাগরিক চেতনা',
+        topics: [],
+      },
+      {
+        id: 'ssc-civics-ch11',
+        name: 'বাংলাদেশ ও আন্তর্জাতিক সংগঠন',
+        topics: [],
+      },
+    ],
   },
   {
     id: 'ssc-economics',
     name: 'SSC অর্থনীতি',
     icon: BarChart3,
-    group: 'Arts',
+    group: 'Humanities',
     chapters: [
       { id: 'ssc-econ-ch1', name: 'অর্থনীতি পরিচয়', topics: [] },
-      { id: 'ssc-econ-ch2', name: 'অর্থনীতির গুরুত্বপূর্ণ ধারণাসমূহ', topics: [] },
-      { id: 'ssc-econ-ch3', name: 'উপযোগ, চাহিদা, জোগান ও ভারসাম্য', topics: [] },
+      {
+        id: 'ssc-econ-ch2',
+        name: 'অর্থনীতির গুরুত্বপূর্ণ ধারণাসমূহ',
+        topics: [],
+      },
+      {
+        id: 'ssc-econ-ch3',
+        name: 'উপযোগ, চাহিদা, জোগান ও ভারসাম্য',
+        topics: [],
+      },
       { id: 'ssc-econ-ch4', name: 'উৎপাদন ও সংগঠন', topics: [] },
       { id: 'ssc-econ-ch5', name: 'বাজার', topics: [] },
       { id: 'ssc-econ-ch6', name: 'জাতীয় আয় ও এর পরিমাপ', topics: [] },
-      { id: 'ssc-econ-ch7', name: 'অর্থনীতিতে সরকারি অর্থব্যবস্থা', topics: [] },
+      {
+        id: 'ssc-econ-ch7',
+        name: 'অর্থনীতিতে সরকারি অর্থব্যবস্থা',
+        topics: [],
+      },
       { id: 'ssc-econ-ch8', name: 'মুদ্রা, ব্যাংক ও বিমা', topics: [] },
       { id: 'ssc-econ-ch9', name: 'বাংলাদেশের অর্থনীতি', topics: [] },
       { id: 'ssc-econ-ch10', name: 'বাংলাদেশের অর্থনৈতিক উন্নয়ন', topics: [] },
-    ]
+    ],
   },
 ];
-
-    

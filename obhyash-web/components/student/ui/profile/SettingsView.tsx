@@ -414,9 +414,11 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
                   onChange={handleChange}
                   className={selectClass}
                 >
-                  <option>Science</option>
-                  <option>Business Studies</option>
-                  <option>Humanities</option>
+                  <option value="Science">Science (বিজ্ঞান)</option>
+                  <option value="Business Studies">
+                    Business Studies (ব্যবসায় শিক্ষা)
+                  </option>
+                  <option value="Humanities">Humanities (মানবিক)</option>
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-500">
                   <svg

@@ -283,8 +283,8 @@ const UserForm = ({
                 >
                   <option value="">Select</option>
                   <option value="Science">Science</option>
-                  <option value="Arts">Arts</option>
-                  <option value="Commerce">Commerce</option>
+                  <option value="Humanities">Humanities</option>
+                  <option value="Business Studies">Business Studies</option>
                 </StyledSelect>
               </InputGroup>
 

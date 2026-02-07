@@ -491,8 +491,8 @@ export default function NewQuestionPage() {
                     className={selectClassName}
                   >
                     <option>Science</option>
-                    <option>Arts</option>
-                    <option>Commerce</option>
+                    <option>Humanities</option>
+                    <option>Business Studies</option>
                   </select>
                 </div>
 

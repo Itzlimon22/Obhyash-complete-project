@@ -1,5 +1,7 @@
 import React from 'react';
 import { UserProfile, ExamResult } from '@/lib/types';
+import { useMemo } from 'react';
+import { calculateRadarData, calculateActivityStats } from '@/lib/stats-utils';
 import ProfileHeader from './dashboard/ProfileHeader';
 import StatsGrid from './dashboard/StatsGrid';
 import SubjectRadar from './dashboard/SubjectRadar';
@@ -16,7 +18,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
   history,
   onEditProfile,
 }) => {
-  // -- Data Processing (Mock for now, would be Supabase aggregations) --
+  // -- Data Processing --
   const evaluatedExams = history.filter((h) => h.status === 'evaluated');
   const avgScore =
     evaluatedExams.length > 0
@@ -28,26 +30,12 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
         )
       : 0;
 
-  // Mock Subject Data for Radar
-  const radarData = [
-    { subject: 'Physics', score: 80 },
-    { subject: 'Chemistry', score: 65 },
-    { subject: 'Math', score: 90 },
-    { subject: 'Biology', score: 70 },
-    { subject: 'English', score: 55 },
-    { subject: 'GK', score: 85 },
-  ];
-
-  // Mock Activity Data for Area Chart
-  const activityData = [
-    { name: 'শনি', xp: 400 },
-    { name: 'রবি', xp: 300 },
-    { name: 'সোম', xp: 550 },
-    { name: 'মঙ্গল', xp: 450 },
-    { name: 'বুধ', xp: 600 },
-    { name: 'বৃহঃ', xp: 200 },
-    { name: 'শুক্র', xp: 700 },
-  ];
+  // Real Data from History
+  const radarData = useMemo(() => calculateRadarData(history), [history]);
+  const activityData = useMemo(
+    () => calculateActivityStats(history),
+    [history],
+  );
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-fade-in pb-12 pt-2">
@@ -59,7 +47,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
         examsTaken={user.examsTaken}
         avgScore={avgScore}
         xp={user.xp}
-        streak={12} // Mock streak
+        streak={user.streakCount || 0}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

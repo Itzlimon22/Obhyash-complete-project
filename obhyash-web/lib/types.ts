@@ -3,7 +3,11 @@ import { LucideIcon } from 'lucide-react';
 // ==========================================
 // 1. STATIC CONTENT TYPES (Curriculum)
 // ==========================================
-export type GroupType = 'General' | 'Science' | 'Arts' | 'Commerce';
+export type GroupType =
+  | 'General'
+  | 'Science'
+  | 'Humanities'
+  | 'Business Studies';
 
 export interface Topic {
   id: string;
@@ -247,6 +251,7 @@ export interface UserProfile extends Partial<User> {
   isCurrentUser?: boolean;
   target?: string;
   stream?: string;
+  group?: string; // Legacy alias for division
   createdAt?: string; // Mapped from DB created_at
   bio?: string;
   streakCount?: number;

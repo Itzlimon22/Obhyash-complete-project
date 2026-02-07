@@ -377,7 +377,9 @@ export default function StudentRoot({
         >
           <UserProfileView
             user={selectedUserProfile}
+            currentUser={currentUser}
             rank={0}
+            history={examHistory}
             onBack={() => setActiveTab('leaderboard')}
           />
         </AppLayout>

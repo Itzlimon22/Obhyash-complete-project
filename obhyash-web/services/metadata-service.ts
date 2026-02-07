@@ -14,7 +14,7 @@ const SUBJECT_ICONS: Record<string, string> = {
   ICT: '💻',
 };
 
-// Helper to get subjects based on group (Science, Arts, Commerce) and stream (HSC, Admission)
+// Helper to get subjects based on group (Science, Humanities, Business Studies) and stream (HSC, Admission)
 export const getSubjects = async (
   group?: string,
   stream?: string,
@@ -25,7 +25,7 @@ export const getSubjects = async (
   if (isSupabaseConfigured() && supabase) {
     let query = supabase.from('subjects').select('*');
 
-    // Filter by Group (Science, Arts, Commerce) OR General (Mapped to division column)
+    // Filter by Group (Science, Humanities, Business Studies) OR General (Mapped to division column)
     if (group && group !== 'General') {
       console.log(
         `[getSubjects] Filtering by Division (Group): ${group} OR General`,

@@ -42,7 +42,7 @@ export default function SignupPage() {
     // Step 3: Academic
     institute: '',
     stream: 'HSC', // Was studyGoal
-    group: 'Science', // Science, Arts, Commerce
+    group: 'Science', // Science, Humanities, Business Studies
     batch: 'HSC 2025',
   });
 
@@ -423,9 +423,11 @@ export default function SignupPage() {
                         onChange={handleChange}
                         className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200 appearance-none cursor-pointer"
                       >
-                        <option>Science</option>
-                        <option>Business Studies</option>
-                        <option>Humanities</option>
+                        <option value="Science">Science</option>
+                        <option value="Business Studies">
+                          Business Studies
+                        </option>
+                        <option value="Humanities">Humanities</option>
                       </select>
                     </div>
                   </div>

@@ -55,7 +55,7 @@ const mapProfileToDbRow = (user: UserProfile): UserDatabaseRow => {
     avatar_color: user.avatarColor || null,
 
     institute: user.institute || null,
-    division: user.division || user.group || null, // Handle potential aliasing
+    division: user.division || user.group || null, // Frontend 'group' -> DB 'division'
     stream: user.stream || null,
     batch: user.batch || null,
     target: user.target || null,

@@ -16,9 +16,9 @@ WHERE id IN (
   'hsc_statistics' -- Often science/general
 );
 
--- 2. Set Arts Groups (Humanities)
+-- 2. Set Humanities Groups (Arts)
 UPDATE public.subjects
-SET "division" = 'Arts'
+SET "division" = 'Humanities'
 WHERE id IN (
   'hsc_civics', 'hsc_civics_1', 'hsc_civics_2',
   'hsc_economics', 'hsc_economics_1', 'hsc_economics_2',
@@ -28,9 +28,9 @@ WHERE id IN (
   'hsc_logic', 'hsc_geography'
 );
 
--- 3. Set Commerce Groups (Business Studies)
+-- 3. Set Business Studies Groups (Commerce)
 UPDATE public.subjects
-SET "division" = 'Commerce'
+SET "division" = 'Business Studies'
 WHERE id IN (
   'hsc_accounting', 'hsc_accounting_1', 'hsc_accounting_2',
   'hsc_business_org', 'hsc_business_org_1', 'hsc_business_org_2',

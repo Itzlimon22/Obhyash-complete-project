@@ -7,7 +7,7 @@ import { Question } from './types';
 export interface UploadQuestionFormat {
   // Academic Info
   stream?: string;
-  division?: string; // NEW: Science, Arts, Commerce
+  division?: string; // NEW: Science, Humanities, Business Studies
   section?: string;
   subject: string;
   chapter?: string;
