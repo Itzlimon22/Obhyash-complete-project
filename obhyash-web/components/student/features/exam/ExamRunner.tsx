@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 
-// ❌ AppLayout is NOT needed in Next.js pages (handled by app/layout.tsx)
-// If you need a wrapper, use a simple <div> or Fragment <>...</>
-// import AppLayout from '../../components/layout/AppLayout';
+// ... imports ...
 import AppLayout from '@/components/student/ui/layout/AppLayout';
 import ExamHeader from '@/components/student/ui/ExamHeader';
 import QuestionCard from '@/components/student/ui/exam/QuestionCard';
@@ -15,6 +13,7 @@ import NavigationWarningModal from '@/components/student/ui/common/NavigationWar
 
 // Features / Results
 import ScriptUploader from '@/components/student/ui/ScriptUploader';
+import { OmrPrintModal } from '@/components/student/features/omr/OmrPrintModal'; // Added
 
 // Data & Services
 import {
@@ -24,7 +23,7 @@ import {
   UserAnswers,
   UserProfile,
 } from '@/lib/types';
-import { printQuestionPaper, printOMRSheet } from '@/services/print-service';
+import { printQuestionPaper } from '@/services/print-service'; // Removed printOMRSheet
 
 /**
  * Props for the ExamRunner component.
@@ -95,18 +94,6 @@ interface ExamRunnerProps {
   isDarkMode: boolean;
 }
 
-/**
- * ExamRunner Component
- *
- * The main container for the exam taking interface. It handles:
- * - Render of the ExamHeader with timer and mode toggles.
- * - Listing of QuestionCards.
- * - Sticky footer for submission (Digital or OMR).
- * - Modal management (Timeout, Confirmation, Upload, Report).
- * - Responsive layout adaptation.
- *
- * @param props - {@link ExamRunnerProps}
- */
 const ExamRunner: React.FC<ExamRunnerProps> = ({
   appState,
   examDetails,
@@ -122,10 +109,8 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
   selectedScript,
   setSelectedScript,
   onSubmit,
-  //onExit,
   onTimeoutReattempt,
   onTimeoutCancel,
-  //setAppState,
   navWarning,
   setNavWarning,
   confirmNavigation,
@@ -137,17 +122,18 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
 }) => {
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isOmrPrintModalOpen, setIsOmrPrintModalOpen] = useState(false); // New State
   const [reportModalState, setReportModalState] = useState<{
     isOpen: boolean;
     questionId: number | null;
   }>({ isOpen: false, questionId: null });
 
+  // ... (Handlers) ...
   const handleSubmitRequest = () => {
     if (isOmrMode && !selectedScript) {
       setIsUploadModalOpen(true);
       return;
     }
-    // Check for unanswered questions if not in OMR mode
     const unanswered = questions.length - Object.keys(userAnswers).length;
     if (!isOmrMode && unanswered > 0) {
       setIsSubmitModalOpen(true);
@@ -188,7 +174,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
           onDownloadQuestionPaper={() =>
             printQuestionPaper(examDetails, questions)
           }
-          onDownloadOMR={() => printOMRSheet(examDetails, questions.length)}
+          onDownloadOMR={() => setIsOmrPrintModalOpen(true)} // Updated
           onExit={() => setIsSubmitModalOpen(true)}
           answeredCount={Object.keys(userAnswers).length}
           totalQuestions={questions.length}
@@ -341,6 +327,14 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
             onCancel={onTimeoutCancel}
           />
         )}
+
+        {/* OMR Print Modal */}
+        <OmrPrintModal
+          isOpen={isOmrPrintModalOpen}
+          onClose={() => setIsOmrPrintModalOpen(false)}
+          details={examDetails}
+          totalQuestions={questions.length}
+        />
       </div>
     </AppLayout>
   );

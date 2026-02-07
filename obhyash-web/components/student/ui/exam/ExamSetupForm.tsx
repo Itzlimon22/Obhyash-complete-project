@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
-import { printQuestionPaper, printOMRSheet } from '@/services/print-service';
+import { printQuestionPaper } from '@/services/print-service'; // Removed printOMRSheet
+import { OmrPrintModal } from '@/components/student/features/omr/OmrPrintModal'; // Added
 
 interface ExamSetupFormProps {
   onStartExam: (config: ExamConfig) => void;
@@ -68,6 +69,12 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const [omrTopic, setOmrTopic] = useState('');
   const [omrCount, setOmrCount] = useState(50);
   const [omrIsBlank, setOmrIsBlank] = useState(false);
+
+  // OMR Print Modal State
+  const [isOmrPrintModalOpen, setIsOmrPrintModalOpen] = useState(false);
+  const [omrPrintDetails, setOmrPrintDetails] = useState<ExamDetails | null>(
+    null,
+  );
 
   // --- EFFECT: Fetch Subjects from Database ---
   useEffect(() => {
@@ -162,7 +169,8 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       negativeMarking: 0,
     };
 
-    printOMRSheet(details, omrCount);
+    setOmrPrintDetails(details);
+    setIsOmrPrintModalOpen(true);
     setIsOmrModalOpen(false);
   };
 
@@ -678,6 +686,15 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             </div>
           </div>
         </div>
+      )}
+      {/* OMR Preview & Print Modal */}
+      {omrPrintDetails && (
+        <OmrPrintModal
+          isOpen={isOmrPrintModalOpen}
+          onClose={() => setIsOmrPrintModalOpen(false)}
+          details={omrPrintDetails}
+          totalQuestions={omrCount}
+        />
       )}
     </div>
   );

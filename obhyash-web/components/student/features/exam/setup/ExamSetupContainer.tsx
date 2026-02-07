@@ -5,7 +5,7 @@ import { SubjectSelector } from './SubjectSelector';
 import { TopicSelector } from './TopicSelector';
 import { ExamSettings } from './ExamSettings';
 import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
-import { printQuestionPaper, printOMRSheet } from '@/services/print-service';
+import { OmrPrintModal } from '@/components/student/features/omr/OmrPrintModal';
 import { getSubjectMetadata, SubjectMetadata } from '@/services/database';
 import { toast } from 'sonner';
 import { AlertCircle, Zap, Download } from 'lucide-react';
@@ -40,6 +40,9 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
   // State
   const [availableSubjects, setAvailableSubjects] = useState<any[]>([]);
   const [isSubjectsLoading, setIsSubjectsLoading] = useState(true);
+
+  // OMR Modal State
+  const [isOmrModalOpen, setIsOmrModalOpen] = useState(false);
 
   // Selection
   const [subject, setSubject] = useState('');
@@ -163,8 +166,12 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
     });
   };
 
-  // OMR Printing Logic (Restored)
-  const handleOmrPrint = () => {
+  // OMR Logic
+  const handleOmrClick = () => {
+    setIsOmrModalOpen(true);
+  };
+
+  const getOmrDetails = (): ExamDetails => {
     const subjectLabel = subject
       ? availableSubjects.find((s) => s.id === subject)?.name || subject
       : '______________';
@@ -173,18 +180,16 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
         ? selectedChapters.join(', ')
         : 'All Chapters';
 
-    const details: ExamDetails = {
+    return {
       subject: subjectLabel,
       examType: 'Practice Exam',
       chapters: chaptersLabel,
       topics: '',
-      totalQuestions: 50, // Default OMR size usually
+      totalQuestions: 50,
       durationMinutes: 0,
       totalMarks: 0,
       negativeMarking: 0,
     };
-    printOMRSheet(details, 50);
-    toast.success('OMR Sheet Downloaded');
   };
 
   return (
@@ -201,7 +206,7 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
         </div>
         <button
           type="button"
-          onClick={handleOmrPrint}
+          onClick={handleOmrClick}
           className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 rounded-xl font-bold text-xs hover:border-neutral-300 transition-colors shadow-sm"
         >
           <Download size={16} />
@@ -303,6 +308,13 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
           </div>
         </div>
       </form>
+
+      {/* OMR Modal */}
+      <OmrPrintModal
+        isOpen={isOmrModalOpen}
+        onClose={() => setIsOmrModalOpen(false)}
+        details={getOmrDetails()}
+      />
     </div>
   );
 };

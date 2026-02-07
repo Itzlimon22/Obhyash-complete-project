@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
-import { printQuestionPaper, printOMRSheet } from '@/services/print-service';
+import { printQuestionPaper } from '@/services/print-service'; // Removed printOMRSheet
+import { OmrPrintModal } from '@/components/student/features/omr/OmrPrintModal'; // Added
 
 interface ExamSetupFormProps {
   onStartExam: (config: ExamConfig) => void;
   isLoading: boolean;
 }
 
-// SUBJECT_OPTIONS removed in favor of dynamic fetching from database.ts
+// ... (Constants options remain same)
 
 const EXAM_TYPE_OPTIONS = [
   { id: 'Academic', label: 'Academic' },
@@ -59,22 +60,29 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     { id: string; name: string }[]
   >([]);
 
-  // OMR Modal State
+  // OMR Config Modal State
   const [isOmrModalOpen, setIsOmrModalOpen] = useState(false);
+  // OMR Print Modal State
+  const [isOmrPrintModalOpen, setIsOmrPrintModalOpen] = useState(false); // New
+  const [omrPrintDetails, setOmrPrintDetails] = useState<ExamDetails | null>(
+    null,
+  ); // New
+
   const [omrSubject, setOmrSubject] = useState(''); // ID
   const [omrChapter, setOmrChapter] = useState(''); // ID
   const [omrTopic, setOmrTopic] = useState(''); // ID
   const [omrCount, setOmrCount] = useState(50);
   const [omrIsBlank, setOmrIsBlank] = useState(false);
 
-  // 1. Fetch Subjects (unchanged logic, just ensuring it sets options)
+  // ... (Effects 1, 2, 3 remain same - omitted from replacement to match range?)
+  // Actually I need to cover up to handleOmrDownload.
+
+  // 1. Fetch Subjects
   React.useEffect(() => {
     const loadSubjects = async () => {
       const { getSubjects, getUserProfile } =
         await import('@/services/database');
       const user = await getUserProfile('me');
-      // Map user division to group logic if needed, e.g. 'Science' -> 'Science'
-      // Assume user.division holds 'Science', 'Arts' etc.
       const subjects = await getSubjects(user?.division || undefined);
       setSubjectOptions(subjects);
     };
@@ -119,8 +127,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       const loadOmrSubjects = async () => {
         const { getSubjects, getUserProfile } =
           await import('@/services/database');
-        // We can potentially reuse the cached user profile or fetch again.
-        // For simplicity, let's fetch. In a real app we'd use a context or query cache.
         const user = await getUserProfile('me');
         const subjects = await getSubjects(user?.division || undefined);
         setOmrSubjectOptions(subjects);
@@ -225,7 +231,10 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       negativeMarking: 0,
     };
 
-    printOMRSheet(details, omrCount);
+    setOmrPrintDetails(details);
+    setIsOmrPrintModalOpen(true);
+    // don't close the config modal yet, or maybe closing it is better UX?
+    // setIsOmrModalOpen(false); // Let's keep it open or close depending on preference. Closing it seems correct as we open the preview.
     setIsOmrModalOpen(false);
   };
 
@@ -919,32 +928,28 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   <span>100 Questions</span>
                 </div>
               </div>
-
-              <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+              <div className="mt-8">
                 <button
+                  type="button"
                   onClick={handleOmrDownload}
-                  className="w-full py-3.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-lg transition-all active:scale-[0.98] flex justify-center items-center gap-2 text-sm"
+                  className="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-rose-500/30 transition-all active:scale-[0.98]"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-                    />
-                  </svg>
-                  Generate PDF
+                  Confirm & Print
                 </button>
               </div>
             </div>
           </div>
         </div>
+      )}
+
+      {/* OMR Preview & Print Modal */}
+      {omrPrintDetails && (
+        <OmrPrintModal
+          isOpen={isOmrPrintModalOpen}
+          onClose={() => setIsOmrPrintModalOpen(false)}
+          details={omrPrintDetails}
+          totalQuestions={omrCount}
+        />
       )}
     </div>
   );

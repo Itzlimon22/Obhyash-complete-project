@@ -159,17 +159,58 @@ body::after {
 @media print {
   @page {
     size: A4;
-    margin: 1cm;
+    margin: 0; /* Remove browser default margins, let component handle it */
   }
   body {
     background-color: white;
     color: black;
     background-image: none;
+    overflow: visible !important;
   }
   body::before,
   body::after {
     display: none;
   }
+
+  /* Hide Next.js root and portals by default */
+  body > *:not(.print-content-wrapper) {
+    display: none !important;
+  }
+
+  /* 
+     If we want to print something specific, we can use a class like .print-content 
+     But since the modal is usually inside a Portal at the body level, 
+     we need a more specific strategy. 
+     
+     Strategy:
+     When printing, if an element with class 'print-content' exists, 
+     hide everything else.
+  */
+
+  body:has(.print-content) > * {
+    display: none !important;
+  }
+
+  /* 
+     Re-display the parent of .print-content if it was hidden (e.g. standard Next.js root layout),
+     but in the case of Radix UI dialog, it's in a Portal.
+     
+     Actually, the simplest reliable way for React modern printing:
+     Hide everything. Position .print-content fixed top left w-full h-full z-max.
+  */
+  .print-content {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 210mm;
+    height: 297mm;
+    z-index: 9999;
+    background: white;
+    margin: 0;
+    padding: 0;
+  }
+
   .no-print {
     display: none !important;
   }
