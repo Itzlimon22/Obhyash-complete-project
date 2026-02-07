@@ -42,7 +42,12 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
   const [isSubjectsLoading, setIsSubjectsLoading] = useState(true);
 
   // OMR Modal State
-  const [isOmrModalOpen, setIsOmrModalOpen] = useState(false);
+  const [isOmrConfigOpen, setIsOmrConfigOpen] = useState(false);
+  const [omrPrintDetails, setOmrPrintDetails] = useState<ExamDetails | null>(
+    null,
+  );
+  const [omrQuestionCount, setOmrQuestionCount] = useState(50);
+  const [isOmrPrintModalOpen, setIsOmrPrintModalOpen] = useState(false);
 
   // Selection
   const [subject, setSubject] = useState('');
@@ -306,11 +311,14 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
       </form>
 
       {/* OMR Modal */}
-      <OmrPrintModal
-        isOpen={isOmrModalOpen}
-        onClose={() => setIsOmrModalOpen(false)}
-        details={getOmrDetails()}
-      />
+      {omrPrintDetails && (
+        <OmrPrintModal
+          isOpen={isOmrPrintModalOpen}
+          onClose={() => setIsOmrPrintModalOpen(false)}
+          details={omrPrintDetails}
+          totalQuestions={omrQuestionCount}
+        />
+      )}
     </div>
   );
 };
