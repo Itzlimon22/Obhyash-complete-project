@@ -175,29 +175,18 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
 
   // OMR Logic
   const handleOmrClick = () => {
-    setIsOmrModalOpen(true);
+    setIsOmrConfigOpen(true);
   };
 
-  const getOmrDetails = (): ExamDetails => {
-    const subjectLabel = subject
-      ? availableSubjects.find((s) => s.id === subject)?.name || subject
-      : '______________';
-    const chaptersLabel =
-      selectedChapters.length > 0
-        ? selectedChapters.join(', ')
-        : 'All Chapters';
-
-    return {
-      subject: subjectLabel,
-      examType: 'Practice Exam',
-      chapters: chaptersLabel,
-      topics: '',
-      totalQuestions: 50,
-      durationMinutes: 0,
-      totalMarks: 0,
-      negativeMarking: 0,
-    };
+  const handleOmrGenerate = (details: ExamDetails, totalQuestions: number) => {
+    setOmrPrintDetails(details);
+    setOmrQuestionCount(totalQuestions);
+    setIsOmrPrintModalOpen(true);
   };
+
+  // Helper to get formatted subject name for pre-filling
+  const getSubjectName = () =>
+    availableSubjects.find((s) => s.id === subject)?.name || subject;
 
   return (
     <div className="w-full max-w-5xl mx-auto pb-32">
