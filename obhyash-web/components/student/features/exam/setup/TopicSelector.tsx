@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   ChevronRight,
+  ChevronDown,
   ListFilter,
   X,
   CheckSquare,
@@ -187,53 +188,68 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
     <>
       <div
         className={cn(
-          'space-y-4',
+          'space-y-2',
           disabled && 'opacity-50 pointer-events-none',
         )}
       >
-        <div
-          onClick={() => !disabled && setIsOpen(true)}
-          className="group cursor-pointer"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-bold text-neutral-900 dark:text-white pointer-events-none">
-              {title}
-            </label>
-            <span className="text-xs font-semibold text-rose-600 dark:text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity">
-              Edit
-            </span>
-          </div>
-
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-4 rounded-2xl flex items-center justify-between hover:border-rose-300 dark:hover:border-rose-700 transition-colors shadow-sm">
-            <div className="flex items-center gap-3 overflow-hidden">
-              <div className="w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500">
-                {title === 'অধ্যায় (Chapters)' ? (
-                  <BookOpen size={20} />
-                ) : (
-                  <Layers size={20} />
-                )}
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-sm font-semibold truncate text-neutral-900 dark:text-white">
-                  {selectedItems.length === 0
-                    ? 'Select items...'
-                    : selectedItems.length === items.length
-                      ? 'All Selected'
-                      : `${selectedItems.length} Selected`}
-                </span>
-                <span className="text-xs text-neutral-500 truncate max-w-[200px]">
-                  {selectedItems.length === 0
-                    ? `Choose from ${items.length} options`
-                    : selectedItems.join(', ')}
-                </span>
-              </div>
-            </div>
-
-            <div className="w-8 h-8 rounded-full bg-neutral-50 dark:bg-neutral-800 flex items-center justify-center">
-              <ChevronRight size={16} className="text-neutral-400" />
-            </div>
-          </div>
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-bold text-neutral-700 dark:text-neutral-300">
+            {title}
+          </label>
         </div>
+
+        <button
+          type="button"
+          onClick={() => !disabled && setIsOpen(true)}
+          disabled={disabled}
+          className={cn(
+            'w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 outline-none group text-left',
+            'bg-white dark:bg-neutral-900',
+            disabled
+              ? 'cursor-not-allowed bg-neutral-100 dark:bg-neutral-800'
+              : 'cursor-pointer',
+            isOpen
+              ? 'border-rose-500 ring-2 ring-rose-500/10'
+              : 'border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700',
+          )}
+        >
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div
+              className={cn(
+                'w-8 h-8 rounded-lg flex items-center justify-center shadow-sm border border-neutral-100 dark:border-neutral-700 shrink-0',
+                disabled
+                  ? 'bg-neutral-200 dark:bg-neutral-700'
+                  : 'bg-neutral-50 dark:bg-neutral-800',
+              )}
+            >
+              {title.includes('Chapter') ? (
+                <BookOpen size={16} className="text-neutral-500" />
+              ) : (
+                <Layers size={16} className="text-neutral-500" />
+              )}
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span
+                className={cn(
+                  'text-sm font-semibold truncate',
+                  selectedItems.length > 0
+                    ? 'text-neutral-900 dark:text-white'
+                    : 'text-neutral-400',
+                )}
+              >
+                {selectedItems.length === 0
+                  ? 'নির্বাচন করুন...'
+                  : selectedItems.length === items.length
+                    ? 'সব নির্বাচন করা হয়েছে'
+                    : `${selectedItems.length} টি নির্বাচিত`}
+              </span>
+            </div>
+          </div>
+          <ChevronDown
+            size={20}
+            className="text-neutral-400 group-hover:text-neutral-600 transition-colors"
+          />
+        </button>
       </div>
 
       {isOpen && <SelectorModal />}
