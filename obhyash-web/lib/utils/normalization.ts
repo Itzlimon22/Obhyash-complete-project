@@ -1,8 +1,17 @@
+interface Topic {
+  serial: string | number;
+  name: string;
+}
+
+interface ChapterData {
+  topics?: Topic[];
+}
+
 /**
  * Normalizes topic inputs by handling Bengali digits and fuzzy matching.
  */
 export const normalizeTopic = (
-  chapterData: any,
+  chapterData: ChapterData | null | undefined,
   inputTopic: string,
 ): string => {
   if (!inputTopic || !chapterData?.topics) return inputTopic;
@@ -17,7 +26,7 @@ export const normalizeTopic = (
   const topicNumber = parseInt(cleaned, 10);
   if (!isNaN(topicNumber)) {
     const topicBySerial = chapterData.topics.find(
-      (t: any) => Number(t.serial) === topicNumber,
+      (t: Topic) => Number(t.serial) === topicNumber,
     );
     if (topicBySerial) return topicBySerial.name;
   }
@@ -27,7 +36,7 @@ export const normalizeTopic = (
 /**
  * Maps various answer inputs (Bengali, English, Keys) to the actual option text.
  */
-export const normalizeAnswer = (row: any, options: string[]): string => {
+export const normalizeAnswer = (row: { answer?: string }, options: string[]): string => {
   const answerTrimmed = String(row.answer || '')
     .trim()
     .toLowerCase();
@@ -57,5 +66,5 @@ export const normalizeAnswer = (row: any, options: string[]): string => {
     return options[optionIndex];
   }
 
-  return row.answer; // Fallback to raw text if no key match
+  return row.answer ?? ''; // Fallback to raw text if no key match
 };

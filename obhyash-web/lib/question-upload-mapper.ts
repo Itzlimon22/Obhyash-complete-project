@@ -349,8 +349,8 @@ export function transformDatabaseToQuestion(
 
     explanation: dbQuestion.explanation,
 
-    type: dbQuestion.type as any,
-    difficulty: dbQuestion.difficulty as any,
+    type: dbQuestion.type as Question['type'],
+    difficulty: dbQuestion.difficulty as Question['difficulty'],
 
     subject: dbQuestion.subject,
     chapter: dbQuestion.chapter,
@@ -362,7 +362,7 @@ export function transformDatabaseToQuestion(
     institutes: dbQuestion.institutes,
     years: dbQuestion.years,
 
-    status: dbQuestion.status as any,
+    status: dbQuestion.status as Question['status'],
     author: dbQuestion.author,
     createdAt: dbQuestion.created_at || new Date().toISOString(),
     version: dbQuestion.version,

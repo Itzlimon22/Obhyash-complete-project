@@ -209,7 +209,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         } else if (lowerHeader.includes('topic')) {
           question.topic = value;
         } else if (lowerHeader.includes('difficulty')) {
-          question.difficulty = value as any;
+          question.difficulty = value as 'Easy' | 'Medium' | 'Hard';
         } else if (lowerHeader.includes('explanation')) {
           question.explanation = value;
         } else if (lowerHeader.includes('stream')) {
@@ -660,7 +660,7 @@ HSC,Science,রসায়ন ১ম পত্র,ল্যাবরেটর�
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 size={14} className="text-emerald-600" />
-                answer (সঠিক উত্তর - "option1", "option2", etc.)
+                answer (সঠিক উত্তর - &quot;option1&quot;, &quot;option2&quot;, etc.)
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 size={14} className="text-emerald-600" />
@@ -945,7 +945,7 @@ HSC,Science,রসায়ন ১ম পত্র,ল্যাবরেটর�
                     onChange={(e) =>
                       setEditingData({
                         ...editingData,
-                        difficulty: e.target.value as any,
+                        difficulty: e.target.value as 'Easy' | 'Medium' | 'Hard',
                       })
                     }
                     className="w-full p-2 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white text-sm"

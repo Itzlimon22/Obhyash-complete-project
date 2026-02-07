@@ -525,7 +525,7 @@ export interface Notification {
   action_url?: string;
   icon?: string;
   priority: NotificationPriority;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   created_at: string;
   read_at?: string;
   expires_at?: string;

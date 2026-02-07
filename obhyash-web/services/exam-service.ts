@@ -73,7 +73,7 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
         user_id: user.id,
         // Ensure chapters is included explicitly if it's not in the spread
         // Cast to any to bypass strict type check if Type definition update is separate
-        chapters: (result as any).chapters || 'General',
+        chapters: (result as ExamResult & { chapters?: string }).chapters || 'General',
       };
 
       const { error } = await supabase

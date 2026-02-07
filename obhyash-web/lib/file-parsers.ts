@@ -41,7 +41,7 @@ export async function parseJSONFile(
         const text = e.target?.result as string;
         const json = JSON.parse(text);
         const questions = Array.isArray(json) ? json : [json];
-        resolve(questions as UploadQuestionFormat[]);
+        resolve(questions as unknown as UploadQuestionFormat[]);
       } catch (error) {
         reject(error);
       }
@@ -67,14 +67,14 @@ export async function parseXLSXFile(
         const workbook = XLSX.read(data, { type: 'binary' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-        const json = XLSX.utils.sheet_to_json(worksheet, {
+        const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, {
           raw: false,
           defval: '',
         });
 
         // Process arrays stored as comma-separated strings
-        const questions = json.map((row: any) => {
-          const processed: any = { ...row };
+        const questions = json.map((row: Record<string, unknown>) => {
+          const processed: Record<string, unknown> = { ...row };
 
           if (processed.options && typeof processed.options === 'string') {
             processed.options = processed.options
@@ -108,7 +108,7 @@ export async function parseXLSXFile(
           return processed;
         });
 
-        resolve(questions as UploadQuestionFormat[]);
+        resolve(questions as unknown as UploadQuestionFormat[]);
       } catch (error) {
         reject(error);
       }

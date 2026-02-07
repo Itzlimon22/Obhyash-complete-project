@@ -41,34 +41,40 @@ export function QuestionFormDialog({
   onSubmit,
 }: QuestionFormDialogProps) {
   // Default state structure to prevent null errors
-  const [formData, setFormData] = useState<QuestionFormData>({
-    stream: '',
-    section: '',
-    subject: '',
-    chapter: '',
-    topic: '',
-    question: '',
-    image_url: '', // Main Question Image
-    options: [
-      { id: 'a', text: '', isCorrect: false },
-      { id: 'b', text: '', isCorrect: false },
-      { id: 'c', text: '', isCorrect: false },
-      { id: 'd', text: '', isCorrect: false },
-    ],
-    explanation: '',
-    explanation_image_url: '', // ✅ Explanation Image
-    difficulty: 'Medium',
-    examType: '',
-    institute: '',
-    year: '',
-    status: 'Pending',
-  });
-
-  useEffect(() => {
+  const getInitialFormData = () => {
     if (question) {
-      setFormData(JSON.parse(JSON.stringify(question)));
+      return JSON.parse(JSON.stringify(question));
     }
-  }, [question]);
+    return {
+      stream: '',
+      section: '',
+      subject: '',
+      chapter: '',
+      topic: '',
+      question: '',
+      image_url: '', // Main Question Image
+      options: [
+        { id: 'a', text: '', isCorrect: false },
+        { id: 'b', text: '', isCorrect: false },
+        { id: 'c', text: '', isCorrect: false },
+        { id: 'd', text: '', isCorrect: false },
+      ],
+      explanation: '',
+      explanation_image_url: '', // ✅ Explanation Image
+      difficulty: 'Medium',
+      examType: '',
+      institute: '',
+      year: '',
+      status: 'Pending',
+    };
+  };
+
+  const [formData, setFormData] = useState<QuestionFormData>(() => {
+    if (question) {
+      return JSON.parse(JSON.stringify(question));
+    }
+    return getInitialFormData();
+  });
 
   if (!formData) return null;
 

@@ -73,14 +73,19 @@ export const getQuestionsPage = async (
       }
 
       // Map snake_case to camelCase
-      const mappedQuestions: Question[] = (data || []).map((q: any) => ({
+      const mappedQuestions: Question[] = (data || []).map((q: Record<string, unknown>) => ({
         ...q,
         createdAt: q.created_at || new Date().toISOString(),
         correctAnswer: q.correct_answer,
         correctAnswerIndex: q.correct_answer_index,
+        correctAnswerIndices: q.correct_answer_indices || [],
         imageUrl: q.image_url,
+        optionImages: q.option_images || [],
         explanationImageUrl: q.explanation_image_url,
-      }));
+        examType: q.exam_type,
+        institutes: q.institutes || [],
+        years: q.years || [],
+      } as Question));
 
       return {
         questions: mappedQuestions,
@@ -271,7 +276,7 @@ export const updateQuestion = async (
 ): Promise<{ success: boolean; error?: string }> => {
   if (isSupabaseConfigured() && supabase) {
     try {
-      const payload: any = {
+      const payload: Record<string, unknown> = {
         ...updates,
         updated_at: new Date().toISOString(),
       };
@@ -398,7 +403,7 @@ export const bulkUpdateQuestionStatus = async (
  */
 export const bulkCreateQuestions = async (
   questions: Partial<Question>[],
-): Promise<{ success: boolean; count: number; errors: any[] }> => {
+): Promise<{ success: boolean; count: number; errors: unknown[] }> => {
   if (isSupabaseConfigured() && supabase) {
     try {
       // Map Question objects to database format

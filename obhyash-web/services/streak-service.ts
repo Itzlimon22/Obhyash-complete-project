@@ -23,7 +23,7 @@ export const checkAndUpdateStreak = async (
     now.getDate(),
   ).getTime();
 
-  let lastStreakDate = user.lastStreakDate
+  const lastStreakDate = user.lastStreakDate
     ? new Date(user.lastStreakDate)
     : null;
 

@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
 
+interface User {
+  institute?: string;
+  batch?: string;
+}
+
 interface AdvancedFilterBarProps {
   onFilterChange: (filters: FilterState) => void;
-  users: any[]; // Used to derive options for Institute/Batch
+  users: User[]; // Used to derive options for Institute/Batch
   isOpen: boolean;
   onToggle: () => void;
 }
@@ -83,7 +88,7 @@ export default function AdvancedFilterBar({
               onChange={(e) =>
                 setFilters((prev) => ({
                   ...prev,
-                  lastActiveRange: e.target.value as any,
+                  lastActiveRange: e.target.value as 'all' | '7days' | '30days' | 'inactive',
                 }))
               }
               className="w-full p-2.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
@@ -103,7 +108,7 @@ export default function AdvancedFilterBar({
               onChange={(e) =>
                 setFilters((prev) => ({
                   ...prev,
-                  subscriptionStatus: e.target.value as any,
+                  subscriptionStatus: e.target.value as 'all' | 'Active' | 'Past Due' | 'Expired',
                 }))
               }
               className="w-full p-2.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm focus:ring-2 focus:ring-blue-500 outline-none"

@@ -168,7 +168,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                   <select
                     value={formData.role}
                     onChange={(e) =>
-                      setFormData({ ...formData, role: e.target.value as any })
+                      setFormData({ ...formData, role: e.target.value as 'Student' | 'Teacher' | 'Admin' })
                     }
                     className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
                   >
@@ -189,7 +189,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        status: e.target.value as any,
+                        status: e.target.value as 'Active' | 'Inactive' | 'Suspended',
                       })
                     }
                     className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none appearance-none"

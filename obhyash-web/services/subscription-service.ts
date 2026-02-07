@@ -7,6 +7,18 @@ import {
 import { supabase, isSupabaseConfigured } from './core';
 import { createNotification } from './notification-service';
 
+interface DbSubscriptionPlan {
+  id: string;
+  display_name: string;
+  price: number;
+  currency?: string;
+  duration_days: number;
+  features?: string[];
+  color_theme?: string;
+  is_popular?: boolean;
+  is_active: boolean;
+}
+
 export const getSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
   if (!isSupabaseConfigured() || !supabase) {
     throw new Error('Database configuration missing');
@@ -25,7 +37,7 @@ export const getSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
 
   if (data) {
     // Map DB plans to Frontend SubscriptionPlan type
-    const dbPlans = data.map((plan: any) => ({
+    const dbPlans = data.map((plan: DbSubscriptionPlan) => ({
       id: plan.id,
       name: plan.display_name,
       price: plan.price,
@@ -77,7 +89,7 @@ export const getUserInvoices = async (): Promise<Invoice[]> => {
     }
 
     if (data) {
-      return data.map((req: any) => ({
+      return data.map((req: { id: string; requested_at: string; amount: number; currency?: string; plan_name: string }) => ({
         id: req.id,
         date: new Date(req.requested_at).toLocaleDateString('en-GB', {
           day: 'numeric',
@@ -158,7 +170,7 @@ export const getUserActiveSubscription =
     }
 
     if (data && data.plan) {
-      const plan = data.plan as any;
+      const plan = (Array.isArray(data.plan) ? data.plan[0] : data.plan) as DbSubscriptionPlan;
       return {
         id: plan.id,
         name: plan.display_name,

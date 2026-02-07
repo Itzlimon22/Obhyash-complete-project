@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 import { FilterState } from '@/components/admin/user-management/AdvancedFilterBar';
-import { User } from '@/lib/types';
+import { User, UserRole } from '@/lib/types';
 
 /**
  * Custom hook for managing user data in the Admin Panel.
@@ -73,24 +73,56 @@ export function useUserManagement() {
       if (error) throw error;
 
       // Map DB fields to User type
-      const mappedUsers: User[] = (data || []).map((u: any) => ({
+      interface UserRow {
+        id: string;
+        name?: string;
+        email?: string;
+        phone?: string;
+        role?: string;
+        status?: string;
+        avatar_url?: string;
+        institute?: string;
+        division?: string;
+        batch?: string;
+        exams_taken?: number;
+        created_at: string;
+        subscription?: { plan: string; status: string; expiry: string };
+        goal?: string;
+        target?: string;
+        stream?: string;
+        ssc_roll?: string;
+        ssc_reg?: string;
+        ssc_board?: string;
+        ssc_passing_year?: string;
+        level?: string;
+        xp?: number;
+        avatar_color?: string;
+      }
+
+      const mappedUsers: User[] = (data || []).map((u: UserRow) => ({
         id: u.id,
         name: u.name || '',
         email: u.email || '',
         phone: u.phone,
-        role: u.role || 'Student',
-        status: u.status || 'Active',
+        role: (u.role || 'Student') as UserRole,
+        status: (u.status || 'Active') as User['status'],
         avatarUrl: u.avatar_url,
         institute: u.institute,
         division: u.division,
         batch: u.batch,
         enrolledExams: u.exams_taken || 0, // Map exams_taken to enrolledExams
         lastActive: u.created_at, // Using created_at as proxy for now if last_active missing
-        subscription: u.subscription || {
-          plan: 'Free',
-          status: 'Active',
-          expiry: '',
-        },
+        subscription: u.subscription
+          ? {
+              plan: u.subscription.plan as 'Free' | 'Pro' | 'Enterprise',
+              status: u.subscription.status as 'Active' | 'Past Due' | 'Canceled',
+              expiry: u.subscription.expiry,
+            }
+          : {
+              plan: 'Free' as const,
+              status: 'Active' as const,
+              expiry: '',
+            },
         recentExams: [], // Placeholder
         goal: u.goal,
         target: u.target,
@@ -332,8 +364,8 @@ export function useUserManagement() {
     const ids = Array.from(selectedUsers);
 
     try {
-      let query = supabase.from('users');
-      let payload: any = {};
+      const query = supabase.from('users');
+      let payload: Record<string, string | { plan: string | undefined; status: string }> = {};
 
       if (action === 'activate') payload = { status: 'Active' };
       if (action === 'deactivate') payload = { status: 'Inactive' };

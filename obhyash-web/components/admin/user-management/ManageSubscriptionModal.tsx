@@ -79,7 +79,7 @@ export default function ManageSubscriptionModal({
       toast.success('Subscription updated successfully');
       onUpdate();
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating subscription:', error);
       toast.error('Failed to update subscription');
     } finally {

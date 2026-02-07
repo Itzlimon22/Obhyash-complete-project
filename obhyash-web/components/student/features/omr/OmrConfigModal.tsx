@@ -54,6 +54,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
 
     const details: ExamDetails = {
       subject: isBlank ? '' : subject,
+      subjectLabel: isBlank ? '' : subject,
       examType: isBlank ? '' : 'Practice Exam',
       chapters: isBlank ? '' : chapter,
       topics: isBlank ? '' : topic,

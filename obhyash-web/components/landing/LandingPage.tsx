@@ -36,6 +36,17 @@ interface LandingPageProps {
   historyCount: number;
 }
 
+interface PricingPlan {
+  title: string;
+  price: string;
+  period: string;
+  features: string[];
+  cta: string;
+  color: string;
+  buttonColor: string;
+  highlight?: boolean;
+}
+
 const DEMO_QUESTIONS = [
   {
     text: 'একটি কণা $v = u + at$ সূত্র মেনে চলে। যদি $u=0$ এবং $a=5 ms^{-2}$ হয়, তবে $t=4s$ এ বেগ কত?',
@@ -110,7 +121,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
   // --- Data Arrays ---
 
-  const [pricingPlans, setPricingPlans] = useState<any[]>([
+  const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>([
     {
       title: 'বেসিক (Free)',
       price: '০',

@@ -43,7 +43,7 @@ export default function BulkUploadDialog({
 }) {
   const [step, setStep] = useState(1);
   const [parsedData, setParsedData] = useState<QuestionFormData[]>([]);
-  const [failedData, setFailedData] = useState<any[]>([]);
+  const [failedData, setFailedData] = useState<{ question: string; error: string }[]>([]);
   const [uploading, setUploading] = useState(false);
   const [isAiReviewing, setIsAiReviewing] = useState(false);
   const [aiProgress, setAiProgress] = useState(0);
@@ -71,20 +71,20 @@ export default function BulkUploadDialog({
   };
 
   // ✅ HELPER: Smart Case-Insensitive Search
-  const findValue = (row: any, possibleKeys: string[]): string => {
+  const findValue = (row: Record<string, unknown>, possibleKeys: string[]): string => {
     const rowKeys = Object.keys(row);
     for (const target of possibleKeys) {
       const foundKey = rowKeys.find(
         (k) => k.toLowerCase().trim() === target.toLowerCase().trim(),
       );
       if (foundKey && row[foundKey]) {
-        return row[foundKey].toString().trim();
+        return row[foundKey]?.toString().trim() || '';
       }
     }
     return '';
   };
 
-  const processParsedData = (rawData: any[]): QuestionFormData[] => {
+  const processParsedData = (rawData: Record<string, unknown>[]): QuestionFormData[] => {
     return rawData
       .map((row) => {
         // 1. MATCH IDs
@@ -209,7 +209,7 @@ export default function BulkUploadDialog({
     setIsAiReviewing(true);
     setAiProgress(0);
     const updated = [...parsedData];
-    const errors: any[] = [];
+    const errors: { question: string; error: string }[] = [];
 
     for (let i = 0; i < updated.length; i++) {
       try {
@@ -222,8 +222,9 @@ export default function BulkUploadDialog({
           }));
           updated[i].explanation = result.formattedExplanation;
         }
-      } catch (err: any) {
-        errors.push({ question: updated[i].question, error: err.message });
+      } catch (err: Error | unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        errors.push({ question: updated[i].question, error: errorMessage });
       }
       setAiProgress(((i + 1) / updated.length) * 100);
     }
@@ -286,12 +287,13 @@ export default function BulkUploadDialog({
 
       onSuccess();
       setTimeout(onClose, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       console.error(err);
-      setLogs((prev) => [...prev, `❌ Error: ${err.message}`]);
+      setLogs((prev) => [...prev, `❌ Error: ${errorMessage}`]);
       toast({
         title: 'Upload Failed',
-        description: err.message,
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -329,7 +331,7 @@ export default function BulkUploadDialog({
       const workbook = new ExcelJS.Workbook();
       await workbook.xlsx.load(await file.arrayBuffer());
       const worksheet = workbook.getWorksheet(1);
-      let raw: any[] = [];
+      const raw: Array<Record<string, unknown>> = [];
 
       // ✅ Improved Excel Parsing: Get headers from Row 1 to use as keys
       const headers: string[] = [];
@@ -341,7 +343,7 @@ export default function BulkUploadDialog({
         if (rowNumber === 1) return;
 
         // Construct an object where keys are the headers from row 1
-        const rowData: any = {};
+        const rowData: Record<string, unknown> = {};
         row.eachCell((cell, colNumber) => {
           if (headers[colNumber]) {
             rowData[headers[colNumber]] = cell.text; // map "Option A" -> value

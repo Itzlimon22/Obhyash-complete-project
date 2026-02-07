@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {
   Search,
   Menu,
@@ -22,7 +22,10 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme !== 'light';
+  });
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -31,16 +34,14 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const supabase = createClientComponentClient();
 
   // Load Theme Preference from LocalStorage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-      setIsDarkMode(false);
+  useLayoutEffect(() => {
+    const isLight = !isDarkMode;
+    if (isLight) {
       document.documentElement.classList.remove('dark');
     } else {
-      setIsDarkMode(true);
       document.documentElement.classList.add('dark');
     }
-  }, []);
+  }, [isDarkMode]);
 
   // Fetch User Profile
   useEffect(() => {

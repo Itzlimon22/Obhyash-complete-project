@@ -8,7 +8,7 @@ interface ActivityLog {
   activity_type: string;
   description: string;
   created_at: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 interface ActivityLogModalProps {

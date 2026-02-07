@@ -3,6 +3,11 @@ import { X, Search } from 'lucide-react';
 import { QuestionFilters } from '@/services/database';
 import { getSubjects, getChapters, getTopics } from '@/services/database';
 
+interface FilterItem {
+  id: string;
+  name: string;
+}
+
 interface QuestionFiltersProps {
   filters: QuestionFilters;
   onFiltersChange: (filters: QuestionFilters) => void;
@@ -14,9 +19,9 @@ export const QuestionFiltersPanel: React.FC<QuestionFiltersProps> = ({
   onFiltersChange,
   onClear,
 }) => {
-  const [subjects, setSubjects] = useState<any[]>([]);
-  const [chapters, setChapters] = useState<any[]>([]);
-  const [topics, setTopics] = useState<any[]>([]);
+  const [subjects, setSubjects] = useState<FilterItem[]>([]);
+  const [chapters, setChapters] = useState<FilterItem[]>([]);
+  const [topics, setTopics] = useState<FilterItem[]>([]);
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
 
   // Debounce search
@@ -39,29 +44,32 @@ export const QuestionFiltersPanel: React.FC<QuestionFiltersProps> = ({
 
   // Load chapters when subject changes
   useEffect(() => {
-    if (filters.subject) {
-      const loadChapters = async () => {
-        const chaps = await getChapters(filters.subject!);
-        setChapters(chaps);
-      };
-      loadChapters();
-    } else {
-      setChapters([]);
+    const loadChapters = async () => {
+      if (!filters.subject) {
+        setChapters([]);
+        setTopics([]);
+        return;
+      }
+      
+      const chaps = await getChapters(filters.subject!);
+      setChapters(chaps);
       setTopics([]);
-    }
+    };
+    loadChapters();
   }, [filters.subject]);
 
   // Load topics when chapter changes
   useEffect(() => {
-    if (filters.chapter) {
-      const loadTopics = async () => {
-        const tops = await getTopics(filters.chapter!);
-        setTopics(tops);
-      };
-      loadTopics();
-    } else {
-      setTopics([]);
-    }
+    const loadTopics = async () => {
+      if (!filters.chapter) {
+        setTopics([]);
+        return;
+      }
+      
+      const tops = await getTopics(filters.chapter!);
+      setTopics(tops);
+    };
+    loadTopics();
   }, [filters.chapter]);
 
   const handleSubjectChange = (value: string) => {
