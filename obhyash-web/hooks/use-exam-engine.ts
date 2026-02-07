@@ -90,7 +90,7 @@ export const useExamEngine = () => {
    *
    * @param config - Configuration for the exam (subject, topics, duration, etc.)
    */
-  const startExam = async (config: ExamConfig) => {
+  const startExam = async (config: ExamConfig): Promise<boolean> => {
     setErrorDetails('');
     setAppState(AppState.LOADING);
     setIsOmrMode(false);
@@ -98,6 +98,14 @@ export const useExamEngine = () => {
 
     try {
       const generatedQuestions = await fetchExamQuestions(config);
+
+      if (!generatedQuestions || generatedQuestions.length === 0) {
+        setAppState(AppState.IDLE);
+        throw new Error(
+          'No questions found for the selected criteria. Please try different topics.',
+        );
+      }
+
       setQuestions(generatedQuestions);
       setExamDetails({
         subject: config.subject,
@@ -116,14 +124,24 @@ export const useExamEngine = () => {
       setUserAnswers({});
       setFlaggedQuestions(new Set());
       setAppState(AppState.INSTRUCTIONS);
+      return true;
     } catch (e: unknown) {
       console.error(e);
+      let msg = 'Failed to load questions from database.';
       if (e instanceof Error) {
-        setErrorDetails(e.message || 'Failed to load questions from database.');
-      } else {
-        setErrorDetails('Failed to load questions from database.');
+        msg = e.message || msg;
       }
+
+      // If it's the "No questions" error we just threw, keep state IDLE so user stays on form
+      if (msg.includes('No questions found')) {
+        setAppState(AppState.IDLE);
+        // We re-throw so the UI component can toast/alert
+        throw e;
+      }
+
+      setErrorDetails(msg);
       setAppState(AppState.ERROR);
+      return false;
     }
   };
 

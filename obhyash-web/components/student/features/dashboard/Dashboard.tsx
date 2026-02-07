@@ -139,138 +139,136 @@ const Dashboard: React.FC<DashboardProps> = ({
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto flex flex-col-reverse lg:grid lg:grid-cols-3 gap-4 md:gap-6">
-      <div className="lg:col-span-2 space-y-4 md:space-y-6">
-        <div className="grid grid-cols-2 gap-3 md:gap-4">
-          <button
-            onClick={onMockExamClick}
-            className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-rose-50/50 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(225,29,72,0.1)] dark:shadow-none border border-rose-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-rose-200 dark:hover:border-rose-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
-          >
-            <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-rose-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+    <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+      {/* Cards Section - Order 1 on Mobile, Top Left on Desktop */}
+      <div className="lg:col-span-2 grid grid-cols-2 gap-3 md:gap-4 h-fit">
+        <button
+          onClick={onMockExamClick}
+          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-rose-50/50 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(225,29,72,0.1)] dark:shadow-none border border-rose-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-rose-200 dark:hover:border-rose-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
+        >
+          <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-rose-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
 
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-rose-100 dark:border-neutral-700 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-105 transition-transform relative z-10">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.8}
-                stroke="currentColor"
-                className="w-5 h-5 md:w-6 md:h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-                />
-              </svg>
-            </div>
-            <div className="relative z-10">
-              <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
-                মক পরীক্ষা
-              </h3>
-            </div>
-          </button>
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-rose-100 dark:border-neutral-700 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-105 transition-transform relative z-10">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.8}
+              stroke="currentColor"
+              className="w-5 h-5 md:w-6 md:h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+              />
+            </svg>
+          </div>
+          <div className="relative z-10">
+            <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+              মক পরীক্ষা
+            </h3>
+          </div>
+        </button>
 
-          <button
-            onClick={onHistoryClick}
-            className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-neutral-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all text-center h-full group active:scale-[0.98] duration-200"
-          >
-            <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-neutral-100/30 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+        <button
+          onClick={onHistoryClick}
+          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-neutral-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all text-center h-full group active:scale-[0.98] duration-200"
+        >
+          <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-neutral-100/30 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
 
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-neutral-100 dark:border-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-400 group-hover:scale-105 transition-transform relative z-10">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.8}
-                stroke="currentColor"
-                className="w-5 h-5 md:w-6 md:h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                />
-              </svg>
-            </div>
-            <div className="relative z-10">
-              <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
-                ইতিহাস
-              </h3>
-            </div>
-          </button>
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-neutral-100 dark:border-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-400 group-hover:scale-105 transition-transform relative z-10">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.8}
+              stroke="currentColor"
+              className="w-5 h-5 md:w-6 md:h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              />
+            </svg>
+          </div>
+          <div className="relative z-10">
+            <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
+              ইতিহাস
+            </h3>
+          </div>
+        </button>
 
-          <button
-            onClick={onLeaderboardClick}
-            className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-amber-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(245,158,11,0.1)] dark:shadow-none border border-amber-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-amber-200 dark:hover:border-amber-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
-          >
-            <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-amber-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+        <button
+          onClick={onLeaderboardClick}
+          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-amber-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(245,158,11,0.1)] dark:shadow-none border border-amber-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-amber-200 dark:hover:border-amber-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
+        >
+          <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-amber-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
 
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-amber-100 dark:border-neutral-700 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform relative z-10">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.8}
-                stroke="currentColor"
-                className="w-5 h-5 md:w-6 md:h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0V5.625a1.125 1.125 0 0 0-1.125-1.125h-2.812a1.125 1.125 0 0 0-1.125 1.125v9.75"
-                />
-              </svg>
-            </div>
-            <div className="relative z-10">
-              <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                লিডারবোর্ড
-              </h3>
-            </div>
-          </button>
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-amber-100 dark:border-neutral-700 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform relative z-10">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.8}
+              stroke="currentColor"
+              className="w-5 h-5 md:w-6 md:h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0V5.625a1.125 1.125 0 0 0-1.125-1.125h-2.812a1.125 1.125 0 0 0-1.125 1.125v9.75"
+              />
+            </svg>
+          </div>
+          <div className="relative z-10">
+            <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+              লিডারবোর্ড
+            </h3>
+          </div>
+        </button>
 
-          <button
-            onClick={() => {}}
-            className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-cyan-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(6,182,212,0.1)] dark:shadow-none border border-cyan-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-cyan-200 dark:hover:border-cyan-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
-          >
-            <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-cyan-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+        <button
+          onClick={() => {}}
+          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-cyan-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(6,182,212,0.1)] dark:shadow-none border border-cyan-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-cyan-200 dark:hover:border-cyan-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
+        >
+          <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-cyan-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
 
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-cyan-100 dark:border-neutral-700 flex items-center justify-center text-cyan-600 dark:text-cyan-400 group-hover:scale-105 transition-transform relative z-10">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.8}
-                stroke="currentColor"
-                className="w-5 h-5 md:w-6 md:h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z"
-                />
-              </svg>
-            </div>
-            <div className="relative z-10">
-              <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
-                এনালাইসিস
-              </h3>
-            </div>
-          </button>
-        </div>
-
-        <SubjectStat data={subjectStats} onSubjectClick={onSubjectClick} />
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-cyan-100 dark:border-neutral-700 flex items-center justify-center text-cyan-600 dark:text-cyan-400 group-hover:scale-105 transition-transform relative z-10">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.8}
+              stroke="currentColor"
+              className="w-5 h-5 md:w-6 md:h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z"
+              />
+            </svg>
+          </div>
+          <div className="relative z-10">
+            <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+              এনালাইসিস
+            </h3>
+          </div>
+        </button>
       </div>
 
-      <div className="lg:col-span-1">
+      {/* Leaderboard Section - Order 2 on Mobile, Right Column on Desktop */}
+      <div className="lg:col-span-1 h-full">
         <div
           onClick={onLeaderboardClick}
-          className="relative bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden group cursor-pointer hover:border-amber-200 dark:hover:border-amber-900/50 transition-all active:scale-[0.99] duration-200"
+          className="relative bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden group cursor-pointer hover:border-amber-200 dark:hover:border-amber-900/50 transition-all active:scale-[0.99] duration-200 h-full"
         >
           {/* Subtle Background Pattern */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-50 to-transparent dark:from-amber-900/10 dark:to-transparent rounded-bl-full -mr-4 -mt-4 opacity-50"></div>
@@ -383,6 +381,11 @@ const Dashboard: React.FC<DashboardProps> = ({
             )}
           </div>
         </div>
+      </div>
+
+      {/* Subject Stats Section - Order 3 on Mobile, Bottom Left on Desktop */}
+      <div className="lg:col-span-2">
+        <SubjectStat data={subjectStats} onSubjectClick={onSubjectClick} />
       </div>
     </div>
   );
