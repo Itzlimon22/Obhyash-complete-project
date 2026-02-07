@@ -67,7 +67,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
 
   // Mobile Drawer / Modal Component
   const SelectorModal = () => (
-    <div className="fixed inset-0 z-[100] flex flex-col justify-end md:justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[100] flex flex-col justify-end md:justify-center bg-black/40 backdrop-blur-md animate-in fade-in duration-300">
       <div className="absolute inset-0" onClick={() => setIsOpen(false)} />
 
       <div className="relative w-full md:max-w-md md:rounded-3xl rounded-t-3xl bg-white dark:bg-neutral-900 shadow-2xl flex flex-col max-h-[85vh] md:max-h-[600px] animate-in slide-in-from-bottom duration-300 md:mx-auto">

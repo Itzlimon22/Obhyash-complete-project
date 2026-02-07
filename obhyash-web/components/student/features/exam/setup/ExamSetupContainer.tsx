@@ -89,18 +89,25 @@ export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
 
   useEffect(() => {
     if (subject) {
-      getSubjectMetadata(subject).then((data) => {
-        if (data) {
-          setMetadata(data);
-          setChapterOptions(data.chapters);
-          setSelectedChapters([]);
-          setSelectedTopics([]);
-          setTopicOptions([]);
-        } else {
-          setChapterOptions([]);
-          setTopicOptions([]);
-        }
-      });
+      setIsSubjectsLoading(true); // Re-use loading state or add a specific one
+      getSubjectMetadata(subject)
+        .then((data) => {
+          if (data) {
+            setMetadata(data);
+            setChapterOptions(data.chapters);
+            setSelectedChapters([]);
+            setSelectedTopics([]);
+            setTopicOptions([]);
+          } else {
+            setChapterOptions([]);
+            setTopicOptions([]);
+          }
+          setIsSubjectsLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setIsSubjectsLoading(false);
+        });
     } else {
       setChapterOptions([]);
       setTopicOptions([]);

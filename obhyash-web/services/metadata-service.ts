@@ -119,34 +119,38 @@ export const getChapters = async (
     const { data, error } = await supabase
       .from('chapters')
       .select('id, name')
-      .eq('subject_id', subjectId);
+      .eq('subject_id', subjectId)
+      .order('name'); // Optional: order alphabetically
 
     if (!error && data) return data;
+    console.error('Error fetching chapters:', error);
   }
 
+  // Fallback to mock only if DB fails or not configured
   await new Promise((r) => setTimeout(r, 200));
-  // Mock fallback: generate fake IDs for strings
   const names = SUBJECT_METADATA[subjectId]?.chapters || [];
   return names.map((name, i) => ({ id: `${subjectId}-ch-${i}`, name }));
 };
 
 export const getTopics = async (
-  chapterId: string,
-): Promise<{ id: string; name: string }[]> => {
+  chapterIds: string | string[],
+): Promise<{ id: string; name: string; chapter_id: string }[]> => {
   if (isSupabaseConfigured() && supabase) {
-    const { data, error } = await supabase
-      .from('topics')
-      .select('id, name')
-      .eq('chapter_id', chapterId);
+    let query = supabase.from('topics').select('id, name, chapter_id');
+
+    if (Array.isArray(chapterIds)) {
+      if (chapterIds.length === 0) return [];
+      query = query.in('chapter_id', chapterIds);
+    } else {
+      query = query.eq('chapter_id', chapterIds);
+    }
+
+    const { data, error } = await query;
 
     if (!error && data) return data;
+    console.error('Error fetching topics:', error);
   }
-  await new Promise((r) => setTimeout(r, 200));
-  // Mock fallback: return empty or try to reverse map ID to name if possible,
-  // but for mock we can just return empty or generic topics if strictly using IDs.
-  // Since we don't assume mock structure uses IDs, we might return empty here or some dummy data.
-  // Let's try to parse the mock ID if it matches our pattern, otherwise empty.
-  // Actually, for the "database connectivity" task, we assume DB is primary.
+
   return [];
 };
 
@@ -172,10 +176,29 @@ export const getExamTypes = async (): Promise<
 export const getSubjectMetadata = async (
   subjectId: string,
 ): Promise<SubjectMetadata | null> => {
-  // Legacy support or detailed fetch
+  // Prefer fetching fresh data from DB now
   if (isSupabaseConfigured() && supabase) {
-    // ...
+    const chapters = await getChapters(subjectId);
+    const metadata: SubjectMetadata = {
+      chapters: chapters.map((c) => c.name), // Legacy format expects strings
+      topics: {},
+    };
+
+    // Fetch topics for all chapters in parallel (or optimized query)
+    // For legacy structure, we need a map of Chapter Name -> Topic Names array
+    // This is expensive if we do it one by one.
+    // Better approach: fetch all topics for these chapters.
+    const chapterIds = chapters.map((c) => c.id);
+    const allTopics = await getTopics(chapterIds);
+
+    chapters.forEach((ch) => {
+      const chTopics = allTopics.filter((t) => t.chapter_id === ch.id);
+      metadata.topics[ch.name] = chTopics.map((t) => t.name);
+    });
+
+    return metadata;
   }
+
   await new Promise((r) => setTimeout(r, 200));
   return SUBJECT_METADATA[subjectId] || null;
 };
