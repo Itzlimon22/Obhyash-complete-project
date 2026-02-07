@@ -1,16 +1,3 @@
-import React from 'react';
-import { Notification } from '@/lib/types';
-import NotificationItem from './NotificationItem';
-import { CheckCheck } from 'lucide-react';
-
-interface NotificationDropdownProps {
-  notifications: Notification[];
-  onNotificationClick: (notification: Notification) => void;
-  onMarkAllAsRead: () => void;
-  onViewAll: () => void;
-  isLoading?: boolean;
-}
-
 import React, { useEffect, useState } from 'react';
 import { Notification } from '@/lib/types';
 import NotificationItem from './NotificationItem';
@@ -146,7 +133,5 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     </>
   );
 };
-
-export default NotificationDropdown;
 
 export default NotificationDropdown;
