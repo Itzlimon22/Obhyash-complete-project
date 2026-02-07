@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 // ✅ Import the specific fonts you requested
 import { Inter, Hind_Siliguri } from 'next/font/google';
 import './globals.css';
@@ -21,18 +21,19 @@ export const metadata: Metadata = {
   title: 'Obhyash',
   description: 'Smart Exam Platform',
   manifest: '/manifest.json',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false, // Prevents zooming for app-like feel
-  },
-  themeColor: '#e11d48',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'Obhyash',
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#e11d48',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
