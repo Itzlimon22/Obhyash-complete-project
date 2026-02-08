@@ -63,7 +63,15 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   // Metadata Cache & Loading
   const [metadata, setMetadata] = useState<SubjectMetadata | null>(null);
   const [isMetaLoading, setIsMetaLoading] = useState(false);
-  const [availableSubjects, setAvailableSubjects] = useState<any[]>([]);
+  const [availableSubjects, setAvailableSubjects] = useState<
+    {
+      id: string;
+      name: string;
+      label?: string;
+      icon?: string;
+      group?: string;
+    }[]
+  >([]);
   const [isSubjectsLoading, setIsSubjectsLoading] = useState(true);
 
   // Validation
@@ -91,9 +99,9 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         const user = await getUserProfile('me');
         if (user) {
           const subjects = await getSubjects(
-            user.division || (user as any).section,
+            user.division,
             user.stream,
-            (user as any).optional_subject,
+            user.optional_subject,
           );
           setAvailableSubjects(subjects);
         }

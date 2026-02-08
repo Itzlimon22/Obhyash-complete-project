@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 // Types & Services
-import { UserProfile, AppState, ExamResult } from '@/lib/types';
+import { UserProfile, AppState, ExamConfig, ExamResult } from '@/lib/types';
 import {
   printQuestionPaper,
   printResultWithExplanations,
@@ -86,6 +86,16 @@ export default function StudentRoot({
     setTimeTaken,
     startCustomExam,
   } = engine;
+
+  // Store the last ExamConfig so we can reattempt without type mismatch
+  const lastExamConfigRef = useRef<ExamConfig | null>(null);
+  const handleStartExam = useCallback(
+    async (config: ExamConfig) => {
+      lastExamConfigRef.current = config;
+      return startExam(config);
+    },
+    [startExam],
+  );
 
   // --- Global User State ---
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -256,7 +266,7 @@ export default function StudentRoot({
           {...commonLayoutProps}
           title="নতুন পরীক্ষা"
         >
-          <ExamSetupContainer onStartExam={startExam} isLoading={false} />
+          <ExamSetupContainer onStartExam={handleStartExam} isLoading={false} />
         </AppLayout>
       );
     }
@@ -439,7 +449,7 @@ export default function StudentRoot({
           onTimeoutReattempt={() => {
             setIsTimeoutModalOpen(false);
             setAppState(AppState.IDLE);
-            startExam(examDetails as any);
+            if (lastExamConfigRef.current) startExam(lastExamConfigRef.current);
           }}
           onTimeoutCancel={() => setAppState(AppState.IDLE)}
           setAppState={setAppState}
@@ -457,7 +467,8 @@ export default function StudentRoot({
             onReattempt={() => {
               setIsTimeoutModalOpen(false);
               setAppState(AppState.IDLE);
-              startExam(examDetails as any);
+              if (lastExamConfigRef.current)
+                startExam(lastExamConfigRef.current);
             }}
             onCancel={() => setAppState(AppState.IDLE)}
           />

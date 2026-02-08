@@ -27,9 +27,10 @@ export const submitComplaint = async (
 
     if (error) throw error;
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error submitting complaint:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: errorMessage };
   }
 };
 
@@ -42,7 +43,7 @@ export const getComplaints = async (
   if (!isSupabaseConfigured() || !supabase) return [];
 
   try {
-    let query = supabase
+    const query = supabase
       .from('app_complaints')
       .select('*')
       .order('created_at', { ascending: false });
@@ -81,8 +82,9 @@ export const resolveComplaint = async (
 
     if (error) throw error;
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error resolving complaint:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: errorMessage };
   }
 };

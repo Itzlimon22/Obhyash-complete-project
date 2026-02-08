@@ -16,7 +16,7 @@ import {
 import { AppComplaint, ComplaintStatus } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Portal } from '@/components/ui/portal';
+import Portal from '@/components/ui/portal';
 import { resolveComplaint } from '@/services/complaint-service';
 import { createNotification } from '@/services/notification-service';
 import { toast } from 'sonner';
@@ -125,7 +125,7 @@ export function ComplaintResolutionModal({
             {/* Description */}
             <div className="space-y-3">
               <h4 className="text-xs font-black text-neutral-400 uppercase flex items-center gap-2">
-                <MessageSquare size={14} /> Student's Complaint
+                <MessageSquare size={14} /> {`Student's Complaint`}
               </h4>
               <div className="p-5 rounded-2xl bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/20 text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap leading-relaxed">
                 {complaint.description}

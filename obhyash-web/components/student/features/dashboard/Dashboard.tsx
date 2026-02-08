@@ -6,6 +6,21 @@ import { MOCK_USERS } from './leaderboard/leaderboardData'; // Removed direct us
 // But wait, replace_file_content cannot delete lines easily without replacement.
 // I will replace it with empty string or comment.
 
+interface SubjectStats {
+  name: string;
+  correct: number;
+  wrong: number;
+  skipped: number;
+  total: number;
+}
+
+interface LeaderboardUser {
+  id: string;
+  name: string;
+  xp: number;
+  avatarColor?: string;
+}
+
 interface DashboardProps {
   onMockExamClick: () => void;
   onHistoryClick: () => void;
@@ -22,7 +37,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   history,
 }) => {
   // Dynamic Subject Stats Logic
-  const [subjectStats, setSubjectStats] = React.useState<any[]>([]);
+  const [subjectStats, setSubjectStats] = React.useState<SubjectStats[]>([]);
 
   React.useEffect(() => {
     const fetchStats = async () => {
@@ -32,9 +47,9 @@ const Dashboard: React.FC<DashboardProps> = ({
         const user = await getUserProfile('me');
         // Fetch subjects based on user's stream/group
         const subjects = await getSubjects(
-          user?.division || (user as any)?.section || undefined,
+          user?.division || undefined,
           user?.stream || undefined,
-          (user as any)?.optional_subject || undefined,
+          user?.optional_subject || undefined,
         );
 
         // Calculate stats for each subject
@@ -92,7 +107,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   }, [history]);
 
   // Leaderboard Preview Logic
-  const [topUser, setTopUser] = React.useState<any>(null);
+  const [topUser, setTopUser] = React.useState<LeaderboardUser | null>(null);
   const [userRank, setUserRank] = React.useState<number>(0);
   const [totalUsers, setTotalUsers] = React.useState<number>(0);
   const [xpDiff, setXpDiff] = React.useState<number>(0);

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   ChevronDown,
   X,
@@ -67,12 +67,11 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
   // Local buffer for selection
   const [localSelected, setLocalSelected] = useState<string[]>([]);
 
-  // Sync local state when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      setLocalSelected([...selectedItems]);
-    }
-  }, [isOpen, selectedItems]);
+  // Open the modal and sync local state from props
+  const openModal = useCallback(() => {
+    setLocalSelected([...selectedItems]);
+    setIsOpen(true);
+  }, [selectedItems]);
 
   const toggleGroup = (group: string) => {
     setExpandedGroups((prev) => ({ ...prev, [group]: !prev[group] }));
@@ -159,7 +158,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
 
         <button
           type="button"
-          onClick={() => !disabled && setIsOpen(true)}
+          onClick={() => !disabled && openModal()}
           disabled={disabled}
           className={cn(
             'w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 outline-none group text-left',

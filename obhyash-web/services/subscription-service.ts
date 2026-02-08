@@ -89,19 +89,27 @@ export const getUserInvoices = async (): Promise<Invoice[]> => {
     }
 
     if (data) {
-      return data.map((req: { id: string; requested_at: string; amount: number; currency?: string; plan_name: string }) => ({
-        id: req.id,
-        date: new Date(req.requested_at).toLocaleDateString('en-GB', {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric',
+      return data.map(
+        (req: {
+          id: string;
+          requested_at: string;
+          amount: number;
+          currency?: string;
+          plan_name: string;
+        }) => ({
+          id: req.id,
+          date: new Date(req.requested_at).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+          }),
+          amount: req.amount,
+          currency: req.currency || '৳',
+          status: 'paid',
+          planName: req.plan_name,
+          downloadUrl: '#',
         }),
-        amount: req.amount,
-        currency: req.currency || '৳',
-        status: 'paid',
-        planName: req.plan_name,
-        downloadUrl: '#',
-      }));
+      );
     }
   }
 
@@ -118,14 +126,14 @@ export const getUserPaymentMethods = async (): Promise<PaymentMethod[]> => {
   return [];
 };
 
-export const deletePaymentMethod = async (id: string): Promise<void> => {
+export const deletePaymentMethod = async (_id: string): Promise<void> => {
   if (!isSupabaseConfigured() || !supabase) {
     throw new Error('Database configuration missing');
   }
-  // await supabase.from('payment_methods').delete().eq('id', id);
+  // await supabase.from('payment_methods').delete().eq('id', _id);
 };
 
-export const subscribeToPlan = async (planId: string): Promise<boolean> => {
+export const subscribeToPlan = async (_planId: string): Promise<boolean> => {
   if (!isSupabaseConfigured() || !supabase) {
     throw new Error('Database configuration missing');
   }
@@ -134,7 +142,7 @@ export const subscribeToPlan = async (planId: string): Promise<boolean> => {
 };
 
 export const addPaymentMethod = async (
-  method: Omit<PaymentMethod, 'id'>,
+  _method: Omit<PaymentMethod, 'id'>,
 ): Promise<PaymentMethod> => {
   if (!isSupabaseConfigured() || !supabase) {
     throw new Error('Database configuration missing');
@@ -170,7 +178,9 @@ export const getUserActiveSubscription =
     }
 
     if (data && data.plan) {
-      const plan = (Array.isArray(data.plan) ? data.plan[0] : data.plan) as DbSubscriptionPlan;
+      const plan = (
+        Array.isArray(data.plan) ? data.plan[0] : data.plan
+      ) as DbSubscriptionPlan;
       return {
         id: plan.id,
         name: plan.display_name,

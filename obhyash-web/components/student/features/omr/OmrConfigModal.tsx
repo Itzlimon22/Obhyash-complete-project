@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Download,
@@ -38,14 +38,18 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
   const [topic, setTopic] = useState(initialTopics);
   const [count, setCount] = useState(50);
 
-  // Reset or Sync when opened
-  useEffect(() => {
-    if (isOpen) {
-      setSubject(initialSubject);
-      setChapter(initialChapters);
-      setTopic(initialTopics);
-    }
-  }, [isOpen, initialSubject, initialChapters, initialTopics]);
+  // Sync state from props when the modal transitions from closed to open
+  // Using the "store previous prop in state" pattern recommended by React:
+  // https://react.dev/reference/react/useState#storing-information-from-previous-renders
+  const [prevIsOpen, setPrevIsOpen] = useState(false);
+  if (isOpen && !prevIsOpen) {
+    setSubject(initialSubject);
+    setChapter(initialChapters);
+    setTopic(initialTopics);
+  }
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
+  }
 
   const handleGenerate = () => {
     // Validation if not blank

@@ -184,7 +184,7 @@ export default function AdminComplaintsPage() {
             />
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
+              onChange={(e) => setStatusFilter(e.target.value as ComplaintStatus | 'All')}
               className="w-full pl-12 pr-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none appearance-none transition-all font-medium"
             >
               <option value="All">All Statuses</option>
