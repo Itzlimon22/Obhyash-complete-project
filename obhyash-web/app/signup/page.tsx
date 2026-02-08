@@ -72,6 +72,9 @@ export default function SignupPage() {
       if (!/^01\d{9}$/.test(formData.phone)) {
         return 'সঠিক মোবাইল নম্বর দিন (যেমন: 01712345678)';
       }
+      if (!formData.gender) {
+        return 'লিঙ্গ নির্বাচন করা আবশ্যক';
+      }
     }
     if (currentStep === 2) {
       // Academic
@@ -291,64 +294,8 @@ export default function SignupPage() {
           )}
 
           <div className="space-y-6">
-            {/* STEP 1: CREDENTIALS */}
+            {/* STEP 1: PERSONAL DETAILS */}
             {step === 1 && (
-              <div className="space-y-5 animate-in slide-in-from-right-4 fade-in duration-300">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                    ইমেইল এড্রেস
-                  </label>
-                  <div className="relative group">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="example@mail.com"
-                      className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                    পাসওয়ার্ড
-                  </label>
-                  <div className="relative group">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
-                    <input
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      placeholder="কমপক্ষে ৬ অক্ষর"
-                      className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                    পাসওয়ার্ড নিশ্চিত করুন
-                  </label>
-                  <div className="relative group">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      placeholder="পাসওয়ার্ডটি আবার লিখুন"
-                      className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* STEP 2: PERSONAL DETAILS */}
-            {step === 2 && (
               <div className="space-y-5 animate-in slide-in-from-right-4 fade-in duration-300">
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
@@ -388,7 +335,7 @@ export default function SignupPage() {
                   <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
                     লিঙ্গ (Gender)
                   </label>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 gap-3">
                     {['Male', 'Female'].map((g) => (
                       <button
                         key={g}
@@ -550,7 +497,11 @@ export default function SignupPage() {
                   </div>
                 </div>
 
-                <Suspense fallback={<div className="h-12 w-full bg-neutral-100 dark:bg-neutral-800 rounded-xl animate-pulse" />}>
+                <Suspense
+                  fallback={
+                    <div className="h-12 w-full bg-neutral-100 dark:bg-neutral-800 rounded-xl animate-pulse" />
+                  }
+                >
                   <SocialLoginButton
                     mode="signup"
                     onBeforeRedirect={handleGoogleSignup}
