@@ -24,6 +24,7 @@ import Dashboard from '@/components/student/features/dashboard/Dashboard';
 import SubjectReportView from '@/components/student/features/dashboard/SubjectReportView';
 import LeaderboardView from '@/components/student/features/dashboard/LeaderboardView';
 import UserProfileView from '@/components/student/features/dashboard/UserProfileView';
+import { ComplaintView } from '@/components/student/features/complaint/ComplaintView';
 import AnalysisView from '@/components/student/features/dashboard/AnalysisView';
 import { PracticeDashboard } from '@/components/student/features/practice/PracticeDashboard';
 
@@ -233,13 +234,7 @@ export default function StudentRoot({
         setIsReviewingHistory(false);
       }
 
-      if (tab === 'complaint') {
-        import('next/navigation').then(({ useRouter }) => {
-          // We can't use useRouter hook conditionally, but we can access window location
-          window.location.href = '/complaint';
-        });
-        return;
-      }
+      // if (tab === 'complaint') ... removed to allow internal navigation
 
       setActiveTab(tab);
     }
@@ -406,6 +401,18 @@ export default function StudentRoot({
               setActiveTab('subject_report');
             }}
           />
+        </AppLayout>
+      );
+    }
+
+    if (activeTab === 'complaint') {
+      return (
+        <AppLayout
+          activeTab={activeTab}
+          {...commonLayoutProps}
+          title="অভিযোগ ও পরামর্শ"
+        >
+          <ComplaintView />
         </AppLayout>
       );
     }
