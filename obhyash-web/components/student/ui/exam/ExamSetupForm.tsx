@@ -261,9 +261,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           <section className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xs">
-                  1
-                </div>
                 বিষয় নির্বাচন
               </h3>
             </div>
@@ -293,9 +290,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           >
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-neutral-200 text-neutral-600 flex items-center justify-center text-xs">
-                  2
-                </div>
                 অধ্যায় ও টপিক (ঐচ্ছিক)
               </h3>
             </div>
@@ -354,9 +348,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               )}
             >
               <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-neutral-200 text-neutral-600 flex items-center justify-center text-xs">
-                  3
-                </div>
                 সেটিংস ও কনফিগারেশন
               </h3>
 

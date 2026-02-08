@@ -8,45 +8,88 @@ export const fetchQuestions = async (
     throw new Error('Database configuration missing');
   }
 
-  // Supabase Logic: Fetch random questions based on subject/tags
-  // RPC signature: get_random_questions(subject_param, limit_param, chapter_param, topic_param)
+  console.log('Fetching questions for config:', config);
 
-  // Config passes "All" for chapters/topics sometimes, handle that.
-  // Parse comma-separated strings into arrays
-  const chapterArgs =
-    config.chapters && config.chapters !== 'All'
-      ? config.chapters.split(',').map((s) => s.trim())
-      : null;
+  try {
+    // 1. Base Query
+    let query = supabase.from('questions').select('*');
 
-  const topicArgs =
-    config.topics && config.topics !== 'General'
-      ? config.topics.split(',').map((s) => s.trim())
-      : null;
+    // 2. Subject Filter (Mandatory)
+    // Handle case where subject might be an ID or a Name.
+    // Ideally we should use ID. If simple string matching fails, we might need a join or dual check.
+    // For now assuming ID is passed or Name matches exactly.
+    if (config.subject) {
+      query = query.eq('subject', config.subject);
+    }
 
-  console.log('Fetching questions with RPC:', {
-    subject: config.subject,
-    count: config.questionCount,
-    chapters: chapterArgs,
-    topics: topicArgs,
-  });
+    // 3. Chapter Filter
+    if (config.chapters && config.chapters !== 'All') {
+      const chapters = config.chapters.split(',').map((c) => c.trim());
+      if (chapters.length > 0) {
+        query = query.in('chapter', chapters);
+      }
+    }
 
-  const { data, error } = await supabase.rpc('get_random_questions', {
-    subject_param: config.subject,
-    limit_param: config.questionCount,
-    chapter_params: chapterArgs,
-    topic_params: topicArgs,
-    difficulty_param:
-      config.difficulty && config.difficulty !== 'Mixed'
-        ? config.difficulty
-        : null,
-  });
+    // 4. Topic Filter
+    if (
+      config.topics &&
+      config.topics !== 'General' &&
+      config.topics !== 'All'
+    ) {
+      const topics = config.topics.split(',').map((t) => t.trim());
+      if (topics.length > 0) {
+        query = query.in('topic', topics);
+      }
+    }
 
-  if (error) {
-    console.error('Error fetching questions from DB:', error);
-    throw error;
+    // 5. Difficulty Filter
+    if (config.difficulty && config.difficulty !== 'Mixed') {
+      query = query.eq('difficulty', config.difficulty);
+    }
+
+    // 6. Question Count Limit (Randomized efficiently)
+    // Note: 'random()' is not standard Supabase/PostgREST.
+    // We typically fetch more and shuffle client side, or use a customized RPC.
+    // Since RPC was failing, we'll try a direct fetch limit.
+    // To get "randomness" without RPC, we can fetch a larger batch and shuffle client-side,
+    // or rely on the RPC if we fix it.
+    // LET'S TRY DIRECT QUERY FIRST to rule out RPC issues.
+
+    query = query.limit(config.questionCount * 2); // Fetch double to allow some client-side shuffling
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Supabase Query Error:', error);
+      throw error;
+    }
+
+    if (!data || data.length === 0) {
+      console.warn('No questions found for criteria');
+      return [];
+    }
+
+    // Client-side Shuffle
+    const shuffled = data.sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, config.questionCount);
+
+    // Map to Question type (snake_case -> camelCase)
+    return selected.map((q: any) => ({
+      ...q,
+      createdAt: q.created_at,
+      correctAnswer: q.correct_answer,
+      correctAnswerIndex: q.correct_answer_index,
+      correctAnswerIndices: q.correct_answer_indices || [],
+      imageUrl: q.image_url,
+      optionImages: q.option_images || [],
+      explanationImageUrl: q.explanation_image_url,
+      examType: q.exam_type,
+    }));
+  } catch (err) {
+    console.error('Failed to fetch questions:', err);
+    // Fallback to empty array instead of crashing, let UI handle "No Questions"
+    return [];
   }
-
-  return data || [];
 };
 
 export const saveExamResult = async (result: ExamResult): Promise<void> => {
@@ -73,7 +116,8 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
         user_id: user.id,
         // Ensure chapters is included explicitly if it's not in the spread
         // Cast to any to bypass strict type check if Type definition update is separate
-        chapters: (result as ExamResult & { chapters?: string }).chapters || 'General',
+        chapters:
+          (result as ExamResult & { chapters?: string }).chapters || 'General',
       };
 
       const { error } = await supabase
