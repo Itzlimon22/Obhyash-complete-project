@@ -23,48 +23,62 @@ import { createClient } from '@/utils/supabase/client'; // ✅ Added for future 
  */
 export const StatCard: React.FC<{ data: StatData }> = ({ data }) => {
   return (
-    <div className="relative overflow-hidden bg-white dark:bg-obsidian-900 border border-paper-200 dark:border-obsidian-800 rounded-xl p-6 hover:border-brand-300 dark:hover:border-brand-700/50 transition-all duration-300 group shadow-subtle hover:shadow-lg dark:shadow-none">
-      {/* Decorative Glow Effect on Hover */}
+    <div className="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 hover:border-rose-300 dark:hover:border-rose-900/50 transition-all duration-300 group shadow-sm hover:shadow-xl dark:shadow-none">
+      {/* Decorative Glow */}
       <div
-        className={`absolute -top-10 -right-10 w-40 h-40 rounded-full blur-3xl opacity-0 group-hover:opacity-10 dark:opacity-0 dark:group-hover:opacity-5 transition-opacity duration-700 ${data.bgClass.replace('/10', '/30')}`}
+        className={`absolute -top-12 -right-12 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-20 dark:group-hover:opacity-10 transition-opacity duration-700 ${data.bgClass.replace('/30', '/60')}`}
       />
 
-      <div className="flex justify-between items-start mb-5 relative z-10">
-        <div>
-          <h4 className="text-gray-500 dark:text-gray-400 text-sm font-semibold uppercase tracking-wider mb-2">
+      <div className="flex justify-between items-start relative z-10 mb-4">
+        <div className="space-y-1">
+          <h4 className="text-neutral-500 dark:text-neutral-500 text-[10px] font-bold uppercase tracking-widest">
             {data.title}
           </h4>
-          <div className="flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-paper-900 dark:text-white tracking-tight">
-              {data.value}
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+              {data.value.toLocaleString()}
             </span>
-            {data.trend && (
-              <span
-                className={`text-xs font-semibold flex items-center px-2 py-0.5 rounded-full ${data.trend.isPositive ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400'}`}
-              >
-                {data.trend.isPositive ? (
-                  <ArrowUpRight size={14} className="mr-0.5" />
-                ) : (
-                  <ArrowDownRight size={14} className="mr-0.5" />
-                )}
-                {data.trend.value}%
-              </span>
-            )}
           </div>
         </div>
 
         <div
-          className={`p-3 rounded-xl ${data.bgClass} ${data.colorClass} dark:bg-opacity-5 bg-opacity-20`}
+          className={`p-2.5 rounded-xl ${data.bgClass} ${data.colorClass} dark:bg-opacity-10 bg-opacity-20 flex items-center justify-center shadow-inner`}
         >
-          <data.icon size={22} />
+          <data.icon size={20} strokeWidth={2.5} />
         </div>
       </div>
 
-      <div className="w-full bg-paper-100 dark:bg-obsidian-800 h-1 rounded-full overflow-hidden mt-2">
+      <div className="flex items-center justify-between relative z-10">
+        {data.trend ? (
+          <div
+            className={`flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${
+              data.trend.isPositive
+                ? 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-500/10'
+                : 'text-rose-600 bg-rose-50 dark:text-rose-400 dark:bg-rose-500/10'
+            }`}
+          >
+            {data.trend.isPositive ? (
+              <ArrowUpRight size={12} strokeWidth={3} />
+            ) : (
+              <ArrowDownRight size={12} strokeWidth={3} />
+            )}
+            {data.trend.value}%
+          </div>
+        ) : (
+          <div className="h-5" /> // Spacer
+        )}
+
+        <div className="text-[10px] text-neutral-400 dark:text-neutral-600 font-medium">
+          Monthly
+        </div>
+      </div>
+
+      {/* Modern thin progress indicator */}
+      <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
         <div
-          className={`h-full rounded-full ${data.colorClass.replace('text-', 'bg-')} opacity-80`}
-          style={{ width: '65%' }}
-        ></div>
+          className={`h-full transition-all duration-1000 ease-out group-hover:opacity-100 opacity-60 ${data.colorClass.replace('text-', 'bg-')}`}
+          style={{ width: '70%' }}
+        />
       </div>
     </div>
   );

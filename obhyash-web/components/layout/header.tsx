@@ -100,47 +100,57 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full h-16 bg-paper-50/80 dark:bg-obsidian-950/80 backdrop-blur-md border-b border-paper-200 dark:border-obsidian-800 flex items-center justify-between px-4 md:px-6 transition-colors duration-300">
-      {/* LEFT: Mobile Toggle, Search, Breadcrumbs */}
-      <div className="flex items-center gap-4 flex-1">
+    <header className="sticky top-0 z-30 w-full h-16 bg-white/80 dark:bg-obsidian-950/80 backdrop-blur-md border-b border-neutral-200 dark:border-obsidian-800 flex items-center justify-between px-4 md:px-6 transition-colors duration-300">
+      {/* LEFT: Mobile Toggle & Desktop Breadcrumbs */}
+      <div className="flex items-center gap-2 md:gap-4 flex-1">
         <button
           onClick={toggleSidebar}
-          className="lg:hidden p-2 text-gray-500 hover:text-paper-900 dark:text-gray-400 dark:hover:text-white rounded-lg hover:bg-paper-200 dark:hover:bg-obsidian-800 transition-colors"
+          className="lg:hidden p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
         >
           <Menu size={20} />
         </button>
 
-        {/* Desktop Breadcrumbs (Replaces Search on bigger screens if desired, or sits next to it) */}
+        {/* Center branding on mobile */}
+        <div className="lg:hidden absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-rose-600 to-rose-700 flex items-center justify-center shadow-lg shadow-rose-500/20">
+            <span className="text-white text-xs font-bold">O</span>
+          </div>
+          <span className="font-bold text-sm tracking-tight dark:text-white">
+            Obhyash
+          </span>
+        </div>
+
+        {/* Desktop Breadcrumbs */}
         {generateBreadcrumbs()}
 
-        {/* Search Bar (Optional - Keep hidden on mobile, show on Desktop if needed) */}
-        <div className="relative hidden xl:block group ml-auto mr-4">
+        {/* Search Bar - Hidden on small mobile, show on tablet+ */}
+        <div className="relative hidden sm:block xl:block group ml-auto mr-2">
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-obsidian-700 group-focus-within:text-brand-500 transition-colors"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-600 group-focus-within:text-rose-500 transition-colors"
             size={16}
           />
           <input
             type="text"
             placeholder="Search..."
-            className="bg-paper-100 dark:bg-obsidian-900 border border-transparent dark:border-obsidian-800 text-paper-900 dark:text-gray-200 text-sm rounded-lg pl-10 pr-4 py-2 w-48 outline-none ring-1 ring-transparent focus:ring-brand-500/50 focus:bg-white dark:focus:bg-obsidian-900 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600"
+            className="bg-neutral-100 dark:bg-neutral-900 border border-transparent dark:border-neutral-800 text-neutral-900 dark:text-neutral-200 text-xs md:text-sm rounded-xl pl-10 pr-4 py-2 w-32 md:w-48 outline-none ring-1 ring-transparent focus:ring-rose-500/50 focus:bg-white dark:focus:bg-black transition-all placeholder:text-neutral-400 dark:placeholder:text-neutral-600"
           />
         </div>
       </div>
 
       {/* RIGHT: Actions & Profile */}
-      <div className="flex items-center gap-2 md:gap-4 ml-4">
+      <div className="flex items-center gap-1 md:gap-3 ml-2">
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-2 text-gray-500 hover:text-paper-900 dark:text-gray-400 dark:hover:text-white hover:bg-paper-100 dark:hover:bg-obsidian-800 rounded-lg transition-colors"
+          className="p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors"
         >
-          {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
+          {isDarkMode ? <Moon size={18} /> : <Sun size={18} />}
         </button>
 
         {/* Notifications */}
         <NotificationDropdown />
 
-        <div className="h-6 w-px bg-paper-200 dark:bg-obsidian-800 mx-1"></div>
+        <div className="hidden md:block h-6 w-px bg-neutral-200 dark:bg-neutral-800 mx-1"></div>
 
         {/* User Profile Dropdown */}
         <div className="relative">

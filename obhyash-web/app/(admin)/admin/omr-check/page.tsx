@@ -6,6 +6,7 @@ import { supabase } from '@/services/database'; // Or use createClient from util
 import { ExamResult } from '@/lib/types';
 import { evaluateOMRScript } from '@/services/gemini-service';
 import { toast } from 'sonner';
+import { Loader2, Activity } from 'lucide-react';
 
 // Extended type to include user details
 interface AdminExamResult extends Omit<ExamResult, 'questions'> {
@@ -240,18 +241,18 @@ export default function OmrCheckPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-black p-6 animate-fade-in relative">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white flex items-center gap-3">
-              <span className="bg-rose-600 text-white p-2 rounded-lg">
+      <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white flex items-center gap-3">
+              <span className="bg-rose-600 text-white p-2 rounded-xl shadow-lg shadow-rose-500/20">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={2}
                   stroke="currentColor"
-                  className="w-6 h-6"
+                  className="w-5 h-5"
                 >
                   <path
                     strokeLinecap="round"
@@ -267,13 +268,13 @@ export default function OmrCheckPage() {
               </span>
               OMR চেকিং
             </h1>
-            <p className="text-neutral-500 dark:text-neutral-400 mt-1">
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm">
               শিক্ষার্থীদের জমা দেওয়া OMR স্ক্রিপ্ট মূল্যায়ন করুন
             </p>
           </div>
           <button
             onClick={fetchSubmissions}
-            className="p-2 bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-700 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300"
+            className="p-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-500 hover:text-rose-600 dark:hover:text-rose-400 transition-all shadow-sm shrink-0 w-fit active:scale-95"
             title="Refresh"
           >
             <svg
@@ -294,198 +295,318 @@ export default function OmrCheckPage() {
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
-            <span className="text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase">
-              অপেক্ষমান
-            </span>
-            <div className="text-3xl font-bold text-amber-500 mt-2">
-              {
-                scriptSubmissions.filter(
-                  (s) => s.status !== 'evaluated' && s.status !== 'rejected',
-                ).length
-              }
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {[
+            {
+              label: 'অপেক্ষমান',
+              val: scriptSubmissions.filter(
+                (s) => s.status !== 'evaluated' && s.status !== 'rejected',
+              ).length,
+              color: 'text-amber-500',
+              bg: 'bg-amber-50 dark:bg-amber-500/10',
+            },
+            {
+              label: 'মূল্যায়িত',
+              val: scriptSubmissions.filter((s) => s.status === 'evaluated')
+                .length,
+              color: 'text-emerald-500',
+              bg: 'bg-emerald-50 dark:bg-emerald-500/10',
+            },
+            {
+              label: 'বাতিল',
+              val: scriptSubmissions.filter((s) => s.status === 'rejected')
+                .length,
+              color: 'text-rose-500',
+              bg: 'bg-rose-50 dark:bg-rose-500/10',
+            },
+            {
+              label: 'মোট',
+              val: scriptSubmissions.length,
+              color: 'text-indigo-500',
+              bg: 'bg-indigo-50 dark:bg-indigo-500/10',
+            },
+          ].map((stat, i) => (
+            <div
+              key={i}
+              className="bg-white dark:bg-neutral-900 p-4 md:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm"
+            >
+              <span className="text-[10px] md:text-xs font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
+                {stat.label}
+              </span>
+              <div
+                className={`text-2xl md:text-3xl font-black ${stat.color} mt-1`}
+              >
+                {stat.val}
+              </div>
             </div>
-          </div>
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
-            <span className="text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase">
-              মূল্যায়িত
-            </span>
-            <div className="text-3xl font-bold text-emerald-500 mt-2">
-              {scriptSubmissions.filter((s) => s.status === 'evaluated').length}
-            </div>
-          </div>
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
-            <span className="text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase">
-              বাতিল
-            </span>
-            <div className="text-3xl font-bold text-red-500 mt-2">
-              {scriptSubmissions.filter((s) => s.status === 'rejected').length}
-            </div>
-          </div>
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
-            <span className="text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase">
-              মোট
-            </span>
-            <div className="text-3xl font-bold text-rose-500 mt-2">
-              {scriptSubmissions.length}
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* Table */}
-        <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800">
-                <tr>
-                  <th className="px-6 py-4 font-bold text-neutral-700 dark:text-neutral-300">
-                    শিক্ষার্থী
-                  </th>
-                  <th className="px-6 py-4 font-bold text-neutral-700 dark:text-neutral-300">
-                    বিষয় / ধরণ
-                  </th>
-                  <th className="px-6 py-4 font-bold text-neutral-700 dark:text-neutral-300">
-                    জমাদানের সময়
-                  </th>
-                  <th className="px-6 py-4 font-bold text-neutral-700 dark:text-neutral-300">
-                    ফাইল
-                  </th>
-                  <th className="px-6 py-4 font-bold text-neutral-700 dark:text-neutral-300">
-                    স্ট্যাটাস
-                  </th>
-                  <th className="px-6 py-4 font-bold text-neutral-700 dark:text-neutral-300 text-right">
-                    অ্যাকশন
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={6} className="text-center py-10">
-                      <div className="animate-pulse flex justify-center">
-                        Loading...
-                      </div>
-                    </td>
-                  </tr>
-                ) : scriptSubmissions.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="px-6 py-10 text-center text-neutral-500 dark:text-neutral-400"
+        {/* Main Content: Table on desktop, Cards on mobile */}
+        <div className="space-y-4">
+          {/* Mobile Card Layout (< md) */}
+          <div className="grid grid-cols-1 gap-4 md:hidden">
+            {isLoading ? (
+              <div className="bg-white dark:bg-neutral-900 rounded-2xl p-10 border border-neutral-200 dark:border-neutral-800 text-center text-neutral-400">
+                Loading...
+              </div>
+            ) : scriptSubmissions.length === 0 ? (
+              <div className="bg-white dark:bg-neutral-900 rounded-2xl p-10 border border-dashed border-neutral-300 dark:border-neutral-800 text-center text-neutral-500">
+                কোনো OMR স্ক্রিপ্ট জমা পড়েনি
+              </div>
+            ) : (
+              scriptSubmissions.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 shadow-sm space-y-4"
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-bold text-neutral-900 dark:text-white leading-tight">
+                        {item.user?.name || 'Unknown'}
+                      </h4>
+                      <p className="text-xs text-neutral-500 mt-0.5">
+                        {item.user?.email || 'No Email'}
+                      </p>
+                    </div>
+                    {item.status === 'evaluated' && (
+                      <span className="px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400 uppercase tracking-tighter">
+                        evaluated
+                      </span>
+                    )}
+                    {item.status === 'rejected' && (
+                      <span className="px-2 py-1 rounded-lg text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-500/10 dark:text-rose-400 uppercase tracking-tighter">
+                        rejected
+                      </span>
+                    )}
+                    {(item.status === 'pending' || !item.status) && (
+                      <span className="px-2 py-1 rounded-lg text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-500/10 dark:text-amber-400 uppercase tracking-tighter animate-pulse">
+                        pending
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div className="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800">
+                      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1">
+                        Subject
+                      </p>
+                      <p className="font-bold text-neutral-900 dark:text-neutral-200">
+                        {item.subject}
+                      </p>
+                    </div>
+                    <div className="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800">
+                      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1">
+                        Date
+                      </p>
+                      <p className="font-bold text-neutral-900 dark:text-neutral-200">
+                        {new Date(item.date).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2">
+                    <button
+                      onClick={() => setViewingScript(item)}
+                      className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold text-xs hover:underline"
                     >
-                      কোনো OMR স্ক্রিপ্ট জমা পড়েনি
-                    </td>
-                  </tr>
-                ) : (
-                  scriptSubmissions.map((item) => (
-                    <tr
-                      key={item.id}
-                      className="hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="font-bold text-neutral-900 dark:text-white">
-                          {item.user?.name || 'Unknown'}
-                        </div>
-                        <div className="text-xs text-neutral-500">
-                          {item.user?.email || 'No Email'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-bold text-neutral-900 dark:text-white">
-                          {item.subject}
-                        </div>
-                        <div className="text-xs text-neutral-500">
-                          {item.examType || 'General'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-neutral-600 dark:text-neutral-300">
-                        {new Date(item.date).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        className="w-4 h-4"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                        />
+                      </svg>
+                      View Image
+                    </button>
+
+                    <div className="flex-1 text-right">
+                      {item.status === 'evaluated' ? (
+                        <span className="font-extrabold text-neutral-900 dark:text-white text-lg">
+                          {item.score?.toFixed(1) || 0}{' '}
+                          <span className="text-[10px] text-neutral-400">
+                            MARKS
+                          </span>
+                        </span>
+                      ) : item.status === 'rejected' ? (
+                        <span className="text-[10px] text-rose-500 font-bold italic truncate max-w-[120px] inline-block">
+                          {item.rejectionReason || 'Rejected'}
+                        </span>
+                      ) : (
                         <button
-                          onClick={() => setViewingScript(item)}
-                          className="flex items-center gap-2 text-rose-600 dark:text-rose-400 hover:underline"
+                          onClick={() => handleEvaluate(item)}
+                          disabled={processingId === item.id}
+                          className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl text-xs font-black shadow-lg shadow-rose-500/20 active:scale-95 transition-all disabled:opacity-50"
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-4 h-4"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-                            />
-                          </svg>
-                          View Script
+                          {processingId === item.id
+                            ? 'Evaluating...'
+                            : 'AI Evaluation'}
                         </button>
-                      </td>
-                      <td className="px-6 py-4">
-                        {item.status === 'evaluated' && (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
-                            মূল্যায়িত
-                          </span>
-                        )}
-                        {item.status === 'rejected' && (
-                          <div className="flex flex-col gap-1">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 w-fit">
-                              বাতিল
-                            </span>
-                          </div>
-                        )}
-                        {(item.status === 'pending' || !item.status) && (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
-                            অপেক্ষমান
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        {item.status === 'evaluated' ? (
-                          <span className="font-bold text-neutral-900 dark:text-white">
-                            {item.score?.toFixed(2) || 0} নম্বর
-                          </span>
-                        ) : item.status === 'rejected' ? (
-                          <span
-                            className="text-xs text-red-500 italic max-w-[150px] inline-block"
-                            title={item.rejectionReason}
-                          >
-                            {item.rejectionReason || 'Rejected'}
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => handleEvaluate(item)}
-                            disabled={processingId === item.id}
-                            className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all disabled:opacity-50 flex items-center gap-2 ml-auto"
-                          >
-                            {processingId === item.id
-                              ? 'যাচাই হচ্ছে...'
-                              : 'AI মূল্যায়ন'}
-                          </button>
-                        )}
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Desktop Table Layout (>= md) */}
+          <div className="hidden md:block bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800">
+                  <tr className="text-[10px] uppercase font-black tracking-widest text-neutral-400">
+                    <th className="px-6 py-4">Student</th>
+                    <th className="px-6 py-4">Subject</th>
+                    <th className="px-6 py-4">Submitted At</th>
+                    <th className="px-6 py-4">File</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-20">
+                        <div className="animate-pulse flex justify-center text-neutral-400 font-bold uppercase tracking-widest text-xs">
+                          Fetching Data...
+                        </div>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  ) : scriptSubmissions.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="px-6 py-20 text-center text-neutral-500 dark:text-neutral-400 font-medium"
+                      >
+                        কোনো OMR স্ক্রিপ্ট জমা পড়েনি
+                      </td>
+                    </tr>
+                  ) : (
+                    scriptSubmissions.map((item) => (
+                      <tr
+                        key={item.id}
+                        className="hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors group"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="font-bold text-neutral-900 dark:text-white text-base">
+                            {item.user?.name || 'Unknown'}
+                          </div>
+                          <div className="text-[10px] text-neutral-500 font-mono">
+                            {item.user?.email || 'No Email'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="font-black text-neutral-900 dark:text-neutral-200">
+                            {item.subject}
+                          </div>
+                          <div className="text-[10px] text-neutral-500 font-bold bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded w-fit mt-1 uppercase">
+                            {item.examType || 'General'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 text-xs font-medium">
+                          {new Date(item.date).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() => setViewingScript(item)}
+                            className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold hover:underline group-hover:scale-105 transition-transform origin-left"
+                          >
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                            <span>View Script</span>
+                          </button>
+                        </td>
+                        <td className="px-6 py-4">
+                          {item.status === 'evaluated' && (
+                            <span className="inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400 uppercase tracking-widest">
+                              Evaluated
+                            </span>
+                          )}
+                          {item.status === 'rejected' && (
+                            <span className="inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black bg-rose-100 text-rose-800 dark:bg-rose-500/10 dark:text-rose-400 uppercase tracking-widest">
+                              Rejected
+                            </span>
+                          )}
+                          {(item.status === 'pending' || !item.status) && (
+                            <span className="inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black bg-amber-100 text-amber-800 dark:bg-amber-500/10 dark:text-amber-400 uppercase tracking-widest">
+                              Pending
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {item.status === 'evaluated' ? (
+                            <div className="flex flex-col items-end">
+                              <span className="font-black text-xl text-neutral-900 dark:text-white">
+                                {item.score?.toFixed(2) || 0}
+                              </span>
+                              <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest leading-none">
+                                Score
+                              </span>
+                            </div>
+                          ) : item.status === 'rejected' ? (
+                            <span
+                              className="text-xs text-rose-500 font-bold italic opacity-80"
+                              title={item.rejectionReason}
+                            >
+                              {item.rejectionReason || 'Rejected'}
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => handleEvaluate(item)}
+                              disabled={processingId === item.id}
+                              className="bg-rose-600 hover:bg-rose-700 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-rose-500/20 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2 ml-auto"
+                            >
+                              {processingId === item.id ? (
+                                <Loader2 className="animate-spin w-4 h-4" />
+                              ) : (
+                                <Activity size={14} />
+                              )}
+                              {processingId === item.id
+                                ? 'Processing...'
+                                : 'AI Evaluate'}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
         {/* Script Viewer Modal */}
         {viewingScript && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-            <div className="bg-white dark:bg-neutral-900 rounded-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-              <div className="p-4 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center bg-neutral-50 dark:bg-neutral-800">
+          <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white dark:bg-neutral-900 w-full sm:max-w-4xl h-[95vh] sm:h-auto sm:max-h-[90vh] flex flex-col overflow-hidden rounded-t-3xl sm:rounded-2xl shadow-2xl border-t sm:border border-neutral-200 dark:border-neutral-800">
+              <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-neutral-50/50 dark:bg-neutral-900">
                 <div>
-                  <h3 className="font-bold text-lg text-neutral-900 dark:text-white">
-                    {viewingScript.subject} - {viewingScript.user?.name}
+                  <h3 className="font-black text-neutral-900 dark:text-white leading-tight">
+                    {viewingScript.subject}
                   </h3>
-                  <p className="text-xs text-neutral-500">
-                    ID: {viewingScript.id}
+                  <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mt-0.5">
+                    {viewingScript.user?.name} • ID:{' '}
+                    {viewingScript.id.slice(0, 8)}
                   </p>
                 </div>
                 <button
@@ -493,67 +614,65 @@ export default function OmrCheckPage() {
                     setViewingScript(null);
                     setShowRejectInput(false);
                   }}
-                  className="p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                  className="p-2 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-500 hover:text-rose-600 transition-colors"
                 >
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
                     fill="none"
                     viewBox="0 0 24 24"
-                    strokeWidth={2}
                     stroke="currentColor"
-                    className="w-6 h-6 text-neutral-500"
                   >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M6 18 18 6M6 6l12 12"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
                     />
                   </svg>
                 </button>
               </div>
 
-              <div className="flex-1 overflow-auto p-4 bg-neutral-900 flex justify-center">
+              <div className="flex-1 overflow-auto p-2 bg-black/95 flex items-center justify-center">
                 <Image
                   src={viewingScript.scriptImageData ?? '/placeholder.png'}
                   alt="Script"
-                  width={800}
-                  height={600}
-                  className="max-w-full object-contain"
-                  style={{ height: 'auto' }}
+                  width={1200}
+                  height={1600}
+                  className="max-w-full h-auto object-contain shadow-2xl"
                   priority
                 />
               </div>
 
-              <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+              <div className="p-5 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900">
                 {showRejectInput ? (
-                  <div className="animate-fade-in">
-                    <label className="block text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-2">
-                      বাতিল করার কারণ (Rejection Reason):
+                  <div className="animate-in slide-in-from-bottom-4 duration-300">
+                    <label className="block text-xs font-black text-neutral-400 uppercase tracking-widest mb-3">
+                      Rejection Reason
                     </label>
                     <textarea
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
-                      placeholder="কেন এই স্ক্রিপ্টটি বাতিল করা হচ্ছে? (যেমন: অস্পষ্ট ছবি, ভুল ফরম্যাট)"
-                      className="w-full p-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white mb-3 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      placeholder="e.g., Image too blurry, Wrong format..."
+                      className="w-full p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white mb-4 focus:ring-2 focus:ring-rose-500/20 outline-none text-sm min-h-[100px]"
                       autoFocus
                     />
-                    <div className="flex justify-end gap-3">
+                    <div className="flex gap-3">
                       <button
                         onClick={() => setShowRejectInput(false)}
-                        className="px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg text-neutral-700 dark:text-neutral-300 font-bold hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                        className="flex-1 py-3 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-500 font-bold hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all"
                       >
-                        ফিরে যান
+                        Cancel
                       </button>
                       <button
                         onClick={confirmReject}
-                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold shadow-md"
+                        className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-500/20 transition-all"
                       >
-                        নিশ্চিত বাতিল
+                        Confirm Reject
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex justify-end gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <button
                       onClick={() => {
                         setRejectReason('');
@@ -563,9 +682,9 @@ export default function OmrCheckPage() {
                         viewingScript.status === 'evaluated' ||
                         viewingScript.status === 'rejected'
                       }
-                      className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-bold transition-colors disabled:opacity-50"
+                      className="flex-1 py-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 rounded-xl font-black text-xs uppercase tracking-widest transition-all hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 disabled:opacity-30"
                     >
-                      বাতিল করুন (Reject)
+                      Reject Script
                     </button>
                     <button
                       onClick={() => handleEvaluate(viewingScript)}
@@ -573,9 +692,16 @@ export default function OmrCheckPage() {
                         viewingScript.status === 'evaluated' ||
                         viewingScript.status === 'rejected'
                       }
-                      className="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-bold transition-colors shadow-lg disabled:opacity-50"
+                      className="flex-[2] py-4 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-rose-500/30 active:scale-95 disabled:opacity-30 flex items-center justify-center gap-2"
                     >
-                      মূল্যায়ন করুন (Evaluate)
+                      {processingId === viewingScript.id ? (
+                        <Loader2 className="animate-spin w-4 h-4" />
+                      ) : (
+                        <Activity size={16} />
+                      )}
+                      {processingId === viewingScript.id
+                        ? 'Evaluating...'
+                        : 'Start AI Evaluation'}
                     </button>
                   </div>
                 )}

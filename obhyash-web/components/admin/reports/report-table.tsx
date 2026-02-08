@@ -44,102 +44,177 @@ export const ReportTable: React.FC<ReportTableProps> = ({
     );
   }
 
-  // 3. Table Data
+  // 3. Responsive Data Rendering
   return (
-    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-sm transition-all">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-neutral-50 dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 text-xs uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-semibold">
-              <th className="px-6 py-4">Status & Severity</th>
-              <th className="px-6 py-4">Reported Issue</th>
-              <th className="px-6 py-4">Question Preview</th>
-              <th className="px-6 py-4">Reporter</th>
-              <th className="px-6 py-4 text-right">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-            {reports.map((report) => (
-              <tr
-                key={report.id}
-                className="hover:bg-neutral-50 dark:hover:bg-neutral-950/50 transition-colors group"
-              >
-                {/* Status Column */}
-                <td className="px-6 py-4 align-top">
-                  <div className="flex flex-col items-start gap-2">
-                    <ReportStatusBadge status={report.status} />
-                    <SeverityBadge severity={report.severity} />
-                    <span className="text-[10px] text-gray-400 font-mono mt-1">
-                      {report.createdAt.split(' ')[0]}
-                    </span>
-                  </div>
-                </td>
+    <div className="space-y-4">
+      {/* Mobile Card Layout (< md) */}
+      <div className="grid grid-cols-1 gap-4 md:hidden">
+        {reports.map((report) => (
+          <div
+            key={report.id}
+            className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 shadow-sm active:scale-[0.98] transition-all"
+            onClick={() => onReview(report)}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex flex-col gap-2">
+                <ReportStatusBadge status={report.status} />
+                <SeverityBadge severity={report.severity} />
+              </div>
+              <span className="text-[10px] font-mono text-neutral-400 bg-neutral-50 dark:bg-neutral-800 px-2 py-1 rounded-lg border border-neutral-100 dark:border-neutral-700">
+                {report.createdAt.split(' ')[0]}
+              </span>
+            </div>
 
-                {/* Issue Column */}
-                <td className="px-6 py-4 align-top max-w-xs">
-                  <div className="flex items-start gap-2">
-                    <div className="mt-0.5 min-w-[16px]">
-                      <Flag size={14} className="text-rose-500" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-rose-600 dark:text-rose-400">
-                        {report.reason}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 line-clamp-2 italic leading-relaxed">
-                        &quot;{report.description}&quot;
-                      </p>
-                    </div>
-                  </div>
-                </td>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="mt-1 p-2 bg-rose-50 dark:bg-rose-500/10 rounded-xl">
+                  <Flag
+                    size={16}
+                    className="text-rose-600 dark:text-rose-400"
+                  />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-neutral-900 dark:text-white leading-tight">
+                    {report.reason}
+                  </h4>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 italic line-clamp-2">
+                    &quot;{report.description}&quot;
+                  </p>
+                </div>
+              </div>
 
-                {/* Preview Column */}
-                <td className="px-6 py-4 align-top max-w-sm">
-                  <div className="text-sm text-neutral-900 dark:text-gray-200 line-clamp-2 min-h-[1.25rem]">
-                    <MathText
-                      text={
-                        report.questionPreview?.question || 'Content Deleted'
-                      }
-                    />
-                  </div>
-                  <div className="mt-2 flex gap-2">
-                    <span className="text-[10px] bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-500 border border-neutral-200 dark:border-neutral-700">
-                      {report.questionPreview?.subject || 'N/A'}
-                    </span>
-                    <span className="text-[10px] bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-500 border border-neutral-200 dark:border-neutral-700 font-mono">
-                      ID: {report.questionId.slice(0, 6)}...
-                    </span>
-                  </div>
-                </td>
+              <div className="bg-neutral-50 dark:bg-black rounded-xl p-3 border border-neutral-100 dark:border-neutral-800">
+                <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest mb-2">
+                  Question Preview
+                </p>
+                <div className="text-sm text-neutral-800 dark:text-neutral-200 line-clamp-3 leading-relaxed">
+                  <MathText
+                    text={report.questionPreview?.question || 'Content Deleted'}
+                  />
+                </div>
+              </div>
 
-                {/* Reporter Column */}
-                <td className="px-6 py-4 align-top">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xs font-bold uppercase">
-                      {report.reporterName.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-neutral-900 dark:text-white">
-                        {report.reporterName}
-                      </p>
-                      <p className="text-[10px] text-gray-500">Student</p>
-                    </div>
+              <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xs font-bold shadow-inner">
+                    {report.reporterName.charAt(0)}
                   </div>
-                </td>
+                  <div>
+                    <p className="text-xs font-bold text-neutral-900 dark:text-white leading-none">
+                      {report.reporterName}
+                    </p>
+                    <p className="text-[10px] text-neutral-500 mt-0.5">
+                      Reporter
+                    </p>
+                  </div>
+                </div>
 
-                {/* Action Column */}
-                <td className="px-6 py-4 text-right align-top">
-                  <button
-                    onClick={() => onReview(report)}
-                    className="px-3 py-1.5 text-sm font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-900/30 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-all flex items-center gap-1.5 ml-auto shadow-sm"
-                  >
-                    <Eye size={14} />
-                    <span>Review</span>
-                  </button>
-                </td>
+                <button className="flex items-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-rose-500/20 active:scale-95 transition-all">
+                  <Eye size={14} />
+                  Review
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table Layout (>= md) */}
+      <div className="hidden md:block bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-neutral-50 dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 text-xs uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-semibold">
+                <th className="px-6 py-4">Status & Severity</th>
+                <th className="px-6 py-4">Reported Issue</th>
+                <th className="px-6 py-4">Question Preview</th>
+                <th className="px-6 py-4">Reporter</th>
+                <th className="px-6 py-4 text-right">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+              {reports.map((report) => (
+                <tr
+                  key={report.id}
+                  className="hover:bg-neutral-50 dark:hover:bg-neutral-950/50 transition-colors group"
+                >
+                  {/* Status Column */}
+                  <td className="px-6 py-4 align-top">
+                    <div className="flex flex-col items-start gap-2">
+                      <ReportStatusBadge status={report.status} />
+                      <SeverityBadge severity={report.severity} />
+                      <span className="text-[10px] text-gray-400 font-mono mt-1">
+                        {report.createdAt.split(' ')[0]}
+                      </span>
+                    </div>
+                  </td>
+
+                  {/* Issue Column */}
+                  <td className="px-6 py-4 align-top max-w-xs">
+                    <div className="flex items-start gap-2">
+                      <div className="mt-0.5 min-w-[16px]">
+                        <Flag size={14} className="text-rose-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-rose-600 dark:text-rose-400">
+                          {report.reason}
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 line-clamp-2 italic leading-relaxed">
+                          &quot;{report.description}&quot;
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* Preview Column */}
+                  <td className="px-6 py-4 align-top max-w-sm">
+                    <div className="text-sm text-neutral-900 dark:text-gray-200 line-clamp-2 min-h-[1.25rem]">
+                      <MathText
+                        text={
+                          report.questionPreview?.question || 'Content Deleted'
+                        }
+                      />
+                    </div>
+                    <div className="mt-2 flex gap-2">
+                      <span className="text-[10px] bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-500 border border-neutral-200 dark:border-neutral-700">
+                        {report.questionPreview?.subject || 'N/A'}
+                      </span>
+                      <span className="text-[10px] bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-500 border border-neutral-200 dark:border-neutral-700 font-mono">
+                        ID: {report.questionId.slice(0, 6)}...
+                      </span>
+                    </div>
+                  </td>
+
+                  {/* Reporter Column */}
+                  <td className="px-6 py-4 align-top">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xs font-bold uppercase">
+                        {report.reporterName.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-neutral-900 dark:text-white">
+                          {report.reporterName}
+                        </p>
+                        <p className="text-[10px] text-gray-500">Student</p>
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* Action Column */}
+                  <td className="px-6 py-4 text-right align-top">
+                    <button
+                      onClick={() => onReview(report)}
+                      className="px-3 py-1.5 text-sm font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-900/30 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-all flex items-center gap-1.5 ml-auto shadow-sm"
+                    >
+                      <Eye size={14} />
+                      <span>Review</span>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

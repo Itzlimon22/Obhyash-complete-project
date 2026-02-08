@@ -64,7 +64,8 @@ export default function ReportsPage() {
         id: r.id,
         questionId: r.question_id,
         questionPreview: questionsMap.get(r.question_id) || ({} as Question),
-        reporterName: (r.reporter as { name: string } | null)?.name || 'Unknown User',
+        reporterName:
+          (r.reporter as { name: string } | null)?.name || 'Unknown User',
         reason: r.reason,
         description: r.description,
         status: r.status,
@@ -149,24 +150,26 @@ export default function ReportsPage() {
     <div className="min-h-screen bg-neutral-50 dark:bg-black p-6 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-end">
-          <div>
-            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white flex items-center gap-3">
-              <Flag className="text-rose-600" size={32} />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white flex items-center gap-3">
+              <Flag className="text-rose-600" size={28} />
               Report Management
             </h1>
-            <p className="text-neutral-500 dark:text-neutral-400 mt-2">
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm">
               Review and resolve user-submitted content issues
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <ReportStats {...stats} />
+          <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+            <div className="overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+              <ReportStats {...stats} />
+            </div>
             <button
               onClick={() => fetchReports(true)}
-              className="p-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-neutral-500 hover:text-rose-600 dark:hover:text-rose-400 transition-colors shadow-sm"
+              className="p-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-500 hover:text-rose-600 dark:hover:text-rose-400 transition-all shadow-sm shrink-0 active:scale-95"
             >
               <RefreshCw
-                size={20}
+                size={18}
                 className={isRefreshing ? 'animate-spin' : ''}
               />
             </button>

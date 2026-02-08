@@ -57,9 +57,11 @@ interface User {
 interface ExamResult {
   id: string;
   created_at: string;
-  users: {
-    name: string;
-  }[] | null;
+  users:
+    | {
+        name: string;
+      }[]
+    | null;
 }
 
 export default function DashboardPage() {
@@ -294,46 +296,45 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-neutral-50 dark:bg-black">
       <div className="space-y-6 md:space-y-8 animate-fade-in pb-10">
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-700 dark:from-white dark:via-neutral-100 dark:to-neutral-300 bg-clip-text text-transparent">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
+          <div className="space-y-1">
+            <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
               Admin Dashboard
             </h1>
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-2 flex items-center gap-2">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-              Welcome back,{' '}
-              <span className="font-semibold text-neutral-900 dark:text-white">
-                Admin
-              </span>
-            </p>
+            <div className="flex items-center gap-2 text-neutral-500 dark:text-neutral-500 text-sm">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>System active and monitoring</span>
+            </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-3">
+          {/* Action Buttons - Scrollable on mobile */}
+          <div className="flex items-center gap-3 overflow-x-auto pb-2 -mx-1 px-1 md:overflow-visible md:pb-0 md:mx-0 md:px-0 scrollbar-none">
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="group flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 text-sm font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 transition-all shadow-sm hover:shadow-md active:scale-95 disabled:opacity-50"
+              className="group shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-sm font-bold rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-95 disabled:opacity-50"
             >
               <RefreshCw
                 size={16}
-                className={isRefreshing ? 'animate-spin' : ''}
+                className={
+                  isRefreshing ? 'animate-spin text-rose-500' : 'text-rose-500'
+                }
               />
-              <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+              <span>{isRefreshing ? '...' : 'Refresh'}</span>
             </button>
             <button
               onClick={handleExport}
-              className="group flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 text-sm font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 transition-all shadow-sm hover:shadow-md active:scale-95"
+              className="group shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-sm font-bold rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-95"
             >
               <Download
                 size={16}
-                className="group-hover:-translate-y-0.5 transition-transform"
+                className="text-indigo-500 group-hover:-translate-y-0.5 transition-transform"
               />
               <span>Export</span>
             </button>
             <button
               onClick={() => handleNavigate('question-management')}
-              className="group flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-rose-500/30 transition-all hover:shadow-xl hover:shadow-rose-500/40 active:scale-95"
+              className="group shrink-0 flex items-center justify-center gap-2 px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-rose-500/20 transition-all active:scale-95"
             >
               <Upload
                 size={16}
@@ -379,41 +380,41 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-14 bg-neutral-100 dark:bg-neutral-700 rounded-xl animate-pulse"
+                    className="h-16 bg-neutral-100 dark:bg-neutral-900 rounded-xl animate-pulse"
                   ></div>
                 ))
               ) : recentActivity.length === 0 ? (
-                <div className="text-center py-12 text-neutral-500 dark:text-neutral-400">
-                  <Activity className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <div className="text-center py-12 text-neutral-500 dark:text-neutral-500">
+                  <Activity className="w-12 h-12 mx-auto mb-3 opacity-20" />
                   <p className="text-sm">No recent activity</p>
                 </div>
               ) : (
                 recentActivity.map((activity) => (
                   <div
                     key={activity.id}
-                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-700/50 transition-all cursor-pointer group"
+                    className="flex items-center gap-4 p-3 rounded-2xl hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-all cursor-pointer group border border-transparent hover:border-neutral-100 dark:hover:border-neutral-800"
                   >
                     <div
-                      className={`p-2.5 rounded-xl ${
+                      className={`p-3 rounded-2xl shrink-0 ${
                         activity.type === 'user'
-                          ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400'
+                          ? 'bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400'
                           : activity.type === 'exam'
-                            ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
-                            : 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'
+                            ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                            : 'bg-amber-100 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400'
                       }`}
                     >
                       {getActivityIcon(activity.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 group-hover:text-neutral-700 dark:group-hover:text-white transition-colors">
+                      <p className="text-sm font-bold text-neutral-900 dark:text-neutral-100 truncate group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
                         {activity.message}
                       </p>
-                      <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                      <p className="text-[11px] text-neutral-500 dark:text-neutral-500 mt-0.5">
                         {formatTimeAgo(activity.timestamp)}
                       </p>
                     </div>
@@ -432,72 +433,72 @@ export default function DashboardPage() {
               Quick Actions
             </h3>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 sm:grid-cols-1 gap-3">
               <button
                 onClick={() => handleNavigate('question-management')}
-                className="w-full text-left px-4 py-4 rounded-xl bg-white dark:bg-neutral-700 hover:bg-rose-50 dark:hover:bg-neutral-600 border border-neutral-200 dark:border-neutral-600 hover:border-rose-300 dark:hover:border-rose-500 transition-all flex items-center justify-between group shadow-sm hover:shadow-md"
+                className="w-full text-left p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-rose-50 dark:hover:bg-rose-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-rose-300 dark:hover:border-rose-500/50 transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between group shadow-sm active:scale-95"
               >
-                <div>
-                  <span className="block text-sm font-semibold text-neutral-900 dark:text-white group-hover:text-rose-700 dark:group-hover:text-rose-300 transition-colors">
-                    Manage Questions
+                <div className="mb-3 sm:mb-0">
+                  <span className="block text-sm font-bold text-neutral-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                    Questions
                   </span>
-                  <span className="block text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                    Add, edit, or delete questions
+                  <span className="hidden sm:block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5">
+                    Add/Edit bank
                   </span>
                 </div>
-                <div className="p-2 bg-rose-50 dark:bg-rose-950/30 rounded-lg text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform">
-                  <FileQuestion size={18} />
+                <div className="p-2.5 bg-rose-50 dark:bg-rose-500/10 rounded-xl text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform w-fit">
+                  <FileQuestion size={18} strokeWidth={2.5} />
                 </div>
               </button>
 
               <button
                 onClick={() => handleNavigate('user-management')}
-                className="w-full text-left px-4 py-4 rounded-xl bg-white dark:bg-neutral-800 hover:bg-rose-50 dark:hover:bg-neutral-700 border border-neutral-200 dark:border-neutral-700 hover:border-rose-300 dark:hover:border-rose-500 transition-all flex items-center justify-between group shadow-sm hover:shadow-md"
+                className="w-full text-left p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-rose-50 dark:hover:bg-rose-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-rose-300 dark:hover:border-rose-500/50 transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between group shadow-sm active:scale-95"
               >
-                <div>
-                  <span className="block text-sm font-semibold text-neutral-900 dark:text-white group-hover:text-rose-700 dark:group-hover:text-rose-300 transition-colors">
-                    Manage Users
+                <div className="mb-3 sm:mb-0">
+                  <span className="block text-sm font-bold text-neutral-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                    Users
                   </span>
-                  <span className="block text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                    View and manage user accounts
+                  <span className="hidden sm:block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5">
+                    Manage accounts
                   </span>
                 </div>
-                <div className="p-2 bg-rose-50 dark:bg-rose-950/30 rounded-lg text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform">
-                  <Users size={18} />
+                <div className="p-2.5 bg-rose-50 dark:bg-rose-500/10 rounded-xl text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform w-fit">
+                  <Users size={18} strokeWidth={2.5} />
                 </div>
               </button>
 
               <button
                 onClick={() => handleNavigate('reports')}
-                className="w-full text-left px-4 py-4 rounded-xl bg-white dark:bg-neutral-700 hover:bg-amber-50 dark:hover:bg-neutral-600 border border-neutral-200 dark:border-neutral-600 hover:border-amber-300 dark:hover:border-amber-500 transition-all flex items-center justify-between group shadow-sm hover:shadow-md"
+                className="w-full text-left p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-amber-50 dark:hover:bg-amber-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-amber-300 dark:hover:border-amber-500/50 transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between group shadow-sm active:scale-95"
               >
-                <div>
-                  <span className="block text-sm font-semibold text-neutral-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-300 transition-colors">
-                    Review Reports
+                <div className="mb-3 sm:mb-0">
+                  <span className="block text-sm font-bold text-neutral-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                    Reports
                   </span>
-                  <span className="block text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                    {dashboardStats?.pendingReports || 0} pending reports
+                  <span className="hidden sm:block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5 truncate max-w-[100px]">
+                    {dashboardStats?.pendingReports || 0} pending
                   </span>
                 </div>
-                <div className="p-2 bg-amber-50 dark:bg-amber-950/30 rounded-lg text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
-                  <Flag size={18} />
+                <div className="p-2.5 bg-amber-50 dark:bg-amber-500/10 rounded-xl text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform w-fit">
+                  <Flag size={18} strokeWidth={2.5} />
                 </div>
               </button>
 
               <button
                 onClick={() => handleNavigate('analytics')}
-                className="w-full text-left px-4 py-4 rounded-xl bg-white dark:bg-neutral-700 hover:bg-violet-50 dark:hover:bg-neutral-600 border border-neutral-200 dark:border-neutral-600 hover:border-violet-300 dark:hover:border-violet-500 transition-all flex items-center justify-between group shadow-sm hover:shadow-md"
+                className="w-full text-left p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-emerald-50 dark:hover:bg-emerald-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-emerald-300 dark:hover:border-emerald-500/50 transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between group shadow-sm active:scale-95"
               >
-                <div>
-                  <span className="block text-sm font-semibold text-neutral-900 dark:text-white group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors">
-                    View Analytics
+                <div className="mb-3 sm:mb-0">
+                  <span className="block text-sm font-bold text-neutral-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                    Analytics
                   </span>
-                  <span className="block text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                    Performance insights
+                  <span className="hidden sm:block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5">
+                    Insights
                   </span>
                 </div>
-                <div className="p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
-                  <BarChart3 size={18} />
+                <div className="p-2.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform w-fit">
+                  <BarChart3 size={18} strokeWidth={2.5} />
                 </div>
               </button>
             </div>

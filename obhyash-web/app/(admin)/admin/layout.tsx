@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
+import AdminMobileBottomNav from '@/components/admin/layout/AdminMobileBottomNav';
 
 export default function AdminLayout({
   children,
@@ -59,7 +60,16 @@ export default function AdminLayout({
         <Header toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
 
         {/* 4. The Page Content */}
-        <main className="flex-1 p-6 overflow-x-hidden">{children}</main>
+        <main
+          className={`flex-1 p-6 overflow-x-hidden ${isMobile ? 'pb-24' : ''}`}
+        >
+          {children}
+        </main>
+
+        {/* 5. Mobile Bottom Navigation */}
+        {isMobile && (
+          <AdminMobileBottomNav onMenuClick={() => setIsSidebarOpen(true)} />
+        )}
       </div>
 
       {/* Mobile Overlay (Darkens background when sidebar is open on mobile) */}

@@ -4,7 +4,14 @@ import { useEffect, useState } from 'react';
 // ✅ New Import
 import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
-import { LogOut, Settings, Home, Monitor, Globe } from 'lucide-react';
+import {
+  LogOut,
+  Settings,
+  Home,
+  Monitor,
+  Globe,
+  AlertTriangle,
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -82,6 +89,13 @@ export function UserNav() {
           <DropdownMenuItem className="cursor-pointer hover:bg-white/10 focus:bg-white/10 rounded-md">
             <Home className="mr-2 h-4 w-4" />
             <span>Back to App</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => router.push('/complaint')}
+            className="cursor-pointer hover:bg-white/10 focus:bg-white/10 rounded-md text-amber-400 font-medium"
+          >
+            <AlertTriangle className="mr-2 h-4 w-4" />
+            <span>Report an Issue</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
 

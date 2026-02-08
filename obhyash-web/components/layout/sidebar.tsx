@@ -19,6 +19,7 @@ import {
   Layers,
   BookOpen,
   Bell,
+  AlertTriangle,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@/lib/utils/supabase';
@@ -96,8 +97,15 @@ const SIDEBAR_NAVIGATION: { title?: string; items: NavItem[] }[] = [
       {
         id: 'omr-check',
         label: 'OMR Check',
-        icon: FileQuestion, // Using FileQuestion as a placeholder, or maybe something better like ClipboardCheck if available, but FileQuestion is imported. Let's reuse layout or import check.
+        icon: FileQuestion,
         href: '/admin/omr-check',
+      },
+      {
+        id: 'complaints',
+        label: 'Complaints',
+        icon: AlertTriangle,
+        href: '/admin/complaints',
+        count: 0, // Will be updated dynamically if possible
       },
     ],
   },

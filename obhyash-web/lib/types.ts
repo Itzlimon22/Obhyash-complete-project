@@ -535,3 +535,34 @@ export interface Notification {
   read_at?: string;
   expires_at?: string;
 }
+// ==========================================
+// 11. APP COMPLAINTS (Technical/UX)
+// ==========================================
+
+export type ComplaintType =
+  | 'Technical'
+  | 'UX'
+  | 'Bug'
+  | 'Feature Request'
+  | 'Other';
+
+export type ComplaintStatus =
+  | 'Pending'
+  | 'In Progress'
+  | 'Resolved'
+  | 'Dismissed';
+
+export interface AppComplaint {
+  id: string;
+  user_id: string;
+  user?: {
+    name: string;
+    email: string;
+  };
+  type: ComplaintType;
+  description: string;
+  status: ComplaintStatus;
+  admin_feedback?: string;
+  created_at: string;
+  updated_at: string;
+}

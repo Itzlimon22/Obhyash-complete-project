@@ -180,39 +180,42 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
 
         {/* Footer */}
         {report.status === 'Pending' ? (
-          <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 flex justify-between items-center">
+          <div className="p-4 sm:p-6 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 flex flex-col sm:flex-row justify-between items-center gap-4">
             <button
               onClick={() => {
                 if (confirm('Are you sure?')) handleAction('delete');
               }}
-              className="px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors flex items-center gap-2"
+              className="w-full sm:w-auto px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-colors flex items-center justify-center gap-2 font-bold"
             >
-              <Trash2 size={16} /> Delete
+              <Trash2 size={16} /> Delete Report
             </button>
-            <div className="flex gap-3">
+            <div className="flex gap-3 w-full sm:w-auto">
               <button
                 onClick={() => handleAction('ignore')}
-                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+                className="flex-1 sm:flex-none px-6 py-2.5 text-sm font-bold text-gray-600 dark:text-gray-300 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-xl transition-all active:scale-95"
               >
                 Ignore
               </button>
               <button
                 onClick={() => handleAction('fix')}
                 disabled={isSaving}
-                className="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg shadow-lg flex items-center gap-2"
+                className="flex-[2] sm:flex-none px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-black rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-50"
               >
                 {isSaving ? (
                   <Loader2 className="animate-spin" size={16} />
                 ) : (
                   <CheckCircle2 size={16} />
-                )}{' '}
+                )}
                 Update & Resolve
               </button>
             </div>
           </div>
         ) : (
-          <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/50 text-center text-sm text-gray-500">
-            Report is <strong>{report.status}</strong>.
+          <div className="p-6 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950/50 text-center text-xs font-bold text-neutral-400 uppercase tracking-widest">
+            Report is already{' '}
+            <span className="text-neutral-900 dark:text-white">
+              {report.status}
+            </span>
           </div>
         )}
       </div>
