@@ -68,7 +68,7 @@ export const ExamSettings: React.FC<ExamSettingsProps> = ({
                     : 'border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-200',
                 )}
               >
-                <div className="flex w-full justify-between items-center mb-1">
+                <div className="flex w-full justify-between items-center">
                   <span
                     className={cn(
                       'font-bold text-sm',
@@ -83,9 +83,6 @@ export const ExamSettings: React.FC<ExamSettingsProps> = ({
                     <div className="w-2 h-2 rounded-full bg-rose-500" />
                   )}
                 </div>
-                <span className="text-xs text-neutral-500 leading-relaxed max-w-[90%]">
-                  {type.desc}
-                </span>
               </button>
             );
           })}

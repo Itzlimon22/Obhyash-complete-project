@@ -17,7 +17,8 @@ import { ExamSettings } from '@/components/student/features/exam/setup/ExamSetti
 import { TopicSelector } from '@/components/student/features/exam/setup/TopicSelector';
 import { SubjectSelector } from '@/components/student/features/exam/setup/SubjectSelector'; // New Import
 import { OmrConfigModal } from '@/components/student/features/omr/OmrConfigModal';
-import { OmrPrintModal } from '@/components/student/features/omr/OmrPrintModal';
+import { OmrSheet } from '@/components/student/features/omr/OmrSheet';
+import Portal from '@/components/ui/portal';
 
 interface ExamSetupFormProps {
   onStartExam: (config: ExamConfig) => void;
@@ -73,7 +74,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   // --- Modals State ---
   const [isOmrConfigOpen, setIsOmrConfigOpen] = useState(false);
-  const [isOmrPrintOpen, setIsOmrPrintOpen] = useState(false);
+  // Removed isOmrPrintOpen state as we will print directly
   const [omrDetails, setOmrDetails] = useState<ExamDetails | null>(null);
   const [omrTotalQuestions, setOmrTotalQuestions] = useState(50);
 
@@ -94,22 +95,25 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             (user as any).optional_subject,
           );
 
-          const formattedSubjects = subjects.map((sub: any) => ({
-            id: sub.id,
-            label:
-              sub.name_en === 'English'
-                ? 'English'
-                : `${sub.name_bn || sub.name} (${sub.name || sub.name_en || ''})`,
-            icon:
-              sub.icon ||
-              STATIC_SUBJECT_ICONS[sub.name_en] ||
-              STATIC_SUBJECT_ICONS[sub.id] ||
-              STATIC_SUBJECT_ICONS.default,
-            name:
-              sub.name_en === 'English'
-                ? 'English'
-                : `${sub.name_bn || sub.name} (${sub.name || sub.name_en || ''})`,
-          }));
+          const formattedSubjects = subjects.map((sub: any) => {
+            const nameBn = sub.name_bn || sub.name;
+            const nameEn = sub.name || sub.name_en;
+            const label =
+              nameEn && nameEn !== nameBn && !nameBn.includes(nameEn)
+                ? `${nameBn} (${nameEn})`
+                : nameBn;
+
+            return {
+              id: sub.id,
+              label: label,
+              icon:
+                sub.icon ||
+                STATIC_SUBJECT_ICONS[sub.name_en] ||
+                STATIC_SUBJECT_ICONS[sub.id] ||
+                STATIC_SUBJECT_ICONS.default,
+              name: label,
+            };
+          });
 
           setAvailableSubjects(formattedSubjects);
         }
@@ -224,7 +228,10 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const handleOmrGenerate = (details: ExamDetails, total: number) => {
     setOmrDetails(details);
     setOmrTotalQuestions(total);
-    setIsOmrPrintOpen(true);
+    // Use setTimeout to allow state update and DOM rendering of the hidden OMR sheet before printing
+    setTimeout(() => {
+      window.print();
+    }, 500);
   };
 
   return (
@@ -253,9 +260,9 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-        {/* Left Column: Selection (Subject & Topics) */}
-        <div className="lg:col-span-7 space-y-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        {/* Left Column: Selection (Subject & Topics) - User Friendly Width */}
+        <div className="lg:col-span-8 space-y-10">
           {/* 1. Subject Selection */}
           <section className="space-y-4">
             <div className="flex items-center justify-between">
@@ -343,66 +350,66 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 </div>
               )}
             </div>
+
+            {/* Submit Area - Moved/Duplicated to Left Column for better UX */}
+            <div className="pt-4">
+              <button
+                onClick={handleStartExam}
+                disabled={isLoading || !subject}
+                className="w-full group relative overflow-hidden bg-neutral-900 dark:bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+              >
+                <div className="relative z-10 flex items-center justify-center gap-3">
+                  {isLoading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>প্রসেস হচ্ছে...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-lg">নির্দেশাবলী দেখুন</span>
+                      <Sparkles
+                        size={18}
+                        className="group-hover:rotate-12 transition-transform"
+                      />
+                    </>
+                  )}
+                </div>
+              </button>
+              <p className="text-center text-[10px] text-neutral-400 mt-3 font-medium">
+                পরবর্তী ধাপে নির্দেশাবলী দেখানো হবে
+              </p>
+            </div>
           </section>
         </div>
 
-        {/* Right Column: Settings & Actions */}
-        <div className="lg:col-span-5 space-y-8">
-          <div className="lg:sticky lg:top-24 space-y-8">
-            <section
-              className={cn('space-y-4 transition-all duration-500 delay-200')}
-            >
-              <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                সেটিংস ও কনফিগারেশন
-              </h3>
+        {/* Right Column: Settings & Actions (Sticky) */}
+        <div className="lg:col-span-4 space-y-8 lg:sticky lg:top-24">
+          <section
+            className={cn('space-y-4 transition-all duration-500 delay-200')}
+          >
+            <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+              সেটিংস ও কনফিগারেশন
+            </h3>
 
-              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-1 border border-neutral-200 dark:border-neutral-800 shadow-xl shadow-neutral-200/50 dark:shadow-none">
-                <div className="p-5">
-                  <ExamSettings
-                    examTypes={examTypes}
-                    setExamTypes={setExamTypes}
-                    difficulty={difficulty}
-                    setDifficulty={setDifficulty}
-                    questionCount={questionCount}
-                    setQuestionCount={setQuestionCount}
-                    duration={duration}
-                    setDuration={setDuration}
-                    negativeMarking={negativeMarking}
-                    setNegativeMarking={setNegativeMarking}
-                  />
-                </div>
-
-                {/* Submit Area */}
-                <div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-b-3xl border-t border-neutral-100 dark:border-neutral-800">
-                  <button
-                    onClick={handleStartExam}
-                    disabled={isLoading || !subject}
-                    className="w-full group relative overflow-hidden bg-neutral-900 dark:bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
-                  >
-                    <div className="relative z-10 flex items-center justify-center gap-3">
-                      {isLoading ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          <span>প্রসেস হচ্ছে...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="text-lg">নির্দেশাবলী দেখুন</span>
-                          <Sparkles
-                            size={18}
-                            className="group-hover:rotate-12 transition-transform"
-                          />
-                        </>
-                      )}
-                    </div>
-                  </button>
-                  <p className="text-center text-[10px] text-neutral-400 mt-3 font-medium">
-                    পরবর্তী ধাপে নির্দেশাবলী দেখানো হবে
-                  </p>
-                </div>
+            <div className="bg-white dark:bg-neutral-900 rounded-3xl p-1 border border-neutral-200 dark:border-neutral-800 shadow-xl shadow-neutral-200/50 dark:shadow-none">
+              <div className="p-5">
+                <ExamSettings
+                  examTypes={examTypes}
+                  setExamTypes={setExamTypes}
+                  difficulty={difficulty}
+                  setDifficulty={setDifficulty}
+                  questionCount={questionCount}
+                  setQuestionCount={setQuestionCount}
+                  duration={duration}
+                  setDuration={setDuration}
+                  negativeMarking={negativeMarking}
+                  setNegativeMarking={setNegativeMarking}
+                />
               </div>
-            </section>
-          </div>
+
+              {/* Submit Area Removed from Right Column */}
+            </div>
+          </section>
         </div>
       </div>
 
@@ -416,13 +423,18 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         }
       />
 
+      {/* Hidden OMR Sheet for Printing - Portal to escape parent hiding */}
       {omrDetails && (
-        <OmrPrintModal
-          isOpen={isOmrPrintOpen}
-          onClose={() => setIsOmrPrintOpen(false)}
-          details={omrDetails}
-          totalQuestions={omrTotalQuestions}
-        />
+        <Portal>
+          <div className="hidden print:block fixed inset-0 z-[9999] bg-white h-screen w-screen">
+            <div className="print-content">
+              <OmrSheet
+                details={omrDetails}
+                totalQuestions={omrTotalQuestions}
+              />
+            </div>
+          </div>
+        </Portal>
       )}
     </div>
   );
