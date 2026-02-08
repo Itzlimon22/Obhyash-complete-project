@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   Loader2,
 } from 'lucide-react';
+import Logo from '@/components/student/ui/Logo';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -232,6 +233,9 @@ export default function SignupPage() {
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500" />
 
         <div className="p-8 md:p-10">
+          <div className="flex justify-center mb-6">
+            <Logo size="lg" />
+          </div>
           <div className="text-center mb-8">
             <h1 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2">
               নতুন অ্যাকাউন্ট খুলুন

@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
-import { Mail, Lock, LogIn, Loader2, Sparkles } from 'lucide-react';
+import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';
+import Logo from '@/components/student/ui/Logo';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -78,8 +79,8 @@ export default function LoginPage() {
 
         <div className="p-8 md:p-10 relative">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-white shadow-lg shadow-indigo-500/30 rotate-3 transform hover:rotate-6 transition-all duration-300">
-              <Sparkles className="w-8 h-8" />
+            <div className="flex justify-center mb-6">
+              <Logo size="lg" />
             </div>
             <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight">
               স্বাগতম! (Welcome)

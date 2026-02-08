@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#e11d48',
+  themeColor: '#9f1239',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -49,6 +49,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <link rel="apple-touch-icon" href="/icon-512.png" />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
