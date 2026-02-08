@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
@@ -550,10 +550,12 @@ export default function SignupPage() {
                   </div>
                 </div>
 
-                <SocialLoginButton
-                  mode="signup"
-                  onBeforeRedirect={handleGoogleSignup}
-                />
+                <Suspense fallback={<div className="h-12 w-full bg-neutral-100 dark:bg-neutral-800 rounded-xl animate-pulse" />}>
+                  <SocialLoginButton
+                    mode="signup"
+                    onBeforeRedirect={handleGoogleSignup}
+                  />
+                </Suspense>
               </div>
             )}
 

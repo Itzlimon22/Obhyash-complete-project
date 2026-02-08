@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
@@ -165,7 +165,13 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <SocialLoginButton mode="signin" />
+          <Suspense
+            fallback={
+              <div className="h-12 w-full bg-neutral-100 dark:bg-neutral-800 rounded-xl animate-pulse" />
+            }
+          >
+            <SocialLoginButton mode="signin" />
+          </Suspense>
 
           <div className="mt-8 text-center space-y-4">
             <p className="text-sm text-slate-500 dark:text-slate-400">
