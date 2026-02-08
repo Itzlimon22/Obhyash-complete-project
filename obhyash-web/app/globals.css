@@ -90,7 +90,6 @@
 
   body {
     @apply bg-background text-foreground transition-colors duration-300 ease-in-out;
-    font-family: 'Noto Sans Bengali', 'Inter', sans-serif; /* From Latest */
     position: relative;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
@@ -126,7 +125,7 @@ body::after {
 }
 
 .font-serif-exam {
-  font-family: 'Noto Serif Bengali', 'Times New Roman', serif;
+  font-family: var(--font-anek), 'Times New Roman', serif;
 }
 
 /* --- 3. CUSTOM SCROLLBARS (Combined) --- */

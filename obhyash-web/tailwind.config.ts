@@ -80,7 +80,7 @@ const config = {
       },
       fontFamily: {
         // --- 🟢 NEW: Font Integration ---
-        sans: ['var(--font-hind)', 'var(--font-inter)', 'sans-serif'],
+        sans: ['var(--font-anek)', 'var(--font-inter)', 'sans-serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',

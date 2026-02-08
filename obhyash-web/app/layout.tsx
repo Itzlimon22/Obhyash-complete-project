@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 // ✅ Import the specific fonts you requested
-import { Inter, Hind_Siliguri } from 'next/font/google';
+import { Inter, Anek_Bangla } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'sonner';
 
@@ -10,11 +10,11 @@ const inter = Inter({
   subsets: ['latin'],
 });
 
-// ✅ Configure Hind Siliguri (Bengali text)
-const hindSiliguri = Hind_Siliguri({
-  variable: '--font-hind',
-  weight: ['300', '400', '500', '600', '700'],
+// ✅ Configure Anek Bangla (Bengali text)
+const anekBangla = Anek_Bangla({
+  variable: '--font-anek',
   subsets: ['bengali', 'latin'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -45,7 +45,7 @@ export default function RootLayout({
     // ✅ Added 'dark' class for theme and font variables
     <html
       lang="en"
-      className={`${hindSiliguri.variable} ${inter.variable}`}
+      className={`${anekBangla.variable} ${inter.variable}`}
       suppressHydrationWarning
     >
       <head>
