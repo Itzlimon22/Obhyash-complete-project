@@ -13,7 +13,6 @@ import NavigationWarningModal from '@/components/student/ui/common/NavigationWar
 
 // Features / Results
 import ScriptUploader from '@/components/student/ui/ScriptUploader';
-import { OmrPrintModal } from '@/components/student/features/omr/OmrPrintModal'; // Added
 
 // Data & Services
 import {
@@ -23,7 +22,7 @@ import {
   UserAnswers,
   UserProfile,
 } from '@/lib/types';
-import { printQuestionPaper } from '@/services/print-service'; // Removed printOMRSheet
+import { printQuestionPaper, printOMRSheet } from '@/services/print-service'; // Added printOMRSheet
 
 /**
  * Props for the ExamRunner component.
@@ -122,7 +121,6 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
 }) => {
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [isOmrPrintModalOpen, setIsOmrPrintModalOpen] = useState(false); // New State
   const [reportModalState, setReportModalState] = useState<{
     isOpen: boolean;
     questionId: number | null;
@@ -174,7 +172,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
           onDownloadQuestionPaper={() =>
             printQuestionPaper(examDetails, questions)
           }
-          onDownloadOMR={() => setIsOmrPrintModalOpen(true)} // Updated
+          onDownloadOMR={() => printOMRSheet(examDetails, questions.length)} // Updated
           onExit={() => setIsSubmitModalOpen(true)}
           answeredCount={Object.keys(userAnswers).length}
           totalQuestions={questions.length}
@@ -327,14 +325,6 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
             onCancel={onTimeoutCancel}
           />
         )}
-
-        {/* OMR Print Modal */}
-        <OmrPrintModal
-          isOpen={isOmrPrintModalOpen}
-          onClose={() => setIsOmrPrintModalOpen(false)}
-          details={examDetails}
-          totalQuestions={questions.length}
-        />
       </div>
     </AppLayout>
   );

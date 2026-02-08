@@ -317,106 +317,203 @@ export const printSubjectReport = (subject: string, stats: SubjectAnalysis) => {
 };
 
 export const printInvoice = (invoice: Invoice, user: UserProfile) => {
+  // ... (existing implementation) ...
+};
+
+/**
+ * Generates and prints an OMR (Optical Mark Recognition) answer sheet.
+ * This replaces the need for an OmrPrintModal by printing directly.
+ *
+ * @param details - Metadata for the exam (subject, type, etc.)
+ * @param totalQuestions - Number of questions to show on the OMR (default: 50)
+ */
+export const printOMRSheet = (
+  details: ExamDetails,
+  totalQuestions: number = 50,
+) => {
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
+
+  const qrData = encodeURIComponent(
+    JSON.stringify({
+      s: details.subject,
+      t: details.examType,
+      m: details.totalMarks,
+      q: totalQuestions,
+    }),
+  );
 
   const htmlContent = `
     <!DOCTYPE html>
     <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <title>Invoice - ${invoice.id}</title>
-      <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; line-height: 1.6; }
-        .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); }
-        .header { display: flex; justify-content: space-between; margin-bottom: 40px; }
-        .logo { font-size: 28px; font-weight: bold; color: #4f46e5; }
-        .company-info { text-align: right; font-size: 12px; color: #666; }
-        .invoice-details { margin-bottom: 30px; display: flex; justify-content: space-between; }
-        .bill-to { font-size: 14px; }
-        .invoice-meta { text-align: right; }
-        .invoice-meta h1 { margin: 0; font-size: 24px; color: #333; }
-        .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .table th { background: #f9fafb; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #e5e7eb; }
-        .table td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .total-section { text-align: right; margin-top: 20px; }
-        .total-row { display: flex; justify-content: flex-end; gap: 40px; font-size: 14px; padding: 5px 0; }
-        .grand-total { font-weight: bold; font-size: 18px; color: #4f46e5; border-top: 2px solid #eee; padding-top: 10px; margin-top: 10px; }
-        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #aaa; border-top: 1px solid #eee; padding-top: 20px; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        .paid { background: #d1fae5; color: #065f46; }
-        .pending { background: #fef3c7; color: #92400e; }
-        .failed { background: #fee2e2; color: #991b1b; }
-      </style>
-    </head>
-    <body>
-      <div class="invoice-box">
+      <head>
+        <meta charset="UTF-8">
+        <title>OMR Sheet - ${details.subject || 'Obhyash'}</title>
+        <style>
+          @page { size: A4; margin: 0; }
+          body { 
+            width: 210mm; 
+            height: 297mm; 
+            margin: 0; 
+            padding: 12mm; 
+            box-sizing: border-box; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            line-height: normal;
+            color: black;
+            background: white;
+            position: relative;
+          }
+          .marker { position: absolute; width: 6mm; h-height: 6mm; bg-color: black; }
+          .top-left { top: 8mm; left: 8mm; border-bottom-right-radius: 1mm; background: black; width: 6mm; height: 6mm; }
+          .top-right { top: 8mm; right: 8mm; border-bottom-left-radius: 1mm; background: black; width: 6mm; height: 6mm; }
+          .bottom-left { bottom: 8mm; left: 8mm; border-top-right-radius: 1mm; background: black; width: 6mm; height: 6mm; }
+          .bottom-right { bottom: 8mm; right: 8mm; border-top-left-radius: 1mm; background: black; width: 6mm; height: 6mm; }
+
+          .header { border-bottom: 2px solid black; padding-bottom: 2mm; margin-bottom: 4mm; display: flex; justify-content: space-between; align-items: flex-end; }
+          .header h1 { font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
+          .header .meta { font-size: 10px; font-weight: bold; margin-top: 2px; text-transform: uppercase; }
+          .omr-badge { border: 2px solid black; padding: 1px 4px; border-radius: 4px; font-size: 18px; font-weight: 900; }
+
+          .info-section { display: flex; gap: 4mm; margin-bottom: 5mm; }
+          .student-info { flex: 1; border: 1.5px solid black; rounded: 4px; padding: 3mm; display: flex; flex-direction: column; justify-content: space-between; height: 35mm; }
+          .info-row { display: flex; align-items: flex-end; margin-bottom: 2mm; }
+          .info-label { font-size: 10px; font-weight: bold; width: 50px; text-transform: uppercase; }
+          .info-line { flex: 1; border-bottom: 1.5px dashed #666; height: 14px; margin-left: 4px; }
+
+          .instructions { width: 40%; border: 1.5px solid black; padding: 2.5mm; background: #f9f9f9; font-size: 9px; line-height: 1.3; }
+          .instr-title { font-weight: 900; text-transform: uppercase; border-bottom: 1px solid black; padding-bottom: 1px; margin-bottom: 2px; display: block; }
+          .instr-list { list-style: none; padding: 0; margin: 0; }
+          .instr-examples { display: flex; justify-content: space-between; margin-top: 4px; }
+          .circle { width: 14px; height: 14px; border: 1.2px solid black; border-radius: 50%; display: inline-block; vertical-align: middle; }
+          .circle.filled { background: black; }
+          .circle.wrong { text-align: center; font-weight: bold; font-size: 12px; line-height: 14px; }
+
+          .answer-container { flex: 1; border: 2px solid black; padding: 4mm; display: flex; justify-content: space-between; position: relative; min-height: 185mm; }
+          .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; font-weight: 950; color: #f0f0f0; opacity: 0.5; z-index: 0; user-select: none; }
+          .column { width: 23%; z-index: 10; }
+          .q-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5mm; height: 5mm; }
+          .q-num { font-family: monospace; font-size: 11px; font-weight: bold; width: 25px; text-align: right; margin-right: 4px; }
+          .options { display: flex; gap: 1.5mm; }
+          .option { width: 18px; height: 18px; border: 1.2px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; color: #555; }
+          .dimmed { opacity: 0.15; filter: grayscale(1); }
+
+          .footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 5mm; }
+          .sig-box { width: 30%; text-align: center; }
+          .sig-line { border-top: 1.5px solid black; margin-bottom: 2px; }
+          .sig-label { font-size: 9px; font-weight: bold; text-transform: uppercase; }
+          .qr-box { border: 1.5px solid black; padding: 2px; background: white; text-align: center; }
+          .qr-box img { width: 48px; height: 48px; display: block; }
+          .qr-label { font-size: 8px; font-weight: 900; font-family: monospace; display: block; margin-top: 2px; }
+
+          @media print {
+            body { padding: 8mm; width: auto; height: auto; }
+            .watermark { color: #f5f5f5 !important; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="marker top-left"></div>
+        <div class="marker top-right"></div>
+        <div class="marker bottom-left"></div>
+        <div class="marker bottom-right"></div>
+
         <div class="header">
-          <div class="logo">Zenith / Obhyash</div>
-          <div class="company-info">
-            Level 5, House 42, Road 7/A<br>
-            Dhanmondi, Dhaka - 1209<br>
-            support@zenith.edu.bd<br>
-            +880 1712 345678
+          <div>
+            <h1>Obhyash Answer Sheet</h1>
+            <div class="meta">
+              EXAM: <span style="text-decoration: underline;">${details.subjectLabel || details.subject || 'Practice'}</span>
+              &nbsp;|&nbsp; TYPE: ${details.examType || 'Practice Exam'}
+            </div>
+          </div>
+          <div class="omr-badge">OMR</div>
+        </div>
+
+        <div class="info-section">
+          <div class="student-info">
+            <div class="info-row"><span class="info-label">Name</span><div class="info-line"></div></div>
+            <div class="info-row"><span class="info-label">Mobile</span><div class="info-line"></div></div>
+            <div class="info-row"><span class="info-label">Date</span><div class="info-line"></div></div>
+            <div class="info-row"><span class="info-label">Student ID</span><div class="info-line"></div></div>
+          </div>
+          <div class="instructions">
+            <span class="instr-title">Instructions</span>
+            <ul class="instr-list">
+              <li>• Use <b>Black</b> or <b>Blue</b> pen.</li>
+              <li>• Darken circle completely.</li>
+              <li>• No stray marks.</li>
+              <li>• Multiple marks invalid.</li>
+            </ul>
+            <div class="instr-examples">
+              <div>
+                <span style="font-size:8px; font-weight:bold; display:block;">CORRECT</span>
+                <div class="circle filled"></div>
+                <div class="circle"></div>
+              </div>
+              <div>
+                <span style="font-size:8px; font-weight:bold; display:block;">WRONG</span>
+                <div class="circle wrong">×</div>
+                <div class="circle"></div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="invoice-details">
-          <div class="bill-to">
-            <strong>Bill To:</strong><br>
-            ${user.name}<br>
-            ${user.institute}<br>
-            Dhaka, Bangladesh
-          </div>
-          <div class="invoice-meta">
-            <h1>INVOICE</h1>
-            <p><strong>#${invoice.id}</strong></p>
-            <p>Date: ${invoice.date}</p>
-            <p>Status: <span class="badge ${invoice.status}">${invoice.status}</span></p>
-          </div>
-        </div>
-
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Description</th>
-              <th style="text-align: center">Cycle</th>
-              <th style="text-align: right">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>${invoice.planName} Subscription</td>
-              <td style="text-align: center">Monthly</td>
-              <td style="text-align: right">${invoice.currency} ${invoice.amount}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="total-section">
-          <div class="total-row">
-            <span>Subtotal:</span>
-            <span>${invoice.currency} ${invoice.amount}</span>
-          </div>
-          <div class="total-row">
-            <span>Tax (0%):</span>
-            <span>${invoice.currency} 0.00</span>
-          </div>
-          <div class="total-row grand-total">
-            <span>Total:</span>
-            <span>${invoice.currency} ${invoice.amount}</span>
-          </div>
+        <div class="answer-container">
+          <div class="watermark">OBHYASH</div>
+          ${[0, 1, 2, 3]
+            .map(
+              (col) => `
+            <div class="column">
+              ${Array.from({ length: 25 })
+                .map((_, row) => {
+                  const qNum = col * 25 + row + 1;
+                  const isVisible = qNum <= totalQuestions;
+                  return `
+                  <div class="q-row ${!isVisible ? 'dimmed' : ''}">
+                    <span class="q-num">${qNum}</span>
+                    <div class="options">
+                      <div class="option">A</div>
+                      <div class="option">B</div>
+                      <div class="option">C</div>
+                      <div class="option">D</div>
+                    </div>
+                  </div>
+                `;
+                })
+                .join('')}
+            </div>
+          `,
+            )
+            .join('')}
         </div>
 
         <div class="footer">
-          <p>Thank you for your business!</p>
-          <p>This is a computer-generated invoice and requires no signature.</p>
+          <div class="sig-box">
+            <div class="sig-line"></div>
+            <span class="sig-label">Candidate Signature</span>
+          </div>
+          <div class="qr-box">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrData}" alt="QR Code" />
+            <span class="qr-label">SCAN ME</span>
+          </div>
+          <div class="sig-box">
+            <div class="sig-line"></div>
+            <span class="sig-label">Invigilator Signature</span>
+          </div>
         </div>
-      </div>
-      <script>setTimeout(() => { window.print(); }, 800);</script>
-    </body>
+
+        <script>
+          window.onload = () => {
+            setTimeout(() => {
+              window.print();
+              // window.close(); // Optional: close widow after printing
+            }, 500);
+          };
+        </script>
+      </body>
     </html>
   `;
+
   printWindow.document.write(htmlContent);
   printWindow.document.close();
 };

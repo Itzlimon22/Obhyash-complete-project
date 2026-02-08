@@ -8,6 +8,7 @@ import { UserProfile } from '@/lib/types';
 
 import LandingPage from '@/components/landing/LandingPage';
 import StudentRoot from '@/components/student/StudentRoot';
+import InitialLoader from '@/components/student/ui/InitialLoader';
 
 export default function Home() {
   const router = useRouter();
@@ -102,14 +103,7 @@ export default function Home() {
   if (!mounted) return null;
 
   if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-white dark:bg-black text-slate-500">
-        <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="w-12 h-12 bg-indigo-100 dark:bg-slate-800 rounded-full animate-spin border-t-2 border-indigo-600"></div>
-          Loading Obhyash...
-        </div>
-      </div>
-    );
+    return <InitialLoader />;
   }
 
   // --- ROUTING ---

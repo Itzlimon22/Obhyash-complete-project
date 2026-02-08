@@ -126,14 +126,14 @@ export const getUserPaymentMethods = async (): Promise<PaymentMethod[]> => {
   return [];
 };
 
-export const deletePaymentMethod = async (_id: string): Promise<void> => {
+export const deletePaymentMethod = async (id: string): Promise<void> => {
   if (!isSupabaseConfigured() || !supabase) {
     throw new Error('Database configuration missing');
   }
   // await supabase.from('payment_methods').delete().eq('id', _id);
 };
 
-export const subscribeToPlan = async (_planId: string): Promise<boolean> => {
+export const subscribeToPlan = async (planId: string): Promise<boolean> => {
   if (!isSupabaseConfigured() || !supabase) {
     throw new Error('Database configuration missing');
   }
@@ -142,7 +142,7 @@ export const subscribeToPlan = async (_planId: string): Promise<boolean> => {
 };
 
 export const addPaymentMethod = async (
-  _method: Omit<PaymentMethod, 'id'>,
+  method: Omit<PaymentMethod, 'id'>,
 ): Promise<PaymentMethod> => {
   if (!isSupabaseConfigured() || !supabase) {
     throw new Error('Database configuration missing');
