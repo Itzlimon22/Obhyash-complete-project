@@ -59,6 +59,77 @@ export default function StudentRoot({
   onLogout,
 }: StudentRootProps) {
   const engine = useExamEngine();
+  const supabase = createClient();
+  const [isProcessingProfile, setIsProcessingProfile] = useState(false);
+
+  // Check for temp_signup_data in localStorage (from Google Signup)
+  useEffect(() => {
+    const checkAndCreateProfile = async () => {
+      const tempProfileData = localStorage.getItem('temp_signup_data');
+      if (tempProfileData && initialUser && !isProcessingProfile) {
+        // User is logged in, but we have temp data -> this means they just signed up via Google
+        try {
+          setIsProcessingProfile(true);
+          const profileData = JSON.parse(tempProfileData);
+
+          // Check if profile truly exists (double check)
+          const { data: existingProfile } = await supabase
+            .from('users')
+            .select('id')
+            .eq('id', initialUser.id)
+            .single();
+
+          if (!existingProfile) {
+            toast.info('আপনার প্রোফাইল তৈরি করা হচ্ছে...', { duration: 2000 });
+
+            // Create Profile
+            const { error: insertError } = await supabase.from('users').insert({
+              id: initialUser.id,
+              email: initialUser.email,
+              name: profileData.name,
+              phone: profileData.phone,
+              gender: profileData.gender || null,
+              institute: profileData.institute,
+              stream: profileData.stream,
+              division: profileData.group,
+              batch: profileData.batch,
+              role: 'Student',
+              status: 'Active',
+              subscription: {
+                plan: 'Free',
+                expiry: new Date(
+                  Date.now() + 365 * 24 * 60 * 60 * 1000,
+                ).toISOString(),
+                status: 'Active',
+              },
+              xp: 0,
+              level: 'Beginner',
+              examsTaken: 0,
+              enrolledExams: 0,
+              lastActive: new Date().toISOString(),
+            });
+
+            if (insertError) throw insertError;
+
+            toast.success('প্রোফাইল সফলভাবে তৈরি হয়েছে!');
+            // Refresh to load new profile data into app state if needed
+            window.location.reload();
+          }
+
+          // Clear temp data
+          localStorage.removeItem('temp_signup_data');
+        } catch (error) {
+          console.error('Error creating profile from temp data:', error);
+          toast.error('প্রোফাইল তৈরিতে সমস্যা হয়েছে।');
+        } finally {
+          setIsProcessingProfile(false);
+        }
+      }
+    };
+
+    checkAndCreateProfile();
+  }, [initialUser, supabase, isProcessingProfile]);
+
   const {
     appState,
     setAppState,

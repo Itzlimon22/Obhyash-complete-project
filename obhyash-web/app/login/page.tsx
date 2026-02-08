@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';
 import Logo from '@/components/student/ui/Logo';
+import SocialLoginButton from '@/components/auth/SocialLoginButton';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -82,9 +83,9 @@ export default function LoginPage() {
             <div className="flex justify-center mb-6">
               <Logo size="lg" />
             </div>
-            <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight">
-              স্বাগতম! (Welcome)
-            </h2>
+            <h4 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight">
+              স্বাগতম!
+            </h4>
             <p className="text-slate-500 dark:text-slate-400 text-sm">
               আপনার অ্যাকাউন্টে লগইন করুন
             </p>
@@ -152,6 +153,19 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          <div className="relative py-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white dark:bg-slate-900 px-2 text-slate-500 dark:text-slate-400 font-bold">
+                অথবা
+              </span>
+            </div>
+          </div>
+
+          <SocialLoginButton mode="signin" />
 
           <div className="mt-8 text-center space-y-4">
             <p className="text-sm text-slate-500 dark:text-slate-400">

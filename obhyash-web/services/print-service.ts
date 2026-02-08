@@ -415,7 +415,7 @@ export const printOMRSheet = (
           .qr-label { font-size: 8px; font-weight: 900; font-family: monospace; display: block; margin-top: 2px; }
 
           @media print {
-            body { padding: 8mm; width: auto; height: auto; }
+            body { padding: 8mm; width: auto; height: auto; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .watermark { color: #f5f5f5 !important; }
           }
         </style>

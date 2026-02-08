@@ -16,8 +16,12 @@ import {
   BookOpen,
   CheckCircle2,
   Loader2,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import Logo from '@/components/student/ui/Logo';
+import SocialLoginButton from '@/components/auth/SocialLoginButton';
+import { toast } from 'sonner';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -28,23 +32,25 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  const [showPassword, setShowPassword] = useState(false);
+
   // Form State
   const [formData, setFormData] = useState({
-    // Step 1: Credentials
-    email: '',
-    password: '',
-    confirmPassword: '',
-
-    // Step 2: Personal
+    // Step 1: Personal (Was Step 2)
     name: '',
     phone: '',
     gender: '', // Male, Female, Other
 
-    // Step 3: Academic
+    // Step 2: Academic (Was Step 3)
     institute: '',
-    stream: 'HSC', // Was studyGoal
-    group: 'Science', // Science, Humanities, Business Studies
+    stream: 'HSC',
+    group: 'Science',
     batch: 'HSC 2025',
+
+    // Step 3: Credentials (Was Step 1)
+    email: '',
+    password: '',
+    confirmPassword: '',
   });
 
   const handleChange = (
@@ -56,6 +62,28 @@ export default function SignupPage() {
 
   const validateStep = (currentStep: number) => {
     if (currentStep === 1) {
+      // Personal
+      if (!formData.name) {
+        return 'আপনার নাম উল্লেখ করা আবশ্যক';
+      }
+      if (!formData.phone) {
+        return 'মোবাইল নম্বর উল্লেখ করা আবশ্যক';
+      }
+      if (!/^01\d{9}$/.test(formData.phone)) {
+        return 'সঠিক মোবাইল নম্বর দিন (যেমন: 01712345678)';
+      }
+    }
+    if (currentStep === 2) {
+      // Academic
+      if (!formData.batch) {
+        return 'ব্যাচ সিলেক্ট করা আবশ্যক';
+      }
+      if (!formData.institute) {
+        return 'আপনার শিক্ষা প্রতিষ্ঠানের নাম লিখুন';
+      }
+    }
+    if (currentStep === 3) {
+      // Credentials
       if (!formData.email || !formData.password || !formData.confirmPassword) {
         return 'সব তথ্য পূরণ করতে হবে';
       }
@@ -64,16 +92,6 @@ export default function SignupPage() {
       }
       if (formData.password !== formData.confirmPassword) {
         return 'পাসওয়ার্ড দুটি মিলছে না';
-      }
-    }
-    if (currentStep === 2) {
-      if (!formData.name) {
-        return 'আপনার নাম উল্লেখ করা আবশ্যক';
-      }
-    }
-    if (currentStep === 3) {
-      if (!formData.batch) {
-        return 'ব্যাচ সিলেক্ট করা আবশ্যক';
       }
     }
     return null;
@@ -91,6 +109,25 @@ export default function SignupPage() {
   const handleBack = () => {
     setStep(step - 1);
     setError(null);
+  };
+
+  const handleGoogleSignup = () => {
+    // Save Step 1 & 2 data to localStorage before redirecting
+    const tempProfileData = {
+      name: formData.name,
+      phone: formData.phone,
+      gender: formData.gender,
+      institute: formData.institute,
+      stream: formData.stream,
+      group: formData.group,
+      batch: formData.batch,
+      role: 'Student', // Explicitly needed
+    };
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('temp_signup_data', JSON.stringify(tempProfileData));
+    }
+    // Button component handles the actual redirect
   };
 
   const handleSignup = async () => {
@@ -111,13 +148,9 @@ export default function SignupPage() {
         options: {
           emailRedirectTo: `${location.origin}/dashboard`,
           data: {
-            name: formData.name,
             full_name: formData.name,
-            role: 'Student', // Pass role in metadata for triggers
-            institute: formData.institute,
-            group: formData.group,
-            stream: formData.stream,
-            batch: formData.batch,
+            name: formData.name,
+            role: 'Student',
           },
         },
       });
@@ -130,9 +163,9 @@ export default function SignupPage() {
           id: data.user.id,
           email: formData.email,
           name: formData.name,
-          phone: formData.phone || null,
+          phone: formData.phone,
           gender: formData.gender || null,
-          institute: formData.institute || null,
+          institute: formData.institute,
           stream: formData.stream,
           division: formData.group, // Mapping group -> division
           batch: formData.batch,
@@ -154,7 +187,14 @@ export default function SignupPage() {
 
         if (profileError) {
           console.error('Profile creation error:', profileError);
-          throw new Error(`প্রোফাইল তৈরি করা যায়নি: ${profileError.message}`);
+          // Don't throw here if auth succeeded, just log it.
+          // The auth trigger might have handled it, or we can handle it on dashboard.
+          toast.error(
+            'প্রোফাইল তৈরিতে সমস্যা হয়েছে, তবে অ্যাকাউন্ট তৈরি হয়েছে।',
+            {
+              description: profileError.message,
+            },
+          );
         }
 
         // If Auto-Confirm is enabled in Supabase, we get a session immediately.
@@ -237,9 +277,6 @@ export default function SignupPage() {
             <Logo size="lg" />
           </div>
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2">
-              নতুন অ্যাকাউন্ট খুলুন
-            </h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm">
               মাত্র ৩টি ধাপে সম্পন্ন করুন আপনার রেজিস্ট্রেশন
             </p>
@@ -352,7 +389,7 @@ export default function SignupPage() {
                     লিঙ্গ (Gender)
                   </label>
                   <div className="grid grid-cols-3 gap-3">
-                    {['Male', 'Female', 'Other'].map((g) => (
+                    {['Male', 'Female'].map((g) => (
                       <button
                         key={g}
                         type="button"
@@ -363,11 +400,7 @@ export default function SignupPage() {
                             : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-white dark:hover:bg-slate-900 hover:border-slate-300'
                         }`}
                       >
-                        {g === 'Male'
-                          ? 'পুরুষ'
-                          : g === 'Female'
-                            ? 'মহিলা'
-                            : 'অন্যান্য'}
+                        {g === 'Male' ? 'পুরুষ' : 'মহিলা'}
                       </button>
                     ))}
                   </div>
@@ -375,8 +408,8 @@ export default function SignupPage() {
               </div>
             )}
 
-            {/* STEP 3: ACADEMIC INFO */}
-            {step === 3 && (
+            {/* STEP 2: ACADEMIC INFO (Was Step 3) */}
+            {step === 2 && (
               <div className="space-y-5 animate-in slide-in-from-right-4 fade-in duration-300">
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
@@ -398,26 +431,7 @@ export default function SignupPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                      কী নিয়ে চর্চা করতে চাও? (Stream)
-                    </label>
-                    <div className="relative">
-                      <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
-                      <select
-                        name="stream"
-                        value={formData.stream}
-                        onChange={handleChange}
-                        className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200 appearance-none cursor-pointer"
-                      >
-                        <option>HSC</option>
-                        <option>Admission</option>
-                        <option>Job Prep</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                      সেকশন (Section)
+                      বিভাগ (Group)
                     </label>
                     <div className="relative">
                       <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
@@ -425,7 +439,7 @@ export default function SignupPage() {
                         name="group"
                         value={formData.group}
                         onChange={handleChange}
-                        className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200 appearance-none cursor-pointer"
+                        className="w-full pl-10 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200 appearance-none cursor-pointer"
                       >
                         <option value="Science">Science</option>
                         <option value="Business Studies">
@@ -435,29 +449,111 @@ export default function SignupPage() {
                       </select>
                     </div>
                   </div>
-                </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                    ব্যাচ
-                  </label>
-                  <div className="grid grid-cols-3 gap-3">
-                    {['HSC 2024', 'HSC 2025', 'HSC 2026'].map((b) => (
-                      <button
-                        key={b}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, batch: b })}
-                        className={`py-2.5 rounded-xl text-xs font-bold transition-all border ${
-                          formData.batch === b
-                            ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-500 text-rose-600 dark:text-rose-400 shadow-sm'
-                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-white dark:hover:bg-slate-900 hover:border-slate-300'
-                        }`}
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                      ব্যাচ
+                    </label>
+                    <div className="relative">
+                      <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                      <select
+                        name="batch"
+                        value={formData.batch}
+                        onChange={handleChange}
+                        className="w-full pl-10 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200 appearance-none cursor-pointer"
                       >
-                        {b}
-                      </button>
-                    ))}
+                        <option>HSC 2024</option>
+                        <option>HSC 2025</option>
+                        <option>HSC 2026</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* STEP 3: CREDENTIALS & GOOGLE (Was Step 1) */}
+            {step === 3 && (
+              <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
+                <div className="space-y-5">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                      ইমেইল এড্রেস
+                    </label>
+                    <div className="relative group">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="example@mail.com"
+                        className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                      পাসওয়ার্ড
+                    </label>
+                    <div className="relative group">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder="কমপক্ষে ৬ অক্ষর"
+                        className="w-full pl-12 pr-12 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="w-5 h-5" />
+                        ) : (
+                          <Eye className="w-5 h-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                      পাসওয়ার্ড নিশ্চিত করুন
+                    </label>
+                    <div className="relative group">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        placeholder="পাসওয়ার্ডটি আবার লিখুন"
+                        className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="relative py-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-white dark:bg-slate-900 px-2 text-slate-500 dark:text-slate-400 font-bold">
+                      অথবা
+                    </span>
+                  </div>
+                </div>
+
+                <SocialLoginButton
+                  mode="signup"
+                  onBeforeRedirect={handleGoogleSignup}
+                />
               </div>
             )}
 
