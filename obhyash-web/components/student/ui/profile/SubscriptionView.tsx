@@ -188,95 +188,28 @@ const SubscriptionView: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 animate-fade-in pb-16">
-      {/* Current Plan Details Header */}
-      <div className="bg-gradient-to-r from-neutral-900 to-neutral-800 dark:from-neutral-800 dark:to-neutral-900 rounded-2xl p-5 md:p-6 text-white shadow-lg relative overflow-hidden border border-neutral-700">
-        {/* Background Decor */}
-        <div className="absolute top-0 right-0 p-8 opacity-5">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-32 h-32"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-            />
-          </svg>
-        </div>
-
-        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div>
-            <h2 className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-2">
-              বর্তমান সাবস্ক্রিপশন
-            </h2>
-            {loading ? (
-              <div className="h-8 w-40 bg-neutral-700 rounded animate-pulse mb-3"></div>
-            ) : (
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-3xl font-extrabold text-white">
-                  {currentPlan.name}
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold uppercase tracking-wide">
-                  Active
-                </span>
-              </div>
-            )}
-            <div className="flex flex-wrap gap-4 text-sm text-neutral-300">
-              <div className="flex items-center gap-1.5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-4 h-4 text-neutral-500"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
-                  />
-                </svg>
-                শুরু:{' '}
-                <span className="font-medium text-white">12 Oct, 2023</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-4 h-4 text-neutral-500"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                  />
-                </svg>
-                নবায়ন:{' '}
-                <span className="font-medium text-white">
-                  {currentPlan.id === 'free' ? 'আজীবন' : 'আগামী মাসে'}
-                </span>
-              </div>
-            </div>
+      {/* Current Plan Details Header Removed - Showing minimal active plan info if needed or just pricing */}
+      <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <h2 className="text-sm font-bold text-neutral-500 uppercase tracking-widest mb-1">
+            বর্তমান সাবস্ক্রিপশন
+          </h2>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl font-black text-neutral-900 dark:text-white">
+              {currentPlan.name}
+            </span>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wide">
+              Active
+            </span>
           </div>
-
-          {currentPlanId === 'free' && (
-            <div className="bg-neutral-800/50 p-3 rounded-xl border border-neutral-700 backdrop-blur-sm max-w-xs">
-              <p className="text-xs text-neutral-300 leading-relaxed">
-                <span className="font-bold text-amber-400">টিপস:</span>{' '}
-                প্রিমিয়াম প্ল্যানে আপগ্রেড করে আনলিমিটেড এক্সাম এবং এআই
-                এনালাইসিস আনলক করুন।
-              </p>
-            </div>
-          )}
         </div>
+        {currentPlanId === 'free' && (
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-md text-center md:text-right">
+            আনলিমিটেড এক্সাম এবং এনালাইসিস পেতে{' '}
+            <span className="text-rose-600 font-bold">প্রিমিয়াম</span> প্ল্যানে
+            আপগ্রেড করুন
+          </p>
+        )}
       </div>
 
       {/* Pricing Cards Grid */}

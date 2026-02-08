@@ -39,8 +39,19 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-fade-in pb-12 pt-2">
-      {/* 1. Header Section */}
-      <ProfileHeader user={user} onEdit={onEditProfile} />
+      {/* 1. Header Section Removed */}
+      {/* <ProfileHeader user={user} onEdit={onEditProfile} /> */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">
+          প্রোফাইল
+        </h1>
+        <button
+          onClick={onEditProfile}
+          className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg font-bold text-sm"
+        >
+          এডিট করুন
+        </button>
+      </div>
 
       {/* 2. Key Stats Grid */}
       <StatsGrid

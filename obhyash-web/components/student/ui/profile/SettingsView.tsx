@@ -29,6 +29,8 @@ const selectClass =
   'w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-neutral-800 dark:text-neutral-200 appearance-none';
 
 const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
+  // No large header to remove here, but ensuring top spacing is correct
+
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl); // Local state for immediate preview
 

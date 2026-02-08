@@ -124,14 +124,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     <div className="max-w-5xl mx-auto p-6 space-y-6 animate-fade-in">
       {/* Header & Tabs */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white mb-1">
-            অনুশীলন (Practice)
-          </h1>
-          <p className="text-neutral-500 dark:text-neutral-400 text-sm">
-            আপনার ভুল এবং বুকমার্ক করা প্রশ্নগুলো পুনরায় অনুশীলন করুন।
-          </p>
-        </div>
+        {/* Header Removed */}
 
         <div className="flex bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl shrink-0">
           <button

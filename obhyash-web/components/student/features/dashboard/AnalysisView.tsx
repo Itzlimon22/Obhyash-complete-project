@@ -107,15 +107,8 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-fade-in pb-12">
       {/* Header & Filter */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
-        <div>
-          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">
-            পারফরম্যান্স এনালাইসিস
-          </h1>
-          <p className="text-neutral-500 dark:text-neutral-400 text-sm">
-            আপনার অগ্রগতির সামগ্রিক চিত্র
-          </p>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 mb-2">
+        {/* Header Removed */}
 
         <select
           value={timeFilter}

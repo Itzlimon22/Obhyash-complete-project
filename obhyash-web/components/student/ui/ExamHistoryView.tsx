@@ -77,31 +77,21 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-4 md:p-8 transition-colors">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white">
-              পরীক্ষার ইতিহাস
-            </h2>
-            <p className="text-neutral-600 dark:text-neutral-400 mt-1">
-              আপনার পূর্ববর্তী সকল পরীক্ষার ফলাফল
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onClearHistory}
-              disabled={history.length === 0}
-              className="px-4 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-800 transition-colors disabled:opacity-50 disabled:pointer-events-none text-sm font-medium"
-            >
-              ইতিহাস মুছুন
-            </button>
-            <button
-              onClick={onBack}
-              className="px-5 py-2.5 bg-neutral-900 dark:bg-indigo-600 hover:bg-neutral-800 dark:hover:bg-indigo-500 text-white rounded-lg font-semibold transition-colors shadow-sm"
-            >
-              ফিরে যান
-            </button>
-          </div>
+        {/* Header Removed - Actions Retained */}
+        <div className="flex justify-end gap-3 mb-8">
+          <button
+            onClick={onClearHistory}
+            disabled={history.length === 0}
+            className="px-4 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-800 transition-colors disabled:opacity-50 disabled:pointer-events-none text-sm font-medium"
+          >
+            ইতিহাস মুছুন
+          </button>
+          <button
+            onClick={onBack}
+            className="px-5 py-2.5 bg-neutral-900 dark:bg-indigo-600 hover:bg-neutral-800 dark:hover:bg-indigo-500 text-white rounded-lg font-semibold transition-colors shadow-sm"
+          >
+            ফিরে যান
+          </button>
         </div>
 
         {/* Filter Section */}
