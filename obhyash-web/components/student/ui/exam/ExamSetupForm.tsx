@@ -15,6 +15,7 @@ import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { ExamSettings } from '@/components/student/features/exam/setup/ExamSettings';
 import { TopicSelector } from '@/components/student/features/exam/setup/TopicSelector';
+import { SubjectSelector } from '@/components/student/features/exam/setup/SubjectSelector'; // New Import
 import { OmrConfigModal } from '@/components/student/features/omr/OmrConfigModal';
 import { OmrPrintModal } from '@/components/student/features/omr/OmrPrintModal';
 
@@ -26,8 +27,8 @@ interface ExamSetupFormProps {
 interface Subject {
   id: string;
   label: string;
-  icon: string;
-  name?: string;
+  icon: string | React.ReactNode; // Updated to allow both
+  name: string; // Added name property
 }
 
 interface Item {
@@ -75,7 +76,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   // --- Data Fetching ---
 
-  // 1. Fetch Subjects on Mount
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
@@ -102,7 +102,10 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               STATIC_SUBJECT_ICONS[sub.name_en] ||
               STATIC_SUBJECT_ICONS[sub.id] ||
               STATIC_SUBJECT_ICONS.default,
-            name: sub.name,
+            name:
+              sub.name_en === 'English'
+                ? 'English'
+                : `${sub.name_bn || sub.name} (${sub.name || sub.name_en || ''})`,
           }));
 
           setAvailableSubjects(formattedSubjects);
@@ -118,7 +121,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     fetchSubjects();
   }, []);
 
-  // 2. Fetch Chapters when Subject changes
   useEffect(() => {
     if (!subject) {
       setAvailableChapters([]);
@@ -145,7 +147,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     fetchChapters();
   }, [subject]);
 
-  // 3. Fetch Topics when Chapters change
   useEffect(() => {
     if (selectedChapters.length === 0) {
       setAvailableTopics([]);
@@ -197,6 +198,9 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       availableSubjects.find((s) => s.id === subject)?.label || subject;
 
     try {
+      // We pass the config to parent. Parent will show instructions.
+      // We are NOT calling engine.startExam here anymore in the redesigned flow (conceptually).
+      // But we call props.onStartExam which is hooked to handleStartExam in StudentRoot.
       await onStartExam({
         subject,
         subjectLabel,
@@ -209,13 +213,8 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         negativeMarking,
       });
     } catch (error: any) {
-      if (error?.message?.includes('No questions')) {
-        toast.error(
-          'এই সেটিংসের জন্য পর্যাপ্ত প্রশ্ন নেই। দয়া করে অন্য অধ্যায় বা টপিক চেষ্টা করুন।',
-        );
-      } else {
-        toast.error('পরীক্ষা শুরু করা যাচ্ছে না। আবার চেষ্টা করুন।');
-      }
+      // Errors handled by parent or toast
+      console.error(error);
     }
   };
 
@@ -267,67 +266,20 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 </div>
                 বিষয় নির্বাচন
               </h3>
-              {availableSubjects.length > 0 && !isFetchingData && (
-                <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest">
-                  {availableSubjects.length} টি বিষয় পাওয়া গেছে
-                </span>
-              )}
             </div>
 
-            {isFetchingData ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div
-                    key={i}
-                    className="h-32 bg-neutral-100 dark:bg-neutral-800/50 rounded-2xl animate-pulse"
-                  />
-                ))}
-              </div>
-            ) : availableSubjects.length === 0 ? (
-              <div className="p-8 text-center bg-neutral-50 dark:bg-neutral-800/30 rounded-2xl border-2 border-dashed border-neutral-200 dark:border-neutral-800">
-                <p className="text-neutral-500 font-medium">
-                  কোনো বিষয় পাওয়া যায়নি।
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {availableSubjects.map((sub) => {
-                  const isSelected = subject === sub.id;
-                  return (
-                    <button
-                      key={sub.id}
-                      onClick={() => setSubject(sub.id)}
-                      className={cn(
-                        'group relative flex flex-col items-center justify-center gap-3 p-4 h-32 rounded-2xl border-2 transition-all duration-300',
-                        isSelected
-                          ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-500 shadow-xl shadow-rose-500/10 scale-[1.02]'
-                          : 'bg-white dark:bg-neutral-900 border-neutral-100 dark:border-neutral-800 hover:border-rose-200 dark:hover:border-rose-900/50 hover:shadow-lg hover:-translate-y-1',
-                      )}
-                    >
-                      <span className="text-4xl filter drop-shadow-sm group-hover:scale-110 transition-transform duration-300">
-                        {sub.icon}
-                      </span>
-                      <span
-                        className={cn(
-                          'text-sm font-bold text-center leading-tight max-w-[90%]',
-                          isSelected
-                            ? 'text-rose-700 dark:text-rose-300'
-                            : 'text-neutral-600 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white',
-                        )}
-                      >
-                        {sub.label.split('(')[0]}
-                      </span>
-
-                      {isSelected && (
-                        <div className="absolute top-2 right-2 w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center text-white animate-in zoom-in">
-                          <Zap size={10} fill="currentColor" />
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+            <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+              <SubjectSelector
+                subjects={availableSubjects.map((s) => ({
+                  id: s.id,
+                  name: s.name, // Pass the name/label
+                  icon: s.icon,
+                }))}
+                selectedSubject={subject}
+                onSelect={setSubject}
+                isLoading={isFetchingData}
+              />
+            </div>
           </section>
 
           {/* 2. Topics Selection */}
@@ -348,11 +300,10 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               </h3>
             </div>
 
-            <div className="bg-neutral-50 dark:bg-neutral-900/50 rounded-3xl p-6 border border-neutral-100 dark:border-neutral-800 space-y-4">
+            <div className="bg-white dark:bg-neutral-900/50 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 space-y-4 shadow-sm">
               <div className="grid gap-4">
                 <TopicSelector
                   title="অধ্যায় (Chapters)"
-                  // We map items to strings for the selector
                   items={availableChapters.map((c) => c.name)}
                   selectedItems={availableChapters
                     .filter((c) => selectedChapters.includes(c.id))
@@ -430,28 +381,24 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   <button
                     onClick={handleStartExam}
                     disabled={isLoading || !subject}
-                    className="w-full group relative overflow-hidden bg-rose-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-rose-500/30 hover:shadow-rose-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+                    className="w-full group relative overflow-hidden bg-neutral-900 dark:bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
                   >
                     <div className="relative z-10 flex items-center justify-center gap-3">
                       {isLoading ? (
                         <>
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          <span>প্রশ্ন তৈরি হচ্ছে...</span>
+                          <span>প্রসেস হচ্ছে...</span>
                         </>
                       ) : (
                         <>
+                          <span className="text-lg">নির্দেশাবলী দেখুন</span>
                           <Sparkles
                             size={18}
                             className="group-hover:rotate-12 transition-transform"
                           />
-                          <span className="text-lg">পরীক্ষা শুরু করুন</span>
                         </>
                       )}
                     </div>
-                    {/* Animated Shine */}
-                    {!isLoading && subject && (
-                      <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine" />
-                    )}
                   </button>
                   <p className="text-center text-[10px] text-neutral-400 mt-3 font-medium">
                     পরবর্তী ধাপে নির্দেশাবলী দেখানো হবে

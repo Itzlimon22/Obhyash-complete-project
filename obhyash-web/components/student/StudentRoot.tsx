@@ -34,7 +34,8 @@ import SettingsView from '@/components/student/ui/profile/SettingsView';
 
 // Exam Features
 import { ExamSetupContainer } from '@/components/student/features/exam/setup/ExamSetupContainer';
-import InstructionsView from '@/components/student/ui/InstructionsView';
+// import InstructionsView from '@/components/student/ui/InstructionsView'; // Deprecated in new flow
+import { ExamInstructionsView } from '@/components/student/features/exam/ExamInstructionsView';
 import ExamRunner from '@/components/student/features/exam/ExamRunner';
 
 // History & Results
@@ -89,19 +90,47 @@ export default function StudentRoot({
 
   // Store the last ExamConfig so we can reattempt without type mismatch
   const lastExamConfigRef = useRef<ExamConfig | null>(null);
+
+  // Modified: Sets up the instructions view instead of starting immediately
   const handleStartExam = useCallback(
     async (config: ExamConfig) => {
       lastExamConfigRef.current = config;
-      return startExam(config);
+      setPendingConfig(config);
+      // Manually set to INSTRUCTIONS to show the rule page
+      // Engine is still IDLE or pre-loading, but we want to show instructions first.
+      // We rely on checking !examDetails to know it's pre-fetch.
+      setAppState(AppState.INSTRUCTIONS);
     },
-    [startExam],
+    [setAppState],
   );
 
-  // --- Global User State ---
+  const handleProceedToExam = async () => {
+    if (!pendingConfig) return false;
+
+    try {
+      // 1. Fetch Questions
+      const success = await startExam(pendingConfig);
+
+      // 2. If success, Auto-Start Timer (Skip post-fetch instructions)
+      if (success) {
+        beginTimer();
+      }
+
+      return success;
+    } catch (e) {
+      console.error('Exam start failed', e);
+      return false;
+    }
+  };
+
+  // Global User State
   const [activeTab, setActiveTab] = useState('dashboard');
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(
     initialUser,
   );
+
+  // Pending Config for Pre-Fetch Instructions
+  const [pendingConfig, setPendingConfig] = useState<ExamConfig | null>(null);
 
   // Sync prop user to state
   useEffect(() => {
@@ -417,16 +446,33 @@ export default function StudentRoot({
 
   // --- Active Exam States ---
 
-  if (appState === AppState.INSTRUCTIONS && examDetails) {
-    return (
-      <AppLayout activeTab="setup" {...commonLayoutProps} title="নির্দেশাবলী">
-        <InstructionsView
-          details={examDetails}
-          onStart={beginTimer}
-          onBack={() => setAppState(AppState.IDLE)}
-        />
-      </AppLayout>
-    );
+  if (appState === AppState.INSTRUCTIONS) {
+    if (examDetails) {
+      // If we have examDetails, it means we just fetched questions and are about to start.
+      // Show loading or skeleton while changing to ACTIVE
+      return (
+        <AppLayout
+          activeTab="dashboard"
+          {...commonLayoutProps}
+          title="শুরু হচ্ছে..."
+        >
+          <ResultSkeleton />
+        </AppLayout>
+      );
+    }
+
+    // Otherwise show Pre-Fetch Instructions
+    if (pendingConfig) {
+      return (
+        <AppLayout activeTab="setup" {...commonLayoutProps} title="নির্দেশাবলী">
+          <ExamInstructionsView
+            config={pendingConfig}
+            onStart={handleProceedToExam}
+            onBack={() => setAppState(AppState.IDLE)}
+          />
+        </AppLayout>
+      );
+    }
   }
 
   if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
