@@ -37,7 +37,7 @@ const InitialLoader: React.FC = () => {
 
         {/* Brand Name with Gradient */}
         <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-2 bg-gradient-to-r from-rose-600 via-indigo-600 to-rose-600 bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] bg-clip-text text-transparent">
-          Obhyash
+          অভ্যাস
         </h1>
 
         {/* Bengali Tagline */}

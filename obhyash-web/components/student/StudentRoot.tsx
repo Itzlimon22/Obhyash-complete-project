@@ -18,6 +18,7 @@ import { useExamEngine } from '@/hooks/use-exam-engine';
 // Components - Layout & Common
 import AppLayout from '@/components/student/ui/layout/AppLayout';
 import TimeoutModal from '@/components/student/ui/TimeoutModal';
+import { toast } from 'sonner';
 
 // Features
 import Dashboard from '@/components/student/features/dashboard/Dashboard';
@@ -112,14 +113,32 @@ export default function StudentRoot({
       // 1. Fetch Questions
       const success = await startExam(pendingConfig);
 
-      // 2. If success, Auto-Start Timer (Skip post-fetch instructions)
+      // 2. If success, Auto-Start Timer
       if (success) {
         beginTimer();
+      } else {
+        // This usually falls into AppState.ERROR, but engine might throw specifically
+        toast.error(
+          'দুঃখিত, কোনো প্রশ্ন পাওয়া যায়নি। অন্য টপিক নির্বাচন করুন।',
+          {
+            description: 'No questions found for the selected criteria.',
+          },
+        );
       }
 
       return success;
-    } catch (e) {
+    } catch (e: any) {
       console.error('Exam start failed', e);
+      const isNoQuestions = e.message?.includes('No questions found');
+
+      toast.error(
+        isNoQuestions
+          ? 'দুঃখিত, কোনো প্রশ্ন পাওয়া যায়নি। অন্য টপিক নির্বাচন করুন।'
+          : 'পরীক্ষা শুরু করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।',
+        {
+          description: e.message || 'Unknown error starting exam',
+        },
+      );
       return false;
     }
   };
