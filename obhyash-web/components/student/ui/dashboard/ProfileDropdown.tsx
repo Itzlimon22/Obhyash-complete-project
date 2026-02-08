@@ -7,6 +7,7 @@ import {
   Moon,
   Sun,
   ChevronRight,
+  MessageSquare,
 } from 'lucide-react';
 
 interface ProfileDropdownProps {
@@ -60,6 +61,11 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
       label: 'সেটিংস',
       icon: Settings,
       action: () => onNavigate('settings'),
+    },
+    {
+      label: 'অভিযোগ ও পরামর্শ',
+      icon: MessageSquare,
+      action: () => onNavigate('complaint'),
     },
   ];
 

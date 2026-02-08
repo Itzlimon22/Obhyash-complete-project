@@ -46,12 +46,14 @@ const mapProfileToDbRow = (user: UserProfile): UserDatabaseRow => {
   return {
     id: user.id,
     name: user.name,
+    email: user.email || null,
+    phone: user.phone || null,
     // explicitly handle undefined vs null if needed, here we treat undefined as null for DB
     dob: user.dob || null,
     gender: user.gender || null,
     address: user.address || null,
 
-    avatar_url: user.avatarUrl || null,
+    avatar_url: user.avatarUrl || (user as any).avatar_url || null,
     avatar_color: user.avatarColor || null,
 
     institute: user.institute || null,

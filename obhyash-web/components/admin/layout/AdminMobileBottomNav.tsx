@@ -3,7 +3,14 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, FileQuestion, Flag, Menu } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Users,
+  FileQuestion,
+  Flag,
+  Menu,
+  AlertTriangle,
+} from 'lucide-react';
 
 interface AdminMobileBottomNavProps {
   onMenuClick: () => void;
@@ -35,6 +42,11 @@ const AdminMobileBottomNav: React.FC<AdminMobileBottomNavProps> = ({
       icon: Flag,
       href: '/admin/reports',
       count: 5, // Mock count for now, could be passed as props
+    },
+    {
+      label: 'Complaints',
+      icon: AlertTriangle,
+      href: '/admin/complaints',
     },
   ];
 

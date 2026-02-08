@@ -51,6 +51,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
     sscYear: user.ssc_passing_year || '2023',
     optionalSubject: user.optional_subject || '',
     email: user.email || '',
+    phone: user.phone || '',
     newPassword: '',
     confirmPassword: '',
   });
@@ -139,14 +140,40 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
     }));
   };
 
-  const handleSubmit = async () => {
+  const validateForm = () => {
+    // Name validation
+    if (!formData.name.trim()) {
+      toast.error('নাম লেখা আবশ্যক!');
+      return false;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      toast.error('সঠিক ইমেইল ঠিকানা দিন!');
+      return false;
+    }
+
+    // Phone validation: exactly 11 digits, starts with 01
+    const phoneRegex = /^01\d{9}$/;
+    if (formData.phone && !phoneRegex.test(formData.phone)) {
+      toast.error('সঠিক 11 ডিজিটের ফোন নম্বর দিন');
+      return false;
+    }
+
     if (
       formData.newPassword &&
       formData.newPassword !== formData.confirmPassword
     ) {
       toast.error('পাসওয়ার্ড দুটি মিলছে না!', { position: 'top-center' });
-      return;
+      return false;
     }
+
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
 
     const payload: any = {
       name: formData.name,
@@ -165,6 +192,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
       ssc_board: formData.sscBoard,
       ssc_passing_year: formData.sscYear,
       optional_subject: formData.optionalSubject,
+      phone: formData.phone || null,
       avatar_url: avatarUrl || null,
     };
 
@@ -299,6 +327,19 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
           </div>
 
           <div className={inputGroupClass}>
+            <label className={labelClass}>ফোন নম্বর</label>
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              className={inputClass}
+              placeholder="০১XXXXXXXXX"
+              maxLength={11}
+            />
+          </div>
+
+          <div className={inputGroupClass}>
             <label className={labelClass}>জন্ম তারিখ</label>
             <input
               type="date"
@@ -321,7 +362,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
                 <option value="">নির্বাচন করুন</option>
                 <option value="Male">পুরুষ (Male)</option>
                 <option value="Female">মহিলা (Female)</option>
-                <option value="Other">অন্যান্য</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-500">
                 <svg
@@ -383,8 +423,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
                 className={selectClass}
               >
                 <option>HSC</option>
+                <option>SSC</option>
                 <option>Admission</option>
-                <option>Job Prep</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-500">
                 <svg
@@ -446,9 +486,10 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
                   onChange={handleChange}
                   className={selectClass}
                 >
-                  <option>অ্যাডমিশন ২০২৫</option>
+                  <option>HSC 2024</option>
                   <option>HSC 2025</option>
                   <option>HSC 2026</option>
+                  <option>HSC 2027</option>
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-500">
                   <svg
@@ -479,9 +520,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
                 className={selectClass}
               >
                 <option>Medical</option>
-                <option>Engineering (BUET/CKRUET)</option>
-                <option>University (Dhaka Univ)</option>
-                <option>GST</option>
+                <option>Engineering</option>
+                <option>University</option>
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-500">
                 <svg
@@ -572,9 +612,11 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
                   onChange={handleChange}
                   className={selectClass}
                 >
+                  <option>2026</option>
+                  <option>2025</option>
+                  <option>2024</option>
                   <option>2023</option>
                   <option>2022</option>
-                  <option>2021</option>
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-500">
                   <svg
