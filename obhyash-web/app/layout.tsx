@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Anek_Bangla } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'sonner';
+import AuthProvider from '@/components/auth/AuthProvider';
 
 // ✅ Configure Inter (English text)
 const inter = Inter({
@@ -58,11 +59,13 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased overflow-x-hidden selection:bg-brand-500/30 bg-paper-50 text-paper-900 dark:bg-paper-900 dark:text-paper-50 font-sans">
-        {/* Render the application */}
-        {children}
+        <AuthProvider>
+          {/* Render the application */}
+          {children}
 
-        {/* ✅ Render the Toast Container (Overlay) */}
-        <Toaster position="top-right" richColors />
+          {/* ✅ Render the Toast Container (Overlay) */}
+          <Toaster position="top-right" richColors />
+        </AuthProvider>
       </body>
     </html>
   );
