@@ -61,61 +61,61 @@ export default function StudentRoot({
   const engine = useExamEngine();
   const supabase = createClient();
   const [isProcessingProfile, setIsProcessingProfile] = useState(false);
+  const hasAttemptedProfileCreation = useRef(false);
 
   // Check for temp_signup_data in localStorage (from Google Signup)
   useEffect(() => {
     const checkAndCreateProfile = async () => {
       const tempProfileData = localStorage.getItem('temp_signup_data');
-      if (tempProfileData && initialUser && !isProcessingProfile) {
-        // User is logged in, but we have temp data -> this means they just signed up via Google
+
+      // Prevent loop: only run if we have data, user is logged in, not processing, AND haven't attempted yet
+      if (
+        tempProfileData &&
+        initialUser &&
+        !isProcessingProfile &&
+        !hasAttemptedProfileCreation.current
+      ) {
+        hasAttemptedProfileCreation.current = true; // Mark as attempted immediately
+
         try {
           setIsProcessingProfile(true);
           const profileData = JSON.parse(tempProfileData);
 
-          // Use UPSERT to handle both new profiles and existing empty profiles (from triggers)
-          const { error: upsertError } = await supabase.from('users').upsert(
-            {
-              id: initialUser.id,
-              email: initialUser.email,
-              name: profileData.name,
-              phone: profileData.phone,
-              gender: profileData.gender || null,
-              institute: profileData.institute,
-              stream: profileData.stream,
-              division: profileData.group,
-              batch: profileData.batch,
-              role: 'Student',
-              status: 'Active',
-              subscription: {
-                plan: 'Free',
-                expiry: new Date(
-                  Date.now() + 365 * 24 * 60 * 60 * 1000,
-                ).toISOString(),
-                status: 'Active',
-              },
-              xp: 0,
-              level: 'Beginner',
-              examsTaken: 0,
-              enrolledExams: 0,
-              lastActive: new Date().toISOString(),
+          toast.info('আপনার প্রোফাইল সম্পূর্ণ করা হচ্ছে...', {
+            duration: 2000,
+          });
+
+          // Call API to create profile securely
+          const response = await fetch('/api/auth/complete-profile', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
             },
-            { onConflict: 'id' },
-          );
+            body: JSON.stringify({ profileData }),
+          });
 
-          if (upsertError) throw upsertError;
+          const result = await response.json();
 
-          toast.success('প্রোফাইল তথ্য আপডেট করা হয়েছে!');
+          if (!response.ok) {
+            throw new Error(result.error || 'Failed to create profile');
+          }
 
-          // Small delay to allow DB propagation before reload
+          toast.success('প্রোফাইল সফলভাবে তৈরি হয়েছে!');
+
+          // Clear temp data ONLY on success
+          localStorage.removeItem('temp_signup_data');
+
+          // Small delay before reload
           setTimeout(() => {
             window.location.reload();
           }, 1000);
-
-          // Clear temp data
-          localStorage.removeItem('temp_signup_data');
         } catch (error) {
           console.error('Error creating profile from temp data:', error);
-          toast.error('প্রোফাইল তৈরিতে সমস্যা হয়েছে।');
+          toast.error(
+            'প্রোফাইল তৈরিতে সমস্যা হয়েছে। দয়া করে সাপোর্ট এ যোগাযোগ করুন।',
+          );
+          // Note: We do NOT clear localStorage here so user can try again by refreshing manually if it was a network error.
+          // But hasAttemptedProfileCreation prevents infinite loop in this session.
         } finally {
           setIsProcessingProfile(false);
         }
@@ -123,7 +123,7 @@ export default function StudentRoot({
     };
 
     checkAndCreateProfile();
-  }, [initialUser, supabase, isProcessingProfile]);
+  }, [initialUser, isProcessingProfile]);
 
   const {
     appState,

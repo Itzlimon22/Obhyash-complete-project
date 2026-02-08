@@ -17,7 +17,7 @@ export default function TermsPage() {
             <span className="text-xl font-bold text-slate-900 dark:text-white font-serif-exam">
               অভ্যাস
             </span>
-          </Link> It's likely that your database has an automated trigger that creates a blank user profile immediately upon Google authentication. 
+          </Link>
           <Link
             href="/"
             className="flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
