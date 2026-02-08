@@ -42,22 +42,43 @@ export default function AdminComplaintsPage() {
 
     try {
       // 1. Fetch Complaints from DB
-      const { data, error } = await supabase
+      const { data: complaintsData, error: complaintsError } = await supabase
         .from('app_complaints')
-        .select(
-          `
-          *,
-          user:users (
-            name,
-            email
-          )
-        `,
-        )
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (complaintsError) throw complaintsError;
 
-      setComplaints(data || []);
+      // 2. Fetch user details for each complaint
+      const userIds = [
+        ...new Set((complaintsData || []).map((c) => c.user_id)),
+      ];
+      let usersMap: Record<string, { name: string; email: string }> = {};
+
+      if (userIds.length > 0) {
+        const { data: usersData } = await supabase
+          .from('users')
+          .select('id, name, email')
+          .in('id', userIds);
+
+        if (usersData) {
+          usersMap = usersData.reduce(
+            (acc, user) => {
+              acc[user.id] = { name: user.name, email: user.email };
+              return acc;
+            },
+            {} as Record<string, { name: string; email: string }>,
+          );
+        }
+      }
+
+      // 3. Combine complaints with user info
+      const complaintsWithUsers = (complaintsData || []).map((c) => ({
+        ...c,
+        user: usersMap[c.user_id] || { name: 'Unknown', email: '' },
+      }));
+
+      setComplaints(complaintsWithUsers);
       if (showToast) toast.success('Complaints list updated');
     } catch (error) {
       console.error('Failed to fetch complaints:', error);
@@ -184,7 +205,9 @@ export default function AdminComplaintsPage() {
             />
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as ComplaintStatus | 'All')}
+              onChange={(e) =>
+                setStatusFilter(e.target.value as ComplaintStatus | 'All')
+              }
               className="w-full pl-12 pr-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none appearance-none transition-all font-medium"
             >
               <option value="All">All Statuses</option>

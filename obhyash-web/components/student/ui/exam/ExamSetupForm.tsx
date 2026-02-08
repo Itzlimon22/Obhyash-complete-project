@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -231,7 +231,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 text-xs font-bold uppercase tracking-wider">
-              Exam Setup
+              পরীক্ষা সেটআপ
             </span>
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
@@ -297,7 +297,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             <div className="bg-white dark:bg-neutral-900/50 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 space-y-4 shadow-sm">
               <div className="grid gap-4">
                 <TopicSelector
-                  title="অধ্যায় (Chapters)"
+                  title="অধ্যায়"
                   items={availableChapters.map((c) => c.name)}
                   selectedItems={availableChapters
                     .filter((c) => selectedChapters.includes(c.id))
@@ -310,7 +310,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 />
 
                 <TopicSelector
-                  title="টপিক (Topics)"
+                  title="টপিক"
                   items={availableTopics.map((t) => t.name)}
                   selectedItems={availableTopics
                     .filter((t) => selectedTopics.includes(t.id))
@@ -424,3 +424,4 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 };
 
 export default ExamSetupForm;
+

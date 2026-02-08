@@ -186,8 +186,8 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
         <div className="flex-1 px-4 py-6 md:px-8 max-w-4xl mx-auto w-full">
           {/* Header Info */}
           <div className="flex justify-between items-center mb-6 text-sm text-neutral-500 dark:text-neutral-400 font-medium sticky top-0 bg-[#f8fafc] dark:bg-black z-10 py-2 border-b border-neutral-200 dark:border-neutral-800">
-            <span>Total: {questions.length} Questions</span>
-            <span>Answered: {Object.keys(userAnswers).length}</span>
+            <span>মোট: {questions.length} টি প্রশ্ন</span>
+            <span>উত্তর দেওয়া: {Object.keys(userAnswers).length}</span>
           </div>
 
           <div className="space-y-6">
@@ -248,14 +248,14 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                       d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
                     />
                   </svg>
-                  {selectedScript ? 'Script Attached' : 'Capture OMR'}
+                  {selectedScript ? 'স্ক্রিপ্ট সংযুক্ত' : 'OMR ক্যাপচার'}
                 </button>
                 <button
                   onClick={handleSubmitRequest}
                   disabled={!selectedScript}
                   className="flex-1 sm:flex-none px-8 py-3 bg-indigo-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
                 >
-                  Submit Script
+                  স্ক্রিপ্ট জমা দিন
                 </button>
               </div>
             ) : (
