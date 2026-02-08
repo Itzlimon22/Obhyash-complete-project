@@ -1,8 +1,22 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
-import { OmrPrintModal } from '@/components/student/features/omr/OmrPrintModal';
-import { TopicSelector } from '@/components/student/features/exam/setup/TopicSelector';
+import {
+  BookOpen,
+  Layout,
+  Settings2,
+  Share2,
+  Sparkles,
+  Zap,
+} from 'lucide-react';
 import { toast } from 'sonner';
+
+import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import { ExamSettings } from '@/components/student/features/exam/setup/ExamSettings';
+import { TopicSelector } from '@/components/student/features/exam/setup/TopicSelector';
+import { OmrConfigModal } from '@/components/student/features/omr/OmrConfigModal';
+import { OmrPrintModal } from '@/components/student/features/omr/OmrPrintModal';
 
 interface ExamSetupFormProps {
   onStartExam: (config: ExamConfig) => void;
@@ -13,6 +27,7 @@ interface Subject {
   id: string;
   label: string;
   icon: string;
+  name?: string;
 }
 
 interface Item {
@@ -28,69 +43,39 @@ const STATIC_SUBJECT_ICONS: Record<string, string> = {
   Bangla: '📚',
   English: '📝',
   GK: '🌍',
+  ICT: '💻',
   default: '📖',
 };
-
-const EXAM_TYPE_OPTIONS = [
-  { id: 'Academic', label: 'Academic' },
-  { id: 'Medical Admission', label: 'Medical Admission' },
-  { id: 'Engineering Admission', label: 'Engineering Admission' },
-  { id: 'Varsity Admission', label: 'Varsity Admission' },
-  { id: 'Main Book', label: 'Main Book' },
-  { id: 'Mixed', label: 'Mixed' },
-];
-
-const DIFFICULTY_OPTIONS = [
-  { id: Difficulty.Easy, label: 'সহজ', color: 'emerald' },
-  { id: Difficulty.Medium, label: 'মধ্যম', color: 'amber' },
-  { id: Difficulty.Hard, label: 'কঠিন', color: 'red' },
-  { id: Difficulty.Mixed, label: 'মিশ্র', color: 'indigo' },
-];
-
-const NEGATIVE_MARKING_OPTIONS = [0, 0.25, 0.5, 1.0];
 
 const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   onStartExam,
   isLoading,
 }) => {
-  // --- New State for Database Data ---
+  // --- Data State ---
   const [availableSubjects, setAvailableSubjects] = useState<Subject[]>([]);
   const [availableChapters, setAvailableChapters] = useState<Item[]>([]);
   const [availableTopics, setAvailableTopics] = useState<Item[]>([]);
   const [isFetchingData, setIsFetchingData] = useState(true);
 
-  // Form State
+  // --- Form State ---
   const [subject, setSubject] = useState('');
-  // const [activeStep, setActiveStep] = useState(1); // 1: Subject, 2: Config (Unused currently)
-
-  const [examTypes, setExamTypes] = useState<string[]>(['Academic']);
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-
-  // Derived strings for API compatibility
-  const chapters = selectedChapters.join(',') || '';
-  const topics = selectedTopics.join(',') || '';
-
+  const [examTypes, setExamTypes] = useState<string[]>(['Academic']);
   const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.Mixed);
-  const [questionCount, setQuestionCount] = useState<number>(20);
-  const [duration, setDuration] = useState<number>(20);
+  const [questionCount, setQuestionCount] = useState<number>(25);
+  const [duration, setDuration] = useState<number>(25);
   const [negativeMarking, setNegativeMarking] = useState<number>(0.25);
 
-  // OMR Modal State
-  const [isOmrModalOpen, setIsOmrModalOpen] = useState(false);
-  const [omrSubject, setOmrSubject] = useState('');
-  const [omrChapter, setOmrChapter] = useState('');
-  const [omrTopic, setOmrTopic] = useState('');
-  const [omrCount, setOmrCount] = useState(50);
-  const [omrIsBlank, setOmrIsBlank] = useState(false);
+  // --- Modals State ---
+  const [isOmrConfigOpen, setIsOmrConfigOpen] = useState(false);
+  const [isOmrPrintOpen, setIsOmrPrintOpen] = useState(false);
+  const [omrDetails, setOmrDetails] = useState<ExamDetails | null>(null);
+  const [omrTotalQuestions, setOmrTotalQuestions] = useState(50);
 
-  // OMR Print Modal State
-  const [isOmrPrintModalOpen, setIsOmrPrintModalOpen] = useState(false);
-  const [omrPrintDetails, setOmrPrintDetails] = useState<ExamDetails | null>(
-    null,
-  );
+  // --- Data Fetching ---
 
-  // --- EFFECT: Fetch Subjects ---
+  // 1. Fetch Subjects on Mount
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
@@ -111,9 +96,10 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             label:
               sub.name_en === 'English'
                 ? 'English'
-                : `${sub.name_bn || sub.name} (${sub.name || sub.name_en})`,
+                : `${sub.name_bn || sub.name} (${sub.name || sub.name_en || ''})`,
             icon:
               sub.icon ||
+              STATIC_SUBJECT_ICONS[sub.name_en] ||
               STATIC_SUBJECT_ICONS[sub.id] ||
               STATIC_SUBJECT_ICONS.default,
             name: sub.name,
@@ -123,7 +109,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         }
       } catch (error) {
         console.error('Failed to fetch subjects:', error);
-        toast.error('বিষয় লোড করা যাচ্ছে না।');
+        toast.error('বিষয় তালিকা লোড করা যাচ্ছে না');
       } finally {
         setIsFetchingData(false);
       }
@@ -132,7 +118,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     fetchSubjects();
   }, []);
 
-  // --- EFFECT: Fetch Chapters when Subject changes ---
+  // 2. Fetch Chapters when Subject changes
   useEffect(() => {
     if (!subject) {
       setAvailableChapters([]);
@@ -147,23 +133,20 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         const { getChapters } = await import('@/services/database');
         const chaptersData = await getChapters(subject);
         setAvailableChapters(chaptersData);
-        // Clear dependent selections
         setSelectedChapters([]);
         setAvailableTopics([]);
         setSelectedTopics([]);
       } catch (error) {
         console.error('Failed to fetch chapters:', error);
-        toast.error('অধ্যায় লোড করা যাচ্ছে না।');
+        toast.error('অধ্যায় লোড করা যাচ্ছে না');
       }
     };
 
     fetchChapters();
   }, [subject]);
 
-  // --- EFFECT: Fetch Topics when Chapters change ---
+  // 3. Fetch Topics when Chapters change
   useEffect(() => {
-    // If no chapters selected, we might want to show ALL topics or NONE.
-    // For now, let's show topics if specific chapters are selected.
     if (selectedChapters.length === 0) {
       setAvailableTopics([]);
       setSelectedTopics([]);
@@ -173,10 +156,9 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     const fetchTopics = async () => {
       try {
         const { getTopics } = await import('@/services/database');
-        // Fetch topics for ALL selected chapters
         const topicsData = await getTopics(selectedChapters);
         setAvailableTopics(topicsData);
-        setSelectedTopics([]); // Reset topic selection when chapters change (or preserve if possible, but safer to reset)
+        setSelectedTopics([]);
       } catch (error) {
         console.error('Failed to fetch topics:', error);
       }
@@ -185,21 +167,29 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     fetchTopics();
   }, [selectedChapters]);
 
-  const toggleExamType = (typeId: string) => {
-    setExamTypes((prev) => {
-      if (prev.includes(typeId)) {
-        if (prev.length === 1) return prev;
-        return prev.filter((t) => t !== typeId);
-      } else {
-        return [...prev, typeId];
-      }
-    });
+  // --- Handlers ---
+
+  const handleTopicSelectionChange = (
+    type: 'chapters' | 'topics',
+    names: string[],
+  ) => {
+    if (type === 'chapters') {
+      const ids = availableChapters
+        .filter((c) => names.includes(c.name))
+        .map((c) => c.id);
+      setSelectedChapters(ids);
+    } else {
+      const ids = availableTopics
+        .filter((t) => names.includes(t.name))
+        .map((t) => t.id);
+      setSelectedTopics(ids);
+    }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleStartExam = async () => {
     if (!subject) {
       toast.error('অনুগ্রহ করে একটি বিষয় নির্বাচন করুন');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -208,22 +198,20 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
     try {
       await onStartExam({
-        subject: subject,
-        subjectLabel: subjectLabel,
+        subject,
+        subjectLabel,
         examType: examTypes.join(' + '),
-        chapters: chapters || 'All',
-        topics: topics || 'General',
+        chapters: selectedChapters.join(',') || 'All',
+        topics: selectedTopics.join(',') || 'General',
         difficulty,
         questionCount,
         durationMinutes: duration,
         negativeMarking,
       });
     } catch (error: any) {
-      // Error is handled in use-exam-engine mostly, but we catch here just in case wrapper doesn't separate it
-      // If onStartExam is async and throws, we can show toast here
-      if (error.message && error.message.includes('No questions')) {
+      if (error?.message?.includes('No questions')) {
         toast.error(
-          'এই টপিক বা অধ্যায়ের কোনো প্রশ্ন পাওয়া যায়নি। দয়া করে অন্য টপিক চেষ্টা করুন।',
+          'এই সেটিংসের জন্য পর্যাপ্ত প্রশ্ন নেই। দয়া করে অন্য অধ্যায় বা টপিক চেষ্টা করুন।',
         );
       } else {
         toast.error('পরীক্ষা শুরু করা যাচ্ছে না। আবার চেষ্টা করুন।');
@@ -231,486 +219,266 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     }
   };
 
-  const handleOmrDownload = () => {
-    const finalSubject = omrIsBlank
-      ? ''
-      : omrSubject || '______________________';
-    const finalChapter = omrIsBlank
-      ? ''
-      : omrChapter || '______________________';
-    const finalTopic = omrIsBlank ? '' : omrTopic || '______________________';
-
-    const details: ExamDetails = {
-      subject: finalSubject,
-      subjectLabel: finalSubject,
-      examType: omrIsBlank ? '' : 'Practice Exam',
-      chapters: finalChapter,
-      topics: finalTopic,
-      totalQuestions: omrCount,
-      durationMinutes: 0,
-      totalMarks: 0,
-      negativeMarking: 0,
-    };
-
-    setOmrPrintDetails(details);
-    setIsOmrPrintModalOpen(true);
-    setIsOmrModalOpen(false);
+  const handleOmrGenerate = (details: ExamDetails, total: number) => {
+    setOmrDetails(details);
+    setOmrTotalQuestions(total);
+    setIsOmrPrintOpen(true);
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto pb-24 px-4 md:px-0 font-sans">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div className="w-full max-w-6xl mx-auto pb-32 px-4 md:px-6 lg:px-8 font-sans animate-in fade-in duration-500">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pt-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-neutral-900 dark:text-white mb-2">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 text-xs font-bold uppercase tracking-wider">
+              Exam Setup
+            </span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
             কাস্টম এক্সাম
-          </h2>
-          <p className="text-neutral-500 dark:text-neutral-400 font-medium">
-            আপনার প্রস্তুতি যাচাই করতে নিজের মতো পরীক্ষা সাজান
+          </h1>
+          <p className="text-neutral-500 dark:text-neutral-400 mt-2 font-medium max-w-lg">
+            আপনার প্রস্তুতি যাচাই করতে নিজের পছন্দমতো বিষয় এবং প্যারামিটার সেট
+            করে পরীক্ষা দিন।
           </p>
         </div>
+
         <button
-          onClick={() => setIsOmrModalOpen(true)}
-          className="group flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-neutral-800 border-2 border-dashed border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-xl font-bold text-sm hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 dark:hover:border-indigo-500 transition-all"
+          onClick={() => setIsOmrConfigOpen(true)}
+          className="group flex items-center gap-3 px-5 py-3 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl font-bold text-neutral-600 dark:text-neutral-300 shadow-sm hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="w-5 h-5 group-hover:scale-110 transition-transform"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-            />
-          </svg>
-          OMR শিট ডাউনলোড
+          <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 transition-colors">
+            <Share2 className="w-4 h-4" />
+          </div>
+          <span>OMR শিট জেনারেটর</span>
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Subject Selection Grid */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <label className="text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-              বিষয় নির্বাচন করুন
-            </label>
-          </div>
-
-          {isFetchingData ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="h-24 bg-neutral-100 dark:bg-neutral-800 rounded-2xl animate-pulse"
-                ></div>
-              ))}
-            </div>
-          ) : availableSubjects.length === 0 ? (
-            <div className="text-center p-8 bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl border border-neutral-200 dark:border-neutral-800">
-              <p className="text-neutral-500">কোনো বিষয় খুঁজে পাওয়া যায়নি।</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {availableSubjects.map((sub) => (
-                <button
-                  key={sub.id}
-                  type="button"
-                  onClick={() => setSubject(sub.id)}
-                  className={`
-                                relative p-4 h-full flex flex-col items-center justify-center gap-3 rounded-2xl border-2 transition-all active:scale-95 duration-200
-                                ${
-                                  subject === sub.id
-                                    ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-600 dark:border-indigo-400 shadow-lg shadow-indigo-100 dark:shadow-none'
-                                    : 'bg-white dark:bg-neutral-900 border-neutral-100 dark:border-neutral-800 hover:border-indigo-200 dark:hover:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-800'
-                                }
-                            `}
-                >
-                  <span className="text-3xl filter drop-shadow-sm">
-                    {sub.icon}
-                  </span>
-                  <span
-                    className={`text-sm font-bold text-center leading-tight ${subject === sub.id ? 'text-indigo-700 dark:text-indigo-300' : 'text-neutral-700 dark:text-neutral-300'}`}
-                  >
-                    {sub.label.split('(')[0]}
-                  </span>
-                  {subject === sub.id && (
-                    <div className="absolute top-3 right-3 text-indigo-600 dark:text-indigo-400">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="w-5 h-5"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Configuration Section (Always visible but disabled state handling) */}
-        <div
-          className={`space-y-8 transition-all duration-500 ${!subject ? 'opacity-50 pointer-events-none grayscale' : 'opacity-100'}`}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Left Col: Topics */}
-            <div className="space-y-6">
-              <div className="bg-neutral-50 dark:bg-neutral-800/40 p-6 rounded-3xl border border-neutral-100 dark:border-neutral-800">
-                <label className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-4 block">
-                  অধ্যায় ও টপিক (ঐচ্ছিক)
-                </label>
-                <div className="space-y-4">
-                  <div className="relative">
-                    <TopicSelector
-                      title="অধ্যায় (Chapters)"
-                      items={availableChapters.map((c) => c.name)} // Pass names for display
-                      selectedItems={availableChapters
-                        .filter((c) => selectedChapters.includes(c.id))
-                        .map((c) => c.name)}
-                      onChange={(names) => {
-                        // Map back names to IDs
-                        // NOTE: This assumes names are unique per subject, which is generally true but IDs are safer.
-                        // TopicSelector currently works with strings.
-                        // If we want to use IDs, TopicSelector needs to handle value vs label.
-                        // For now, let's map names back to IDs.
-                        const newIds = availableChapters
-                          .filter((c) => names.includes(c.name))
-                          .map((c) => c.id);
-                        setSelectedChapters(newIds);
-                      }}
-                      emptyLabel="No chapters found"
-                      disabled={!subject}
-                    />
-                  </div>
-                  <div className="relative">
-                    <TopicSelector
-                      title="টপিক (Topics)"
-                      items={availableTopics.map((t) => t.name)}
-                      selectedItems={availableTopics
-                        .filter((t) => selectedTopics.includes(t.id))
-                        .map((t) => t.name)}
-                      onChange={(names) => {
-                        const newIds = availableTopics
-                          .filter((t) => names.includes(t.name))
-                          .map((t) => t.id);
-                        setSelectedTopics(newIds);
-                      }}
-                      emptyLabel="No topics found (Select chapters first)"
-                      disabled={selectedChapters.length === 0}
-                    />
-                  </div>
-                  <p className="text-xs text-neutral-400 pl-1">
-                    * অধ্যায় নির্বাচন করলে সেই অধ্যায়ের টপিক আসবে
-                  </p>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+        {/* Left Column: Selection (Subject & Topics) */}
+        <div className="lg:col-span-7 space-y-10">
+          {/* 1. Subject Selection */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xs">
+                  1
                 </div>
-              </div>
-
-              <div className="bg-neutral-50 dark:bg-neutral-800/40 p-6 rounded-3xl border border-neutral-100 dark:border-neutral-800">
-                <label className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-4 block">
-                  পরীক্ষার ধরন
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {EXAM_TYPE_OPTIONS.map((type) => (
-                    <button
-                      key={type.id}
-                      type="button"
-                      onClick={() => toggleExamType(type.id)}
-                      className={`px-4 py-2 rounded-lg text-sm font-bold border transition-all ${
-                        examTypes.includes(type.id)
-                          ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-500/20'
-                          : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-neutral-300'
-                      }`}
-                    >
-                      {type.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Right Col: Difficulty & Time */}
-            <div className="space-y-6">
-              <div className="bg-white dark:bg-neutral-900 p-6 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-sm">
-                <label className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-4 block">
-                  কঠিনতার স্তর
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  {DIFFICULTY_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => setDifficulty(opt.id as Difficulty)}
-                      className={`
-                                        p-3 rounded-xl border-2 text-center transition-all
-                                        ${
-                                          difficulty === opt.id
-                                            ? `bg-${opt.color}-50 dark:bg-${opt.color}-900/20 border-${opt.color}-500 text-${opt.color}-700 dark:text-${opt.color}-400`
-                                            : 'border-neutral-100 dark:border-neutral-800 text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-800'
-                                        }
-                                    `}
-                    >
-                      <span className="block font-bold text-sm">
-                        {opt.label}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-neutral-50 dark:bg-neutral-800/40 p-5 rounded-2xl border border-neutral-100 dark:border-neutral-800">
-                  <label className="text-xs font-bold text-neutral-500 mb-2 block">
-                    প্রশ্ন সংখ্যা
-                  </label>
-                  <input
-                    type="number"
-                    value={questionCount}
-                    onChange={(e) =>
-                      setQuestionCount(
-                        Math.min(
-                          100,
-                          Math.max(5, parseInt(e.target.value) || 20),
-                        ),
-                      )
-                    }
-                    className="w-full bg-transparent text-2xl font-black text-neutral-800 dark:text-white outline-none border-b-2 border-dashed border-neutral-300 focus:border-indigo-500 transition-colors py-1"
-                  />
-                </div>
-                <div className="bg-neutral-50 dark:bg-neutral-800/40 p-5 rounded-2xl border border-neutral-100 dark:border-neutral-800">
-                  <label className="text-xs font-bold text-neutral-500 mb-2 block">
-                    সময় (মিনিট)
-                  </label>
-                  <input
-                    type="number"
-                    value={duration}
-                    onChange={(e) =>
-                      setDuration(
-                        Math.min(
-                          180,
-                          Math.max(5, parseInt(e.target.value) || 20),
-                        ),
-                      )
-                    }
-                    className="w-full bg-transparent text-2xl font-black text-neutral-800 dark:text-white outline-none border-b-2 border-dashed border-neutral-300 focus:border-indigo-500 transition-colors py-1"
-                  />
-                </div>
-              </div>
-
-              <div className="bg-neutral-50 dark:bg-neutral-800/40 p-5 rounded-2xl border border-neutral-100 dark:border-neutral-800">
-                <label className="text-xs font-bold text-neutral-500 mb-3 block">
-                  নেগেটিভ মার্কিং
-                </label>
-                <div className="flex bg-white dark:bg-neutral-900 p-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700">
-                  {NEGATIVE_MARKING_OPTIONS.map((val) => (
-                    <button
-                      key={val}
-                      type="button"
-                      onClick={() => setNegativeMarking(val)}
-                      className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${negativeMarking === val ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300' : 'text-neutral-400 hover:text-neutral-600'}`}
-                    >
-                      {val}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Sticky Action Bar */}
-          <div className="pt-6 sticky bottom-4 z-20">
-            <button
-              type="submit"
-              disabled={isLoading || !subject}
-              className="w-full group relative overflow-hidden bg-gradient-to-r from-neutral-900 to-neutral-800 dark:from-indigo-600 dark:to-indigo-500 text-white font-bold py-4 rounded-2xl shadow-xl shadow-neutral-500/20 dark:shadow-indigo-500/20 hover:shadow-2xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            >
-              <div className="relative z-10 flex items-center justify-center gap-3">
-                {isLoading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>প্রশ্ন তৈরি হচ্ছে...</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-lg">পরীক্ষা শুরু করুন</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2.5}
-                      stroke="currentColor"
-                      className="w-5 h-5 group-hover:translate-x-1 transition-transform"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                      />
-                    </svg>
-                  </>
-                )}
-              </div>
-              {/* Shine Effect */}
-              <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine" />
-            </button>
-          </div>
-        </div>
-      </form>
-
-      {/* Legacy OMR Modal (Preserved Functionality) */}
-      {isOmrModalOpen && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-sm animate-fade-in">
-          {/* ... Simply reusing the content logic for OMR Modal but styled cleaner if needed. Content omitted for brevity but strictly keeping functionality ... */}
-          {/* Re-implementing OMR Modal Content inline for completeness or keeping original if user wants exact same modal. Users request was "redesign form". I will keep the modal markup but slightly cleaned. */}
-          <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl max-w-lg w-full p-8 border border-neutral-100 dark:border-neutral-800">
-            <div className="flex justify-between items-center mb-8">
-              <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">
-                OMR শিট প্রিন্ট
+                বিষয় নির্বাচন
               </h3>
-              <button
-                onClick={() => setIsOmrModalOpen(false)}
-                className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18 18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+              {availableSubjects.length > 0 && !isFetchingData && (
+                <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest">
+                  {availableSubjects.length} টি বিষয় পাওয়া গেছে
+                </span>
+              )}
             </div>
 
-            <div className="space-y-6">
-              {/* Blank Option */}
-              <div
-                onClick={() => setOmrIsBlank(!omrIsBlank)}
-                className={`cursor-pointer p-4 rounded-2xl border-2 transition-all flex items-center justify-between ${omrIsBlank ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20' : 'border-neutral-200 dark:border-neutral-700'}`}
-              >
-                <div>
-                  <div className="font-bold text-neutral-900 dark:text-white">
-                    ব্ল্যাঙ্ক শিট (Blank)
-                  </div>
-                  <div className="text-xs text-neutral-500">
-                    হাতে লিখে তথ্য পূরণ করার জন্য
-                  </div>
-                </div>
-                <div
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${omrIsBlank ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-neutral-300'}`}
-                >
-                  {omrIsBlank && (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="w-4 h-4"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                </div>
-              </div>
-
-              <div
-                className={`space-y-4 transition-all ${omrIsBlank ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}
-              >
-                <div>
-                  <label className="text-xs font-bold text-neutral-500 uppercase mb-1 block">
-                    বিষয়
-                  </label>
-                  <input
-                    type="text"
-                    value={omrSubject}
-                    onChange={(e) => setOmrSubject(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 font-medium"
-                    placeholder="উদাঃ পদার্থবিজ্ঞান"
+            {isFetchingData ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div
+                    key={i}
+                    className="h-32 bg-neutral-100 dark:bg-neutral-800/50 rounded-2xl animate-pulse"
                   />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-bold text-neutral-500 uppercase mb-1 block">
-                      অধ্যায়
-                    </label>
-                    <input
-                      type="text"
-                      value={omrChapter}
-                      onChange={(e) => setOmrChapter(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 font-medium"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-neutral-500 uppercase mb-1 block">
-                      টপিক
-                    </label>
-                    <input
-                      type="text"
-                      value={omrTopic}
-                      onChange={(e) => setOmrTopic(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-950 font-medium"
-                    />
-                  </div>
-                </div>
+                ))}
               </div>
+            ) : availableSubjects.length === 0 ? (
+              <div className="p-8 text-center bg-neutral-50 dark:bg-neutral-800/30 rounded-2xl border-2 border-dashed border-neutral-200 dark:border-neutral-800">
+                <p className="text-neutral-500 font-medium">
+                  কোনো বিষয় পাওয়া যায়নি।
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {availableSubjects.map((sub) => {
+                  const isSelected = subject === sub.id;
+                  return (
+                    <button
+                      key={sub.id}
+                      onClick={() => setSubject(sub.id)}
+                      className={cn(
+                        'group relative flex flex-col items-center justify-center gap-3 p-4 h-32 rounded-2xl border-2 transition-all duration-300',
+                        isSelected
+                          ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-500 shadow-xl shadow-rose-500/10 scale-[1.02]'
+                          : 'bg-white dark:bg-neutral-900 border-neutral-100 dark:border-neutral-800 hover:border-rose-200 dark:hover:border-rose-900/50 hover:shadow-lg hover:-translate-y-1',
+                      )}
+                    >
+                      <span className="text-4xl filter drop-shadow-sm group-hover:scale-110 transition-transform duration-300">
+                        {sub.icon}
+                      </span>
+                      <span
+                        className={cn(
+                          'text-sm font-bold text-center leading-tight max-w-[90%]',
+                          isSelected
+                            ? 'text-rose-700 dark:text-rose-300'
+                            : 'text-neutral-600 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white',
+                        )}
+                      >
+                        {sub.label.split('(')[0]}
+                      </span>
 
-              <div>
-                <div className="flex justify-between mb-2">
-                  <label className="text-xs font-bold text-neutral-500 uppercase">
-                    প্রশ্ন সংখ্যা
-                  </label>
-                  <span className="text-xs font-bold text-indigo-600">
-                    {omrCount}
-                  </span>
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center text-white animate-in zoom-in">
+                          <Zap size={10} fill="currentColor" />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          {/* 2. Topics Selection */}
+          <section
+            className={cn(
+              'space-y-6 transition-all duration-500 delay-100',
+              !subject
+                ? 'opacity-40 pointer-events-none grayscale blur-[1px]'
+                : 'opacity-100',
+            )}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-neutral-200 text-neutral-600 flex items-center justify-center text-xs">
+                  2
                 </div>
-                <input
-                  type="range"
-                  min="10"
-                  max="100"
-                  step="5"
-                  value={omrCount}
-                  onChange={(e) => setOmrCount(parseInt(e.target.value))}
-                  className="w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                অধ্যায় ও টপিক (ঐচ্ছিক)
+              </h3>
+            </div>
+
+            <div className="bg-neutral-50 dark:bg-neutral-900/50 rounded-3xl p-6 border border-neutral-100 dark:border-neutral-800 space-y-4">
+              <div className="grid gap-4">
+                <TopicSelector
+                  title="অধ্যায় (Chapters)"
+                  // We map items to strings for the selector
+                  items={availableChapters.map((c) => c.name)}
+                  selectedItems={availableChapters
+                    .filter((c) => selectedChapters.includes(c.id))
+                    .map((c) => c.name)}
+                  onChange={(names) =>
+                    handleTopicSelectionChange('chapters', names)
+                  }
+                  disabled={!subject}
+                  emptyLabel="এই বিষয়ের জন্য কোনো অধ্যায় পাওয়া যায়নি"
+                />
+
+                <TopicSelector
+                  title="টপিক (Topics)"
+                  items={availableTopics.map((t) => t.name)}
+                  selectedItems={availableTopics
+                    .filter((t) => selectedTopics.includes(t.id))
+                    .map((t) => t.name)}
+                  onChange={(names) =>
+                    handleTopicSelectionChange('topics', names)
+                  }
+                  disabled={selectedChapters.length === 0}
+                  emptyLabel="আগে অধ্যায় নির্বাচন করুন"
                 />
               </div>
 
-              <button
-                onClick={handleOmrDownload}
-                className="w-full py-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg shadow-lg shadow-indigo-200 dark:shadow-none transition-all mt-4"
-              >
-                PDF ডাউনলোড
-              </button>
+              {selectedChapters.length > 0 && selectedTopics.length === 0 && (
+                <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-xs text-blue-700 dark:text-blue-300">
+                  <BookOpen size={14} className="mt-0.5 shrink-0" />
+                  <p>
+                    আপনি কোনো নির্দিষ্ট টপিক সিলেক্ট না করলে নির্বাচিত
+                    অধ্যায়গুলোর সব টপিক থেকে প্রশ্ন আসবে।
+                  </p>
+                </div>
+              )}
             </div>
+          </section>
+        </div>
+
+        {/* Right Column: Settings & Actions */}
+        <div className="lg:col-span-5 space-y-8">
+          <div className="lg:sticky lg:top-24 space-y-8">
+            <section
+              className={cn(
+                'space-y-4 transition-all duration-500 delay-200',
+                !subject
+                  ? 'opacity-40 pointer-events-none grayscale'
+                  : 'opacity-100',
+              )}
+            >
+              <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-neutral-200 text-neutral-600 flex items-center justify-center text-xs">
+                  3
+                </div>
+                সেটিংস ও কনফিগারেশন
+              </h3>
+
+              <div className="bg-white dark:bg-neutral-900 rounded-3xl p-1 border border-neutral-200 dark:border-neutral-800 shadow-xl shadow-neutral-200/50 dark:shadow-none">
+                <div className="p-5">
+                  <ExamSettings
+                    examTypes={examTypes}
+                    setExamTypes={setExamTypes}
+                    difficulty={difficulty}
+                    setDifficulty={setDifficulty}
+                    questionCount={questionCount}
+                    setQuestionCount={setQuestionCount}
+                    duration={duration}
+                    setDuration={setDuration}
+                    negativeMarking={negativeMarking}
+                    setNegativeMarking={setNegativeMarking}
+                  />
+                </div>
+
+                {/* Submit Area */}
+                <div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-b-3xl border-t border-neutral-100 dark:border-neutral-800">
+                  <button
+                    onClick={handleStartExam}
+                    disabled={isLoading || !subject}
+                    className="w-full group relative overflow-hidden bg-rose-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-rose-500/30 hover:shadow-rose-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+                  >
+                    <div className="relative z-10 flex items-center justify-center gap-3">
+                      {isLoading ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>প্রশ্ন তৈরি হচ্ছে...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles
+                            size={18}
+                            className="group-hover:rotate-12 transition-transform"
+                          />
+                          <span className="text-lg">পরীক্ষা শুরু করুন</span>
+                        </>
+                      )}
+                    </div>
+                    {/* Animated Shine */}
+                    {!isLoading && subject && (
+                      <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-hover:animate-shine" />
+                    )}
+                  </button>
+                  <p className="text-center text-[10px] text-neutral-400 mt-3 font-medium">
+                    পরবর্তী ধাপে নির্দেশাবলী দেখানো হবে
+                  </p>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* OMR Print Preview */}
-      {omrPrintDetails && (
+      {/* Modals */}
+      <OmrConfigModal
+        isOpen={isOmrConfigOpen}
+        onClose={() => setIsOmrConfigOpen(false)}
+        onGenerate={handleOmrGenerate}
+        initialSubject={
+          availableSubjects.find((s) => s.id === subject)?.label || subject
+        }
+      />
+
+      {omrDetails && (
         <OmrPrintModal
-          isOpen={isOmrPrintModalOpen}
-          onClose={() => setIsOmrPrintModalOpen(false)}
-          details={omrPrintDetails}
-          totalQuestions={omrCount}
+          isOpen={isOmrPrintOpen}
+          onClose={() => setIsOmrPrintOpen(false)}
+          details={omrDetails}
+          totalQuestions={omrTotalQuestions}
         />
       )}
     </div>

@@ -203,6 +203,15 @@ export default function StudentRoot({
         setAppState(AppState.IDLE);
         setIsReviewingHistory(false);
       }
+
+      if (tab === 'complaint') {
+        import('next/navigation').then(({ useRouter }) => {
+          // We can't use useRouter hook conditionally, but we can access window location
+          window.location.href = '/complaint';
+        });
+        return;
+      }
+
       setActiveTab(tab);
     }
   };
