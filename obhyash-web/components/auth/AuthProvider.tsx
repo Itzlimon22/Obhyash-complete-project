@@ -5,7 +5,6 @@ import {
   useContext,
   useEffect,
   useState,
-  useRef,
   ReactNode,
 } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -39,7 +38,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const supabase = createClient();
-  const hasAttemptedProfileCreation = useRef(false);
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -60,54 +58,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const handleProfileCreation = async (currentUser: User) => {
-    // Only attempt once per session/mount to avoid loops
-    if (hasAttemptedProfileCreation.current) return;
-
-    const tempProfileData = localStorage.getItem('temp_signup_data');
-    if (!tempProfileData) return;
-
-    hasAttemptedProfileCreation.current = true;
-
-    try {
-      const profileData = JSON.parse(tempProfileData);
-
-      toast.info('আপনার প্রোফাইল সম্পূর্ণ করা হচ্ছে...', { duration: 2000 });
-
-      // Call API to create profile securely
-      const response = await fetch('/api/auth/complete-profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ profileData }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to create profile');
-      }
-
-      toast.success('প্রোফাইল সফলভাবে তৈরি হয়েছে!');
-
-      // Clear temp data
-      localStorage.removeItem('temp_signup_data');
-
-      // Fetch the newly created profile
-      const newProfile = await fetchProfile(currentUser.id);
-      if (newProfile) {
-        setProfile(newProfile);
-      }
-
-      // Refresh the page or redirect to ensure app state is consistent
-      router.refresh();
-    } catch (error) {
-      console.error('Error creating profile from temp data:', error);
-      toast.error('প্রোফাইল তৈরিতে সমস্যা হয়েছে।');
-    }
-  };
-
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -124,9 +74,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
           if (userProfile) {
             setProfile(userProfile);
-          } else {
-            // 3. If no profile, check for temp data and create it
-            await handleProfileCreation(session.user);
           }
         } else {
           setUser(null);
@@ -153,8 +100,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           const userProfile = await fetchProfile(session.user.id);
           if (userProfile) {
             setProfile(userProfile);
-          } else {
-            await handleProfileCreation(session.user);
           }
         }
       } else {

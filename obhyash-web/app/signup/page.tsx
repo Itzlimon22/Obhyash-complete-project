@@ -90,6 +90,10 @@ export default function SignupPage() {
       if (!formData.email || !formData.password || !formData.confirmPassword) {
         return 'সব তথ্য পূরণ করতে হবে';
       }
+      // Strict Email Validation (Gmail included in standard format)
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        return 'সঠিক ইমেইল এড্রেস দিন (যেমন: example@gmail.com)';
+      }
       if (formData.password.length < 6) {
         return 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে';
       }
@@ -112,25 +116,6 @@ export default function SignupPage() {
   const handleBack = () => {
     setStep(step - 1);
     setError(null);
-  };
-
-  const handleGoogleSignup = () => {
-    // Save Step 1 & 2 data to localStorage before redirecting
-    const tempProfileData = {
-      name: formData.name,
-      phone: formData.phone,
-      gender: formData.gender,
-      institute: formData.institute,
-      stream: formData.stream,
-      group: formData.group,
-      batch: formData.batch,
-      role: 'Student', // Explicitly needed
-    };
-
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('temp_signup_data', JSON.stringify(tempProfileData));
-    }
-    // Button component handles the actual redirect
   };
 
   const handleSignup = async () => {
@@ -485,28 +470,6 @@ export default function SignupPage() {
                     </div>
                   </div>
                 </div>
-
-                <div className="relative py-2">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white dark:bg-slate-900 px-2 text-slate-500 dark:text-slate-400 font-bold">
-                      অথবা
-                    </span>
-                  </div>
-                </div>
-
-                <Suspense
-                  fallback={
-                    <div className="h-12 w-full bg-neutral-100 dark:bg-neutral-800 rounded-xl animate-pulse" />
-                  }
-                >
-                  <SocialLoginButton
-                    mode="signup"
-                    onBeforeRedirect={handleGoogleSignup}
-                  />
-                </Suspense>
               </div>
             )}
 

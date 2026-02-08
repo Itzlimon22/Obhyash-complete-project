@@ -7,6 +7,7 @@ import { createClient } from '@/utils/supabase/client';
 import { UserProfile } from '@/lib/types';
 import { toast } from 'sonner';
 import UserAvatar from '../common/UserAvatar';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 interface SettingsViewProps {
   user: UserProfile;
@@ -35,7 +36,41 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl); // Local state for immediate preview
 
   const [showPassword, setShowPassword] = useState(false);
-  const [isLinkedGoogle, setIsLinkedGoogle] = useState(false);
+
+  // Account Linking State
+  const { user: currentUser } = useAuth();
+  const [isLinking, setIsLinking] = useState(false);
+  const isGoogleLinked = currentUser?.identities?.some(
+    (identity) => identity.provider === 'google',
+  );
+
+  const handleLinkGoogle = async () => {
+    setIsLinking(true);
+    const supabase = createClient();
+    try {
+      const { data, error } = await supabase.auth.linkIdentity({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+      if (error) throw error;
+      // Redirect happens automatically
+    } catch (error: any) {
+      console.error('Linking error:', error);
+      if (
+        error.message?.includes('already linked') ||
+        error.code === 'identity_already_exists'
+      ) {
+        toast.error(
+          'এই গুগল অ্যাকাউন্টটি ইতিমধ্যেই অন্য একটি আইডির সাথে যুক্ত।',
+        );
+      } else {
+        toast.error('গুগল অ্যাকাউন্ট লিংক করতে সমস্যা হয়েছে।');
+      }
+      setIsLinking(false);
+    }
+  };
 
   const [formData, setFormData] = useState({
     name: user.name || '',
@@ -329,16 +364,47 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
           </div>
 
           <div className={inputGroupClass}>
-            <label className={labelClass}>ফোন নম্বর</label>
-            <input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="০১XXXXXXXXX"
-              maxLength={11}
-            />
+            <label className={labelClass}>
+              ফোন নম্বর
+              {user.phone && (
+                <span className="text-xs text-rose-500 ml-2">
+                  (পরিবর্তনযোগ্য নয়)
+                </span>
+              )}
+            </label>
+            <div className="relative">
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className={`${inputClass} ${
+                  user.phone
+                    ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 cursor-not-allowed'
+                    : ''
+                }`}
+                placeholder="০১XXXXXXXXX"
+                maxLength={11}
+                readOnly={!!user.phone}
+                disabled={!!user.phone}
+              />
+              {user.phone && (
+                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-neutral-400">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className={inputGroupClass}>
@@ -710,17 +776,31 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
               লিংক অ্যাকাউন্ট
             </span>
             <button
-              onClick={() => setIsLinkedGoogle(!isLinkedGoogle)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${isLinkedGoogle ? 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300' : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-500'}`}
+              onClick={handleLinkGoogle}
+              disabled={isGoogleLinked || isLinking}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${
+                isGoogleLinked
+                  ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 cursor-default'
+                  : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700'
+              }`}
             >
-              <Image
-                src="https://www.google.com/favicon.ico"
-                alt="Google"
-                width={16}
-                height={16}
-                className="w-4 h-4"
-              />
-              {isLinkedGoogle && (
+              {isLinking ? (
+                <Loader2 className="w-4 h-4 animate-spin text-slate-500" />
+              ) : (
+                <Image
+                  src="https://www.google.com/favicon.ico"
+                  alt="Google"
+                  width={16}
+                  height={16}
+                  className="w-4 h-4"
+                />
+              )}
+
+              <span className="text-sm font-medium">
+                {isGoogleLinked ? 'Connected' : 'Connect Google'}
+              </span>
+
+              {isGoogleLinked && (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
