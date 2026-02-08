@@ -72,18 +72,9 @@ export default function StudentRoot({
           setIsProcessingProfile(true);
           const profileData = JSON.parse(tempProfileData);
 
-          // Check if profile truly exists (double check)
-          const { data: existingProfile } = await supabase
-            .from('users')
-            .select('id')
-            .eq('id', initialUser.id)
-            .single();
-
-          if (!existingProfile) {
-            toast.info('আপনার প্রোফাইল তৈরি করা হচ্ছে...', { duration: 2000 });
-
-            // Create Profile
-            const { error: insertError } = await supabase.from('users').insert({
+          // Use UPSERT to handle both new profiles and existing empty profiles (from triggers)
+          const { error: upsertError } = await supabase.from('users').upsert(
+            {
               id: initialUser.id,
               email: initialUser.email,
               name: profileData.name,
@@ -107,14 +98,18 @@ export default function StudentRoot({
               examsTaken: 0,
               enrolledExams: 0,
               lastActive: new Date().toISOString(),
-            });
+            },
+            { onConflict: 'id' },
+          );
 
-            if (insertError) throw insertError;
+          if (upsertError) throw upsertError;
 
-            toast.success('প্রোফাইল সফলভাবে তৈরি হয়েছে!');
-            // Refresh to load new profile data into app state if needed
+          toast.success('প্রোফাইল তথ্য আপডেট করা হয়েছে!');
+
+          // Small delay to allow DB propagation before reload
+          setTimeout(() => {
             window.location.reload();
-          }
+          }, 1000);
 
           // Clear temp data
           localStorage.removeItem('temp_signup_data');
