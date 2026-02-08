@@ -329,7 +329,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           <div
             className={cn(
               'bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 space-y-6',
-              !subject && 'opacity-50 pointer-events-none',
+              !subject && 'opacity-70 pointer-events-none cursor-not-allowed',
             )}
           >
             {/* Chapter Selection */}
@@ -864,23 +864,59 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                     <label className="block text-xs font-bold text-neutral-500 uppercase mb-2">
                       বিষয় (Subject)
                     </label>
-                    <div className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-white text-sm font-bold truncate">
-                      {subject
-                        ? availableSubjects.find((s) => s.id === subject)
-                            ?.name || subject
-                        : '⚠️ আগে বিষয় নির্বাচন করুন'}
-                    </div>
+                    <select
+                      value={subject || ''}
+                      onChange={(e) => setSubject(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-white text-sm font-bold border-none focus:ring-2 focus:ring-rose-500/20"
+                    >
+                      <option value="" disabled>
+                        বিষয় নির্বাচন করুন
+                      </option>
+                      {availableSubjects.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.name || s.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-neutral-500 uppercase mb-2">
                       অধ্যায় (Chapters)
                     </label>
-                    <div className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-white text-sm font-bold truncate">
-                      {selectedChapters.length > 0
-                        ? selectedChapters.join(', ')
-                        : 'সব অধ্যায়'}
-                    </div>
+                    <button
+                      onClick={() => setIsChapterModalOpen(true)}
+                      className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-white text-sm font-bold flex justify-between items-center hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all"
+                    >
+                      <span className="truncate">
+                        {selectedChapters.length > 0
+                          ? selectedChapters.join(', ')
+                          : 'সব অধ্যায়'}
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-neutral-400" />
+                    </button>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-neutral-500 uppercase mb-2">
+                      টপিক (Topics)
+                    </label>
+                    <button
+                      onClick={() =>
+                        topicOptions.length > 0 && setIsTopicModalOpen(true)
+                      }
+                      disabled={topicOptions.length === 0}
+                      className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-white text-sm font-bold flex justify-between items-center hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <span className="truncate">
+                        {topicOptions.length === 0
+                          ? 'অধ্যায় নির্বাচন করুন'
+                          : selectedTopics.length === 0
+                            ? 'সব টপিক'
+                            : `${selectedTopics.length} টি নির্বাচিত`}
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-neutral-400" />
+                    </button>
                   </div>
                 </div>
               </div>

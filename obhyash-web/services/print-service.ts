@@ -372,7 +372,7 @@ export const printOMRSheet = (
             background: white;
             position: relative;
           }
-          .marker { position: absolute; width: 6mm; h-height: 6mm; bg-color: black; }
+          .marker { position: absolute; width: 6mm; height: 6mm; background-color: black; }
           .top-left { top: 8mm; left: 8mm; border-bottom-right-radius: 1mm; background: black; width: 6mm; height: 6mm; }
           .top-right { top: 8mm; right: 8mm; border-bottom-left-radius: 1mm; background: black; width: 6mm; height: 6mm; }
           .bottom-left { bottom: 8mm; left: 8mm; border-top-right-radius: 1mm; background: black; width: 6mm; height: 6mm; }
