@@ -55,7 +55,10 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   // --- Data State ---
   const [availableSubjects, setAvailableSubjects] = useState<Subject[]>([]);
   const [availableChapters, setAvailableChapters] = useState<Item[]>([]);
-  const [availableTopics, setAvailableTopics] = useState<Item[]>([]);
+  interface TopicItem extends Item {
+    chapter_id?: string;
+  }
+  const [availableTopics, setAvailableTopics] = useState<TopicItem[]>([]);
   const [isFetchingData, setIsFetchingData] = useState(true);
 
   // --- Form State ---
@@ -235,12 +238,8 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             </span>
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
-            কাস্টম এক্সাম
+            প্রশ্নপদ্ধতি নির্বাচন করুন
           </h1>
-          <p className="text-neutral-500 dark:text-neutral-400 mt-2 font-medium max-w-lg">
-            আপনার প্রস্তুতি যাচাই করতে নিজের পছন্দমতো বিষয় এবং প্যারামিটার সেট
-            করে পরীক্ষা দিন।
-          </p>
         </div>
 
         <button
@@ -312,6 +311,17 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 <TopicSelector
                   title="টপিক"
                   items={availableTopics.map((t) => t.name)}
+                  groupedItems={availableTopics.reduce(
+                    (acc, topic: any) => {
+                      const chapterName =
+                        availableChapters.find((c) => c.id === topic.chapter_id)
+                          ?.name || 'Other';
+                      if (!acc[chapterName]) acc[chapterName] = [];
+                      acc[chapterName].push(topic.name);
+                      return acc;
+                    },
+                    {} as Record<string, string[]>,
+                  )}
                   selectedItems={availableTopics
                     .filter((t) => selectedTopics.includes(t.id))
                     .map((t) => t.name)}
@@ -340,12 +350,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         <div className="lg:col-span-5 space-y-8">
           <div className="lg:sticky lg:top-24 space-y-8">
             <section
-              className={cn(
-                'space-y-4 transition-all duration-500 delay-200',
-                !subject
-                  ? 'opacity-40 pointer-events-none grayscale'
-                  : 'opacity-100',
-              )}
+              className={cn('space-y-4 transition-all duration-500 delay-200')}
             >
               <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
                 সেটিংস ও কনফিগারেশন
@@ -424,4 +429,3 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 };
 
 export default ExamSetupForm;
-
