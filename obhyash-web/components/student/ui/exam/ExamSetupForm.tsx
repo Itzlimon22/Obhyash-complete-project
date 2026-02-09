@@ -23,8 +23,7 @@ import {
 import { TopicSelector } from '@/components/student/features/exam/setup/TopicSelector';
 import { SubjectSelector } from '@/components/student/features/exam/setup/SubjectSelector';
 import { OmrConfigModal } from '@/components/student/features/omr/OmrConfigModal';
-import { OmrSheet } from '@/components/student/features/omr/OmrSheet';
-import Portal from '@/components/ui/portal';
+import { printOMRSheet } from '@/services/print-service';
 
 interface ExamSetupFormProps {
   onStartExam: (config: ExamConfig) => void;
@@ -80,8 +79,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   // --- Modals State ---
   const [isOmrConfigOpen, setIsOmrConfigOpen] = useState(false);
-  const [omrDetails, setOmrDetails] = useState<ExamDetails | null>(null);
-  const [omrTotalQuestions, setOmrTotalQuestions] = useState(50);
 
   // --- Data Fetching ---
 
@@ -227,11 +224,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   };
 
   const handleOmrGenerate = (details: ExamDetails, total: number) => {
-    setOmrDetails(details);
-    setOmrTotalQuestions(total);
-    setTimeout(() => {
-      window.print();
-    }, 500);
+    printOMRSheet(details, total);
   };
 
   const StartExamButton = ({ className }: { className?: string }) => (
@@ -417,19 +410,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         }
       />
 
-      {/* Hidden OMR Sheet for Printing */}
-      {omrDetails && (
-        <Portal>
-          <div className="hidden print:block fixed inset-0 z-[9999] bg-white h-screen w-screen">
-            <div className="print-content">
-              <OmrSheet
-                details={omrDetails}
-                totalQuestions={omrTotalQuestions}
-              />
-            </div>
-          </div>
-        </Portal>
-      )}
+      {/* OMR Sheet is now generated and printed via printOMRSheet service */}
     </div>
   );
 };
