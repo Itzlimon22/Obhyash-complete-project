@@ -875,7 +875,7 @@ HSC,Science,রসায়ন ১ম পত্র,ল্যাবরেটর�
                     onChange={(e) =>
                       setEditingData({
                         ...editingData,
-                        difficulty: e.target.value as any,
+                        difficulty: e.target.value as 'Easy' | 'Medium' | 'Hard',
                       })
                     }
                     className="w-full p-3 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-sm"

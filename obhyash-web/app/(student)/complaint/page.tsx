@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { submitComplaint } from '@/services/complaint-service';
 import { ComplaintType } from '@/lib/types';
 import { createClient } from '@/utils/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 const COMPLAINT_TYPES = [
   {
@@ -61,7 +62,7 @@ export default function ComplaintPage() {
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -118,8 +119,8 @@ export default function ComplaintPage() {
             Message Received!
           </h1>
           <p className="text-neutral-500 dark:text-neutral-400">
-            Our team has been alerted! We'll look into it and notify you as soon
-            as it's resolved. Redirecting you back to the dashboard...
+            Our team has been alerted! We&apos;ll look into it and notify you as soon
+            as it&apos;s resolved. Redirecting you back to the dashboard...
           </p>
           <Button
             variant="ghost"
@@ -155,7 +156,7 @@ export default function ComplaintPage() {
               Something <span className="text-rose-600">Bugging</span> You? 🐛
             </h1>
             <p className="text-neutral-500 dark:text-neutral-400 text-lg">
-              Tell us what's wrong or how we can make Obhyash better for you!
+              Tell us what{"'"}s wrong or how we can make Obhyash better for you!
             </p>
           </div>
           <div className="hidden sm:block">

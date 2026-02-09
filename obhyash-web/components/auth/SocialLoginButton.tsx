@@ -36,9 +36,9 @@ export default function SocialLoginButton({
       });
 
       if (error) throw error;
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error('Google login failed', {
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Unknown error',
       });
       setLoading(false);
     }

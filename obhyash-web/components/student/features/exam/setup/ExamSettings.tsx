@@ -233,7 +233,13 @@ export const NegativeMarkingSelection: React.FC<
 };
 
 // Main Export remains for compatibility, but Decomposed exports are primary.
-export const ExamSettings: React.FC<any> = (props) => {
+type ExamSettingsProps = ExamTypeSelectionProps &
+  DifficultySelectionProps &
+  QuestionCountSelectionProps &
+  TimeSelectionProps &
+  NegativeMarkingSelectionProps;
+
+export const ExamSettings: React.FC<ExamSettingsProps> = (props) => {
   return (
     <div className="space-y-6">
       <ExamTypeSelection {...props} />

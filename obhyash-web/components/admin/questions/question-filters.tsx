@@ -89,14 +89,6 @@ export const QuestionFiltersPanel: React.FC<QuestionFiltersProps> = ({
     });
   };
 
-  const hasActiveFilters =
-    filters.subject ||
-    filters.chapter ||
-    filters.topic ||
-    filters.difficulty ||
-    filters.status ||
-    filters.search;
-
   const [isExpanded, setIsExpanded] = useState(false);
 
   const hasActiveFilters =

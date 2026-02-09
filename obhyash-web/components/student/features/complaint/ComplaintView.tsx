@@ -100,18 +100,33 @@ export const ComplaintView: React.FC = () => {
   const [myComplaints, setMyComplaints] = useState<AppComplaint[]>([]);
   const [isLoadingComplaints, setIsLoadingComplaints] = useState(false);
 
-  const fetchMyComplaints = async () => {
+  useEffect(() => {
+    if (activeTab !== 'my') return;
+
+    let isMounted = true;
+
+    const fetchMyComplaints = async () => {
+      if (isMounted) setIsLoadingComplaints(true);
+      const data = await getComplaints(false);
+      if (isMounted) {
+        setMyComplaints(data);
+        setIsLoadingComplaints(false);
+      }
+    };
+
+    void fetchMyComplaints();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTab]);
+
+  const handleRefreshComplaints = async () => {
     setIsLoadingComplaints(true);
     const data = await getComplaints(false);
     setMyComplaints(data);
     setIsLoadingComplaints(false);
   };
-
-  useEffect(() => {
-    if (activeTab === 'my') {
-      fetchMyComplaints();
-    }
-  }, [activeTab]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -233,7 +248,7 @@ export const ComplaintView: React.FC = () => {
                 <span className="text-indigo-200">আমরা শুনছি।</span>
               </h1>
               <p className="text-indigo-100 text-lg md:text-xl font-medium leading-relaxed max-w-lg">
-                'অভ্যাস' প্ল্যাটফর্মকে আরও উন্নত করতে আপনার মতামত বা অভিযোগ
+                &apos;অভ্যাস&apos; প্ল্যাটফর্মকে আরও উন্নত করতে আপনার মতামত বা অভিযোগ
                 আমাদের জানান।
               </p>
             </div>
@@ -379,7 +394,7 @@ export const ComplaintView: React.FC = () => {
               আমার অভিযোগসমূহ
             </h2>
             <button
-              onClick={fetchMyComplaints}
+              onClick={handleRefreshComplaints}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-sm font-bold transition-colors"
             >
               <RefreshCcw

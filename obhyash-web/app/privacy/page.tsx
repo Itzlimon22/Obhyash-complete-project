@@ -5,6 +5,13 @@ import Link from 'next/link';
 import { Flame, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { POLICY_CONTENT } from '@/lib/constants/policies';
 
+interface Section {
+  id?: number;
+  title: string;
+  content: string | string[];
+  warning?: string;
+}
+
 export default function PrivacyPage() {
   const content = POLICY_CONTENT.privacy;
 
@@ -50,7 +57,7 @@ export default function PrivacyPage() {
       {/* Content */}
       <section className="py-16 px-6">
         <div className="max-w-3xl mx-auto space-y-12">
-          {content.sections.map((section: any, idx) => (
+          {content.sections.map((section: Section, idx) => (
             <div key={idx} className="space-y-4">
               <h2 className="text-2xl font-bold flex items-center gap-3 text-slate-900 dark:text-white">
                 <span className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 text-sm font-bold">

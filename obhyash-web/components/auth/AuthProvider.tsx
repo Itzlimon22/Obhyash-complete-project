@@ -70,7 +70,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           setUser(session.user);
 
           // 2. Fetch Profile
-          let userProfile = await fetchProfile(session.user.id);
+          const userProfile = await fetchProfile(session.user.id);
 
           if (userProfile) {
             setProfile(userProfile);
