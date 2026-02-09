@@ -45,9 +45,11 @@ export const getSubscriptionPlans = async (): Promise<SubscriptionPlan[]> => {
       billingCycle:
         plan.duration_days >= 365
           ? 'Yearly'
-          : plan.duration_days >= 30
-            ? 'Monthly'
-            : `${plan.duration_days} Days`,
+          : plan.duration_days >= 90
+            ? 'Quarterly'
+            : plan.duration_days >= 30
+              ? 'Monthly'
+              : `${plan.duration_days} Days`,
       features: plan.features || [],
       colorTheme:
         plan.color_theme ||
@@ -189,9 +191,11 @@ export const getUserActiveSubscription =
         billingCycle:
           plan.duration_days >= 365
             ? 'Yearly'
-            : plan.duration_days >= 30
-              ? 'Monthly'
-              : `${plan.duration_days} Days`,
+            : plan.duration_days >= 90
+              ? 'Quarterly'
+              : plan.duration_days >= 30
+                ? 'Monthly'
+                : `${plan.duration_days} Days`,
         features: plan.features || [],
         colorTheme: plan.display_name.toLowerCase().includes('year')
           ? 'emerald'

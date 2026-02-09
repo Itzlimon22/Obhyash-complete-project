@@ -161,6 +161,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
   const [activeDemoTab, setActiveDemoTab] = useState<
     'generate' | 'omr' | 'analytics'
   >('generate');
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const demoQuestion = {
     id: 1,
@@ -213,7 +214,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     {
       title: 'মাসিক (Monthly)',
       price: '১৪৯',
-      period: '/মাস',
+      period: '/১ মাস',
       features: [
         'আনলিমিটেড এক্সাম',
         'আনলিমিটেড OMR স্ক্যান',
@@ -247,19 +248,27 @@ const LandingPage: React.FC<LandingPageProps> = ({
   const faqs = [
     {
       q: 'Obhyash অ্যাপটি কি সম্পূর্ণ ফ্রি?',
-      a: "আমাদের একটি 'বেসিক' প্ল্যান আছে যা সম্পূর্ণ ফ্রি। তবে আনলিমিটেড এক্সাম এবং অ্যাডভান্সড ফিচারগুলোর জন্য প্রিমিয়াম সাবস্ক্রিপশন প্রয়োজন।",
+      a: "আমাদের একটি 'বেসিক' প্ল্যান আছে যা আজীবন ফ্রি। এতে প্রতিদিন ১টি ফ্রি এক্সাম এবং লিমিটেড ফিচার ব্যবহারের সুযোগ রয়েছে। তবে আনলিমিটেড এক্সাম, AI ব্যাখ্যা এবং অ্যাডভান্সড এনালাইসিস ব্যবহারের জন্য আপনাকে মাসিক বা ত্রৈমাসিক সাবস্ক্রিপশন নিতে হবে।",
     },
     {
       q: 'OMR স্ক্যান ফিচারটি কিভাবে কাজ করে?',
-      a: 'আপনি যেকোনো সাধারণ কাগজে পরীক্ষা দিয়ে আমাদের অ্যাপের মাধ্যমে ছবি তুললেই আমাদের AI সিস্টেম তা যাচাই করে ফলাফল জানিয়ে দিবে।',
+      a: 'বাসায় বসে সাধারণ কাগজে পরীক্ষা দিন এবং আমাদের অ্যাপের ক্যামেরা দিয়ে ওএমআর শিটটির ছবি তুলুন। আমাদের অত্যাধুনিক AI ২০ সেকেন্ডের মধ্যে আপনার খাতা মূল্যায়ন করে নির্ভুল স্কোর এবং সঠিক উত্তরের ব্যাখ্যা দেখাবে। এটি কোচিং সেন্টারের ওএমআর রিডারের মতোই কার্যকর।',
     },
     {
-      q: 'পেমেন্ট পদ্ধতি কি কি?',
-      a: 'বর্তমানে আমরা বিকাশ, নগদ এবং রকেটের মাধ্যমে পেমেন্ট গ্রহণ করছি। খুব শীঘ্রই কার্ড পেমেন্ট যুক্ত করা হবে।',
+      q: 'AI ব্যাখ্যা এবং সমাধান কতটা নির্ভুল?',
+      a: 'আমরা গুগল-এর শক্তিশালী Gemini AI ব্যবহার করি যা গাণিতিক সমস্যা এবং সৃজনশীল যুক্তিতে অত্যন্ত দক্ষ। এটি প্রতিটি ভুল উত্তরের পেছনে কারণ ব্যাখ্যা করে এবং সঠিক সমাধান বুঝতে সাহায্য করে। তবে আমরা সবসময় টেক্সটবুক ফলো করার পরামর্শ দেই।',
     },
     {
-      q: 'আমি কি মোবাইল থেকে পরীক্ষা দিতে পারবো?',
-      a: 'হ্যাঁ, Obhyash সম্পূর্ণ মোবাইল-ফ্রেন্ডলি। আপনি যেকোনো স্মার্টফোন, ট্যাবলেট বা কম্পিউটার থেকে এটি ব্যবহার করতে পারবেন।',
+      q: 'সাবস্ক্রিপশন পেমেন্ট করার পদ্ধতি কী?',
+      a: 'আমরা বাংলাদেশের জনপ্রিয় সব পেমেন্ট মেথড সাপোর্ট করি। আপনি bKash, নাগদ বা রকেটের মাধ্যমে খুব সহজেই পেমেন্ট করতে পারবেন। পেমেন্ট সম্পন্ন হওয়ার সাথে সাথেই আপনার অ্যাকাউন্ট প্রিমিয়াম ফিচারে আপডেট হয়ে যাবে।',
+    },
+    {
+      q: 'আমি কি একাধিক ডিভাইসে অ্যাপটি ব্যবহার করতে পারবো?',
+      a: 'হ্যাঁ, আপনি একই অ্যাকাউন্ট দিয়ে স্মার্টফোন, ট্যাবলেট এবং পিসিতে লগইন করতে পারবেন। আপনার সব এক্সাম রেকর্ড এবং ডাটা ক্লাউডে সুরক্ষিত থাকবে, ফলে আপনি যেকোনো ডিভাইস থেকে নিজের অগ্রগতি দেখতে পাবেন।',
+    },
+    {
+      q: 'প্রশ্নপত্র কি ডাউনলোড বা প্রিন্ট করা যায়?',
+      a: 'অবশ্যই! আমাদের প্রিমিয়াম ইউজাররা চাইলে যেকোনো কাস্টম প্রশ্নপত্র এবং ওএমআর শিট PDF আকারে ডাউনলোড করতে পারেন। এটি অফলাইনে পরীক্ষা দেওয়ার এবং প্র্যাকটিস করার জন্য অত্যন্ত সহায়ক।',
     },
   ];
 
@@ -988,21 +997,55 @@ const LandingPage: React.FC<LandingPageProps> = ({
             সচরাচর জিজ্ঞাসিত প্রশ্ন (FAQ)
           </h2>
         </div>
-        <div className="grid gap-4">
-          {faqs.map((faq, idx) => (
-            <div
-              key={idx}
-              className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-red-100 dark:border-neutral-800 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <h3 className="font-bold text-lg text-neutral-900 dark:text-white mb-2 flex items-start gap-3">
-                <span className="text-indigo-500 text-xl leading-none">Q.</span>
-                {faq.q}
-              </h3>
-              <p className="text-neutral-600 dark:text-neutral-400 pl-7 leading-relaxed">
-                {faq.a}
-              </p>
-            </div>
-          ))}
+        <div className="space-y-4">
+          {faqs.map((faq, idx) => {
+            const isOpen = openFaq === idx;
+            return (
+              <div
+                key={idx}
+                className={`bg-white dark:bg-neutral-900 rounded-2xl border transition-all duration-300 overflow-hidden ${isOpen ? 'border-indigo-500 shadow-md ring-1 ring-indigo-500/10' : 'border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md'}`}
+              >
+                <button
+                  onClick={() => setOpenFaq(isOpen ? null : idx)}
+                  className="w-full text-left p-6 flex items-start justify-between gap-4 group"
+                >
+                  <h3 className="font-bold text-lg text-neutral-900 dark:text-white flex items-start gap-3">
+                    <span
+                      className={`text-indigo-500 text-xl leading-none transition-transform duration-300 ${isOpen ? 'scale-110' : ''}`}
+                    >
+                      Q.
+                    </span>
+                    {faq.q}
+                  </h3>
+                  <div
+                    className={`mt-1 flex-shrink-0 w-6 h-6 rounded-full border border-neutral-200 dark:border-neutral-700 flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-indigo-500 border-indigo-500 text-white rotate-180' : 'text-neutral-400 group-hover:text-indigo-500 group-hover:border-indigo-500'}`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2.5}
+                      stroke="currentColor"
+                      className="w-3.5 h-3.5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                      />
+                    </svg>
+                  </div>
+                </button>
+                <div
+                  className={`transition-all duration-300 ease-in-out px-6 ${isOpen ? 'max-h-[500px] pb-6 opacity-100' : 'max-h-0 pb-0 opacity-0'}`}
+                >
+                  <div className="pl-7 text-neutral-600 dark:text-neutral-400 leading-relaxed border-t border-neutral-50 dark:border-neutral-800/50 pt-4">
+                    {faq.a}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 

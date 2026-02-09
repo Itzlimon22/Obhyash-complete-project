@@ -187,7 +187,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   ? '/বছর'
                   : plan.billingCycle === 'Monthly'
                     ? '/মাস'
-                    : plan.billingCycle,
+                    : plan.billingCycle === 'Quarterly'
+                      ? '/৩ মাস'
+                      : plan.billingCycle,
               features: plan.features,
               cta: isFree ? 'বিনামূল্যে শুরু করুন' : 'সাবস্ক্রাইব করুন',
               highlight: plan.isPopular,

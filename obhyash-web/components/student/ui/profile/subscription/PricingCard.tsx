@@ -72,6 +72,17 @@ const PricingCard: React.FC<PricingCardProps> = ({
             <span className="text-5xl sm:text-6xl font-black text-neutral-900 dark:text-white tracking-tighter">
               {plan.price}
             </span>
+            {!plan.price === false && plan.price > 0 && (
+              <span className="text-neutral-500 dark:text-neutral-400 font-bold text-sm sm:text-base mt-auto mb-1.5 sm:mb-2 ml-1">
+                {plan.billingCycle === 'Yearly'
+                  ? '/বছর'
+                  : plan.billingCycle === 'Monthly'
+                    ? '/মাস'
+                    : plan.billingCycle === 'Quarterly'
+                      ? '/৩ মাস'
+                      : `/${plan.billingCycle}`}
+              </span>
+            )}
           </div>
 
           <ul className="space-y-2 sm:space-y-3 w-full text-left mb-5 sm:mb-8">

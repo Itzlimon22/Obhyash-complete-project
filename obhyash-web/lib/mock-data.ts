@@ -252,7 +252,7 @@ export const MOCK_PLANS: SubscriptionPlan[] = [
     id: 'quarterly',
     name: '৩ মাসের বান্ডেল',
     price: 299,
-    billingCycle: 'Yearly',
+    billingCycle: 'Quarterly',
     currency: '৳',
     features: [
       'মাসিক প্ল্যানের সব সুবিধা',
