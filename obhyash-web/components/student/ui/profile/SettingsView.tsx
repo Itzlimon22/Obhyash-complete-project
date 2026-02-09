@@ -13,11 +13,7 @@ import { uploadAvatar } from '@/services/storage-service';
 
 interface SettingsViewProps {
   user: UserProfile;
-  onSave?: (
-    data: Omit<Partial<UserProfile>, 'avatarUrl'> & {
-      avatarUrl?: string | null;
-    },
-  ) => void;
+  onSave?: (data: Partial<UserProfile>) => void;
 }
 
 type SettingsUpdatePayload = {
@@ -255,7 +251,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
           dob: payload.dob ?? undefined,
           gender: payload.gender ?? undefined,
           address: payload.address ?? undefined,
-          avatarUrl: payload.avatar_url,
+          avatarUrl: payload.avatar_url ?? undefined,
         };
         onSave(uiUpdate);
         toast.success('সেটিংস সফলভাবে সেভ করা হয়েছে!', {
@@ -343,7 +339,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
               <button
                 onClick={() => {
                   setAvatarUrl(undefined);
-                  onSave?.({ avatarUrl: null });
+                  onSave?.({ avatarUrl: undefined });
                   toast.success('ছবি সরিয়ে নেওয়া হয়েছে।');
                 }}
                 className="mt-4 flex items-center gap-1.5 text-xs font-bold text-rose-500 hover:text-rose-600 transition-colors"
