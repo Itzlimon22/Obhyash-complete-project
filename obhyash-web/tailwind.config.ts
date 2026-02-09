@@ -21,12 +21,12 @@ const config = {
       colors: {
         // --- 🟢 NEW: Brand Colors ---
         brand: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          900: '#312e81',
+          50: '#fff1f2',
+          100: '#ffe4e6',
+          500: '#f43f5e',
+          600: '#e11d48',
+          700: '#be123c',
+          900: '#881337',
         },
         // --- 🟢 NEW: Custom Dark Backgrounds ---
         obsidian: {
@@ -90,7 +90,7 @@ const config = {
       boxShadow: {
         // --- 🟢 NEW: Custom Shadows ---
         glass: '0 4px 30px rgba(0, 0, 0, 0.1)',
-        glow: '0 0 15px rgba(99, 102, 241, 0.15)',
+        glow: '0 0 15px rgba(244, 63, 94, 0.15)',
         subtle: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
       },
       keyframes: {

@@ -147,33 +147,41 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-black p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-white dark:bg-black p-4 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div className="space-y-1">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white flex items-center gap-3">
-              <Flag className="text-rose-600" size={28} />
-              Report Management
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-0.5">
+            <h1 className="text-xl md:text-3xl font-black text-neutral-900 dark:text-white flex items-center gap-2.5 tracking-tight">
+              <Flag className="text-rose-600" size={24} />
+              Reports
             </h1>
-            <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+            <p className="text-neutral-500 dark:text-neutral-400 text-[11px] md:text-sm font-medium">
               Review and resolve user-submitted content issues
             </p>
           </div>
-          <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
-            <div className="overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-              <ReportStats {...stats} />
-            </div>
+          <div className="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto">
+            <ReportStats {...stats} />
             <button
               onClick={() => fetchReports(true)}
-              className="p-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-500 hover:text-rose-600 dark:hover:text-rose-400 transition-all shadow-sm shrink-0 active:scale-95"
+              className="p-2 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-500 hover:text-rose-600 dark:hover:text-rose-400 transition-all shadow-sm shrink-0 active:scale-95"
             >
               <RefreshCw
-                size={18}
+                size={16}
                 className={isRefreshing ? 'animate-spin' : ''}
               />
             </button>
           </div>
+        </div>
+
+        <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800">
+          <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-widest">
+            Showing{' '}
+            <span className="text-neutral-900 dark:text-white">
+              {reports.length}
+            </span>{' '}
+            active report(s)
+          </p>
         </div>
 
         {/* Main Table */}

@@ -50,7 +50,7 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
         </div>
         <button
           onClick={onAddMethod}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
         >
           <Plus className="w-3.5 h-3.5" />
           যুক্ত করুন

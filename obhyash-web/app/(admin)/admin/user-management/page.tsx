@@ -151,27 +151,27 @@ export default function UserManagementPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black p-6 lg:p-8">
-      <div className="max-w-[1600px] mx-auto space-y-8">
+    <div className="min-h-screen bg-white dark:bg-black p-4 lg:p-8">
+      <div className="max-w-[1600px] mx-auto space-y-4 md:space-y-8">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-6">
           <div>
-            <h1 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl lg:text-4xl font-bold text-neutral-900 dark:text-white tracking-tight">
               User Management
             </h1>
-            <p className="text-neutral-600 dark:text-neutral-400 mt-2">
+            <p className="text-xs lg:text-base text-neutral-600 dark:text-neutral-400 mt-1">
               Manage student accounts, roles, and permissions
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3">
             <button
               onClick={() => fetchUsers(true)}
               disabled={isRefreshing}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-sm font-medium rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm hover:shadow active:scale-[0.98] disabled:opacity-50"
+              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-medium rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-[0.98] disabled:opacity-50"
             >
               <RefreshCw
-                size={18}
+                size={16}
                 className={isRefreshing ? 'animate-spin' : ''}
               />
               <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
@@ -179,10 +179,10 @@ export default function UserManagementPage() {
 
             <button
               onClick={handleExport}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-sm font-medium rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm hover:shadow active:scale-[0.98]"
+              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-medium rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-[0.98]"
             >
-              <Download size={18} />
-              <span>Export CSV</span>
+              <Download size={16} />
+              <span>Export</span>
             </button>
           </div>
         </div>
@@ -191,66 +191,68 @@ export default function UserManagementPage() {
         <UserStatsCards stats={stats} isLoading={isLoading} />
 
         {/* Filters */}
-        <UserFilters
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          roleFilter={roleFilter}
-          setRoleFilter={setRoleFilter}
-          statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
-          showAdvancedFilters={showAdvancedFilters}
-          setShowAdvancedFilters={setShowAdvancedFilters}
-        />
+        <div className="space-y-4">
+          <UserFilters
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            roleFilter={roleFilter}
+            setRoleFilter={setRoleFilter}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            showAdvancedFilters={showAdvancedFilters}
+            setShowAdvancedFilters={setShowAdvancedFilters}
+          />
 
-        <AdvancedFilterBar
-          isOpen={showAdvancedFilters}
-          users={users}
-          onFilterChange={setAdvancedFilters}
-          onToggle={() => setShowAdvancedFilters(!showAdvancedFilters)}
-        />
+          <AdvancedFilterBar
+            isOpen={showAdvancedFilters}
+            users={users}
+            onFilterChange={setAdvancedFilters}
+            onToggle={() => setShowAdvancedFilters(!showAdvancedFilters)}
+          />
+        </div>
 
         {/* Bulk Actions Toolbar */}
         {selectedUsers.size > 0 && (
-          <div className="mt-4 p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-xl">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <p className="text-sm font-semibold text-rose-900 dark:text-rose-100">
+          <div className="p-3 md:p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div className="flex items-center justify-between md:justify-start gap-3">
+                <p className="text-xs md:text-sm font-bold text-rose-900 dark:text-rose-100">
                   {selectedUsers.size} user(s) selected
                 </p>
                 <button
                   onClick={() => setSelectedUsers(new Set())}
-                  className="text-sm text-rose-600 dark:text-rose-400 hover:underline"
+                  className="text-xs text-rose-600 dark:text-rose-400 font-bold hover:underline"
                 >
-                  Clear selection
+                  Clear
                 </button>
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={() => activeBulkAction('activate')}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-lg transition-all active:scale-[0.98] flex items-center gap-2"
+                  className="flex-1 md:flex-none px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] md:text-sm font-bold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
-                  <CheckCircle className="w-4 h-4" />
+                  <CheckCircle className="w-3.5 h-3.5" />
                   Activate
                 </button>
                 <button
                   onClick={() => activeBulkAction('deactivate')}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold rounded-lg transition-all active:scale-[0.98] flex items-center gap-2"
+                  className="flex-1 md:flex-none px-3 py-2 bg-amber-600 hover:bg-amber-500 text-white text-[11px] md:text-sm font-bold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
-                  <Clock className="w-4 h-4" />
+                  <Clock className="w-3.5 h-3.5" />
                   Deactivate
                 </button>
 
                 <div className="relative group">
                   <button
                     onClick={() => setShowBulkActions(!showBulkActions)}
-                    className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold rounded-lg transition-all active:scale-[0.98] flex items-center gap-2"
+                    className="flex-1 md:flex-none px-3 py-2 bg-rose-600 hover:bg-rose-500 text-white text-[11px] md:text-sm font-bold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                   >
-                    <Crown className="w-4 h-4" />
-                    Subscription
+                    <Crown className="w-3.5 h-3.5" />
+                    Sub
                   </button>
                   {showBulkActions && (
-                    <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 z-10">
+                    <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 z-50">
                       <div className="py-2">
                         <button
                           onClick={() => {
@@ -277,16 +279,16 @@ export default function UserManagementPage() {
 
                 <button
                   onClick={() => activeBulkAction('delete')}
-                  className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold rounded-lg transition-all active:scale-[0.98] flex items-center gap-2"
+                  className="flex-1 md:flex-none px-3 py-2 bg-rose-600 hover:bg-rose-500 text-white text-[11px] md:text-sm font-bold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                   Delete
                 </button>
                 <button
                   onClick={() => setShowBulkEmailModal(true)}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-lg transition-all active:scale-[0.98] flex items-center gap-2"
+                  className="flex-1 md:flex-none px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] md:text-sm font-bold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
-                  <Mail className="w-4 h-4" />
+                  <Mail className="w-3.5 h-3.5" />
                   Email
                 </button>
               </div>
@@ -294,14 +296,14 @@ export default function UserManagementPage() {
           </div>
         )}
 
-        <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+        <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800">
+          <p className="text-[10px] md:text-sm text-neutral-600 dark:text-neutral-400">
             Showing{' '}
-            <span className="font-semibold text-neutral-900 dark:text-white">
+            <span className="font-bold text-neutral-900 dark:text-white">
               {filteredUsers.length}
             </span>{' '}
             of{' '}
-            <span className="font-semibold text-neutral-900 dark:text-white">
+            <span className="font-bold text-neutral-900 dark:text-white">
               {users.length}
             </span>{' '}
             users

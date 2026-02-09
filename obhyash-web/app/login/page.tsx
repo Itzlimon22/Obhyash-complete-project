@@ -80,9 +80,6 @@ export default function LoginPage() {
 
         <div className="p-8 md:p-10 relative">
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-6">
-              <Logo size="lg" />
-            </div>
             <h4 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight">
               স্বাগতম!
             </h4>

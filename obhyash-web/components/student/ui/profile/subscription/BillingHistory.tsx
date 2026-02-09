@@ -93,7 +93,7 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
                 </span>
                 <button
                   onClick={() => onDownload(inv)}
-                  className="p-2 text-neutral-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
+                  className="p-2 text-neutral-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
                   title="ডাউনলোড"
                 >
                   <Download className="w-4 h-4" />

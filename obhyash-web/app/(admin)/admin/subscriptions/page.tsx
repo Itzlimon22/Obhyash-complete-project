@@ -525,38 +525,35 @@ export default function SubscriptionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black p-6 lg:p-8">
-      <div className="max-w-[1600px] mx-auto space-y-8">
+    <div className="min-h-screen bg-white dark:bg-black p-4 sm:p-6 lg:p-8">
+      <div className="max-w-[1600px] mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 border-b border-neutral-200 dark:border-neutral-800 pb-6">
           <div>
-            <h1 className="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white tracking-tight">
-              Subscriptions & Payments
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white tracking-tight">
+              সাবস্ক্রিপশন ও পেমেন্ট
             </h1>
-            <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-              Manage payment requests, subscriptions, and plans
-            </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => fetchData(true)}
               disabled={isRefreshing}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-sm font-medium rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm hover:shadow active:scale-[0.98] disabled:opacity-50"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs sm:text-sm font-medium rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-95 disabled:opacity-50"
             >
               <RefreshCw
-                size={18}
+                size={16}
                 className={isRefreshing ? 'animate-spin' : ''}
               />
-              <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+              <span>{isRefreshing ? 'লোডিং...' : 'রিফ্রেশ'}</span>
             </button>
 
             <button
               onClick={handleExport}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-sm font-medium rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm hover:shadow active:scale-[0.98]"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs sm:text-sm font-medium rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-95"
             >
-              <Download size={18} />
-              <span>Export CSV</span>
+              <Download size={16} />
+              <span>এক্সপোর্ট</span>
             </button>
 
             {activeTab === 'plans' && (
@@ -569,63 +566,67 @@ export default function SubscriptionsPage() {
                   });
                   setShowPlanModal(true);
                 }}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white text-sm font-semibold rounded-xl shadow-lg transition-all active:scale-[0.98]"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg shadow-rose-500/20 transition-all active:scale-95"
               >
-                <Plus size={18} />
-                <span>Create Plan</span>
+                <Plus size={16} />
+                <span>নতুন প্লান</span>
               </button>
             )}
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {[
             {
-              label: 'Total Revenue',
+              label: 'মোট আয়',
               value: `৳${stats.totalRevenue.toLocaleString()}`,
               icon: DollarSign,
               gradient: 'from-rose-500 to-red-500',
               bg: 'bg-rose-50 dark:bg-rose-500/10',
+              textColor: 'text-rose-600 dark:text-rose-400',
             },
             {
-              label: 'Pending Requests',
+              label: 'পেন্ডিং রিকোয়েস্ট',
               value: stats.pendingRequests,
               icon: Clock,
               gradient: 'from-amber-500 to-orange-500',
               bg: 'bg-amber-50 dark:bg-amber-500/10',
+              textColor: 'text-amber-600 dark:text-amber-400',
             },
             {
-              label: 'Active Subscriptions',
+              label: 'এক্টিভ ইউজার',
               value: stats.activeSubscriptions,
               icon: Users,
               gradient: 'from-rose-500 to-red-500',
               bg: 'bg-rose-50 dark:bg-rose-500/10',
+              textColor: 'text-rose-600 dark:text-rose-400',
             },
             {
-              label: 'Approval Rate',
+              label: 'অ্যাপ্রুভাল রেট',
               value: `${stats.approvalRate}%`,
               icon: TrendingUp,
               gradient: 'from-emerald-500 to-teal-500',
               bg: 'bg-emerald-50 dark:bg-emerald-500/10',
+              textColor: 'text-emerald-600 dark:text-emerald-400',
             },
           ].map((stat, i) => (
             <div
               key={i}
-              className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all"
+              className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-[1.5rem] border border-neutral-200/60 dark:border-neutral-800/60 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-2 sm:mb-4">
                 <div
-                  className={`p-3 rounded-xl ${stat.bg} bg-gradient-to-br ${stat.gradient} bg-clip-padding`}
+                  className={`p-2 sm:p-3 rounded-xl ${stat.bg} text-white bg-gradient-to-br ${stat.gradient}`}
                 >
-                  <stat.icon className="w-6 h-6 text-white" />
+                  <stat.icon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1">
+                <p className="text-[10px] sm:text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1">
                   {stat.label}
                 </p>
-                <p className="text-3xl font-bold text-neutral-900 dark:text-white">
+                <p className="text-lg sm:text-2xl lg:text-3xl font-bold text-neutral-900 dark:text-white">
                   {stat.value}
                 </p>
               </div>
@@ -634,19 +635,19 @@ export default function SubscriptionsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-neutral-200 dark:border-neutral-800">
+        <div className="flex gap-2 border-b border-neutral-200 dark:border-neutral-800 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
           {[
-            { id: 'requests', label: 'Payment Requests', icon: FileText },
-            { id: 'subscriptions', label: 'Active Subscriptions', icon: Crown },
-            { id: 'plans', label: 'Plans', icon: CreditCard },
+            { id: 'requests', label: 'পেমেন্ট রিকোয়েস্ট', icon: FileText },
+            { id: 'subscriptions', label: 'এক্টিভ ইউজার', icon: Crown },
+            { id: 'plans', label: 'প্লান ম্যানেজমেন্ট', icon: CreditCard },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`flex items-center gap-2 px-6 py-3 text-sm font-semibold border-b-2 transition-colors ${
+              className={`flex items-center gap-2 px-4 sm:px-6 py-3 text-[13px] sm:text-sm font-bold border-b-2 transition-colors shrink-0 whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'border-rose-600 text-rose-600 dark:text-rose-400'
-                  : 'border-transparent text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'
+                  : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'
               }`}
             >
               <tab.icon size={18} />
@@ -659,32 +660,32 @@ export default function SubscriptionsPage() {
         {activeTab === 'requests' && (
           <div className="space-y-6">
             {/* Filters */}
-            <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+              <div className="flex flex-col gap-4">
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
                   <input
                     type="text"
-                    placeholder="Search by name, email, or transaction ID..."
+                    placeholder="নাম, ইমেইল বা ট্রানজেকশন আইডি দিয়ে খুঁজুন..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
+                    className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-rose-500 transition-all text-sm"
                   />
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
                   {(['All', 'Pending', 'Approved', 'Rejected'] as const).map(
                     (status) => (
                       <button
                         key={status}
                         onClick={() => setStatusFilter(status)}
-                        className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
                           statusFilter === status
                             ? 'bg-rose-600 text-white shadow-md'
-                            : 'bg-neutral-50 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700'
+                            : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
                         }`}
                       >
-                        {status}
+                        {status === 'All' ? 'সবগুলো' : status}
                       </button>
                     ),
                   )}
@@ -692,16 +693,117 @@ export default function SubscriptionsPage() {
               </div>
             </div>
 
-            {/* Requests Table */}
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
+            {/* Mobile Card List (Visible on mobile only) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:hidden gap-3">
+              {filteredRequests.map((request) => (
+                <div
+                  key={request.id}
+                  className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-600 font-bold text-sm">
+                        {request.user?.name?.charAt(0) || '?'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-neutral-900 dark:text-white line-clamp-1">
+                          {request.user?.name || 'Unknown'}
+                        </p>
+                        <p className="text-[10px] text-neutral-500 dark:text-neutral-400 line-clamp-1">
+                          {request.user?.email || 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusColor(
+                        request.status,
+                      )}`}
+                    >
+                      {request.status}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 py-3 border-y border-neutral-100 dark:border-neutral-800">
+                    <div>
+                      <p className="text-[10px] text-neutral-400 font-bold uppercase">
+                        প্যাক
+                      </p>
+                      <p className="text-[13px] font-bold text-neutral-800 dark:text-neutral-200">
+                        {request.plan_name}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-neutral-400 font-bold uppercase">
+                        টাকা
+                      </p>
+                      <p className="text-[13px] font-bold text-rose-600 dark:text-rose-400">
+                        ৳{request.amount.toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-[10px] text-neutral-400 font-bold uppercase">
+                        Transaction ID
+                      </p>
+                      <p className="text-[11px] font-mono text-neutral-600 dark:text-neutral-400 truncate">
+                        {request.transaction_id || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    <div className="flex items-center gap-1.5 text-[10px] text-neutral-500">
+                      <Calendar size={12} />
+                      {new Date(request.requested_at).toLocaleDateString()}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {request.payment_proof_url && (
+                        <button
+                          onClick={() => {
+                            setSelectedProof(request.payment_proof_url);
+                            setShowProofModal(true);
+                          }}
+                          className="p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg transition-colors border border-blue-100 dark:border-blue-900/30"
+                        >
+                          <Eye size={16} />
+                        </button>
+                      )}
+                      {request.status === 'Pending' && (
+                        <>
+                          <button
+                            onClick={() => {
+                              setReviewingRequest(request);
+                              setReviewAction('approve');
+                              setShowReviewModal(true);
+                            }}
+                            className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-emerald-500/20"
+                          >
+                            <Check size={14} /> Approve
+                          </button>
+                          <button
+                            onClick={() => {
+                              setReviewingRequest(request);
+                              setReviewAction('reject');
+                              setShowReviewModal(true);
+                            }}
+                            className="flex items-center gap-1 px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-rose-500/20"
+                          >
+                            <X size={14} /> Reject
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Requests Table (Hidden on mobile) */}
+            <div className="hidden lg:block bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
               {filteredRequests.length === 0 ? (
                 <div className="py-24 flex flex-col items-center justify-center">
                   <FileText className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
                   <p className="text-neutral-600 dark:text-neutral-400 font-medium mb-2">
-                    No payment requests found
-                  </p>
-                  <p className="text-sm text-neutral-500 dark:text-neutral-500">
-                    Try adjusting your filters
+                    কোন রিকোয়েস্ট পাওয়া যায়নি
                   </p>
                 </div>
               ) : (
@@ -851,152 +953,230 @@ export default function SubscriptionsPage() {
 
         {/* Active Subscriptions Tab */}
         {activeTab === 'subscriptions' && (
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
-            {subscriptions.length === 0 ? (
-              <div className="py-24 flex flex-col items-center justify-center">
-                <Crown className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
-                <p className="text-neutral-600 dark:text-neutral-400 font-medium mb-2">
-                  No active subscriptions
-                </p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                        User
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                        Plan
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                        Started
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                        Expires
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
-                    {subscriptions.map((sub) => (
-                      <tr
-                        key={sub.id}
-                        className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+          <div className="space-y-4">
+            {/* Mobile Card List (Visible on mobile only) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:hidden gap-3">
+              {subscriptions.length === 0 ? (
+                <div className="py-24 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center">
+                  <Crown className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
+                  <p className="text-neutral-600 dark:text-neutral-400 font-medium">
+                    কোন এক্টিভ ইউজার নেই
+                  </p>
+                </div>
+              ) : (
+                subscriptions.map((sub) => (
+                  <div
+                    key={sub.id}
+                    className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 font-bold text-sm">
+                          <Crown size={18} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-neutral-900 dark:text-white line-clamp-1">
+                            {sub.user?.name || 'Unknown'}
+                          </p>
+                          <p className="text-[10px] text-neutral-500 dark:text-neutral-400 line-clamp-1">
+                            {sub.user?.email || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusColor(
+                          sub.is_active ? 'Active' : 'Expired',
+                        )}`}
                       >
-                        <td className="px-6 py-4">
-                          <div>
-                            <p className="text-sm font-semibold text-neutral-900 dark:text-white">
-                              {sub.user?.name || 'Unknown'}
-                            </p>
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                              {sub.user?.email || 'N/A'}
-                            </p>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <p className="text-sm font-medium text-neutral-900 dark:text-white flex items-center gap-2">
-                            <Crown className="w-4 h-4 text-amber-500" />
-                            {sub.plan?.display_name || 'Unknown Plan'}
-                          </p>
-                        </td>
-                        <td className="px-6 py-4">
-                          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                            {new Date(sub.started_at).toLocaleDateString()}
-                          </p>
-                        </td>
-                        <td className="px-6 py-4">
-                          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                            {new Date(sub.expires_at).toLocaleDateString()}
-                          </p>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusColor(
-                              sub.is_active ? 'Active' : 'Expired',
-                            )}`}
-                          >
-                            {sub.is_active ? (
-                              <CheckCircle className="w-3.5 h-3.5" />
-                            ) : (
-                              <XCircle className="w-3.5 h-3.5" />
-                            )}
-                            {sub.is_active ? 'Active' : 'Expired'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <button
-                            onClick={() => {
-                              setExtendingSubscription(sub);
-                              setShowExtendModal(true);
-                            }}
-                            className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
-                          >
-                            Extend
-                          </button>
-                        </td>
+                        {sub.is_active ? 'Active' : 'Expired'}
+                      </span>
+                    </div>
+
+                    <div className="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800">
+                      <div className="flex justify-between items-center mb-1">
+                        <p className="text-[10px] text-neutral-400 font-bold uppercase">
+                          প্যাক
+                        </p>
+                        <p className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                          {sub.plan?.display_name || 'Unknown'}
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-center text-[11px]">
+                        <span className="text-neutral-500">
+                          Exp: {new Date(sub.expires_at).toLocaleDateString()}
+                        </span>
+                        <span className="text-rose-600 font-bold">
+                          ৳{sub.plan?.price || 0}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-end pt-1">
+                      <button
+                        onClick={() => {
+                          setExtendingSubscription(sub);
+                          setShowExtendModal(true);
+                        }}
+                        className="w-full py-2 bg-rose-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-rose-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                      >
+                        <RefreshCw size={14} /> মেয়াদ বাড়ান
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Subscriptions Table (Hidden on mobile) */}
+            <div className="hidden lg:block bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
+              {subscriptions.length === 0 ? (
+                <div className="py-24 flex flex-col items-center justify-center">
+                  <Crown className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
+                  <p className="text-neutral-600 dark:text-neutral-400 font-medium">
+                    কোন এক্টিভ ইউজার পাওয়া যায়নি
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                          User
+                        </th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                          Plan
+                        </th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                          Started
+                        </th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                          Expires
+                        </th>
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                          Action
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    </thead>
+                    <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
+                      {subscriptions.map((sub) => (
+                        <tr
+                          key={sub.id}
+                          className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+                        >
+                          <td className="px-6 py-4">
+                            <div>
+                              <p className="text-sm font-semibold text-neutral-900 dark:text-white">
+                                {sub.user?.name || 'Unknown'}
+                              </p>
+                              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                {sub.user?.email || 'N/A'}
+                              </p>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-sm font-medium text-neutral-900 dark:text-white flex items-center gap-2">
+                              <Crown className="w-4 h-4 text-amber-500" />
+                              {sub.plan?.display_name || 'Unknown Plan'}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                              {new Date(sub.started_at).toLocaleDateString()}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                              {new Date(sub.expires_at).toLocaleDateString()}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusColor(
+                                sub.is_active ? 'Active' : 'Expired',
+                              )}`}
+                            >
+                              {sub.is_active ? (
+                                <CheckCircle className="w-3.5 h-3.5" />
+                              ) : (
+                                <XCircle className="w-3.5 h-3.5" />
+                              )}
+                              {sub.is_active ? 'Active' : 'Expired'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              onClick={() => {
+                                setExtendingSubscription(sub);
+                                setShowExtendModal(true);
+                              }}
+                              className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                            >
+                              Extend
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
         {/* Plans Tab */}
         {activeTab === 'plans' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {plans.map((plan) => (
               <div
                 key={plan.id}
-                className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all"
+                className="bg-white dark:bg-neutral-900 p-5 sm:p-6 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-neutral-900 dark:text-white">
-                      {plan.display_name}
-                    </h3>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-                      {plan.duration_days} days
+                <div>
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">
+                        {plan.display_name}
+                      </h3>
+                      <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 font-bold uppercase tracking-wider mt-1">
+                        মেয়াদ: {plan.duration_days} দিন
+                      </p>
+                    </div>
+                    <span
+                      className={`px-3 py-1 rounded-full text-[10px] font-bold ${
+                        plan.is_active
+                          ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                          : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'
+                      }`}
+                    >
+                      {plan.is_active ? 'এক্টিভ' : 'ইনএক্টিভ'}
+                    </span>
+                  </div>
+
+                  <div className="mb-6">
+                    <p className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-white">
+                      ৳{plan.price.toLocaleString()}
+                    </p>
+                    <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-bold uppercase">
+                      {plan.currency}
                     </p>
                   </div>
-                  <span
-                    className={`px-3 py-1 rounded-lg text-xs font-semibold ${
-                      plan.is_active
-                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'
-                    }`}
-                  >
-                    {plan.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
 
-                <div className="mb-6">
-                  <p className="text-3xl font-bold text-neutral-900 dark:text-white">
-                    ৳{plan.price.toLocaleString()}
-                  </p>
-                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                    {plan.currency}
-                  </p>
-                </div>
-
-                <div className="space-y-2 mb-6">
-                  {plan.features.map((feature, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400"
-                    >
-                      <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                      {feature}
-                    </div>
-                  ))}
+                  <div className="space-y-2 mb-8">
+                    {plan.features.map((feature, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-start gap-2 text-xs sm:text-sm text-neutral-600 dark:text-neutral-400"
+                      >
+                        <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+                        <span className="line-clamp-2">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="flex gap-2">
@@ -1005,16 +1185,16 @@ export default function SubscriptionsPage() {
                       setEditingPlan(plan);
                       setShowPlanModal(true);
                     }}
-                    className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold transition-all active:scale-[0.98]"
+                    className="flex-1 py-3 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 rounded-xl text-xs sm:text-sm font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5"
                   >
-                    <Edit className="w-4 h-4 inline mr-1" />
-                    Edit
+                    <Edit size={16} />
+                    এডিট
                   </button>
                   <button
                     onClick={() => handleDeletePlan(plan.id)}
-                    className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-sm font-semibold transition-all active:scale-[0.98]"
+                    className="py-3 px-4 bg-rose-50 dark:bg-rose-900/10 hover:bg-rose-100 dark:hover:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-xl transition-all active:scale-95 flex items-center justify-center"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </div>
@@ -1024,29 +1204,39 @@ export default function SubscriptionsPage() {
 
         {/* Payment Proof Modal */}
         {showProofModal && selectedProof && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-2xl w-full">
-              <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                  <ImageIcon className="w-5 h-5" />
-                  Payment Proof
+          <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-neutral-900 rounded-[2rem] shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-2xl w-full overflow-hidden">
+              <div className="p-4 sm:p-6 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-white dark:bg-neutral-900">
+                <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                  <ImageIcon size={20} className="text-rose-600" />
+                  পেমেন্ট প্রুফ (Proof)
                 </h3>
                 <button
                   onClick={() => {
                     setShowProofModal(false);
                     setSelectedProof(null);
                   }}
-                  className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors"
+                  className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full text-neutral-500 transition-colors"
                 >
-                  <X className="w-6 h-6" />
+                  <X size={20} />
                 </button>
               </div>
-              <div className="p-6">
+              <div className="p-4 sm:p-6 bg-neutral-50 dark:bg-neutral-950 max-h-[70vh] overflow-y-auto custom-scrollbar">
                 <img
                   src={selectedProof}
                   alt="Payment Proof"
-                  className="w-full rounded-xl"
+                  className="w-full rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-800"
                 />
+              </div>
+              <div className="p-4 border-t border-neutral-200 dark:border-neutral-800 flex justify-end bg-white dark:bg-neutral-900">
+                <a
+                  href={selectedProof}
+                  download
+                  target="_blank"
+                  className="px-6 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-xl text-sm font-bold hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all flex items-center gap-2"
+                >
+                  <Download size={16} /> ডাউনলোড
+                </a>
               </div>
             </div>
           </div>
@@ -1054,61 +1244,70 @@ export default function SubscriptionsPage() {
 
         {/* Review Modal */}
         {showReviewModal && reviewingRequest && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-md w-full">
+          <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-neutral-900 rounded-[2rem] shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-md w-full overflow-hidden">
               <div
-                className={`p-6 rounded-t-2xl ${
+                className={`p-6 ${
                   reviewAction === 'approve'
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600'
-                    : 'bg-gradient-to-r from-rose-600 to-red-600'
+                    ? 'bg-gradient-to-br from-emerald-600 to-teal-700'
+                    : 'bg-gradient-to-br from-rose-600 to-red-700'
                 }`}
               >
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                  {reviewAction === 'approve' ? (
-                    <CheckCircle className="w-6 h-6" />
-                  ) : (
-                    <XCircle className="w-6 h-6" />
-                  )}
-                  {reviewAction === 'approve' ? 'Approve' : 'Reject'} Payment
-                </h3>
-                <p className="text-white/80 text-sm mt-1">
-                  Review payment request from {reviewingRequest.user?.name}
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    {reviewAction === 'approve' ? (
+                      <CheckCircle className="w-6 h-6" />
+                    ) : (
+                      <XCircle className="w-6 h-6" />
+                    )}
+                    {reviewAction === 'approve'
+                      ? 'অ্যাপ্রুভ করুন'
+                      : 'রিজেক্ট করুন'}
+                  </h3>
+                  <button
+                    onClick={() => {
+                      setShowReviewModal(false);
+                      setReviewingRequest(null);
+                      setAdminNotes('');
+                    }}
+                    className="p-1 hover:bg-white/20 rounded-full text-white/80 transition-colors"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                <p className="text-white/80 text-xs sm:text-sm">
+                  {reviewingRequest.user?.name} এর পেমেন্ট রিকোয়েস্টটি রিভিউ
+                  করুন
                 </p>
               </div>
 
-              <div className="p-6 space-y-4">
-                <div className="bg-neutral-50 dark:bg-neutral-800 p-4 rounded-xl space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-neutral-600 dark:text-neutral-400">
-                      Plan:
-                    </span>
-                    <span className="font-semibold text-neutral-900 dark:text-white">
+              <div className="p-6 space-y-6">
+                <div className="bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-2xl border border-neutral-100 dark:border-neutral-800 space-y-3">
+                  <div className="flex justify-between text-xs sm:text-sm">
+                    <span className="text-neutral-500">প্লান:</span>
+                    <span className="font-bold text-neutral-900 dark:text-white">
                       {reviewingRequest.plan_name}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-neutral-600 dark:text-neutral-400">
-                      Amount:
-                    </span>
-                    <span className="font-semibold text-neutral-900 dark:text-white">
+                  <div className="flex justify-between text-xs sm:text-sm">
+                    <span className="text-neutral-500">টাকার পরিমাণ:</span>
+                    <span className="font-bold text-rose-600 dark:text-rose-400">
                       ৳{reviewingRequest.amount.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-neutral-600 dark:text-neutral-400">
-                      Method:
-                    </span>
-                    <span className="font-semibold text-neutral-900 dark:text-white">
+                  <div className="flex justify-between text-xs sm:text-sm">
+                    <span className="text-neutral-500">পেমেন্ট মেথড:</span>
+                    <span className="font-bold text-neutral-900 dark:text-white">
                       {reviewingRequest.payment_method}
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-                    Admin Notes{' '}
+                  <label className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">
+                    অ্যাডমিন নোট (ঐচ্ছিক)
                     {reviewAction === 'reject' && (
-                      <span className="text-rose-600">*</span>
+                      <span className="text-rose-600 ml-1">*</span>
                     )}
                   </label>
                   <textarea
@@ -1116,36 +1315,38 @@ export default function SubscriptionsPage() {
                     onChange={(e) => setAdminNotes(e.target.value)}
                     placeholder={
                       reviewAction === 'approve'
-                        ? 'Add any notes (optional)'
-                        : 'Provide reason for rejection'
+                        ? 'অতিরিক্ত কোনো তথ্য থাকলে লিখুন...'
+                        : 'রিজেক্ট করার কারণ অবশ্যই লিখুন...'
                     }
                     rows={3}
-                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
+                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-rose-500 transition-all resize-none text-sm"
                   />
                 </div>
               </div>
 
-              <div className="p-6 border-t border-neutral-200 dark:border-neutral-800 flex gap-3">
+              <div className="p-6 pt-2 flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => {
                     setShowReviewModal(false);
                     setReviewingRequest(null);
                     setAdminNotes('');
                   }}
-                  className="flex-1 px-6 py-3 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 transition-all active:scale-[0.98]"
+                  className="flex-1 px-6 py-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold rounded-2xl transition-all active:scale-95"
                 >
-                  Cancel
+                  বাতিল
                 </button>
                 <button
                   onClick={handleReviewPayment}
                   disabled={reviewAction === 'reject' && !adminNotes.trim()}
-                  className={`flex-1 px-6 py-3 font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed ${
+                  className={`flex-1 px-6 py-3 font-bold rounded-2xl shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
                     reviewAction === 'approve'
-                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white'
-                      : 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white'
+                      ? 'bg-emerald-600 text-white shadow-emerald-500/20'
+                      : 'bg-rose-600 text-white shadow-rose-500/20'
                   }`}
                 >
-                  {reviewAction === 'approve' ? 'Approve' : 'Reject'}
+                  {reviewAction === 'approve'
+                    ? 'অ্যাপ্রুভ করুন'
+                    : 'রিজেক্ট করুন'}
                 </button>
               </div>
             </div>
@@ -1154,23 +1355,40 @@ export default function SubscriptionsPage() {
 
         {/* Plan Modal */}
         {showPlanModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-violet-600 p-6 rounded-t-2xl">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                  <CreditCard className="w-6 h-6" />
-                  {editingPlan.id ? 'Edit Plan' : 'Create New Plan'}
-                </h3>
-                <p className="text-blue-100 text-sm mt-1">
-                  Configure subscription plan details
-                </p>
+          <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+              <div className="p-6 bg-gradient-to-br from-blue-600 to-indigo-700">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                      <CreditCard className="w-6 h-6" />
+                      {editingPlan.id ? 'প্লান এডিট করুন' : 'নতুন প্লান তৈরি'}
+                    </h3>
+                    <p className="text-blue-100 text-xs sm:text-sm mt-1">
+                      সাবস্ক্রিপশন প্লানের সকল তথ্য এখানে প্রদান করুন
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowPlanModal(false);
+                      setEditingPlan({
+                        currency: 'BDT',
+                        features: [],
+                        is_active: true,
+                      });
+                    }}
+                    className="p-1 hover:bg-white/20 rounded-full text-white transition-colors"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
               </div>
 
-              <div className="p-6 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-                      Plan Name (ID)
+                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2">
+                      প্লান আইডি (নাম)
                     </label>
                     <input
                       type="text"
@@ -1180,13 +1398,13 @@ export default function SubscriptionsPage() {
                       }
                       disabled={!!editingPlan.id}
                       placeholder="premium_monthly"
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:opacity-50"
+                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:opacity-50 text-sm"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-                      Display Name
+                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2">
+                      ডিসপ্লে নাম
                     </label>
                     <input
                       type="text"
@@ -1198,13 +1416,13 @@ export default function SubscriptionsPage() {
                         })
                       }
                       placeholder="Premium Monthly"
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-                      Price
+                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2">
+                      টাকার পরিমাণ (Price)
                     </label>
                     <input
                       type="number"
@@ -1216,13 +1434,13 @@ export default function SubscriptionsPage() {
                         })
                       }
                       placeholder="299"
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm font-bold"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-                      Duration (Days)
+                    <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2">
+                      মেয়াদ (দিন)
                     </label>
                     <input
                       type="number"
@@ -1234,14 +1452,14 @@ export default function SubscriptionsPage() {
                         })
                       }
                       placeholder="30"
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-                    Features (one per line)
+                  <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2">
+                    ফিচারসমূহ (প্রতিটি আলাদা লাইনে)
                   </label>
                   <textarea
                     value={editingPlan.features?.join('\n') || ''}
@@ -1253,16 +1471,16 @@ export default function SubscriptionsPage() {
                           .filter((f) => f.trim()),
                       })
                     }
-                    placeholder="Unlimited exams&#10;AI question generator&#10;Detailed analytics"
+                    placeholder="অনিমিত এক্সাম&#10;সকল চ্যাপ্টার এক্সেস&#10;বিস্তারিত এনালাইটিক্স"
                     rows={5}
-                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
+                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none text-sm leading-relaxed"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-neutral-50 dark:bg-neutral-950 rounded-3xl border border-neutral-100 dark:border-neutral-800">
                   <div>
-                    <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">
-                      Color Theme
+                    <label className="block text-[10px] font-bold text-neutral-400 uppercase mb-2">
+                      থিম কালার সিলেক্ট করুন
                     </label>
                     <select
                       value={editingPlan.color_theme || 'border-neutral-200'}
@@ -1272,46 +1490,39 @@ export default function SubscriptionsPage() {
                           color_theme: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      className="w-full px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
                     >
-                      <option value="border-neutral-200">Neutral (Gray)</option>
-                      <option value="border-indigo-500">
-                        Indigo (Blue-ish)
-                      </option>
-                      <option value="border-rose-500">Rose (Red-ish)</option>
-                      <option value="border-emerald-500">
-                        Emerald (Green)
-                      </option>
-                      <option value="border-amber-500">Amber (Orange)</option>
+                      <option value="border-neutral-200">Gray (Default)</option>
+                      <option value="border-blue-500">Blue (Premium)</option>
+                      <option value="border-rose-500">Rose (Popular)</option>
+                      <option value="border-emerald-500">Green (Growth)</option>
+                      <option value="border-amber-500">Amber (Gold)</option>
                     </select>
                   </div>
 
-                  <div className="flex flex-col gap-2 pt-8">
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        id="is_active"
-                        checked={editingPlan.is_active}
-                        onChange={(e) =>
-                          setEditingPlan({
-                            ...editingPlan,
-                            is_active: e.target.checked,
-                          })
-                        }
-                        className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-700 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                      />
-                      <label
-                        htmlFor="is_active"
-                        className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
-                      >
-                        Active (visible to users)
-                      </label>
-                    </div>
+                  <div className="flex flex-col justify-center gap-3">
+                    <label className="flex items-center gap-3 cursor-pointer group">
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          checked={editingPlan.is_active}
+                          onChange={(e) =>
+                            setEditingPlan({
+                              ...editingPlan,
+                              is_active: e.target.checked,
+                            })
+                          }
+                          className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-700 text-blue-600 focus:ring-0"
+                        />
+                      </div>
+                      <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300 group-hover:text-blue-600 transition-colors">
+                        প্লানটি এক্টিভ রাখুন
+                      </span>
+                    </label>
 
-                    <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-3 cursor-pointer group">
                       <input
                         type="checkbox"
-                        id="is_popular"
                         checked={editingPlan.is_popular}
                         onChange={(e) =>
                           setEditingPlan({
@@ -1319,20 +1530,17 @@ export default function SubscriptionsPage() {
                             is_popular: e.target.checked,
                           })
                         }
-                        className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-700 text-amber-500 focus:ring-2 focus:ring-amber-500"
+                        className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-700 text-amber-500 focus:ring-0"
                       />
-                      <label
-                        htmlFor="is_popular"
-                        className="text-sm font-medium text-neutral-700 dark:text-neutral-300"
-                      >
-                        Mark as Popular (Highlight)
-                      </label>
-                    </div>
+                      <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300 group-hover:text-amber-500 transition-colors">
+                        জনপ্রিয় (Highlighed) হিসেবে দেখান
+                      </span>
+                    </label>
                   </div>
                 </div>
               </div>
 
-              <div className="sticky bottom-0 bg-neutral-50 dark:bg-neutral-800 p-6 rounded-b-2xl border-t border-neutral-200 dark:border-neutral-700 flex gap-3">
+              <div className="p-6 bg-neutral-50 dark:bg-neutral-950 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => {
                     setShowPlanModal(false);
@@ -1342,44 +1550,47 @@ export default function SubscriptionsPage() {
                       is_active: true,
                     });
                   }}
-                  className="flex-1 px-6 py-3 bg-white dark:bg-neutral-900 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 transition-all active:scale-[0.98]"
+                  className="flex-1 px-6 py-3 bg-white dark:bg-neutral-900 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold rounded-2xl border border-neutral-200 dark:border-neutral-800 transition-all active:scale-95"
                 >
-                  Cancel
+                  বাতিল
                 </button>
                 <button
                   onClick={handleCreatePlan}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98]"
+                  className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/20 transition-all active:scale-95"
                 >
-                  {editingPlan.id ? 'Update Plan' : 'Create Plan'}
+                  {editingPlan.id ? 'আপডেট করুন' : 'তৈরি করুন'}
                 </button>
               </div>
             </div>
           </div>
         )}
+
         {/* Extend Subscription Modal */}
         {showExtendModal && extendingSubscription && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-sm w-full animate-fade-in">
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-1">
-                  Extend Subscription
+          <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-neutral-900 rounded-[2rem] shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-sm w-full overflow-hidden">
+              <div className="p-6 bg-gradient-to-br from-rose-600 to-red-700">
+                <h3 className="text-xl font-bold text-white mb-1">
+                  মেয়াদ বাড়িয়ে দিন
                 </h3>
-                <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-4">
-                  Add days to {extendingSubscription.user?.name}&apos;s current plan.
+                <p className="text-white/80 text-xs">
+                  {extendingSubscription.user?.name} এর সাবস্ক্রিপশন মেয়াদ বাড়ান
                 </p>
+              </div>
 
-                <div className="bg-neutral-50 dark:bg-neutral-800 p-4 rounded-xl mb-4">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-neutral-500">Current Expiry:</span>
-                    <span className="font-medium text-neutral-900 dark:text-white">
+              <div className="p-6 space-y-5">
+                <div className="bg-neutral-50 dark:bg-neutral-950 p-4 rounded-2xl border border-neutral-100 dark:border-neutral-800 space-y-2">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-neutral-500">বর্তমান মেয়াদ:</span>
+                    <span className="font-bold text-neutral-700 dark:text-neutral-300">
                       {new Date(
                         extendingSubscription.expires_at,
                       ).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-neutral-500">New Expiry:</span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-neutral-500">নতুন মেয়াদ:</span>
+                    <span className="font-bold text-emerald-600">
                       {new Date(
                         new Date(extendingSubscription.expires_at).getTime() +
                           extensionDays * 24 * 60 * 60 * 1000,
@@ -1388,22 +1599,26 @@ export default function SubscriptionsPage() {
                   </div>
                 </div>
 
-                <div className="space-y-3 mb-6">
-                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    Extension Duration
+                <div className="space-y-3">
+                  <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+                    কতদিন বাড়াবেন?
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {[7, 30, 365].map((days) => (
                       <button
                         key={days}
                         onClick={() => setExtensionDays(days)}
-                        className={`px-3 py-2 text-sm font-medium rounded-lg border ${
+                        className={`py-2 text-xs font-bold rounded-xl border transition-all ${
                           extensionDays === days
-                            ? 'bg-blue-600 border-blue-600 text-white'
-                            : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700'
+                            ? 'bg-rose-600 border-rose-600 text-white shadow-lg shadow-rose-500/20'
+                            : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-500'
                         }`}
                       >
-                        {days} Days
+                        {days === 7
+                          ? '৭ দিন'
+                          : days === 30
+                            ? '৩০ দিন'
+                            : '১ বছর'}
                       </button>
                     ))}
                   </div>
@@ -1414,31 +1629,31 @@ export default function SubscriptionsPage() {
                       onChange={(e) =>
                         setExtensionDays(parseInt(e.target.value) || 0)
                       }
-                      className="w-full px-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-rose-600 dark:text-rose-400 font-bold focus:outline-none focus:ring-2 focus:ring-rose-500"
                     />
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-neutral-500">
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-neutral-400 uppercase">
                       Days
                     </span>
                   </div>
                 </div>
+              </div>
 
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      setShowExtendModal(false);
-                      setExtendingSubscription(null);
-                    }}
-                    className="flex-1 px-4 py-2.5 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 font-semibold rounded-xl transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleExtendSubscription}
-                    className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg transition-colors"
-                  >
-                    Confirm
-                  </button>
-                </div>
+              <div className="p-6 pt-0 flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowExtendModal(false);
+                    setExtendingSubscription(null);
+                  }}
+                  className="flex-1 py-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-500 font-bold rounded-2xl transition-all active:scale-95"
+                >
+                  বাতিল
+                </button>
+                <button
+                  onClick={handleExtendSubscription}
+                  className="flex-1 py-3 bg-rose-600 text-white font-bold rounded-2xl shadow-lg shadow-rose-500/20 transition-all active:scale-95"
+                >
+                  নিশ্চিত করুন
+                </button>
               </div>
             </div>
           </div>

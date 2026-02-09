@@ -175,7 +175,7 @@ const ResultView: React.FC<ResultViewProps> = ({
           {onDownloadQuestionPaper && (
             <button
               onClick={onDownloadQuestionPaper}
-              className="flex-1 min-w-0 inline-flex items-center justify-center gap-1 px-2 py-2.5 bg-neutral-100 dark:bg-neutral-800 text-indigo-600 dark:text-indigo-400 rounded-lg text-[10px] sm:text-xs font-bold hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors border border-neutral-200 dark:border-neutral-700 whitespace-nowrap"
+              className="flex-1 min-w-0 inline-flex items-center justify-center gap-1 px-2 py-2.5 bg-neutral-100 dark:bg-neutral-800 text-emerald-600 dark:text-emerald-400 rounded-lg text-[10px] sm:text-xs font-bold hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors border border-neutral-200 dark:border-neutral-700 whitespace-nowrap"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -198,7 +198,7 @@ const ResultView: React.FC<ResultViewProps> = ({
           {onDownloadResultWithExplanations && (
             <button
               onClick={onDownloadResultWithExplanations}
-              className="flex-1 min-w-0 inline-flex items-center justify-center gap-1 px-2 py-2.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg text-[10px] sm:text-xs font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors border border-indigo-100 dark:border-indigo-800 whitespace-nowrap"
+              className="flex-1 min-w-0 inline-flex items-center justify-center gap-1 px-2 py-2.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg text-[10px] sm:text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-100 dark:border-emerald-800 whitespace-nowrap"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -260,7 +260,7 @@ const ResultView: React.FC<ResultViewProps> = ({
               <select
                 value={reportCategory}
                 onChange={(e) => setReportCategory(e.target.value)}
-                className="w-full p-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-black text-xs text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                className="w-full p-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-black text-xs text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none"
               >
                 <option value="Wrong Answer">ভুল উত্তর (Wrong Answer)</option>
                 <option value="Typo/Grammar">বানান ভুল (Typo/Grammar)</option>
@@ -275,7 +275,7 @@ const ResultView: React.FC<ResultViewProps> = ({
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value)}
               placeholder="বিস্তারিত বর্ণনা করুন..."
-              className="w-full h-24 p-3 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 outline-none resize-none mb-4 text-sm"
+              className="w-full h-24 p-3 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 outline-none resize-none mb-4 text-sm"
               autoFocus
             />
 

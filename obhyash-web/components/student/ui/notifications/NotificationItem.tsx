@@ -32,8 +32,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       case 'exam_result':
         return {
           icon: <TrendingUp className="w-4 h-4" />,
-          bgColor: 'bg-blue-100 dark:bg-blue-900/30',
-          textColor: 'text-blue-600 dark:text-blue-400',
+          bgColor: 'bg-emerald-100 dark:bg-emerald-900/30',
+          textColor: 'text-emerald-600 dark:text-emerald-400',
         };
       case 'achievement':
         return {
@@ -44,8 +44,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       case 'level_up':
         return {
           icon: <TrendingUp className="w-4 h-4" />,
-          bgColor: 'bg-purple-100 dark:bg-purple-900/30',
-          textColor: 'text-purple-600 dark:text-purple-400',
+          bgColor: 'bg-rose-100 dark:bg-rose-900/30',
+          textColor: 'text-rose-600 dark:text-rose-400',
         };
       case 'announcement':
         return {

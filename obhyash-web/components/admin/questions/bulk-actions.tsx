@@ -32,12 +32,12 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
   };
 
   return (
-    <div className="bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-900/30 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in fade-in duration-200">
+    <div className="bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-900/30 rounded-2xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in duration-200">
       {/* Selection Info */}
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
+      <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
           <CheckCircle2
-            size={20}
+            size={18}
             className="text-rose-600 dark:text-rose-400"
           />
         </div>
@@ -49,14 +49,14 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
             {selectedCount < totalCount && (
               <button
                 onClick={onSelectAll}
-                className="text-xs font-medium text-rose-600 dark:text-rose-400 hover:underline"
+                className="text-[10px] sm:text-xs font-medium text-rose-600 dark:text-rose-400 hover:underline"
               >
-                সব নির্বাচন করুন ({totalCount} টি)
+                সব নির্বাচন করুন ({totalCount})
               </button>
             )}
             <button
               onClick={onClearSelection}
-              className="text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300"
+              className="text-[10px] sm:text-xs font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300"
             >
               নির্বাচন মুছুন
             </button>
@@ -65,42 +65,34 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
         {/* Update Status */}
-        <div className="flex items-center gap-1 bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800 p-1">
+        <div className="flex items-center gap-1 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-1 flex-1 sm:flex-none justify-center">
           <button
             onClick={() => onUpdateStatus('Approved')}
-            className="px-3 py-1.5 rounded-md text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors flex items-center gap-1.5"
+            className="flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors flex items-center justify-center gap-1.5"
             title="Approve Selected"
           >
-            <CheckCircle2 size={14} />
-            Approve
+            <CheckCircle2 size={14} className="sm:inline" />
+            <span className="hidden xs:inline">Approve</span>
           </button>
           <button
             onClick={() => onUpdateStatus('Rejected')}
-            className="px-3 py-1.5 rounded-md text-xs font-medium text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-1.5"
+            className="flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-medium text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors flex items-center justify-center gap-1.5"
             title="Reject Selected"
           >
-            <XCircle size={14} />
-            Reject
-          </button>
-          <button
-            onClick={() => onUpdateStatus('Draft')}
-            className="px-3 py-1.5 rounded-md text-xs font-medium text-neutral-700 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5"
-            title="Mark as Draft"
-          >
-            <FileEdit size={14} />
-            Draft
+            <XCircle size={14} className="sm:inline" />
+            <span className="hidden xs:inline">Reject</span>
           </button>
         </div>
 
         {/* Delete */}
         <button
           onClick={handleDelete}
-          className="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium shadow-lg shadow-rose-500/20 transition-all active:scale-95 flex items-center gap-2"
+          className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-medium shadow-lg shadow-rose-500/20 transition-all active:scale-95 flex items-center gap-2 shrink-0"
         >
           <Trash2 size={16} />
-          মুছে ফেলুন
+          <span className="hidden xs:inline">মুছে ফেলুন</span>
         </button>
       </div>
     </div>

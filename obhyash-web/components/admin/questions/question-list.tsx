@@ -84,7 +84,77 @@ export const QuestionList: React.FC<QuestionListProps> = ({
 
   return (
     <>
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-sm">
+      {/* Mobile Card View - 2 Columns */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:hidden gap-3">
+        {questions.map((q) => (
+          <div
+            key={q.id}
+            onClick={() => onPreview(q)}
+            className={`relative p-4 rounded-2xl border transition-all active:scale-95 ${
+              selectedQuestions.has(q.id)
+                ? 'bg-rose-50 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800'
+                : 'bg-white border-neutral-200 dark:bg-neutral-900 dark:border-neutral-800'
+            } shadow-sm cursor-pointer`}
+          >
+            {/* Selection Checkbox */}
+            <div className="absolute top-3 right-3 z-10">
+              <input
+                type="checkbox"
+                checked={selectedQuestions.has(q.id)}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  onToggleSelection(q.id);
+                }}
+                className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-rose-600 focus:ring-rose-500 cursor-pointer"
+              />
+            </div>
+
+            {/* Content */}
+            <div className="space-y-3">
+              <div className="text-sm font-medium text-neutral-900 dark:text-neutral-200 line-clamp-3 leading-relaxed">
+                <MathText text={q.question || ''} />
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <StatusBadge status={q.status} />
+                <DifficultyBadge level={q.difficulty} />
+              </div>
+
+              <div className="pt-3 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-bold text-neutral-900 dark:text-neutral-300">
+                    {q.subject}
+                  </span>
+                  <span className="text-[10px] text-neutral-500 line-clamp-1">
+                    {q.chapter || 'সাধারণ'}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(q);
+                    }}
+                    className="p-1.5 text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors"
+                  >
+                    <Edit2 size={15} />
+                  </button>
+                  <button
+                    onClick={(e) => handleDeleteClick(e, q.id)}
+                    className="p-1.5 text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden lg:block bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>

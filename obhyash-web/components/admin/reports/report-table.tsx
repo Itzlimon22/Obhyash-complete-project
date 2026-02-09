@@ -48,69 +48,69 @@ export const ReportTable: React.FC<ReportTableProps> = ({
   return (
     <div className="space-y-4">
       {/* Mobile Card Layout (< md) */}
-      <div className="grid grid-cols-1 gap-4 md:hidden">
+      <div className="grid grid-cols-1 gap-3 md:hidden">
         {reports.map((report) => (
           <div
             key={report.id}
-            className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 shadow-sm active:scale-[0.98] transition-all"
+            className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 shadow-sm active:scale-[0.99] transition-all"
             onClick={() => onReview(report)}
           >
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-center mb-3">
+              <div className="flex items-center gap-2">
                 <ReportStatusBadge status={report.status} />
                 <SeverityBadge severity={report.severity} />
               </div>
-              <span className="text-[10px] font-mono text-neutral-400 bg-neutral-50 dark:bg-neutral-800 px-2 py-1 rounded-lg border border-neutral-100 dark:border-neutral-700">
+              <span className="text-[9px] font-bold text-neutral-400 bg-neutral-50 dark:bg-neutral-800 px-2 py-0.5 rounded-lg border border-neutral-100 dark:border-neutral-700">
                 {report.createdAt.split(' ')[0]}
               </span>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="mt-1 p-2 bg-rose-50 dark:bg-rose-500/10 rounded-xl">
+            <div className="space-y-3">
+              <div className="flex items-start gap-2.5">
+                <div className="mt-0.5 p-1.5 bg-rose-50 dark:bg-rose-500/10 rounded-lg shrink-0">
                   <Flag
-                    size={16}
+                    size={14}
                     className="text-rose-600 dark:text-rose-400"
                   />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-neutral-900 dark:text-white leading-tight">
+                  <h4 className="text-[13px] font-bold text-neutral-900 dark:text-white leading-tight">
                     {report.reason}
                   </h4>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 italic line-clamp-2">
+                  <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5 italic line-clamp-1">
                     &quot;{report.description}&quot;
                   </p>
                 </div>
               </div>
 
-              <div className="bg-neutral-50 dark:bg-black rounded-xl p-3 border border-neutral-100 dark:border-neutral-800">
-                <p className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest mb-2">
+              <div className="bg-neutral-50 dark:bg-neutral-950 rounded-xl p-2.5 border border-neutral-100 dark:border-neutral-800/50">
+                <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest mb-1.5 opacity-70">
                   Question Preview
                 </p>
-                <div className="text-sm text-neutral-800 dark:text-neutral-200 line-clamp-3 leading-relaxed">
+                <div className="text-xs text-neutral-800 dark:text-neutral-200 line-clamp-2 leading-snug">
                   <MathText
                     text={report.questionPreview?.question || 'Content Deleted'}
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-2">
+              <div className="flex items-center justify-between pt-1">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xs font-bold shadow-inner">
+                  <div className="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center text-[10px] font-black shadow-inner uppercase">
                     {report.reporterName.charAt(0)}
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-neutral-900 dark:text-white leading-none">
+                    <p className="text-[11px] font-bold text-neutral-900 dark:text-white leading-none">
                       {report.reporterName}
                     </p>
-                    <p className="text-[10px] text-neutral-500 mt-0.5">
+                    <p className="text-[9px] text-neutral-500 mt-0.5 font-medium uppercase tracking-tighter">
                       Reporter
                     </p>
                   </div>
                 </div>
 
-                <button className="flex items-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-rose-500/20 active:scale-95 transition-all">
-                  <Eye size={14} />
+                <button className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-black shadow-md shadow-rose-500/10 active:scale-95 transition-all">
+                  <Eye size={12} />
                   Review
                 </button>
               </div>

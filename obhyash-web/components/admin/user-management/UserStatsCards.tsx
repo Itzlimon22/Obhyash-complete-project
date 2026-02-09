@@ -47,25 +47,25 @@ const UserStatsCards: React.FC<UserStatsCardsProps> = ({
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-6">
       {cards.map((stat, i) => (
         <div
           key={i}
-          className="bg-white dark:bg-neutral-900 p-4 md:p-6 rounded-[1.75rem] border border-neutral-200/60 dark:border-neutral-800/60 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-all"
+          className="bg-white dark:bg-neutral-900 p-3 md:p-6 rounded-2xl md:rounded-[1.75rem] border border-neutral-200/60 dark:border-neutral-800/60 shadow-sm hover:shadow-md transition-all group"
         >
-          <div className="flex items-center justify-between mb-3 md:mb-4">
+          <div className="flex items-center justify-between mb-2 md:mb-4">
             <div
-              className={`p-2.5 md:p-3 rounded-xl ${stat.bg} bg-gradient-to-br ${stat.gradient} bg-clip-padding`}
+              className={`p-2 md:p-3 rounded-lg md:rounded-xl ${stat.bg} bg-gradient-to-br ${stat.gradient} bg-clip-padding flex items-center justify-center`}
             >
-              <stat.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
+              <stat.icon className="w-4.5 h-4.5 md:w-6 md:h-6 text-white" />
             </div>
           </div>
           <div>
-            <p className="text-[10px] md:text-sm font-extrabold uppercase tracking-widest text-neutral-500 dark:text-neutral-500 mb-1 opacity-80">
+            <p className="text-[8px] md:text-xs font-extrabold uppercase tracking-widest text-neutral-500 dark:text-neutral-500 mb-0.5 md:mb-1 opacity-80 truncate">
               {stat.label}
             </p>
-            <p className="text-xl md:text-3xl font-bold text-neutral-900 dark:text-white">
-              {isLoading ? '...' : stat.value}
+            <p className="text-lg md:text-3xl font-bold text-neutral-900 dark:text-white">
+              {isLoading ? '...' : stat.value.toLocaleString()}
             </p>
           </div>
         </div>

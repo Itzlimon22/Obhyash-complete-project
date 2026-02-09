@@ -135,48 +135,58 @@ export default function AdminComplaintsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-black p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-white dark:bg-black p-4 lg:p-8 text-neutral-900 dark:text-neutral-100">
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-black text-neutral-900 dark:text-white flex items-center gap-3">
-              <AlertTriangle className="text-rose-600" size={32} />
-              Platform Complaints
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="space-y-0.5">
+            <h1 className="text-xl md:text-3xl font-black text-neutral-900 dark:text-white flex items-center gap-2.5 tracking-tight">
+              <AlertTriangle className="text-rose-600" size={24} />
+              Complaints
             </h1>
-            <p className="text-neutral-500 dark:text-neutral-400 font-medium">
-              Manage technical issues and UX feedback from students
+            <p className="text-neutral-500 dark:text-neutral-400 text-[11px] md:text-sm font-medium">
+              Manage technical issues and feedback from students
             </p>
           </div>
 
-          <div className="flex items-center gap-3 self-end md:self-auto">
-            <div className="hidden sm:flex items-center gap-6 mr-4">
-              <div className="text-right">
-                <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                  Pending
-                </p>
-                <p className="text-xl font-black text-amber-500">
-                  {stats.pending}
-                </p>
+          <div className="flex items-center gap-2 self-end md:self-auto">
+            <div className="flex items-center gap-2.5 mr-1">
+              <div className="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-800 rounded-xl flex items-center gap-2">
+                <div className="p-1 px-1.5 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-lg">
+                  <AlertCircle size={12} />
+                </div>
+                <div>
+                  <p className="text-[8px] text-amber-600/70 font-black uppercase tracking-tight">
+                    Pending
+                  </p>
+                  <p className="text-sm font-black text-amber-600 dark:text-amber-400 leading-none">
+                    {stats.pending}
+                  </p>
+                </div>
               </div>
-              <div className="text-right border-l border-neutral-200 dark:border-neutral-800 pl-6">
-                <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                  Solved
-                </p>
-                <p className="text-xl font-black text-emerald-500">
-                  {stats.resolved}
-                </p>
+              <div className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-800 rounded-xl flex items-center gap-2">
+                <div className="p-1 px-1.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                  <CheckCircle2 size={12} />
+                </div>
+                <div>
+                  <p className="text-[8px] text-emerald-600/70 font-black uppercase tracking-tight">
+                    Solved
+                  </p>
+                  <p className="text-sm font-black text-emerald-600 dark:text-emerald-400 leading-none">
+                    {stats.resolved}
+                  </p>
+                </div>
               </div>
             </div>
             <Button
               variant="outline"
               size="icon"
               onClick={() => fetchComplaints(true)}
-              className="rounded-xl border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm"
+              className="w-10 h-10 rounded-xl border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 shadow-sm"
               disabled={isRefreshing}
             >
               <RefreshCw
-                size={20}
+                size={16}
                 className={isRefreshing ? 'animate-spin' : ''}
               />
             </Button>
@@ -184,31 +194,31 @@ export default function AdminComplaintsPage() {
         </div>
 
         {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="relative col-span-1 md:col-span-2">
             <Search
               className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"
-              size={18}
+              size={16}
             />
             <input
               type="text"
-              placeholder="Search by student name or description..."
+              placeholder="Search by student or problem..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all font-medium"
+              className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all text-xs md:text-sm font-bold"
             />
           </div>
           <div className="relative">
             <Filter
               className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"
-              size={18}
+              size={16}
             />
             <select
               value={statusFilter}
               onChange={(e) =>
                 setStatusFilter(e.target.value as ComplaintStatus | 'All')
               }
-              className="w-full pl-12 pr-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none appearance-none transition-all font-medium"
+              className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none appearance-none transition-all text-xs md:text-sm font-bold cursor-pointer"
             >
               <option value="All">All Statuses</option>
               <option value="Pending">Pending</option>
@@ -217,6 +227,16 @@ export default function AdminComplaintsPage() {
               <option value="Dismissed">Dismissed</option>
             </select>
           </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-1 border-t border-neutral-100 dark:border-neutral-800">
+          <p className="text-[10px] md:text-xs font-black text-neutral-400 uppercase tracking-widest">
+            Showing{' '}
+            <span className="text-neutral-900 dark:text-white">
+              {filteredComplaints.length}
+            </span>{' '}
+            of {complaints.length} complaints
+          </p>
         </div>
 
         {/* Complaints Listing */}
@@ -320,45 +340,46 @@ export default function AdminComplaintsPage() {
               </table>
             </div>
 
-            {/* Mobile Card View (Hidden on desktop) */}
-            <div className="lg:hidden space-y-4">
+            {/* Mobile Card View (2 Column Grid) */}
+            <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-3 pb-20">
               {filteredComplaints.map((c) => {
                 const SIcon = getStatusIcon(c.status);
                 return (
                   <Card
                     key={c.id}
-                    className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 rounded-3xl overflow-hidden shadow-sm"
+                    className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-sm active:scale-[0.99] transition-all"
+                    onClick={() => setSelectedComplaint(c)}
                   >
-                    <CardContent className="p-6 space-y-4">
+                    <CardContent className="p-4 space-y-3">
                       <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-black text-neutral-900 dark:text-white text-lg capitalize">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-black text-neutral-900 dark:text-white text-sm capitalize truncate">
                             {c.user?.name || 'Unknown'}
                           </p>
-                          <p className="text-xs text-neutral-500 font-bold uppercase tracking-widest mt-1">
+                          <p className="text-[9px] text-neutral-400 font-bold uppercase tracking-wider mt-0.5 truncate">
                             {c.type}
                           </p>
                         </div>
                         <div
-                          className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tight flex items-center gap-1.5 ${getStatusColor(c.status)}`}
+                          className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-tight flex items-center gap-1 shrink-0 ${getStatusColor(c.status)}`}
                         >
-                          <SIcon size={12} />
+                          <SIcon size={10} />
                           {c.status}
                         </div>
                       </div>
-                      <p className="text-neutral-600 dark:text-neutral-400 text-sm font-medium line-clamp-3 bg-neutral-50 dark:bg-neutral-950/50 p-4 rounded-2xl">
-                        {c.description}
-                      </p>
-                      <div className="flex justify-between items-center pt-2">
-                        <span className="text-xs text-neutral-400 font-bold uppercase">
+                      <div className="bg-neutral-50 dark:bg-neutral-950/50 p-2.5 rounded-xl border border-neutral-100 dark:border-neutral-800/50 min-h-[60px]">
+                        <p className="text-neutral-600 dark:text-neutral-400 text-[11px] font-medium line-clamp-2 leading-relaxed">
+                          {c.description}
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-center pt-1.5 border-t border-neutral-100 dark:border-neutral-800">
+                        <span className="text-[9px] text-neutral-400 font-black uppercase tracking-tighter">
                           {new Date(c.created_at).toLocaleDateString()}
                         </span>
-                        <Button
-                          onClick={() => setSelectedComplaint(c)}
-                          className="bg-neutral-900 dark:bg-white text-white dark:text-black font-black rounded-xl text-xs px-6 py-2"
-                        >
-                          Review Issue
-                        </Button>
+                        <div className="flex items-center gap-1 text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-tight cursor-pointer">
+                          <span>Review</span>
+                          <ChevronRight size={12} />
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

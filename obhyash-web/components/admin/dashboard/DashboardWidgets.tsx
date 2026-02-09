@@ -23,28 +23,28 @@ import { createClient } from '@/utils/supabase/client'; // ✅ Added for future 
  */
 export const StatCard: React.FC<{ data: StatData }> = ({ data }) => {
   return (
-    <div className="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200/60 dark:border-neutral-800/60 rounded-[1.75rem] p-4 md:p-5 hover:border-emerald-500/30 dark:hover:border-emerald-500/20 transition-all duration-300 group shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-xl dark:shadow-none">
+    <div className="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200/60 dark:border-neutral-800/60 rounded-2xl md:rounded-[1.75rem] p-3 md:p-5 hover:border-emerald-500/30 dark:hover:border-emerald-500/20 transition-all duration-300 group shadow-sm hover:shadow-xl dark:shadow-none">
       {/* Decorative Glow */}
       <div
         className={`absolute -top-12 -right-12 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-20 dark:group-hover:opacity-10 transition-opacity duration-700 ${data.bgClass.replace('/30', '/60')}`}
       />
 
-      <div className="flex justify-between items-start relative z-10 mb-4">
-        <div className="space-y-0.5">
-          <h4 className="text-neutral-500 dark:text-neutral-500 text-[9px] font-extrabold uppercase tracking-widest opacity-80">
+      <div className="flex justify-between items-start relative z-10 mb-2 md:mb-4">
+        <div className="space-y-0.5 min-w-0">
+          <h4 className="text-neutral-500 dark:text-neutral-500 text-[8px] md:text-[9px] font-extrabold uppercase tracking-widest opacity-80 truncate">
             {data.title}
           </h4>
           <div className="flex items-baseline gap-2">
-            <span className="text-xl md:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+            <span className="text-lg md:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
               {data.value.toLocaleString()}
             </span>
           </div>
         </div>
 
         <div
-          className={`p-2.5 rounded-xl ${data.bgClass} ${data.colorClass} dark:bg-opacity-10 bg-opacity-20 flex items-center justify-center shadow-inner`}
+          className={`p-2 md:p-2.5 rounded-lg md:rounded-xl ${data.bgClass} ${data.colorClass} dark:bg-opacity-10 bg-opacity-20 flex items-center justify-center shadow-inner shrink-0`}
         >
-          <data.icon size={20} strokeWidth={2.5} />
+          <data.icon size={18} className="md:w-5 md:h-5" strokeWidth={2.5} />
         </div>
       </div>
 
@@ -111,29 +111,35 @@ const ToolItem: React.FC<{ tool: DatabaseTool }> = ({ tool }) => {
   return (
     <div
       onClick={handleClick}
-      className="group flex items-center justify-between p-5 bg-paper-50 dark:bg-obsidian-950 border border-paper-200 dark:border-obsidian-800 rounded-xl hover:bg-white dark:hover:bg-obsidian-900 hover:border-brand-300 dark:hover:border-brand-800 transition-all duration-300 cursor-pointer"
+      className="group flex items-center justify-between p-4 md:p-5 bg-paper-50 dark:bg-obsidian-950 border border-paper-200 dark:border-obsidian-800 rounded-xl hover:bg-white dark:hover:bg-obsidian-900 hover:border-brand-300 dark:hover:border-brand-800 transition-all duration-300 cursor-pointer"
     >
-      <div className="flex items-center gap-4">
-        <div className="p-3 rounded-lg bg-white dark:bg-obsidian-900 border border-paper-200 dark:border-obsidian-800 text-gray-400 dark:text-gray-500 group-hover:text-brand-600 dark:group-hover:text-brand-400 group-hover:border-brand-200 dark:group-hover:border-brand-900/50 transition-all duration-300 shadow-sm">
+      <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
+        <div className="p-2.5 md:p-3 rounded-lg bg-white dark:bg-obsidian-900 border border-paper-200 dark:border-obsidian-800 text-gray-400 dark:text-gray-500 group-hover:text-brand-600 dark:group-hover:text-brand-400 group-hover:border-brand-200 dark:group-hover:border-brand-900/50 transition-all duration-300 shadow-sm shrink-0">
           {isLoading ? (
-            <Loader2 size={22} className="animate-spin" />
+            <Loader2
+              size={20}
+              className="animate-spin md:w-[22px] md:h-[22px]"
+            />
           ) : isSuccess ? (
-            <Check size={22} className="text-emerald-500" />
+            <Check
+              size={20}
+              className="text-emerald-500 md:w-[22px] md:h-[22px]"
+            />
           ) : (
-            <tool.icon size={22} />
+            <tool.icon size={20} className="md:w-[22px] md:h-[22px]" />
           )}
         </div>
-        <div>
-          <h5 className="text-base font-semibold text-paper-900 dark:text-gray-200 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+        <div className="min-w-0">
+          <h5 className="text-sm md:text-base font-semibold text-paper-900 dark:text-gray-200 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors truncate">
             {isSuccess ? 'Operation Successful' : tool.label}
           </h5>
-          <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+          <p className="text-xs md:text-sm text-gray-500 dark:text-gray-500 mt-0.5 md:mt-1 truncate">
             {tool.description}
           </p>
         </div>
       </div>
-      <div className="w-8 h-8 rounded-full flex items-center justify-center bg-transparent group-hover:bg-brand-50 dark:group-hover:bg-brand-900/20 text-gray-300 dark:text-obsidian-700 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-all">
-        <ArrowUpRight size={18} />
+      <div className="w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center bg-transparent group-hover:bg-brand-50 dark:group-hover:bg-brand-900/20 text-gray-300 dark:text-obsidian-700 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-all shrink-0 ml-2">
+        <ArrowUpRight size={16} className="md:w-[18px] md:h-[18px]" />
       </div>
     </div>
   );
@@ -188,7 +194,7 @@ export const DatabaseToolsSection: React.FC = () => {
       </div>
 
       <div className="bg-white dark:bg-obsidian-900 border border-paper-200 dark:border-obsidian-800 rounded-3xl p-4 md:p-6 shadow-subtle dark:shadow-none">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
           {tools.map((tool) => (
             <ToolItem key={tool.id} tool={tool} />
           ))}

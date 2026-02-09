@@ -79,7 +79,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
   const [activeDemoTab, setActiveDemoTab] = useState<
     'generate' | 'omr' | 'analytics'
   >('generate');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // --- Interactive Demo Logic ---
   const [demoQIndex, setDemoQIndex] = useState(0);
@@ -340,52 +339,34 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </button>
           </div>
 
-          {/* Mobile Menu Toggle */}
-          <div className="md:hidden flex items-center gap-2">
-            <button onClick={toggleTheme} className="p-2">
-              {isDarkMode ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
+          {/* Mobile Navigation - Direct Buttons */}
+          <div className="md:hidden flex items-center gap-3">
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2"
+              onClick={toggleTheme}
+              className="p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-600 dark:text-neutral-400"
             >
-              {mobileMenuOpen ? (
-                <X className="w-6 h-6" />
+              {isDarkMode ? (
+                <Sun className="w-4.5 h-4.5" />
               ) : (
-                <Menu className="w-6 h-6" />
+                <Moon className="w-4.5 h-4.5" />
               )}
             </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onLogin}
+                className="text-xs font-bold text-neutral-600 dark:text-neutral-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors pr-1"
+              >
+                লগইন
+              </button>
+              <button
+                onClick={onGetStarted}
+                className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-[11px] transition-all shadow-md shadow-indigo-500/20"
+              >
+                রেজিস্ট্রেশন
+              </button>
+            </div>
           </div>
         </div>
-
-        {/* Mobile Menu Dropdown */}
-        {mobileMenuOpen && (
-          <div className="md:hidden absolute top-16 left-0 w-full bg-white dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800 p-4 flex flex-col gap-4 shadow-xl">
-            {/* 4. Separate Mobile Buttons */}
-            <button
-              onClick={() => {
-                onLogin();
-                setMobileMenuOpen(false);
-              }}
-              className="w-full py-3 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 rounded-lg font-bold"
-            >
-              লগইন করুন
-            </button>
-            <button
-              onClick={() => {
-                onGetStarted();
-                setMobileMenuOpen(false);
-              }}
-              className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold"
-            >
-              রেজিস্ট্রেশন / শুরু করুন
-            </button>
-          </div>
-        )}
       </header>
 
       {/* Hero Section */}

@@ -68,10 +68,10 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-obsidian-900 rounded-2xl border border-paper-200 dark:border-obsidian-800 shadow-xl max-w-4xl mx-auto animate-fade-in relative">
+    <div className="bg-white dark:bg-obsidian-900 rounded-2xl border border-paper-200 dark:border-obsidian-800 shadow-xl max-w-4xl mx-auto animate-fade-in relative overflow-hidden">
       {/* গ্লোবাল লোডিং ওভারলে (যদি আপলোড চলে) */}
       {isUploading && (
-        <div className="absolute inset-0 bg-white/50 dark:bg-black/50 z-50 flex items-center justify-center rounded-2xl backdrop-blur-sm">
+        <div className="absolute inset-0 bg-white/50 dark:bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
           <div className="bg-white dark:bg-obsidian-800 px-6 py-4 rounded-xl shadow-lg flex items-center gap-3">
             <Loader2 className="animate-spin text-brand-600" />
             <span className="text-sm font-medium">ছবি আপলোড হচ্ছে...</span>
@@ -79,8 +79,8 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
         </div>
       )}
 
-      <div className="p-6 border-b border-paper-200 dark:border-obsidian-800 flex justify-between items-center">
-        <h2 className="text-lg font-bold text-paper-900 dark:text-white">
+      <div className="p-4 sm:p-6 border-b border-paper-200 dark:border-obsidian-800 flex justify-between items-center bg-white dark:bg-obsidian-900 sticky top-0 z-20">
+        <h2 className="text-base sm:text-lg font-bold text-paper-900 dark:text-white">
           {data.id ? 'প্রশ্ন এডিট করুন' : 'নতুন প্রশ্ন তৈরি করুন'}
         </h2>
         <button
@@ -91,9 +91,9 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
         </button>
       </div>
 
-      <div className="p-8 space-y-8">
+      <div className="p-4 sm:p-8 space-y-6 sm:space-y-8">
         {/* মেটাডাটা গ্রিড */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5">
           <div>
             <Label>স্ট্রিম (Stream)</Label>
             <Input
@@ -129,7 +129,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                     difficulty: e.target.value as 'Easy' | 'Medium' | 'Hard',
                   })
                 }
-                className="w-full px-3 py-2 rounded-lg border border-paper-200 dark:border-obsidian-800 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none appearance-none cursor-pointer dark:text-gray-200"
+                className="w-full px-3 py-2.5 rounded-xl border border-paper-200 dark:border-obsidian-800 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none appearance-none cursor-pointer dark:text-gray-200"
               >
                 <option>Easy</option>
                 <option>Medium</option>
@@ -137,19 +137,19 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
               </select>
               <ChevronDown
                 size={14}
-                className="absolute right-3 top-1/2 -tranneutral-y-1/2 text-gray-400 pointer-events-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
               />
             </div>
           </div>
         </div>
 
         {/* প্রশ্ন লেখার এরিয়া */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-end">
+        <div className="space-y-3 sm:space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-0">
             <h3 className="text-sm font-semibold text-paper-900 dark:text-white">
               মূল প্রশ্ন (Question Content)
             </h3>
-            <span className="text-[10px] font-medium px-2 py-0.5 bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300 rounded border border-brand-100 dark:border-brand-800">
+            <span className="self-start sm:self-auto text-[10px] font-medium px-2 py-0.5 bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300 rounded border border-brand-100 dark:border-brand-800">
               LaTeX সমর্থিত ($...$)
             </span>
           </div>
@@ -164,7 +164,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
         {data.question && (
           <div className="p-4 rounded-xl border border-paper-200 dark:border-obsidian-800 bg-paper-50 dark:bg-obsidian-950/50">
             <Label>প্রিভিউ (Preview)</Label>
-            <div className="text-sm text-paper-900 dark:text-gray-200 min-h-[20px] mt-1">
+            <div className="text-sm text-paper-900 dark:text-gray-200 min-h-[20px] mt-1 overflow-x-auto">
               <RichText text={data.question} />
             </div>
           </div>
@@ -172,11 +172,10 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 
         <div>
           <Label>প্রশ্নের ছবি (Question Image)</Label>
-          <div className="mt-2">
-            {/* এখানে UploadBox কম্পোনেন্টটি আগের মতই থাকবে, শুধু onUpload পরিবর্তন হবে */}
+          <div className="mt-2 text-center">
             <UploadBox
               image={data.imageUrl}
-              onUpload={(e) => handleImageUpload(e, 'imageUrl')} // ✅ Real Upload
+              onUpload={(e) => handleImageUpload(e, 'imageUrl')}
               onRemove={() => setData({ ...data, imageUrl: undefined })}
             />
           </div>
@@ -191,10 +190,10 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
             {[0, 1, 2, 3].map((idx) => (
               <div
                 key={idx}
-                className="p-3 rounded-xl border border-paper-200 dark:border-obsidian-800 bg-paper-50/50 dark:bg-obsidian-900/50 flex flex-col gap-2"
+                className="p-3.5 rounded-2xl border border-paper-200 dark:border-obsidian-800 bg-paper-50/50 dark:bg-obsidian-900/50 flex flex-col gap-3"
               >
                 <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-full bg-paper-200 dark:bg-obsidian-800 flex items-center justify-center text-xs font-bold text-gray-500 mt-1.5">
+                  <div className="w-6 h-6 rounded-full bg-paper-200 dark:bg-obsidian-800 flex items-center justify-center text-[10px] font-bold text-gray-500 mt-1 shrink-0">
                     {String.fromCharCode(65 + idx)}
                   </div>
                   <textarea
@@ -206,14 +205,14 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                       newOptions[idx] = e.target.value;
                       setData({ ...data, options: newOptions });
                     }}
-                    className="flex-1 bg-transparent text-sm outline-none resize-none h-16 text-paper-900 dark:text-gray-200 placeholder:text-gray-400"
+                    className="flex-1 bg-transparent text-sm outline-none resize-none h-16 text-paper-900 dark:text-gray-200 placeholder:text-gray-400 leading-relaxed"
                     placeholder={`অপশন ${String.fromCharCode(65 + idx)}`}
                   />
                 </div>
                 {/* অপশন ইমেজ আপলোড */}
                 <div className="pl-9">
                   <UploadBox
-                    height="h-16"
+                    height="h-20"
                     label="IMG"
                     image={data.optionImages?.[idx]}
                     onUpload={(e) => handleImageUpload(e, { optionIndex: idx })}
@@ -231,7 +230,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 
         {/* সঠিক উত্তর ও ব্যাখ্যা */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-500/20">
+          <div className="p-4 rounded-2xl bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-500/20">
             <Label>সঠিক উত্তর (Correct Answer)</Label>
             <div className="relative mt-2">
               <select
@@ -239,7 +238,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                 onChange={(e) =>
                   setData({ ...data, correctAnswer: e.target.value })
                 }
-                className="w-full px-4 py-2.5 rounded-lg border border-emerald-200 dark:border-emerald-500/30 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none appearance-none cursor-pointer dark:text-gray-200"
+                className="w-full px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none appearance-none cursor-pointer dark:text-gray-200"
               >
                 <option value="">সঠিক উত্তর নির্বাচন করুন</option>
                 {(data.options || []).map((opt, i) => (
@@ -250,16 +249,16 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
               </select>
               <ChevronDown
                 size={16}
-                className="absolute right-3 top-1/2 -tranneutral-y-1/2 text-emerald-500 pointer-events-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 pointer-events-none"
               />
             </div>
           </div>
 
           <div>
             <Label>ব্যাখ্যা (Explanation Image)</Label>
-            <div className="mt-2">
+            <div className="mt-2 text-center">
               <UploadBox
-                height="h-[88px]"
+                height="h-24"
                 label="ব্যাখ্যার ছবি আপলোড করুন"
                 image={data.explanationImageUrl}
                 onUpload={(e) => handleImageUpload(e, 'explanationImageUrl')}
@@ -274,27 +273,27 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
         <div>
           <Label>ব্যাখ্যা টেক্সট (Explanation Text)</Label>
           <textarea
-            rows={3}
+            rows={4}
             value={data.explanation || ''}
             onChange={(e) => setData({ ...data, explanation: e.target.value })}
-            className="w-full px-4 py-3 mt-2 rounded-xl border border-paper-200 dark:border-obsidian-700 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none resize-y placeholder:text-gray-400 dark:text-gray-200"
+            className="w-full px-4 py-3.5 mt-2 rounded-2xl border border-paper-200 dark:border-obsidian-700 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none resize-y placeholder:text-gray-400 dark:text-gray-200 leading-relaxed"
             placeholder="গাণিতিক ব্যাখ্যা দিন..."
           />
         </div>
       </div>
 
-      <div className="p-6 border-t border-paper-200 dark:border-obsidian-800 flex justify-end gap-3 bg-paper-50 dark:bg-obsidian-950 rounded-b-2xl">
+      <div className="p-4 sm:p-6 border-t border-paper-200 dark:border-obsidian-800 flex flex-col sm:flex-row justify-end gap-3 bg-paper-50 dark:bg-obsidian-950">
         <button
           onClick={onCancel}
           disabled={isUploading}
-          className="px-6 py-2.5 rounded-lg border border-paper-300 dark:border-obsidian-700 bg-white dark:bg-obsidian-900 text-gray-700 dark:text-gray-300 font-medium hover:bg-paper-50 dark:hover:bg-obsidian-800 transition-colors"
+          className="order-2 sm:order-1 px-6 py-3 rounded-xl border border-paper-300 dark:border-obsidian-700 bg-white dark:bg-obsidian-900 text-gray-700 dark:text-gray-300 font-medium hover:bg-paper-50 dark:hover:bg-obsidian-800 transition-colors w-full sm:w-auto"
         >
           বাতিল করুন
         </button>
         <button
           onClick={() => onSave(data)}
           disabled={isUploading}
-          className="px-6 py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-lg font-medium shadow-lg shadow-brand-500/20 flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70"
+          className="order-1 sm:order-2 px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-medium shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-70 w-full sm:w-auto"
         >
           <Save size={18} /> সংরক্ষণ করুন
         </button>
@@ -303,7 +302,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
   );
 };
 
-// --- Reusable Upload Box (Same as before, just kept here for context) ---
+// --- Reusable Upload Box ---
 import { Trash2, Image as ImageIcon } from 'lucide-react';
 
 const UploadBox: React.FC<{
@@ -314,7 +313,7 @@ const UploadBox: React.FC<{
   onRemove: () => void;
 }> = ({ label, height = 'h-32', image, onUpload, onRemove }) => (
   <div
-    className={`relative w-full ${height} border-2 border-dashed ${image ? 'border-brand-500/50' : 'border-paper-300 dark:border-obsidian-700 hover:border-brand-400 dark:hover:border-brand-600'} rounded-xl flex flex-col items-center justify-center transition-colors bg-paper-50/50 dark:bg-obsidian-950/30 overflow-hidden group`}
+    className={`relative w-full ${height} border-2 border-dashed ${image ? 'border-brand-500/50' : 'border-paper-300 dark:border-obsidian-700 hover:border-brand-400 dark:hover:border-brand-600'} rounded-2xl flex flex-col items-center justify-center transition-colors bg-paper-50/50 dark:bg-obsidian-950/30 overflow-hidden group`}
   >
     {image ? (
       <>
@@ -329,7 +328,7 @@ const UploadBox: React.FC<{
         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
           <button
             onClick={onRemove}
-            className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"
+            className="bg-red-500 text-white p-2.5 rounded-full hover:bg-red-600 transition-colors shadow-lg"
           >
             <Trash2 size={18} />
           </button>
@@ -343,8 +342,10 @@ const UploadBox: React.FC<{
           accept="image/*"
           onChange={onUpload}
         />
-        <ImageIcon size={20} className="mb-1 opacity-50" />
-        <span className="text-[10px] font-medium">{label || 'Upload'}</span>
+        <ImageIcon size={22} className="mb-1.5 opacity-50" />
+        <span className="text-[11px] font-bold uppercase tracking-wider">
+          {label || 'Upload'}
+        </span>
       </label>
     )}
   </div>

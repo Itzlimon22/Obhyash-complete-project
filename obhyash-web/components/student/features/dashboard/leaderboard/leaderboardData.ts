@@ -16,7 +16,7 @@ export const LEVELS: {
     label: 'লিজেন্ড (Legend)',
     minXP: 5000,
     maxXP: 100000,
-    color: 'from-fuchsia-600 to-purple-600',
+    color: 'from-rose-700 to-rose-950',
     icon: null,
   },
   {
@@ -66,7 +66,7 @@ export const MOCK_USERS: UserProfile[] = [
     xp: 5820,
     level: 'Legend',
     examsTaken: 95,
-    avatarColor: 'bg-fuchsia-500',
+    avatarColor: 'bg-rose-500',
   },
   {
     id: '2',
@@ -75,7 +75,7 @@ export const MOCK_USERS: UserProfile[] = [
     xp: 5150,
     level: 'Legend',
     examsTaken: 82,
-    avatarColor: 'bg-purple-500',
+    avatarColor: 'bg-rose-400',
   },
   {
     id: '3',
@@ -102,7 +102,7 @@ export const MOCK_USERS: UserProfile[] = [
     xp: 2850,
     level: 'Warrior',
     examsTaken: 42,
-    avatarColor: 'bg-indigo-600',
+    avatarColor: 'bg-emerald-600',
     isCurrentUser: true,
   },
   {

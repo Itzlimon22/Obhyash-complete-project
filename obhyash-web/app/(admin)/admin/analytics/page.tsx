@@ -128,7 +128,9 @@ export default function AnalyticsPage() {
         .gte('created_at', startDate.toISOString());
 
       const uniqueActiveUsers = new Set(
-        activeUsersData?.map((e: ExamResultWithUserId) => e.user_id).filter(Boolean),
+        activeUsersData
+          ?.map((e: ExamResultWithUserId) => e.user_id)
+          .filter(Boolean),
       );
 
       const totalExams = exams?.length || 0;
@@ -242,136 +244,120 @@ export default function AnalyticsPage() {
   const maxUserGrowth = Math.max(...userGrowth.map((g) => g.users), 1);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50/30 dark:from-neutral-950 dark:via-neutral-900 dark:to-blue-950/20">
-      <div className="space-y-6 md:space-y-8 animate-fade-in pb-10">
+    <div className="min-h-screen bg-white dark:bg-black p-4 lg:p-8 text-neutral-900 dark:text-neutral-100">
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 animate-fade-in pb-20 md:pb-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-rose-600 via-red-600 to-rose-600 dark:from-rose-400 dark:via-red-400 dark:to-rose-400 bg-clip-text text-transparent flex items-center gap-3">
-              <Sparkles className="w-8 h-8 text-violet-600 dark:text-violet-400" />
-              Analytics Dashboard
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-0.5">
+            <h1 className="text-xl md:text-3xl font-black text-neutral-900 dark:text-white flex items-center gap-2.5 tracking-tight">
+              <Sparkles className="text-violet-600" size={24} />
+              Analytics
             </h1>
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm mt-2 flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
-              Real-time performance insights and metrics
+            <p className="text-neutral-500 dark:text-neutral-400 text-[11px] md:text-sm font-medium">
+              Performance insights & platform metrics
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl p-1 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div className="flex bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-1 shadow-sm">
               {(['7d', '30d', '90d'] as const).map((range) => (
                 <button
                   key={range}
                   onClick={() => setTimeRange(range)}
-                  className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
+                  className={`flex-1 sm:flex-none px-3 py-1.5 text-[10px] md:text-xs font-black rounded-lg transition-all uppercase tracking-tight ${
                     timeRange === range
-                      ? 'bg-gradient-to-r from-violet-600 to-rose-600 text-white shadow-lg'
-                      : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm border border-neutral-200 dark:border-neutral-700'
+                      : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
                   }`}
                 >
-                  {range === '7d'
-                    ? '7 Days'
-                    : range === '30d'
-                      ? '30 Days'
-                      : '3 Months'}
+                  {range === '7d' ? '7D' : range === '30d' ? '30D' : '90D'}
                 </button>
               ))}
             </div>
 
-            <button
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="group flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-200 text-sm font-semibold rounded-xl border border-neutral-200 dark:border-neutral-700 transition-all shadow-sm hover:shadow-md active:scale-95 disabled:opacity-50"
-            >
-              <RefreshCw
-                size={16}
-                className={
-                  isRefreshing
-                    ? 'animate-spin'
-                    : 'group-hover:rotate-180 transition-transform duration-500'
-                }
-              />
-              <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-neutral-50 dark:bg-neutral-900 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400 text-[11px] font-black rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all uppercase tracking-tight active:scale-95 disabled:opacity-50"
+              >
+                <RefreshCw
+                  size={14}
+                  className={isRefreshing ? 'animate-spin' : ''}
+                />
+                <span>Refresh</span>
+              </button>
 
-            <button
-              onClick={handleExport}
-              className="group flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-rose-600 hover:from-violet-500 hover:to-rose-500 text-white text-sm font-bold rounded-xl shadow-lg shadow-violet-500/30 transition-all hover:shadow-xl hover:shadow-violet-500/40 active:scale-95"
-            >
-              <Download
-                size={16}
-                className="group-hover:-translate-y-0.5 transition-transform"
-              />
-              <span>Export</span>
-            </button>
+              <button
+                onClick={handleExport}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-black text-[11px] font-black rounded-xl shadow-lg active:scale-95 transition-all uppercase tracking-tight"
+              >
+                <Download size={14} />
+                <span>Export</span>
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {[
             {
-              label: 'Total Exams',
+              label: 'Exams',
               value: examStats.totalExams,
               icon: CheckCircle,
-              color: 'text-emerald-600 dark:text-emerald-400',
-              bgColor:
-                'bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950/30 dark:to-emerald-900/20',
-              borderColor: 'border-emerald-200 dark:border-emerald-800',
+              color: 'text-emerald-600',
+              bgColor: 'bg-emerald-50/50 dark:bg-emerald-500/5',
+              borderColor: 'border-emerald-100 dark:border-emerald-500/10',
               change: '+12%',
             },
             {
-              label: 'Average Score',
+              label: 'Avg Score',
               value: `${examStats.averageScore.toFixed(1)}%`,
               icon: Target,
-              color: 'text-violet-600 dark:text-violet-400',
-              bgColor:
-                'bg-gradient-to-br from-violet-50 to-violet-100 dark:from-violet-950/30 dark:to-violet-900/20',
-              borderColor: 'border-violet-200 dark:border-violet-800',
+              color: 'text-violet-600',
+              bgColor: 'bg-violet-50/50 dark:bg-violet-500/5',
+              borderColor: 'border-violet-100 dark:border-violet-500/10',
               change: '+5.2%',
             },
             {
-              label: 'Active Users',
+              label: 'Active',
               value: activeUsers,
               icon: Users,
-              color: 'text-rose-600 dark:text-rose-400',
-              bgColor:
-                'bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20',
-              borderColor: 'border-blue-200 dark:border-blue-800',
-              change: `${totalUsers} total`,
+              color: 'text-blue-600',
+              bgColor: 'bg-blue-50/50 dark:bg-blue-500/5',
+              borderColor: 'border-blue-100 dark:border-blue-500/10',
+              change: totalUsers,
             },
             {
-              label: 'Question Bank',
+              label: 'Bank',
               value: examStats.totalQuestions,
               icon: FileQuestion,
-              color: 'text-rose-600 dark:text-rose-400',
-              bgColor:
-                'bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-950/30 dark:to-rose-900/20',
-              borderColor: 'border-rose-200 dark:border-rose-800',
-              change: 'Questions',
+              color: 'text-rose-600',
+              bgColor: 'bg-rose-50/50 dark:bg-rose-500/5',
+              borderColor: 'border-rose-100 dark:border-rose-500/10',
+              change: 'Qns',
             },
           ].map((stat, i) => (
             <div
               key={i}
-              className={`${stat.bgColor} p-6 rounded-2xl border-2 ${stat.borderColor} shadow-sm hover:shadow-xl transition-all group cursor-pointer relative overflow-hidden`}
+              className={`${stat.bgColor} p-3.5 md:p-5 rounded-2xl border ${stat.borderColor} shadow-sm transition-all active:scale-[0.98] group relative overflow-hidden`}
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 dark:bg-black/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
-
               <div className="relative z-10">
-                <div className="flex justify-between items-start mb-4">
+                <div className="flex justify-between items-start mb-2.5 md:mb-4">
                   <div
-                    className={`p-3 rounded-xl bg-white dark:bg-neutral-900 ${stat.color} shadow-md group-hover:scale-110 transition-transform`}
+                    className={`p-2 rounded-lg bg-white dark:bg-neutral-900 ${stat.color} shadow-sm border border-neutral-100 dark:border-neutral-800`}
                   >
-                    <stat.icon size={24} strokeWidth={2.5} />
+                    <stat.icon size={18} strokeWidth={2.5} />
                   </div>
-                  <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-white dark:bg-neutral-900 px-2.5 py-1 rounded-lg shadow-sm">
+                  <span className="text-[9px] font-black text-neutral-400 bg-white dark:bg-neutral-900 px-1.5 py-0.5 rounded-md shadow-sm border border-neutral-100 dark:border-neutral-800 uppercase tracking-tight">
                     {stat.change}
                   </span>
                 </div>
-                <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1">
+                <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-0.5 opacity-70">
                   {stat.label}
                 </p>
-                <p className="text-3xl font-bold text-neutral-900 dark:text-white">
+                <p className="text-xl md:text-2xl font-black text-neutral-900 dark:text-white leading-none tracking-tight">
                   {isLoading ? '...' : stat.value}
                 </p>
               </div>
@@ -379,62 +365,53 @@ export default function AnalyticsPage() {
           ))}
         </div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Insights Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           {/* User Growth Chart */}
-          <div className="lg:col-span-2 bg-white dark:bg-neutral-800 p-6 rounded-2xl border-2 border-neutral-200 dark:border-neutral-700 shadow-lg hover:shadow-xl transition-shadow">
-            <div className="flex justify-between items-center mb-6">
+          <div className="lg:col-span-2 bg-neutral-50 dark:bg-neutral-900 p-4 md:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            <div className="flex justify-between items-center mb-5">
               <div>
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-950/30 rounded-lg">
-                    <TrendingUp className="w-5 h-5 text-rose-600 dark:text-rose-400" />
-                  </div>
-                  User Growth Trend
+                <h3 className="text-xs md:text-sm font-black text-neutral-900 dark:text-white uppercase tracking-widest flex items-center gap-2 opacity-80">
+                  <TrendingUp className="text-rose-500" size={16} /> User
+                  Acquisition
                 </h3>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 ml-11">
-                  Cumulative user registrations
-                </p>
               </div>
-              <div className="flex items-center gap-2 text-xs">
-                <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-violet-500"></div>
-                <span className="text-neutral-600 dark:text-neutral-400 font-medium">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
+                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-tight">
                   Total Users
                 </span>
               </div>
             </div>
 
             {isLoading ? (
-              <div className="h-64 flex items-center justify-center bg-neutral-50 dark:bg-neutral-900 rounded-xl">
-                <RefreshCw className="w-8 h-8 animate-spin text-neutral-400" />
+              <div className="h-[240px] md:h-[300px] flex items-center justify-center bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800">
+                <RefreshCw className="w-6 h-6 animate-spin text-neutral-400" />
               </div>
             ) : userGrowth.length === 0 ? (
-              <div className="h-64 flex flex-col items-center justify-center bg-neutral-50 dark:bg-neutral-900 rounded-xl">
-                <Brain className="w-16 h-16 text-neutral-300 dark:text-neutral-600 mb-3" />
-                <p className="text-neutral-500 dark:text-neutral-400 font-medium">
-                  No data available
-                </p>
-                <p className="text-xs text-neutral-400 dark:text-neutral-500">
-                  Try selecting a different time range
+              <div className="h-[240px] md:h-[300px] flex flex-col items-center justify-center bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800">
+                <Brain className="w-12 h-12 text-neutral-200 dark:text-neutral-700 mb-2" />
+                <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                  Insufficient Data
                 </p>
               </div>
             ) : (
-              <div className="h-64 bg-gradient-to-br from-blue-50/50 to-violet-50/50 dark:from-blue-950/20 dark:to-violet-950/20 rounded-xl p-4">
-                <svg viewBox="0 0 1000 250" className="w-full h-full">
+              <div className="h-[240px] md:h-[300px] bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800 p-4 overflow-hidden">
+                <svg
+                  viewBox="0 0 1000 250"
+                  className="w-full h-full"
+                  preserveAspectRatio="none"
+                >
                   <defs>
                     <linearGradient
-                      id="userGrowthGradient"
+                      id="growthGrad"
                       x1="0%"
                       y1="0%"
                       x2="0%"
                       y2="100%"
                     >
-                      <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" />
-                      <stop
-                        offset="50%"
-                        stopColor="#8b5cf6"
-                        stopOpacity="0.2"
-                      />
-                      <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0" />
+                      <stop offset="0%" stopColor="#f43f5e" stopOpacity="0.2" />
+                      <stop offset="100%" stopColor="#f43f5e" stopOpacity="0" />
                     </linearGradient>
                   </defs>
 
@@ -446,10 +423,9 @@ export default function AnalyticsPage() {
                       y1={i * 62.5}
                       x2="1000"
                       y2={i * 62.5}
-                      stroke="currentColor"
-                      strokeWidth="0.5"
-                      className="text-neutral-200 dark:text-neutral-700"
-                      strokeDasharray="5,5"
+                      className="stroke-neutral-100 dark:stroke-neutral-900"
+                      strokeWidth="1"
+                      strokeDasharray="4,4"
                     />
                   ))}
 
@@ -457,53 +433,43 @@ export default function AnalyticsPage() {
                   <path
                     d={`M 0 250 ${userGrowth
                       .map((d, i) => {
-                        const x =
-                          userGrowth.length > 1
-                            ? (i / (userGrowth.length - 1)) * 1000
-                            : 500;
+                        const x = (i / (userGrowth.length - 1)) * 1000;
                         const y = 250 - (d.users / maxUserGrowth) * 220;
                         return `L ${x} ${y}`;
                       })
                       .join(' ')} L 1000 250 Z`}
-                    fill="url(#userGrowthGradient)"
+                    fill="url(#growthGrad)"
                   />
 
                   {/* Line */}
                   <path
                     d={`M ${userGrowth
                       .map((d, i) => {
-                        const x =
-                          userGrowth.length > 1
-                            ? (i / (userGrowth.length - 1)) * 1000
-                            : 500;
+                        const x = (i / (userGrowth.length - 1)) * 1000;
                         const y = 250 - (d.users / maxUserGrowth) * 220;
                         return `${x},${y}`;
                       })
                       .join(' L ')}`}
                     fill="none"
-                    stroke="url(#userGrowthGradient)"
-                    strokeWidth="4"
+                    stroke="#f43f5e"
+                    strokeWidth="3"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
 
-                  {/* Dots */}
+                  {/* Nodes */}
                   {userGrowth.map((d, i) => {
-                    const x =
-                      userGrowth.length > 1
-                        ? (i / (userGrowth.length - 1)) * 1000
-                        : 500;
+                    const x = (i / (userGrowth.length - 1)) * 1000;
                     const y = 250 - (d.users / maxUserGrowth) * 220;
                     return (
                       <circle
                         key={i}
                         cx={x}
                         cy={y}
-                        r="5"
+                        r="4"
                         fill="white"
-                        stroke="#3b82f6"
-                        strokeWidth="3"
-                        className="hover:r-8 transition-all"
+                        stroke="#f43f5e"
+                        strokeWidth="2.5"
                       />
                     );
                   })}
@@ -512,57 +478,54 @@ export default function AnalyticsPage() {
             )}
           </div>
 
-          {/* Top Performers */}
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 p-6 rounded-2xl border-2 border-amber-200 dark:border-amber-800 shadow-lg hover:shadow-xl transition-shadow">
-            <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
-              <div className="p-2 bg-amber-100 dark:bg-amber-950/30 rounded-lg">
-                <Award className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-              </div>
-              Top Performers
+          {/* Top Performers Section */}
+          <div className="bg-neutral-50 dark:bg-neutral-900 p-4 md:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            <h3 className="text-xs md:text-sm font-black text-neutral-900 dark:text-white mb-5 flex items-center gap-2 uppercase tracking-widest opacity-80">
+              <Award className="text-amber-500" size={16} /> Leaderboard
             </h3>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2.5">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <div
                     key={i}
-                    className="h-16 bg-white/50 dark:bg-neutral-700/50 rounded-xl animate-pulse"
+                    className="h-14 bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800 animate-pulse"
                   ></div>
                 ))
               ) : topPerformers.length === 0 ? (
-                <div className="text-center py-8 bg-white/50 dark:bg-neutral-800/50 rounded-xl">
-                  <Zap className="w-12 h-12 mx-auto mb-2 text-neutral-300 dark:text-neutral-600" />
-                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                    No performers yet
+                <div className="col-span-full py-10 flex flex-col items-center justify-center bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800">
+                  <Zap className="text-neutral-200 dark:text-neutral-700 mb-2" />
+                  <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                    No Activites
                   </p>
                 </div>
               ) : (
                 topPerformers.map((performer, index) => (
                   <div
                     key={performer.id}
-                    className="flex items-center gap-3 p-3 bg-white dark:bg-neutral-800 rounded-xl hover:shadow-md transition-all cursor-pointer group border border-neutral-200 dark:border-neutral-700"
+                    className="flex items-center gap-3 p-2.5 bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800 shadow-sm active:scale-[0.98] transition-all group"
                   >
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shadow-md ${
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center font-black text-xs shadow-sm ${
                         index === 0
-                          ? 'bg-gradient-to-br from-amber-400 to-amber-600 text-white'
+                          ? 'bg-amber-100 text-amber-600'
                           : index === 1
-                            ? 'bg-gradient-to-br from-neutral-300 to-neutral-400 text-neutral-700'
+                            ? 'bg-neutral-100 text-neutral-500'
                             : index === 2
-                              ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white'
-                              : 'bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-700 dark:to-neutral-800 text-neutral-600 dark:text-neutral-300'
+                              ? 'bg-orange-100 text-orange-600'
+                              : 'bg-neutral-50 text-neutral-400'
                       }`}
                     >
                       {index + 1}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-neutral-900 dark:text-white truncate group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                      <p className="text-[13px] font-black text-neutral-900 dark:text-white truncate tracking-tight">
                         {performer.name}
                       </p>
-                      <p className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
-                        <CheckCircle className="w-3 h-3" />
-                        {performer.examsCompleted} exams completed
-                      </p>
+                      <div className="flex items-center gap-1.5 text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">
+                        <CheckCircle size={10} className="text-rose-500" />
+                        {performer.examsCompleted} EXAMS
+                      </div>
                     </div>
                   </div>
                 ))
@@ -572,76 +535,68 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Subject Performance */}
-        <div className="bg-white dark:bg-neutral-800 p-6 rounded-2xl border-2 border-neutral-200 dark:border-neutral-700 shadow-lg hover:shadow-xl transition-shadow">
-          <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
-            <div className="p-2 bg-rose-100 dark:bg-rose-950/30 rounded-lg">
-              <BookOpen className="w-5 h-5 text-rose-600 dark:text-rose-400" />
-            </div>
-            Subject-wise Performance
+        <div className="bg-neutral-50 dark:bg-neutral-900 p-4 md:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+          <h3 className="text-xs md:text-sm font-black text-neutral-900 dark:text-white mb-5 flex items-center gap-2 uppercase tracking-widest opacity-80">
+            <BookOpen className="text-rose-500" size={16} /> Subject Metrics
           </h3>
 
           {isLoading ? (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {Array.from({ length: 3 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-20 bg-neutral-100 dark:bg-neutral-700 rounded-xl animate-pulse"
+                  className="h-28 bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800 animate-pulse"
                 ></div>
               ))}
             </div>
           ) : subjectPerformance.length === 0 ? (
-            <div className="text-center py-12 bg-neutral-50 dark:bg-neutral-900 rounded-xl">
-              <Brain className="w-16 h-16 mx-auto mb-3 text-neutral-300 dark:text-neutral-600" />
-              <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                No exam data available
-              </p>
-              <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
-                Exams will appear here once students start taking them
+            <div className="text-center py-12 bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800">
+              <Brain className="w-10 h-10 mx-auto mb-2 text-neutral-200 dark:text-neutral-700" />
+              <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                No active subjects
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {subjectPerformance.map((subject, index) => (
                 <div
                   key={index}
-                  className="group p-4 bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-900 dark:to-neutral-800 rounded-xl border-2 border-neutral-200 dark:border-neutral-700 hover:border-violet-300 dark:hover:border-violet-700 transition-all hover:shadow-lg"
+                  className="group p-3.5 bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800 shadow-sm hover:border-rose-200 dark:hover:border-rose-900 transition-all active:scale-[0.98]"
                 >
                   <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 via-violet-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 rounded-lg bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center text-rose-600 font-black text-sm shadow-inner group-hover:scale-110 transition-transform">
                         {subject.subject.charAt(0)}
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-neutral-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                        <p className="text-[13px] font-black text-neutral-900 dark:text-white truncate tracking-tight">
                           {subject.subject}
                         </p>
-                        <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                          {subject.examsCount} exams
+                        <p className="text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">
+                          {subject.examsCount} EXAMS
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xl font-bold bg-gradient-to-r from-violet-600 to-rose-600 bg-clip-text text-transparent">
+                      <p className="text-sm font-black text-rose-600 dark:text-rose-400 tracking-tighter">
                         {subject.averageScore.toFixed(1)}%
                       </p>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="h-2.5 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+                  <div className="space-y-1.5">
+                    <div className="h-2 bg-neutral-100 dark:bg-neutral-900 rounded-full overflow-hidden border border-neutral-50 dark:border-neutral-800">
                       <div
-                        className="h-full bg-gradient-to-r from-rose-500 via-violet-500 to-blue-500 rounded-full transition-all duration-500 group-hover:scale-x-105"
+                        className="h-full bg-rose-500 rounded-full transition-all duration-700"
                         style={{
                           width: `${Math.min(subject.averageScore, 100)}%`,
                         }}
                       ></div>
                     </div>
-                    <div className="flex justify-between text-xs text-neutral-500 dark:text-neutral-400">
+                    <div className="flex justify-between text-[9px] font-black text-neutral-400 uppercase tracking-tighter opacity-70">
                       <span className="flex items-center gap-1">
-                        <Users className="w-3 h-3" />
-                        {subject.totalStudents} students
+                        <Users size={10} /> {subject.totalStudents} STUDENTS
                       </span>
-                      <span className="font-medium">Avg Score</span>
                     </div>
                   </div>
                 </div>

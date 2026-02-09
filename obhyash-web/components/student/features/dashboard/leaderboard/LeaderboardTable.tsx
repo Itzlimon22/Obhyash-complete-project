@@ -113,7 +113,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                     key={user.id}
                     className={`
                                         transition-colors group
-                                        ${isMe ? 'bg-indigo-50/60 dark:bg-indigo-900/10' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/30'}
+                                        ${isMe ? 'bg-rose-50/60 dark:bg-rose-900/10' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/30'}
                                     `}
                   >
                     <td className="px-3 py-3 md:px-6 md:py-5 text-center">
@@ -131,15 +131,15 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                         <UserAvatar
                           user={user}
                           size="lg"
-                          className={`ring-2 ${isMe ? 'ring-indigo-200 dark:ring-indigo-800' : 'ring-transparent'}`}
+                          className={`ring-2 ${isMe ? 'ring-rose-200 dark:ring-rose-800' : 'ring-transparent'}`}
                         />
                         <div className="min-w-0 flex-1">
                           <div
-                            className={`font-bold text-sm md:text-lg truncate ${isMe ? 'text-indigo-700 dark:text-indigo-300' : 'text-neutral-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors'}`}
+                            className={`font-bold text-sm md:text-lg truncate ${isMe ? 'text-rose-700 dark:text-rose-300' : 'text-neutral-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors'}`}
                           >
                             {user.name}
                             {isMe && (
-                              <span className="ml-2 text-[8px] md:text-[10px] px-1.5 py-0.5 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 rounded-full font-bold uppercase tracking-wide align-middle">
+                              <span className="ml-2 text-[8px] md:text-[10px] px-1.5 py-0.5 bg-rose-100 dark:bg-rose-900 text-rose-600 dark:text-rose-300 rounded-full font-bold uppercase tracking-wide align-middle">
                                 You
                               </span>
                             )}
@@ -151,7 +151,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                       </div>
                     </td>
                     <td className="px-3 py-3 md:px-6 md:py-5 text-right whitespace-nowrap">
-                      <div className="font-mono font-bold text-indigo-600 dark:text-indigo-400 text-sm md:text-xl">
+                      <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm md:text-xl">
                         {user.xp.toLocaleString()}
                       </div>
                     </td>

@@ -48,7 +48,7 @@ export default function AdminProfilePage() {
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <EditProfileModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
@@ -57,23 +57,24 @@ export default function AdminProfilePage() {
       />
 
       {/* 1. Profile Banner & Header Card */}
-      <div className="relative rounded-3xl overflow-hidden bg-white dark:bg-obsidian-900 shadow-xl border border-paper-200 dark:border-obsidian-800">
+      <div className="relative rounded-[2.5rem] overflow-hidden bg-white dark:bg-neutral-900 shadow-xl border border-neutral-200 dark:border-neutral-800">
         {/* Banner Image */}
-        <div className="h-48 bg-gradient-to-r from-brand-500 to-rose-600 relative">
+        <div className="h-32 sm:h-48 bg-gradient-to-r from-rose-600 to-rose-400 relative">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
           <div className="absolute top-4 right-4">
-            <button className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2">
-              <Edit2 size={14} /> Edit Cover
+            <button className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white p-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2">
+              <Edit2 size={14} />
+              <span className="hidden sm:inline">ব্যানার পরিবর্তন</span>
             </button>
           </div>
         </div>
 
         {/* Profile Info Wrapper */}
-        <div className="px-8 pb-8">
-          <div className="flex flex-col md:flex-row gap-6 items-start -mt-16">
+        <div className="px-6 sm:px-10 pb-8">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-center sm:items-start -mt-12 sm:mt-[-4rem]">
             {/* Avatar */}
             <div className="relative group">
-              <div className="w-32 h-32 rounded-full border-4 border-white dark:border-obsidian-900 bg-white dark:bg-obsidian-800 shadow-lg overflow-hidden flex items-center justify-center">
+              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-[2rem] border-4 border-white dark:border-neutral-900 bg-white dark:bg-neutral-800 shadow-xl overflow-hidden flex items-center justify-center">
                 {user?.avatarUrl ? (
                   <img
                     src={user.avatarUrl}
@@ -81,42 +82,47 @@ export default function AdminProfilePage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-brand-100 to-rose-100 dark:from-brand-900 dark:to-rose-900 flex items-center justify-center text-4xl font-bold text-brand-600 dark:text-brand-400">
+                  <div className="w-full h-full bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-900 dark:to-rose-800 flex items-center justify-center text-5xl font-black text-rose-600 dark:text-rose-400">
                     {user?.name?.[0]?.toUpperCase() || 'A'}
                   </div>
                 )}
               </div>
               <button
                 onClick={() => setIsEditModalOpen(true)}
-                className="absolute bottom-2 right-2 bg-brand-500 text-white p-2 rounded-full shadow-lg hover:bg-brand-600 transition-colors"
+                className="absolute -bottom-1 -right-1 bg-white dark:bg-neutral-800 text-rose-600 p-2.5 rounded-2xl shadow-xl hover:bg-rose-50 dark:hover:bg-rose-900/50 transition-all border border-neutral-100 dark:border-neutral-700 active:scale-90"
               >
-                <Edit2 size={16} />
+                <Edit2 size={16} strokeWidth={3} />
               </button>
             </div>
 
             {/* Name & Role */}
-            <div className="flex-1 pt-16 md:pt-20">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <h1 className="text-2xl font-bold text-paper-900 dark:text-white">
-                    {user?.name || 'Admin User'}
+            <div className="flex-1 pt-4 sm:pt-20 text-center sm:text-left">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div className="space-y-1">
+                  <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
+                    {user?.name || 'অ্যাডমিন ইউজার'}
                   </h1>
-                  <p className="text-paper-500 dark:text-gray-400 flex items-center gap-2 mt-1">
-                    <Shield size={16} className="text-brand-500" />
-                    {user?.role || 'Super Administrator'}
-                    <span className="w-1.5 h-1.5 rounded-full bg-paper-300 dark:bg-gray-600"></span>
-                    <span className="text-green-500 font-medium">Active</span>
-                  </p>
+                  <div className="flex items-center justify-center sm:justify-start gap-2">
+                    <span className="px-3 py-1 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 text-[10px] font-black uppercase tracking-[0.2em] border border-rose-100 dark:border-rose-500/20">
+                      {user?.role === 'Admin'
+                        ? 'সুপার অ্যাডমিন'
+                        : 'অ্যাডমিনিস্ট্রেটর'}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-emerald-500 text-[10px] font-black uppercase tracking-widest pl-2">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                      সক্রিয়
+                    </span>
+                  </div>
                 </div>
-                <div className="flex gap-3">
-                  <button className="px-6 py-2 bg-gray-100 border border-gray-200 dark:bg-obsidian-800 dark:border-obsidian-700 text-gray-900 dark:text-white rounded-xl hover:bg-gray-200 dark:hover:bg-obsidian-700 transition-colors font-medium">
-                    Settings
+                <div className="flex items-center justify-center gap-3">
+                  <button className="flex-1 sm:flex-none px-6 py-3.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 rounded-2xl hover:bg-neutral-200 transition-all font-black text-xs uppercase tracking-widest active:scale-95">
+                    সেটিংস
                   </button>
                   <button
                     onClick={() => setIsEditModalOpen(true)}
-                    className="px-6 py-2 bg-brand-500 text-white rounded-xl hover:bg-brand-600 shadow-lg shadow-brand-500/20 transition-all font-medium"
+                    className="flex-1 sm:flex-none px-6 py-3.5 bg-rose-600 text-white rounded-2xl hover:bg-rose-700 shadow-xl shadow-rose-500/30 transition-all font-black text-xs uppercase tracking-widest active:scale-95"
                   >
-                    Edit Profile
+                    প্রোফাইল এডিট
                   </button>
                 </div>
               </div>
@@ -128,82 +134,84 @@ export default function AdminProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 2. Personal Information (Left Column) */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white dark:bg-obsidian-900 rounded-2xl p-6 shadow-sm border border-paper-200 dark:border-obsidian-800">
-            <h3 className="text-lg font-bold text-paper-900 dark:text-white mb-6 flex items-center gap-2">
-              <User size={20} className="text-brand-500" />
-              About Me
+          <div className="bg-white dark:bg-neutral-900 rounded-[2rem] p-6 sm:p-8 shadow-sm border border-neutral-200 dark:border-neutral-800">
+            <h3 className="text-lg font-black text-neutral-900 dark:text-white mb-8 flex items-center gap-3">
+              <span className="p-2 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-xl">
+                <User size={20} />
+              </span>
+              আমার সম্পর্কে
             </h3>
 
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 p-3 rounded-xl bg-gray-50 border border-gray-100 dark:bg-obsidian-800/50 dark:border-obsidian-700/50">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
+            <div className="grid grid-cols-1 gap-4">
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 transition-all hover:border-blue-100 dark:hover:border-blue-900/30 group">
+                <div className="p-2.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl transition-transform group-hover:scale-110">
                   <Mail size={18} />
                 </div>
                 <div>
-                  <p className="text-xs text-paper-500 dark:text-gray-500 uppercase font-semibold">
-                    Email
+                  <p className="text-[10px] text-neutral-400 dark:text-neutral-500 uppercase font-black tracking-widest leading-none mb-1.5">
+                    ইমেইল
                   </p>
-                  <p className="text-sm font-medium text-paper-900 dark:text-gray-200">
-                    {user?.email || 'Not Provided'}
+                  <p className="text-sm font-black text-neutral-900 dark:text-neutral-200 truncate">
+                    {user?.email || 'ব্যক্তিগত তথ্য'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 p-3 rounded-xl bg-paper-50 dark:bg-obsidian-800/50">
-                <div className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg">
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 transition-all hover:border-emerald-100 dark:hover:border-emerald-900/30 group">
+                <div className="p-2.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl transition-transform group-hover:scale-110">
                   <Phone size={18} />
                 </div>
                 <div>
-                  <p className="text-xs text-paper-500 dark:text-gray-500 uppercase font-semibold">
-                    Phone
+                  <p className="text-[10px] text-neutral-400 dark:text-neutral-500 uppercase font-black tracking-widest leading-none mb-1.5">
+                    ফোন
                   </p>
-                  <p className="text-sm font-medium text-paper-900 dark:text-gray-200">
-                    {user?.phone || 'Not Set'}
+                  <p className="text-sm font-black text-neutral-900 dark:text-neutral-200">
+                    {user?.phone || '০১৭XXXXXXXX'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 p-3 rounded-xl bg-paper-50 dark:bg-obsidian-800/50">
-                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg">
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 transition-all hover:border-indigo-100 dark:hover:border-indigo-900/30 group">
+                <div className="p-2.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl transition-transform group-hover:scale-110">
                   <MapPin size={18} />
                 </div>
                 <div>
-                  <p className="text-xs text-paper-500 dark:text-gray-500 uppercase font-semibold">
-                    Location
+                  <p className="text-[10px] text-neutral-400 dark:text-neutral-500 uppercase font-black tracking-widest leading-none mb-1.5">
+                    ঠিকানা
                   </p>
-                  <p className="text-sm font-medium text-paper-900 dark:text-gray-200">
-                    {user?.address || 'Not Set'}
+                  <p className="text-sm font-black text-neutral-900 dark:text-neutral-200 truncate">
+                    {user?.address || 'তথ্য প্রদান করা হয়নি'}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 p-3 rounded-xl bg-paper-50 dark:bg-obsidian-800/50">
-                <div className="p-2 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-lg">
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 transition-all hover:border-purple-100 dark:hover:border-purple-900/30 group">
+                <div className="p-2.5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-xl transition-transform group-hover:scale-110">
                   <Calendar size={18} />
                 </div>
                 <div>
-                  <p className="text-xs text-paper-500 dark:text-gray-500 uppercase font-semibold">
-                    Joined
+                  <p className="text-[10px] text-neutral-400 dark:text-neutral-500 uppercase font-black tracking-widest leading-none mb-1.5">
+                    জয়েন করেছেন
                   </p>
-                  <p className="text-sm font-medium text-paper-900 dark:text-gray-200">
+                  <p className="text-sm font-black text-neutral-900 dark:text-neutral-200">
                     {user?.createdAt
-                      ? new Date(user.createdAt).toLocaleDateString('en-US', {
+                      ? new Date(user.createdAt).toLocaleDateString('bn-BD', {
                           month: 'long',
                           year: 'numeric',
                         })
-                      : 'Unknown'}
+                      : 'জানুয়ারি ২০২৪'}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-paper-100 dark:border-obsidian-800">
-              <h4 className="text-sm font-semibold text-paper-900 dark:text-white mb-3">
-                Bio
+            <div className="mt-8 pt-6 border-t border-neutral-100 dark:border-neutral-800">
+              <h4 className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-3.5 ml-1">
+                বায়ো (Bio)
               </h4>
-              <p className="text-sm text-paper-500 dark:text-gray-400 leading-relaxed whitespace-pre-wrap">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed font-medium bg-neutral-50 dark:bg-black/20 p-4 rounded-2xl border border-neutral-100 dark:border-neutral-800/50 italic">
                 {user?.bio ||
-                  'No bio provided yet. Click "Edit Profile" to add details about yourself.'}
+                  'আপনার সম্পর্কে আরও তথ্য দিতে প্রোফাইল এডিট করুন।'}
               </p>
             </div>
           </div>
@@ -212,105 +220,102 @@ export default function AdminProfilePage() {
         {/* 3. Stats & Activity (Right Column - Spans 2) */}
         <div className="lg:col-span-2 space-y-6">
           {/* Quick Stats Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white dark:bg-obsidian-900 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-obsidian-800 flex items-center gap-4 hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div className="bg-white dark:bg-neutral-900 p-6 rounded-[2rem] shadow-sm border border-neutral-100 dark:border-neutral-800 transition-all hover:shadow-md group">
+              <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center transition-transform group-hover:scale-110">
                 <Activity size={24} />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-paper-900 dark:text-white">
-                  128
+              <div className="mt-6">
+                <p className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white leading-none">
+                  ১২৮
                 </p>
-                <p className="text-xs text-paper-500 dark:text-gray-400 font-medium">
-                  Actions Today
+                <p className="text-[10px] text-neutral-400 font-black uppercase tracking-widest mt-2 leading-none">
+                  আজকের অ্যাকশন
                 </p>
               </div>
             </div>
-            <div className="bg-white dark:bg-obsidian-900 p-5 rounded-2xl shadow-sm border border-paper-200 dark:border-obsidian-800 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <div className="bg-white dark:bg-neutral-900 p-6 rounded-[2rem] shadow-sm border border-neutral-100 dark:border-neutral-800 transition-all hover:shadow-md group">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center transition-transform group-hover:scale-110">
                 <BookOpen size={24} />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-paper-900 dark:text-white">
-                  24
+              <div className="mt-6">
+                <p className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white leading-none">
+                  ২৪
                 </p>
-                <p className="text-xs text-paper-500 dark:text-gray-400 font-medium">
-                  Pending Reviews
+                <p className="text-[10px] text-neutral-400 font-black uppercase tracking-widest mt-2 leading-none">
+                  বাকি রিভিউ
                 </p>
               </div>
             </div>
-            <div className="bg-white dark:bg-obsidian-900 p-5 rounded-2xl shadow-sm border border-paper-200 dark:border-obsidian-800 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <div className="col-span-2 sm:col-span-1 bg-white dark:bg-neutral-900 p-6 rounded-[2rem] shadow-sm border border-neutral-100 dark:border-neutral-800 transition-all hover:shadow-md group flex sm:block items-center justify-between">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-transform group-hover:scale-110">
                 <Award size={24} />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-paper-900 dark:text-white">
-                  Active
+              <div className="sm:mt-6 text-right sm:text-left">
+                <p className="text-2xl sm:text-3xl font-black text-emerald-500 leading-none">
+                  সক্রিয়
                 </p>
-                <p className="text-xs text-paper-500 dark:text-gray-400 font-medium">
-                  Team Status
+                <p className="text-[10px] text-neutral-400 font-black uppercase tracking-widest mt-2 leading-none">
+                  টিম স্ট্যাটাস
                 </p>
               </div>
             </div>
           </div>
 
           {/* Activity Timeline */}
-          <div className="bg-white dark:bg-obsidian-900 rounded-2xl shadow-sm border border-paper-200 dark:border-obsidian-800 flex-1">
-            <div className="p-6 border-b border-paper-100 dark:border-obsidian-800 flex justify-between items-center">
-              <h3 className="text-lg font-bold text-paper-900 dark:text-white flex items-center gap-2">
-                <Clock size={20} className="text-brand-500" />
-                Recent Activity
-              </h3>
-              <button className="text-sm text-brand-500 hover:text-brand-600 font-medium">
-                View All
+          <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] shadow-sm border border-neutral-200 dark:border-neutral-800 flex-1 overflow-hidden">
+            <div className="p-6 sm:p-8 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center transition-all bg-neutral-50/50 dark:bg-neutral-800/20">
+              <div className="flex items-center gap-3">
+                <span className="p-2 bg-rose-600 text-white rounded-xl shadow-lg shadow-rose-500/20">
+                  <Clock size={20} />
+                </span>
+                <h3 className="text-lg font-black text-neutral-900 dark:text-white tracking-tight">
+                  সাম্প্রতিক অ্যাক্টিভিটি
+                </h3>
+              </div>
+              <button className="text-[10px] font-black text-rose-600 uppercase tracking-[0.2em] hover:text-rose-700">
+                সব দেখুন
               </button>
             </div>
-            <div className="p-6">
-              {/* Mock Activity List */}
-              <div className="relative pl-6 border-l-2 border-paper-100 dark:border-obsidian-800 space-y-8">
+            <div className="p-6 sm:p-10">
+              {/* Activity List */}
+              <div className="relative pl-8 border-l-4 border-neutral-100 dark:border-neutral-800 space-y-10 ml-2">
                 {[
                   {
-                    title: 'Approved 5 Manual Payments',
-                    time: '2 hours ago',
+                    title: '৫টি ম্যানুয়াল পেমেন্ট অ্যাপ্রুভ করেছেন',
+                    time: '২ ঘণ্টা আগে',
                     type: 'payment',
-                    desc: 'Verified transactions for student subscriptions.',
+                    desc: 'শিক্ষার্থীদের সাবস্ক্রিপশন ট্রানজ্যাকশন ভেরিফাই করা হয়েছে।',
                   },
                   {
-                    title: 'Updated System Settings',
-                    time: '5 hours ago',
+                    title: 'সিস্টেম সেটিংস আপডেট করেছেন',
+                    time: '৫ ঘণ্টা আগে',
                     type: 'system',
-                    desc: 'Changed default language settings for new users.',
+                    desc: 'নতুন ব্যবহারকারীদের জন্য ডিফল্ট ভাষা পরিবর্তন করা হয়েছে।',
                   },
                   {
-                    title: 'Resolved 3 User Reports',
-                    time: 'Yesterday',
+                    title: '৩টি ইউজার রিপোর্ট সমাধান করেছেন',
+                    time: 'গতকাল',
                     type: 'report',
-                    desc: 'Addressed question error reports in Physics 1st Paper.',
-                  },
-                  {
-                    title: 'Created New Question Bank',
-                    time: '2 days ago',
-                    type: 'content',
-                    desc: 'Added 50 new questions to Biology chapter.',
+                    desc: 'পদার্থবিজ্ঞান ১ম পত্রের প্রশ্নের ভুল সংশোধন করা হয়েছে।',
                   },
                 ].map((item, idx) => (
-                  <div key={idx} className="relative">
+                  <div key={idx} className="relative group">
                     <span
-                      className={`absolute -left-[31px] w-4 h-4 rounded-full border-2 border-white dark:border-obsidian-900 shadow-sm
-                              ${item.type === 'payment' ? 'bg-green-500' : ''}
-                              ${item.type === 'system' ? 'bg-blue-500' : ''}
-                              ${item.type === 'report' ? 'bg-orange-500' : ''}
-                              ${item.type === 'content' ? 'bg-purple-500' : ''}
+                      className={`absolute -left-[40px] top-0 w-5 h-5 rounded-full border-4 border-white dark:border-neutral-900 shadow-xl transition-transform group-hover:scale-125
+                              ${item.type === 'payment' ? 'bg-emerald-500' : ''}
+                              ${item.type === 'system' ? 'bg-indigo-500' : ''}
+                              ${item.type === 'report' ? 'bg-amber-500' : ''}
                            `}
                     ></span>
-                    <div>
-                      <p className="text-sm font-semibold text-paper-900 dark:text-white">
+                    <div className="space-y-1.5 transition-all group-hover:translate-x-2">
+                      <p className="text-sm font-black text-neutral-900 dark:text-white leading-tight">
                         {item.title}
                       </p>
-                      <p className="text-xs text-paper-400 dark:text-gray-500 mb-1">
+                      <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-widest pl-0.5">
                         {item.time}
                       </p>
-                      <p className="text-sm text-paper-600 dark:text-gray-400">
+                      <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed max-w-lg">
                         {item.desc}
                       </p>
                     </div>

@@ -102,7 +102,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               placeholder="বিষয় অনুযায়ী খুঁজুন... (Subject)"
               value={filterSubject}
               onChange={(e) => setFilterSubject(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
           <div className="md:w-1/3">
@@ -113,7 +113,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 setFilterDate(e.target.value);
                 setVisibleCount(5);
               }}
-              className="w-full px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
         </div>
@@ -121,7 +121,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex items-center gap-5">
-            <div className="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+            <div className="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -359,7 +359,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
 
                     <button
                       onClick={() => onViewResult(item)}
-                      className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-indigo-600 dark:text-indigo-400 rounded-lg font-bold hover:bg-indigo-50 dark:hover:bg-neutral-700 transition-colors flex items-center gap-2 border border-neutral-200 dark:border-neutral-700"
+                      className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-emerald-600 dark:text-emerald-400 rounded-lg font-bold hover:bg-emerald-50 dark:hover:bg-neutral-700 transition-colors flex items-center gap-2 border border-neutral-200 dark:border-neutral-700"
                     >
                       <span>ফলাফল দেখুন</span>
                       <svg

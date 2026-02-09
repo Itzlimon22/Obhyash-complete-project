@@ -75,7 +75,7 @@ const ResultStats: React.FC<ResultStatsProps> = ({
 
         {/* Points */}
         <div className="bg-white dark:bg-neutral-900 p-3 md:p-5 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
-          <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center mb-2 text-indigo-600 dark:text-indigo-400">
+          <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center mb-2 text-rose-600 dark:text-rose-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -104,7 +104,7 @@ const ResultStats: React.FC<ResultStatsProps> = ({
 
         {/* Time */}
         <div className="bg-white dark:bg-neutral-900 p-3 md:p-5 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors col-span-2 md:col-span-1">
-          <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-2 text-blue-600 dark:text-blue-400">
+          <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-2 text-emerald-600 dark:text-emerald-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -200,7 +200,7 @@ const ResultStats: React.FC<ResultStatsProps> = ({
           <span className="font-bold text-sm md:text-base text-neutral-900 dark:text-white">
             মোট প্রাপ্ত নম্বর
           </span>
-          <span className="font-bold text-sm md:text-base text-indigo-600 dark:text-indigo-400">
+          <span className="font-bold text-sm md:text-base text-emerald-600 dark:text-emerald-400">
             {finalScore.toFixed(2)} / {totalPoints}
           </span>
         </div>

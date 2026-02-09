@@ -240,48 +240,27 @@ export default function OmrCheckPage() {
   const scriptSubmissions = submissions;
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-black p-6 animate-fade-in relative">
-      <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div className="space-y-1">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white flex items-center gap-3">
-              <span className="bg-rose-600 text-white p-2 rounded-xl shadow-lg shadow-rose-500/20">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z"
-                  />
-                </svg>
-              </span>
+    <div className="min-h-screen bg-neutral-50 dark:bg-black p-4 sm:p-6 animate-fade-in relative">
+      <div className="max-w-6xl mx-auto space-y-4 sm:space-y-8">
+        <div className="flex flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="bg-rose-600 text-white p-2 rounded-2xl shadow-lg shadow-rose-500/20">
+              <Activity size={24} />
+            </span>
+            <h1 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
               OMR চেকিং
             </h1>
-            <p className="text-neutral-500 dark:text-neutral-400 text-sm">
-              শিক্ষার্থীদের জমা দেওয়া OMR স্ক্রিপ্ট মূল্যায়ন করুন
-            </p>
           </div>
           <button
             onClick={fetchSubmissions}
-            className="p-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-500 hover:text-rose-600 dark:hover:text-rose-400 transition-all shadow-sm shrink-0 w-fit active:scale-95"
+            className="p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-500 hover:text-rose-600 transition-all shadow-sm active:scale-95"
             title="Refresh"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              strokeWidth={1.5}
+              strokeWidth={2}
               stroke="currentColor"
               className="w-5 h-5"
             >
@@ -295,7 +274,7 @@ export default function OmrCheckPage() {
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {[
             {
               label: 'অপেক্ষমান',
@@ -328,14 +307,12 @@ export default function OmrCheckPage() {
           ].map((stat, i) => (
             <div
               key={i}
-              className="bg-white dark:bg-neutral-900 p-4 md:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm"
+              className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-[2rem] border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all hover:shadow-md"
             >
-              <span className="text-[10px] md:text-xs font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
+              <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-[0.2em] mb-1 block">
                 {stat.label}
               </span>
-              <div
-                className={`text-2xl md:text-3xl font-black ${stat.color} mt-1`}
-              >
+              <div className={`text-2xl sm:text-3xl font-black ${stat.color}`}>
                 {stat.val}
               </div>
             </div>
@@ -345,62 +322,70 @@ export default function OmrCheckPage() {
         {/* Main Content: Table on desktop, Cards on mobile */}
         <div className="space-y-4">
           {/* Mobile Card Layout (< md) */}
-          <div className="grid grid-cols-1 gap-4 md:hidden">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
             {isLoading ? (
-              <div className="bg-white dark:bg-neutral-900 rounded-2xl p-10 border border-neutral-200 dark:border-neutral-800 text-center text-neutral-400">
-                Loading...
+              <div className="col-span-full bg-white dark:bg-neutral-900 rounded-[2rem] p-12 border border-neutral-200 dark:border-neutral-800 text-center">
+                <Loader2
+                  className="animate-spin mx-auto text-rose-500 mb-2"
+                  size={32}
+                />
+                <p className="text-neutral-500 dark:text-neutral-400 font-bold text-sm">
+                  লোড হচ্ছে...
+                </p>
               </div>
             ) : scriptSubmissions.length === 0 ? (
-              <div className="bg-white dark:bg-neutral-900 rounded-2xl p-10 border border-dashed border-neutral-300 dark:border-neutral-800 text-center text-neutral-500">
-                কোনো OMR স্ক্রিপ্ট জমা পড়েনি
+              <div className="col-span-full bg-white dark:bg-neutral-900 rounded-[2rem] p-12 border border-dashed border-neutral-300 dark:border-neutral-800 text-center">
+                <p className="text-neutral-400 font-bold text-sm">
+                  কোনো OMR স্ক্রিপ্ট জমা পড়েনি
+                </p>
               </div>
             ) : (
               scriptSubmissions.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 shadow-sm space-y-4"
+                  className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-[2rem] p-6 shadow-sm space-y-5 transition-all active:scale-[0.98]"
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="font-bold text-neutral-900 dark:text-white leading-tight">
-                        {item.user?.name || 'Unknown'}
+                      <h4 className="font-black text-neutral-900 dark:text-white leading-tight">
+                        {item.user?.name || 'অজানা ব্যবহারকারী'}
                       </h4>
-                      <p className="text-xs text-neutral-500 mt-0.5">
-                        {item.user?.email || 'No Email'}
+                      <p className="text-[10px] font-bold text-neutral-400 mt-1 uppercase tracking-wider">
+                        {item.user?.email || 'ইমেইল নেই'}
                       </p>
                     </div>
                     {item.status === 'evaluated' && (
-                      <span className="px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400 uppercase tracking-tighter">
-                        evaluated
+                      <span className="px-2.5 py-1 rounded-xl text-[10px] font-black bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 uppercase tracking-widest border border-emerald-100 dark:border-emerald-500/20">
+                        EVALUATED
                       </span>
                     )}
                     {item.status === 'rejected' && (
-                      <span className="px-2 py-1 rounded-lg text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-500/10 dark:text-rose-400 uppercase tracking-tighter">
-                        rejected
+                      <span className="px-2.5 py-1 rounded-xl text-[10px] font-black bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 uppercase tracking-widest border border-rose-100 dark:border-rose-500/20">
+                        REJECTED
                       </span>
                     )}
                     {(item.status === 'pending' || !item.status) && (
-                      <span className="px-2 py-1 rounded-lg text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-500/10 dark:text-amber-400 uppercase tracking-tighter animate-pulse">
-                        pending
+                      <span className="px-2.5 py-1 rounded-xl text-[10px] font-black bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 uppercase tracking-widest border border-amber-100 dark:border-amber-500/20 animate-pulse">
+                        PENDING
                       </span>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800">
-                      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1">
-                        Subject
+                  <div className="grid grid-cols-2 gap-4 text-xs">
+                    <div className="bg-neutral-50 dark:bg-neutral-900/50 p-4 rounded-2xl border border-neutral-100 dark:border-neutral-800">
+                      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1.5 leading-none">
+                        বিষয়
                       </p>
-                      <p className="font-bold text-neutral-900 dark:text-neutral-200">
+                      <p className="font-black text-neutral-900 dark:text-neutral-200 truncate">
                         {item.subject}
                       </p>
                     </div>
-                    <div className="bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800">
-                      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1">
-                        Date
+                    <div className="bg-neutral-50 dark:bg-neutral-900/50 p-4 rounded-2xl border border-neutral-100 dark:border-neutral-800">
+                      <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-1.5 leading-none">
+                        তারিখ
                       </p>
-                      <p className="font-bold text-neutral-900 dark:text-neutral-200">
-                        {new Date(item.date).toLocaleDateString()}
+                      <p className="font-black text-neutral-900 dark:text-neutral-200">
+                        {new Date(item.date).toLocaleDateString('bn-BD')}
                       </p>
                     </div>
                   </div>
@@ -408,13 +393,13 @@ export default function OmrCheckPage() {
                   <div className="flex items-center justify-between pt-2">
                     <button
                       onClick={() => setViewingScript(item)}
-                      className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold text-xs hover:underline"
+                      className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold text-xs hover:bg-rose-50 dark:hover:bg-rose-950/20 px-3 py-2 rounded-xl transition-colors"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
-                        strokeWidth={2}
+                        strokeWidth={2.5}
                         stroke="currentColor"
                         className="w-4 h-4"
                       >
@@ -424,30 +409,35 @@ export default function OmrCheckPage() {
                           d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
                         />
                       </svg>
-                      View Image
+                      স্ক্রিপ্ট দেখুন
                     </button>
 
                     <div className="flex-1 text-right">
                       {item.status === 'evaluated' ? (
-                        <span className="font-extrabold text-neutral-900 dark:text-white text-lg">
-                          {item.score?.toFixed(1) || 0}{' '}
-                          <span className="text-[10px] text-neutral-400">
+                        <div className="flex flex-col items-end">
+                          <span className="font-black text-rose-600 dark:text-rose-500 text-2xl leading-none">
+                            {item.score?.toFixed(1) || 0}
+                          </span>
+                          <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest mt-1">
                             MARKS
                           </span>
-                        </span>
+                        </div>
                       ) : item.status === 'rejected' ? (
                         <span className="text-[10px] text-rose-500 font-bold italic truncate max-w-[120px] inline-block">
-                          {item.rejectionReason || 'Rejected'}
+                          {item.rejectionReason || 'বাতিল করা হয়েছে'}
                         </span>
                       ) : (
                         <button
                           onClick={() => handleEvaluate(item)}
                           disabled={processingId === item.id}
-                          className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl text-xs font-black shadow-lg shadow-rose-500/20 active:scale-95 transition-all disabled:opacity-50"
+                          className="bg-rose-600 hover:bg-rose-700 text-white px-5 py-2.5 rounded-2xl text-xs font-black shadow-lg shadow-rose-500/20 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2"
                         >
-                          {processingId === item.id
-                            ? 'Evaluating...'
-                            : 'AI Evaluation'}
+                          {processingId === item.id ? (
+                            <Loader2 className="animate-spin" size={16} />
+                          ) : (
+                            <Activity size={16} />
+                          )}
+                          মূল্যায়ন
                         </button>
                       )}
                     </div>
@@ -458,25 +448,31 @@ export default function OmrCheckPage() {
           </div>
 
           {/* Desktop Table Layout (>= md) */}
-          <div className="hidden md:block bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
+          <div className="hidden md:block bg-white dark:bg-neutral-900 rounded-[2rem] border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800">
-                  <tr className="text-[10px] uppercase font-black tracking-widest text-neutral-400">
-                    <th className="px-6 py-4">Student</th>
-                    <th className="px-6 py-4">Subject</th>
-                    <th className="px-6 py-4">Submitted At</th>
-                    <th className="px-6 py-4">File</th>
-                    <th className="px-6 py-4">Status</th>
-                    <th className="px-6 py-4 text-right">Action</th>
+              <table className="w-full text-left text-sm border-separate border-spacing-0">
+                <thead className="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
+                  <tr className="text-[10px] uppercase font-black tracking-[0.2em] text-neutral-400">
+                    <th className="px-8 py-5">শিক্ষার্থী (Student)</th>
+                    <th className="px-8 py-5">বিষয় (Subject)</th>
+                    <th className="px-8 py-5">সময় (Submitted At)</th>
+                    <th className="px-8 py-5">স্ক্রিপ্ট (Script)</th>
+                    <th className="px-8 py-5">স্ট্যাটাস (Status)</th>
+                    <th className="px-8 py-5 text-right">অ্যাকশন (Action)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+                <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/50">
                   {isLoading ? (
                     <tr>
-                      <td colSpan={6} className="text-center py-20">
-                        <div className="animate-pulse flex justify-center text-neutral-400 font-bold uppercase tracking-widest text-xs">
-                          Fetching Data...
+                      <td colSpan={6} className="text-center py-24">
+                        <div className="flex flex-col items-center justify-center gap-3">
+                          <Loader2
+                            className="animate-spin text-rose-500"
+                            size={32}
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
+                            Fetching Data...
+                          </span>
                         </div>
                       </td>
                     </tr>
@@ -484,7 +480,7 @@ export default function OmrCheckPage() {
                     <tr>
                       <td
                         colSpan={6}
-                        className="px-6 py-20 text-center text-neutral-500 dark:text-neutral-400 font-medium"
+                        className="px-8 py-24 text-center text-neutral-400 font-bold"
                       >
                         কোনো OMR স্ক্রিপ্ট জমা পড়েনি
                       </td>
@@ -493,72 +489,72 @@ export default function OmrCheckPage() {
                     scriptSubmissions.map((item) => (
                       <tr
                         key={item.id}
-                        className="hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors group"
+                        className="hover:bg-neutral-50 dark:hover:bg-neutral-800/20 transition-colors group"
                       >
-                        <td className="px-6 py-4">
-                          <div className="font-bold text-neutral-900 dark:text-white text-base">
+                        <td className="px-8 py-6">
+                          <div className="font-black text-neutral-900 dark:text-white text-base leading-tight">
                             {item.user?.name || 'Unknown'}
                           </div>
-                          <div className="text-[10px] text-neutral-500 font-mono">
+                          <div className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mt-1">
                             {item.user?.email || 'No Email'}
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-8 py-6">
                           <div className="font-black text-neutral-900 dark:text-neutral-200">
                             {item.subject}
                           </div>
-                          <div className="text-[10px] text-neutral-500 font-bold bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded w-fit mt-1 uppercase">
+                          <div className="text-[9px] text-rose-600 dark:text-rose-400 font-black bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-lg w-fit mt-1.5 uppercase tracking-widest border border-rose-100 dark:border-rose-500/20">
                             {item.examType || 'General'}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-neutral-600 dark:text-neutral-400 text-xs font-medium">
-                          {new Date(item.date).toLocaleString()}
+                        <td className="px-8 py-6 text-neutral-500 font-bold text-xs">
+                          {new Date(item.date).toLocaleString('bn-BD')}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-8 py-6">
                           <button
                             onClick={() => setViewingScript(item)}
-                            className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold hover:underline group-hover:scale-105 transition-transform origin-left"
+                            className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-black text-xs hover:bg-rose-50 dark:hover:bg-rose-500/10 px-3 py-2 rounded-xl transition-all active:scale-95 border border-transparent hover:border-rose-100 dark:hover:border-rose-500/20"
                           >
                             <svg
                               className="w-5 h-5"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
+                              strokeWidth={2.5}
                             >
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                strokeWidth={2}
                                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                               />
                             </svg>
-                            <span>View Script</span>
+                            <span>স্ক্রিপ্ট দেখুন</span>
                           </button>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-8 py-6">
                           {item.status === 'evaluated' && (
-                            <span className="inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400 uppercase tracking-widest">
+                            <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-black bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 uppercase tracking-widest border border-emerald-100 dark:border-emerald-500/20">
                               Evaluated
                             </span>
                           )}
                           {item.status === 'rejected' && (
-                            <span className="inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black bg-rose-100 text-rose-800 dark:bg-rose-500/10 dark:text-rose-400 uppercase tracking-widest">
+                            <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-black bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 uppercase tracking-widest border border-rose-100 dark:border-rose-500/20">
                               Rejected
                             </span>
                           )}
                           {(item.status === 'pending' || !item.status) && (
-                            <span className="inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black bg-amber-100 text-amber-800 dark:bg-amber-500/10 dark:text-amber-400 uppercase tracking-widest">
+                            <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-black bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 uppercase tracking-widest border border-amber-100 dark:border-amber-500/20">
                               Pending
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-8 py-6 text-right">
                           {item.status === 'evaluated' ? (
                             <div className="flex flex-col items-end">
-                              <span className="font-black text-xl text-neutral-900 dark:text-white">
+                              <span className="font-black text-2xl text-rose-600 dark:text-rose-500 leading-none">
                                 {item.score?.toFixed(2) || 0}
                               </span>
-                              <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest leading-none">
+                              <span className="text-[9px] text-neutral-400 font-black uppercase tracking-[0.2em] mt-1.5">
                                 Score
                               </span>
                             </div>
@@ -573,15 +569,15 @@ export default function OmrCheckPage() {
                             <button
                               onClick={() => handleEvaluate(item)}
                               disabled={processingId === item.id}
-                              className="bg-rose-600 hover:bg-rose-700 text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-rose-500/20 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2 ml-auto"
+                              className="bg-rose-600 hover:bg-rose-700 text-white px-6 py-3 rounded-2xl text-xs font-black shadow-lg shadow-rose-500/20 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2 ml-auto"
                             >
                               {processingId === item.id ? (
                                 <Loader2 className="animate-spin w-4 h-4" />
                               ) : (
-                                <Activity size={14} />
+                                <Activity size={16} />
                               )}
                               {processingId === item.id
-                                ? 'Processing...'
+                                ? 'Evaluatiing...'
                                 : 'AI Evaluate'}
                             </button>
                           )}
@@ -597,14 +593,14 @@ export default function OmrCheckPage() {
 
         {/* Script Viewer Modal */}
         {viewingScript && (
-          <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in">
-            <div className="bg-white dark:bg-neutral-900 w-full sm:max-w-4xl h-[95vh] sm:h-auto sm:max-h-[90vh] flex flex-col overflow-hidden rounded-t-3xl sm:rounded-2xl shadow-2xl border-t sm:border border-neutral-200 dark:border-neutral-800">
-              <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-neutral-50/50 dark:bg-neutral-900">
+          <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in transition-all">
+            <div className="bg-white dark:bg-neutral-900 w-full sm:max-w-4xl h-[95vh] sm:h-auto sm:max-h-[90vh] flex flex-col overflow-hidden rounded-t-[2.5rem] sm:rounded-[2rem] shadow-2xl border-t sm:border border-neutral-200 dark:border-neutral-800">
+              <div className="p-6 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-white dark:bg-neutral-900 sticky top-0 z-10">
                 <div>
                   <h3 className="font-black text-neutral-900 dark:text-white leading-tight">
                     {viewingScript.subject}
                   </h3>
-                  <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mt-0.5">
+                  <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-[0.2em] mt-1">
                     {viewingScript.user?.name} • ID:{' '}
                     {viewingScript.id.slice(0, 8)}
                   </p>
@@ -614,7 +610,7 @@ export default function OmrCheckPage() {
                     setViewingScript(null);
                     setShowRejectInput(false);
                   }}
-                  className="p-2 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-500 hover:text-rose-600 transition-colors"
+                  className="p-3 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-500 hover:text-rose-600 transition-all active:scale-95"
                 >
                   <svg
                     className="w-5 h-5"
@@ -625,54 +621,54 @@ export default function OmrCheckPage() {
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      strokeWidth={2}
+                      strokeWidth={2.5}
                       d="M6 18L18 6M6 6l12 12"
                     />
                   </svg>
                 </button>
               </div>
 
-              <div className="flex-1 overflow-auto p-2 bg-black/95 flex items-center justify-center">
+              <div className="flex-1 overflow-auto p-4 bg-neutral-950 flex items-center justify-center">
                 <Image
                   src={viewingScript.scriptImageData ?? '/placeholder.png'}
                   alt="Script"
                   width={1200}
                   height={1600}
-                  className="max-w-full h-auto object-contain shadow-2xl"
+                  className="max-w-full h-auto object-contain rounded-xl shadow-2xl"
                   priority
                 />
               </div>
 
-              <div className="p-5 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900">
+              <div className="p-6 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 sticky bottom-0 z-10">
                 {showRejectInput ? (
                   <div className="animate-in slide-in-from-bottom-4 duration-300">
-                    <label className="block text-xs font-black text-neutral-400 uppercase tracking-widest mb-3">
-                      Rejection Reason
+                    <label className="block text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-3 ml-1">
+                      বাতিল করার কারণ (Rejection Reason)
                     </label>
                     <textarea
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
-                      placeholder="e.g., Image too blurry, Wrong format..."
-                      className="w-full p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white mb-4 focus:ring-2 focus:ring-rose-500/20 outline-none text-sm min-h-[100px]"
+                      placeholder="যেমন: ছবি অস্পষ্ট, ভুল ফরম্যাট..."
+                      className="w-full p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white mb-4 focus:ring-2 focus:ring-rose-500/20 outline-none text-sm min-h-[100px] resize-none"
                       autoFocus
                     />
-                    <div className="flex gap-3">
+                    <div className="flex gap-4">
                       <button
                         onClick={() => setShowRejectInput(false)}
-                        className="flex-1 py-3 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-500 font-bold hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all"
+                        className="flex-1 py-3.5 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-500 font-bold hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all active:scale-95"
                       >
-                        Cancel
+                        ফিরে যান
                       </button>
                       <button
                         onClick={confirmReject}
-                        className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-lg shadow-red-500/20 transition-all"
+                        className="flex-1 py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-bold shadow-lg shadow-red-500/20 transition-all active:scale-95"
                       >
-                        Confirm Reject
+                        বাতিল নিশ্চিত করুন
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-col sm:flex-row gap-4">
                     <button
                       onClick={() => {
                         setRejectReason('');
@@ -682,9 +678,9 @@ export default function OmrCheckPage() {
                         viewingScript.status === 'evaluated' ||
                         viewingScript.status === 'rejected'
                       }
-                      className="flex-1 py-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 rounded-xl font-black text-xs uppercase tracking-widest transition-all hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 disabled:opacity-30"
+                      className="flex-1 py-3.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 disabled:opacity-30 active:scale-95"
                     >
-                      Reject Script
+                      স্ক্রিপ্ট বাতিল করুন
                     </button>
                     <button
                       onClick={() => handleEvaluate(viewingScript)}
@@ -692,16 +688,16 @@ export default function OmrCheckPage() {
                         viewingScript.status === 'evaluated' ||
                         viewingScript.status === 'rejected'
                       }
-                      className="flex-[2] py-4 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-rose-500/30 active:scale-95 disabled:opacity-30 flex items-center justify-center gap-2"
+                      className="flex-[2] py-4 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-rose-500/30 active:scale-95 disabled:opacity-30 flex items-center justify-center gap-2"
                     >
                       {processingId === viewingScript.id ? (
-                        <Loader2 className="animate-spin w-4 h-4" />
+                        <Loader2 className="animate-spin w-5 h-5" />
                       ) : (
-                        <Activity size={16} />
+                        <Activity size={18} />
                       )}
                       {processingId === viewingScript.id
-                        ? 'Evaluating...'
-                        : 'Start AI Evaluation'}
+                        ? 'মূল্যায়ন চলছে...'
+                        : 'AI মূল্যায়ন শুরু করুন'}
                     </button>
                   </div>
                 )}

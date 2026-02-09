@@ -57,14 +57,14 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
           onClick={() => setActiveTab(tab.id as TabId)}
           className={`flex-1 py-3 text-sm font-bold transition-all relative ${
             activeTab === tab.id
-              ? 'text-indigo-600 dark:text-indigo-400'
+              ? 'text-emerald-600 dark:text-emerald-400'
               : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400'
           }`}
         >
           <span className="mr-2">{tab.icon}</span>
           {tab.label}
           {activeTab === tab.id && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 dark:bg-indigo-400 rounded-t-full"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 dark:bg-emerald-400 rounded-t-full"></div>
           )}
         </button>
       ))}
@@ -128,7 +128,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 </div>
 
                 {/* Instructions Box */}
-                <div className="bg-white dark:bg-black border-2 border-dashed border-indigo-200 dark:border-indigo-900 rounded-xl p-5 text-center">
+                <div className="bg-white dark:bg-black border-2 border-dashed border-emerald-200 dark:border-emerald-900 rounded-xl p-5 text-center">
                   <h4 className="text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-3">
                     অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করুন
                   </h4>
@@ -149,7 +149,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="w-4 h-4 text-neutral-400 group-hover:text-indigo-500"
+                      className="w-4 h-4 text-neutral-400 group-hover:text-emerald-500"
                     >
                       <path
                         strokeLinecap="round"
@@ -180,7 +180,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                     <select
                       value={paymentMethod}
                       onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none font-medium"
+                      className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none font-medium"
                     >
                       <option value="bKash">bKash</option>
                       <option value="Nagad">Nagad</option>

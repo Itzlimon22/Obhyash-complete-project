@@ -294,28 +294,28 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-black">
-      <div className="space-y-6 md:space-y-8 animate-fade-in pb-10">
+      <div className="space-y-4 md:space-y-8 animate-fade-in pb-10 px-4 md:px-0">
         {/* Page Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
-          <div className="space-y-1">
-            <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 pb-2">
+          <div className="space-y-0.5">
+            <h1 className="text-xl md:text-3xl font-black tracking-tight text-neutral-900 dark:text-white">
               Admin Dashboard
             </h1>
-            <div className="flex items-center gap-2 text-neutral-500 dark:text-neutral-500 text-sm">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="flex items-center gap-2 text-neutral-500 dark:text-neutral-500 text-[10px] md:text-xs">
+              <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>System active and monitoring</span>
             </div>
           </div>
 
           {/* Action Buttons - Scrollable on mobile */}
-          <div className="flex items-center gap-3 overflow-x-auto pb-2 -mx-1 px-1 md:overflow-visible md:pb-0 md:mx-0 md:px-0 scrollbar-none">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:overflow-visible md:pb-0 md:mx-0 md:px-0 scrollbar-none">
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="group shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-sm font-bold rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-95 disabled:opacity-50"
+              className="group shrink-0 flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-[11px] md:text-xs font-bold rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-95 disabled:opacity-50"
             >
               <RefreshCw
-                size={16}
+                size={14}
                 className={
                   isRefreshing ? 'animate-spin text-rose-500' : 'text-rose-500'
                 }
@@ -324,20 +324,20 @@ export default function DashboardPage() {
             </button>
             <button
               onClick={handleExport}
-              className="group shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-sm font-bold rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-95"
+              className="group shrink-0 flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-[11px] md:text-xs font-bold rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-95"
             >
               <Download
-                size={16}
+                size={14}
                 className="text-indigo-500 group-hover:-translate-y-0.5 transition-transform"
               />
               <span>Export</span>
             </button>
             <button
               onClick={() => handleNavigate('question-management')}
-              className="group shrink-0 flex items-center justify-center gap-2 px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-rose-500/20 transition-all active:scale-95"
+              className="group shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-[11px] md:text-xs font-bold rounded-xl shadow-lg shadow-rose-500/20 transition-all active:scale-95"
             >
               <Upload
-                size={16}
+                size={14}
                 className="group-hover:-translate-y-0.5 transition-transform"
               />
               <span>Bulk Upload</span>
@@ -346,7 +346,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Key Metrics Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 md:gap-5">
           {isLoading
             ? Array.from({ length: 5 }).map((_, i) => (
                 <div
@@ -425,80 +425,96 @@ export default function DashboardPage() {
           </div>
 
           {/* Quick Actions Panel */}
-          <div className="bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-            <h3 className="font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
-              <div className="p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg">
-                <Settings className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          <div className="bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-md transition-shadow">
+            <h3 className="font-bold text-neutral-900 dark:text-white mb-4 md:mb-6 flex items-center gap-2">
+              <div className="p-1.5 md:p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg">
+                <Settings className="w-4 h-4 md:w-5 md:h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               Quick Actions
             </h3>
 
-            <div className="grid grid-cols-2 sm:grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-2 md:gap-3">
               <button
                 onClick={() => handleNavigate('question-management')}
-                className="w-full text-left p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-rose-50 dark:hover:bg-rose-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-rose-300 dark:hover:border-rose-500/50 transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between group shadow-sm active:scale-95"
+                className="w-full text-left p-3.5 md:p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-rose-50 dark:hover:bg-rose-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-rose-300 dark:hover:border-rose-500/50 transition-all flex items-center justify-between group shadow-sm active:scale-95"
               >
-                <div className="mb-3 sm:mb-0">
-                  <span className="block text-sm font-bold text-neutral-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                <div className="flex-1 min-w-0 mr-3">
+                  <span className="block text-[13px] md:text-sm font-bold text-neutral-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
                     Questions
                   </span>
-                  <span className="hidden sm:block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5">
+                  <span className="block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5">
                     Add/Edit bank
                   </span>
                 </div>
-                <div className="p-2.5 bg-rose-50 dark:bg-rose-500/10 rounded-xl text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform w-fit">
-                  <FileQuestion size={18} strokeWidth={2.5} />
+                <div className="p-2 md:p-2.5 bg-rose-50 dark:bg-rose-500/10 rounded-xl text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform w-fit shrink-0">
+                  <FileQuestion
+                    size={16}
+                    className="md:w-[18px] md:h-[18px]"
+                    strokeWidth={2.5}
+                  />
                 </div>
               </button>
 
               <button
                 onClick={() => handleNavigate('user-management')}
-                className="w-full text-left p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-rose-50 dark:hover:bg-rose-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-rose-300 dark:hover:border-rose-500/50 transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between group shadow-sm active:scale-95"
+                className="w-full text-left p-3.5 md:p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-rose-50 dark:hover:bg-rose-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-rose-300 dark:hover:border-rose-500/50 transition-all flex items-center justify-between group shadow-sm active:scale-95"
               >
-                <div className="mb-3 sm:mb-0">
-                  <span className="block text-sm font-bold text-neutral-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                <div className="flex-1 min-w-0 mr-3">
+                  <span className="block text-[13px] md:text-sm font-bold text-neutral-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
                     Users
                   </span>
-                  <span className="hidden sm:block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5">
+                  <span className="block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5">
                     Manage accounts
                   </span>
                 </div>
-                <div className="p-2.5 bg-rose-50 dark:bg-rose-500/10 rounded-xl text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform w-fit">
-                  <Users size={18} strokeWidth={2.5} />
+                <div className="p-2 md:p-2.5 bg-rose-50 dark:bg-rose-500/10 rounded-xl text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform w-fit shrink-0">
+                  <Users
+                    size={16}
+                    className="md:w-[18px] md:h-[18px]"
+                    strokeWidth={2.5}
+                  />
                 </div>
               </button>
 
               <button
                 onClick={() => handleNavigate('reports')}
-                className="w-full text-left p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-amber-50 dark:hover:bg-amber-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-amber-300 dark:hover:border-amber-500/50 transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between group shadow-sm active:scale-95"
+                className="w-full text-left p-3.5 md:p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-amber-50 dark:hover:bg-amber-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-amber-300 dark:hover:border-amber-500/50 transition-all flex items-center justify-between group shadow-sm active:scale-95"
               >
-                <div className="mb-3 sm:mb-0">
-                  <span className="block text-sm font-bold text-neutral-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                <div className="flex-1 min-w-0 mr-3">
+                  <span className="block text-[13px] md:text-sm font-bold text-neutral-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                     Reports
                   </span>
-                  <span className="hidden sm:block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5 truncate max-w-[100px]">
+                  <span className="block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5 truncate">
                     {dashboardStats?.pendingReports || 0} pending
                   </span>
                 </div>
-                <div className="p-2.5 bg-amber-50 dark:bg-amber-500/10 rounded-xl text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform w-fit">
-                  <Flag size={18} strokeWidth={2.5} />
+                <div className="p-2 md:p-2.5 bg-amber-50 dark:bg-amber-500/10 rounded-xl text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform w-fit shrink-0">
+                  <Flag
+                    size={16}
+                    className="md:w-[18px] md:h-[18px]"
+                    strokeWidth={2.5}
+                  />
                 </div>
               </button>
 
               <button
                 onClick={() => handleNavigate('analytics')}
-                className="w-full text-left p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-emerald-50 dark:hover:bg-emerald-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-emerald-300 dark:hover:border-emerald-500/50 transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between group shadow-sm active:scale-95"
+                className="w-full text-left p-3.5 md:p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-emerald-50 dark:hover:bg-emerald-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-emerald-300 dark:hover:border-emerald-500/50 transition-all flex items-center justify-between group shadow-sm active:scale-95"
               >
-                <div className="mb-3 sm:mb-0">
-                  <span className="block text-sm font-bold text-neutral-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                <div className="flex-1 min-w-0 mr-3">
+                  <span className="block text-[13px] md:text-sm font-bold text-neutral-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                     Analytics
                   </span>
-                  <span className="hidden sm:block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5">
+                  <span className="block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5">
                     Insights
                   </span>
                 </div>
-                <div className="p-2.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform w-fit">
-                  <BarChart3 size={18} strokeWidth={2.5} />
+                <div className="p-2 md:p-2.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform w-fit shrink-0">
+                  <BarChart3
+                    size={16}
+                    className="md:w-[18px] md:h-[18px]"
+                    strokeWidth={2.5}
+                  />
                 </div>
               </button>
             </div>

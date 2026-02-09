@@ -261,9 +261,6 @@ export default function SignupPage() {
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500" />
 
         <div className="p-8 md:p-10">
-          <div className="flex justify-center mb-6">
-            <Logo size="lg" />
-          </div>
           <div className="text-center mb-8">
             <p className="text-slate-500 dark:text-slate-400 text-sm">
               মাত্র ৩টি ধাপে সম্পন্ন করুন আপনার রেজিস্ট্রেশন

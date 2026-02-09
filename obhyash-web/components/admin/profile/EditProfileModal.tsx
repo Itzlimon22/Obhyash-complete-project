@@ -71,78 +71,100 @@ export default function EditProfileModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-obsidian-900 rounded-2xl shadow-2xl w-full max-w-lg border border-paper-200 dark:border-obsidian-800 animate-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between p-6 border-b border-paper-100 dark:border-obsidian-800">
-          <h2 className="text-xl font-bold text-paper-900 dark:text-white">
-            Edit Profile
-          </h2>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-white dark:bg-neutral-900 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl w-full max-w-lg border-x border-t sm:border border-neutral-200 dark:border-neutral-800 animate-in slide-in-from-bottom-10 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 overflow-hidden">
+        <div className="flex items-center justify-between p-6 sm:p-8 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/20">
+          <div className="flex items-center gap-3">
+            <span className="p-2 bg-rose-600 text-white rounded-xl shadow-lg shadow-rose-500/20">
+              <User size={20} />
+            </span>
+            <h2 className="text-xl font-black text-neutral-900 dark:text-white tracking-tight">
+              প্রোফাইল এডিট
+            </h2>
+          </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-paper-100 dark:hover:bg-obsidian-800 rounded-full transition-colors text-paper-500 dark:text-gray-400"
+            className="p-2.5 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-2xl transition-all text-neutral-500 active:scale-90"
           >
-            <X size={20} />
+            <X size={20} strokeWidth={3} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form
+          onSubmit={handleSubmit}
+          className="p-6 sm:p-8 space-y-6 overflow-y-auto max-h-[80vh] sm:max-h-none"
+        >
           {/* Name Field */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-paper-700 dark:text-gray-300 flex items-center gap-2">
-              <User size={16} className="text-brand-500" />
-              Full Name
+          <div className="space-y-2.5">
+            <label className="text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest flex items-center gap-2 ml-1">
+              পুরো নাম
             </label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              className="w-full px-4 py-2.5 rounded-xl bg-paper-50 dark:bg-obsidian-800 border border-paper-200 dark:border-obsidian-700 focus:ring-2 focus:ring-brand-500 outline-none text-paper-900 dark:text-white"
-              placeholder="Enter your name"
-              required
-            />
+            <div className="relative group">
+              <User
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-rose-500 transition-colors"
+                size={18}
+              />
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 outline-none text-neutral-900 dark:text-white font-black text-sm transition-all"
+                placeholder="আপনার নাম লিখুন"
+                required
+              />
+            </div>
           </div>
 
           {/* Phone Field */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-paper-700 dark:text-gray-300 flex items-center gap-2">
-              <Phone size={16} className="text-brand-500" />
-              Phone Number
+          <div className="space-y-2.5">
+            <label className="text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest flex items-center gap-2 ml-1">
+              ফোন নম্বর
             </label>
-            <input
-              type="tel"
-              value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
-              className="w-full px-4 py-2.5 rounded-xl bg-paper-50 dark:bg-obsidian-800 border border-paper-200 dark:border-obsidian-700 focus:ring-2 focus:ring-brand-500 outline-none text-paper-900 dark:text-white"
-              placeholder="+880 1XXX XXXXXX"
-            />
+            <div className="relative group">
+              <Phone
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-rose-500 transition-colors"
+                size={18}
+              />
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
+                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 outline-none text-neutral-900 dark:text-white font-black text-sm transition-all"
+                placeholder="০১XXXXXXXXX"
+              />
+            </div>
           </div>
 
           {/* Address Field */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-paper-700 dark:text-gray-300 flex items-center gap-2">
-              <MapPin size={16} className="text-brand-500" />
-              Address
+          <div className="space-y-2.5">
+            <label className="text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest flex items-center gap-2 ml-1">
+              ঠিকানা
             </label>
-            <input
-              type="text"
-              value={formData.address}
-              onChange={(e) =>
-                setFormData({ ...formData, address: e.target.value })
-              }
-              className="w-full px-4 py-2.5 rounded-xl bg-paper-50 dark:bg-obsidian-800 border border-paper-200 dark:border-obsidian-700 focus:ring-2 focus:ring-brand-500 outline-none text-paper-900 dark:text-white"
-              placeholder="Your location"
-            />
+            <div className="relative group">
+              <MapPin
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-rose-500 transition-colors"
+                size={18}
+              />
+              <input
+                type="text"
+                value={formData.address}
+                onChange={(e) =>
+                  setFormData({ ...formData, address: e.target.value })
+                }
+                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 outline-none text-neutral-900 dark:text-white font-black text-sm transition-all"
+                placeholder="আপনার বর্তমান অবস্থান"
+              />
+            </div>
           </div>
 
           {/* Bio Field */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-paper-700 dark:text-gray-300 flex items-center gap-2">
-              <FileText size={16} className="text-brand-500" />
-              Bio
+          <div className="space-y-2.5">
+            <label className="text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest flex items-center gap-2 ml-1">
+              বায়ো (Bio)
             </label>
             <textarea
               value={formData.bio}
@@ -150,30 +172,30 @@ export default function EditProfileModal({
                 setFormData({ ...formData, bio: e.target.value })
               }
               rows={3}
-              className="w-full px-4 py-2.5 rounded-xl bg-paper-50 dark:bg-obsidian-800 border border-paper-200 dark:border-obsidian-700 focus:ring-2 focus:ring-brand-500 outline-none text-paper-900 dark:text-white resize-none"
-              placeholder="Tell us a little about yourself"
+              className="w-full px-5 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 outline-none text-neutral-900 dark:text-white font-medium text-sm transition-all resize-none"
+              placeholder="আপনার সম্পর্কে কিছু লিখুন"
             />
           </div>
 
-          <div className="pt-4 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2.5 text-paper-600 dark:text-gray-300 font-medium hover:bg-paper-100 dark:hover:bg-obsidian-800 rounded-xl transition-colors"
-            >
-              Cancel
-            </button>
+          <div className="pt-4 flex flex-col sm:flex-row gap-3">
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 bg-brand-500 text-white font-medium rounded-xl hover:bg-brand-600 shadow-lg shadow-brand-500/20 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full order-first sm:order-last px-8 py-4 bg-rose-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-rose-700 shadow-xl shadow-rose-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-70 active:scale-95"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                <Save size={18} />
+                <Save size={18} strokeWidth={3} />
               )}
-              Save Changes
+              পরিবর্তন সংরক্ষণ করুন
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full px-8 py-4 text-neutral-500 font-black text-xs uppercase tracking-widest hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-2xl transition-all active:scale-95"
+            >
+              বাতিল
             </button>
           </div>
         </form>

@@ -21,11 +21,11 @@ const StatsGrid: React.FC<StatsGridProps> = ({
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
       {/* Total Exams */}
-      <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-indigo-200 dark:hover:border-indigo-900 transition-all group overflow-hidden relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+      <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-rose-200 dark:hover:border-rose-900 transition-all group overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-rose-500/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
 
         <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-          <div className="p-2 sm:p-2.5 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg sm:rounded-xl text-indigo-600 dark:text-indigo-400">
+          <div className="p-2 sm:p-2.5 bg-rose-50 dark:bg-rose-900/20 rounded-lg sm:rounded-xl text-rose-600 dark:text-rose-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

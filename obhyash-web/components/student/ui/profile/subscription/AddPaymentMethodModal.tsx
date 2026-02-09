@@ -91,7 +91,7 @@ const AddPaymentMethodModal: React.FC<AddPaymentMethodModalProps> = ({
                   value={number}
                   onChange={(e) => setNumber(e.target.value)}
                   placeholder="017xxxxxxxx"
-                  className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+                  className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-mono"
                   required
                 />
               </div>

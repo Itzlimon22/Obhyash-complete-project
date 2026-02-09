@@ -247,12 +247,12 @@ const Dashboard: React.FC<DashboardProps> = ({
         </button>
 
         <button
-          onClick={() => {}}
-          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-cyan-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(6,182,212,0.1)] dark:shadow-none border border-cyan-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-cyan-200 dark:hover:border-cyan-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
+          onClick={() => onLeaderboardClick()}
+          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-emerald-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(5,150,105,0.1)] dark:shadow-none border border-emerald-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-emerald-200 dark:hover:border-emerald-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
         >
-          <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-cyan-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+          <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-emerald-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
 
-          <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-cyan-100 dark:border-neutral-700 flex items-center justify-center text-cyan-600 dark:text-cyan-400 group-hover:scale-105 transition-transform relative z-10">
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-emerald-100 dark:border-neutral-700 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform relative z-10">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -274,7 +274,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             </svg>
           </div>
           <div className="relative z-10">
-            <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+            <h3 className="font-bold text-sm md:text-base text-neutral-700 dark:text-neutral-200 leading-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
               এনালাইসিস
             </h3>
           </div>
