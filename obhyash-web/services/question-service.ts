@@ -54,7 +54,7 @@ export const getQuestionsPage = async (
 
       // Apply search (full-text search on question content)
       if (filters.search && filters.search.trim()) {
-        query = query.ilike('content', `%${filters.search.trim()}%`);
+        query = query.ilike('question', `%${filters.search.trim()}%`);
       }
 
       // Apply sorting
@@ -73,19 +73,22 @@ export const getQuestionsPage = async (
       }
 
       // Map snake_case to camelCase
-      const mappedQuestions: Question[] = (data || []).map((q: Record<string, unknown>) => ({
-        ...q,
-        createdAt: q.created_at || new Date().toISOString(),
-        correctAnswer: q.correct_answer,
-        correctAnswerIndex: q.correct_answer_index,
-        correctAnswerIndices: q.correct_answer_indices || [],
-        imageUrl: q.image_url,
-        optionImages: q.option_images || [],
-        explanationImageUrl: q.explanation_image_url,
-        examType: q.exam_type,
-        institutes: q.institutes || [],
-        years: q.years || [],
-      } as Question));
+      const mappedQuestions: Question[] = (data || []).map(
+        (q: Record<string, unknown>) =>
+          ({
+            ...q,
+            createdAt: q.created_at || new Date().toISOString(),
+            correctAnswer: q.correct_answer,
+            correctAnswerIndex: q.correct_answer_index,
+            correctAnswerIndices: q.correct_answer_indices || [],
+            imageUrl: q.image_url,
+            optionImages: q.option_images || [],
+            explanationImageUrl: q.explanation_image_url,
+            examType: q.exam_type,
+            institutes: q.institutes || [],
+            years: q.years || [],
+          }) as Question,
+      );
 
       return {
         questions: mappedQuestions,
@@ -127,7 +130,8 @@ export const getQuestionCount = async (
       if (filters.difficulty)
         query = query.eq('difficulty', filters.difficulty);
       if (filters.status) query = query.eq('status', filters.status);
-      if (filters.search) query = query.ilike('content', `%${filters.search}%`);
+      if (filters.search)
+        query = query.ilike('question', `%${filters.search}%`);
 
       const { count, error } = await query;
 
@@ -219,6 +223,8 @@ export const createQuestion = async (
         image_url: question.imageUrl,
         option_images: question.optionImages,
         explanation_image_url: question.explanationImageUrl,
+        // Sync: Add random_id for Smart Fetch
+        random_id: Math.random(),
       };
 
       const { data, error } = await supabase
@@ -438,6 +444,8 @@ export const bulkCreateQuestions = async (
           image_url: q.imageUrl,
           option_images: q.optionImages,
           explanation_image_url: q.explanationImageUrl,
+          // Sync: Add random_id for Smart Fetch
+          random_id: Math.random(),
         };
       });
 

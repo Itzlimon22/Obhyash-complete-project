@@ -92,25 +92,46 @@ export default function BulkUploadPage() {
   const handleImport = async () => {
     if (selectedRows.size === 0)
       return alert('Please select at least one question');
+
     setIsImporting(true);
+    let successCount = 0;
+    let failCount = 0;
 
     try {
+      // Chunking for large datasets (e.g. 50 at a time) to prevent timeouts
       const selected = Array.from(selectedRows)
         .map((idx) => previewQuestions[idx])
         .filter(Boolean);
-      const result = await bulkCreateQuestions(selected);
 
-      if (result.success) {
-        alert(`Successfully imported ${result.count} questions!`);
+      const BATCH_SIZE = 50;
+      const chunks = [];
+      for (let i = 0; i < selected.length; i += BATCH_SIZE) {
+        chunks.push(selected.slice(i, i + BATCH_SIZE));
+      }
+
+      for (const chunk of chunks) {
+        const result = await bulkCreateQuestions(chunk);
+        if (result.success) {
+          successCount += result.count;
+        } else {
+          failCount += chunk.length; // Approximate
+          console.error('Batch failed', result.errors);
+        }
+      }
+
+      if (failCount === 0) {
+        alert(
+          `Successfully imported all ${successCount} questions! Data is now synchronized.`,
+        );
         router.push('/admin/question-management');
       } else {
         alert(
-          `Import failed: ${result.errors.map((e: unknown) => (e instanceof Error ? e.message : JSON.stringify(e))).join(', ')}`,
+          `Import Partial Success: ${successCount} uploaded, ${failCount} failed. Check console for details.`,
         );
       }
     } catch (error) {
       alert(
-        `Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Critical Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
     } finally {
       setIsImporting(false);

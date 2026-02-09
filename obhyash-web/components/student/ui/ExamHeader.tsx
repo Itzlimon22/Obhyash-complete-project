@@ -72,7 +72,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
         {onExit && (
           <button
             onClick={onExit}
-            className="p-2 -ml-2 rounded-md text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            className="p-3 -ml-2 rounded-md text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
             title="ফিরে যান"
           >
             <svg

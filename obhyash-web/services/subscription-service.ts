@@ -123,16 +123,44 @@ export const getUserPaymentMethods = async (): Promise<PaymentMethod[]> => {
     throw new Error('Database configuration missing');
   }
 
-  // TODO: Implement actual payment method fetching if table exists
-  // const { data, error } = await supabase.from('payment_methods').select('*').eq('user_id', user.id);
-  return [];
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from('payment_methods')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching payment methods:', error);
+    return [];
+  }
+
+  return data.map((method: any) => ({
+    id: method.id,
+    type: method.type,
+    last4: method.last4,
+    number: method.number,
+    expiry: method.expiry,
+    isDefault: method.is_default,
+  }));
 };
 
 export const deletePaymentMethod = async (id: string): Promise<void> => {
   if (!isSupabaseConfigured() || !supabase) {
     throw new Error('Database configuration missing');
   }
-  // await supabase.from('payment_methods').delete().eq('id', _id);
+  
+  const { error } = await supabase.from('payment_methods').delete().eq('id', id);
+  
+  if (error) {
+    console.error('Error deleting payment method:', error);
+    throw error;
+  }
 };
 
 export const subscribeToPlan = async (planId: string): Promise<boolean> => {
@@ -149,8 +177,39 @@ export const addPaymentMethod = async (
   if (!isSupabaseConfigured() || !supabase) {
     throw new Error('Database configuration missing');
   }
-  // Add payment method logic
-  throw new Error('Not implemented');
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('User not authenticated');
+
+  const { data, error } = await supabase
+    .from('payment_methods')
+    .insert({
+      user_id: user.id,
+      type: method.type,
+      number: method.number,
+      last4: method.last4,
+      expiry: method.expiry,
+      is_default: method.isDefault,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error adding payment method:', error);
+    throw error;
+  }
+
+  return {
+    id: data.id,
+    type: data.type,
+    last4: data.last4,
+    number: data.number,
+    expiry: data.expiry,
+    isDefault: data.is_default,
+  };
 };
 
 export const getUserActiveSubscription =

@@ -11,18 +11,61 @@ export const fetchQuestions = async (
   console.log('Fetching questions for config:', config);
 
   try {
-    // 1. Base Query
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    // If user is logged in, use SMART FETCH (RPC)
+    if (user) {
+      console.log('Using Smart Fetch for user:', user.id);
+
+      const { data, error } = await supabase.rpc('get_smart_exam_questions', {
+        p_user_id: user.id,
+        p_subject: config.subject, // Assuming strict match or handled by UI
+        p_limit: config.questionCount,
+        p_chapters:
+          config.chapters && config.chapters !== 'All'
+            ? config.chapters.split(',').map((c) => c.trim())
+            : null,
+        p_topics:
+          config.topics &&
+          config.topics !== 'General' &&
+          config.topics !== 'All'
+            ? config.topics.split(',').map((t) => t.trim())
+            : null,
+        p_difficulty:
+          config.difficulty && config.difficulty !== 'Mixed'
+            ? config.difficulty
+            : null,
+      });
+
+      if (error) {
+        console.error('Smart Fetch RPC Error:', error);
+        // Fallback to legacy fetch if RPC fails
+      } else if (data) {
+        // Map snake_case to camelCase
+        return data.map((q: any) => ({
+          ...q,
+          createdAt: q.created_at,
+          correctAnswer: q.correct_answer,
+          correctAnswerIndex: q.correct_answer_index,
+          correctAnswerIndices: q.correct_answer_indices || [],
+          imageUrl: q.image_url,
+          optionImages: q.option_images || [],
+          explanationImageUrl: q.explanation_image_url,
+          examType: q.exam_type,
+        }));
+      }
+    }
+
+    // --- FALLBACK / LEGACY FETCH (For guest users or RPC failure) ---
+    console.log('Using Legacy Fetch');
     let query = supabase.from('questions').select('*');
 
-    // 2. Subject Filter (Mandatory)
-    // Handle case where subject might be an ID or a Name.
-    // Ideally we should use ID. If simple string matching fails, we might need a join or dual check.
-    // For now assuming ID is passed or Name matches exactly.
     if (config.subject) {
       query = query.eq('subject', config.subject);
     }
 
-    // 3. Chapter Filter
     if (config.chapters && config.chapters !== 'All') {
       const chapters = config.chapters.split(',').map((c) => c.trim());
       if (chapters.length > 0) {
@@ -30,7 +73,6 @@ export const fetchQuestions = async (
       }
     }
 
-    // 4. Topic Filter
     if (
       config.topics &&
       config.topics !== 'General' &&
@@ -42,20 +84,12 @@ export const fetchQuestions = async (
       }
     }
 
-    // 5. Difficulty Filter
     if (config.difficulty && config.difficulty !== 'Mixed') {
       query = query.eq('difficulty', config.difficulty);
     }
 
-    // 6. Question Count Limit (Randomized efficiently)
-    // Note: 'random()' is not standard Supabase/PostgREST.
-    // We typically fetch more and shuffle client side, or use a customized RPC.
-    // Since RPC was failing, we'll try a direct fetch limit.
-    // To get "randomness" without RPC, we can fetch a larger batch and shuffle client-side,
-    // or rely on the RPC if we fix it.
-    // LET'S TRY DIRECT QUERY FIRST to rule out RPC issues.
-
-    query = query.limit(config.questionCount * 2); // Fetch double to allow some client-side shuffling
+    // Legacy random fetch logic
+    query = query.limit(config.questionCount * 2);
 
     const { data, error } = await query;
 
@@ -69,11 +103,9 @@ export const fetchQuestions = async (
       return [];
     }
 
-    // Client-side Shuffle
     const shuffled = data.sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, config.questionCount);
 
-    // Map to Question type (snake_case -> camelCase)
     return selected.map((q: any) => ({
       ...q,
       createdAt: q.created_at,
@@ -87,8 +119,43 @@ export const fetchQuestions = async (
     }));
   } catch (err) {
     console.error('Failed to fetch questions:', err);
-    // Fallback to empty array instead of crashing, let UI handle "No Questions"
     return [];
+  }
+};
+
+// Helper to update analytics for a single question
+const updateQuestionAnalytics = async (
+  userId: string,
+  questionId: string,
+  isCorrect: boolean,
+) => {
+  try {
+    // We use upsert to handle both insert (first time) and update (subsequent times)
+    // Logic:
+    // - If it exists, increment times_attempted, and increment times_correct IF correct
+    // - If it doesn't exist, insert with initial values
+
+    // Note: Standard upsert with computed columns can be tricky.
+    // We can use a stored procedure OR basic rpc, but simple upsert might work if we read first.
+    // For efficiency, let's call an RPC for the update if possible, or use raw SQL.
+    // Since we created the table, let's try a direct RPC approach for atomicity,
+    // OR just use client-side logic reading is slower.
+
+    // Better approach: Call a specific RPC for updating stats to avoid concurrency issues.
+    // For now, we'll try a simple RPC call.
+
+    const { error } = await supabase.rpc('update_user_question_stats', {
+      p_user_id: userId,
+      p_question_id: questionId,
+      p_is_correct: isCorrect,
+    });
+
+    if (error) {
+      // Fallback: If RPC doesn't exist yet, we can try manual check-update (slower)
+      console.warn('Analytics update error (RPC might be missing):', error);
+    }
+  } catch (e) {
+    console.error('Failed to update analytics for question:', questionId, e);
   }
 };
 
@@ -104,18 +171,10 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
     } = await supabase.auth.getUser();
 
     if (user) {
-      // Add user_id to the result for database trigger
-      // Also extract chapters from config/questions if available
-      // The frontend result object might need to carry chapters info if exam-service
-      // doesn't persist it in 'result' object directly yet.
-      // Assuming 'result' object might have it or we infer it.
-      // Looking at stats-service, it reads 'chapters' property from ExamResult.
-
       const resultWithUserId = {
         ...result,
         user_id: user.id,
         // Ensure chapters is included explicitly if it's not in the spread
-        // Cast to any to bypass strict type check if Type definition update is separate
         chapters:
           (result as ExamResult & { chapters?: string }).chapters || 'General',
       };
@@ -128,9 +187,21 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
         console.error('Error saving exam result:', error);
         throw error;
       } else {
-        console.log(
-          '✅ Exam result saved successfully, examsTaken will be auto-incremented by trigger',
-        );
+        console.log('✅ Exam result saved successfully');
+
+        // --- 🚀 NEW: Update Smart Analytics ---
+        // Fire and forget (don't block the UI)
+        if (result.answers) {
+          // We need to know which questions were correct
+          // The 'result' object usually has 'score' but maybe not per-question correctness explicitly
+          // unless we re-evaluate or if 'answers' contains it.
+          // Types.ts definition of ExamResult: answers: Record<string, number> (questionId -> optionIndex)
+          // We need the original questions or validity map to know correctness.
+          // If 'correctAnswers' or 'scoreDetails' is not in ExamResult, we might skip this
+          // OR we rely on the component to call a separate 'submitAnalytics'
+          // TODO: The ExamResult type needs to support detailed correctness for this to work perfectly here.
+          // Alternatively, we can assume the UI/Frontend has calculated it.
+        }
       }
     } else {
       console.warn(

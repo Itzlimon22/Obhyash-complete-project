@@ -64,9 +64,9 @@ export const getLeaderboardUsers = async (
 ): Promise<UserProfile[]> => {
   if (isSupabaseConfigured() && supabase) {
     try {
-      // Select snake_case columns
+      // Select safe columns from public view
       const { data, error } = await supabase
-        .from('users')
+        .from('public_profiles')
         .select(
           'id, name, institute, xp, level, exams_taken, avatar_url, avatar_color',
         )

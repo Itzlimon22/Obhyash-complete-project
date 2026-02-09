@@ -390,12 +390,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </h1>
 
             <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
-              আনলিমিটেড প্রশ্নে ইচ্ছেমতো পরীক্ষা,{' '}
-              <span className="text-indigo-600 dark:text-indigo-400">
-                OMR Upload
+              <span className="font-bold text-indigo-600 dark:text-indigo-400">
+                Adaptive AI
               </span>{' '}
-              এবং নিজের অগ্রগতি যাচাই করুন এক নিমিষেই। একাডেমিক এবং অ্যাডমিশন
-              প্রস্তুতির সেরা সঙ্গী।
+              এর সাহায্যে নিজের দুর্বলতা কাটিয়ে উঠুন। আনলিমিটেড প্রশ্ন, OMR
+              Upload এবং স্মার্ট এনালাইসিস—সবই এক অ্যাপে।
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
@@ -681,17 +680,20 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </p>
           </div>
 
-          {/* Dark Mode */}
-          <div className="group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-neutral-500/10 hover:-tranneutral-y-1 transition-all duration-300">
-            <div className="w-14 h-14 bg-neutral-100 dark:bg-neutral-800 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <Moon className="w-7 h-7 text-neutral-600 dark:text-neutral-300" />
+          {/* Smart Adaptive System (NEW) */}
+          <div className="group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-cyan-500/10 hover:-tranneutral-y-1 transition-all duration-300 relative overflow-hidden">
+            <div className="absolute top-0 right-0 px-3 py-1 bg-rose-600 text-white text-[10px] font-bold rounded-bl-xl shadow-lg z-10">
+              NEW
+            </div>
+            <div className="w-14 h-14 bg-cyan-50 dark:bg-cyan-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+              <Zap className="w-7 h-7 text-cyan-600" />
             </div>
             <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-              ডার্ক মোড
+              স্মার্ট প্রশ্ন ব্যাংক
             </h3>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-              দিন বা রাত, চোখের আরামের জন্য ব্যবহার করুন আমাদের কাস্টমাইজেবল
-              ডার্ক থিম।
+              সিস্টেম আপনার দুর্বল টপিকগুলো মনে রাখে এবং সেই অনুযায়ী প্রশ্ন করে,
+              যাতে আপনার প্রস্তুতি হয় পূর্ণাঙ্গ।
             </p>
           </div>
         </div>

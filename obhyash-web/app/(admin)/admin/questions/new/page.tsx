@@ -10,6 +10,7 @@ import {
   Trash2,
   CheckCircle,
   Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import {
   createQuestion,
@@ -219,15 +220,60 @@ export default function NewQuestionPage() {
     setFormData((prev) => ({ ...prev, correctAnswerIndices: newIndices }));
   };
 
+  const [notification, setNotification] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
+
   const handleSubmit = async () => {
-    if (!formData.question.trim() || !formData.subject.trim()) {
-      alert('Question and Subject are required');
+    setNotification(null);
+
+    // Validation
+    if (!formData.question.trim()) {
+      setNotification({ type: 'error', message: 'Question text is required' });
+      return;
+    }
+    if (!formData.subject) {
+      setNotification({ type: 'error', message: 'Subject is required' });
       return;
     }
 
     const validOptions = formData.options.filter((o) => o.trim());
     if (validOptions.length < 2) {
-      alert('At least 2 options are required');
+      setNotification({
+        type: 'error',
+        message: 'At least 2 valid options are required',
+      });
+      return;
+    }
+
+    // Better strategy: Filter empty options AND re-map indices safely
+    const finalOptions: string[] = [];
+    const finalIndices: number[] = [];
+
+    formData.options.forEach((opt, originalIdx) => {
+      if (opt.trim()) {
+        finalOptions.push(opt.trim());
+        // If this original index was a correct answer, new index is (finalOptions.length - 1)
+        if (formData.correctAnswerIndices.includes(originalIdx)) {
+          finalIndices.push(finalOptions.length - 1);
+        }
+      }
+    });
+
+    if (finalOptions.length < 2) {
+      setNotification({
+        type: 'error',
+        message: 'Please provide at least 2 non-empty options.',
+      });
+      return;
+    }
+
+    if (finalIndices.length === 0) {
+      setNotification({
+        type: 'error',
+        message: 'Please mark at least one correct answer.',
+      });
       return;
     }
 
@@ -235,10 +281,10 @@ export default function NewQuestionPage() {
     try {
       const questionData: Partial<Question> = {
         question: formData.question,
-        options: validOptions,
-        correctAnswerIndices: formData.correctAnswerIndices,
-        correctAnswer: validOptions[formData.correctAnswerIndices[0]] || '',
-        correctAnswerIndex: formData.correctAnswerIndices[0],
+        options: finalOptions,
+        correctAnswerIndices: finalIndices,
+        correctAnswer: finalOptions[finalIndices[0]] || '', // Legacy
+        correctAnswerIndex: finalIndices[0], // Legacy
         explanation: formData.explanation,
         subject: formData.subject,
         chapter: formData.chapter,
@@ -254,6 +300,7 @@ export default function NewQuestionPage() {
         explanationImageUrl: formData.explanationImageUrl,
         type: 'MCQ',
         status: 'Pending',
+        // Auto-generate random_id is handled in service
       };
 
       const result = isEditMode
@@ -261,15 +308,37 @@ export default function NewQuestionPage() {
         : await createQuestion(questionData);
 
       if (result.success) {
-        alert(isEditMode ? 'Question updated!' : 'Question created!');
-        router.push('/admin/question-management');
+        setNotification({
+          type: 'success',
+          message: isEditMode
+            ? 'Question updated successfully!'
+            : 'Question created successfully!',
+        });
+
+        if (!isEditMode) {
+          // Reset form for next entry, but keep some context like Subject/Chapter for faster data entry
+          setFormData((prev) => ({
+            ...defaultFormData,
+            subject: prev.subject,
+            chapter: prev.chapter,
+            topic: prev.topic,
+            stream: prev.stream,
+            division: prev.division,
+            examType: prev.examType,
+          }));
+          // Scroll to top
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          router.push('/admin/question-management');
+        }
       } else {
-        alert(`Failed: ${result.error}`);
+        setNotification({ type: 'error', message: `Failed: ${result.error}` });
       }
     } catch (error) {
-      alert(
-        `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
+      setNotification({
+        type: 'error',
+        message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
     } finally {
       setIsSaving(false);
     }
@@ -283,6 +352,7 @@ export default function NewQuestionPage() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur border-b border-slate-200 dark:border-slate-700 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* ... existing header content ... */}
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
@@ -297,7 +367,7 @@ export default function NewQuestionPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowPreview(!showPreview)}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg text-sm font-medium"
             >
               <Eye className="w-4 h-4" /> {showPreview ? 'Hide' : 'Show'}{' '}
               Preview
@@ -305,7 +375,7 @@ export default function NewQuestionPage() {
             <button
               onClick={handleSubmit}
               disabled={isSaving}
-              className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white rounded-lg"
+              className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white rounded-lg font-bold shadow-sm transition-all active:scale-95"
             >
               {isSaving ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -319,8 +389,26 @@ export default function NewQuestionPage() {
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
+        {/* Notifications */}
+        {notification && (
+          <div
+            className={`mb-6 p-4 rounded-xl border flex items-center gap-3 shadow-sm animate-in slide-in-from-top-2 ${
+              notification.type === 'success'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-200'
+                : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-200'
+            }`}
+          >
+            {notification.type === 'success' ? (
+              <CheckCircle className="w-5 h-5" />
+            ) : (
+              <AlertCircle className="w-5 h-5" />
+            )}
+            <p className="font-medium">{notification.message}</p>
+          </div>
+        )}
+
         <div
-          className={`grid ${showPreview ? 'grid-cols-2' : 'grid-cols-1'} gap-6`}
+          className={`grid ${showPreview ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'} gap-6`}
         >
           {/* Editor */}
           <div className="space-y-6">

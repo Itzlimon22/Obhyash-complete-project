@@ -244,11 +244,18 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
+          <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2 flex items-center gap-3">
             মক টেস্ট সেটআপ
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-indigo-500/10 to-rose-500/10 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 text-[10px] uppercase tracking-wider font-extrabold">
+              <Sparkles className="w-3 h-3 text-rose-500" />
+              Smart AI Active
+            </span>
           </h2>
-          <p className="text-neutral-600 dark:text-neutral-400 text-sm">
+          <p className="text-neutral-600 dark:text-neutral-400 text-sm flex items-center gap-2">
             আপনার প্রয়োজন অনুযায়ী পরীক্ষা কাস্টমাইজ করুন
+            <span className="sm:hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 text-[10px] font-bold">
+              <Sparkles className="w-3 h-3" /> AI Active
+            </span>
           </p>
         </div>
 

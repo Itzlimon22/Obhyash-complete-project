@@ -122,7 +122,7 @@ const UserTable: React.FC<UserTableProps> = ({
                   type="checkbox"
                   checked={selectedUsers.has(user.id)}
                   onChange={() => onSelectUser(user.id)}
-                  className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer shrink-0"
+                  className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-600 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer shrink-0"
                 />
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
                   {user.name?.charAt(0).toUpperCase() || 'U'}

@@ -45,6 +45,9 @@ CREATE TABLE questions (
     option_images TEXT[] DEFAULT '{}',
     explanation_image_url TEXT,
     
+    -- Smart Fetch Optimization
+    random_id DOUBLE PRECISION DEFAULT random(),
+    
     -- Timestamps
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -64,6 +67,7 @@ CREATE INDEX idx_questions_difficulty ON questions(difficulty);
 CREATE INDEX idx_questions_status ON questions(status);
 CREATE INDEX idx_questions_exam_type ON questions(exam_type);
 CREATE INDEX idx_questions_created_at ON questions(created_at DESC);
+CREATE INDEX idx_questions_random_id ON questions(random_id);
 
 -- Composite indexes for common queries
 CREATE INDEX idx_questions_stream_subject ON questions(stream, subject);
