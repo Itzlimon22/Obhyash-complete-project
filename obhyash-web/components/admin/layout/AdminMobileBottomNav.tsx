@@ -11,6 +11,7 @@ import {
   Menu,
   AlertTriangle,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface AdminMobileBottomNavProps {
   onMenuClick: () => void;
@@ -23,7 +24,7 @@ const AdminMobileBottomNav: React.FC<AdminMobileBottomNavProps> = ({
 
   const navItems = [
     {
-      label: 'Dashboard',
+      label: 'Home',
       icon: LayoutDashboard,
       href: '/admin/dashboard',
     },
@@ -33,7 +34,7 @@ const AdminMobileBottomNav: React.FC<AdminMobileBottomNavProps> = ({
       href: '/admin/user-management',
     },
     {
-      label: 'Questions',
+      label: 'Question',
       icon: FileQuestion,
       href: '/admin/question-management',
     },
@@ -41,17 +42,17 @@ const AdminMobileBottomNav: React.FC<AdminMobileBottomNavProps> = ({
       label: 'Reports',
       icon: Flag,
       href: '/admin/reports',
-      count: 5, // Mock count for now, could be passed as props
+      count: 0,
     },
     {
-      label: 'Complaints',
+      label: 'Complain',
       icon: AlertTriangle,
       href: '/admin/complaints',
     },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-obsidian-950/90 backdrop-blur-lg border-t border-neutral-200 dark:border-obsidian-800 pb-safe z-50 lg:hidden px-2 py-1 flex justify-around items-center shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border-t border-neutral-200/50 dark:border-neutral-800/50 pb-safe z-50 lg:hidden px-4 md:px-8 h-16 flex justify-between items-center shadow-[0_-4px_24px_rgba(0,0,0,0.06)]">
       {navItems.map((item) => {
         const isActive =
           pathname === item.href || pathname?.startsWith(`${item.href}/`);
@@ -61,36 +62,52 @@ const AdminMobileBottomNav: React.FC<AdminMobileBottomNavProps> = ({
           <Link
             key={item.href}
             href={item.href}
-            className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 w-16 relative ${
-              isActive
-                ? 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10'
-                : 'text-neutral-500 dark:text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-900'
-            }`}
+            className="flex flex-col items-center justify-center gap-1 group relative flex-1 min-w-0"
           >
-            <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-            <span className="text-[10px] font-bold tracking-tight uppercase">
+            <div
+              className={cn(
+                'relative flex items-center justify-center h-8 w-14 rounded-full transition-all duration-300 ease-out',
+                isActive
+                  ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'
+                  : 'text-neutral-500 dark:text-neutral-400 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-800',
+              )}
+            >
+              <Icon
+                size={22}
+                strokeWidth={isActive ? 2.5 : 2}
+                className={cn(
+                  'transition-transform duration-300',
+                  isActive && 'scale-110',
+                )}
+              />
+              {item.count && item.count > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-600 text-white text-[9px] font-bold flex items-center justify-center rounded-full border-2 border-white dark:border-neutral-900">
+                  {item.count}
+                </span>
+              )}
+            </div>
+            <span
+              className={cn(
+                'text-[10px] font-bold tracking-tight transition-colors duration-300 truncate w-full text-center',
+                isActive
+                  ? 'text-neutral-900 dark:text-white'
+                  : 'text-neutral-500 dark:text-neutral-500',
+              )}
+            >
               {item.label}
             </span>
-
-            {item.count && item.count > 0 && (
-              <span className="absolute top-1.5 right-3 w-4 h-4 bg-rose-600 text-white text-[9px] font-bold flex items-center justify-center rounded-full border-2 border-white dark:border-obsidian-950">
-                {item.count}
-              </span>
-            )}
-
-            {isActive && (
-              <div className="absolute -top-[1px] left-1/4 right-1/4 h-[2px] bg-rose-600 dark:bg-rose-500 rounded-full" />
-            )}
           </Link>
         );
       })}
 
       <button
         onClick={onMenuClick}
-        className="flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 w-16 text-neutral-500 dark:text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+        className="flex flex-col items-center justify-center gap-1 group flex-1 min-w-0"
       >
-        <Menu size={20} />
-        <span className="text-[10px] font-bold tracking-tight uppercase">
+        <div className="flex items-center justify-center h-8 w-14 rounded-full text-neutral-500 dark:text-neutral-400 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-800 transition-all duration-300">
+          <Menu size={22} />
+        </div>
+        <span className="text-[10px] font-bold tracking-tight text-neutral-500 dark:text-neutral-500">
           Menu
         </span>
       </button>

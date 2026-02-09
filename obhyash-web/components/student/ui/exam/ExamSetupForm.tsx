@@ -13,9 +13,15 @@ import { toast } from 'sonner';
 
 import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { ExamSettings } from '@/components/student/features/exam/setup/ExamSettings';
+import {
+  ExamTypeSelection,
+  DifficultySelection,
+  QuestionCountSelection,
+  TimeSelection,
+  NegativeMarkingSelection,
+} from '@/components/student/features/exam/setup/ExamSettings';
 import { TopicSelector } from '@/components/student/features/exam/setup/TopicSelector';
-import { SubjectSelector } from '@/components/student/features/exam/setup/SubjectSelector'; // New Import
+import { SubjectSelector } from '@/components/student/features/exam/setup/SubjectSelector';
 import { OmrConfigModal } from '@/components/student/features/omr/OmrConfigModal';
 import { OmrSheet } from '@/components/student/features/omr/OmrSheet';
 import Portal from '@/components/ui/portal';
@@ -28,8 +34,8 @@ interface ExamSetupFormProps {
 interface Subject {
   id: string;
   label: string;
-  icon: string | React.ReactNode; // Updated to allow both
-  name: string; // Added name property
+  icon: string | React.ReactNode;
+  name: string;
 }
 
 interface Item {
@@ -74,7 +80,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   // --- Modals State ---
   const [isOmrConfigOpen, setIsOmrConfigOpen] = useState(false);
-  // Removed isOmrPrintOpen state as we will print directly
   const [omrDetails, setOmrDetails] = useState<ExamDetails | null>(null);
   const [omrTotalQuestions, setOmrTotalQuestions] = useState(50);
 
@@ -205,9 +210,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       availableSubjects.find((s) => s.id === subject)?.label || subject;
 
     try {
-      // We pass the config to parent. Parent will show instructions.
-      // We are NOT calling engine.startExam here anymore in the redesigned flow (conceptually).
-      // But we call props.onStartExam which is hooked to handleStartExam in StudentRoot.
       await onStartExam({
         subject,
         subjectLabel,
@@ -220,7 +222,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         negativeMarking,
       });
     } catch (error: any) {
-      // Errors handled by parent or toast
       console.error(error);
     }
   };
@@ -228,188 +229,181 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const handleOmrGenerate = (details: ExamDetails, total: number) => {
     setOmrDetails(details);
     setOmrTotalQuestions(total);
-    // Use setTimeout to allow state update and DOM rendering of the hidden OMR sheet before printing
     setTimeout(() => {
       window.print();
     }, 500);
   };
 
+  const StartExamButton = ({ className }: { className?: string }) => (
+    <div className={cn('pt-4', className)}>
+      <button
+        onClick={handleStartExam}
+        disabled={isLoading || !subject}
+        className="w-full group relative overflow-hidden bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-5 rounded-3xl shadow-lg hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+      >
+        <div className="relative z-10 flex items-center justify-center gap-3">
+          {isLoading ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span>Cooking...</span>
+            </>
+          ) : (
+            <>
+              <span className="text-xl">পরীক্ষা শুরু করুন</span>
+              <Sparkles
+                size={22}
+                className="group-hover:rotate-12 transition-transform"
+              />
+            </>
+          )}
+        </div>
+      </button>
+      <p className="text-center text-[11px] text-neutral-400 mt-4 font-bold uppercase tracking-widest">
+        পরবর্তী ধাপে নির্দেশাবলী দেখানো হবে
+      </p>
+    </div>
+  );
+
   return (
-    <div className="w-full max-w-6xl mx-auto pb-32 px-4 md:px-6 lg:px-8 font-sans animate-in fade-in duration-500">
+    <div className="w-full max-w-7xl mx-auto pb-32 px-4 md:px-6 lg:px-8 font-sans animate-in fade-in duration-700">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pt-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 pt-6">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
-              পরীক্ষা সেটআপ
+          <div className="flex items-center gap-2 mb-3">
+            <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-xs font-black uppercase tracking-widest">
+              Exam Configuration
             </span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
-            প্রশ্নপদ্ধতি নির্বাচন করুন
+          <h1 className="text-4xl md:text-5xl font-black text-neutral-900 dark:text-white tracking-tight">
+            পরীক্ষা সেটআপ করুন
           </h1>
         </div>
 
         <button
           onClick={() => setIsOmrConfigOpen(true)}
-          className="group flex items-center gap-3 px-5 py-3 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl font-bold text-neutral-600 dark:text-neutral-300 shadow-sm hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all"
+          className="group flex items-center gap-3 px-6 py-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl font-black text-neutral-700 dark:text-neutral-300 shadow-sm hover:shadow-xl hover:border-emerald-500/30 transition-all active:scale-95"
         >
-          <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/30 transition-colors">
-            <Share2 className="w-4 h-4" />
+          <div className="w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all">
+            <Share2 className="w-5 h-5" />
           </div>
-          <span>OMR শিট জেনারেটর</span>
+          <span>OMR Sheet</span>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        {/* Left Column: Selection (Subject & Topics) - User Friendly Width */}
-        <div className="lg:col-span-8 space-y-10">
-          {/* 1. Subject Selection */}
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                বিষয় নির্বাচন
-              </h3>
-            </div>
-
-            <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm">
-              <SubjectSelector
-                subjects={availableSubjects.map((s) => ({
-                  id: s.id,
-                  name: s.name, // Pass the name/label
-                  icon: s.icon,
-                }))}
-                selectedSubject={subject}
-                onSelect={setSubject}
-                isLoading={isFetchingData}
-              />
-            </div>
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+        {/* Left Column: Selection (Subject & Topics) */}
+        <div className="xl:col-span-8 space-y-8">
+          {/* 1. Subject Selection Card */}
+          <section className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            <h3 className="text-xl font-black text-neutral-900 dark:text-white mb-8 flex items-center gap-3">
+              <div className="w-2 h-8 bg-emerald-600 rounded-full" />
+              বিষয় নির্বাচন
+            </h3>
+            <SubjectSelector
+              subjects={availableSubjects.map((s) => ({
+                id: s.id,
+                name: s.name,
+                icon: s.icon,
+              }))}
+              selectedSubject={subject}
+              onSelect={setSubject}
+              isLoading={isFetchingData}
+            />
           </section>
 
-          {/* 2. Topics Selection */}
+          {/* 2. Topics Selection Card */}
           <section
             className={cn(
-              'space-y-6 transition-all duration-500 delay-100',
-              !subject
-                ? 'opacity-40 pointer-events-none grayscale blur-[1px]'
-                : 'opacity-100',
+              'bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-500',
+              !subject ? 'opacity-50 pointer-events-none' : 'opacity-100',
             )}
           >
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                অধ্যায় ও টপিক (ঐচ্ছিক)
-              </h3>
+            <h3 className="text-xl font-black text-neutral-900 dark:text-white mb-8 flex items-center gap-3">
+              <div className="w-2 h-8 bg-emerald-600 rounded-full" />
+              অধ্যায় ও টপিক
+            </h3>
+            <div className="grid gap-8">
+              <TopicSelector
+                title="অধ্যায়"
+                items={availableChapters.map((c) => c.name)}
+                selectedItems={availableChapters
+                  .filter((c) => selectedChapters.includes(c.id))
+                  .map((c) => c.name)}
+                onChange={(names) =>
+                  handleTopicSelectionChange('chapters', names)
+                }
+                disabled={!subject}
+                emptyLabel="এই বিষয়ের জন্য কোনো অধ্যায় পাওয়া যায়নি"
+              />
+
+              <TopicSelector
+                title="টপিক"
+                items={availableTopics.map((t) => t.name)}
+                groupedItems={availableTopics.reduce(
+                  (acc, topic: any) => {
+                    const chapterName =
+                      availableChapters.find((c) => c.id === topic.chapter_id)
+                        ?.name || 'Other';
+                    if (!acc[chapterName]) acc[chapterName] = [];
+                    acc[chapterName].push(topic.name);
+                    return acc;
+                  },
+                  {} as Record<string, string[]>,
+                )}
+                selectedItems={availableTopics
+                  .filter((t) => selectedTopics.includes(t.id))
+                  .map((t) => t.name)}
+                onChange={(names) =>
+                  handleTopicSelectionChange('topics', names)
+                }
+                disabled={selectedChapters.length === 0}
+                emptyLabel="আগে অধ্যায় নির্বাচন করুন"
+              />
             </div>
 
-            <div className="bg-white dark:bg-neutral-900/50 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 space-y-4 shadow-sm">
-              <div className="grid gap-4">
-                <TopicSelector
-                  title="অধ্যায়"
-                  items={availableChapters.map((c) => c.name)}
-                  selectedItems={availableChapters
-                    .filter((c) => selectedChapters.includes(c.id))
-                    .map((c) => c.name)}
-                  onChange={(names) =>
-                    handleTopicSelectionChange('chapters', names)
-                  }
-                  disabled={!subject}
-                  emptyLabel="এই বিষয়ের জন্য কোনো অধ্যায় পাওয়া যায়নি"
-                />
-
-                <TopicSelector
-                  title="টপিক"
-                  items={availableTopics.map((t) => t.name)}
-                  groupedItems={availableTopics.reduce(
-                    (acc, topic: any) => {
-                      const chapterName =
-                        availableChapters.find((c) => c.id === topic.chapter_id)
-                          ?.name || 'Other';
-                      if (!acc[chapterName]) acc[chapterName] = [];
-                      acc[chapterName].push(topic.name);
-                      return acc;
-                    },
-                    {} as Record<string, string[]>,
-                  )}
-                  selectedItems={availableTopics
-                    .filter((t) => selectedTopics.includes(t.id))
-                    .map((t) => t.name)}
-                  onChange={(names) =>
-                    handleTopicSelectionChange('topics', names)
-                  }
-                  disabled={selectedChapters.length === 0}
-                  emptyLabel="আগে অধ্যায় নির্বাচন করুন"
-                />
+            {selectedChapters.length > 0 && selectedTopics.length === 0 && (
+              <div className="mt-8 flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl text-sm text-emerald-800 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/50">
+                <BookOpen size={18} className="mt-0.5 shrink-0" />
+                <p className="font-medium">
+                  আপনি কোনো নির্দিষ্ট টপিক সিলেক্ট না করলে নির্বাচিত অধ্যায়গুলোর
+                  সব টপিক থেকে প্রশ্ন আসবে।
+                </p>
               </div>
-
-              {selectedChapters.length > 0 && selectedTopics.length === 0 && (
-                <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-xs text-blue-700 dark:text-blue-300">
-                  <BookOpen size={14} className="mt-0.5 shrink-0" />
-                  <p>
-                    আপনি কোনো নির্দিষ্ট টপিক সিলেক্ট না করলে নির্বাচিত
-                    অধ্যায়গুলোর সব টপিক থেকে প্রশ্ন আসবে।
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Submit Area - Moved/Duplicated to Left Column for better UX */}
-            <div className="pt-4">
-              <button
-                onClick={handleStartExam}
-                disabled={isLoading || !subject}
-                className="w-full group relative overflow-hidden bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
-              >
-                <div className="relative z-10 flex items-center justify-center gap-3">
-                  {isLoading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>প্রসেস হচ্ছে...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-lg">নির্দেশাবলী দেখুন</span>
-                      <Sparkles
-                        size={18}
-                        className="group-hover:rotate-12 transition-transform"
-                      />
-                    </>
-                  )}
-                </div>
-              </button>
-              <p className="text-center text-[10px] text-neutral-400 mt-3 font-medium">
-                পরবর্তী ধাপে নির্দেশাবলী দেখানো হবে
-              </p>
-            </div>
+            )}
           </section>
+
+          {/* Desktop Submit Button */}
+          <StartExamButton className="hidden xl:block" />
         </div>
 
-        {/* Right Column: Settings & Actions (Sticky) */}
-        <div className="lg:col-span-4 space-y-8 lg:sticky lg:top-24">
-          <section
-            className={cn('space-y-4 transition-all duration-500 delay-200')}
-          >
-            <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-              সেটিংস ও কনফিগারেশন
-            </h3>
+        {/* Right Column: Settings Cards */}
+        <div className="xl:col-span-4 space-y-6">
+          <ExamTypeSelection
+            examTypes={examTypes}
+            setExamTypes={setExamTypes}
+          />
 
-            <div className="bg-white dark:bg-neutral-900 rounded-3xl p-1 border border-neutral-200 dark:border-neutral-800 shadow-xl shadow-neutral-200/50 dark:shadow-none">
-              <div className="p-5">
-                <ExamSettings
-                  examTypes={examTypes}
-                  setExamTypes={setExamTypes}
-                  difficulty={difficulty}
-                  setDifficulty={setDifficulty}
-                  questionCount={questionCount}
-                  setQuestionCount={setQuestionCount}
-                  duration={duration}
-                  setDuration={setDuration}
-                  negativeMarking={negativeMarking}
-                  setNegativeMarking={setNegativeMarking}
-                />
-              </div>
+          <DifficultySelection
+            difficulty={difficulty}
+            setDifficulty={setDifficulty}
+          />
 
-              {/* Submit Area Removed from Right Column */}
-            </div>
-          </section>
+          <QuestionCountSelection
+            questionCount={questionCount}
+            setQuestionCount={setQuestionCount}
+          />
+
+          <TimeSelection duration={duration} setDuration={setDuration} />
+
+          <NegativeMarkingSelection
+            negativeMarking={negativeMarking}
+            setNegativeMarking={setNegativeMarking}
+          />
+        </div>
+
+        {/* Mobile Submit Button */}
+        <div className="xl:hidden pb-10">
+          <StartExamButton />
         </div>
       </div>
 
@@ -423,7 +417,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         }
       />
 
-      {/* Hidden OMR Sheet for Printing - Portal to escape parent hiding */}
+      {/* Hidden OMR Sheet for Printing */}
       {omrDetails && (
         <Portal>
           <div className="hidden print:block fixed inset-0 z-[9999] bg-white h-screen w-screen">

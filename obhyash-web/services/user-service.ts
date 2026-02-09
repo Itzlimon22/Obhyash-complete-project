@@ -130,7 +130,15 @@ export const getUserProfile = async (
   // Fallback: Local Storage or Mock
   if (typeof window !== 'undefined') {
     const localUser = localStorage.getItem('obhyash_user_profile');
-    if (localUser) return JSON.parse(localUser);
+    if (localUser) {
+      try {
+        return JSON.parse(localUser);
+      } catch (e) {
+        console.error('Failed to parse local user profile:', e);
+        localStorage.removeItem('obhyash_user_profile');
+        return null;
+      }
+    }
   }
 
   return null;

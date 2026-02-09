@@ -64,8 +64,8 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
           'w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 outline-none select-none',
           'bg-white dark:bg-neutral-900',
           isOpen
-            ? 'border-indigo-500 ring-4 ring-indigo-500/10'
-            : 'border-neutral-200 dark:border-neutral-800 hover:border-indigo-300 dark:hover:border-neutral-700',
+            ? 'border-emerald-500 ring-4 ring-emerald-500/10'
+            : 'border-neutral-200 dark:border-neutral-800 hover:border-emerald-300 dark:hover:border-neutral-700',
         )}
       >
         <div className="flex items-center gap-3 overflow-hidden">
@@ -73,7 +73,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
             className={cn(
               'w-8 h-8 rounded-lg flex items-center justify-center text-lg shrink-0 transition-colors',
               selectedSubjectData
-                ? 'bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'
+                ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
                 : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400',
             )}
           >
@@ -126,7 +126,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
               placeholder="বিষয় খুঁজুন..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full pl-9 pr-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm focus:outline-none focus:border-emerald-500 transition-colors"
               autoFocus={isOpen}
             />
           </div>
@@ -151,7 +151,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
                   className={cn(
                     'w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200 group',
                     isSelected
-                      ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                      ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
                       : 'hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300',
                   )}
                 >
@@ -159,7 +159,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
                     className={cn(
                       'w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-sm border',
                       isSelected
-                        ? 'bg-white dark:bg-neutral-900 border-indigo-200 dark:border-indigo-500/30'
+                        ? 'bg-white dark:bg-neutral-900 border-emerald-200 dark:border-emerald-500/30'
                         : 'bg-white dark:bg-neutral-900 border-neutral-100 dark:border-neutral-700 group-hover:border-neutral-300 dark:group-hover:border-neutral-600',
                     )}
                   >
@@ -169,7 +169,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
                     {subject.name}
                   </span>
                   {isSelected && (
-                    <Check size={16} className="text-indigo-600" />
+                    <Check size={16} className="text-emerald-600" />
                   )}
                 </button>
               );

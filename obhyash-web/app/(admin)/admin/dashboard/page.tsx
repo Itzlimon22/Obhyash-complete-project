@@ -346,7 +346,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Key Metrics Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-5">
           {isLoading
             ? Array.from({ length: 5 }).map((_, i) => (
                 <div

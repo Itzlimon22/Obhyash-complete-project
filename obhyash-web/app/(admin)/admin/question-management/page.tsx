@@ -128,77 +128,77 @@ export default function QuestionManagementPage() {
           </div>
 
           {/* Statistics Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+            <div className="bg-white dark:bg-neutral-900 rounded-[1.5rem] border border-neutral-200/60 dark:border-neutral-800/60 p-4 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                  <p className="text-[10px] md:text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.15em] opacity-80">
                     মোট প্রশ্ন
                   </p>
-                  <p className="text-3xl font-bold text-neutral-900 dark:text-white mt-2">
+                  <p className="text-xl md:text-3xl font-bold text-neutral-900 dark:text-white mt-1 md:mt-2">
                     {stats.total}
                   </p>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-[1rem] bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
                   <FileText
-                    size={24}
+                    size={20}
                     className="text-neutral-600 dark:text-neutral-400"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-neutral-900 rounded-xl border border-emerald-200 dark:border-emerald-900/30 p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-white dark:bg-neutral-900 rounded-[1.5rem] border border-emerald-200/50 dark:border-emerald-900/30 p-4 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                  <p className="text-[10px] md:text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.15em] opacity-80">
                     Approved
                   </p>
-                  <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-400 mt-2">
+                  <p className="text-xl md:text-3xl font-bold text-emerald-700 dark:text-emerald-400 mt-1 md:mt-2">
                     {stats.approved}
                   </p>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-[1rem] bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                   <CheckCircle
-                    size={24}
+                    size={20}
                     className="text-emerald-600 dark:text-emerald-400"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-neutral-900 rounded-xl border border-amber-200 dark:border-amber-900/30 p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-white dark:bg-neutral-900 rounded-[1.5rem] border border-amber-200/50 dark:border-amber-900/30 p-4 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+                  <p className="text-[10px] md:text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-[0.15em] opacity-80">
                     Pending
                   </p>
-                  <p className="text-3xl font-bold text-amber-700 dark:text-amber-400 mt-2">
+                  <p className="text-xl md:text-3xl font-bold text-amber-700 dark:text-amber-400 mt-1 md:mt-2">
                     {stats.pending}
                   </p>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-[1rem] bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                   <Clock
-                    size={24}
+                    size={20}
                     className="text-amber-600 dark:text-amber-400"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-neutral-900 rounded-xl border border-rose-200 dark:border-rose-900/30 p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-white dark:bg-neutral-900 rounded-[1.5rem] border border-rose-200/50 dark:border-rose-900/30 p-4 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-rose-600 dark:text-rose-400 uppercase tracking-wider">
+                  <p className="text-[10px] md:text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-[0.15em] opacity-80">
                     Rejected
                   </p>
-                  <p className="text-3xl font-bold text-rose-700 dark:text-rose-400 mt-2">
+                  <p className="text-xl md:text-3xl font-bold text-rose-700 dark:text-rose-400 mt-1 md:mt-2">
                     {stats.rejected}
                   </p>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-[1rem] bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
                   <AlertCircle
-                    size={24}
+                    size={20}
                     className="text-rose-600 dark:text-rose-400"
                   />
                 </div>

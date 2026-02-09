@@ -145,9 +145,17 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
 
   // Local Storage Logic (always save for backup)
   if (typeof window !== 'undefined') {
-    const existingHistory = JSON.parse(
-      localStorage.getItem('obhyash_exam_history') || '[]',
-    );
+    let existingHistory: ExamResult[] = [];
+    try {
+      const stored = localStorage.getItem('obhyash_exam_history');
+      if (stored) {
+        existingHistory = JSON.parse(stored);
+      }
+    } catch (e) {
+      console.error('Failed to parse existing exam history:', e);
+      // If malformed, we'll start with a clean slate
+      existingHistory = [];
+    }
     const updatedHistory = [...existingHistory, result];
     localStorage.setItem(
       'obhyash_exam_history',
@@ -173,7 +181,17 @@ export const getExamHistory = async (): Promise<ExamResult[]> => {
 
   if (typeof window !== 'undefined') {
     const stored = localStorage.getItem('obhyash_exam_history');
-    return stored ? JSON.parse(stored) : [];
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch (e) {
+        console.error('Failed to parse local exam history:', e);
+        // Clear the corrupted data
+        localStorage.removeItem('obhyash_exam_history');
+        return [];
+      }
+    }
+    return [];
   }
   return [];
 };

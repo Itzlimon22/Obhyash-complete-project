@@ -167,7 +167,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
               ? 'cursor-not-allowed bg-neutral-100 dark:bg-neutral-800'
               : 'cursor-pointer',
             isOpen
-              ? 'border-rose-500 ring-2 ring-rose-500/10'
+              ? 'border-emerald-500 ring-2 ring-emerald-500/10'
               : 'border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700',
           )}
         >
@@ -244,7 +244,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                 />
               </div>
               <div className="flex gap-2">
@@ -272,7 +272,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
                 ) : (
                   <button
                     onClick={handleLocalSelectAll}
-                    className="flex-1 py-2 text-xs font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 dark:text-indigo-300 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-colors"
+                    className="flex-1 py-2 text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-300 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors"
                   >
                     Select All
                   </button>
@@ -280,7 +280,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
 
                 <button
                   onClick={handleLocalClear}
-                  className="flex-1 py-2 text-xs font-bold text-rose-600 bg-rose-50 dark:bg-rose-500/10 dark:text-rose-300 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors"
+                  className="flex-1 py-2 text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-300 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-colors"
                 >
                   Clear Selection
                 </button>
@@ -312,7 +312,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
                         className={cn(
                           'border rounded-xl overflow-hidden mb-3 transition-colors',
                           isExpanded
-                            ? 'border-rose-100 dark:border-rose-900/30'
+                            ? 'border-emerald-100 dark:border-emerald-900/30'
                             : 'border-neutral-200 dark:border-neutral-800',
                         )}
                       >
@@ -320,7 +320,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
                           className={cn(
                             'flex items-center justify-between p-3 cursor-pointer transition-colors select-none',
                             isExpanded
-                              ? 'bg-rose-50/50 dark:bg-rose-900/10'
+                              ? 'bg-emerald-50/50 dark:bg-emerald-900/10'
                               : 'bg-neutral-50 dark:bg-neutral-800/50 hover:bg-neutral-100 dark:hover:bg-neutral-800',
                           )}
                           onClick={() => toggleGroup(group)}
@@ -367,7 +367,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
                             className={cn(
                               'text-xs font-bold px-3 py-1.5 rounded-lg transition-colors',
                               allGroupSelected
-                                ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300'
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
                                 : 'bg-white text-neutral-600 border border-neutral-200 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 hover:bg-neutral-50',
                             )}
                           >
@@ -433,7 +433,7 @@ const SelectorItem = React.memo(
       className={cn(
         'w-full flex items-center justify-between p-4 rounded-xl text-left transition-all duration-200 border',
         isSelected
-          ? 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30'
+          ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30'
           : 'bg-white dark:bg-neutral-800/50 border-transparent hover:bg-neutral-50 dark:hover:bg-neutral-800',
       )}
     >
@@ -441,7 +441,7 @@ const SelectorItem = React.memo(
         className={cn(
           'text-sm font-medium',
           isSelected
-            ? 'text-rose-900 dark:text-rose-100'
+            ? 'text-emerald-900 dark:text-emerald-100'
             : 'text-neutral-700 dark:text-neutral-300',
         )}
       >
@@ -451,7 +451,7 @@ const SelectorItem = React.memo(
         className={cn(
           'w-5 h-5 rounded-full border flex items-center justify-center transition-all',
           isSelected
-            ? 'bg-rose-500 border-rose-500 text-white'
+            ? 'bg-emerald-600 border-emerald-600 text-white'
             : 'border-neutral-300 dark:border-neutral-600',
         )}
       >

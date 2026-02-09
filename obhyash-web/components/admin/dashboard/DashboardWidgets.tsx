@@ -23,19 +23,19 @@ import { createClient } from '@/utils/supabase/client'; // ✅ Added for future 
  */
 export const StatCard: React.FC<{ data: StatData }> = ({ data }) => {
   return (
-    <div className="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 hover:border-rose-300 dark:hover:border-rose-900/50 transition-all duration-300 group shadow-sm hover:shadow-xl dark:shadow-none">
+    <div className="relative overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200/60 dark:border-neutral-800/60 rounded-[1.75rem] p-4 md:p-5 hover:border-emerald-500/30 dark:hover:border-emerald-500/20 transition-all duration-300 group shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-xl dark:shadow-none">
       {/* Decorative Glow */}
       <div
         className={`absolute -top-12 -right-12 w-32 h-32 rounded-full blur-3xl opacity-0 group-hover:opacity-20 dark:group-hover:opacity-10 transition-opacity duration-700 ${data.bgClass.replace('/30', '/60')}`}
       />
 
       <div className="flex justify-between items-start relative z-10 mb-4">
-        <div className="space-y-1">
-          <h4 className="text-neutral-500 dark:text-neutral-500 text-[10px] font-bold uppercase tracking-widest">
+        <div className="space-y-0.5">
+          <h4 className="text-neutral-500 dark:text-neutral-500 text-[9px] font-extrabold uppercase tracking-widest opacity-80">
             {data.title}
           </h4>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+            <span className="text-xl md:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
               {data.value.toLocaleString()}
             </span>
           </div>
@@ -187,8 +187,8 @@ export const DatabaseToolsSection: React.FC = () => {
         </button>
       </div>
 
-      <div className="bg-white dark:bg-obsidian-900 border border-paper-200 dark:border-obsidian-800 rounded-2xl p-6 shadow-subtle dark:shadow-none">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-white dark:bg-obsidian-900 border border-paper-200 dark:border-obsidian-800 rounded-3xl p-4 md:p-6 shadow-subtle dark:shadow-none">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           {tools.map((tool) => (
             <ToolItem key={tool.id} tool={tool} />
           ))}
