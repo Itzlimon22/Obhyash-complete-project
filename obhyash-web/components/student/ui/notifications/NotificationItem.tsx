@@ -3,6 +3,7 @@ import { Notification } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 import { bn } from 'date-fns/locale';
 import { Bell, Trophy, TrendingUp, Megaphone, Settings } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -72,30 +73,40 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`group px-5 py-3.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-all duration-200 cursor-pointer relative overflow-hidden ${
-        !notification.is_read ? 'bg-rose-50/30 dark:bg-rose-900/5' : ''
-      }`}
+      className={cn(
+        'group px-5 py-4 cursor-pointer relative overflow-hidden transition-all duration-200 active:bg-neutral-100 dark:active:bg-neutral-800 tap-highlight-transparent',
+        !notification.is_read
+          ? 'bg-rose-50/20 dark:bg-rose-900/5'
+          : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/50',
+      )}
     >
       {/* Unread Indicator Bar */}
       {!notification.is_read && (
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]"></div>
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.4)]"></div>
       )}
 
-      <div className="flex items-start gap-4 relaltive z-10">
+      <div className="flex items-start gap-4 relative z-10">
         {/* Icon */}
         <div
-          className={`flex-shrink-0 w-9 h-9 rounded-xl ${config.bgColor} ${config.textColor} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}
+          className={cn(
+            'flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-105 group-active:scale-95',
+            config.bgColor,
+            config.textColor,
+          )}
         >
           {config.icon}
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0 pt-0.5">
-          <div className="flex items-center justify-between gap-2 mb-0.5">
+          <div className="flex items-center justify-between gap-2 mb-1">
             <h4
-              className={`text-sm font-bold text-neutral-800 dark:text-neutral-100 leading-snug group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors ${
-                !notification.is_read ? 'text-black dark:text-white' : ''
-              }`}
+              className={cn(
+                'text-[13px] md:text-sm font-bold leading-snug transition-colors',
+                !notification.is_read
+                  ? 'text-neutral-900 dark:text-white'
+                  : 'text-neutral-700 dark:text-neutral-300 group-hover:text-rose-600 dark:group-hover:text-rose-400',
+              )}
             >
               {notification.title}
             </h4>

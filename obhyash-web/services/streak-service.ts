@@ -1,5 +1,6 @@
 import { UserProfile } from '@/lib/types';
 import { updateUserProfile } from './user-service';
+import { calculateLevel } from '@/lib/utils';
 
 /**
  * Checks and updates the user's daily streak.
@@ -40,10 +41,14 @@ export const checkAndUpdateStreak = async (
       return null;
     } else if (diffDays === 1) {
       // Consecutive day!
+      const xpGained = 20;
+      const newXp = (user.xp || 0) + xpGained;
       const updatedUser: UserProfile = {
         ...user,
         streakCount: (user.streakCount || 0) + 1,
         lastStreakDate: now.toISOString(),
+        xp: newXp,
+        level: calculateLevel(newXp),
       };
       await updateUserProfile(updatedUser);
       return updatedUser;
@@ -59,10 +64,14 @@ export const checkAndUpdateStreak = async (
     }
   } else {
     // First time streak tracking
+    const xpGained = 20;
+    const newXp = (user.xp || 0) + xpGained;
     const updatedUser: UserProfile = {
       ...user,
       streakCount: 1,
       lastStreakDate: now.toISOString(),
+      xp: newXp,
+      level: calculateLevel(newXp),
     };
     await updateUserProfile(updatedUser);
     return updatedUser;

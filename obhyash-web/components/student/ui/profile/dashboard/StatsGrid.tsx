@@ -1,4 +1,5 @@
 import React from 'react';
+import { useCountUp } from '@/hooks/use-count-up';
 
 interface StatsGridProps {
   examsTaken: number;
@@ -13,10 +14,16 @@ const StatsGrid: React.FC<StatsGridProps> = ({
   xp,
   streak,
 }) => {
+  const animatedExams = useCountUp(examsTaken, 1000);
+  const animatedScore = useCountUp(avgScore, 1500);
+  const animatedXp = useCountUp(xp, 2000);
+  const animatedStreak = useCountUp(streak, 1200);
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       {/* Total Exams */}
-      <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-indigo-200 dark:hover:border-indigo-900 transition-colors">
+      <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-indigo-200 dark:hover:border-indigo-900 transition-all group overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+
         <div className="flex items-center gap-3 mb-2">
           <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg text-indigo-600 dark:text-indigo-400">
             <svg
@@ -38,8 +45,8 @@ const StatsGrid: React.FC<StatsGridProps> = ({
             মোট পরীক্ষা
           </span>
         </div>
-        <div className="text-2xl font-bold text-neutral-900 dark:text-white">
-          {examsTaken}
+        <div className="text-2xl font-bold text-neutral-900 dark:text-white group-hover:scale-110 transition-transform origin-left">
+          {animatedExams}
         </div>
       </div>
 
@@ -66,8 +73,8 @@ const StatsGrid: React.FC<StatsGridProps> = ({
             গড় স্কোর
           </span>
         </div>
-        <div className="text-2xl font-bold text-neutral-900 dark:text-white">
-          {avgScore}%
+        <div className="text-2xl font-bold text-neutral-900 dark:text-white group-hover:scale-110 transition-transform origin-left">
+          {animatedScore}%
         </div>
       </div>
 
@@ -94,8 +101,8 @@ const StatsGrid: React.FC<StatsGridProps> = ({
             মোট XP
           </span>
         </div>
-        <div className="text-2xl font-bold text-neutral-900 dark:text-white">
-          {xp.toLocaleString()}
+        <div className="text-2xl font-bold text-neutral-900 dark:text-white group-hover:scale-110 transition-transform origin-left">
+          {animatedXp.toLocaleString()}
         </div>
       </div>
 
@@ -127,8 +134,8 @@ const StatsGrid: React.FC<StatsGridProps> = ({
             স্ট্রিক
           </span>
         </div>
-        <div className="text-2xl font-bold text-neutral-900 dark:text-white">
-          {streak} দিন
+        <div className="text-2xl font-bold text-neutral-900 dark:text-white group-hover:scale-110 transition-transform origin-left">
+          {animatedStreak} দিন
         </div>
       </div>
     </div>

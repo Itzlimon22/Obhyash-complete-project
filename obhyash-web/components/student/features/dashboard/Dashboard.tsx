@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SubjectStat from './SubjectStat';
+import { celebration } from '@/lib/confetti';
+import { toast } from 'sonner';
 import { ExamResult } from 'lib/types';
 import { MOCK_USERS } from './leaderboard/leaderboardData'; // Removed direct usage, but checking if other imports are needed or if we can delete the line.
 // Actually the previous step removed usage. So I can delete this line.
@@ -112,27 +114,18 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [totalUsers, setTotalUsers] = React.useState<number>(0);
   const [xpDiff, setXpDiff] = React.useState<number>(0);
 
+  const prevRankRef = useRef<number>(0);
+
   React.useEffect(() => {
     const fetchLeaderboardStats = async () => {
       const { getLeaderboardUsers, getUserProfile } =
         await import('@/services/database');
-      // For simplicity, we check 'All' or user's level. Let's try user's level or global.
-      // Since we don't have user level prop easily here without passing it, we fetch 'me'.
-      // But props passed `history` not user.
-      // Better to pass `user` to Dashboard?
-      // Dashboard doesn't have `user` prop.
-      // Let's rely on getUserProfile('me').
 
       try {
         const currentUser = await getUserProfile('me');
+        if (!currentUser) return;
 
-        // Check if currentUser exists before accessing properties
-        if (!currentUser) {
-          console.warn('User profile not found');
-          return;
-        }
-
-        const level = currentUser.level || 'Rookie';
+        const level = currentUser.level || 'Level 1';
         const users = await getLeaderboardUsers(level);
 
         const sorted = [...users].sort((a, b) => b.xp - a.xp);
@@ -140,6 +133,15 @@ const Dashboard: React.FC<DashboardProps> = ({
         const top = sorted[0];
         const diff =
           top && currentUser ? Math.max(0, top.xp - currentUser.xp) : 0;
+
+        // Rank up celebration
+        if (prevRankRef.current > 0 && rank < prevRankRef.current) {
+          celebration.achievement();
+          toast.success('অভিনন্দন! আপনার র‍্যাংক উন্নত হয়েছে!', {
+            description: `আপনি এখন #${rank} স্থানে আছেন।`,
+          });
+        }
+        prevRankRef.current = rank;
 
         setTopUser(top);
         setUserRank(rank);

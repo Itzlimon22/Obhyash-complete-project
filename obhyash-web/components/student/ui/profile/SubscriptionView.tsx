@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import {
   SubscriptionPlan,
@@ -22,6 +24,15 @@ import {
   getUserActiveSubscription,
 } from '@/services/database';
 import { printInvoice } from '@/services/print-service';
+import { cn } from '@/lib/utils';
+import {
+  Crown,
+  Shield,
+  Clock,
+  Headphones,
+  RefreshCcw,
+  Sparkles,
+} from 'lucide-react';
 
 const SubscriptionView: React.FC = () => {
   // State
@@ -134,7 +145,7 @@ const SubscriptionView: React.FC = () => {
       const success = await submitManualPayment(submission);
       if (success) {
         alert(
-          `আপনার পেমেন্ট তথ্য জমা নেওয়া হয়েছে। যাচাই করার পর ${selectedPlan?.name} প্ল্যানটি চালু হবে।`,
+          `আপনার পেমেন্ট তথ্য জমা নেওয়া হয়েছে। যাচাই করার পর ${selectedPlan?.name} প্ল্যানটি চালু হবে।`,
         );
         setIsPaymentModalOpen(false);
         setSelectedPlan(null);
@@ -142,7 +153,7 @@ const SubscriptionView: React.FC = () => {
         throw new Error('Submission failed');
       }
     } catch {
-      alert('ত্রুটি হয়েছে। আবার চেষ্টা করুন।');
+      alert('ত্রুটি হয়েছে। আবার চেষ্টা করুন।');
     }
   };
 
@@ -160,7 +171,7 @@ const SubscriptionView: React.FC = () => {
       setPaymentMethods((prev) => [...prev, newMethod]);
       setIsAddMethodOpen(false);
     } catch {
-      alert('মেথড যুক্ত করা যায়নি।');
+      alert('মেথড যুক্ত করা যায়নি।');
     } finally {
       setIsAddingMethod(false);
     }
@@ -173,7 +184,7 @@ const SubscriptionView: React.FC = () => {
         setPaymentMethods((prev) => prev.filter((m) => m.id !== id));
       } catch (error) {
         console.error('Failed to delete method', error);
-        alert('মুছে ফেলা সম্ভব হয়নি।');
+        alert('মুছে ফেলা সম্ভব হয়নি।');
       }
     }
   };
@@ -186,82 +197,141 @@ const SubscriptionView: React.FC = () => {
     }
   };
 
+  const isFreeUser = currentPlanId === 'free' || !currentPlanId;
+
+  const TRUST_BADGES = [
+    { icon: Shield, label: 'নিরাপদ পেমেন্ট', color: 'text-emerald-500' },
+    { icon: RefreshCcw, label: 'যেকোনো সময় বাতিল', color: 'text-blue-500' },
+    { icon: Headphones, label: '২৪/৭ সাপোর্ট', color: 'text-purple-500' },
+    { icon: Clock, label: 'তাৎক্ষণিক অ্যাক্সেস', color: 'text-orange-500' },
+  ];
+
   return (
-    <div className="max-w-5xl mx-auto space-y-6 animate-fade-in pb-16">
-      {/* Current Plan Details Header Removed - Showing minimal active plan info if needed or just pricing */}
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
-        <div>
-          <h2 className="text-sm font-bold text-neutral-500 uppercase tracking-widest mb-1">
-            বর্তমান সাবস্ক্রিপশন
-          </h2>
-          <div className="flex items-center gap-3">
-            <span className="text-2xl font-black text-neutral-900 dark:text-white">
-              {currentPlan.name}
-            </span>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wide">
-              Active
-            </span>
+    <div className="max-w-5xl mx-auto space-y-8 animate-fade-in pb-20">
+      {/* HERO SECTION */}
+      <div className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 p-6 md:p-10">
+        {/* Decorative Elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-rose-500/20 via-purple-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-emerald-500/20 via-teal-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          {/* Left Content */}
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-3">
+              <div
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold',
+                  isFreeUser
+                    ? 'bg-neutral-700/50 text-neutral-300'
+                    : 'bg-emerald-500/20 text-emerald-400',
+                )}
+              >
+                {isFreeUser ? (
+                  <>
+                    <Sparkles className="w-3 h-3" />
+                    ফ্রি প্ল্যান
+                  </>
+                ) : (
+                  <>
+                    <Crown className="w-3 h-3" />
+                    {currentPlan.name}
+                  </>
+                )}
+              </div>
+              {!isFreeUser && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-400 font-bold uppercase">
+                  Active
+                </span>
+              )}
+            </div>
+
+            <h1 className="text-2xl md:text-3xl font-black text-white mb-2 leading-tight">
+              {isFreeUser
+                ? 'আপনার সম্ভাবনা আনলক করুন'
+                : 'আপনি প্রিমিয়াম সদস্য! 🎉'}
+            </h1>
+            <p className="text-neutral-400 text-sm md:text-base max-w-md">
+              {isFreeUser
+                ? 'আনলিমিটেড এক্সাম, এডভান্সড এনালাইসিস এবং আরও অনেক কিছু পেতে প্রিমিয়ামে আপগ্রেড করুন।'
+                : 'সব প্রিমিয়াম ফিচার আপনার জন্য খোলা আছে। পড়াশোনা চালিয়ে যান!'}
+            </p>
           </div>
+
+          {/* Right Stats (for Premium users) */}
+          {!isFreeUser && (
+            <div className="flex gap-4 md:gap-6">
+              <div className="text-center">
+                <div className="text-2xl md:text-3xl font-black text-white">
+                  {currentPlan.currency}
+                  {currentPlan.price}
+                </div>
+                <div className="text-xs text-neutral-500 font-medium">
+                  {currentPlan.billingCycle}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-        {currentPlanId === 'free' && (
-          <p className="text-sm text-neutral-500 dark:text-neutral-400 max-w-md text-center md:text-right">
-            আনলিমিটেড এক্সাম এবং এনালাইসিস পেতে{' '}
-            <span className="text-rose-600 font-bold">প্রিমিয়াম</span> প্ল্যানে
-            আপগ্রেড করুন
-          </p>
-        )}
       </div>
 
-      {/* Pricing Cards Grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="h-64 bg-white dark:bg-neutral-900 rounded-xl animate-pulse"
-            ></div>
-          ))}
+      {/* PRICING CARDS */}
+      <div>
+        <div className="text-center mb-6">
+          <h2 className="text-lg md:text-xl font-bold text-neutral-800 dark:text-white mb-1">
+            আপনার প্ল্যান বেছে নিন
+          </h2>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            সব প্ল্যানে ৩ দিনের ফ্রি ট্রায়াল অন্তর্ভুক্ত
+          </p>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 max-w-5xl mx-auto">
-          {plans.map((plan) => (
-            <div key={plan.id} className="relative">
+
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-80 bg-white dark:bg-neutral-900 rounded-2xl animate-pulse border border-neutral-100 dark:border-neutral-800"
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            {plans.map((plan) => (
               <PricingCard
+                key={plan.id}
                 plan={plan}
                 isCurrent={currentPlanId === plan.id}
                 onSelect={() => handlePlanSelect(plan)}
               />
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
 
-      {/* Feature Comparison - Minimal */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 py-4 border-y border-neutral-200 dark:border-neutral-800">
-        {[
-          { label: 'Secure Payment', icon: '🔒' },
-          { label: 'Cancel Anytime', icon: '📅' },
-          { label: '24/7 Support', icon: '💬' },
-          { label: 'Money Back', icon: '💰' },
-        ].map((item, idx) => (
+      {/* TRUST BADGES */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        {TRUST_BADGES.map((badge, idx) => (
           <div
             key={idx}
-            className="flex flex-row md:flex-col items-center justify-center text-center gap-2 md:gap-1 p-2"
+            className="flex flex-col items-center justify-center text-center gap-2 p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-md transition-shadow"
           >
-            <span className="text-base md:text-lg">{item.icon}</span>
-            <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wide">
-              {item.label}
+            <badge.icon
+              className={cn('w-6 h-6', badge.color)}
+              strokeWidth={1.5}
+            />
+            <span className="text-xs font-bold text-neutral-600 dark:text-neutral-300">
+              {badge.label}
             </span>
           </div>
         ))}
       </div>
 
-      {/* Account Management Section */}
+      {/* BILLING & PAYMENT SECTION */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Payment Methods */}
         <div className="lg:col-span-1">
           {loading ? (
-            <div className="h-40 bg-white dark:bg-neutral-900 rounded-2xl animate-pulse"></div>
+            <div className="h-40 bg-white dark:bg-neutral-900 rounded-2xl animate-pulse border border-neutral-100 dark:border-neutral-800" />
           ) : (
             <PaymentMethods
               methods={paymentMethods}
@@ -274,7 +344,7 @@ const SubscriptionView: React.FC = () => {
         {/* Billing History */}
         <div className="lg:col-span-2">
           {loading ? (
-            <div className="h-64 bg-neutral-100 dark:bg-neutral-800/50 rounded-2xl animate-pulse"></div>
+            <div className="h-64 bg-white dark:bg-neutral-900 rounded-2xl animate-pulse border border-neutral-100 dark:border-neutral-800" />
           ) : (
             <BillingHistory
               invoices={invoices}

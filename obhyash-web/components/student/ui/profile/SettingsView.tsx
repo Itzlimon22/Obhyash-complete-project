@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import UserAvatar from '../common/UserAvatar';
 import { useAuth } from '@/components/auth/AuthProvider';
 
+import { uploadAvatar } from '@/services/storage-service';
+
 interface SettingsViewProps {
   user: UserProfile;
   onSave?: (data: any) => void;
@@ -33,7 +35,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
   // No large header to remove here, but ensuring top spacing is correct
 
   const [uploading, setUploading] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl); // Local state for immediate preview
+  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || user.avatar_url); // Local state for immediate preview
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -99,66 +101,34 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
     }
 
     const file = e.target.files[0];
+
+    // Size limit check: 2MB
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('ছবি ২ মেগাবাইটের বেশি হতে পারবে না।');
+      return;
+    }
+
     setUploading(true);
 
     try {
-      // 1. Get Signed URL from R2 API
-      console.log('Requesting signed URL...');
-      const response = await fetch('/api/r2-upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fileName: file.name,
-          fileType: file.type,
-          folder: 'avatars', // Store in avatars folder
-        }),
-      });
+      console.log('🔄 Uploading avatar to Supabase...');
+      const result = await uploadAvatar(file);
 
-      console.log('Signed URL response status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Failed to get signed URL:', errorText);
-        throw new Error(
-          `Failed to get upload URL: ${response.status} ${errorText}`,
-        );
-      }
-
-      const data = await response.json();
-      console.log('Signed URL data:', data);
-      const { uploadUrl, publicUrl } = data;
-
-      if (!uploadUrl)
-        throw new Error(
-          'Failed to get upload URL: Missing uploadUrl in response',
-        );
-
-      // 2. Upload to R2 directly
-      console.log('Uploading to R2...');
-      const uploadResponse = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type },
-      });
-      if (!uploadResponse.ok) {
-        throw new Error('Upload failed');
-      }
-
-      console.log('R2 Upload successful');
+      console.log('✅ Avatar uploaded:', result.url);
 
       // 3. Update Parent State & DB via onSave
       if (onSave) {
-        onSave({ avatarUrl: publicUrl });
+        onSave({ avatarUrl: result.url });
       }
 
-      setAvatarUrl(publicUrl);
+      setAvatarUrl(result.url);
       toast.success('সফলভাবে প্রোফাইল ছবি পরিবর্তন করা হয়েছে!', {
         position: 'top-center',
         className: 'font-bengali',
       });
     } catch (error: any) {
       console.error('Upload Error:', error);
-      toast.error(`ছবি আপলোড করতে সমস্যা হয়েছে: ${error.message}`, {
+      toast.error(`ছবি আপলোড করতে সমস্যা হয়েছে: ${error.message || 'Error'}`, {
         position: 'top-center',
         className: 'font-bengali',
       });

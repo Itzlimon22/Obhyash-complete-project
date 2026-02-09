@@ -1,15 +1,47 @@
-// Refactored to use Next.js API Route instead of Supabase Edge Function
+import { supabase } from './core';
+
 export interface UploadResult {
   url: string;
   path: string;
 }
 
+/**
+ * Uploads a file to the appropriate storage provider (Supabase or R2).
+ */
 export const uploadFile = async (
   file: File,
-  bucket: 'avatars' | 'scripts' | 'questions',
+  bucket: string, // 'avatars' | 'scripts' | 'questions' | 'resources' etc.
 ): Promise<UploadResult> => {
   try {
-    // 1. Request Signed URL from Next.js API
+    // A: Supabase Storage for Avatars (Easy RLS integration in future if needed, currently public bucket)
+    if (bucket === 'avatars') {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+        });
+
+      if (error) throw error;
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('avatars').getPublicUrl(filePath);
+
+      console.log('✅ Uploaded to Supabase Storage:', publicUrl);
+
+      return {
+        url: publicUrl,
+        path: filePath,
+      };
+    }
+
+    // B: Cloudflare R2 for heavy/large assets (Zero egress cost)
+    // 1. Request Signed URL from unified R2 API
     const response = await fetch('/api/r2-upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -43,35 +75,41 @@ export const uploadFile = async (
 
     return {
       url: publicUrl,
-      path: publicUrl, // Using publicUrl as path for simplicity, or extract relative if needed
+      path: publicUrl,
     };
   } catch (error) {
-    console.error('R2 Upload failed:', error);
+    console.error(`${bucket} Upload failed:`, error);
     throw error;
   }
 };
 
 /**
- * Helper to upload user avatar images.
- * Wraps uploadFile with the 'avatars' bucket.
- *
- * @param file - The image file to upload.
+ * Helper to upload user avatar images to Supabase Storage.
  */
 export const uploadAvatar = async (file: File) => {
   return uploadFile(file, 'avatars');
 };
 
 /**
- * Helper to upload OMR script images.
- * Wraps uploadFile with the 'scripts' bucket.
- *
- * @param file - The image file to upload.
+ * Helper to upload OMR script images to Cloudflare R2.
  */
 export const uploadScriptImage = async (file: File) => {
   return uploadFile(file, 'scripts');
 };
 
+/**
+ * Helper to upload Question images to Cloudflare R2.
+ */
+export const uploadQuestionImage = async (file: File) => {
+  return uploadFile(file, 'questions');
+};
+
 export const getAvatarUrl = (path: string | null | undefined) => {
-  if (!path) return '/placeholder-avatar.png'; // Default placeholder
-  return path;
+  if (!path) return '/placeholder-avatar.png';
+  // If it's already a full URL (e.g. from Google Auth or R2 if we ever mixed up), return it
+  if (path.startsWith('http')) return path;
+
+  // Otherwise, construct Supabase URL
+  const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+  return data.publicUrl;
 };

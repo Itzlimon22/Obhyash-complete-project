@@ -1,4 +1,19 @@
-﻿import React, { useState, ReactNode, useRef, useEffect } from 'react';
+﻿'use client';
+
+import React, { useState, ReactNode, useRef, useEffect } from 'react';
+import {
+  User,
+  CreditCard,
+  Settings,
+  Info,
+  MessageSquare,
+  LogOut,
+  Bell,
+  Search,
+  ChevronRight,
+  Menu,
+  X,
+} from 'lucide-react';
 import Sidebar from './Sidebar';
 import MobileBottomNav from './MobileBottomNav';
 import { UserProfile, Notification } from '@/lib/types';
@@ -206,30 +221,29 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           <div className="sticky top-0 z-30 shrink-0">{customHeader}</div>
         ) : (
           <header
-            className={`${simpleHeader ? 'h-14' : 'h-16'} bg-white/80 dark:bg-[#0c0a09]/80 backdrop-blur-md border-b border-neutral-200/60 dark:border-neutral-800/60 flex items-center justify-between px-4 md:px-8 z-30 shrink-0 sticky top-0 transition-all duration-300`}
+            className={`${simpleHeader ? 'h-14' : 'h-14 md:h-16'} bg-white/80 dark:bg-[#0c0a09]/80 backdrop-blur-md border-b border-neutral-200/60 dark:border-neutral-800/60 flex items-center justify-between px-3 md:px-8 z-30 shrink-0 sticky top-0 transition-all duration-300`}
           >
             {/* Left: Mobile Toggle & Title */}
-            <div className="flex items-center gap-4">
-              {/* Mobile Sidebar Toggle Removed */}
+            <div className="flex items-center gap-3">
               <h1
-                className={`font-bold text-neutral-800 dark:text-white tracking-tight flex items-center gap-2 truncate ${simpleHeader ? 'text-base' : 'text-lg md:text-xl'}`}
+                className={`font-bold text-neutral-800 dark:text-white tracking-tight flex items-center gap-2 truncate ${simpleHeader ? 'text-sm' : 'text-base md:text-xl'}`}
               >
                 {title}
               </h1>
             </div>
 
             {/* Right: Actions */}
-            <div className="flex items-center gap-3 md:gap-5">
+            <div className="flex items-center gap-2 md:gap-5">
               {/* Streak Icon */}
               <div
-                className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1 md:py-1.5 bg-orange-50 dark:bg-orange-900/10 rounded-full border border-orange-100 dark:border-orange-900/20 group cursor-help transition-all hover:border-orange-200"
+                className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 bg-orange-50 dark:bg-orange-900/10 rounded-full border border-orange-100 dark:border-orange-900/20 group cursor-help transition-all hover:border-orange-200"
                 title="Daily Streak"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform"
+                  className="w-3.5 h-3.5 md:w-4 md:h-4 text-orange-500 group-hover:scale-110 transition-transform"
                 >
                   <path
                     fillRule="evenodd"
@@ -237,8 +251,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-xs font-bold text-orange-600 dark:text-orange-400 tabular-nums">
-                  {user?.streakCount || 0} Days
+                <span className="text-[10px] md:text-xs font-bold text-orange-600 dark:text-orange-400 tabular-nums">
+                  {user?.streakCount || 0}
                 </span>
               </div>
 
@@ -279,44 +293,31 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                 </button>
 
                 {isProfileOpen && user && (
-                  <div className="absolute right-0 top-14 w-72 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl shadow-xl shadow-neutral-200/50 dark:shadow-black/50 z-50 overflow-hidden animate-fade-in origin-top-right">
-                    {/* User Header */}
-                    <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/30 dark:bg-neutral-800/20">
-                      <div className="flex items-center gap-3">
-                        <UserAvatar user={user} size="md" />
+                  <div className="absolute right-0 top-12 w-64 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl shadow-xl shadow-neutral-200/50 dark:shadow-black/50 z-50 overflow-hidden animate-fade-in origin-top-right">
+                    {/* User Header - More Compact */}
+                    <div className="px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/30 dark:bg-neutral-800/20">
+                      <div className="flex items-center gap-2.5">
+                        <UserAvatar user={user} size="sm" />
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-bold text-neutral-900 dark:text-white truncate">
+                          <h4 className="text-[13px] font-bold text-neutral-900 dark:text-white truncate">
                             {user.name}
                           </h4>
-                          <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">
+                          <p className="text-[11px] text-neutral-500 dark:text-neutral-400 truncate">
                             {user.institute}
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-2 space-y-1">
+                    <div className="p-1.5 space-y-0.5">
                       <button
                         onClick={() => {
                           setIsProfileOpen(false);
                           onTabChange('profile');
                         }}
-                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-2.5 transition-colors"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-4 h-4 text-neutral-400"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                          />
-                        </svg>
+                        <User className="w-3.5 h-3.5 text-neutral-400" />
                         আমার প্রোফাইল
                       </button>
                       <button
@@ -324,22 +325,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                           setIsProfileOpen(false);
                           onTabChange('subscription');
                         }}
-                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-2.5 transition-colors"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-4 h-4 text-neutral-400"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"
-                          />
-                        </svg>
+                        <CreditCard className="w-3.5 h-3.5 text-neutral-400" />
                         সাবস্ক্রিপশন ও বিলিং
                       </button>
                       <button
@@ -347,23 +335,21 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                           setIsProfileOpen(false);
                           onTabChange('settings');
                         }}
-                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-2.5 transition-colors"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-4 h-4 text-neutral-400"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.996.946 1.821 1.891 2.222m0 0c.337.141.693.242 1.057.29a5 5 0 1 1 0-10c-.364.048-.72.15-1.057.29m0 0a3.995 3.995 0 0 1-1.891-2.22m3.614 7.66C15.794 13.91 15 12.98 15 11.97v-1.743a4 4 0 0 1 2.29-3.68 9 9 0 0 0-4.58-1.508A9 9 0 0 0 12 5.053"
-                          />
-                        </svg>
+                        <Settings className="w-3.5 h-3.5 text-neutral-400" />
                         সেটিংস
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setIsProfileOpen(false);
+                          onTabChange('about');
+                        }}
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-2.5 transition-colors"
+                      >
+                        <Info className="w-3.5 h-3.5 text-neutral-400" />
+                        আমাদের সম্পর্কে
                       </button>
 
                       <button
@@ -371,37 +357,24 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                           setIsProfileOpen(false);
                           onTabChange('complaint');
                         }}
-                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-2.5 transition-colors"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-4 h-4 text-neutral-400"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
-                          />
-                        </svg>
+                        <MessageSquare className="w-3.5 h-3.5 text-neutral-400" />
                         অভিযোগ ও পরামর্শ
                       </button>
 
                       <div className="h-px bg-neutral-100 dark:bg-neutral-800 my-1"></div>
 
-                      <div className="px-3 py-2 flex items-center justify-between">
-                        <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                      <div className="px-2.5 py-1.5 flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-neutral-700 dark:text-neutral-300">
                           ডার্ক মোড
                         </span>
                         <button
                           onClick={toggleTheme}
-                          className={`w-9 h-5 rounded-full relative transition-colors ${isDarkMode ? 'bg-rose-600' : 'bg-neutral-200 dark:bg-neutral-700'}`}
+                          className={`w-7 h-4 rounded-full relative transition-colors ${isDarkMode ? 'bg-rose-600' : 'bg-neutral-200 dark:bg-neutral-700'}`}
                         >
                           <div
-                            className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform shadow-sm ${isDarkMode ? 'tranneutral-x-4' : 'tranneutral-x-0'}`}
+                            className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform shadow-sm ${isDarkMode ? 'translate-x-3' : 'translate-x-0'}`}
                           ></div>
                         </button>
                       </div>
@@ -410,22 +383,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
                       <button
                         onClick={onLogout}
-                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-black text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2.5 transition-colors"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-4 h-4"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
-                          />
-                        </svg>
+                        <LogOut className="w-3.5 h-3.5" />
                         লগ আউট
                       </button>
                     </div>

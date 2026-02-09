@@ -19,6 +19,7 @@ import { useExamEngine } from '@/hooks/use-exam-engine';
 import AppLayout from '@/components/student/ui/layout/AppLayout';
 import TimeoutModal from '@/components/student/ui/TimeoutModal';
 import { toast } from 'sonner';
+import { celebration } from '@/lib/confetti';
 
 // Features
 import Dashboard from '@/components/student/features/dashboard/Dashboard';
@@ -33,6 +34,7 @@ import { PracticeDashboard } from '@/components/student/features/practice/Practi
 import MyProfileView from '@/components/student/ui/profile/MyProfileView';
 import SubscriptionView from '@/components/student/ui/profile/SubscriptionView';
 import SettingsView from '@/components/student/ui/profile/SettingsView';
+import AboutUsView from '@/components/student/ui/profile/AboutUsView';
 
 // Exam Features
 import { ExamSetupContainer } from '@/components/student/features/exam/setup/ExamSetupContainer';
@@ -206,15 +208,51 @@ export default function StudentRoot({
   // Exam Completion Logic
   const handleExamComplete = async (result: ExamResult) => {
     if (!currentUser) return;
-    const xpGained = result.correctCount * 10;
+
+    // XP Logic:
+    // 1. Correct Answer: +10 XP per question
+    // 2. Completion Bonus: +50 XP
+    // 3. Perfect Score Bonus: +100 XP
+    const correctXp = result.correctCount * 10;
+    const completionXp = 50;
+    const isPerfect =
+      result.correctCount === result.totalQuestions &&
+      result.totalQuestions > 0;
+    const perfectXp = isPerfect ? 100 : 0;
+
+    const totalXpGained = correctXp + completionXp + perfectXp;
+
+    const oldLevel = currentUser.level;
+    const oldXp = currentUser.xp || 0;
+    const newXpOralValue = oldXp + totalXpGained;
+    const newLevel = calculateLevel(newXpOralValue);
+
     const updatedUser = {
       ...currentUser,
-      xp: currentUser.xp + xpGained,
-      examsTaken: currentUser.examsTaken + 1,
-      level: calculateLevel(currentUser.xp + xpGained),
+      xp: (currentUser.xp || 0) + totalXpGained,
+      examsTaken: (currentUser.examsTaken || 0) + 1,
+      level: newLevel,
     };
+
     setCurrentUser(updatedUser);
     await updateUserProfile(updatedUser);
+
+    // Provide feedback & Celebrations
+    if (newLevel !== oldLevel) {
+      celebration.levelUp();
+      toast.success(`অভিনন্দন! আপনি ${newLevel}-এ উন্নীত হয়েছেন!`, {
+        description: `আপনার বর্তমান XP: ${updatedUser.xp}`,
+        duration: 8000,
+      });
+    } else if (isPerfect) {
+      toast.success('অসাধারন! আপনি পারফেক্ট স্কোর করেছেন।', {
+        description: `আপনি +${totalXpGained} XP অর্জন করেছেন! (বোনাস সহ)`,
+      });
+    } else {
+      toast.success('পরীক্ষা সম্পন্ন হয়েছে!', {
+        description: `আপনি +${totalXpGained} XP অর্জন করেছেন।`,
+      });
+    }
   };
 
   useEffect(() => {
@@ -434,6 +472,14 @@ export default function StudentRoot({
           title="অভিযোগ ও পরামর্শ"
         >
           <ComplaintView />
+        </AppLayout>
+      );
+    }
+
+    if (activeTab === 'about') {
+      return (
+        <AppLayout activeTab="" {...commonLayoutProps} title="আমাদের সম্পর্কে">
+          <AboutUsView />
         </AppLayout>
       );
     }

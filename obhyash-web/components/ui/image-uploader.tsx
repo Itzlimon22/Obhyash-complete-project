@@ -4,19 +4,22 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, ImagePlus, X } from 'lucide-react';
-import { uploadToR2 } from '@/app/actions/upload';
+import { uploadFile } from '@/services/storage-service';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
 interface ImageUploaderProps {
   onUploadComplete: (url: string) => void;
   folder?: string;
   defaultValue?: string;
+  className?: string;
 }
 
 export function ImageUploader({
   onUploadComplete,
   folder = 'misc',
   defaultValue,
+  className,
 }: ImageUploaderProps) {
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(defaultValue || null);
@@ -28,19 +31,20 @@ export function ImageUploader({
 
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append('file', file);
+    try {
+      const result = await uploadFile(file, folder);
 
-    const result = await uploadToR2(formData, folder);
-
-    if (result.success && result.url) {
-      setPreview(result.url);
-      onUploadComplete(result.url); // Send URL back to parent form
-    } else {
-      alert('Upload failed: ' + result.error);
+      if (result.url) {
+        setPreview(result.url);
+        onUploadComplete(result.url);
+        toast.success('Upload successful');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Upload failed');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const clearImage = () => {
@@ -50,7 +54,7 @@ export function ImageUploader({
   };
 
   return (
-    <div className="space-y-2">
+    <div className={`space-y-2 ${className || ''}`}>
       <input
         type="file"
         ref={fileInputRef}

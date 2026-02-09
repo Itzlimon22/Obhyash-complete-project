@@ -8,10 +8,14 @@ export const useFileUpload = () => {
     setIsUploading(true);
     try {
       // 1. Get Signed URL
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/api/r2-upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: file.name, contentType: file.type }),
+        body: JSON.stringify({
+          fileName: file.name,
+          fileType: file.type,
+          folder: 'uploads',
+        }),
       });
 
       if (!response.ok) throw new Error('Failed to get upload URL');
