@@ -299,97 +299,91 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
                   <p className="text-sm">{emptyLabel}</p>
                 </div>
               ) : isGrouped ? (
-                Object.entries(filteredData.groups).map(
-                  ([group, groupItems]) => {
-                    if (groupItems.length === 0) return null;
-                    const isExpanded = expandedGroups[group] ?? true;
-                    const allGroupSelected = groupItems.every((i) =>
-                      localSelected.includes(i),
-                    );
-                    return (
+                Object.entries(filteredData.groups).map((entry) => {
+                  const [group, groupItems] = entry;
+                  if (groupItems.length === 0) return null;
+                  const isExpanded = !!expandedGroups[group];
+                  const allGroupSelected = groupItems.every((i) =>
+                    localSelected.includes(i),
+                  );
+                  return (
+                    <div
+                      key={group}
+                      className={cn(
+                        'border rounded-xl overflow-hidden mb-3 transition-colors',
+                        isExpanded
+                          ? 'border-emerald-100 dark:border-emerald-900/30'
+                          : 'border-neutral-200 dark:border-neutral-800',
+                      )}
+                    >
                       <div
-                        key={group}
                         className={cn(
-                          'border rounded-xl overflow-hidden mb-3 transition-colors',
+                          'flex items-center justify-between p-3 cursor-pointer transition-colors select-none',
                           isExpanded
-                            ? 'border-emerald-100 dark:border-emerald-900/30'
-                            : 'border-neutral-200 dark:border-neutral-800',
+                            ? 'bg-emerald-50/50 dark:bg-emerald-900/10'
+                            : 'bg-neutral-50 dark:bg-neutral-800/50 hover:bg-neutral-100 dark:hover:bg-neutral-800',
                         )}
+                        onClick={() => toggleGroup(group)}
                       >
-                        <div
-                          className={cn(
-                            'flex items-center justify-between p-3 cursor-pointer transition-colors select-none',
-                            isExpanded
-                              ? 'bg-emerald-50/50 dark:bg-emerald-900/10'
-                              : 'bg-neutral-50 dark:bg-neutral-800/50 hover:bg-neutral-100 dark:hover:bg-neutral-800',
-                          )}
-                          onClick={() => toggleGroup(group)}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="text-neutral-400">
-                              {isExpanded ? (
-                                <ChevronUp size={16} />
-                              ) : (
-                                <ChevronDown size={16} />
-                              )}
-                            </span>
-
-                            <div className="flex flex-col">
-                              <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
-                                {group}
-                              </span>
-                              <span className="text-[10px] font-medium text-neutral-500">
-                                {
-                                  groupItems.filter((i) =>
-                                    localSelected.includes(i),
-                                  ).length
-                                }{' '}
-                                / {groupItems.length} selected
-                              </span>
-                            </div>
-                          </div>
-
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const newSet = allGroupSelected
-                                ? localSelected.filter(
-                                    (i) => !groupItems.includes(i),
-                                  )
-                                : [
-                                    ...new Set([
-                                      ...localSelected,
-                                      ...groupItems,
-                                    ]),
-                                  ];
-                              setLocalSelected(newSet);
-                            }}
-                            className={cn(
-                              'text-xs font-bold px-3 py-1.5 rounded-lg transition-colors',
-                              allGroupSelected
-                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
-                                : 'bg-white text-neutral-600 border border-neutral-200 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 hover:bg-neutral-50',
+                        <div className="flex items-center gap-3">
+                          <span className="text-neutral-400">
+                            {isExpanded ? (
+                              <ChevronUp size={16} />
+                            ) : (
+                              <ChevronDown size={16} />
                             )}
-                          >
-                            {allGroupSelected ? 'Deselect All' : 'Select All'}
-                          </button>
-                        </div>
-                        {isExpanded && (
-                          <div className="p-2 space-y-1 bg-white dark:bg-neutral-900">
-                            {groupItems.map((item) => (
-                              <SelectorItem
-                                key={item}
-                                item={item}
-                                isSelected={localSelected.includes(item)}
-                                onToggle={() => handleLocalToggle(item)}
-                              />
-                            ))}
+                          </span>
+
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
+                              {group}
+                            </span>
+                            <span className="text-[10px] font-medium text-neutral-500">
+                              {
+                                groupItems.filter((i) =>
+                                  localSelected.includes(i),
+                                ).length
+                              }{' '}
+                              / {groupItems.length} selected
+                            </span>
                           </div>
-                        )}
+                        </div>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const newSet = allGroupSelected
+                              ? localSelected.filter(
+                                  (i) => !groupItems.includes(i),
+                                )
+                              : [...new Set([...localSelected, ...groupItems])];
+                            setLocalSelected(newSet);
+                          }}
+                          className={cn(
+                            'text-xs font-bold px-3 py-1.5 rounded-lg transition-colors',
+                            allGroupSelected
+                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                              : 'bg-white text-neutral-600 border border-neutral-200 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 hover:bg-neutral-50',
+                          )}
+                        >
+                          {allGroupSelected ? 'Deselect All' : 'Select All'}
+                        </button>
                       </div>
-                    );
-                  },
-                )
+                      {isExpanded && (
+                        <div className="p-2 space-y-1 bg-white dark:bg-neutral-900">
+                          {groupItems.map((item) => (
+                            <SelectorItem
+                              key={item}
+                              item={item}
+                              isSelected={localSelected.includes(item)}
+                              onToggle={() => handleLocalToggle(item)}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
               ) : (
                 filteredData.flat.map((item) => (
                   <SelectorItem

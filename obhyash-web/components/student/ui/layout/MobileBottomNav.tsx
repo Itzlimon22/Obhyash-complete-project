@@ -1,4 +1,5 @@
 import { LayoutDashboard, FileEdit, History, Trophy, Menu } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface MobileBottomNavProps {
   activeTab: string;
@@ -51,8 +52,11 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           const isCenter = item.isCenter;
 
           return (
-            <button
+            <motion.button
               key={item.id}
+              whileTap={{ scale: 0.85 }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
               onClick={() => {
                 if (item.action === 'menu') {
                   onMenuClick();
@@ -63,19 +67,24 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               className={`
                 relative flex items-center justify-center transition-all duration-300
                 ${
-                  isCenter
-                    ? 'w-14 h-14 -mt-6 rounded-2xl bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-xl shadow-rose-500/40 scale-100 hover:scale-105 active:scale-95'
-                    : isActive
-                      ? 'w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400'
-                      : 'w-12 h-12 rounded-xl text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                  isActive
+                    ? 'w-14 h-14 rounded-2xl bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400'
+                    : 'w-14 h-14 rounded-2xl text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
                 }
               `}
             >
               <Icon
-                size={isCenter ? 24 : 22}
+                size={isCenter ? 32 : 28}
                 strokeWidth={isCenter || isActive ? 2.5 : 2}
               />
-            </button>
+              {isActive && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-rose-600 dark:bg-rose-400"
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                />
+              )}
+            </motion.button>
           );
         })}
       </div>
