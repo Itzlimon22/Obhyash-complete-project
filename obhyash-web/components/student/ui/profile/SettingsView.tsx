@@ -13,8 +13,31 @@ import { uploadAvatar } from '@/services/storage-service';
 
 interface SettingsViewProps {
   user: UserProfile;
-  onSave?: (data: any) => void;
+  onSave?: (
+    data: Omit<Partial<UserProfile>, 'avatarUrl'> & {
+      avatarUrl?: string | null;
+    },
+  ) => void;
 }
+
+type SettingsUpdatePayload = {
+  name: string;
+  dob: string | null;
+  gender: string | null;
+  address: string | null;
+  institute: string;
+  stream: string;
+  division: string;
+  batch: string;
+  target: string;
+  ssc_roll: string;
+  ssc_reg: string;
+  ssc_board: string;
+  ssc_passing_year: string;
+  optional_subject: string;
+  phone: string | null;
+  avatar_url: string | null;
+};
 
 const cardClass =
   'bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden';
@@ -35,7 +58,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
   // No large header to remove here, but ensuring top spacing is correct
 
   const [uploading, setUploading] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || user.avatar_url); // Local state for immediate preview
+  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl); // Local state for immediate preview
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -58,11 +81,13 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
       });
       if (error) throw error;
       // Redirect happens automatically
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Linking error:', error);
+      const errObj = error instanceof Error ? error : null;
+      const errCode = (error as Record<string, unknown>)?.code;
       if (
-        error.message?.includes('already linked') ||
-        error.code === 'identity_already_exists'
+        errObj?.message?.includes('already linked') ||
+        errCode === 'identity_already_exists'
       ) {
         toast.error(
           'এই গুগল অ্যাকাউন্টটি ইতিমধ্যেই অন্য একটি আইডির সাথে যুক্ত।',
@@ -126,12 +151,15 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
         position: 'top-center',
         className: 'font-bengali',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Upload Error:', error);
-      toast.error(`ছবি আপলোড করতে সমস্যা হয়েছে: ${error.message || 'Error'}`, {
-        position: 'top-center',
-        className: 'font-bengali',
-      });
+      toast.error(
+        `ছবি আপলোড করতে সমস্যা হয়েছে: ${error instanceof Error ? error.message : 'Error'}`,
+        {
+          position: 'top-center',
+          className: 'font-bengali',
+        },
+      );
     } finally {
       setUploading(false);
     }
@@ -182,7 +210,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    const payload: any = {
+    const payload: SettingsUpdatePayload = {
       name: formData.name,
       dob: formData.dob || null,
       gender: formData.gender || null,
@@ -220,7 +248,16 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
       }
 
       if (onSave) {
-        onSave(payload);
+        // Convert to UserProfile compatibility (undefined instead of null for most fields)
+        const uiUpdate = {
+          ...payload,
+          phone: payload.phone ?? undefined,
+          dob: payload.dob ?? undefined,
+          gender: payload.gender ?? undefined,
+          address: payload.address ?? undefined,
+          avatarUrl: payload.avatar_url,
+        };
+        onSave(uiUpdate);
         toast.success('সেটিংস সফলভাবে সেভ করা হয়েছে!', {
           position: 'top-center',
         });
