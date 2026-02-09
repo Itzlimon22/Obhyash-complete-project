@@ -4,11 +4,12 @@ import {
   UserAnswers,
   Invoice,
   UserProfile,
-  SubjectAnalysis, // ✅ Imported from central types, not local database
+  SubjectAnalysis,
 } from '@/lib/types';
 import katex from 'katex';
 
-// Helper to render LaTeX
+// --- Helpers ---
+
 const renderLatex = (text: string): string => {
   if (!text) return '';
   const parts = text.split(/(\$[^$]+\$)/g);
@@ -20,7 +21,7 @@ const renderLatex = (text: string): string => {
             throwOnError: false,
             displayMode: false,
           });
-        } catch {
+        } catch (e) {
           return part;
         }
       }
@@ -29,16 +30,7 @@ const renderLatex = (text: string): string => {
     .join('');
 };
 
-const LOGO_SVG = `
-<svg width="120" height="40" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M30 10C18.9543 10 10 18.9543 10 30C10 41.0457 18.9543 50 30 50C41.0457 50 50 41.0457 50 30C50 18.9543 41.0457 10 30 10Z" fill="white" stroke="#047857" stroke-width="4"/>
-  <path d="M30 20C24.4772 20 20 24.4772 20 30C20 35.5228 24.4772 40 30 40C35.5228 40 40 35.5228 40 30C40 24.4772 35.5228 20 30 20Z" fill="#047857"/>
-  <path d="M30 40L25 55L30 52L35 55L30 40Z" fill="#047857"/>
-  <text x="65" y="42" fill="black" style="font-family: Arial, sans-serif; font-size: 32px; font-weight: 900;">অ<tspan fill="#047857">ভ্যা</tspan>স</text>
-</svg>
-`;
-
-// Helper to render Image from R2/Supabase
+// Restored Image Helper (Critical for questions with diagrams)
 const renderImage = (imageUrl?: string) => {
   if (!imageUrl) return '';
   return `<div style="margin: 10px 0; text-align: center;">
@@ -46,13 +38,8 @@ const renderImage = (imageUrl?: string) => {
           </div>`;
 };
 
-/**
- * Generates and prints a question paper for a given exam.
- * Opens a new window with formatted HTML including LaTeX rendering and image support.
- *
- * @param details - The metadata for the exam (subject, type, duration, etc.)
- * @param questions - The list of questions to include in the paper.
- */
+// --- Exported Print Functions ---
+
 export const printQuestionPaper = (
   details: ExamDetails,
   questions: Question[],
@@ -86,7 +73,7 @@ export const printQuestionPaper = (
       </head>
       <body>
         <div class="header-container">
-          <div style="margin-bottom: 10px;">${LOGO_SVG}</div>
+          <h1 class="institution-name">Obhyash (অভ্যাস) Exam Platform</h1>
           <div class="exam-title">${details.subject}</div>
           <div style="font-size: 10pt; margin-top: -10px; margin-bottom: 10px;">${details.examType}</div>
           <table class="meta-table">
@@ -104,9 +91,9 @@ export const printQuestionPaper = (
             <div class="question-item">
               <div class="q-header">
                 <span style="min-width:25px">${idx + 1}.</span>
-                <div style="flex:1">
-                    <span>${renderLatex(q.question)}</span>
-                    ${renderImage(q.imageUrl)} </div>
+                    <span>${renderLatex(q.question || '')}</span>
+                    ${renderImage(q.imageUrl)} 
+                </div>
                 <span style="font-size:9pt;margin-left:5px">[${q.points}]</span>
               </div>
               <ul class="options-list">
@@ -128,6 +115,227 @@ export const printQuestionPaper = (
         </div>
         <script>setTimeout(() => { window.print(); }, 800);</script>
       </body>
+    </html>
+  `;
+  printWindow.document.write(htmlContent);
+  printWindow.document.close();
+};
+
+export const printOMRSheet = (details: ExamDetails, totalQuestions: number) => {
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return;
+  const qrData = JSON.stringify({
+    s: details.subject,
+    t: details.examType,
+    m: details.totalMarks,
+    q: totalQuestions,
+  });
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Obhyash OMR Sheet</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+        <style>
+            @page { size: A4; margin: 0; }
+            body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-print-color-adjust: exact; background: #fff; }
+            
+            .page { width: 210mm; height: 297mm; position: relative; padding: 12mm; margin: 0 auto; box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; }
+            
+            /* Corner Markers (Fiducials) - Critical for Scanning */
+            .marker { width: 6mm; height: 6mm; background: black; position: absolute; }
+            .tl { top: 10mm; left: 10mm; border-bottom-right-radius: 4px; }
+            .tr { top: 10mm; right: 10mm; border-bottom-left-radius: 4px; }
+            .bl { bottom: 10mm; left: 10mm; border-top-right-radius: 4px; }
+            .br { bottom: 10mm; right: 10mm; border-top-left-radius: 4px; }
+
+            /* Header */
+            .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; margin-top: 10px; }
+            .title-block h1 { font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0; line-height: 1; letter-spacing: 1px; color: #000; }
+            .title-block p { font-size: 10px; font-weight: 600; margin: 4px 0 0; color: #333; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; }
+            .omr-badge { border: 2px solid #000; padding: 2px 8px; border-radius: 4px; font-weight: 900; font-size: 16px; letter-spacing: 1px; }
+
+            /* Top Section: Info & Instructions */
+            .top-section { display: flex; gap: 15px; margin-bottom: 20px; height: 160px; }
+            
+            /* Student Info (Left) */
+            .info-box { flex: 1; border: 1.5px solid #000; border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-evenly; }
+            .field-row { display: flex; align-items: flex-end; }
+            .field-label { font-size: 10px; font-weight: 700; width: 60px; text-transform: uppercase; color: #000; padding-bottom: 2px; }
+            .field-line { flex: 1; border-bottom: 1.5px dashed #aaa; height: 16px; margin-left: 5px; }
+
+            /* Instructions (Right) */
+            .instructions-box { width: 38%; border: 1.5px solid #000; border-radius: 6px; padding: 10px 12px; background: #f8f8f8; display: flex; flex-direction: column; }
+            .inst-header { font-size: 10px; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 3px; margin-bottom: 5px; }
+            .inst-list { margin: 0; padding-left: 12px; font-size: 9px; line-height: 1.4; color: #222; font-weight: 500; }
+            .inst-list li { margin-bottom: 2px; }
+            
+            /* Bubbling Example */
+            .example-area { margin-top: auto; display: flex; justify-content: space-between; padding-top: 6px; }
+            .ex-label { font-size: 8px; font-weight: 800; margin-bottom: 3px; display: block; }
+            .bubbles-row { display: flex; gap: 4px; }
+            .bubble-ex { width: 14px; height: 14px; border: 1px solid #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7px; background: #fff; }
+            .bubble-ex.fill { background: #000; border-color: #000; }
+            .bubble-ex.wrong { position: relative; overflow: hidden; }
+            .bubble-ex.wrong::after { content: '×'; position: absolute; font-size: 12px; font-weight: bold; line-height: 0; }
+
+            /* Answer Sheet Body */
+            .sheet-body { 
+                border: 2px solid #000; 
+                padding: 15px 10px; 
+                border-radius: 6px; 
+                display: flex; 
+                justify-content: space-between; 
+                position: relative;
+                flex: 1;
+            }
+            .watermark {
+                position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg);
+                font-size: 60px; font-weight: 900; color: rgba(0,0,0,0.03); pointer-events: none; z-index: 0; white-space: nowrap;
+            }
+
+            .column { width: 23%; z-index: 1; display: flex; flex-direction: column; }
+            .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; height: 20px; }
+            .q-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 800; width: 22px; text-align: right; color: #000; }
+            .options { display: flex; gap: 6px; }
+            .opt-bubble { 
+                width: 18px; height: 18px; 
+                border: 1.2px solid #000; 
+                border-radius: 50%; 
+                display: flex; align-items: center; justify-content: center; 
+                font-size: 8px; font-weight: 700; 
+                color: #444; 
+                font-family: 'Inter', sans-serif;
+            }
+            
+            /* Footer */
+            .footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px; padding-top: 5px; }
+            .sig-block { text-align: center; width: 30%; }
+            .sig-line { border-top: 1.5px solid #000; margin-bottom: 4px; }
+            .sig-text { font-size: 9px; font-weight: 700; text-transform: uppercase; color: #333; }
+            .qr-block { border: 1.5px solid #000; padding: 2px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; }
+            .scan-text { font-size: 8px; font-weight: 800; font-family: 'JetBrains Mono'; margin-top: 2px; }
+            
+        </style>
+    </head>
+    <body>
+        <div class="page">
+            <div class="marker tl"></div>
+            <div class="marker tr"></div>
+            <div class="marker bl"></div>
+            <div class="marker br"></div>
+
+            <div class="header">
+                <div class="title-block">
+                    <h1>Obhyash Answer Sheet</h1>
+                    <p>EXAM: <span style="text-decoration: underline;">${details.subject.substring(0, 25)}</span> &nbsp;|&nbsp; TYPE: ${details.examType}</p>
+                </div>
+                <div class="omr-badge">OMR</div>
+            </div>
+
+            <div class="top-section">
+                <div class="info-box">
+                    <div class="field-row">
+                        <label class="field-label">NAME</label>
+                        <div class="field-line"></div>
+                    </div>
+                    <div class="field-row">
+                        <label class="field-label">MOBILE</label>
+                        <div class="field-line"></div>
+                    </div>
+                    <div class="field-row">
+                        <label class="field-label">DATE</label>
+                        <div class="field-line"></div>
+                    </div>
+                    <div class="field-row">
+                        <label class="field-label">STUDENT ID</label>
+                        <div class="field-line"></div>
+                    </div>
+                </div>
+
+                <div class="instructions-box">
+                    <div class="inst-header">INSTRUCTIONS</div>
+                    <ul class="inst-list">
+                        <li>Use <strong>Black</strong> or <strong>Blue</strong> ball point pen only.</li>
+                        <li>Darken the circle completely.</li>
+                        <li>Do not make stray marks on the sheet.</li>
+                        <li>Multiple markings are invalid.</li>
+                    </ul>
+                    <div class="example-area">
+                        <div class="ex-group">
+                            <span class="ex-label">CORRECT</span>
+                            <div class="bubbles-row">
+                                <div class="bubble-ex fill"></div>
+                                <div class="bubble-ex"></div>
+                                <div class="bubble-ex"></div>
+                                <div class="bubble-ex"></div>
+                            </div>
+                        </div>
+                        <div class="ex-group">
+                            <span class="ex-label">WRONG</span>
+                            <div class="bubbles-row">
+                                <div class="bubble-ex wrong"></div>
+                                <div class="bubble-ex"></div>
+                                <div class="bubble-ex"></div>
+                                <div class="bubble-ex"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sheet-body">
+                <div class="watermark">OBHYASH</div>
+                ${[0, 1, 2, 3]
+                  .map(
+                    (col) => `
+                    <div class="column">
+                        ${Array(25)
+                          .fill(0)
+                          .map((_, row) => {
+                            const qNum = col * 25 + row + 1;
+                            const opacity = qNum <= totalQuestions ? 1 : 0.15;
+                            return `
+                                <div class="row" style="opacity: ${opacity}">
+                                    <span class="q-num">${qNum}</span>
+                                    <div class="options">
+                                        <div class="opt-bubble">A</div>
+                                        <div class="opt-bubble">B</div>
+                                        <div class="opt-bubble">C</div>
+                                        <div class="opt-bubble">D</div>
+                                    </div>
+                                </div>
+                            `;
+                          })
+                          .join('')}
+                    </div>
+                `,
+                  )
+                  .join('')}
+            </div>
+
+            <div class="footer">
+                <div class="sig-block">
+                    <div class="sig-line"></div>
+                    <div class="sig-text">Signature of Candidate</div>
+                </div>
+                
+                <div class="qr-block">
+                    <img src="${qrUrl}" width="50" height="50" style="display:block;" />
+                    <span class="scan-text">SCAN ME</span>
+                </div>
+
+                <div class="sig-block">
+                    <div class="sig-line"></div>
+                    <div class="sig-text">Signature of Invigilator</div>
+                </div>
+            </div>
+        </div>
+        <script>window.onload = () => setTimeout(() => window.print(), 800);</script>
+    </body>
     </html>
   `;
   printWindow.document.write(htmlContent);
@@ -180,7 +388,7 @@ export const printResultWithExplanations = (
       </head>
       <body>
         <div class="header-container">
-          <div style="margin-bottom: 10px;">${LOGO_SVG}</div>
+          <h1 class="institution-name">Obhyash (অভ্যাস) Exam Platform</h1>
           <div class="exam-title">${details.subject} - Solution</div>
           <div style="font-size: 10pt; margin-top: -10px; margin-bottom: 10px;">${details.examType}</div>
           <table class="meta-table">
@@ -208,9 +416,9 @@ export const printResultWithExplanations = (
             <div class="question-item">
               <div class="q-header">
                 <span style="min-width:25px">${idx + 1}.</span>
-                <div style="flex:1">
-                    <span>${renderLatex(q.question)}</span>
-                    ${renderImage(q.imageUrl)} </div>
+                    <span>${renderLatex(q.question || '')}</span>
+                    ${renderImage(q.imageUrl)} 
+                </div>
                 <span style="font-size:9pt;margin-left:5px">[${q.points}]</span>
               </div>
               <ul class="options-list">
@@ -299,17 +507,14 @@ export const printSubjectReport = (subject: string, stats: SubjectAnalysis) => {
         <div class="mistake-list">
            ${stats.mistakes
              .map(
-               (m: {
-                 examDate: string;
-                 examName: string;
-                 question: Question;
-                 userAns: number;
-                 correctAns: number;
-               }) => `
+               (m) => `
               <div class="mistake-item">
                  <div class="meta">${new Date(m.examDate).toLocaleDateString()} - ${m.examName}</div>
-                 <p><strong>Q:</strong> ${renderLatex(m.question.question)}</p>
-                 ${renderImage(m.question.imageUrl)} <p style="color:red">Your Answer: ${renderLatex(m.question.options[m.userAns])}</p>
+                 <div class="q-content">
+                    <p><strong>Q:</strong> ${renderLatex(m.question.question || '')}</p>
+                    ${renderImage(m.question.imageUrl)}
+                 </div>
+                 <p style="color:red">Your Answer: ${renderLatex(m.question.options[m.userAns])}</p>
                  <p style="color:green">Correct Answer: ${renderLatex(m.question.options[m.correctAns])}</p>
                  <p style="font-size:12px; font-style:italic; margin-top:5px; color:#475569">Exp: ${renderLatex(m.question.explanation || '')}</p>
               </div>
@@ -326,206 +531,106 @@ export const printSubjectReport = (subject: string, stats: SubjectAnalysis) => {
 };
 
 export const printInvoice = (invoice: Invoice, user: UserProfile) => {
-  // ... (existing implementation) ...
-};
-
-/**
- * Generates and prints an OMR (Optical Mark Recognition) answer sheet.
- * This replaces the need for an OmrPrintModal by printing directly.
- *
- * @param details - Metadata for the exam (subject, type, etc.)
- * @param totalQuestions - Number of questions to show on the OMR (default: 50)
- */
-export const printOMRSheet = (
-  details: ExamDetails,
-  totalQuestions: number = 50,
-) => {
   const printWindow = window.open('', '_blank');
   if (!printWindow) return;
-
-  const qrData = encodeURIComponent(
-    JSON.stringify({
-      s: details.subject,
-      t: details.examType,
-      m: details.totalMarks,
-      q: totalQuestions,
-    }),
-  );
 
   const htmlContent = `
     <!DOCTYPE html>
     <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <title>OMR Sheet - ${details.subject || 'Obhyash'}</title>
-        <style>
-          @page { size: A4; margin: 0; }
-          body { 
-            width: 210mm; 
-            height: 297mm; 
-            margin: 0; 
-            padding: 12mm; 
-            box-sizing: border-box; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            line-height: normal;
-            color: black;
-            background: white;
-            position: relative;
-          }
-          .marker { position: absolute; width: 6mm; height: 6mm; background-color: black; }
-          .top-left { top: 8mm; left: 8mm; border-bottom-right-radius: 1mm; background: black; width: 6mm; height: 6mm; }
-          .top-right { top: 8mm; right: 8mm; border-bottom-left-radius: 1mm; background: black; width: 6mm; height: 6mm; }
-          .bottom-left { bottom: 8mm; left: 8mm; border-top-right-radius: 1mm; background: black; width: 6mm; height: 6mm; }
-          .bottom-right { bottom: 8mm; right: 8mm; border-top-left-radius: 1mm; background: black; width: 6mm; height: 6mm; }
-
-          .header { border-bottom: 2px solid black; padding-bottom: 2mm; margin-bottom: 4mm; display: flex; justify-content: space-between; align-items: flex-end; }
-          .header h1 { font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
-          .header .meta { font-size: 10px; font-weight: bold; margin-top: 2px; text-transform: uppercase; }
-          .omr-badge { border: 2px solid black; padding: 1px 4px; border-radius: 4px; font-size: 18px; font-weight: 900; }
-
-          .info-section { display: flex; gap: 4mm; margin-bottom: 5mm; }
-          .student-info { flex: 1; border: 1.5px solid black; rounded: 4px; padding: 3mm; display: flex; flex-direction: column; justify-content: space-between; height: 35mm; }
-          .info-row { display: flex; align-items: flex-end; margin-bottom: 2mm; }
-          .info-label { font-size: 10px; font-weight: bold; width: 50px; text-transform: uppercase; }
-          .info-line { flex: 1; border-bottom: 1.5px dashed #666; height: 14px; margin-left: 4px; }
-
-          .instructions { width: 40%; border: 1.5px solid black; padding: 2.5mm; background: #f9f9f9; font-size: 9px; line-height: 1.3; }
-          .instr-title { font-weight: 900; text-transform: uppercase; border-bottom: 1px solid black; padding-bottom: 1px; margin-bottom: 2px; display: block; }
-          .instr-list { list-style: none; padding: 0; margin: 0; }
-          .instr-examples { display: flex; justify-content: space-between; margin-top: 4px; }
-          .circle { width: 14px; height: 14px; border: 1.2px solid black; border-radius: 50%; display: inline-block; vertical-align: middle; }
-          .circle.filled { background: black; }
-          .circle.wrong { text-align: center; font-weight: bold; font-size: 12px; line-height: 14px; }
-
-          .answer-container { flex: 1; border: 2px solid black; padding: 4mm; display: flex; justify-content: space-between; position: relative; min-height: 185mm; }
-          .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; font-weight: 950; color: #f0f0f0; opacity: 0.5; z-index: 0; user-select: none; }
-          .column { width: 23%; z-index: 10; }
-          .q-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5mm; height: 5mm; }
-          .q-num { font-family: monospace; font-size: 11px; font-weight: bold; width: 25px; text-align: right; margin-right: 4px; }
-          .options { display: flex; gap: 1.5mm; }
-          .option { width: 18px; height: 18px; border: 1.2px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; color: #555; }
-          .dimmed { opacity: 0.15; filter: grayscale(1); }
-
-          .footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 5mm; }
-          .sig-box { width: 30%; text-align: center; }
-          .sig-line { border-top: 1.5px solid black; margin-bottom: 2px; }
-          .sig-label { font-size: 9px; font-weight: bold; text-transform: uppercase; }
-          .qr-box { border: 1.5px solid black; padding: 2px; background: white; text-align: center; }
-          .qr-box img { width: 48px; height: 48px; display: block; }
-          .qr-label { font-size: 8px; font-weight: 900; font-family: monospace; display: block; margin-top: 2px; }
-
-          @media print {
-            body { padding: 8mm; width: auto; height: auto; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .watermark { color: #f5f5f5 !important; }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="marker top-left"></div>
-        <div class="marker top-right"></div>
-        <div class="marker bottom-left"></div>
-        <div class="marker bottom-right"></div>
-
+    <head>
+      <meta charset="UTF-8">
+      <title>Invoice - ${invoice.id}</title>
+      <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; line-height: 1.6; }
+        .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); }
+        .header { display: flex; justify-content: space-between; margin-bottom: 40px; }
+        .logo { font-size: 28px; font-weight: bold; color: #4f46e5; }
+        .company-info { text-align: right; font-size: 12px; color: #666; }
+        .invoice-details { margin-bottom: 30px; display: flex; justify-content: space-between; }
+        .bill-to { font-size: 14px; }
+        .invoice-meta { text-align: right; }
+        .invoice-meta h1 { margin: 0; font-size: 24px; color: #333; }
+        .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .table th { background: #f9fafb; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #e5e7eb; }
+        .table td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .total-section { text-align: right; margin-top: 20px; }
+        .total-row { display: flex; justify-content: flex-end; gap: 40px; font-size: 14px; padding: 5px 0; }
+        .grand-total { font-weight: bold; font-size: 18px; color: #4f46e5; border-top: 2px solid #eee; padding-top: 10px; margin-top: 10px; }
+        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #aaa; border-top: 1px solid #eee; padding-top: 20px; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        .paid { background: #d1fae5; color: #065f46; }
+        .pending { background: #fef3c7; color: #92400e; }
+        .failed { background: #fee2e2; color: #991b1b; }
+      </style>
+    </head>
+    <body>
+      <div class="invoice-box">
         <div class="header">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            ${LOGO_SVG}
-            <div>
-              <h1 style="font-size: 18px;">Answer Sheet</h1>
-              <div class="meta">
-              EXAM: <span style="text-decoration: underline;">${details.subjectLabel || details.subject || 'Practice'}</span>
-              &nbsp;|&nbsp; TYPE: ${details.examType || 'Practice Exam'}
-            </div>
-          </div>
-          <div class="omr-badge">OMR</div>
-        </div>
-
-        <div class="info-section">
-          <div class="student-info">
-            <div class="info-row"><span class="info-label">Name</span><div class="info-line"></div></div>
-            <div class="info-row"><span class="info-label">Mobile</span><div class="info-line"></div></div>
-            <div class="info-row"><span class="info-label">Date</span><div class="info-line"></div></div>
-            <div class="info-row"><span class="info-label">Student ID</span><div class="info-line"></div></div>
-          </div>
-          <div class="instructions">
-            <span class="instr-title">Instructions</span>
-            <ul class="instr-list">
-              <li>• Use <b>Black</b> or <b>Blue</b> pen.</li>
-              <li>• Darken circle completely.</li>
-              <li>• No stray marks.</li>
-              <li>• Multiple marks invalid.</li>
-            </ul>
-            <div class="instr-examples">
-              <div>
-                <span style="font-size:8px; font-weight:bold; display:block;">CORRECT</span>
-                <div class="circle filled"></div>
-                <div class="circle"></div>
-              </div>
-              <div>
-                <span style="font-size:8px; font-weight:bold; display:block;">WRONG</span>
-                <div class="circle wrong">×</div>
-                <div class="circle"></div>
-              </div>
-            </div>
+          <div class="logo">Zenith / Obhyash</div>
+          <div class="company-info">
+            Level 5, House 42, Road 7/A<br>
+            Dhanmondi, Dhaka - 1209<br>
+            support@zenith.edu.bd<br>
+            +880 1712 345678
           </div>
         </div>
 
-        <div class="answer-container">
-          <div class="watermark">OBHYASH</div>
-          ${[0, 1, 2, 3]
-            .map(
-              (col) => `
-            <div class="column">
-              ${Array.from({ length: 25 })
-                .map((_, row) => {
-                  const qNum = col * 25 + row + 1;
-                  const isVisible = qNum <= totalQuestions;
-                  return `
-                  <div class="q-row ${!isVisible ? 'dimmed' : ''}">
-                    <span class="q-num">${qNum}</span>
-                    <div class="options">
-                      <div class="option">A</div>
-                      <div class="option">B</div>
-                      <div class="option">C</div>
-                      <div class="option">D</div>
-                    </div>
-                  </div>
-                `;
-                })
-                .join('')}
-            </div>
-          `,
-            )
-            .join('')}
+        <div class="invoice-details">
+          <div class="bill-to">
+            <strong>Bill To:</strong><br>
+            ${user.name}<br>
+            ${user.institute}<br>
+            Dhaka, Bangladesh
+          </div>
+          <div class="invoice-meta">
+            <h1>INVOICE</h1>
+            <p><strong>#${invoice.id}</strong></p>
+            <p>Date: ${invoice.date}</p>
+            <p>Status: <span class="badge ${invoice.status}">${invoice.status}</span></p>
+          </div>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th style="text-align: center">Cycle</th>
+              <th style="text-align: right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${invoice.planName} Subscription</td>
+              <td style="text-align: center">Monthly</td>
+              <td style="text-align: right">${invoice.currency} ${invoice.amount}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="total-section">
+          <div class="total-row">
+            <span>Subtotal:</span>
+            <span>${invoice.currency} ${invoice.amount}</span>
+          </div>
+          <div class="total-row">
+            <span>Tax (0%):</span>
+            <span>${invoice.currency} 0.00</span>
+          </div>
+          <div class="total-row grand-total">
+            <span>Total:</span>
+            <span>${invoice.currency} ${invoice.amount}</span>
+          </div>
         </div>
 
         <div class="footer">
-          <div class="sig-box">
-            <div class="sig-line"></div>
-            <span class="sig-label">Candidate Signature</span>
-          </div>
-          <div class="qr-box">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrData}" alt="QR Code" />
-            <span class="qr-label">SCAN ME</span>
-          </div>
-          <div class="sig-box">
-            <div class="sig-line"></div>
-            <span class="sig-label">Invigilator Signature</span>
-          </div>
+          <p>Thank you for your business!</p>
+          <p>This is a computer-generated invoice and requires no signature.</p>
         </div>
-
-        <script>
-          window.onload = () => {
-            setTimeout(() => {
-              window.print();
-              // window.close(); // Optional: close widow after printing
-            }, 500);
-          };
-        </script>
-      </body>
+      </div>
+      <script>setTimeout(() => { window.print(); }, 800);</script>
+    </body>
     </html>
   `;
-
-  printWindow.document.open();
   printWindow.document.write(htmlContent);
   printWindow.document.close();
 };
