@@ -108,14 +108,16 @@ export const DifficultySelection: React.FC<DifficultySelectionProps> = ({
 interface QuestionCountSelectionProps {
   questionCount: number;
   setQuestionCount: (n: number) => void;
+  noContainer?: boolean;
 }
 
 export const QuestionCountSelection: React.FC<QuestionCountSelectionProps> = ({
   questionCount,
   setQuestionCount,
+  noContainer = false,
 }) => {
-  return (
-    <div className="space-y-6 bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
+  const content = (
+    <div className="space-y-6">
       <div className="flex justify-between items-center mb-1">
         <label className="flex items-center gap-2 text-neutral-900 dark:text-white font-bold text-base">
           <HelpCircle size={20} className="text-emerald-600" />
@@ -142,6 +144,14 @@ export const QuestionCountSelection: React.FC<QuestionCountSelectionProps> = ({
           <span>Max: 100</span>
         </div>
       </div>
+    </div>
+  );
+
+  if (noContainer) return content;
+
+  return (
+    <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
+      {content}
     </div>
   );
 };

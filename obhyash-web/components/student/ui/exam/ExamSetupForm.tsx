@@ -303,7 +303,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               isLoading={isFetchingData}
             />
           </section>
-
           {/* 2. Topics Selection Card */}
           <section
             className={cn(
@@ -364,7 +363,14 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               </div>
             )}
           </section>
-
+          |{/* 3. Question Count Selection Card */}
+          <section className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            <QuestionCountSelection
+              questionCount={questionCount}
+              setQuestionCount={setQuestionCount}
+              noContainer
+            />
+          </section>
           {/* Desktop Submit Button */}
           <StartExamButton className="hidden xl:block" />
         </div>
@@ -379,11 +385,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           <DifficultySelection
             difficulty={difficulty}
             setDifficulty={setDifficulty}
-          />
-
-          <QuestionCountSelection
-            questionCount={questionCount}
-            setQuestionCount={setQuestionCount}
           />
 
           <TimeSelection duration={duration} setDuration={setDuration} />
