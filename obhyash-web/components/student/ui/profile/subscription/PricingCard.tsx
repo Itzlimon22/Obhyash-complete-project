@@ -3,7 +3,7 @@
 import React from 'react';
 import { SubscriptionPlan } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { Check, Sparkles, Crown, Zap } from 'lucide-react';
+import { Check, Crown, Zap } from 'lucide-react';
 
 interface PricingCardProps {
   plan: SubscriptionPlan;
@@ -16,176 +16,103 @@ const PricingCard: React.FC<PricingCardProps> = ({
   isCurrent,
   onSelect,
 }) => {
-  const isFree = plan.price === 0;
-  const isPremium =
-    plan.colorTheme === 'emerald' || plan.colorTheme === 'indigo';
-
-  // Dynamic theme classes
-  const getCardClasses = () => {
-    if (isCurrent) {
-      return 'ring-2 ring-emerald-500 shadow-lg shadow-emerald-500/10';
-    }
-    if (plan.colorTheme === 'emerald') {
-      return 'hover:ring-2 hover:ring-emerald-400/50 hover:shadow-emerald-500/20';
-    }
-    if (plan.colorTheme === 'indigo') {
-      return 'hover:ring-2 hover:ring-indigo-400/50 hover:shadow-indigo-500/20';
-    }
-    return 'hover:ring-1 hover:ring-neutral-300 dark:hover:ring-neutral-600';
-  };
-
-  const getGradientBg = () => {
-    if (plan.colorTheme === 'emerald') {
-      return 'bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent dark:from-emerald-500/20 dark:via-teal-500/10';
-    }
-    if (plan.colorTheme === 'indigo') {
-      return 'bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent dark:from-indigo-500/20 dark:via-purple-500/10';
-    }
-    return 'bg-neutral-50/50 dark:bg-neutral-800/30';
-  };
-
-  const getAccentColor = () => {
-    if (plan.colorTheme === 'emerald')
-      return 'text-emerald-600 dark:text-emerald-400';
-    if (plan.colorTheme === 'indigo')
-      return 'text-indigo-600 dark:text-indigo-400';
-    return 'text-neutral-600 dark:text-neutral-400';
-  };
-
-  const getButtonClasses = () => {
-    if (isCurrent) {
-      return 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-default border border-neutral-200 dark:border-neutral-700';
-    }
-    if (plan.colorTheme === 'emerald') {
-      return 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25';
-    }
-    if (plan.colorTheme === 'indigo') {
-      return 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/25';
-    }
-    return 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100';
-  };
-
-  const PlanIcon = () => {
-    if (plan.colorTheme === 'emerald') return <Crown className="w-5 h-5" />;
-    if (plan.colorTheme === 'indigo') return <Zap className="w-5 h-5" />;
-    return <Sparkles className="w-5 h-5" />;
-  };
+  const isPremium = plan.price > 0;
+  // Assuming the higher priced plan (or specifically named one) is the "Best Value"
+  const isBestValue = plan.price === 299 || plan.billingCycle.includes('3');
 
   return (
     <div
       className={cn(
-        'relative rounded-2xl md:rounded-3xl flex flex-col h-full transition-all duration-300 overflow-hidden',
-        'bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm border border-neutral-200/60 dark:border-neutral-800/60',
-        'shadow-xl hover:shadow-2xl hover:-translate-y-1',
-        getCardClasses(),
+        'relative rounded-3xl p-1', // Border container
+        isBestValue
+          ? 'bg-gradient-to-b from-rose-500 via-purple-500 to-indigo-500 shadow-2xl shadow-rose-500/20'
+          : 'bg-neutral-200 dark:bg-neutral-800',
+        'flex flex-col h-full transition-transform hover:-translate-y-1 duration-300',
       )}
     >
-      {/* Popular Badge */}
-      {plan.isPopular && (
-        <div className="absolute -top-1 left-1/2 -translate-x-1/2 z-10">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 blur-md opacity-60 rounded-full" />
-            <div className="relative px-4 py-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-lg">
-              🔥 সেরা অফার
-            </div>
-          </div>
+      {isBestValue && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-rose-600 to-indigo-600 text-white text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg z-20 whitespace-nowrap">
+          সেরা অফার 🔥
         </div>
       )}
 
-      {/* Current Plan Badge */}
-      {isCurrent && (
-        <div className="absolute top-3 right-3 z-10">
-          <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 rounded-full">
-            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-            <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">
-              Active
+      <div className="bg-white dark:bg-neutral-900 rounded-[22px] h-full flex flex-col overflow-hidden relative">
+        {/* Background blobs */}
+        {isBestValue && (
+          <>
+            <div className="absolute top-0 right-0 w-40 h-40 bg-rose-500/5 rounded-full blur-3xl -translate-y-10 translate-x-10" />
+            <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl translate-y-10 -translate-x-10" />
+          </>
+        )}
+
+        <div className="p-8 flex-1 flex flex-col items-center text-center relative z-10">
+          <div
+            className={cn(
+              'w-14 h-14 rounded-2xl flex items-center justify-center mb-4 text-2xl shadow-sm',
+              isBestValue
+                ? 'bg-gradient-to-br from-indigo-500 to-rose-500 text-white shadow-rose-500/20'
+                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400',
+            )}
+          >
+            {isBestValue ? (
+              <Crown className="w-7 h-7" />
+            ) : (
+              <Zap className="w-7 h-7" />
+            )}
+          </div>
+
+          <h3 className="text-lg font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2">
+            {plan.name}
+          </h3>
+
+          <div className="flex items-baseline gap-1 mb-6">
+            <span className="text-4xl md:text-5xl font-black text-neutral-900 dark:text-white tracking-tight">
+              {plan.currency}
+              {plan.price}
             </span>
-          </div>
-        </div>
-      )}
-
-      {/* Gradient Background */}
-      <div
-        className={cn('absolute inset-0 pointer-events-none', getGradientBg())}
-      />
-
-      {/* Header */}
-      <div className="relative p-5 md:p-6 text-center border-b border-neutral-100/50 dark:border-neutral-800/50">
-        {/* Plan Icon */}
-        <div
-          className={cn(
-            'w-12 h-12 mx-auto mb-3 rounded-2xl flex items-center justify-center',
-            isPremium
-              ? 'bg-gradient-to-br from-white/80 to-white/40 dark:from-neutral-800 dark:to-neutral-800/50 shadow-lg'
-              : 'bg-neutral-100 dark:bg-neutral-800',
-          )}
-        >
-          <span className={getAccentColor()}>
-            <PlanIcon />
-          </span>
-        </div>
-
-        <h3
-          className={cn(
-            'text-sm font-bold uppercase tracking-widest mb-2',
-            getAccentColor(),
-          )}
-        >
-          {plan.name}
-        </h3>
-
-        {/* Price */}
-        <div className="flex items-baseline justify-center gap-1">
-          <span className="text-3xl md:text-4xl font-black text-neutral-900 dark:text-white leading-none">
-            {isFree ? 'ফ্রি' : `${plan.currency}${plan.price}`}
-          </span>
-          {!isFree && (
-            <span className="text-neutral-500 dark:text-neutral-400 text-xs font-bold">
+            <span className="text-neutral-400 font-bold">
               /{plan.billingCycle}
             </span>
-          )}
-        </div>
-      </div>
+          </div>
 
-      {/* Features */}
-      <div className="relative p-5 md:p-6 flex flex-col flex-1">
-        <ul className="space-y-3 mb-6 flex-1">
-          {plan.features.map((feature, idx) => (
-            <li
-              key={idx}
-              className="flex items-start gap-3 text-sm font-medium text-neutral-600 dark:text-neutral-300"
-            >
-              <div
-                className={cn(
-                  'mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0',
-                  isPremium
-                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
-                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500',
-                )}
+          <ul className="space-y-3 w-full text-left mb-8">
+            {plan.features.map((feature, idx) => (
+              <li
+                key={idx}
+                className="flex items-center gap-3 text-sm font-medium text-neutral-700 dark:text-neutral-300"
               >
-                <Check className="w-3 h-3" strokeWidth={3} />
-              </div>
-              <span>{feature}</span>
-            </li>
-          ))}
-        </ul>
+                <div
+                  className={cn(
+                    'w-5 h-5 rounded-full flex items-center justify-center shrink-0',
+                    isBestValue
+                      ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400'
+                      : 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400',
+                  )}
+                >
+                  <Check className="w-3 h-3" strokeWidth={3} />
+                </div>
+                {feature}
+              </li>
+            ))}
+          </ul>
 
-        {/* CTA Button */}
-        <button
-          onClick={onSelect}
-          disabled={isCurrent}
-          className={cn(
-            'w-full py-3.5 md:py-3 rounded-xl font-bold text-sm tracking-wide transition-all duration-200',
-            'active:scale-[0.98] disabled:active:scale-100',
-            getButtonClasses(),
-          )}
-        >
-          {isCurrent
-            ? '✓ বর্তমান প্ল্যান'
-            : isPremium
-              ? '🚀 আপগ্রেড করুন'
-              : 'বেছে নিন'}
-        </button>
+          <div className="mt-auto w-full">
+            <button
+              onClick={onSelect}
+              disabled={isCurrent}
+              className={cn(
+                'w-full py-4 rounded-xl font-bold text-sm tracking-wide transition-all shadow-lg hover:shadow-xl active:scale-95',
+                isCurrent
+                  ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-default shadow-none'
+                  : isBestValue
+                    ? 'bg-gradient-to-r from-rose-600 to-indigo-600 text-white shadow-rose-500/25 hover:shadow-rose-500/40'
+                    : 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200',
+              )}
+            >
+              {isCurrent ? 'বর্তমান প্ল্যান' : 'পেমেন্ট করুন'}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

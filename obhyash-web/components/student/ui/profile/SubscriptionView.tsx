@@ -208,102 +208,92 @@ const SubscriptionView: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-fade-in pb-20">
-      {/* HERO SECTION */}
-      <div className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 p-6 md:p-10">
-        {/* Decorative Elements */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-rose-500/20 via-purple-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-emerald-500/20 via-teal-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+      {/* HERO SECTION - REPLACED WITH CURRENT PLAN CARD & BANNER */}
+      <div className="space-y-6">
+        {/* Banner for new users or upgrades */}
+        <div className="relative overflow-hidden rounded-3xl bg-neutral-900 dark:bg-black p-8 md:p-12 text-center">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          {/* Left Content */}
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-3">
-              <div
-                className={cn(
-                  'flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold',
-                  isFreeUser
-                    ? 'bg-neutral-700/50 text-neutral-300'
-                    : 'bg-emerald-500/20 text-emerald-400',
-                )}
-              >
-                {isFreeUser ? (
-                  <>
-                    <Sparkles className="w-3 h-3" />
-                    ফ্রি প্ল্যান
-                  </>
-                ) : (
-                  <>
-                    <Crown className="w-3 h-3" />
-                    {currentPlan.name}
-                  </>
-                )}
-              </div>
-              {!isFreeUser && (
-                <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-400 font-bold uppercase">
-                  Active
-                </span>
-              )}
-            </div>
-
-            <h1 className="text-2xl md:text-3xl font-black text-white mb-2 leading-tight">
-              {isFreeUser
-                ? 'আপনার সম্ভাবনা আনলক করুন'
-                : 'আপনি প্রিমিয়াম সদস্য! 🎉'}
+          <div className="relative z-10 max-w-2xl mx-auto space-y-4">
+            <h1 className="text-3xl md:text-5xl font-black text-white leading-tight">
+              আনলিমিটেড প্র্যাকটিস, <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-rose-400">
+                সেরা প্রস্তুতি
+              </span>
             </h1>
-            <p className="text-neutral-400 text-sm md:text-base max-w-md">
-              {isFreeUser
-                ? 'আনলিমিটেড এক্সাম, এডভান্সড এনালাইসিস এবং আরও অনেক কিছু পেতে প্রিমিয়ামে আপগ্রেড করুন।'
-                : 'সব প্রিমিয়াম ফিচার আপনার জন্য খোলা আছে। পড়াশোনা চালিয়ে যান!'}
+            <p className="text-neutral-400 text-lg font-medium">
+              আপনার প্রস্তুতিকে নেক্সট লেভেলে নিয়ে যেতে আজই আপগ্রেড করুন।
             </p>
           </div>
+        </div>
 
-          {/* Right Stats (for Premium users) */}
-          {!isFreeUser && (
-            <div className="flex gap-4 md:gap-6">
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-black text-white">
-                  {currentPlan.currency}
-                  {currentPlan.price}
+        {/* Current Plan Details Card (If active subscription exists) */}
+        {!isFreeUser && (
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                <Crown className="w-8 h-8" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-xl font-bold text-neutral-900 dark:text-white">
+                    {currentPlan.name}
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">
+                    Active
+                  </span>
                 </div>
-                <div className="text-xs text-neutral-500 font-medium">
-                  {currentPlan.billingCycle}
-                </div>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                  মেয়াদ শেষ হবে:{' '}
+                  <span className="font-bold text-neutral-700 dark:text-neutral-300">
+                    {/* Placeholder for expiry date - in real app would come from subscription data */}
+                    (অ্যাক্টিভ)
+                  </span>
+                </p>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* PRICING CARDS */}
-      <div>
-        <div className="text-center mb-6">
-          <h2 className="text-lg md:text-xl font-bold text-neutral-800 dark:text-white mb-1">
+      <div id="pricing-plans" className="scroll-mt-24">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-black text-neutral-900 dark:text-white mb-2">
             আপনার প্ল্যান বেছে নিন
           </h2>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            সব প্ল্যানে ৩ দিনের ফ্রি ট্রায়াল অন্তর্ভুক্ত
-          </p>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-            {[1, 2, 3].map((i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {[1, 2].map((i) => (
               <div
                 key={i}
-                className="h-80 bg-white dark:bg-neutral-900 rounded-2xl animate-pulse border border-neutral-100 dark:border-neutral-800"
+                className="h-96 bg-white dark:bg-neutral-900 rounded-3xl animate-pulse border border-neutral-100 dark:border-neutral-800"
               />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-            {plans.map((plan) => (
-              <PricingCard
-                key={plan.id}
-                plan={plan}
-                isCurrent={currentPlanId === plan.id}
-                onSelect={() => handlePlanSelect(plan)}
-              />
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
+            {plans
+              .filter(
+                (p) =>
+                  p.price > 0 &&
+                  (p.billingCycle.includes('মাস') ||
+                    p.billingCycle === 'Monthly' ||
+                    p.price === 149 ||
+                    p.price === 299),
+              ) // Filter specifically for desired plans
+              .sort((a, b) => a.price - b.price) // Ensure 1 month comes first
+              .map((plan) => (
+                <PricingCard
+                  key={plan.id}
+                  plan={plan}
+                  isCurrent={currentPlanId === plan.id}
+                  onSelect={() => handlePlanSelect(plan)}
+                />
+              ))}
           </div>
         )}
       </div>

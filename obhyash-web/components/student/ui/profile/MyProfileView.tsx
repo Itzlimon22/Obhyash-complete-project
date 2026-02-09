@@ -107,42 +107,42 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
       {/* Header */}
       <div className="flex justify-between items-end mb-2">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">
             প্রোফাইল
           </h1>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          <p className="text-base text-neutral-500 dark:text-neutral-400">
             আপনার শিখার যাত্রা এবং অর্জনসমূহ
           </p>
         </div>
         <button
           onClick={onEditProfile}
-          className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg font-bold text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+          className="px-5 py-2.5 bg-neutral-100 dark:bg-neutral-800 rounded-lg font-bold text-base hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
         >
           এডিট করুন
         </button>
       </div>
 
       {/* Level Progress Bar */}
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 shadow-sm relative overflow-hidden group">
+      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 md:p-8 shadow-sm relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-700" />
 
         <div className="flex justify-between items-end mb-4 relative z-10">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 text-xs font-black rounded-md uppercase tracking-wider">
+            <div className="flex items-center gap-3 mb-1.5">
+              <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 text-sm font-black rounded-md uppercase tracking-wider">
                 {user.level || 'Level 1'}
               </span>
-              <h2 className="text-xl font-black text-neutral-800 dark:text-white">
+              <h2 className="text-2xl font-black text-neutral-800 dark:text-white">
                 পরবর্তী লেভেল রিভার্ড
               </h2>
             </div>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
+            <p className="text-base text-neutral-500 dark:text-neutral-400 font-medium">
               {(1000 - (user.xp % 1000)).toLocaleString()} XP প্রয়োজন পরবর্তী
               লেভেলের জন্য
             </p>
           </div>
           <div className="text-right">
-            <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
+            <span className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
               {Math.floor((user.xp % 1000) / 10)}%
             </span>
           </div>

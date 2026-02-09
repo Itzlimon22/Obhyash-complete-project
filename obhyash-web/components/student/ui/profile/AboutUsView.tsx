@@ -60,11 +60,11 @@ export default function AboutUsView() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-[1fr,3fr] gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr,3fr] gap-8">
         {/* Navigation - Sidebar (Desktop) / Chips (Mobile) */}
         <div className="space-y-4">
           <div className="lg:sticky lg:top-8 space-y-2">
-            <h3 className="text-sm font-black text-neutral-400 dark:text-neutral-600 px-4 uppercase tracking-widest">
+            <h3 className="text-sm font-black text-neutral-400 dark:text-neutral-600 px-4 uppercase tracking-widest hidden lg:block">
               সেকশন নির্বাচন করুন
             </h3>
 
@@ -112,7 +112,7 @@ export default function AboutUsView() {
             </div>
 
             {/* Mobile Chips */}
-            <div className="lg:hidden flex gap-2 overflow-x-auto pb-4 px-2 scrollbar-none no-scrollbar">
+            <div className="lg:hidden flex gap-2 overflow-x-auto pb-4 px-4 scrollbar-none no-scrollbar -mx-4 md:mx-0 md:px-0">
               {(Object.keys(POLICY_CONTENT) as PolicyKey[]).map((key) => (
                 <button
                   key={key}
@@ -124,6 +124,12 @@ export default function AboutUsView() {
                       : 'bg-white dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400',
                   )}
                 >
+                  {React.cloneElement(KEY_ICONS[key], {
+                    className: cn(
+                      'w-4 h-4',
+                      activePolicy === key ? 'text-white' : '',
+                    ),
+                  })}
                   {POLICY_CONTENT[key].title}
                 </button>
               ))}
@@ -140,18 +146,18 @@ export default function AboutUsView() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="space-y-8"
+              className="space-y-6 md:space-y-8"
             >
               {/* Description Section */}
-              <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 p-8 md:p-10 shadow-sm relative overflow-hidden group">
+              <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 p-6 md:p-10 shadow-sm relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700" />
-                <p className="text-lg md:text-xl text-neutral-600 dark:text-neutral-400 leading-relaxed font-medium">
+                <p className="text-base md:text-xl text-neutral-600 dark:text-neutral-400 leading-relaxed font-medium">
                   {content.description}
                 </p>
               </div>
 
               {/* Policy Sections */}
-              <div className="grid gap-6">
+              <div className="grid gap-4 md:gap-6">
                 {(content.sections as Section[]).map((section, idx) => (
                   <motion.div
                     key={idx}
@@ -160,13 +166,13 @@ export default function AboutUsView() {
                     transition={{ delay: idx * 0.1 }}
                     className="group"
                   >
-                    <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 p-6 md:p-8 hover:border-indigo-200 dark:hover:border-indigo-900/50 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300">
-                      <div className="flex items-start gap-4 md:gap-6">
+                    <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 p-5 md:p-8 hover:border-indigo-200 dark:hover:border-indigo-900/50 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300">
+                      <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
                         <div className="flex-none flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 font-black text-lg shadow-inner group-hover:scale-110 transition-transform">
                           {section.id || idx + 1}
                         </div>
-                        <div className="flex-1 space-y-4">
-                          <h3 className="text-xl font-black text-neutral-900 dark:text-white group-hover:text-indigo-600 transition-colors">
+                        <div className="flex-1 space-y-3 md:space-y-4">
+                          <h3 className="text-lg md:text-xl font-black text-neutral-900 dark:text-white group-hover:text-indigo-600 transition-colors">
                             {section.title}
                           </h3>
                           <div className="space-y-3">
@@ -175,15 +181,15 @@ export default function AboutUsView() {
                                 {section.content.map((item, i) => (
                                   <li
                                     key={i}
-                                    className="flex items-start gap-3 text-neutral-600 dark:text-neutral-400 leading-relaxed"
+                                    className="flex items-start gap-3 text-neutral-600 dark:text-neutral-400 leading-relaxed text-sm md:text-base"
                                   >
-                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-2.5" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-2" />
                                     <span className="flex-1">{item}</span>
                                   </li>
                                 ))}
                               </ul>
                             ) : (
-                              <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                              <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-sm md:text-base">
                                 {section.content}
                               </p>
                             )}
