@@ -88,7 +88,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
           </button>
           <button
             onClick={onBack}
-            className="px-5 py-2.5 bg-neutral-900 dark:bg-indigo-600 hover:bg-neutral-800 dark:hover:bg-indigo-500 text-white rounded-lg font-semibold transition-colors shadow-sm"
+            className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-semibold transition-colors shadow-sm"
           >
             ফিরে যান
           </button>
@@ -277,7 +277,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                     {!hasReason && (
                       <button
                         onClick={() => onRecheckRequest(item.id)}
-                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
+                        className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-bold rounded-lg shadow-sm transition-colors flex items-center gap-2"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

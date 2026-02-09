@@ -66,7 +66,7 @@ const OmrErrorModal: React.FC<OmrErrorModalProps> = ({
             </button>
             <button
               onClick={onRetry}
-              className="px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold transition-colors shadow-sm text-sm"
+              className="px-4 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-bold transition-colors shadow-sm text-sm"
             >
               পুনরায় চেষ্টা
             </button>

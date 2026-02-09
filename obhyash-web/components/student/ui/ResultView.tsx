@@ -169,7 +169,7 @@ const ResultView: React.FC<ResultViewProps> = ({
       {/* Theme Toggle Button */}
       <button
         onClick={onToggleTheme}
-        className="absolute top-0 right-4 p-2.5 rounded-full bg-white dark:bg-neutral-800 shadow-sm border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all z-20"
+        className="absolute top-0 right-4 p-2.5 rounded-full bg-white dark:bg-neutral-800 shadow-sm border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all z-20"
         title={isDarkMode ? 'লাইট মোড' : 'ডার্ক মোড'}
       >
         {isDarkMode ? (
@@ -240,7 +240,7 @@ const ResultView: React.FC<ResultViewProps> = ({
           {onDownloadQuestionPaper && (
             <button
               onClick={onDownloadQuestionPaper}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-indigo-600 dark:text-indigo-400 rounded-lg text-sm font-bold hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors border border-neutral-200 dark:border-neutral-700"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-emerald-600 dark:text-emerald-400 rounded-lg text-sm font-bold hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors border border-neutral-200 dark:border-neutral-700"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -263,7 +263,7 @@ const ResultView: React.FC<ResultViewProps> = ({
           {onDownloadResultWithExplanations && (
             <button
               onClick={onDownloadResultWithExplanations}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors border border-indigo-100 dark:border-indigo-800"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg text-sm font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-100 dark:border-emerald-800"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -326,7 +326,7 @@ const ResultView: React.FC<ResultViewProps> = ({
 
         {/* Points */}
         <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
-          <div className="w-16 h-16 rounded-full bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center mb-4 text-indigo-600 dark:text-indigo-400">
+          <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-4 text-emerald-600 dark:text-emerald-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -501,7 +501,7 @@ const ResultView: React.FC<ResultViewProps> = ({
           <span className="font-bold text-lg md:text-xl text-neutral-900 dark:text-white">
             মোট প্রাপ্ত নম্বর
           </span>
-          <span className="font-bold text-lg md:text-xl text-indigo-600 dark:text-indigo-400">
+          <span className="font-bold text-lg md:text-xl text-emerald-600 dark:text-emerald-400">
             {finalScore.toFixed(2)} / {totalPoints}
           </span>
         </div>
@@ -765,13 +765,13 @@ const ResultView: React.FC<ResultViewProps> = ({
 
                 {/* Redesigned Explanation Section */}
                 <div className="mt-6 md:mt-8 pt-6 border-t border-neutral-100 dark:border-neutral-800">
-                  <div className="bg-neutral-50 dark:bg-neutral-800/40 rounded-lg p-4 md:p-5 border-l-4 border-indigo-500 shadow-sm">
+                  <div className="bg-neutral-50 dark:bg-neutral-800/40 rounded-lg p-4 md:p-5 border-l-4 border-emerald-500 shadow-sm">
                     <div className="mb-3">
                       <span className="text-sm font-bold text-neutral-500 dark:text-neutral-400 block mb-1">
                         সঠিক উত্তর
                       </span>
-                      <div className="text-indigo-700 dark:text-indigo-300 font-bold text-base md:text-lg flex items-center gap-3">
-                        <span className="flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-sm md:text-base">
+                      <div className="text-emerald-700 dark:text-emerald-300 font-bold text-base md:text-lg flex items-center gap-3">
+                        <span className="flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-sm md:text-base">
                           {correctOptionLabel}
                         </span>
                         <span className="text-sm md:text-base">
@@ -802,7 +802,7 @@ const ResultView: React.FC<ResultViewProps> = ({
       <div className="mt-12 flex justify-center">
         <button
           onClick={onRestart}
-          className="w-full sm:w-auto px-8 py-4 bg-neutral-900 dark:bg-indigo-600 text-white rounded-xl font-bold text-lg shadow-lg shadow-neutral-300 dark:shadow-none hover:bg-neutral-800 dark:hover:bg-indigo-500 hover:shadow-xl hover:-tranneutral-y-1 transition-all active:scale-95 flex items-center justify-center gap-2"
+          className="w-full sm:w-auto px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold text-lg shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2"
         >
           {isHistoryMode ? (
             <>

@@ -20,8 +20,9 @@ const QuestionPalette: React.FC<QuestionPaletteProps> = ({
 
     if (isFlagged)
       return 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-700 ring-1 ring-amber-300 dark:ring-amber-700';
-    if (isAnswered) return 'bg-rose-600 text-white border-rose-600 shadow-sm';
-    return 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-rose-300 dark:hover:border-rose-600';
+    if (isAnswered)
+      return 'bg-emerald-600 text-white border-emerald-600 shadow-sm';
+    return 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-emerald-300 dark:hover:border-emerald-600';
   };
 
   const answeredCount = Object.keys(userAnswers).length;
@@ -60,7 +61,8 @@ const QuestionPalette: React.FC<QuestionPaletteProps> = ({
 
       <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-800 grid grid-cols-3 gap-2 text-[10px] font-bold text-neutral-500 uppercase tracking-wide">
         <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-rose-600"></div> Answered
+          <div className="w-2.5 h-2.5 rounded-full bg-emerald-600"></div>{' '}
+          Answered
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-2.5 h-2.5 rounded-full bg-amber-400"></div> Review

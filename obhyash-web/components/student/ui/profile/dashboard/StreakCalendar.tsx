@@ -57,25 +57,20 @@ const StreakCalendar: React.FC<StreakCalendarProps> = ({
   }
 
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6">
+    <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5 sm:p-8">
       {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
-            {getMonthName()} কার্যক্রম
-          </h3>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">
-            এই মাসে আপনার পরীক্ষার পরিসংখ্যান
-          </p>
-        </div>
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
+        <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">
+          {getMonthName()} কার্যক্রম
+        </h3>
 
         {/* Streak Badge */}
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-50 dark:bg-orange-900/20 rounded-full border border-orange-100 dark:border-orange-900/30">
+        <div className="flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-orange-50 dark:bg-orange-900/20 rounded-full border border-orange-100 dark:border-orange-900/30 shadow-sm shadow-orange-500/5 w-fit">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4 text-orange-500"
+            className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500"
           >
             <path
               fillRule="evenodd"
@@ -83,18 +78,18 @@ const StreakCalendar: React.FC<StreakCalendarProps> = ({
               clipRule="evenodd"
             />
           </svg>
-          <span className="text-sm font-bold text-orange-600 dark:text-orange-400">
+          <span className="text-sm sm:text-base font-black text-orange-600 dark:text-orange-400">
             {streakCount} দিন স্ট্রিক
           </span>
         </div>
       </div>
 
       {/* Weekday Headers */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-1 sm:gap-1.5 mb-2 sm:mb-3">
         {WEEKDAYS.map((day) => (
           <div
             key={day}
-            className="text-center text-xs font-medium text-neutral-500 dark:text-neutral-400 py-1"
+            className="text-center text-xs sm:text-sm font-bold text-neutral-500 dark:text-neutral-400 py-0.5 sm:py-1"
           >
             {day}
           </div>
@@ -102,17 +97,17 @@ const StreakCalendar: React.FC<StreakCalendarProps> = ({
       </div>
 
       {/* Calendar Grid */}
-      <div className="space-y-1 relative">
+      <div className="space-y-1 sm:space-y-1.5 relative">
         {weeks.map((week, weekIdx) => (
-          <div key={weekIdx} className="grid grid-cols-7 gap-1">
+          <div key={weekIdx} className="grid grid-cols-7 gap-1 sm:gap-1.5">
             {week.map((day, dayIdx) => (
               <div
                 key={`${weekIdx}-${dayIdx}`}
                 className={`
-                  aspect-square rounded-lg flex items-center justify-center text-xs font-medium cursor-pointer
+                  aspect-square rounded-lg sm:rounded-xl flex items-center justify-center text-xs sm:text-sm md:text-base font-bold sm:font-black cursor-pointer
                   transition-all duration-200 hover:scale-110 hover:shadow-md
                   ${getColorClass(day.examCount, day.isCurrentMonth)}
-                  ${day.isCurrentMonth ? 'text-neutral-700 dark:text-neutral-200' : 'text-neutral-400 dark:text-neutral-600'}
+                  ${day.isCurrentMonth ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-400 dark:text-neutral-600'}
                 `}
                 onMouseEnter={() => setHoveredDay(day)}
                 onMouseLeave={() => setHoveredDay(null)}
@@ -125,14 +120,14 @@ const StreakCalendar: React.FC<StreakCalendarProps> = ({
 
         {/* Tooltip */}
         {hoveredDay && (
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-2 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 text-xs rounded-lg shadow-lg pointer-events-none z-10">
-            <div className="font-bold">
+          <div className="absolute -top-14 left-1/2 -translate-x-1/2 px-4 py-2.5 bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 text-sm rounded-2xl shadow-xl pointer-events-none z-10 border border-white/10 dark:border-black/10">
+            <div className="font-black mb-0.5">
               {new Date(hoveredDay.date).toLocaleDateString('bn-BD', {
                 day: 'numeric',
                 month: 'short',
               })}
             </div>
-            <div>
+            <div className="font-bold text-xs opacity-90">
               {hoveredDay.examCount > 0
                 ? `${hoveredDay.examCount}টি পরীক্ষা`
                 : 'কোনো পরীক্ষা নেই'}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Minus, Plus, Zap, Clock, HelpCircle } from 'lucide-react';
+import { HelpCircle, Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   EXAM_TYPE_OPTIONS,
@@ -7,195 +7,230 @@ import {
   NEGATIVE_MARKING_OPTIONS,
 } from '@/lib/constants';
 import { Difficulty } from '@/lib/types';
-interface ExamSettingsProps {
+
+interface ExamTypeSelectionProps {
   examTypes: string[];
   setExamTypes: React.Dispatch<React.SetStateAction<string[]>>;
-  difficulty: Difficulty;
-  setDifficulty: (d: Difficulty) => void;
-  questionCount: number;
-  setQuestionCount: (n: number) => void;
-  duration: number;
-  setDuration: (n: number) => void;
-  negativeMarking: number;
-  setNegativeMarking: (n: number) => void;
 }
 
-export const ExamSettings: React.FC<ExamSettingsProps> = ({
+export const ExamTypeSelection: React.FC<ExamTypeSelectionProps> = ({
   examTypes,
   setExamTypes,
-  difficulty,
-  setDifficulty,
-  questionCount,
-  setQuestionCount,
-  duration,
-  setDuration,
-  negativeMarking,
-  setNegativeMarking,
 }) => {
   const toggleExamType = (id: string) => {
     setExamTypes((prev) => {
       if (prev.includes(id)) {
-        if (prev.length === 1) return prev; // Must have at least one
+        if (prev.length === 1) return prev;
         return prev.filter((t) => t !== id);
       }
       return [...prev, id];
     });
   };
 
-  const handleRangeChange = (setter: (n: number) => void, value: string) => {
-    setter(parseInt(value, 10));
-  };
-
   return (
-    <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500 delay-100">
-      {/* 1. Exam Type Cards */}
-      <div className="space-y-3">
-        <label className="block text-sm font-bold text-neutral-900 dark:text-white">
-          পরীক্ষার ধরণ (Exam Type)
-        </label>
-        <div className="grid grid-cols-2 gap-3">
-          {EXAM_TYPE_OPTIONS.map((type) => {
-            const isSelected = examTypes.includes(type.id);
-            return (
-              <button
-                key={type.id}
-                type="button"
-                onClick={() => toggleExamType(type.id)}
-                className={cn(
-                  'flex flex-col items-start p-4 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-sm',
-                  isSelected
-                    ? 'border-rose-500 bg-rose-50 dark:bg-rose-500/10'
-                    : 'border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-200',
-                )}
-              >
-                <div className="flex w-full justify-between items-center">
-                  <span
-                    className={cn(
-                      'font-bold text-sm',
-                      isSelected
-                        ? 'text-rose-700 dark:text-rose-300'
-                        : 'text-neutral-900 dark:text-white',
-                    )}
-                  >
-                    {type.label}
-                  </span>
-                  {isSelected && (
-                    <div className="w-2 h-2 rounded-full bg-rose-500" />
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 2. Difficulty Segmented Control */}
-      <div className="space-y-3">
-        <label className="block text-sm font-bold text-neutral-900 dark:text-white">
-          কঠিনতা (Difficulty)
-        </label>
-        <div className="bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-xl flex gap-1">
-          {DIFFICULTY_OPTIONS.map((opt) => (
+    <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
+      <label className="block text-base font-bold text-neutral-900 dark:text-white mb-2">
+        পরীক্ষার ধরণ (Exam Type)
+      </label>
+      <div className="grid grid-cols-2 gap-3">
+        {EXAM_TYPE_OPTIONS.map((type) => {
+          const isSelected = examTypes.includes(type.id);
+          return (
             <button
-              key={opt.id}
+              key={type.id}
               type="button"
-              onClick={() => setDifficulty(opt.id as Difficulty)}
+              onClick={() => toggleExamType(type.id)}
               className={cn(
-                'flex-1 py-2.5 rounded-lg text-xs font-bold transition-all duration-200',
-                difficulty === opt.id
-                  ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm scale-[1.02]'
-                  : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900',
+                'flex flex-col items-start p-4 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-md',
+                isSelected
+                  ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-900/20'
+                  : 'border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900 hover:border-neutral-200',
               )}
             >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 3. Sliders Section */}
-      <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-100 dark:border-neutral-800 space-y-8">
-        {/* Question Count */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2 text-neutral-900 dark:text-white font-bold text-sm">
-              <HelpCircle size={18} className="text-rose-500" />
-              প্রশ্নের সংখ্যা
-            </div>
-            <span className="text-xl font-extrabold text-rose-600 dark:text-rose-400">
-              {questionCount}
-            </span>
-          </div>
-
-          <input
-            type="range"
-            min={5}
-            max={100}
-            step={5}
-            value={questionCount}
-            onChange={(e) =>
-              handleRangeChange(setQuestionCount, e.target.value)
-            }
-            className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full appearance-none cursor-pointer accent-rose-500"
-          />
-          <div className="flex justify-between text-[10px] font-medium text-neutral-400 uppercase tracking-wider">
-            <span>Min: 5</span>
-            <span>Max: 100</span>
-          </div>
-        </div>
-
-        {/* Duration */}
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2 text-neutral-900 dark:text-white font-bold text-sm">
-              <Clock size={18} className="text-blue-500" />
-              সময় (Time)
-            </div>
-            <span className="text-xl font-extrabold text-blue-600 dark:text-blue-400">
-              {duration}{' '}
-              <span className="text-sm font-medium text-neutral-500">min</span>
-            </span>
-          </div>
-
-          <input
-            type="range"
-            min={5}
-            max={180}
-            step={5}
-            value={duration}
-            onChange={(e) => handleRangeChange(setDuration, e.target.value)}
-            className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full appearance-none cursor-pointer accent-blue-500"
-          />
-          <div className="flex justify-between text-[10px] font-medium text-neutral-400 uppercase tracking-wider">
-            <span>5 min</span>
-            <span>3 hours</span>
-          </div>
-        </div>
-
-        {/* Negative Marking */}
-        <div className="space-y-3 pt-2">
-          <label className="block text-sm font-bold text-neutral-700 dark:text-neutral-300">
-            নেগেটিভ মার্কিং (Negative Marking)
-          </label>
-          <div className="grid grid-cols-5 gap-2">
-            {NEGATIVE_MARKING_OPTIONS.map((val) => (
-              <button
-                key={val}
-                type="button"
-                onClick={() => setNegativeMarking(val)}
-                className={cn(
-                  'py-2 rounded-xl text-xs font-bold border-b-2 transition-all',
-                  negativeMarking === val
-                    ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border-rose-500'
-                    : 'bg-neutral-50 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-transparent hover:bg-neutral-100',
+              <div className="flex w-full justify-between items-center">
+                <span
+                  className={cn(
+                    'font-bold text-sm',
+                    isSelected
+                      ? 'text-emerald-700 dark:text-emerald-400'
+                      : 'text-neutral-600 dark:text-neutral-400',
+                  )}
+                >
+                  {type.label}
+                </span>
+                {isSelected && (
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 shadow-sm shadow-emerald-500/50" />
                 )}
-              >
-                {val === 0 ? '0' : `-${val}`}
-              </button>
-            ))}
-          </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+interface DifficultySelectionProps {
+  difficulty: Difficulty;
+  setDifficulty: (d: Difficulty) => void;
+}
+
+export const DifficultySelection: React.FC<DifficultySelectionProps> = ({
+  difficulty,
+  setDifficulty,
+}) => {
+  return (
+    <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
+      <label className="block text-base font-bold text-neutral-900 dark:text-white mb-2">
+        কঠিনতা (Difficulty)
+      </label>
+      <div className="bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-2xl flex gap-1.5">
+        {DIFFICULTY_OPTIONS.map((opt) => (
+          <button
+            key={opt.id}
+            type="button"
+            onClick={() => setDifficulty(opt.id as Difficulty)}
+            className={cn(
+              'flex-1 py-3 rounded-xl text-xs font-bold transition-all duration-300',
+              difficulty === opt.id
+                ? 'bg-white dark:bg-neutral-700 text-emerald-700 dark:text-emerald-400 shadow-md scale-[1.02]'
+                : 'text-neutral-500 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200',
+            )}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+interface QuestionCountSelectionProps {
+  questionCount: number;
+  setQuestionCount: (n: number) => void;
+}
+
+export const QuestionCountSelection: React.FC<QuestionCountSelectionProps> = ({
+  questionCount,
+  setQuestionCount,
+}) => {
+  return (
+    <div className="space-y-6 bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
+      <div className="flex justify-between items-center mb-1">
+        <label className="flex items-center gap-2 text-neutral-900 dark:text-white font-bold text-base">
+          <HelpCircle size={20} className="text-emerald-600" />
+          প্রশ্নের সংখ্যা
+        </label>
+        <div className="px-4 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
+          <span className="text-xl font-black text-emerald-700 dark:text-emerald-400">
+            {questionCount}
+          </span>
         </div>
       </div>
+      <div className="px-1">
+        <input
+          type="range"
+          min={5}
+          max={100}
+          step={5}
+          value={questionCount}
+          onChange={(e) => setQuestionCount(parseInt(e.target.value))}
+          className="w-full h-2.5 bg-neutral-200 dark:bg-neutral-700 rounded-full appearance-none cursor-pointer accent-emerald-600"
+        />
+        <div className="flex justify-between mt-3 text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+          <span>Min: 5</span>
+          <span>Max: 100</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface TimeSelectionProps {
+  duration: number;
+  setDuration: (n: number) => void;
+}
+
+export const TimeSelection: React.FC<TimeSelectionProps> = ({
+  duration,
+  setDuration,
+}) => {
+  return (
+    <div className="space-y-6 bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
+      <div className="flex justify-between items-center mb-1">
+        <label className="flex items-center gap-2 text-neutral-900 dark:text-white font-bold text-base">
+          <Clock size={20} className="text-emerald-600" />
+          সময় (Time)
+        </label>
+        <div className="px-4 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
+          <span className="text-xl font-black text-emerald-700 dark:text-emerald-400">
+            {duration}
+            <span className="text-xs ml-1 font-bold opacity-70">Min</span>
+          </span>
+        </div>
+      </div>
+      <div className="px-1">
+        <input
+          type="range"
+          min={5}
+          max={180}
+          step={5}
+          value={duration}
+          onChange={(e) => setDuration(parseInt(e.target.value))}
+          className="w-full h-2.5 bg-neutral-200 dark:bg-neutral-700 rounded-full appearance-none cursor-pointer accent-emerald-600"
+        />
+        <div className="flex justify-between mt-3 text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+          <span>5 min</span>
+          <span>180 min</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface NegativeMarkingSelectionProps {
+  negativeMarking: number;
+  setNegativeMarking: (n: number) => void;
+}
+
+export const NegativeMarkingSelection: React.FC<
+  NegativeMarkingSelectionProps
+> = ({ negativeMarking, setNegativeMarking }) => {
+  return (
+    <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
+      <label className="block text-base font-bold text-neutral-900 dark:text-white mb-2">
+        নেগেটিভ মার্কিং (Negative Marking)
+      </label>
+      <div className="grid grid-cols-5 gap-2">
+        {NEGATIVE_MARKING_OPTIONS.map((val) => (
+          <button
+            key={val}
+            type="button"
+            onClick={() => setNegativeMarking(val)}
+            className={cn(
+              'py-3 rounded-2xl text-xs font-bold transition-all duration-200 border-2',
+              negativeMarking === val
+                ? 'bg-emerald-700 border-emerald-700 text-white shadow-lg shadow-emerald-500/30 scale-105'
+                : 'bg-neutral-50 dark:bg-neutral-800 border-transparent text-neutral-600 dark:text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700',
+            )}
+          >
+            {val === 0 ? '0' : `-${val}`}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Main Export remains for compatibility, but Decomposed exports are primary.
+export const ExamSettings: React.FC<any> = (props) => {
+  return (
+    <div className="space-y-6">
+      <ExamTypeSelection {...props} />
+      <DifficultySelection {...props} />
+      <QuestionCountSelection {...props} />
+      <TimeSelection {...props} />
+      <NegativeMarkingSelection {...props} />
     </div>
   );
 };

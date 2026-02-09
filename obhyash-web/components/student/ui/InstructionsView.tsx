@@ -31,8 +31,8 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
         <div className="absolute top-0 right-0 p-8 opacity-[0.03] pointer-events-none">
           <BookOpen className="w-64 h-64 text-neutral-900 dark:text-white" />
         </div>
-        <div className="absolute -top-20 -right-20 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-emerald-600/5 rounded-full blur-3xl"></div>
 
         {/* Header */}
         <div className="relative bg-neutral-50/50 dark:bg-neutral-900/50 border-b border-neutral-100 dark:border-neutral-800 p-8 md:p-10">
@@ -40,10 +40,6 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
             <h1 className="text-3xl md:text-4xl font-extrabold text-neutral-900 dark:text-white tracking-tight mb-3">
               পরীক্ষার নির্দেশাবলী
             </h1>
-            <p className="text-neutral-500 dark:text-neutral-400 text-lg max-w-2xl font-medium">
-              আপনার প্রস্তুতি যাচাই করার জন্য প্রস্তুত? শুরু করার আগে নিচের
-              বিষয়গুলো একনজরে দেখে নিন।
-            </p>
           </div>
         </div>
 
@@ -52,9 +48,9 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {/* Subject */}
-            <div className="bg-neutral-50 dark:bg-neutral-950 p-5 rounded-3xl border border-neutral-200 dark:border-neutral-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors group">
+            <div className="bg-neutral-50 dark:bg-neutral-950 p-5 rounded-3xl border border-neutral-200 dark:border-neutral-800 hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors group">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
+                <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
                   <BookOpen className="w-5 h-5" />
                 </div>
                 <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
@@ -117,13 +113,13 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
 
           <div className="mb-10">
             <h3 className="text-lg font-extrabold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
-              <span className="w-1.5 h-6 bg-rose-500 rounded-full"></span>
+              <span className="w-1.5 h-6 bg-emerald-500 rounded-full"></span>
               নিয়মাবলী ও টিপস
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800">
-                <div className="bg-white dark:bg-neutral-900 p-2.5 rounded-xl shadow-sm h-fit text-indigo-500">
+                <div className="bg-white dark:bg-neutral-900 p-2.5 rounded-xl shadow-sm h-fit text-emerald-500">
                   <Play className="w-5 h-5 fill-current" />
                 </div>
                 <div>
@@ -194,7 +190,7 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
             </button>
             <button
               onClick={onStart}
-              className="w-full sm:w-auto flex-1 px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold transition-all shadow-lg shadow-indigo-500/20 text-sm active:scale-[0.98] hover:-translate-y-0.5 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto flex-1 px-8 py-4 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold transition-all shadow-lg shadow-emerald-500/20 text-sm active:scale-[0.98] hover:-translate-y-0.5 flex items-center justify-center gap-2"
             >
               <Play className="w-5 h-5 fill-current" />
               সব প্রস্তুতি শেষ। শুরু করুন

@@ -2,9 +2,8 @@
 
 import React, { useMemo } from 'react';
 import { UserProfile, ExamResult } from '@/lib/types';
-import { calculateRadarData, calculateActivityStats } from '@/lib/stats-utils';
+import { calculateActivityStats } from '@/lib/stats-utils';
 import StatsGrid from './dashboard/StatsGrid';
-import SubjectRadar from './dashboard/SubjectRadar';
 import SubjectsProgressSection from './dashboard/SubjectsProgressSection';
 import StreakCalendar from './dashboard/StreakCalendar';
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
@@ -43,7 +42,6 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
       : 0;
 
   // Real Data from History
-  const radarData = useMemo(() => calculateRadarData(history), [history]);
   const activityData = useMemo(
     () => calculateActivityStats(history),
     [history],
@@ -105,50 +103,43 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-fade-in pb-12 pt-2">
       {/* Header */}
-      <div className="flex justify-between items-end mb-2">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-4">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
             প্রোফাইল
           </h1>
-          <p className="text-base text-neutral-500 dark:text-neutral-400">
-            আপনার শিখার যাত্রা এবং অর্জনসমূহ
-          </p>
         </div>
         <button
           onClick={onEditProfile}
-          className="px-5 py-2.5 bg-neutral-100 dark:bg-neutral-800 rounded-lg font-bold text-base hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+          className="px-5 py-2.5 sm:px-6 sm:py-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl font-bold text-base sm:text-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all active:scale-95 shadow-sm w-fit"
         >
           এডিট করুন
         </button>
       </div>
 
       {/* Level Progress Bar */}
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 md:p-8 shadow-sm relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-700" />
+      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-sm relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-32 sm:w-48 h-32 sm:h-48 bg-indigo-500/5 rounded-full -mr-16 sm:-mr-24 -mt-16 sm:-mt-24 group-hover:scale-110 transition-transform duration-700" />
 
-        <div className="flex justify-between items-end mb-4 relative z-10">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-3 sm:gap-0 mb-4 sm:mb-6 relative z-10">
           <div>
-            <div className="flex items-center gap-3 mb-1.5">
-              <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 text-sm font-black rounded-md uppercase tracking-wider">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-2">
+              <span className="px-3 py-1 sm:px-4 sm:py-1.5 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 text-sm sm:text-base font-black rounded-lg uppercase tracking-wider">
                 {user.level || 'Level 1'}
               </span>
-              <h2 className="text-2xl font-black text-neutral-800 dark:text-white">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-neutral-800 dark:text-white">
                 পরবর্তী লেভেল রিভার্ড
               </h2>
             </div>
-            <p className="text-base text-neutral-500 dark:text-neutral-400 font-medium">
-              {(1000 - (user.xp % 1000)).toLocaleString()} XP প্রয়োজন পরবর্তী
-              লেভেলের জন্য
-            </p>
           </div>
-          <div className="text-right">
-            <span className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
+          <div className="text-left sm:text-right">
+            <span className="text-3xl sm:text-4xl md:text-5xl font-black text-indigo-600 dark:text-indigo-400">
               {Math.floor((user.xp % 1000) / 10)}%
             </span>
           </div>
         </div>
 
-        <div className="h-4 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden relative border border-neutral-200/50 dark:border-neutral-700/50">
+        <div className="h-3 sm:h-4 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden relative border border-neutral-200/50 dark:border-neutral-700/50">
           <div
             className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 transition-all duration-1000 ease-out relative"
             style={{ width: `${(user.xp % 1000) / 10}%` }}
@@ -157,7 +148,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
           </div>
         </div>
 
-        <div className="mt-4 flex justify-between text-[10px] font-bold text-neutral-400 uppercase tracking-widest px-1">
+        <div className="mt-3 sm:mt-4 flex justify-between text-[10px] sm:text-xs font-bold text-neutral-400 uppercase tracking-widest px-1">
           <span>{user.level || 'Level 1'}</span>
           <span>
             Level {parseInt((user.level || 'Level 1').split(' ')[1]) + 1}
@@ -174,37 +165,29 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
       />
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column */}
-        <div className="lg:col-span-1 space-y-6">
-          {/* Subject Radar */}
-          <SubjectRadar data={radarData} />
+        <div className="space-y-6">
+          {/* Subjects Progress Section */}
+          <SubjectsProgressSection subjectStats={subjectStats} />
+        </div>
 
+        {/* Right Column */}
+        <div className="space-y-6">
           {/* Streak Calendar */}
           <StreakCalendar
             calendarData={calendarData}
             streakCount={user.streakCount || 0}
           />
-        </div>
-
-        {/* Right Column */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Subjects Progress Section */}
-          <SubjectsProgressSection subjectStats={subjectStats} />
 
           {/* Weekly Activity Graph */}
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h3 className="text-lg font-bold text-neutral-800 dark:text-white">
-                  সাপ্তাহিক প্রোগ্রেস
-                </h3>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                  গত ৭ দিনের XP অর্জনের চিত্র
-                </p>
-              </div>
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5 sm:p-8">
+            <div className="flex justify-between items-center mb-6 sm:mb-8">
+              <h3 className="text-xl sm:text-2xl font-bold text-neutral-800 dark:text-white">
+                সাপ্তাহিক প্রোগ্রেস
+              </h3>
               <span
-                className={`text-xs font-bold px-2 py-1 rounded ${
+                className={`text-sm font-bold px-3 py-1.5 rounded-lg ${
                   weeklyChange >= 0
                     ? 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20'
                     : 'text-red-600 bg-red-50 dark:bg-red-900/20'
@@ -214,7 +197,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
                 {weeklyChange}% vs last week
               </span>
             </div>
-            <div className="h-64 w-full">
+            <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={activityData}>
                   <defs>
@@ -231,20 +214,22 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
                   </defs>
                   <XAxis
                     dataKey="name"
-                    tick={{ fontSize: 12, fill: '#94a3b8' }}
+                    tick={{ fontSize: 13, fill: '#94a3b8', fontWeight: 600 }}
                     axisLine={false}
                     tickLine={false}
                     dy={10}
                   />
                   <Tooltip
                     contentStyle={{
-                      borderRadius: '12px',
+                      borderRadius: '16px',
                       border: 'none',
                       boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                      fontSize: '14px',
+                      fontWeight: 700,
                     }}
                     cursor={{
                       stroke: '#6366f1',
-                      strokeWidth: 1,
+                      strokeWidth: 2,
                       strokeDasharray: '5 5',
                     }}
                     formatter={(value?: number) => [
@@ -256,7 +241,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
                     type="monotone"
                     dataKey="xp"
                     stroke="#6366f1"
-                    strokeWidth={3}
+                    strokeWidth={4}
                     fillOpacity={1}
                     fill="url(#colorXpProfile)"
                   />
@@ -266,9 +251,9 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
           </div>
 
           {/* Recent Activity List - Limited to 5 items */}
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-neutral-100 dark:border-neutral-800">
-              <h3 className="text-lg font-bold text-neutral-800 dark:text-white">
+          <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
+            <div className="p-8 border-b border-neutral-100 dark:border-neutral-800">
+              <h3 className="text-2xl font-bold text-neutral-800 dark:text-white">
                 সর্বশেষ কার্যক্রম
               </h3>
             </div>
@@ -276,19 +261,19 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
               {history.slice(0, 5).map((exam, idx) => (
                 <div
                   key={exam.id || idx}
-                  className="p-4 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors"
+                  className="p-6 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors"
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-5">
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs ${exam.score / exam.totalMarks >= 0.8 ? 'bg-emerald-500' : exam.score / exam.totalMarks >= 0.5 ? 'bg-amber-500' : 'bg-red-500'}`}
+                      className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-sm ${exam.score / exam.totalMarks >= 0.8 ? 'bg-emerald-500' : exam.score / exam.totalMarks >= 0.5 ? 'bg-amber-500' : 'bg-red-500'}`}
                     >
                       {Math.round((exam.score / exam.totalMarks) * 100)}%
                     </div>
                     <div>
-                      <h4 className="font-bold text-neutral-900 dark:text-white text-sm">
+                      <h4 className="font-bold text-neutral-900 dark:text-white text-base md:text-lg">
                         {exam.subjectLabel || exam.subject}
                       </h4>
-                      <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                      <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
                         {new Date(exam.date).toLocaleDateString('bn-BD', {
                           day: 'numeric',
                           month: 'short',
@@ -297,13 +282,13 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
                       </p>
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-1 rounded">
+                  <span className="text-sm font-bold text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-3 py-1.5 rounded-lg">
                     {exam.examType || 'Practice'}
                   </span>
                 </div>
               ))}
               {history.length === 0 && (
-                <div className="p-8 text-center text-neutral-500 text-sm">
+                <div className="p-12 text-center text-neutral-500 text-lg font-medium">
                   এখনও কোনো পরীক্ষা দেওয়া হয়নি।
                 </div>
               )}

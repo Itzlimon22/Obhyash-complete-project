@@ -11,6 +11,7 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   onTabChange,
   onMenuClick,
 }) => {
+  // Reordered: Home, History, Exam (center), Rank, Menu
   const items = [
     {
       id: 'dashboard',
@@ -18,14 +19,15 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       icon: LayoutDashboard,
     },
     {
-      id: 'setup',
-      label: 'Exam',
-      icon: FileEdit,
-    },
-    {
       id: 'history',
       label: 'History',
       icon: History,
+    },
+    {
+      id: 'setup',
+      label: 'Exam',
+      icon: FileEdit,
+      isCenter: true, // Special flag for center button
     },
     {
       id: 'leaderboard',
@@ -42,10 +44,11 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 lg:hidden">
-      <div className="bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 flex items-center justify-around p-2 pb-safe">
+      <div className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-3xl shadow-xl shadow-black/10 dark:shadow-black/30 flex items-center justify-around p-2 pb-safe">
         {items.map((item) => {
           const isActive = activeTab === item.id;
           const Icon = item.icon;
+          const isCenter = item.isCenter;
 
           return (
             <button
@@ -58,15 +61,20 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 }
               }}
               className={`
-                relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300
+                relative flex items-center justify-center transition-all duration-300
                 ${
-                  isActive
-                    ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/25 scale-105'
-                    : 'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                  isCenter
+                    ? 'w-14 h-14 -mt-6 rounded-2xl bg-gradient-to-br from-rose-500 to-rose-600 text-white shadow-xl shadow-rose-500/40 scale-100 hover:scale-105 active:scale-95'
+                    : isActive
+                      ? 'w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400'
+                      : 'w-12 h-12 rounded-xl text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
                 }
               `}
             >
-              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+              <Icon
+                size={isCenter ? 24 : 22}
+                strokeWidth={isCenter || isActive ? 2.5 : 2}
+              />
             </button>
           );
         })}

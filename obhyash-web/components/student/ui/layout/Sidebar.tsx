@@ -133,7 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               className="flex items-center gap-3 cursor-pointer group"
               onClick={() => onTabChange('dashboard')}
             >
-              <div className="w-9 h-9 bg-rose-600 rounded-lg flex items-center justify-center text-white shadow-md shadow-rose-600/20 group-hover:scale-105 transition-transform duration-300">
+              <div className="w-9 h-9 bg-emerald-700 rounded-lg flex items-center justify-center text-white shadow-md shadow-emerald-600/20 group-hover:scale-105 transition-transform duration-300">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -178,7 +178,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     relative w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3.5'} py-2.5 rounded-xl transition-all duration-300 group
                     ${
                       isActive
-                        ? 'bg-rose-600 text-white shadow-md shadow-rose-600/25'
+                        ? 'bg-emerald-700 text-white shadow-md shadow-emerald-600/25'
                         : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-200'
                     }
                   `}

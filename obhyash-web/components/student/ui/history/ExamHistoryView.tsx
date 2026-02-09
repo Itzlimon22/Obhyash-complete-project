@@ -64,7 +64,7 @@ const PracticeRow: React.FC<{
         {revealed && (
           <button
             onClick={handleRetry}
-            className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+            className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -336,7 +336,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                                     flex-1 md:flex-none flex items-center justify-center gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold transition-all duration-300
                                     ${
                                       isActive
-                                        ? 'bg-white dark:bg-neutral-700 shadow-sm text-indigo-600 dark:text-indigo-400 scale-[1.02]'
+                                        ? 'bg-white dark:bg-neutral-700 shadow-sm text-emerald-600 dark:text-emerald-400 scale-[1.02]'
                                         : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50'
                                     }
                                 `}
@@ -372,7 +372,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               <select
                 value={filterSubject}
                 onChange={(e) => setFilterSubject(e.target.value)}
-                className="w-full appearance-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl pl-9 pr-8 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm cursor-pointer"
+                className="w-full appearance-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl pl-9 pr-8 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm cursor-pointer"
               >
                 <option value="">সকল বিষয়</option>
                 {uniqueSubjects.map((sub) => (
@@ -404,7 +404,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 type="date"
                 value={filterDate}
                 onChange={(e) => setFilterDate(e.target.value)}
-                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm h-full"
+                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm h-full"
               />
             </div>
           </div>
@@ -417,7 +417,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
             <div className="space-y-5 animate-fade-in">
               {/* Stats Overview */}
               <div className="grid grid-cols-3 gap-2 md:gap-4">
-                <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-2.5 md:p-4 text-white shadow-lg shadow-indigo-500/20 flex flex-col justify-center items-center md:items-start">
+                <div className="bg-emerald-700 dark:bg-emerald-600 rounded-xl p-2.5 md:p-4 text-white shadow-lg shadow-emerald-500/20 flex flex-col justify-center items-center md:items-start">
                   <div className="flex items-center gap-2 mb-0.5 md:mb-1 opacity-80">
                     <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-center md:text-left">
                       মোট পরীক্ষা
@@ -508,7 +508,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                     return (
                       <div
                         key={item.id}
-                        className="group bg-white dark:bg-neutral-900 rounded-xl p-4 border border-neutral-200 dark:border-neutral-800 hover:shadow-lg hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-200 flex flex-col justify-between h-full relative overflow-hidden"
+                        className="group bg-white dark:bg-neutral-900 rounded-xl p-4 border border-neutral-200 dark:border-neutral-800 hover:shadow-lg hover:border-emerald-200 dark:hover:border-emerald-900/50 transition-all duration-200 flex flex-col justify-between h-full relative overflow-hidden"
                       >
                         <div className="mb-3">
                           <div className="flex justify-between items-start mb-2">
@@ -521,7 +521,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                               {statusText}
                             </span>
                           </div>
-                          <h3 className="text-base font-bold text-neutral-900 dark:text-white line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                          <h3 className="text-base font-bold text-neutral-900 dark:text-white line-clamp-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                             {item.subject}
                           </h3>
                           <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mb-3 font-medium">
@@ -557,7 +557,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                                 : () => onViewResult(item)
                             }
                             disabled={isPending}
-                            className="w-full py-2 flex items-center justify-center gap-1.5 text-white font-bold text-xs bg-neutral-900 dark:bg-indigo-600 hover:bg-neutral-800 dark:hover:bg-indigo-500 rounded-lg shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 disabled:bg-neutral-400"
+                            className="w-full py-2 flex items-center justify-center gap-1.5 text-white font-bold text-xs bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 rounded-lg shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 disabled:bg-neutral-400"
                           >
                             {isRejected ? 'Request Recheck' : 'View Result'}
                           </button>

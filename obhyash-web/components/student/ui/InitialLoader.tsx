@@ -47,7 +47,7 @@ const InitialLoader: React.FC = () => {
 
         {/* Loading Bar */}
         <div className="mt-12 w-48 h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden border border-neutral-200 dark:border-neutral-700/50">
-          <div className="h-full bg-rose-600 dark:bg-rose-500 rounded-full animate-[loading_1.5s_ease-in-out_infinite] w-1/3"></div>
+          <div className="h-full bg-emerald-600 rounded-full animate-[loading_1.5s_ease-in-out_infinite] w-1/3"></div>
         </div>
       </div>
 

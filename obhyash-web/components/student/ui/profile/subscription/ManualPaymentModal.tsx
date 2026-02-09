@@ -283,7 +283,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                     title: 'সাপোর্টে ইমেইল',
                     sub: 'এখানে ক্লিক করুন',
                     color: 'bg-amber-50 text-amber-600',
-                    link: 'mailto:support@zenith.edu.bd',
+                    link: 'mailto:support@obhyash.com',
                   },
                 ].map((item, idx) => (
                   <a

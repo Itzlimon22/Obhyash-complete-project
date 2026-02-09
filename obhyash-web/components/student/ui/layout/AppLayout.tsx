@@ -14,6 +14,7 @@ import {
   Menu,
   X,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import Sidebar from './Sidebar';
 import MobileBottomNav from './MobileBottomNav';
 import { UserProfile, Notification } from '@/lib/types';
@@ -235,26 +236,32 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             {/* Right: Actions */}
             <div className="flex items-center gap-2 md:gap-5">
               {/* Streak Icon */}
-              <div
-                className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 bg-orange-50 dark:bg-orange-900/10 rounded-full border border-orange-100 dark:border-orange-900/20 group cursor-help transition-all hover:border-orange-200"
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 bg-orange-50 dark:bg-orange-900/10 rounded-full border border-orange-100 dark:border-orange-900/20 group cursor-pointer transition-all hover:border-orange-200 hover:bg-orange-100/50 dark:hover:bg-orange-900/20"
                 title="Daily Streak"
+                onClick={() => {
+                  // Optional: Add logic here if needed (e.g. show streak details)
+                }}
               >
-                <svg
+                <motion.svg
+                  initial={{ scale: 1 }}
+                  whileHover={{ rotate: [0, -10, 10, -10, 0] }}
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className="w-3.5 h-3.5 md:w-4 md:h-4 text-orange-500 group-hover:scale-110 transition-transform"
+                  className="w-4.5 h-4.5 md:w-5 md:h-5 text-orange-500 transition-transform"
                 >
                   <path
                     fillRule="evenodd"
                     d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.177 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
                     clipRule="evenodd"
                   />
-                </svg>
-                <span className="text-[10px] md:text-xs font-bold text-orange-600 dark:text-orange-400 tabular-nums">
+                </motion.svg>
+                <span className="text-xs md:text-sm font-bold text-orange-600 dark:text-orange-400 tabular-nums">
                   {user?.streakCount || 0}
                 </span>
-              </div>
+              </motion.button>
 
               {/* Notification System */}
               <div className="relative" ref={notifRef}>
@@ -371,7 +378,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                         </span>
                         <button
                           onClick={toggleTheme}
-                          className={`w-7 h-4 rounded-full relative transition-colors ${isDarkMode ? 'bg-rose-600' : 'bg-neutral-200 dark:bg-neutral-700'}`}
+                          className={`w-7 h-4 rounded-full relative transition-colors ${isDarkMode ? 'bg-emerald-600' : 'bg-neutral-200 dark:bg-neutral-700'}`}
                         >
                           <div
                             className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform shadow-sm ${isDarkMode ? 'translate-x-3' : 'translate-x-0'}`}

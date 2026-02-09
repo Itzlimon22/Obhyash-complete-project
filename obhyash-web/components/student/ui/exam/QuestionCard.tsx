@@ -42,7 +42,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           isFlagged
             ? 'border-l-amber-400 border-y border-r border-neutral-100 dark:border-y-neutral-800 dark:border-r-neutral-800'
             : isAnswered
-              ? 'border-l-indigo-500 border-y border-r border-neutral-100 dark:border-y-neutral-800 dark:border-r-neutral-800'
+              ? 'border-l-emerald-500 border-y border-r border-neutral-100 dark:border-y-neutral-800 dark:border-r-neutral-800'
               : 'border-l-neutral-200 dark:border-l-neutral-700 border-y border-r border-neutral-100 dark:border-y-neutral-800 dark:border-r-neutral-800'
         }
         ${isOmrMode ? 'opacity-90' : ''}
@@ -173,10 +173,10 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
               iconBorder = 'border-emerald-500 text-emerald-600';
               iconText = '✓';
             } else if (isSelected) {
-              bgClass = 'bg-indigo-50 dark:bg-indigo-900/20';
+              bgClass = 'bg-emerald-50 dark:bg-emerald-900/20';
               borderClass =
-                'border-indigo-500 dark:border-indigo-500 shadow-sm';
-              iconBorder = 'border-indigo-600 bg-indigo-600 text-white';
+                'border-emerald-500 dark:border-emerald-500 shadow-sm';
+              iconBorder = 'border-emerald-600 bg-emerald-600 text-white';
               iconText = '✓';
             }
 
@@ -228,8 +228,8 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
         {/* Explanation Section (Only for Review) */}
         {showFeedback && question.explanation && (
           <div className="mt-6 pt-4 border-t border-neutral-100 dark:border-neutral-800 animate-fade-in">
-            <div className="bg-indigo-50 dark:bg-indigo-900/10 p-4 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
-              <h4 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+            <div className="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800/30">
+              <h4 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-2 flex items-center gap-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"

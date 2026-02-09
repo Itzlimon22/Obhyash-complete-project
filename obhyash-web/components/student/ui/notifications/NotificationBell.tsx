@@ -21,10 +21,10 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
   return (
     <button
       onClick={handleClick}
-      className={`relative p-2 md:p-2.5 rounded-full transition-all duration-300 group flex items-center justify-center border ${
+      className={`relative p-1.5 md:p-2 transition-all duration-300 group flex items-center justify-center ${
         isOpen
-          ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/50 shadow-sm shadow-rose-100 dark:shadow-none'
-          : 'bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm border-neutral-200/60 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400 hover:border-rose-200 dark:hover:border-rose-900/50 hover:bg-rose-50/50 dark:hover:bg-rose-950/20 hover:text-rose-600 dark:hover:text-rose-400'
+          ? 'text-rose-600 dark:text-rose-400'
+          : 'text-neutral-500 dark:text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400'
       }`}
       aria-label="Notifications"
     >
@@ -34,9 +34,9 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
       />
 
       {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-rose-600 px-1.5 text-[10px] font-bold text-white ring-4 ring-white dark:ring-[#0c0a09] transition-all duration-300 group-hover:scale-110 shadow-lg shadow-rose-500/20">
+        <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-emerald-600 px-1.5 text-[10px] font-bold text-white ring-4 ring-white dark:ring-[#0c0a09] transition-all duration-300 group-hover:scale-110 shadow-lg shadow-emerald-500/20">
           {unreadCount > 99 ? '99+' : unreadCount}
-          <span className="absolute inset-0 rounded-full bg-rose-600 animate-ping opacity-25"></span>
+          <span className="absolute inset-0 rounded-full bg-emerald-600 animate-ping opacity-25"></span>
         </span>
       )}
     </button>

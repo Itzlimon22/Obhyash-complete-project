@@ -50,44 +50,39 @@ const SubjectsProgressSection: React.FC<SubjectsProgressSectionProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-6">
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
-            বিষয়ভিত্তিক দক্ষতা
-          </h3>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400">
-            আপনি যে বিষয়গুলো পড়েছেন তার পারফরম্যান্স
-          </p>
-        </div>
+    <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5 sm:p-8">
+      <div className="mb-4 sm:mb-6">
+        <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">
+          বিষয়ভিত্তিক দক্ষতা
+        </h3>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 sm:space-y-5">
         {subjectStats.map((stat) => (
           <div
             key={stat.subject}
-            className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
           >
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-neutral-900 dark:text-white text-sm">
+            <div className="flex justify-between items-center mb-2 sm:mb-3">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="font-bold text-neutral-900 dark:text-white text-base sm:text-lg">
                   {stat.subject}
                 </span>
-                <span className="text-xs text-neutral-500 px-2 py-0.5 bg-neutral-200 dark:bg-neutral-700 rounded">
+                <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 px-2 py-0.5 sm:px-2.5 sm:py-1 bg-neutral-200 dark:bg-neutral-700 rounded-md sm:rounded-lg">
                   {stat.examCount} পরীক্ষা
                 </span>
               </div>
               <span
-                className={`text-xs font-bold px-2 py-1 rounded ${getAccuracyBgColor(stat.accuracy)} ${getAccuracyTextColor(stat.accuracy)}`}
+                className={`text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg ${getAccuracyBgColor(stat.accuracy)} ${getAccuracyTextColor(stat.accuracy)}`}
               >
                 {stat.accuracy}%
               </span>
             </div>
 
             {/* Progress Bar */}
-            <div className="h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+            <div className="h-2 sm:h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
               <div
-                className={`h-full ${getAccuracyColor(stat.accuracy)} transition-all duration-500`}
+                className={`h-full ${getAccuracyColor(stat.accuracy)} transition-all duration-700`}
                 style={{ width: `${stat.accuracy}%` }}
               />
             </div>

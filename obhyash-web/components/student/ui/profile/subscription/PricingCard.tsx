@@ -40,56 +40,58 @@ const PricingCard: React.FC<PricingCardProps> = ({
         {/* Background blobs */}
         {isBestValue && (
           <>
-            <div className="absolute top-0 right-0 w-40 h-40 bg-rose-500/5 rounded-full blur-3xl -translate-y-10 translate-x-10" />
-            <div className="absolute bottom-0 left-0 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl translate-y-10 -translate-x-10" />
+            <div className="absolute top-0 right-0 w-32 sm:w-40 h-32 sm:h-40 bg-rose-500/5 rounded-full blur-3xl -translate-y-10 translate-x-10" />
+            <div className="absolute bottom-0 left-0 w-32 sm:w-40 h-32 sm:h-40 bg-indigo-500/5 rounded-full blur-3xl translate-y-10 -translate-x-10" />
           </>
         )}
 
-        <div className="p-8 flex-1 flex flex-col items-center text-center relative z-10">
+        <div className="p-5 sm:p-8 flex-1 flex flex-col items-center text-center relative z-10">
           <div
             className={cn(
-              'w-14 h-14 rounded-2xl flex items-center justify-center mb-4 text-2xl shadow-sm',
+              'w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 text-xl sm:text-2xl shadow-sm',
               isBestValue
                 ? 'bg-gradient-to-br from-indigo-500 to-rose-500 text-white shadow-rose-500/20'
                 : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400',
             )}
           >
             {isBestValue ? (
-              <Crown className="w-7 h-7" />
+              <Crown className="w-6 h-6 sm:w-7 sm:h-7" />
             ) : (
-              <Zap className="w-7 h-7" />
+              <Zap className="w-6 h-6 sm:w-7 sm:h-7" />
             )}
           </div>
 
-          <h3 className="text-lg font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2">
+          <h3 className="text-base sm:text-lg font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2">
             {plan.name}
           </h3>
 
-          <div className="flex items-baseline gap-1 mb-6">
-            <span className="text-4xl md:text-5xl font-black text-neutral-900 dark:text-white tracking-tight">
+          <div className="flex items-start justify-center gap-1 mb-5 sm:mb-8 relative">
+            <span className="text-2xl sm:text-3xl font-bold text-neutral-400 mt-1 sm:mt-2">
               {plan.currency}
-              {plan.price}
             </span>
-            <span className="text-neutral-400 font-bold">
-              /{plan.billingCycle}
+            <span className="text-5xl sm:text-6xl font-black text-neutral-900 dark:text-white tracking-tighter">
+              {plan.price}
             </span>
           </div>
 
-          <ul className="space-y-3 w-full text-left mb-8">
+          <ul className="space-y-2 sm:space-y-3 w-full text-left mb-5 sm:mb-8">
             {plan.features.map((feature, idx) => (
               <li
                 key={idx}
-                className="flex items-center gap-3 text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300"
               >
                 <div
                   className={cn(
-                    'w-5 h-5 rounded-full flex items-center justify-center shrink-0',
+                    'w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center shrink-0',
                     isBestValue
                       ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400'
                       : 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400',
                   )}
                 >
-                  <Check className="w-3 h-3" strokeWidth={3} />
+                  <Check
+                    className="w-2.5 h-2.5 sm:w-3 sm:h-3"
+                    strokeWidth={3}
+                  />
                 </div>
                 {feature}
               </li>
@@ -101,12 +103,10 @@ const PricingCard: React.FC<PricingCardProps> = ({
               onClick={onSelect}
               disabled={isCurrent}
               className={cn(
-                'w-full py-4 rounded-xl font-bold text-sm tracking-wide transition-all shadow-lg hover:shadow-xl active:scale-95',
+                'w-full py-3 sm:py-4 rounded-xl font-bold text-sm tracking-wide transition-all shadow-lg hover:shadow-xl active:scale-95',
                 isCurrent
                   ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-default shadow-none'
-                  : isBestValue
-                    ? 'bg-gradient-to-r from-rose-600 to-indigo-600 text-white shadow-rose-500/25 hover:shadow-rose-500/40'
-                    : 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200',
+                  : 'bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white shadow-emerald-500/25 hover:shadow-emerald-500/40',
               )}
             >
               {isCurrent ? 'বর্তমান প্ল্যান' : 'পেমেন্ট করুন'}

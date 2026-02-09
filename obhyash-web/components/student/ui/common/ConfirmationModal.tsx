@@ -103,7 +103,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             onClick={onConfirm}
             className={`
               px-5 py-2.5 rounded-lg text-white font-bold shadow-sm transition-colors text-base
-              ${isWarning ? 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-500' : 'bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600'}
+              ${isWarning ? 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-500' : 'bg-emerald-700 hover:bg-emerald-800'}
             `}
           >
             জমা দিন

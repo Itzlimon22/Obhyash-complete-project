@@ -46,7 +46,7 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
             </svg>
           </div>
           <div className="relative z-10">
-            <span className="inline-block px-3 py-1 rounded-full bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-wider mb-3 shadow-lg shadow-indigo-900/20">
+            <span className="inline-block px-3 py-1 rounded-full bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider mb-3 shadow-lg shadow-emerald-900/20">
               {details.examType || 'Practice Exam'}
             </span>
             <h1 className="text-3xl md:text-4xl font-bold font-serif-exam mb-2">
@@ -107,16 +107,16 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div className="bg-indigo-50 dark:bg-indigo-900/10 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-800/30">
-              <span className="block text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-1">
+            <div className="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-800/30">
+              <span className="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1">
                 অধ্যায় (Chapter)
               </span>
               <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">
                 {details.chapters || 'All'}
               </span>
             </div>
-            <div className="bg-indigo-50 dark:bg-indigo-900/10 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-800/30">
-              <span className="block text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-1">
+            <div className="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-800/30">
+              <span className="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1">
                 টপিক (Topic)
               </span>
               <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">
@@ -220,7 +220,7 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
             onClick={() => setAgreed(!agreed)}
           >
             <div
-              className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${agreed ? 'bg-indigo-600 border-indigo-600' : 'bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-600 group-hover:border-indigo-500'}`}
+              className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${agreed ? 'bg-emerald-600 border-emerald-600' : 'bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-600 group-hover:border-emerald-500'}`}
             >
               {agreed && (
                 <svg
@@ -260,7 +260,7 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
                 w-full sm:w-auto flex-1 px-8 py-3.5 rounded-xl text-white font-bold transition-all shadow-lg text-center flex items-center justify-center gap-2 text-base
                 ${
                   agreed && !isStarting
-                    ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 hover:to-indigo-800 hover:scale-[1.01] cursor-pointer shadow-indigo-500/30'
+                    ? 'bg-emerald-700 hover:bg-emerald-800 hover:scale-[1.01] cursor-pointer shadow-emerald-500/30'
                     : 'bg-neutral-300 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-600 cursor-not-allowed shadow-none'
                 }
               `}

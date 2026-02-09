@@ -115,7 +115,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
           </button>
         )}
 
-        <div className="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 bg-indigo-600 rounded-md shadow-sm shrink-0">
+        <div className="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 bg-emerald-600 rounded-md shadow-sm shrink-0">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -156,7 +156,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
             id="omr-toggle-header"
             onClick={onToggleOmr}
             disabled={isGracePeriod}
-            className={`relative w-9 h-5 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 ${isOmrMode ? 'bg-indigo-600' : 'bg-neutral-300 dark:bg-neutral-600'}`}
+            className={`relative w-9 h-5 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900 ${isOmrMode ? 'bg-emerald-600' : 'bg-neutral-300 dark:bg-neutral-600'}`}
           >
             <span
               className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full shadow-sm transition-transform ${isOmrMode ? 'tranneutral-x-4' : 'tranneutral-x-0'}`}

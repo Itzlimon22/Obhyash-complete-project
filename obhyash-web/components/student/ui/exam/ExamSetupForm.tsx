@@ -240,7 +240,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pt-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 text-xs font-bold uppercase tracking-wider">
+            <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
               পরীক্ষা সেটআপ
             </span>
           </div>
@@ -251,9 +251,9 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
         <button
           onClick={() => setIsOmrConfigOpen(true)}
-          className="group flex items-center gap-3 px-5 py-3 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl font-bold text-neutral-600 dark:text-neutral-300 shadow-sm hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
+          className="group flex items-center gap-3 px-5 py-3 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl font-bold text-neutral-600 dark:text-neutral-300 shadow-sm hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all"
         >
-          <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30 transition-colors">
+          <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/30 transition-colors">
             <Share2 className="w-4 h-4" />
           </div>
           <span>OMR শিট জেনারেটর</span>
@@ -356,7 +356,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               <button
                 onClick={handleStartExam}
                 disabled={isLoading || !subject}
-                className="w-full group relative overflow-hidden bg-neutral-900 dark:bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+                className="w-full group relative overflow-hidden bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
               >
                 <div className="relative z-10 flex items-center justify-center gap-3">
                   {isLoading ? (

@@ -114,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group relative
                     ${
                       isActive
-                        ? 'bg-rose-600 text-white shadow-md shadow-rose-500/20'
+                        ? 'bg-emerald-700 text-white shadow-md shadow-emerald-500/20'
                         : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900 hover:text-neutral-900 dark:hover:text-neutral-200'
                     }
                     ${collapsed ? 'justify-center px-0' : ''}

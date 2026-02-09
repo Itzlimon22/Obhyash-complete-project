@@ -111,7 +111,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       <header className="sticky top-0 z-50 w-full backdrop-blur-lg bg-white/70 dark:bg-neutral-900/70 border-b border-neutral-200 dark:border-neutral-800">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+            <div className="w-8 h-8 bg-emerald-700 rounded-lg flex items-center justify-center text-white">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -199,23 +199,23 @@ const LandingPage: React.FC<LandingPageProps> = ({
       {/* Hero Section */}
       <section className="relative pt-12 pb-20 overflow-hidden">
         <div className="absolute inset-0 -z-10 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-600/5 rounded-full blur-3xl"></div>
         </div>
 
         <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 text-sm font-medium border border-indigo-100 dark:border-indigo-800">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 text-sm font-medium border border-emerald-100 dark:border-emerald-800">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
               New: OMR Scan Feature Available
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight font-serif-exam">
               Master Your Exams with{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-rose-600">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-emerald-800">
                 Precision
               </span>
             </h1>
@@ -229,7 +229,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <div className="flex justify-center lg:justify-start pt-4">
               <button
                 onClick={onGetStarted}
-                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-tranneutral-y-1 transition-all active:scale-95 flex items-center gap-2"
+                className="px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-tranneutral-y-1 transition-all active:scale-95 flex items-center gap-2"
               >
                 Get Started
                 <svg
@@ -273,7 +273,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   viewBox="0 0 24 24"
                   strokeWidth={1}
                   stroke="currentColor"
-                  className="w-32 h-32 text-indigo-500 mx-auto mb-4 opacity-80"
+                  className="w-32 h-32 text-emerald-600 mx-auto mb-4 opacity-80"
                 >
                   <path
                     strokeLinecap="round"
@@ -297,11 +297,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <h2 className="text-3xl font-bold mb-4 font-serif-exam">
               Everything You Need to Succeed
             </h2>
-            <p className="text-neutral-600 dark:text-neutral-400">
-              Our platform combines traditional exam methods with cutting-edge
-              AI technology to provide the most comprehensive preparation
-              experience.
-            </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -310,7 +305,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 key={idx}
                 className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 hover:shadow-md hover:-tranneutral-y-1 transition-all duration-300"
               >
-                <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center mb-4">
                   {feature.icon}
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-neutral-900 dark:text-white">

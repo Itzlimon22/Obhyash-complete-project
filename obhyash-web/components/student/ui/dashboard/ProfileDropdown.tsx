@@ -74,7 +74,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
       {/* Avatar Trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-10 h-10 rounded-full bg-rose-600 text-white font-bold text-lg flex items-center justify-center shadow-md hover:shadow-lg transition-shadow border-2 border-white dark:border-neutral-800"
+        className="w-10 h-10 rounded-full bg-emerald-700 text-white font-bold text-lg flex items-center justify-center shadow-md hover:shadow-lg transition-shadow border-2 border-white dark:border-neutral-800"
       >
         {user?.name?.[0] || 'A'}
       </button>
@@ -84,7 +84,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
         <div className="absolute right-0 top-14 w-72 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-200 dark:border-neutral-800 z-50 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
           {/* Header */}
           <div className="p-4 border-b border-neutral-100 dark:border-neutral-800 flex items-center gap-3 bg-neutral-50/50 dark:bg-neutral-800/20">
-            <div className="w-12 h-12 rounded-full bg-rose-600 text-white font-bold text-xl flex items-center justify-center shrink-0 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-emerald-700 text-white font-bold text-xl flex items-center justify-center shrink-0 shadow-sm">
               {user?.name?.[0] || 'A'}
             </div>
             <div className="overflow-hidden">
@@ -131,7 +131,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
               </div>
               <div
                 className={`w-10 h-6 rounded-full p-1 transition-colors duration-300 flex items-center ${
-                  isDarkMode ? 'bg-indigo-600' : 'bg-neutral-300'
+                  isDarkMode ? 'bg-emerald-600' : 'bg-neutral-300'
                 }`}
               >
                 <div

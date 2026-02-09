@@ -19,20 +19,20 @@ const StatsGrid: React.FC<StatsGridProps> = ({
   const animatedXp = useCountUp(xp, 2000);
   const animatedStreak = useCountUp(streak, 1200);
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
       {/* Total Exams */}
-      <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-indigo-200 dark:hover:border-indigo-900 transition-all group overflow-hidden relative">
+      <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-indigo-200 dark:hover:border-indigo-900 transition-all group overflow-hidden relative">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
 
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg text-indigo-600 dark:text-indigo-400">
+        <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+          <div className="p-2 sm:p-2.5 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg sm:rounded-xl text-indigo-600 dark:text-indigo-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={2}
               stroke="currentColor"
-              className="w-5 h-5"
+              className="w-5 h-5 sm:w-6 sm:h-6"
             >
               <path
                 strokeLinecap="round"
@@ -41,26 +41,26 @@ const StatsGrid: React.FC<StatsGridProps> = ({
               />
             </svg>
           </div>
-          <span className="text-xs font-bold text-neutral-500 uppercase tracking-wide">
+          <span className="text-xs sm:text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
             মোট পরীক্ষা
           </span>
         </div>
-        <div className="text-2xl font-bold text-neutral-900 dark:text-white group-hover:scale-110 transition-transform origin-left">
+        <div className="text-2xl sm:text-3xl md:text-4xl font-black text-neutral-900 dark:text-white group-hover:scale-105 transition-transform origin-left tracking-tight">
           {animatedExams}
         </div>
       </div>
 
       {/* Avg Score */}
-      <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-emerald-200 dark:hover:border-emerald-900 transition-colors">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg text-emerald-600 dark:text-emerald-400">
+      <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-emerald-200 dark:hover:border-emerald-900 transition-all group overflow-hidden relative">
+        <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+          <div className="p-2 sm:p-2.5 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg sm:rounded-xl text-emerald-600 dark:text-emerald-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={2}
               stroke="currentColor"
-              className="w-5 h-5"
+              className="w-5 h-5 sm:w-6 sm:h-6"
             >
               <path
                 strokeLinecap="round"
@@ -69,26 +69,26 @@ const StatsGrid: React.FC<StatsGridProps> = ({
               />
             </svg>
           </div>
-          <span className="text-xs font-bold text-neutral-500 uppercase tracking-wide">
-            গড় স্কোর
+          <span className="text-xs sm:text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
+            গড় স্কোর
           </span>
         </div>
-        <div className="text-2xl font-bold text-neutral-900 dark:text-white group-hover:scale-110 transition-transform origin-left">
+        <div className="text-2xl sm:text-3xl md:text-4xl font-black text-neutral-900 dark:text-white group-hover:scale-105 transition-transform origin-left tracking-tight">
           {animatedScore}%
         </div>
       </div>
 
       {/* Total XP */}
-      <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-amber-200 dark:hover:border-amber-900 transition-colors">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg text-amber-600 dark:text-amber-400">
+      <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-amber-200 dark:hover:border-amber-900 transition-all group overflow-hidden relative">
+        <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+          <div className="p-2 sm:p-2.5 bg-amber-50 dark:bg-amber-900/20 rounded-lg sm:rounded-xl text-amber-600 dark:text-amber-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={2}
               stroke="currentColor"
-              className="w-5 h-5"
+              className="w-5 h-5 sm:w-6 sm:h-6"
             >
               <path
                 strokeLinecap="round"
@@ -97,26 +97,26 @@ const StatsGrid: React.FC<StatsGridProps> = ({
               />
             </svg>
           </div>
-          <span className="text-xs font-bold text-neutral-500 uppercase tracking-wide">
+          <span className="text-xs sm:text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
             মোট XP
           </span>
         </div>
-        <div className="text-2xl font-bold text-neutral-900 dark:text-white group-hover:scale-110 transition-transform origin-left">
+        <div className="text-2xl sm:text-3xl md:text-4xl font-black text-neutral-900 dark:text-white group-hover:scale-105 transition-transform origin-left tracking-tight">
           {animatedXp.toLocaleString()}
         </div>
       </div>
 
       {/* Streak */}
-      <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-orange-200 dark:hover:border-orange-900 transition-colors">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg text-orange-600 dark:text-orange-400">
+      <div className="bg-white dark:bg-neutral-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-orange-200 dark:hover:border-orange-900 transition-all group overflow-hidden relative">
+        <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+          <div className="p-2 sm:p-2.5 bg-orange-50 dark:bg-orange-900/20 rounded-lg sm:rounded-xl text-orange-600 dark:text-orange-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={2}
               stroke="currentColor"
-              className="w-5 h-5"
+              className="w-5 h-5 sm:w-6 sm:h-6"
             >
               <path
                 strokeLinecap="round"
@@ -130,11 +130,11 @@ const StatsGrid: React.FC<StatsGridProps> = ({
               />
             </svg>
           </div>
-          <span className="text-xs font-bold text-neutral-500 uppercase tracking-wide">
+          <span className="text-xs sm:text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
             স্ট্রিক
           </span>
         </div>
-        <div className="text-2xl font-bold text-neutral-900 dark:text-white group-hover:scale-110 transition-transform origin-left">
+        <div className="text-2xl sm:text-3xl md:text-4xl font-black text-neutral-900 dark:text-white group-hover:scale-105 transition-transform origin-left tracking-tight">
           {animatedStreak} দিন
         </div>
       </div>
