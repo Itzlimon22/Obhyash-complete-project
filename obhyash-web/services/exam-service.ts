@@ -191,11 +191,11 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
 
         // --- 🚀 NEW: Update Smart Analytics ---
         // Fire and forget (don't block the UI)
-        if (result.answers) {
+        if (result.userAnswers) {
           // We need to know which questions were correct
           // The 'result' object usually has 'score' but maybe not per-question correctness explicitly
-          // unless we re-evaluate or if 'answers' contains it.
-          // Types.ts definition of ExamResult: answers: Record<string, number> (questionId -> optionIndex)
+          // unless we re-evaluate or if 'userAnswers' contains it.
+          // Types.ts definition of ExamResult: userAnswers?: UserAnswers (Record<string | number, number>)
           // We need the original questions or validity map to know correctness.
           // If 'correctAnswers' or 'scoreDetails' is not in ExamResult, we might skip this
           // OR we rely on the component to call a separate 'submitAnalytics'
