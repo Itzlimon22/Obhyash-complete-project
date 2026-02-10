@@ -85,17 +85,17 @@ export default function NotificationManagementPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8">
         {/* Send Notification Form */}
         <div className="lg:col-span-8">
-          <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] border border-neutral-200 dark:border-neutral-800 shadow-sm p-5 sm:p-8">
-            <h2 className="text-lg font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl md:rounded-[2.5rem] border border-neutral-200 dark:border-neutral-800 shadow-sm p-4 md:p-8">
+            <h2 className="text-lg font-bold text-neutral-900 dark:text-white mb-4 md:mb-6 flex items-center gap-2">
               <Send size={20} className="text-rose-600" />
               নতুন নোটিফিকেশন পাঠান
             </h2>
 
-            <form onSubmit={handleSend} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <form onSubmit={handleSend} className="space-y-4 md:space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                 <div>
                   <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2 ml-1">
                     শিরোনাম (Title)
@@ -150,7 +150,7 @@ export default function NotificationManagementPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div>
                   <label className="block text-[10px] font-bold text-neutral-400 uppercase tracking-widest mb-2 ml-1">
                     অগ্রাধিকার (Priority)
@@ -250,8 +250,8 @@ export default function NotificationManagementPage() {
         </div>
 
         {/* Instructions / Info Panel */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="bg-rose-50 dark:bg-rose-900/10 rounded-[2rem] p-6 border border-rose-100 dark:border-rose-900/30">
+        <div className="lg:col-span-4 space-y-4 md:space-y-6">
+          <div className="bg-rose-50 dark:bg-rose-900/10 rounded-2xl md:rounded-[2rem] p-5 md:p-6 border border-rose-100 dark:border-rose-900/30">
             <h3 className="font-bold text-rose-800 dark:text-rose-300 mb-4 flex items-center gap-2">
               <Info size={20} />
               টিপস
@@ -287,7 +287,7 @@ export default function NotificationManagementPage() {
             </ul>
           </div>
 
-          <div className="bg-white dark:bg-neutral-900 rounded-[2rem] p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between min-h-[200px]">
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl md:rounded-[2rem] p-5 md:p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between min-h-[180px] md:min-h-[200px]">
             <h3 className="font-bold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
               <History size={20} />
               রিসেন্ট অ্যাক্টিভিটি

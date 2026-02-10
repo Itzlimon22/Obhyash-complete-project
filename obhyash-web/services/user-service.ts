@@ -53,7 +53,8 @@ const mapProfileToDbRow = (user: UserProfile): UserDatabaseRow => {
     gender: user.gender || null,
     address: user.address || null,
 
-    avatar_url: user.avatarUrl || (user as any).avatar_url || null,
+    avatar_url:
+      user.avatarUrl || (user as UserProfile & { avatar_url?: string }).avatar_url || null,
     avatar_color: user.avatarColor || null,
 
     institute: user.institute || null,

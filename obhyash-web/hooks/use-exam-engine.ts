@@ -53,8 +53,32 @@ export const useExamEngine = () => {
 
   // Load initial history
   useEffect(() => {
-    const stored = localStorage.getItem('obhyash_exam_history');
-    if (stored) setExamHistory(JSON.parse(stored));
+    const loadHistory = async () => {
+      // 1. Try to load from Local Storage first (Instant)
+      const stored = localStorage.getItem('obhyash_exam_history');
+      if (stored) {
+        setExamHistory(JSON.parse(stored));
+      }
+
+      // 2. Fetch from Database (Source of Truth) and update
+      try {
+        // Dynamic import to avoid circular dependency issues if any
+        const { getExamHistory } = await import('@/services/database');
+        const dbHistory = await getExamHistory();
+        if (dbHistory && dbHistory.length > 0) {
+          setExamHistory(dbHistory);
+          // Update local storage to match cloud
+          localStorage.setItem(
+            'obhyash_exam_history',
+            JSON.stringify(dbHistory),
+          );
+        }
+      } catch (error) {
+        console.error('Failed to sync history from DB:', error);
+      }
+    };
+
+    loadHistory();
   }, []);
 
   const calculateExamStats = (

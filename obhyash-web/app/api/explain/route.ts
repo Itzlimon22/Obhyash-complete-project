@@ -1,19 +1,33 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { createClient } from '@/utils/supabase/server';
 
 export const runtime = 'nodejs';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 // ---------------- POST ----------------
-const POST = async (req: Request) => {
+export const POST = async (req: Request) => {
+  // 1. Check Auth
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Unauthorized. Please log in.' },
+      { status: 401 },
+    );
+  }
+
   try {
     const { question, answer, wrongAnswer } = await req.json();
 
     if (!question || !answer || !wrongAnswer) {
       return NextResponse.json(
         { error: 'Missing required fields' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -42,14 +56,14 @@ Explain in 2 simple sentences why the correct answer is right.
           'Access-Control-Allow-Methods': 'POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
         },
-      }
+      },
     );
   } catch (err) {
     console.error('Gemini Error:', err);
 
     return NextResponse.json(
       { error: 'Failed to generate explanation' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };

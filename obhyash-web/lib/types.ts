@@ -149,6 +149,7 @@ export interface ExamResult {
   subject: string;
   subjectLabel?: string;
   examType?: string;
+  chapters?: string; // Comma separated list of chapters
   date: string;
 
   // Stats

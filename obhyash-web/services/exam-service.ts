@@ -1,5 +1,51 @@
-import { ExamConfig, Question, ExamResult } from '@/lib/types';
+import { ExamConfig, Question, ExamResult, UserAnswers } from '@/lib/types';
 import { supabase, isSupabaseConfigured } from './core';
+
+// --- DB TYPES ---
+interface QuestionDbRow {
+  created_at: string;
+  correct_answer: number;
+  correct_answer_index: number;
+  correct_answer_indices: number[];
+  image_url?: string;
+  option_images?: string[];
+  explanation_image_url?: string;
+  exam_type?: string;
+  // Common fields that match Question type or need no mapping
+  id: string | number;
+  question: string;
+  options: string[];
+  explanation?: string;
+  points?: number;
+  subject?: string;
+  chapter?: string;
+  topic?: string;
+  difficulty?: string;
+  institutes?: string[];
+  years?: number[];
+  // ... add other fields from Question if they map 1:1
+}
+
+interface ExamResultDbRow {
+  id: string;
+  subject: string;
+  subject_label?: string;
+  exam_type?: string;
+  date: string;
+  score: number;
+  total_marks: number;
+  total_questions: number;
+  correct_count: number;
+  wrong_count: number;
+  time_taken: number;
+  negative_marking: number;
+  questions?: Question[];
+  user_answers?: UserAnswers;
+  flagged_questions?: number[];
+  chapters?: string;
+  submission_type?: 'digital' | 'script';
+  script_image_data?: string;
+}
 
 export const fetchQuestions = async (
   config: ExamConfig,
@@ -44,7 +90,7 @@ export const fetchQuestions = async (
         // Fallback to legacy fetch if RPC fails
       } else if (data) {
         // Map snake_case to camelCase
-        return data.map((q: any) => ({
+        return (data as unknown as QuestionDbRow[]).map((q) => ({
           ...q,
           createdAt: q.created_at,
           correctAnswer: q.correct_answer,
@@ -54,7 +100,7 @@ export const fetchQuestions = async (
           optionImages: q.option_images || [],
           explanationImageUrl: q.explanation_image_url,
           examType: q.exam_type,
-        }));
+        })) as unknown as Question[];
       }
     }
 
@@ -106,7 +152,7 @@ export const fetchQuestions = async (
     const shuffled = data.sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, config.questionCount);
 
-    return selected.map((q: any) => ({
+    return (selected as unknown as QuestionDbRow[]).map((q) => ({
       ...q,
       createdAt: q.created_at,
       correctAnswer: q.correct_answer,
@@ -116,7 +162,7 @@ export const fetchQuestions = async (
       optionImages: q.option_images || [],
       explanationImageUrl: q.explanation_image_url,
       examType: q.exam_type,
-    }));
+    })) as unknown as Question[];
   } catch (err) {
     console.error('Failed to fetch questions:', err);
     return [];
@@ -171,17 +217,25 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
     } = await supabase.auth.getUser();
 
     if (user) {
-      const resultWithUserId = {
-        ...result,
+      const { error } = await supabase.from('exam_results').insert({
         user_id: user.id,
-        // Ensure chapters is included explicitly if it's not in the spread
-        chapters:
-          (result as ExamResult & { chapters?: string }).chapters || 'General',
-      };
-
-      const { error } = await supabase
-        .from('exam_results')
-        .insert(resultWithUserId);
+        subject: result.subject,
+        exam_type: result.examType,
+        date: result.date || new Date().toISOString(),
+        score: result.score,
+        total_marks: result.totalMarks,
+        total_questions: result.totalQuestions,
+        correct_count: result.correctCount,
+        wrong_count: result.wrongCount,
+        time_taken: result.timeTaken,
+        negative_marking: result.negativeMarking,
+        questions: result.questions,
+        user_answers: result.userAnswers,
+        flagged_questions: result.flaggedQuestions, // If db supports it
+        chapters: result.chapters || 'General',
+        submission_type: result.submissionType || 'digital',
+        script_image_data: result.scriptImageData,
+      });
 
       if (error) {
         console.error('Error saving exam result:', error);
@@ -235,6 +289,29 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
   }
 };
 
+const mapDbResultToExamResult = (data: ExamResultDbRow): ExamResult => {
+  return {
+    id: data.id,
+    subject: data.subject,
+    subjectLabel: data.subject_label || data.subject, // Handle potential DB naming
+    examType: data.exam_type,
+    date: data.date,
+    score: data.score,
+    totalMarks: data.total_marks,
+    totalQuestions: data.total_questions,
+    correctCount: data.correct_count,
+    wrongCount: data.wrong_count,
+    timeTaken: data.time_taken,
+    negativeMarking: data.negative_marking,
+    questions: data.questions,
+    userAnswers: data.user_answers,
+    flaggedQuestions: data.flagged_questions || [],
+    chapters: data.chapters || 'General',
+    submissionType: data.submission_type || 'digital',
+    scriptImageData: data.script_image_data,
+  };
+};
+
 export const getExamHistory = async (): Promise<ExamResult[]> => {
   if (isSupabaseConfigured() && supabase) {
     const { data, error } = await supabase
@@ -243,7 +320,10 @@ export const getExamHistory = async (): Promise<ExamResult[]> => {
       .order('date', { ascending: false });
 
     if (error) throw error;
-    if (data) return data;
+    if (data)
+      return (data as unknown as ExamResultDbRow[]).map(
+        mapDbResultToExamResult,
+      );
   }
 
   // Fallback to local storage if DB is not configured (or maybe we strictly want DB?)
