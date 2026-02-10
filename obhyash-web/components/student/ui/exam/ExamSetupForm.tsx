@@ -410,6 +410,10 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         initialSubject={
           availableSubjects.find((s) => s.id === subject)?.label || subject
         }
+        subjects={availableSubjects.map((s) => ({
+          id: s.id,
+          name: s.label || s.name || '',
+        }))}
       />
 
       {/* OMR Sheet is now generated and printed via printOMRSheet service */}

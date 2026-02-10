@@ -54,6 +54,7 @@ interface StudentRootProps {
   theme: 'light' | 'dark';
   toggleTheme: () => void;
   onLogout: () => void;
+  subjects?: any[];
 }
 
 export default function StudentRoot({
@@ -61,7 +62,9 @@ export default function StudentRoot({
   theme,
   toggleTheme,
   onLogout,
+  subjects = [],
 }: StudentRootProps) {
+  // ... (keeping existing hooks and state)
   const engine = useExamEngine();
   const supabase = createClient();
 
@@ -418,6 +421,7 @@ export default function StudentRoot({
                 setAppState(AppState.COMPLETED);
               }}
               onRecheckRequest={(id) => alert('Recheck requested for: ' + id)}
+              subjects={subjects}
             />
           </AppLayout>
         );
@@ -472,6 +476,7 @@ export default function StudentRoot({
               history={examHistory}
               onStartPractice={startCustomExam}
               onNavigateToMock={() => setActiveTab('setup')}
+              subjects={subjects}
             />
           </AppLayout>
         );

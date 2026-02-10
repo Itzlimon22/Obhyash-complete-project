@@ -7,6 +7,7 @@ interface ExamHistoryViewProps {
   onClearHistory: () => void;
   onViewResult: (result: ExamResult) => void;
   onRecheckRequest: (id: string) => void;
+  subjects?: any[]; // Replace with Subject type when available
 }
 
 const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
@@ -15,17 +16,33 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   onClearHistory,
   onViewResult,
   onRecheckRequest,
+  subjects = [],
 }) => {
   const [filterSubject, setFilterSubject] = useState('');
   const [filterDate, setFilterDate] = useState('');
   const [visibleCount, setVisibleCount] = useState(5);
+
+  // Extract unique subjects for dropdown (Merge DB subjects + History subjects)
+  const uniqueSubjects = useMemo(() => {
+    const subjectSet = new Set<string>();
+
+    // Add subjects from DB
+    subjects.forEach((s) => {
+      if (s.name) subjectSet.add(s.name);
+    });
+
+    // Add subjects from history (in case some are missing from DB)
+    history.forEach((item) => subjectSet.add(item.subject));
+
+    return Array.from(subjectSet).sort();
+  }, [history, subjects]);
 
   // Filter Logic
   const filteredHistory = useMemo(() => {
     return history
       .filter((item) => {
         const matchSubject = filterSubject
-          ? item.subject.toLowerCase().includes(filterSubject.toLowerCase())
+          ? item.subject.toLowerCase() === filterSubject.toLowerCase()
           : true;
         const matchDate = filterDate ? item.date.startsWith(filterDate) : true;
         return matchSubject && matchDate;
@@ -123,10 +140,10 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
           </button>
         </div>
 
-        {/* 2-Column Main Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
-          {/* Filters Column (Left - 4 cols) */}
-          <div className="lg:col-span-4 space-y-4">
+        {/* 2-Column Main Layout - Optimized for Tablet (md:grid-cols-2) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 mb-8">
+          {/* Filters Column (Left - 4 cols on lg, 2 cols on md) */}
+          <div className="md:col-span-2 lg:col-span-4 space-y-4">
             <div className="bg-white dark:bg-neutral-900/50 backdrop-blur-sm p-5 rounded-[2rem] border border-neutral-200 dark:border-neutral-800 shadow-sm sticky top-20">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl">
@@ -155,13 +172,18 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   <label className="text-xs font-bold text-neutral-500 uppercase ml-1">
                     বিষয় অনুযায়ী খুঁজুন
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Search Subject..."
+                  <select
                     value={filterSubject}
                     onChange={(e) => setFilterSubject(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/10 focus:border-rose-500 transition-all text-sm font-medium"
-                  />
+                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/10 focus:border-rose-500 transition-all text-sm font-medium appearance-none"
+                  >
+                    <option value="">সব বিষয় (All Subjects)</option>
+                    {uniqueSubjects.map((idx) => (
+                      <option key={idx} value={idx}>
+                        {idx}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="space-y-1.5">
@@ -182,8 +204,8 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
             </div>
           </div>
 
-          {/* Stats & History Column (Right - 8 cols) */}
-          <div className="lg:col-span-8 space-y-6">
+          {/* Stats & History Column (Right - 8 cols on lg, full on md) */}
+          <div className="md:col-span-2 lg:col-span-8 space-y-6">
             {/* Horizontal Stats Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-white dark:bg-neutral-900 p-6 rounded-[2rem] shadow-sm border border-neutral-200 dark:border-neutral-800 flex items-center gap-5 group hover:border-rose-500/30 transition-all">

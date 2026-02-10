@@ -6,6 +6,7 @@ interface PracticeDashboardProps {
   history: ExamResult[];
   onStartPractice: (questions: Question[], details: ExamDetails) => void;
   onNavigateToMock: () => void;
+  subjects?: any[];
 }
 
 type Tab = 'mistakes' | 'bookmarks';
@@ -14,6 +15,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   history,
   onStartPractice,
   onNavigateToMock,
+  subjects,
 }) => {
   const [activeTab, setActiveTab] = useState<Tab>('mistakes');
   const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(

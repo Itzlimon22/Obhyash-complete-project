@@ -36,6 +36,10 @@ export default async function DashboardPage() {
     }
   }
 
+  // Fetch Subjects for History & OMR
+  const { data: subjectsData } = await supabase.from('subjects').select('*');
+  const subjects = subjectsData || [];
+
   // Safe fallback if user exists in auth but not DB (shouldn't happen often)
   // But if it does, we can construct a basic profile from Auth data or wait for trigger
   const userProfile = profile || {
@@ -53,5 +57,5 @@ export default async function DashboardPage() {
     recentExams: [],
   };
 
-  return <DashboardClient user={userProfile} />;
+  return <DashboardClient user={userProfile} subjects={subjects} />;
 }

@@ -12,6 +12,7 @@ import {
 import { ExamDetails } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import Portal from '@/components/ui/portal';
 
 interface OmrConfigModalProps {
   isOpen: boolean;
@@ -20,9 +21,8 @@ interface OmrConfigModalProps {
   initialSubject?: string;
   initialChapters?: string;
   initialTopics?: string;
+  subjects?: { id: string; name: string }[];
 }
-
-import Portal from '@/components/ui/portal';
 
 export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
   isOpen,
@@ -31,6 +31,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
   initialSubject = '',
   initialChapters = '',
   initialTopics = '',
+  subjects = [],
 }) => {
   const [isBlank, setIsBlank] = useState(false);
   const [subject, setSubject] = useState(initialSubject);
@@ -39,8 +40,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
   const [count, setCount] = useState(50);
 
   // Sync state from props when the modal transitions from closed to open
-  // Using the "store previous prop in state" pattern recommended by React:
-  // https://react.dev/reference/react/useState#storing-information-from-previous-renders
+  // Using the "store previous prop in state" pattern
   const [prevIsOpen, setPrevIsOpen] = useState(false);
   if (isOpen && !prevIsOpen) {
     setSubject(initialSubject);
@@ -54,7 +54,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
   const handleGenerate = () => {
     // Validation if not blank
     if (!isBlank && !subject.trim()) {
-      toast.error("Please enter a subject name or select 'Blank OMR'");
+      toast.error("Please select a subject or choose 'Blank OMR'");
       return;
     }
 
@@ -145,13 +145,30 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
                 <label className="text-xs font-bold text-neutral-500 uppercase flex items-center gap-1">
                   <BookOpen size={12} /> Subject
                 </label>
-                <input
-                  type="text"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  placeholder="e.g. Physics"
-                  className="w-full px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border-transparent focus:bg-white dark:focus:bg-neutral-900 border focus:border-indigo-500 focus:ring-0 transition-all font-medium"
-                />
+                {subjects.length > 0 ? (
+                  <select
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border-transparent focus:bg-white dark:focus:bg-neutral-900 border focus:border-indigo-500 focus:ring-0 transition-all font-medium appearance-none"
+                  >
+                    <option value="" disabled>
+                      Select a Subject
+                    </option>
+                    {subjects.map((sub) => (
+                      <option key={sub.id} value={sub.name}>
+                        {sub.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    placeholder="e.g. Physics"
+                    className="w-full px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border-transparent focus:bg-white dark:focus:bg-neutral-900 border focus:border-indigo-500 focus:ring-0 transition-all font-medium"
+                  />
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">

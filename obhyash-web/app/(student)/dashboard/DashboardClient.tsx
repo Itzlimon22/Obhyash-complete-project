@@ -8,9 +8,13 @@ import { UserProfile } from '@/lib/types';
 
 interface DashboardClientProps {
   user: UserProfile;
+  subjects?: any[]; // Using any[] for now or define Subject type if available
 }
 
-export default function DashboardClient({ user }: DashboardClientProps) {
+export default function DashboardClient({
+  user,
+  subjects = [],
+}: DashboardClientProps) {
   const router = useRouter();
   const supabase = createClient();
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -45,6 +49,7 @@ export default function DashboardClient({ user }: DashboardClientProps) {
       theme={theme}
       toggleTheme={toggleTheme}
       onLogout={handleLogout}
+      subjects={subjects}
     />
   );
 }
