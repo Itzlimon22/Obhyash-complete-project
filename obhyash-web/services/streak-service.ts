@@ -39,32 +39,51 @@ export const checkAndUpdateStreak = async (
     if (diffDays === 0) {
       // Already active today
       return null;
-    } else if (diffDays === 1) {
-      // Consecutive day!
+    } else {
+      // Login day (diffDays >= 1)
       const xpGained = 20;
       const newXp = (user.xp || 0) + xpGained;
       const updatedUser: UserProfile = {
         ...user,
-        streakCount: (user.streakCount || 0) + 1,
+        streakCount: diffDays === 1 ? (user.streakCount || 0) + 1 : 1,
         lastStreakDate: now.toISOString(),
         xp: newXp,
         level: calculateLevel(newXp),
       };
       await updateUserProfile(updatedUser);
-      return updatedUser;
-    } else {
-      // Missed a day
-      const updatedUser: UserProfile = {
-        ...user,
-        streakCount: 1,
-        lastStreakDate: now.toISOString(),
-      };
-      await updateUserProfile(updatedUser);
+
+      // ✅ Add Notification
+      try {
+        const { createNotification } = await import('./notification-service');
+        await createNotification(
+          user.id,
+          'প্রতিদিনের বোনাস!',
+          `আজকের লগইন এর জন্য আপনি +${xpGained} XP অর্জন করেছেন।`,
+          'system',
+          { icon: '🌟' },
+        );
+      } catch (e) {
+        console.error('Failed to create notification:', e);
+      }
+
       return updatedUser;
     }
   } else {
-    // First time streak tracking
-    const xpGained = 20;
+    // First time streak tracking: Calculate backlog since signup
+    const joinedDate = user.createdAt ? new Date(user.createdAt) : now;
+    const joinedDay = new Date(
+      joinedDate.getFullYear(),
+      joinedDate.getMonth(),
+      joinedDate.getDate(),
+    ).getTime();
+
+    // Days since joining (inclusive)
+    const totalDaysSinceSignup = Math.max(
+      1,
+      Math.floor((today - joinedDay) / (1000 * 60 * 60 * 24)) + 1,
+    );
+    const xpGained = totalDaysSinceSignup * 20;
+
     const newXp = (user.xp || 0) + xpGained;
     const updatedUser: UserProfile = {
       ...user,
@@ -74,6 +93,21 @@ export const checkAndUpdateStreak = async (
       level: calculateLevel(newXp),
     };
     await updateUserProfile(updatedUser);
+
+    // ✅ Add Notification
+    try {
+      const { createNotification } = await import('./notification-service');
+      await createNotification(
+        user.id,
+        'লগইন বোনাস!',
+        `আপনি প্ল্যাটফর্মে যোগদানের জন্য +${xpGained} XP অর্জন করেছেন।`,
+        'system',
+        { icon: '🔥' },
+      );
+    } catch (e) {
+      console.error('Failed to create notification:', e);
+    }
+
     return updatedUser;
   }
 };

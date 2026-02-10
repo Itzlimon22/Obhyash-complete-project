@@ -30,6 +30,7 @@ import UserProfileView from '@/components/student/features/dashboard/UserProfile
 import { ComplaintView } from '@/components/student/features/complaint/ComplaintView';
 import AnalysisView from '@/components/student/features/dashboard/AnalysisView';
 import { PracticeDashboard } from '@/components/student/features/practice/PracticeDashboard';
+import NotificationsView from '@/components/student/features/notifications/NotificationsView';
 
 // Profile Features
 import MyProfileView from '@/components/student/ui/profile/MyProfileView';
@@ -494,6 +495,14 @@ export default function StudentRoot({
             title="অভিযোগ ও পরামর্শ"
           >
             <ComplaintView />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === 'notifications') {
+        return (
+          <AppLayout activeTab="" {...commonLayoutProps} title="নোটিফিকেশন">
+            <NotificationsView />
           </AppLayout>
         );
       }

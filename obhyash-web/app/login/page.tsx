@@ -78,8 +78,8 @@ export default function LoginPage() {
         <div className="absolute -top-20 -right-20 w-40 h-40 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="p-8 md:p-10 relative">
-          <div className="text-center mb-8">
+        <div className="p-6 md:p-10 relative">
+          <div className="text-center mb-6">
             <h4 className="text-3xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight">
               স্বাগতম!
             </h4>
@@ -95,7 +95,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form className="space-y-5" onSubmit={handleLogin}>
+          <form className="space-y-4" onSubmit={handleLogin}>
             <div className="space-y-1.5">
               <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
                 ইমেইল এড্রেস
@@ -106,7 +106,7 @@ export default function LoginPage() {
                   id="email"
                   type="email"
                   required
-                  className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
+                  className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 md:py-3.5"
                   placeholder="example@mail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -124,7 +124,7 @@ export default function LoginPage() {
                   id="password"
                   type="password"
                   required
-                  className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
+                  className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 md:py-3.5"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -135,7 +135,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-emerald-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 mt-2"
+              className="group w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-emerald-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 mt-2 md:py-3.5"
             >
               {loading ? (
                 <>
@@ -170,7 +170,7 @@ export default function LoginPage() {
             <SocialLoginButton mode="signin" />
           </Suspense>
 
-          <div className="mt-8 text-center space-y-4">
+          <div className="mt-6 text-center space-y-4 md:mt-8">
             <p className="text-sm text-slate-500 dark:text-slate-400">
               অ্যাকাউন্ট নেই?{' '}
               <Link

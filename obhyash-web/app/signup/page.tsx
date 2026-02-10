@@ -238,7 +238,7 @@ export default function SignupPage() {
 
   // Progress Bar
   const renderProgress = () => (
-    <div className="flex items-center justify-center mb-8 gap-3">
+    <div className="flex items-center justify-center mb-4 md:mb-8 gap-3">
       {[1, 2, 3].map((s) => (
         <div key={s} className="flex items-center">
           <div
@@ -263,13 +263,13 @@ export default function SignupPage() {
   );
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-100 dark:bg-black p-4 font-sans max-md:pt-20">
+    <div className="flex min-h-screen items-center justify-center bg-neutral-100 dark:bg-black p-4 font-sans">
       <div className="w-full max-w-lg bg-white dark:bg-neutral-950 rounded-[2rem] shadow-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 relative z-10">
         {/* Header Decor */}
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 via-red-500 to-rose-500" />
 
-        <div className="p-8 md:p-10">
-          <div className="text-center mb-8">
+        <div className="p-5 md:p-10">
+          <div className="text-center mb-4 md:mb-8">
             <p className="text-slate-500 dark:text-slate-400 text-sm">
               মাত্র ৩টি ধাপে সম্পন্ন করুন আপনার রেজিস্ট্রেশন
             </p>
@@ -283,7 +283,7 @@ export default function SignupPage() {
             </div>
           )}
 
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {/* STEP 1: PERSONAL DETAILS */}
             {step === 1 && (
               <div className="space-y-5 animate-in slide-in-from-right-4 fade-in duration-300">
@@ -449,7 +449,7 @@ export default function SignupPage() {
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="example@mail.com"
-                        className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
+                        className="w-full pl-12 pr-4 py-2.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 md:py-3.5"
                       />
                     </div>
                   </div>
@@ -494,7 +494,7 @@ export default function SignupPage() {
                         value={formData.confirmPassword}
                         onChange={handleChange}
                         placeholder="পাসওয়ার্ডটি আবার লিখুন"
-                        className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
+                        className="w-full pl-12 pr-4 py-2.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 md:py-3.5"
                       />
                     </div>
                   </div>
@@ -518,7 +518,7 @@ export default function SignupPage() {
                 type="button"
                 onClick={step === 3 ? handleSignup : handleNext}
                 disabled={loading}
-                className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-emerald-500/30 active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-emerald-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 md:py-3.5"
               >
                 {loading ? (
                   <>
@@ -536,7 +536,7 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <div className="mt-8 text-center">
+          <div className="mt-4 text-center md:mt-8">
             <p className="text-sm text-slate-500 dark:text-slate-400">
               আগেই অ্যাকাউন্ট আছে?{' '}
               <Link

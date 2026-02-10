@@ -37,6 +37,7 @@ interface UserDatabaseRow {
   xp?: number | null;
   level?: string | null;
   streak?: number | null;
+  last_streak_date?: string | null;
   exams_taken?: number | null;
 
   // System
@@ -81,6 +82,7 @@ const mapProfileToDbRow = (user: UserProfile): UserDatabaseRow => {
     xp: user.xp || 0,
     level: user.level || 'Rookie',
     streak: user.streakCount || 0,
+    last_streak_date: user.lastStreakDate || null,
     exams_taken: user.examsTaken || 0,
 
     updated_at: new Date().toISOString(),
