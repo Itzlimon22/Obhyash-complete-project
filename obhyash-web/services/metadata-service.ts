@@ -37,7 +37,8 @@ export const getSubjects = async (
     // Show subjects that match the stream OR contain NULL (applicable to all streams)
     if (stream) {
       console.log(`[getSubjects] Filtering by Stream: ${stream} OR NULL`);
-      query = query.or(`stream.eq.${stream},stream.is.null`);
+      // Use ilike to allow partial matches (e.g., "HSC" will match "HSC, Admission")
+      query = query.or(`stream.ilike.%${stream}%,stream.is.null`);
     }
 
     // FUTURE: If subjects table supports 'section' column, we can filter here.

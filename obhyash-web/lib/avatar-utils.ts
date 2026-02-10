@@ -20,6 +20,7 @@ export const getRandomAvatar = (
     style = 'lorelei';
   }
 
-  // Add some randomness via the seed
-  return `https://api.dicebear.com/7.x/${style}/svg?seed=${encodeURIComponent(seed)}`;
+  // Add scale and radius parameters to make the avatar fit the circle better
+  // scale 120 makes it larger, backgroundColor transparent ensures no background box
+  return `https://api.dicebear.com/7.x/${style}/svg?seed=${encodeURIComponent(seed)}&scale=120&radius=0&backgroundColor=b6e3f4,c0aede,d1d4f9`;
 };
