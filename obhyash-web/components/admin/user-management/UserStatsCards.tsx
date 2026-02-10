@@ -9,49 +9,60 @@ interface UserStatsCardsProps {
     premium: number;
   };
   isLoading: boolean;
+  onStatClick?: (type: 'active' | 'students' | 'premium' | 'total') => void;
 }
 
 const UserStatsCards: React.FC<UserStatsCardsProps> = ({
   stats,
   isLoading,
+  onStatClick,
 }) => {
   const cards = [
     {
+      id: 'total',
       label: 'Total Users',
       value: stats.total,
       icon: User,
       gradient: 'from-rose-500 to-red-500',
       bg: 'bg-rose-50 dark:bg-rose-500/10',
+      onClick: () => onStatClick?.('total'),
     },
     {
+      id: 'active',
       label: 'Active Users',
       value: stats.active,
       icon: UserCheck,
       gradient: 'from-emerald-500 to-teal-500',
       bg: 'bg-emerald-50 dark:bg-emerald-500/10',
+      onClick: () => onStatClick?.('active'),
     },
     {
+      id: 'students',
       label: 'Students',
       value: stats.students,
       icon: BookOpen,
       gradient: 'from-rose-500 to-rose-400',
       bg: 'bg-rose-50 dark:bg-rose-500/10',
+      onClick: () => onStatClick?.('students'),
     },
     {
+      id: 'premium',
       label: 'Premium Users',
       value: stats.premium,
       icon: Crown,
       gradient: 'from-amber-500 to-orange-500',
       bg: 'bg-amber-50 dark:bg-amber-500/10',
+      onClick: () => onStatClick?.('premium'),
     },
   ];
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-6">
       {cards.map((stat, i) => (
-        <div
+        <button
           key={i}
-          className="bg-white dark:bg-neutral-900 p-3 md:p-6 rounded-2xl md:rounded-[1.75rem] border border-neutral-200/60 dark:border-neutral-800/60 shadow-sm hover:shadow-md transition-all group"
+          onClick={stat.onClick}
+          className="bg-white dark:bg-neutral-900 p-3 md:p-6 rounded-2xl md:rounded-[1.75rem] border border-neutral-200/60 dark:border-neutral-800/60 shadow-sm hover:shadow-md transition-all group text-left w-full outline-none focus:ring-2 focus:ring-rose-500/20"
         >
           <div className="flex items-center justify-between mb-2 md:mb-4">
             <div
@@ -68,7 +79,7 @@ const UserStatsCards: React.FC<UserStatsCardsProps> = ({
               {isLoading ? '...' : stat.value.toLocaleString()}
             </p>
           </div>
-        </div>
+        </button>
       ))}
     </div>
   );

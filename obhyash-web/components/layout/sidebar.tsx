@@ -214,7 +214,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     );
 
     const containerClass = `
-      group flex items-center w-full px-4 py-4 sm:py-3 rounded-2xl transition-all duration-300 border border-transparent mx-auto relative
+      group flex items-center w-full px-4 py-2 sm:py-3 rounded-2xl transition-all duration-300 border border-transparent mx-auto relative
       ${
         isActive
           ? 'bg-rose-50 text-rose-700 dark:bg-rose-500/10'
@@ -226,7 +226,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     if (item.id === 'logout') {
       return (
-        <div className="mb-2 relative">
+        <div className="mb-1 sm:mb-2 relative">
           <button onClick={handleLogout} className={containerClass}>
             {Content}
           </button>
@@ -235,7 +235,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
 
     return (
-      <div className="mb-2 relative">
+      <div className="mb-1 sm:mb-2 relative">
         {item.hasSubmenu ? (
           <button
             onClick={() => toggleSubmenu(item.id)}
@@ -317,11 +317,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Main Navigation */}
-      <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-8 space-y-10">
+      <div className="flex-1 overflow-y-auto no-scrollbar px-4 py-4 sm:py-8 space-y-4 sm:space-y-10">
         {SIDEBAR_NAVIGATION.map((section, idx) => (
           <div key={idx} className="space-y-2">
             {section.title && (isOpen || isMobile) && (
-              <h3 className="px-4 text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-[0.3em] mb-4">
+              <h3 className="px-4 text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-[0.3em] mb-2 sm:mb-4">
                 {section.title}
               </h3>
             )}

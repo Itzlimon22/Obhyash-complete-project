@@ -150,6 +150,49 @@ export default function UserManagementPage() {
     premium: users.filter((u) => u.subscription?.plan !== 'Free').length,
   };
 
+  const handleStatClick = (
+    type: 'active' | 'students' | 'premium' | 'total',
+  ) => {
+    // 1. Reset all filters to default
+    setSearchQuery('');
+    setRoleFilter('all');
+    setStatusFilter('all');
+    setAdvancedFilters({
+      lastActiveRange: 'all',
+      minExams: 0,
+      maxExams: 10000,
+      institutes: [],
+      batches: [],
+      subscriptionStatus: 'all',
+    });
+    setSelectedUsers(new Set()); // Clear selection
+
+    // 2. Apply specific filter based on card clicked
+    switch (type) {
+      case 'active':
+        setStatusFilter('Active');
+        break;
+      case 'students':
+        setRoleFilter('Student');
+        break;
+      case 'premium':
+        // Note: Currently no direct filter for "Plan Type" (Free vs Pro) in basic UI.
+        // We could filter by Subscription Status 'Active' as a proxy,
+        // or add a new filter state later. For now, we'll just leave it as reset-all
+        // or we could assume Premium users likely have 'Active' subscription status.
+        setAdvancedFilters((prev) => ({
+          ...prev,
+          subscriptionStatus: 'Active',
+        }));
+        setShowAdvancedFilters(true);
+        break;
+      case 'total':
+      default:
+        // Already reset above
+        break;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-black p-4 lg:p-8">
       <div className="max-w-[1600px] mx-auto space-y-4 md:space-y-8">
@@ -188,7 +231,11 @@ export default function UserManagementPage() {
         </div>
 
         {/* Stats */}
-        <UserStatsCards stats={stats} isLoading={isLoading} />
+        <UserStatsCards
+          stats={stats}
+          isLoading={isLoading}
+          onStatClick={handleStatClick}
+        />
 
         {/* Filters */}
         <div className="space-y-4">

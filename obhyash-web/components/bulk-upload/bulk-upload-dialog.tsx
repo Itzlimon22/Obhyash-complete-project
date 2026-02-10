@@ -245,12 +245,12 @@ export default function BulkUploadDialog({
 
     try {
       const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-      if (sessionError || !session) throw new Error('Session expired.');
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError || !user) throw new Error('Session expired.');
 
-      const userId = session.user.id;
+      const userId = user.id;
       setLogs((prev) => [...prev, '✅ Session verified. Preparing payload...']);
 
       const finalPayload = parsedData.map((q) => ({

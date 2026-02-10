@@ -46,10 +46,10 @@ export default function Home() {
         // Real logic: Check Supabase session first.
         const supabase = createClient();
         const {
-          data: { session },
-        } = await supabase.auth.getSession();
+          data: { user },
+        } = await supabase.auth.getUser();
 
-        if (session) {
+        if (user) {
           const profile = await getUserProfile('me');
           setCurrentUser(profile);
         } else {

@@ -61,16 +61,16 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // 1. Get current session
+        // 1. Get current user (server-validated, not from local storage)
         const {
-          data: { session },
-        } = await supabase.auth.getSession();
+          data: { user: currentUser },
+        } = await supabase.auth.getUser();
 
-        if (session?.user) {
-          setUser(session.user);
+        if (currentUser) {
+          setUser(currentUser);
 
           // 2. Fetch Profile
-          const userProfile = await fetchProfile(session.user.id);
+          const userProfile = await fetchProfile(currentUser.id);
 
           if (userProfile) {
             setProfile(userProfile);
