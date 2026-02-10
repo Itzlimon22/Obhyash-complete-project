@@ -8,8 +8,6 @@ interface LandingPageProps {
   onGetStarted: () => void;
   isDarkMode: boolean;
   toggleTheme: () => void;
-  onHistoryClick: () => void;
-  historyCount: number;
 }
 
 // --- Dynamic Feature Demos ---
@@ -155,8 +153,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
   onGetStarted,
   isDarkMode,
   toggleTheme,
-  onHistoryClick,
-  historyCount,
 }) => {
   const [activeDemoTab, setActiveDemoTab] = useState<
     'generate' | 'omr' | 'analytics'
@@ -315,14 +311,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
-            {historyCount > 0 && (
-              <button
-                onClick={onHistoryClick}
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-400 bg-white dark:bg-neutral-900 border border-indigo-200 dark:border-indigo-900/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 transition-colors rounded-full"
-              >
-                <span>ইতিহাস ({historyCount})</span>
-              </button>
-            )}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-600 dark:text-neutral-400"

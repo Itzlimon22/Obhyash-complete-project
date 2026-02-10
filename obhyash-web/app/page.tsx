@@ -94,11 +94,6 @@ export default function Home() {
   // --- NAVIGATION HANDLERS (For Landing) ---
   const handleLogin = () => router.push('/login');
   const handleGetStarted = () => router.push('/signup');
-  const handleHistoryClick = () => {
-    // If guest has history, maybe show it? For now just no-op or login prompt
-    // But we just direct to login?
-    router.push('/login');
-  };
 
   if (!mounted) return null;
 
@@ -134,9 +129,6 @@ export default function Home() {
         onLogin={handleLogin}
         isDarkMode={isDarkMode}
         toggleTheme={toggleTheme}
-        onHistoryClick={handleHistoryClick}
-        historyCount={0} // Guests start fresh or read from local?
-        // For simplicity, 0. If we want guest history, we'd need to read it.
       />
     </main>
   );

@@ -401,7 +401,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center gap-2 mb-4 text-white">
                 <span className="text-xl font-bold font-serif-exam">
-                  Zenith
+                  Obhyash
                 </span>
               </div>
               <p className="text-sm max-w-xs leading-relaxed">
