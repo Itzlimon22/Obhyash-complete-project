@@ -20,6 +20,7 @@ import AppLayout from '@/components/student/ui/layout/AppLayout';
 import TimeoutModal from '@/components/student/ui/TimeoutModal';
 import { toast } from 'sonner';
 import { celebration } from '@/lib/confetti';
+import StreakCelebration from '@/components/student/ui/common/StreakCelebration';
 
 // Features
 import Dashboard from '@/components/student/features/dashboard/Dashboard';
@@ -156,6 +157,10 @@ export default function StudentRoot({
   // Pending Config for Pre-Fetch Instructions
   const [pendingConfig, setPendingConfig] = useState<ExamConfig | null>(null);
 
+  // Streak Celebration State
+  const [showStreakCelebration, setShowStreakCelebration] = useState(false);
+  const [newStreakCount, setNewStreakCount] = useState(0);
+
   // Sync prop user to state
   useEffect(() => {
     if (initialUser) setCurrentUser(initialUser);
@@ -169,6 +174,11 @@ export default function StudentRoot({
         await import('@/services/streak-service');
       const updatedUser = await checkAndUpdateStreak(currentUser);
       if (updatedUser) {
+        // If streak incremented, show celebration
+        if ((updatedUser.streakCount || 0) > (currentUser.streakCount || 0)) {
+          setNewStreakCount(updatedUser.streakCount || 0);
+          setShowStreakCelebration(true);
+        }
         setCurrentUser(updatedUser);
       }
     };
@@ -333,350 +343,390 @@ export default function StudentRoot({
 
   // --- Routing Logic ---
 
-  if (appState === AppState.IDLE) {
-    if (activeTab === 'dashboard') {
+  const renderApp = () => {
+    if (appState === AppState.IDLE) {
+      if (activeTab === 'dashboard') {
+        return (
+          <AppLayout activeTab={activeTab} {...commonLayoutProps}>
+            <Dashboard
+              onMockExamClick={() => setActiveTab('setup')}
+              onHistoryClick={() => setActiveTab('history')}
+              onSubjectClick={(subject) => {
+                setSelectedSubjectReport(subject);
+                setActiveTab('subject_report');
+              }}
+              onLeaderboardClick={() => setActiveTab('leaderboard')}
+              history={examHistory}
+            />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === 'setup') {
+        return (
+          <AppLayout
+            activeTab={activeTab}
+            {...commonLayoutProps}
+            title="নতুন পরীক্ষা"
+          >
+            <ExamSetupContainer
+              onStartExam={handleStartExam}
+              isLoading={false}
+            />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === 'history') {
+        return (
+          <AppLayout
+            activeTab={activeTab}
+            {...commonLayoutProps}
+            title="ইতিহাস"
+          >
+            <ExamHistoryView
+              history={examHistory}
+              onBack={() => setActiveTab('dashboard')}
+              onClearHistory={() => {
+                setExamHistory([]);
+                localStorage.removeItem('obhyash_exam_history');
+              }}
+              onViewResult={(res) => {
+                setQuestions(res.questions || []);
+                setUserAnswers(res.userAnswers || {});
+                setExamDetails({
+                  subject: res.subject,
+                  subjectLabel: res.subjectLabel || res.subject,
+                  examType: res.examType || '',
+                  chapters: '',
+                  topics: '',
+                  totalQuestions: res.totalQuestions,
+                  durationMinutes: 0,
+                  totalMarks: res.totalMarks,
+                  negativeMarking: res.negativeMarking,
+                });
+                setTimeTaken(res.timeTaken);
+                setIsReviewingHistory(true);
+                setAppState(AppState.COMPLETED);
+              }}
+              onRecheckRequest={(id) => alert('Recheck requested for: ' + id)}
+            />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === 'leaderboard') {
+        return (
+          <AppLayout
+            activeTab={activeTab}
+            {...commonLayoutProps}
+            title="লিডারবোর্ড"
+          >
+            <LeaderboardView
+              onUserClick={(user) => {
+                setSelectedUserProfile(user);
+                setActiveTab('user_profile');
+              }}
+            />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === 'profile') {
+        return (
+          <AppLayout activeTab="" {...commonLayoutProps} title="আমার প্রোফাইল">
+            <MyProfileView
+              user={currentUser!}
+              history={examHistory}
+              onEditProfile={() => setActiveTab('settings')}
+            />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === 'settings') {
+        return (
+          <AppLayout activeTab="" {...commonLayoutProps} title="সেটিংস">
+            <SettingsView user={currentUser!} onSave={handleProfileUpdate} />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === 'practice') {
+        return (
+          <AppLayout
+            activeTab={activeTab}
+            {...commonLayoutProps}
+            title="অনুশীলন"
+          >
+            <PracticeDashboard
+              history={examHistory}
+              onStartPractice={startCustomExam}
+              onNavigateToMock={() => setActiveTab('setup')}
+            />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === 'analysis') {
+        return (
+          <AppLayout
+            activeTab={activeTab}
+            {...commonLayoutProps}
+            title="এনালাইসিস"
+          >
+            <AnalysisView
+              history={examHistory}
+              onSubjectClick={(subject) => {
+                setSelectedSubjectReport(subject);
+                setActiveTab('subject_report');
+              }}
+            />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === 'complaint') {
+        return (
+          <AppLayout
+            activeTab={activeTab}
+            {...commonLayoutProps}
+            title="অভিযোগ ও পরামর্শ"
+          >
+            <ComplaintView />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === 'about') {
+        return (
+          <AppLayout
+            activeTab=""
+            {...commonLayoutProps}
+            title="আমাদের সম্পর্কে"
+          >
+            <AboutUsView />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === 'subscription')
+        return (
+          <AppLayout activeTab="" {...commonLayoutProps} title="সাবস্ক্রিপশন">
+            <SubscriptionView />
+          </AppLayout>
+        );
+      if (activeTab === 'user_profile' && selectedUserProfile)
+        return (
+          <AppLayout
+            activeTab="leaderboard"
+            {...commonLayoutProps}
+            title="প্রোফাইল"
+          >
+            <UserProfileView
+              user={selectedUserProfile}
+              currentUser={currentUser}
+              rank={0}
+              history={examHistory}
+              onBack={() => setActiveTab('leaderboard')}
+            />
+          </AppLayout>
+        );
+      if (activeTab === 'subject_report' && selectedSubjectReport)
+        return (
+          <AppLayout
+            activeTab="dashboard"
+            {...commonLayoutProps}
+            title="রিপোর্ট"
+          >
+            <SubjectReportView
+              subject={selectedSubjectReport}
+              history={examHistory}
+              onBack={() => setActiveTab('dashboard')}
+            />
+          </AppLayout>
+        );
+    }
+
+    // --- Active Exam States ---
+
+    if (appState === AppState.INSTRUCTIONS) {
+      if (examDetails) {
+        // If we have examDetails, it means we just fetched questions and are about to start.
+        // Show loading or skeleton while changing to ACTIVE
+        return (
+          <AppLayout
+            activeTab="dashboard"
+            {...commonLayoutProps}
+            title="শুরু হচ্ছে..."
+          >
+            <ResultSkeleton />
+          </AppLayout>
+        );
+      }
+
+      // Otherwise show Pre-Fetch Instructions
+      if (pendingConfig) {
+        return (
+          <AppLayout
+            activeTab="setup"
+            {...commonLayoutProps}
+            title="নির্দেশাবলী"
+          >
+            <ExamInstructionsView
+              config={pendingConfig}
+              onStart={handleProceedToExam}
+              onBack={() => setAppState(AppState.IDLE)}
+            />
+          </AppLayout>
+        );
+      }
+    }
+
+    if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
+      if (!examDetails) return null;
       return (
-        <AppLayout activeTab={activeTab} {...commonLayoutProps}>
-          <Dashboard
-            onMockExamClick={() => setActiveTab('setup')}
-            onHistoryClick={() => setActiveTab('history')}
-            onSubjectClick={(subject) => {
-              setSelectedSubjectReport(subject);
-              setActiveTab('subject_report');
+        <>
+          <ExamRunner
+            appState={appState}
+            examDetails={examDetails}
+            questions={questions}
+            userAnswers={userAnswers}
+            setUserAnswers={setUserAnswers}
+            flaggedQuestions={flaggedQuestions}
+            setFlaggedQuestions={setFlaggedQuestions}
+            timeLeft={timeLeft}
+            graceTimeLeft={graceTimeLeft}
+            isOmrMode={isOmrMode}
+            setIsOmrMode={setIsOmrMode}
+            selectedScript={selectedScript}
+            setSelectedScript={setSelectedScript}
+            onSubmit={handleExamSubmit}
+            onExit={() =>
+              setNavWarning({
+                isOpen: true,
+                targetTab: 'dashboard',
+                action: 'tab',
+              })
+            }
+            onTimeoutReattempt={() => {
+              setIsTimeoutModalOpen(false);
+              setAppState(AppState.IDLE);
+              if (lastExamConfigRef.current)
+                startExam(lastExamConfigRef.current);
             }}
-            onLeaderboardClick={() => setActiveTab('leaderboard')}
-            history={examHistory}
-          />
-        </AppLayout>
-      );
-    }
-
-    if (activeTab === 'setup') {
-      return (
-        <AppLayout
-          activeTab={activeTab}
-          {...commonLayoutProps}
-          title="নতুন পরীক্ষা"
-        >
-          <ExamSetupContainer onStartExam={handleStartExam} isLoading={false} />
-        </AppLayout>
-      );
-    }
-
-    if (activeTab === 'history') {
-      return (
-        <AppLayout activeTab={activeTab} {...commonLayoutProps} title="ইতিহাস">
-          <ExamHistoryView
-            history={examHistory}
-            onBack={() => setActiveTab('dashboard')}
-            onClearHistory={() => {
-              setExamHistory([]);
-              localStorage.removeItem('obhyash_exam_history');
-            }}
-            onViewResult={(res) => {
-              setQuestions(res.questions || []);
-              setUserAnswers(res.userAnswers || {});
-              setExamDetails({
-                subject: res.subject,
-                subjectLabel: res.subjectLabel || res.subject,
-                examType: res.examType || '',
-                chapters: '',
-                topics: '',
-                totalQuestions: res.totalQuestions,
-                durationMinutes: 0,
-                totalMarks: res.totalMarks,
-                negativeMarking: res.negativeMarking,
-              });
-              setTimeTaken(res.timeTaken);
-              setIsReviewingHistory(true);
-              setAppState(AppState.COMPLETED);
-            }}
-            onRecheckRequest={(id) => alert('Recheck requested for: ' + id)}
-          />
-        </AppLayout>
-      );
-    }
-
-    if (activeTab === 'leaderboard') {
-      return (
-        <AppLayout
-          activeTab={activeTab}
-          {...commonLayoutProps}
-          title="লিডারবোর্ড"
-        >
-          <LeaderboardView
-            onUserClick={(user) => {
-              setSelectedUserProfile(user);
-              setActiveTab('user_profile');
-            }}
-          />
-        </AppLayout>
-      );
-    }
-
-    if (activeTab === 'profile') {
-      return (
-        <AppLayout activeTab="" {...commonLayoutProps} title="আমার প্রোফাইল">
-          <MyProfileView
-            user={currentUser!}
-            history={examHistory}
-            onEditProfile={() => setActiveTab('settings')}
-          />
-        </AppLayout>
-      );
-    }
-
-    if (activeTab === 'settings') {
-      return (
-        <AppLayout activeTab="" {...commonLayoutProps} title="সেটিংস">
-          <SettingsView user={currentUser!} onSave={handleProfileUpdate} />
-        </AppLayout>
-      );
-    }
-
-    if (activeTab === 'practice') {
-      return (
-        <AppLayout activeTab={activeTab} {...commonLayoutProps} title="অনুশীলন">
-          <PracticeDashboard
-            history={examHistory}
-            onStartPractice={startCustomExam}
-            onNavigateToMock={() => setActiveTab('setup')}
-          />
-        </AppLayout>
-      );
-    }
-
-    if (activeTab === 'analysis') {
-      return (
-        <AppLayout
-          activeTab={activeTab}
-          {...commonLayoutProps}
-          title="এনালাইসিস"
-        >
-          <AnalysisView
-            history={examHistory}
-            onSubjectClick={(subject) => {
-              setSelectedSubjectReport(subject);
-              setActiveTab('subject_report');
-            }}
-          />
-        </AppLayout>
-      );
-    }
-
-    if (activeTab === 'complaint') {
-      return (
-        <AppLayout
-          activeTab={activeTab}
-          {...commonLayoutProps}
-          title="অভিযোগ ও পরামর্শ"
-        >
-          <ComplaintView />
-        </AppLayout>
-      );
-    }
-
-    if (activeTab === 'about') {
-      return (
-        <AppLayout activeTab="" {...commonLayoutProps} title="আমাদের সম্পর্কে">
-          <AboutUsView />
-        </AppLayout>
-      );
-    }
-
-    if (activeTab === 'subscription')
-      return (
-        <AppLayout activeTab="" {...commonLayoutProps} title="সাবস্ক্রিপশন">
-          <SubscriptionView />
-        </AppLayout>
-      );
-    if (activeTab === 'user_profile' && selectedUserProfile)
-      return (
-        <AppLayout
-          activeTab="leaderboard"
-          {...commonLayoutProps}
-          title="প্রোফাইল"
-        >
-          <UserProfileView
-            user={selectedUserProfile}
+            onTimeoutCancel={() => setAppState(AppState.IDLE)}
+            setAppState={setAppState}
+            navWarning={navWarning}
+            setNavWarning={setNavWarning}
+            confirmNavigation={confirmNavigation}
             currentUser={currentUser}
-            rank={0}
-            history={examHistory}
-            onBack={() => setActiveTab('leaderboard')}
+            handleTabChange={handleTabChange}
+            handleLogoutClick={handleLogoutClick}
+            toggleTheme={toggleTheme}
+            isDarkMode={theme === 'dark'}
           />
-        </AppLayout>
+          {isTimeoutModalOpen && (
+            <TimeoutModal
+              onReattempt={() => {
+                setIsTimeoutModalOpen(false);
+                setAppState(AppState.IDLE);
+                if (lastExamConfigRef.current)
+                  startExam(lastExamConfigRef.current);
+              }}
+              onCancel={() => setAppState(AppState.IDLE)}
+            />
+          )}
+        </>
       );
-    if (activeTab === 'subject_report' && selectedSubjectReport)
-      return (
-        <AppLayout activeTab="dashboard" {...commonLayoutProps} title="রিপোর্ট">
-          <SubjectReportView
-            subject={selectedSubjectReport}
-            history={examHistory}
-            onBack={() => setActiveTab('dashboard')}
-          />
-        </AppLayout>
-      );
-  }
+    }
 
-  // --- Active Exam States ---
-
-  if (appState === AppState.INSTRUCTIONS) {
-    if (examDetails) {
-      // If we have examDetails, it means we just fetched questions and are about to start.
-      // Show loading or skeleton while changing to ACTIVE
+    if (isEvaluating || appState === AppState.LOADING) {
       return (
         <AppLayout
           activeTab="dashboard"
           {...commonLayoutProps}
-          title="শুরু হচ্ছে..."
+          title="প্রসেসিং..."
         >
           <ResultSkeleton />
         </AppLayout>
       );
     }
 
-    // Otherwise show Pre-Fetch Instructions
-    if (pendingConfig) {
+    if (appState === AppState.COMPLETED) {
       return (
-        <AppLayout activeTab="setup" {...commonLayoutProps} title="নির্দেশাবলী">
-          <ExamInstructionsView
-            config={pendingConfig}
-            onStart={handleProceedToExam}
-            onBack={() => setAppState(AppState.IDLE)}
+        <AppLayout
+          activeTab="results"
+          onTabChange={handleTabChange}
+          onLogout={handleLogoutClick}
+          toggleTheme={toggleTheme}
+          isDarkMode={theme === 'dark'}
+          title="ফলাফল"
+          user={currentUser!}
+        >
+          <ResultView
+            questions={questions}
+            userAnswers={userAnswers}
+            timeTaken={timeTaken}
+            onRestart={() => {
+              setAppState(AppState.IDLE);
+              setIsReviewingHistory(false);
+            }}
+            isDarkMode={theme === 'dark'}
+            onToggleTheme={toggleTheme}
+            isHistoryMode={isReviewingHistory}
+            negativeMarking={examDetails?.negativeMarking}
+            submissionType={
+              isOmrMode ||
+              examHistory[examHistory.length - 1]?.submissionType === 'script'
+                ? 'script'
+                : 'digital'
+            }
+            onDownloadQuestionPaper={() =>
+              examDetails && printQuestionPaper(examDetails, questions)
+            }
+            onDownloadResultWithExplanations={() =>
+              examDetails &&
+              printResultWithExplanations(examDetails, questions, userAnswers)
+            }
           />
         </AppLayout>
       );
     }
-  }
 
-  if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
-    if (!examDetails) return null;
-    return (
-      <>
-        <ExamRunner
-          appState={appState}
-          examDetails={examDetails}
-          questions={questions}
-          userAnswers={userAnswers}
-          setUserAnswers={setUserAnswers}
-          flaggedQuestions={flaggedQuestions}
-          setFlaggedQuestions={setFlaggedQuestions}
-          timeLeft={timeLeft}
-          graceTimeLeft={graceTimeLeft}
-          isOmrMode={isOmrMode}
-          setIsOmrMode={setIsOmrMode}
-          selectedScript={selectedScript}
-          setSelectedScript={setSelectedScript}
-          onSubmit={handleExamSubmit}
-          onExit={() =>
-            setNavWarning({
-              isOpen: true,
-              targetTab: 'dashboard',
-              action: 'tab',
-            })
-          }
-          onTimeoutReattempt={() => {
-            setIsTimeoutModalOpen(false);
-            setAppState(AppState.IDLE);
-            if (lastExamConfigRef.current) startExam(lastExamConfigRef.current);
-          }}
-          onTimeoutCancel={() => setAppState(AppState.IDLE)}
-          setAppState={setAppState}
-          navWarning={navWarning}
-          setNavWarning={setNavWarning}
-          confirmNavigation={confirmNavigation}
-          currentUser={currentUser}
-          handleTabChange={handleTabChange}
-          handleLogoutClick={handleLogoutClick}
-          toggleTheme={toggleTheme}
-          isDarkMode={theme === 'dark'}
+    if (appState === AppState.ERROR) {
+      return (
+        <AppLayout activeTab="dashboard" {...commonLayoutProps} title="ত্রুটি">
+          <div className="flex flex-col items-center justify-center h-[60vh] text-center p-4">
+            <h2 className="text-2xl font-bold text-red-600 mb-2">
+              ত্রুটি হয়েছে
+            </h2>
+            <p className="text-neutral-600 dark:text-neutral-400 mb-6">
+              {errorDetails}
+            </p>
+            <button
+              onClick={() => setAppState(AppState.IDLE)}
+              className="px-6 py-2 bg-rose-600 text-white rounded-lg"
+            >
+              ফিরে যান
+            </button>
+          </div>
+        </AppLayout>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <>
+      {renderApp()}
+      {showStreakCelebration && (
+        <StreakCelebration
+          count={newStreakCount}
+          onComplete={() => setShowStreakCelebration(false)}
         />
-        {isTimeoutModalOpen && (
-          <TimeoutModal
-            onReattempt={() => {
-              setIsTimeoutModalOpen(false);
-              setAppState(AppState.IDLE);
-              if (lastExamConfigRef.current)
-                startExam(lastExamConfigRef.current);
-            }}
-            onCancel={() => setAppState(AppState.IDLE)}
-          />
-        )}
-      </>
-    );
-  }
-
-  if (isEvaluating || appState === AppState.LOADING) {
-    return (
-      <AppLayout
-        activeTab="dashboard"
-        {...commonLayoutProps}
-        title="প্রসেসিং..."
-      >
-        <ResultSkeleton />
-      </AppLayout>
-    );
-  }
-
-  if (appState === AppState.COMPLETED) {
-    return (
-      <AppLayout
-        activeTab="results"
-        onTabChange={handleTabChange}
-        onLogout={handleLogoutClick}
-        toggleTheme={toggleTheme}
-        isDarkMode={theme === 'dark'}
-        title="ফলাফল"
-        user={currentUser!}
-      >
-        <ResultView
-          questions={questions}
-          userAnswers={userAnswers}
-          timeTaken={timeTaken}
-          onRestart={() => {
-            setAppState(AppState.IDLE);
-            setIsReviewingHistory(false);
-          }}
-          isDarkMode={theme === 'dark'}
-          onToggleTheme={toggleTheme}
-          isHistoryMode={isReviewingHistory}
-          negativeMarking={examDetails?.negativeMarking}
-          submissionType={
-            isOmrMode ||
-            examHistory[examHistory.length - 1]?.submissionType === 'script'
-              ? 'script'
-              : 'digital'
-          }
-          onDownloadQuestionPaper={() =>
-            examDetails && printQuestionPaper(examDetails, questions)
-          }
-          onDownloadResultWithExplanations={() =>
-            examDetails &&
-            printResultWithExplanations(examDetails, questions, userAnswers)
-          }
-        />
-      </AppLayout>
-    );
-  }
-
-  if (appState === AppState.ERROR) {
-    return (
-      <AppLayout activeTab="dashboard" {...commonLayoutProps} title="ত্রুটি">
-        <div className="flex flex-col items-center justify-center h-[60vh] text-center p-4">
-          <h2 className="text-2xl font-bold text-red-600 mb-2">ত্রুটি হয়েছে</h2>
-          <p className="text-neutral-600 dark:text-neutral-400 mb-6">
-            {errorDetails}
-          </p>
-          <button
-            onClick={() => setAppState(AppState.IDLE)}
-            className="px-6 py-2 bg-rose-600 text-white rounded-lg"
-          >
-            ফিরে যান
-          </button>
-        </div>
-      </AppLayout>
-    );
-  }
-
-  return null;
+      )}
+    </>
+  );
 }

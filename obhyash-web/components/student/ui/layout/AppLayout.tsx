@@ -238,26 +238,41 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               {/* Streak Icon */}
               <motion.button
                 whileTap={{ scale: 0.9 }}
-                className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 bg-orange-50 dark:bg-orange-900/10 rounded-full border border-orange-100 dark:border-orange-900/20 group cursor-pointer transition-all hover:border-orange-200 hover:bg-orange-100/50 dark:hover:bg-orange-900/20"
+                className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 bg-orange-50 dark:bg-orange-900/10 rounded-full border border-orange-100 dark:border-orange-900/20 group cursor-pointer transition-all hover:border-orange-200 hover:bg-orange-100/50 dark:hover:bg-orange-900/20 shadow-sm"
                 title="Daily Streak"
                 onClick={() => {
                   // Optional: Add logic here if needed (e.g. show streak details)
                 }}
               >
-                <motion.svg
-                  initial={{ scale: 1 }}
-                  whileHover={{ rotate: [0, -10, 10, -10, 0] }}
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-4.5 h-4.5 md:w-5 md:h-5 text-orange-500 transition-transform"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.177 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
-                    clipRule="evenodd"
-                  />
-                </motion.svg>
+                <div className="relative">
+                  <motion.svg
+                    initial={{ scale: 1 }}
+                    whileHover={{ rotate: [0, -10, 10, -10, 0] }}
+                    animate={{
+                      scale: [1, 1.1, 1],
+                      filter: [
+                        'drop-shadow(0 0 0px #f97316)',
+                        'drop-shadow(0 0 4px #f97316)',
+                        'drop-shadow(0 0 0px #f97316)',
+                      ],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-5 h-5 md:w-5 md:h-5 text-orange-500 transition-transform"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.177 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+                      clipRule="evenodd"
+                    />
+                  </motion.svg>
+                </div>
                 <span className="text-xs md:text-sm font-bold text-orange-600 dark:text-orange-400 tabular-nums">
                   {user?.streakCount || 0}
                 </span>
@@ -322,7 +337,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                           setIsProfileOpen(false);
                           onTabChange('profile');
                         }}
-                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-3 py-1.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
                       >
                         <User className="w-4 h-4 text-neutral-400" />
                         আমার প্রোফাইল
@@ -332,7 +347,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                           setIsProfileOpen(false);
                           onTabChange('subscription');
                         }}
-                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-3 py-1.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
                       >
                         <CreditCard className="w-4 h-4 text-neutral-400" />
                         সাবস্ক্রিপশন ও বিলিং
@@ -342,7 +357,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                           setIsProfileOpen(false);
                           onTabChange('settings');
                         }}
-                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-3 py-1.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
                       >
                         <Settings className="w-4 h-4 text-neutral-400" />
                         সেটিংস
@@ -353,7 +368,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                           setIsProfileOpen(false);
                           onTabChange('about');
                         }}
-                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-3 py-1.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
                       >
                         <Info className="w-4 h-4 text-neutral-400" />
                         আমাদের সম্পর্কে
@@ -363,7 +378,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                           setIsProfileOpen(false);
                           onTabChange('complaint');
                         }}
-                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
+                        className="w-full text-left px-3 py-1.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
                       >
                         <MessageSquare className="w-4 h-4 text-neutral-400" />
                         অভিযোগ ও পরামর্শ

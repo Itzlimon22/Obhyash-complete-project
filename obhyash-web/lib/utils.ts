@@ -29,6 +29,9 @@ export const formatDate = (isoString: string): string => {
 };
 
 export const calculateLevel = (xp: number): string => {
-  const level = 1 + Math.floor(xp / 1000);
-  return `Level ${level}`;
+  if (xp >= 5000) return 'Legend';
+  if (xp >= 3500) return 'Titan';
+  if (xp >= 2000) return 'Warrior';
+  if (xp >= 800) return 'Scout';
+  return 'Rookie';
 };

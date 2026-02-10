@@ -33,6 +33,12 @@ interface UserDatabaseRow {
   ssc_passing_year?: string | null;
   optional_subject?: string | null;
 
+  // Gamification/Progress
+  xp?: number | null;
+  level?: string | null;
+  streak?: number | null;
+  exams_taken?: number | null;
+
   // System
   updated_at: string;
 }
@@ -54,7 +60,9 @@ const mapProfileToDbRow = (user: UserProfile): UserDatabaseRow => {
     address: user.address || null,
 
     avatar_url:
-      user.avatarUrl || (user as UserProfile & { avatar_url?: string }).avatar_url || null,
+      user.avatarUrl ||
+      (user as UserProfile & { avatar_url?: string }).avatar_url ||
+      null,
     avatar_color: user.avatarColor || null,
 
     institute: user.institute || null,
@@ -68,6 +76,12 @@ const mapProfileToDbRow = (user: UserProfile): UserDatabaseRow => {
     ssc_board: user.ssc_board || null,
     ssc_passing_year: user.ssc_passing_year || null,
     optional_subject: user.optional_subject || null,
+
+    // Gamification
+    xp: user.xp || 0,
+    level: user.level || 'Rookie',
+    streak: user.streakCount || 0,
+    exams_taken: user.examsTaken || 0,
 
     updated_at: new Date().toISOString(),
   };
@@ -118,7 +132,7 @@ export const getUserProfile = async (
           createdAt: data.created_at || authCreatedAt,
 
           name: data.name || 'User',
-          level: data.level || 'Beginner',
+          level: data.level || 'Rookie',
           // No bio in DB
           streakCount: data.streak || data.streak_count || 0, // Handle potential DB column variations for read
           lastStreakDate: data.last_streak_date || null,
