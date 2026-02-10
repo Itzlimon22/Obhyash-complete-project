@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
 import { FilterState } from '@/components/admin/user-management/AdvancedFilterBar';
 import { User, UserRole } from '@/lib/types';
+import { getErrorMessage } from '@/lib/error-utils';
 
 /**
  * Custom hook for managing user data in the Admin Panel.
@@ -115,7 +116,10 @@ export function useUserManagement() {
         subscription: u.subscription
           ? {
               plan: u.subscription.plan as 'Free' | 'Pro' | 'Enterprise',
-              status: u.subscription.status as 'Active' | 'Past Due' | 'Canceled',
+              status: u.subscription.status as
+                | 'Active'
+                | 'Past Due'
+                | 'Canceled',
               expiry: u.subscription.expiry,
             }
           : {
@@ -140,7 +144,7 @@ export function useUserManagement() {
       if (showToast) toast.success('Users refreshed successfully');
     } catch (error) {
       console.error('Failed to fetch users:', error);
-      toast.error('Failed to load users');
+      toast.error(getErrorMessage(error));
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -250,7 +254,7 @@ export function useUserManagement() {
       fetchUsers();
     } catch (error) {
       console.error('Failed to update status:', error);
-      toast.error('Failed to update user status');
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -269,7 +273,7 @@ export function useUserManagement() {
       fetchUsers();
     } catch (error) {
       console.error('Failed to update role:', error);
-      toast.error('Failed to update user role');
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -291,7 +295,7 @@ export function useUserManagement() {
       fetchUsers();
     } catch (error) {
       console.error('Failed to delete user:', error);
-      toast.error('Failed to delete user');
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -317,7 +321,7 @@ export function useUserManagement() {
       fetchUsers();
     } catch (error) {
       console.error('Failed to update subscription:', error);
-      toast.error('Failed to update subscription');
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -365,7 +369,10 @@ export function useUserManagement() {
 
     try {
       const query = supabase.from('users');
-      let payload: Record<string, string | { plan: string | undefined; status: string }> = {};
+      let payload: Record<
+        string,
+        string | { plan: string | undefined; status: string }
+      > = {};
 
       if (action === 'activate') payload = { status: 'Active' };
       if (action === 'deactivate') payload = { status: 'Inactive' };
@@ -396,7 +403,7 @@ export function useUserManagement() {
       fetchUsers();
     } catch (error) {
       console.error('Bulk action failed:', error);
-      toast.error('Failed to execute bulk action');
+      toast.error(getErrorMessage(error));
     }
   };
 

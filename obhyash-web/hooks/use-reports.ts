@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { Report, Question, ReportStatus } from '@/lib/types';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/error-utils';
 
 interface ReportRow {
   id: string;
@@ -62,9 +63,9 @@ export const useReports = () => {
           (r) => r.status === 'Pending' && r.severity === 'High',
         ).length,
       });
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to load reports');
+    } catch (error) {
+      console.error('Failed to fetch reports:', error);
+      toast.error(getErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
@@ -114,9 +115,9 @@ export const useReports = () => {
 
       await fetchReports(); // Refresh
       return true;
-    } catch (err) {
-      console.error(err);
-      toast.error('Action failed');
+    } catch (error) {
+      console.error('Action failed:', error);
+      toast.error(getErrorMessage(error));
       return false;
     }
   };

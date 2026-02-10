@@ -22,6 +22,7 @@ import {
 import Logo from '@/components/student/ui/Logo';
 import SocialLoginButton from '@/components/auth/SocialLoginButton';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/error-utils';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -187,14 +188,7 @@ export default function SignupPage() {
 
         if (profileError) {
           console.error('Profile creation error:', profileError);
-          // Don't throw here if auth succeeded, just log it.
-          // The auth trigger might have handled it, or we can handle it on dashboard.
-          toast.error(
-            'প্রোফাইল তৈরিতে সমস্যা হয়েছে, তবে অ্যাকাউন্ট তৈরি হয়েছে।',
-            {
-              description: profileError.message,
-            },
-          );
+          toast.error(getErrorMessage(profileError));
         }
 
         // If Auto-Confirm is enabled in Supabase, we get a session immediately.

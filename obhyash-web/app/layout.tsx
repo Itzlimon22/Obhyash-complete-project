@@ -64,7 +64,19 @@ export default function RootLayout({
           {children}
 
           {/* ✅ Render the Toast Container (Overlay) */}
-          <Toaster position="top-right" richColors />
+          <Toaster
+            position="top-center"
+            richColors
+            expand={true}
+            closeButton
+            theme="light"
+            toastOptions={{
+              className: 'font-anek',
+              style: {
+                borderRadius: '1rem',
+              },
+            }}
+          />
         </AuthProvider>
       </body>
     </html>

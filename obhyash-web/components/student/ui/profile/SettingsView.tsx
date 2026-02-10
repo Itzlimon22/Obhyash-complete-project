@@ -10,6 +10,7 @@ import UserAvatar from '../common/UserAvatar';
 import { useAuth } from '@/components/auth/AuthProvider';
 
 import { uploadAvatar } from '@/services/storage-service';
+import { getErrorMessage } from '@/lib/error-utils';
 
 interface SettingsViewProps {
   user: UserProfile;
@@ -79,18 +80,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
       // Redirect happens automatically
     } catch (error: unknown) {
       console.error('Linking error:', error);
-      const errObj = error instanceof Error ? error : null;
-      const errCode = (error as Record<string, unknown>)?.code;
-      if (
-        errObj?.message?.includes('already linked') ||
-        errCode === 'identity_already_exists'
-      ) {
-        toast.error(
-          'এই গুগল অ্যাকাউন্টটি ইতিমধ্যেই অন্য একটি আইডির সাথে যুক্ত।',
-        );
-      } else {
-        toast.error('গুগল অ্যাকাউন্ট লিংক করতে সমস্যা হয়েছে।');
-      }
+      toast.error(getErrorMessage(error));
       setIsLinking(false);
     }
   };
@@ -149,13 +139,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
       });
     } catch (error: unknown) {
       console.error('Upload Error:', error);
-      toast.error(
-        `ছবি আপলোড করতে সমস্যা হয়েছে: ${error instanceof Error ? error.message : 'Error'}`,
-        {
-          position: 'top-center',
-          className: 'font-bengali',
-        },
-      );
+      toast.error(getErrorMessage(error));
     } finally {
       setUploading(false);
     }
@@ -275,9 +259,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
       }));
     } catch (error: any) {
       console.error('Save Error:', error);
-      toast.error(`সেভ করতে সমস্যা হয়েছে: ${error.message}`, {
-        position: 'top-center',
-      });
+      toast.error(getErrorMessage(error));
     }
   };
 

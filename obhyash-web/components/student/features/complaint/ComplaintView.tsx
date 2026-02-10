@@ -18,6 +18,7 @@ import {
   RefreshCcw,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/error-utils';
 import { submitComplaint, getComplaints } from '@/services/complaint-service';
 import { ComplaintType, AppComplaint, ComplaintStatus } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -140,16 +141,22 @@ export const ComplaintView: React.FC = () => {
     }
 
     setIsLoading(true);
-    const result = await submitComplaint(selectedType, description);
-    setIsLoading(false);
-
-    if (result.success) {
-      setIsSuccess(true);
-      toast.success('আপনার বার্তা আমরা পেয়েছি! ধন্যবাদ। 🚀');
-    } else {
-      toast.error(
-        result.error || 'কিছু ভুল হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
-      );
+    try {
+      const result = await submitComplaint(selectedType, description);
+      if (result.success) {
+        setIsSuccess(true);
+        toast.success('আপনার বার্তা আমরা পেয়েছি! ধন্যবাদ। 🚀');
+      } else {
+        // If result.success is false, it's an application-level error returned by the service
+        toast.error(
+          result.error || 'কিছু ভুল হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+        );
+      }
+    } catch (error) {
+      console.error('Error submitting complaint:', error);
+      toast.error(getErrorMessage(error));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -248,8 +255,8 @@ export const ComplaintView: React.FC = () => {
                 <span className="text-indigo-200">আমরা শুনছি।</span>
               </h1>
               <p className="text-indigo-100 text-lg md:text-xl font-medium leading-relaxed max-w-lg">
-                &apos;অভ্যাস&apos; প্ল্যাটফর্মকে আরও উন্নত করতে আপনার মতামত বা অভিযোগ
-                আমাদের জানান।
+                &apos;অভ্যাস&apos; প্ল্যাটফর্মকে আরও উন্নত করতে আপনার মতামত বা
+                অভিযোগ আমাদের জানান।
               </p>
             </div>
           </div>

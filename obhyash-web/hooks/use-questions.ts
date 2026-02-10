@@ -9,6 +9,7 @@ import {
 } from '@/services/database';
 import { Question, QuestionStatus } from '@/lib/types';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/error-utils';
 
 export interface UseQuestionsOptions {
   initialPage?: number;
@@ -54,7 +55,7 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
       setTotalPages(response.totalPages);
     } catch (err) {
       console.error('Fetch error:', err);
-      toast.error('Failed to load questions');
+      toast.error(getErrorMessage(err));
       setQuestions([]);
     } finally {
       setIsLoading(false);
@@ -134,7 +135,7 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
           await fetchQuestions();
           return true;
         } else {
-          toast.error(result.error || 'আপডেট ব্যর্থ হয়েছে');
+          toast.error(getErrorMessage(result.error));
           return false;
         }
       } else {
@@ -145,13 +146,13 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
           await fetchQuestions();
           return true;
         } else {
-          toast.error(result.error || 'প্রশ্ন তৈরি ব্যর্থ হয়েছে');
+          toast.error(getErrorMessage(result.error));
           return false;
         }
       }
     } catch (err) {
       console.error(err);
-      toast.error('প্রশ্ন সংরক্ষণ করা যায়নি');
+      toast.error(getErrorMessage(err));
       return false;
     }
   };
@@ -164,10 +165,10 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
         setTotalCount((prev) => prev - 1);
         toast.success('প্রশ্নটি মুছে ফেলা হয়েছে');
       } else {
-        toast.error(result.error || 'মুছে ফেলা যায়নি');
+        toast.error(getErrorMessage(result.error));
       }
-    } catch {
-      toast.error('মুছে ফেলা যায়নি');
+    } catch (err) {
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -184,10 +185,10 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
         setSelectedQuestions(new Set());
         await fetchQuestions();
       } else {
-        toast.error(result.error || 'মুছে ফেলা যায়নি');
+        toast.error(getErrorMessage(result.error));
       }
-    } catch {
-      toast.error('মুছে ফেলা যায়নি');
+    } catch (err) {
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -200,10 +201,10 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
         );
         toast.success(`স্ট্যাটাস পরিবর্তন: ${status}`);
       } else {
-        toast.error(result.error || 'স্ট্যাটাস আপডেট ব্যর্থ হয়েছে');
+        toast.error(getErrorMessage(result.error));
       }
-    } catch {
-      toast.error('স্ট্যাটাস আপডেট ব্যর্থ হয়েছে');
+    } catch (err) {
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -225,10 +226,10 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
         setSelectedQuestions(new Set());
         await fetchQuestions();
       } else {
-        toast.error(result.error || 'স্ট্যাটাস আপডেট ব্যর্থ হয়েছে');
+        toast.error(getErrorMessage(result.error));
       }
-    } catch {
-      toast.error('স্ট্যাটাস আপডেট ব্যর্থ হয়েছে');
+    } catch (err) {
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -248,7 +249,7 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
       }
     } catch (err) {
       console.error(err);
-      toast.error('ইম্পোর্ট ব্যর্থ হয়েছে');
+      toast.error(getErrorMessage(err));
       return false;
     }
   };

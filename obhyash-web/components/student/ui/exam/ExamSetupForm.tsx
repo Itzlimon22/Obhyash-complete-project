@@ -10,6 +10,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/error-utils';
 
 import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -120,8 +121,8 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           setAvailableSubjects(formattedSubjects);
         }
       } catch (error) {
-        console.error('Failed to fetch subjects:', error);
-        toast.error('বিষয় তালিকা লোড করা যাচ্ছে না');
+        console.error('Error loading subjects:', error);
+        toast.error(getErrorMessage(error));
       } finally {
         setIsFetchingData(false);
       }
@@ -148,8 +149,8 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         setAvailableTopics([]);
         setSelectedTopics([]);
       } catch (error) {
-        console.error('Failed to fetch chapters:', error);
-        toast.error('অধ্যায় লোড করা যাচ্ছে না');
+        console.error('Error loading chapters:', error);
+        toast.error(getErrorMessage(error));
       }
     };
 

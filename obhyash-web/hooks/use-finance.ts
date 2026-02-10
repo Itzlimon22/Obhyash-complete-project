@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { Transaction, SubscriptionPlan } from '@/lib/types';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/error-utils';
 
 interface FinanceStats {
   revenue: number;
@@ -59,21 +60,25 @@ export const useFinance = () => {
         };
       }
 
-      const mappedTxs: Transaction[] = (txData || []).map((t: SupabaseTransaction) => ({
-        id: t.id,
-        user: {
-          name: t.user?.full_name || 'Unknown',
-          email: t.user?.email || '',
-          initial: (t.user?.full_name?.[0] || '?').toUpperCase(),
-          color: 'bg-brand-500', // You can randomize this if you want
-        },
-        plan: t.plan_name,
-        amount: t.amount,
-        status: (['Completed', 'Pending', 'Failed'].includes(t.status) ? t.status : 'Pending') as 'Completed' | 'Pending' | 'Failed',
-        date: new Date(t.date).toLocaleDateString(),
-        invoiceId: t.invoice_id || 'N/A',
-        method: t.method,
-      }));
+      const mappedTxs: Transaction[] = (txData || []).map(
+        (t: SupabaseTransaction) => ({
+          id: t.id,
+          user: {
+            name: t.user?.full_name || 'Unknown',
+            email: t.user?.email || '',
+            initial: (t.user?.full_name?.[0] || '?').toUpperCase(),
+            color: 'bg-brand-500', // You can randomize this if you want
+          },
+          plan: t.plan_name,
+          amount: t.amount,
+          status: (['Completed', 'Pending', 'Failed'].includes(t.status)
+            ? t.status
+            : 'Pending') as 'Completed' | 'Pending' | 'Failed',
+          date: new Date(t.date).toLocaleDateString(),
+          invoiceId: t.invoice_id || 'N/A',
+          method: t.method,
+        }),
+      );
 
       // 4. Calculate Basic Stats (Client-side for now)
       const totalRevenue = mappedTxs.reduce(
@@ -93,9 +98,9 @@ export const useFinance = () => {
         active: mappedTxs.length, // Just a count for demo
         successRate: rate.toFixed(1),
       });
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to load finance data');
+    } catch (error) {
+      console.error('Failed to fetch finance data:', error);
+      toast.error(getErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
@@ -116,9 +121,9 @@ export const useFinance = () => {
       toast.success('Plan created successfully');
       await fetchData(); // Refresh
       return true;
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to create plan');
+    } catch (error) {
+      console.error('Failed to create plan:', error);
+      toast.error(getErrorMessage(error));
       return false;
     }
   };

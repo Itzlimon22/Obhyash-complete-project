@@ -5,6 +5,7 @@ import { uploadAvatar } from '@/services/storage-service';
 import { updateUserProfile } from '@/services/user-service';
 import { toast } from 'sonner';
 import UserAvatar from '../../common/UserAvatar';
+import { getErrorMessage } from '@/lib/error-utils';
 
 interface ProfileHeaderProps {
   user: UserProfile;
@@ -43,7 +44,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEdit }) => {
       }
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      toast.error('ছবি আপলোড করতে সমস্যা হয়েছে।');
+      toast.error(getErrorMessage(error));
       // Revert preview on error
       setAvatarPreview(user.avatarUrl);
     } finally {

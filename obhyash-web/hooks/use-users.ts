@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { User, UserRole, UserStatus } from '@/lib/types';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/lib/error-utils';
 
 // Define SubPlan type locally
 type SubPlan = 'Free' | 'Pro' | 'Enterprise';
@@ -110,9 +111,9 @@ export const useUsers = () => {
       }));
 
       setUsers(mappedUsers);
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to load users');
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+      toast.error(getErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
@@ -169,9 +170,9 @@ export const useUsers = () => {
 
       await fetchUsers(); // Refresh list
       return true;
-    } catch (err) {
-      console.error(err);
-      toast.error('Operation failed');
+    } catch (error) {
+      console.error('Operation failed:', error);
+      toast.error(getErrorMessage(error));
       return false;
     }
   };
@@ -186,7 +187,7 @@ export const useUsers = () => {
       toast.success('User deleted');
     } catch (err) {
       console.error(err);
-      toast.error('Failed to delete user');
+      toast.error(getErrorMessage(err));
     }
   };
 
