@@ -9,6 +9,7 @@ import { UserProfile } from '@/lib/types';
 import LandingPage from '@/components/landing/LandingPage';
 import StudentRoot from '@/components/student/StudentRoot';
 import InitialLoader from '@/components/student/ui/InitialLoader';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 export default function Home() {
   const router = useRouter();
@@ -20,52 +21,30 @@ export default function Home() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // --- INITIALIZATION ---
+  // 2. Auth Check - Now handled by AuthProvider, but we keep the initial check
+  // for faster first-paint on refresh if needed, however, useAuth is preferred.
+  // We'll trust the AuthProvider for the main state but keep init for theme/mounting.
   useEffect(() => {
     setMounted(true);
 
-    const init = async () => {
-      // 1. Theme Check
-      if (typeof window !== 'undefined') {
-        const storedTheme = localStorage.getItem('theme');
-        // User Request: Default is light. Dark only if explicitly toggled.
-        const shouldBeDark = storedTheme === 'dark';
-
-        setIsDarkMode(shouldBeDark);
-        if (shouldBeDark) document.documentElement.classList.add('dark');
-        else document.documentElement.classList.remove('dark');
-      }
-
-      // 2. Auth Check
-      try {
-        // We use 'me' to get the current authenticated user from Supabase + DB
-        // If not logged in, this usually returns a mock guest or null depending on implementation.
-        // But getUserProfile('me') in database.ts falls back to MOCK_USERS if auth fails?
-        // Let's verify:
-        // getUserProfile('me') -> checks supabase.auth.getUser(). If user, gets from DB.
-        // If no user, log warns and falls back to local storage or Mock.
-        // Real logic: Check Supabase session first.
-        const supabase = createClient();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (user) {
-          const profile = await getUserProfile('me');
-          setCurrentUser(profile);
-        } else {
-          // Not logged in natively.
-          setCurrentUser(null);
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        setCurrentUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    init();
+    if (typeof window !== 'undefined') {
+      const storedTheme = localStorage.getItem('theme');
+      const shouldBeDark = storedTheme === 'dark';
+      setIsDarkMode(shouldBeDark);
+      if (shouldBeDark) document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    }
   }, []);
+
+  // Sync auth state from AuthProvider
+  const { profile, loading: authLoading } = useAuth();
+  
+  useEffect(() => {
+    if (!authLoading) {
+      setCurrentUser(profile);
+      setLoading(false);
+    }
+  }, [profile, authLoading]);
 
   const toggleTheme = () => {
     const newMode = !isDarkMode;

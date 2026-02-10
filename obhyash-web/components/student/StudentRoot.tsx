@@ -167,40 +167,45 @@ export default function StudentRoot({
     if (initialUser) setCurrentUser(initialUser);
   }, [initialUser]);
 
-  // Streak System Check
+  // Streak System Check - Consolidated with initial load logic
   useEffect(() => {
-    const handleStreak = async () => {
-      if (!currentUser) return;
-      const { checkAndUpdateStreak } =
-        await import('@/services/streak-service');
-      const updatedUser = await checkAndUpdateStreak(currentUser);
-      if (updatedUser) {
-        // If streak incremented, show celebration
-        if ((updatedUser.streakCount || 0) > (currentUser.streakCount || 0)) {
-          setNewStreakCount(updatedUser.streakCount || 0);
-          setShowStreakCelebration(true);
-        }
-        setCurrentUser(updatedUser);
-      }
-    };
-    handleStreak();
-  }, [currentUser?.id]);
+    let isMounted = true;
 
-  // Fetch Exam History from Database
-  useEffect(() => {
-    const fetchHistory = async () => {
-      // We only fetch if we have a user (though RLS handles security, good to only try if logged in)
-      if (initialUser || currentUser) {
-        // Import dynamically to avoid circular issues if any, or just use the import at top
+    const handleStreakAndHistory = async () => {
+      if (!currentUser?.id) return;
+
+      try {
+        // 1. Streak Check
+        const { checkAndUpdateStreak } =
+          await import('@/services/streak-service');
+        const updatedUser = await checkAndUpdateStreak(currentUser);
+
+        if (updatedUser && isMounted) {
+          // If streak incremented, show celebration
+          if ((updatedUser.streakCount || 0) > (currentUser.streakCount || 0)) {
+            setNewStreakCount(updatedUser.streakCount || 0);
+            setShowStreakCelebration(true);
+          }
+          setCurrentUser(updatedUser);
+        }
+
+        // 2. Fetch History
         const { getExamHistory } = await import('@/services/database');
         const dbHistory = await getExamHistory();
-        if (dbHistory && dbHistory.length > 0) {
+        if (dbHistory && dbHistory.length > 0 && isMounted) {
           setExamHistory(dbHistory);
         }
+      } catch (err) {
+        console.error('Error in streak/history sync:', err);
       }
     };
-    fetchHistory();
-  }, [initialUser, currentUser, setExamHistory]);
+
+    handleStreakAndHistory();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentUser?.id]);
 
   // Navigation State
   const [isReviewingHistory, setIsReviewingHistory] = useState(false);
@@ -350,6 +355,7 @@ export default function StudentRoot({
         return (
           <AppLayout activeTab={activeTab} {...commonLayoutProps}>
             <Dashboard
+              user={currentUser}
               onMockExamClick={() => setActiveTab('setup')}
               onHistoryClick={() => setActiveTab('history')}
               onSubjectClick={(subject) => {

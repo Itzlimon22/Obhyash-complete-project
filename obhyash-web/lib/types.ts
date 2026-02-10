@@ -144,6 +144,7 @@ export interface ExamHistory {
 
 export interface ExamResult {
   id: string;
+  user_id?: string; // Optional user association
 
   // Exam Info
   subject: string;

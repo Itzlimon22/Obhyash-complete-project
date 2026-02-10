@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import SubjectStat from './SubjectStat';
 import { celebration } from '@/lib/confetti';
 import { toast } from 'sonner';
-import { ExamResult } from 'lib/types';
-import { MOCK_USERS } from './leaderboard/leaderboardData'; // Removed direct usage, but checking if other imports are needed or if we can delete the line.
+import { ExamResult, UserProfile } from '@/lib/types';
 // Actually the previous step removed usage. So I can delete this line.
 // But wait, replace_file_content cannot delete lines easily without replacement.
 // I will replace it with empty string or comment.
@@ -24,6 +23,7 @@ interface LeaderboardUser {
 }
 
 interface DashboardProps {
+  user: UserProfile;
   onMockExamClick: () => void;
   onHistoryClick: () => void;
   onSubjectClick: (subject: string) => void;
@@ -32,6 +32,7 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
+  user,
   onMockExamClick,
   onHistoryClick,
   onSubjectClick,
@@ -43,23 +44,18 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   React.useEffect(() => {
     const fetchStats = async () => {
-      const { getUserProfile, getSubjects } =
-        await import('@/services/database');
+      if (!user) return;
+      const { getSubjects } = await import('@/services/database');
       try {
-        const user = await getUserProfile('me');
         // Fetch subjects based on user's stream/group
         const subjects = await getSubjects(
-          user?.division || undefined,
-          user?.stream || undefined,
-          user?.optional_subject || undefined,
+          user.division || undefined,
+          user.stream || undefined,
+          user.optional_subject || undefined,
         );
 
         // Calculate stats for each subject
         const stats = subjects.map((sub) => {
-          // Find matching history items
-          // We match by subject name (English/Bangla name) or ID
-          // The history item 'subject' field usually contains the name like "Bangla", "Physics" etc.
-          // normalize to lowercase for comparison
           const subName = sub.name.toLowerCase();
           const subId = sub.id.toLowerCase();
 
@@ -70,9 +66,6 @@ const Dashboard: React.FC<DashboardProps> = ({
 
           history.forEach((exam) => {
             const hSub = exam.subject.toLowerCase();
-            // Check if exam subject matches (contains) the subject name
-            // e.g. "Physics 1st Paper" contains "Physics"
-            // Also check mapped names if necessary
             const isMatch =
               hSub.includes(subName) ||
               hSub.includes(subId) ||
@@ -106,7 +99,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     };
 
     fetchStats();
-  }, [history]);
+  }, [history, user]);
 
   // Leaderboard Preview Logic
   const [topUser, setTopUser] = React.useState<LeaderboardUser | null>(null);
@@ -118,33 +111,32 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   React.useEffect(() => {
     const fetchLeaderboardStats = async () => {
-      const { getLeaderboardUsers, getUserProfile } =
-        await import('@/services/database');
+      if (!user) return;
+      const { getLeaderboardUsers } = await import('@/services/database');
 
       try {
-        const currentUser = await getUserProfile('me');
-        if (!currentUser) return;
-
-        const level = currentUser.level || 'Level 1';
+        const level = user.level || 'Level 1';
         const users = await getLeaderboardUsers(level);
 
         const sorted = [...users].sort((a, b) => b.xp - a.xp);
-        const rank = sorted.findIndex((u) => u.id === currentUser.id) + 1;
+        const rank = sorted.findIndex((u) => u.id === user.id) + 49; // Mock slightly boosted rank display offset if wanted, or just exact rank
+        // Real rank
+        const realRank = sorted.findIndex((u) => u.id === user.id) + 1;
+
         const top = sorted[0];
-        const diff =
-          top && currentUser ? Math.max(0, top.xp - currentUser.xp) : 0;
+        const diff = top ? Math.max(0, top.xp - user.xp) : 0;
 
         // Rank up celebration
-        if (prevRankRef.current > 0 && rank < prevRankRef.current) {
+        if (prevRankRef.current > 0 && realRank < prevRankRef.current) {
           celebration.achievement();
           toast.success('অভিনন্দন! আপনার র‍্যাংক উন্নত হয়েছে!', {
-            description: `আপনি এখন #${rank} স্থানে আছেন।`,
+            description: `আপনি এখন #${realRank} স্থানে আছেন।`,
           });
         }
-        prevRankRef.current = rank;
+        prevRankRef.current = realRank;
 
         setTopUser(top);
-        setUserRank(rank);
+        setUserRank(realRank);
         setTotalUsers(sorted.length);
         setXpDiff(diff);
       } catch (e) {
@@ -153,7 +145,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     };
 
     fetchLeaderboardStats();
-  }, []);
+  }, [user]);
 
   return (
     <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">

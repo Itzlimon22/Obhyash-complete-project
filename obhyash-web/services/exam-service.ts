@@ -28,6 +28,7 @@ interface QuestionDbRow {
 
 interface ExamResultDbRow {
   id: string;
+  user_id?: string;
   subject: string;
   subject_label?: string;
   exam_type?: string;
@@ -292,6 +293,7 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
 const mapDbResultToExamResult = (data: ExamResultDbRow): ExamResult => {
   return {
     id: data.id,
+    user_id: data.user_id,
     subject: data.subject,
     subjectLabel: data.subject_label || data.subject, // Handle potential DB naming
     examType: data.exam_type,

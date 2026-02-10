@@ -31,13 +31,25 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
   useEffect(() => {
     let isMounted = true;
     const fetchAnalytics = async () => {
-      setIsLoading(true);
+      // Find a user ID from history if user is not in state yet
+      // This is a backup if the direct auth getUser() is slow
+      let userId = '';
+
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (user && isMounted) {
-          const data = await getOverallAnalytics(user.id, timeFilter);
+        setIsLoading(true);
+        if (history && history.length > 0) {
+          userId = history[0].user_id || '';
+        }
+
+        if (!userId) {
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+          userId = user?.id || '';
+        }
+
+        if (userId && isMounted) {
+          const data = await getOverallAnalytics(userId, timeFilter);
           if (isMounted) setAnalytics(data);
         }
       } catch (e) {
@@ -60,6 +72,16 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
   };
 
   // Check if we have no data
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-6 animate-pulse">
+        <div className="w-20 h-20 bg-neutral-200 dark:bg-neutral-800 rounded-full mb-4"></div>
+        <div className="h-6 w-48 bg-neutral-200 dark:bg-neutral-800 rounded mb-2"></div>
+        <div className="h-4 w-64 bg-neutral-100 dark:bg-neutral-900 rounded"></div>
+      </div>
+    );
+  }
+
   if (!analytics || analytics.totalExams === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-6 animate-fade-in">

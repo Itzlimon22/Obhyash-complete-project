@@ -59,30 +59,32 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    let isMounted = true;
+
     const initializeAuth = async () => {
       try {
-        // 1. Get current user (server-validated, not from local storage)
+        // 1. Get current user (server-validated)
         const {
           data: { user: currentUser },
+          error: authError,
         } = await supabase.auth.getUser();
 
-        if (currentUser) {
-          setUser(currentUser);
+        if (authError) {
+          console.error('Auth check error:', authError);
+        }
 
+        if (currentUser && isMounted) {
+          setUser(currentUser);
           // 2. Fetch Profile
           const userProfile = await fetchProfile(currentUser.id);
-
-          if (userProfile) {
+          if (userProfile && isMounted) {
             setProfile(userProfile);
           }
-        } else {
-          setUser(null);
-          setProfile(null);
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
@@ -95,24 +97,34 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       // console.log('Auth state changed:', event);
 
       if (session?.user) {
-        setUser(session.user);
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (isMounted) setUser(session.user);
+
+        // Refresh profile on specific events
+        if (
+          event === 'SIGNED_IN' ||
+          event === 'TOKEN_REFRESHED' ||
+          event === 'USER_UPDATED'
+        ) {
           const userProfile = await fetchProfile(session.user.id);
-          if (userProfile) {
+          if (userProfile && isMounted) {
             setProfile(userProfile);
           }
         }
       } else {
-        setUser(null);
-        setProfile(null);
+        if (isMounted) {
+          setUser(null);
+          setProfile(null);
+        }
         if (event === 'SIGNED_OUT') {
           router.push('/login');
         }
       }
-      setLoading(false);
+
+      if (isMounted) setLoading(false);
     });
 
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
     };
   }, [supabase, router]);
