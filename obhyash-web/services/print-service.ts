@@ -539,95 +539,172 @@ export const printInvoice = (invoice: Invoice, user: UserProfile) => {
     <html lang="en">
     <head>
       <meta charset="UTF-8">
-      <title>Invoice - ${invoice.id}</title>
+      <title>Payment Slip - ${invoice.id}</title>
+      <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
       <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; line-height: 1.6; }
-        .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); }
-        .header { display: flex; justify-content: space-between; margin-bottom: 40px; }
-        .logo { font-size: 28px; font-weight: bold; color: #4f46e5; }
-        .company-info { text-align: right; font-size: 12px; color: #666; }
-        .invoice-details { margin-bottom: 30px; display: flex; justify-content: space-between; }
-        .bill-to { font-size: 14px; }
+        body { font-family: 'Inter', sans-serif; padding: 40px; color: #1f2937; line-height: 1.5; background: #f3f4f6; }
+        .invoice-container { max-width: 800px; margin: auto; background: #fff; padding: 0; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); position: relative; overflow: hidden; }
+        
+        /* Decorative Border */
+        .border-pattern { height: 8px; background: repeating-linear-gradient(45deg, #059669, #059669 10px, #047857 10px, #047857 20px); }
+        
+        /* Content Area */
+        .content { padding: 40px 50px; position: relative; }
+
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; }
+        .brand h1 { font-family: 'Cinzel', serif; font-size: 32px; font-weight: 700; color: #059669; margin: 0; letter-spacing: 1px; }
+        .brand p { margin: 5px 0 0; font-size: 12px; color: #6b7280; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; }
+        
         .invoice-meta { text-align: right; }
-        .invoice-meta h1 { margin: 0; font-size: 24px; color: #333; }
-        .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .table th { background: #f9fafb; padding: 12px; text-align: left; font-size: 12px; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #e5e7eb; }
-        .table td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .total-section { text-align: right; margin-top: 20px; }
-        .total-row { display: flex; justify-content: flex-end; gap: 40px; font-size: 14px; padding: 5px 0; }
-        .grand-total { font-weight: bold; font-size: 18px; color: #4f46e5; border-top: 2px solid #eee; padding-top: 10px; margin-top: 10px; }
-        .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #aaa; border-top: 1px solid #eee; padding-top: 20px; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        .paid { background: #d1fae5; color: #065f46; }
-        .pending { background: #fef3c7; color: #92400e; }
-        .failed { background: #fee2e2; color: #991b1b; }
+        .invoice-title { font-size: 36px; font-weight: 800; text-transform: uppercase; color: #e5e7eb; margin: 0; line-height: 0.8; }
+        .invoice-subtitle { font-size: 14px; font-weight: 600; color: #374151; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .ref-number { font-family: 'Courier New', monospace; font-size: 14px; color: #6b7280; margin-top: 5px; }
+
+        /* Two Column Layout */
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+        
+        .info-group h3 { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #9ca3af; letter-spacing: 1px; margin: 0 0 10px 0; }
+        .info-card { background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+        .info-row:last-child { margin-bottom: 0; }
+        .info-label { color: #6b7280; font-weight: 500; }
+        .info-value { font-weight: 600; color: #111827; text-align: right; }
+
+        .bill-to-info div { font-size: 14px; font-weight: 600; color: #111827; }
+        .bill-to-info p { font-size: 13px; color: #4b5563; margin: 2px 0 0; }
+
+        /* Amount Section */
+        .amount-box { background: #ecfdf5; border: 1px solid #059669; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 40px; }
+        .amount-label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #047857; letter-spacing: 1px; }
+        .amount-value { font-size: 32px; font-weight: 800; color: #059669; margin: 5px 0; }
+        .amount-currency { font-size: 16px; font-weight: 600; vertical-align: super; }
+
+        /* Stamp */
+        .stamp { 
+            position: absolute; 
+            top: 40%; 
+            right: 80px; 
+            border: 4px solid #059669; 
+            color: #059669; 
+            font-size: 24px; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            padding: 10px 20px; 
+            transform: rotate(-15deg);
+            border-radius: 8px;
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+            letter-spacing: 2px;
+        }
+
+        /* Footer */
+        .footer { text-align: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 40px; }
+        .footer p { margin: 2px 0; }
+
+        /* Print Specifics */
+        @media print {
+            body { padding: 0; background: #fff; }
+            .invoice-container { box-shadow: none; width: 100%; max-width: none; }
+            .amount-box { -webkit-print-color-adjust: exact; }
+            .border-pattern { -webkit-print-color-adjust: exact; }
+        }
       </style>
     </head>
     <body>
-      <div class="invoice-box">
-        <div class="header">
-          <div class="logo">Zenith / Obhyash</div>
-          <div class="company-info">
-            Level 5, House 42, Road 7/A<br>
-            Dhanmondi, Dhaka - 1209<br>
-            support@zenith.edu.bd<br>
-            +880 1712 345678
-          </div>
-        </div>
+      <div class="invoice-container">
+        <div class="border-pattern"></div>
+        <div class="content">
+            <!-- Valid Stamp -->
+            ${invoice.status === 'valid' || invoice.status === 'paid' ? '<div class="stamp">PAID & VALID</div>' : ''}
 
-        <div class="invoice-details">
-          <div class="bill-to">
-            <strong>Bill To:</strong><br>
-            ${user.name}<br>
-            ${user.institute}<br>
-            Dhaka, Bangladesh
-          </div>
-          <div class="invoice-meta">
-            <h1>INVOICE</h1>
-            <p><strong>#${invoice.id}</strong></p>
-            <p>Date: ${invoice.date}</p>
-            <p>Status: <span class="badge ${invoice.status}">${invoice.status}</span></p>
-          </div>
-        </div>
+            <div class="header">
+                <div class="brand">
+                    <h1>OBHYASH</h1>
+                    <p>Academic Excellence</p>
+                </div>
+                <div class="invoice-meta">
+                    <div class="invoice-title">RECEIPT</div>
+                    <div class="invoice-subtitle">Payment Slip</div>
+                    <div class="ref-number">REF: ${invoice.id.toUpperCase().substring(0, 12)}</div>
+                </div>
+            </div>
 
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Description</th>
-              <th style="text-align: center">Cycle</th>
-              <th style="text-align: right">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>${invoice.planName} Subscription</td>
-              <td style="text-align: center">Monthly</td>
-              <td style="text-align: right">${invoice.currency} ${invoice.amount}</td>
-            </tr>
-          </tbody>
-        </table>
+            <div class="info-grid">
+                <!-- User Info -->
+                <div class="info-group">
+                    <h3>Billed To</h3>
+                    <div class="bill-to-info">
+                        <div>${user.name}</div>
+                        <p>${user.institute || 'Institute Not Provided'}</p>
+                        <p>${user.phone || ''}</p>
+                    </div>
+                </div>
 
-        <div class="total-section">
-          <div class="total-row">
-            <span>Subtotal:</span>
-            <span>${invoice.currency} ${invoice.amount}</span>
-          </div>
-          <div class="total-row">
-            <span>Tax (0%):</span>
-            <span>${invoice.currency} 0.00</span>
-          </div>
-          <div class="total-row grand-total">
-            <span>Total:</span>
-            <span>${invoice.currency} ${invoice.amount}</span>
-          </div>
-        </div>
+                <!-- Payment Details -->
+                <div class="info-group">
+                    <h3>Payment Details</h3>
+                    <div class="info-card">
+                        <div class="info-row">
+                            <span class="info-label">Date</span>
+                            <span class="info-value">${invoice.date}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Method</span>
+                            <span class="info-value" style="text-transform: capitalize;">${invoice.paymentMethod || 'Manual'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">TrxID</span>
+                            <span class="info-value" style="font-family: monospace;">${invoice.transactionId || 'N/A'}</span>
+                        </div>
+                        ${
+                          invoice.senderNumber
+                            ? `
+                        <div class="info-row">
+                            <span class="info-label">Sender No.</span>
+                            <span class="info-value" style="font-family: monospace;">${invoice.senderNumber}</span>
+                        </div>`
+                            : ''
+                        }
+                    </div>
+                </div>
+            </div>
 
-        <div class="footer">
-          <p>Thank you for your business!</p>
-          <p>This is a computer-generated invoice and requires no signature.</p>
+            <!-- Plan Details -->
+            <div class="info-group" style="margin-bottom: 30px;">
+                <h3>Subscription Plan</h3>
+                <div class="info-card" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-weight: 700; color: #111827;">${invoice.planName}</div>
+                        <div style="font-size: 12px; color: #6b7280;">Professional Access</div>
+                    </div>
+                    <div style="font-weight: 700; color: #111827;">
+                        ${invoice.currency} ${invoice.amount}
+                    </div>
+                </div>
+            </div>
+
+            <div class="amount-box">
+                <div class="amount-label">Total Amount Paid</div>
+                <div class="amount-value"><span class="amount-currency">${invoice.currency}</span> ${invoice.amount}</div>
+                <div style="font-size: 12px; color: #059669; font-weight: 500;">Thank you for your payment</div>
+            </div>
+
+            <div class="footer">
+                <p><strong>Zenith / Obhyash Education Platform</strong></p>
+                <p>Level 5, House 42, Road 7/A, Dhanmondi, Dhaka - 1209</p>
+                <p>support@obhyash.com | +880 1712 345678</p>
+                <p style="margin-top: 10px; font-style: italic;">This is a computer-generated receipt.</p>
+            </div>
         </div>
+        <div class="border-pattern"></div>
       </div>
-      <script>setTimeout(() => { window.print(); }, 800);</script>
+      <script>
+        window.onload = () => {
+             setTimeout(() => { window.print(); }, 800);
+        };
+      </script>
     </body>
     </html>
   `;

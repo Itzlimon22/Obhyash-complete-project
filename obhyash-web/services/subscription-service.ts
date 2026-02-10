@@ -82,7 +82,7 @@ export const getUserInvoices = async (): Promise<Invoice[]> => {
       .from('payment_requests')
       .select('*')
       .eq('user_id', user.id)
-      .eq('status', 'Approved')
+      .in('status', ['Pending', 'Approved', 'Rejected']) // Fetch all relevant statuses
       .order('requested_at', { ascending: false });
 
     if (error) {
@@ -98,6 +98,9 @@ export const getUserInvoices = async (): Promise<Invoice[]> => {
           amount: number;
           currency?: string;
           plan_name: string;
+          status: string;
+          transaction_id?: string;
+          payment_method?: string;
         }) => ({
           id: req.id,
           date: new Date(req.requested_at).toLocaleDateString('en-GB', {
@@ -107,9 +110,17 @@ export const getUserInvoices = async (): Promise<Invoice[]> => {
           }),
           amount: req.amount,
           currency: req.currency || '৳',
-          status: 'paid',
+          // Map DB status to Frontend Invoice status
+          status:
+            req.status === 'Approved'
+              ? 'valid'
+              : req.status === 'Pending'
+                ? 'checking'
+                : 'rejected',
           planName: req.plan_name,
           downloadUrl: '#',
+          transactionId: req.transaction_id || 'N/A',
+          paymentMethod: req.payment_method || 'N/A',
         }),
       );
     }
@@ -154,9 +165,12 @@ export const deletePaymentMethod = async (id: string): Promise<void> => {
   if (!isSupabaseConfigured() || !supabase) {
     throw new Error('Database configuration missing');
   }
-  
-  const { error } = await supabase.from('payment_methods').delete().eq('id', id);
-  
+
+  const { error } = await supabase
+    .from('payment_methods')
+    .delete()
+    .eq('id', id);
+
   if (error) {
     console.error('Error deleting payment method:', error);
     throw error;

@@ -311,9 +311,13 @@ export interface Invoice {
   date: string;
   amount: number;
   currency: string;
-  status: 'paid' | 'pending' | 'failed';
+  status: 'paid' | 'pending' | 'failed' | 'checking' | 'valid' | 'rejected';
   planName: string;
   downloadUrl?: string;
+  // New fields for detailed payment slip
+  transactionId?: string;
+  paymentMethod?: string;
+  senderNumber?: string;
 }
 
 export interface PaymentMethod {

@@ -30,14 +30,37 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Basic presence check
     if (!senderNumber || !trxId) {
       alert('অনুগ্রহ করে সব তথ্য পূরণ করুন');
       return;
     }
+
+    // Phone number validation: 11 digits, starts with 01
+    const phoneRegex = /^01\d{9}$/;
+    if (!phoneRegex.test(senderNumber)) {
+      alert('সঠিক মোবাইল নম্বর দিন (১১ ডিজিট, শুরু হতে হবে ০১ দিয়ে)');
+      return;
+    }
+
+    // Transaction ID validation: 10 characters, Capital letters and digits
+    const trxIdRegex = /^[A-Z0-9]{10}$/;
+    if (!trxIdRegex.test(trxId.toUpperCase())) {
+      alert(
+        'সঠিক ট্রানজেকশন আইডি দিন (১০ ডিজিটের বড় হাতের অক্ষর ও সংখ্যার সমন্বয়)',
+      );
+      return;
+    }
+
     setIsSubmitting(true);
     // Simulate API delay
     setTimeout(() => {
-      onConfirm({ method: paymentMethod, number: senderNumber, trxId });
+      onConfirm({
+        method: paymentMethod,
+        number: senderNumber,
+        trxId: trxId.toUpperCase(),
+      });
       setIsSubmitting(false);
     }, 1500);
   };

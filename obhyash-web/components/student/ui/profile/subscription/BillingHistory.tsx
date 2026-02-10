@@ -17,15 +17,23 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
   const getStatusBadge = (status: Invoice['status']) => {
     const styles = {
       paid: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
+      valid:
+        'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
       pending:
         'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+      checking:
+        'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
       failed: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+      rejected: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
     };
 
     const labels = {
       paid: 'পরিশোধিত',
+      valid: 'Valid',
       pending: 'অপেক্ষমাণ',
+      checking: 'Checking',
       failed: 'ব্যর্থ',
+      rejected: 'Rejected',
     };
 
     return (
@@ -91,13 +99,15 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
                   {inv.currency}
                   {inv.amount}
                 </span>
-                <button
-                  onClick={() => onDownload(inv)}
-                  className="p-2 text-neutral-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
-                  title="ডাউনলোড"
-                >
-                  <Download className="w-4 h-4" />
-                </button>
+                {(inv.status === 'paid' || inv.status === 'valid') && (
+                  <button
+                    onClick={() => onDownload(inv)}
+                    className="p-2 text-neutral-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
+                    title="ডাউনলোড"
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             </div>
           ))}
