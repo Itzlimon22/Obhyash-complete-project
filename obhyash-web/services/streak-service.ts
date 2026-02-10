@@ -18,23 +18,24 @@ export const checkAndUpdateStreak = async (
   if (!user.id) return null;
 
   const now = new Date();
-  const today = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-  ).getTime();
+
+  // Use UTC to avoid DST issues when calculating day differences
+  const getUtcDate = (date: Date) => {
+    return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+  };
+
+  const today = getUtcDate(now);
 
   const lastStreakDate = user.lastStreakDate
     ? new Date(user.lastStreakDate)
     : null;
 
   if (lastStreakDate) {
-    const lastDate = new Date(
-      lastStreakDate.getFullYear(),
-      lastStreakDate.getMonth(),
-      lastStreakDate.getDate(),
-    ).getTime();
-    const diffDays = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+    const lastDate = getUtcDate(lastStreakDate);
+
+    // Calculate difference in days (independent of time of day)
+    const diffMs = today - lastDate;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) {
       // Already active today
@@ -43,9 +44,13 @@ export const checkAndUpdateStreak = async (
       // Login day (diffDays >= 1)
       const xpGained = 20;
       const newXp = (user.xp || 0) + xpGained;
+
+      // If missed a day (diffDays > 1), reset to 1. If consecutive (diffDays === 1), increment.
+      const newStreak = diffDays === 1 ? (user.streakCount || 0) + 1 : 1;
+
       const updatedUser: UserProfile = {
         ...user,
-        streakCount: diffDays === 1 ? (user.streakCount || 0) + 1 : 1,
+        streakCount: newStreak,
         lastStreakDate: now.toISOString(),
         xp: newXp,
         level: calculateLevel(newXp),
@@ -55,10 +60,15 @@ export const checkAndUpdateStreak = async (
       // ✅ Add Notification
       try {
         const { createNotification } = await import('./notification-service');
+        const message =
+          diffDays === 1
+            ? `আজকের লগইন এর জন্য আপনি +${xpGained} XP অর্জন করেছেন।`
+            : `ফিরে আসার জন্য +${xpGained} XP! প্রতিদিন লগইন করে স্ট্রিক বজায় রাখুন।`;
+
         await createNotification(
           user.id,
           'প্রতিদিনের বোনাস!',
-          `আজকের লগইন এর জন্য আপনি +${xpGained} XP অর্জন করেছেন।`,
+          message,
           'system',
           { icon: '🌟' },
         );
@@ -69,20 +79,10 @@ export const checkAndUpdateStreak = async (
       return updatedUser;
     }
   } else {
-    // First time streak tracking: Calculate backlog since signup
-    const joinedDate = user.createdAt ? new Date(user.createdAt) : now;
-    const joinedDay = new Date(
-      joinedDate.getFullYear(),
-      joinedDate.getMonth(),
-      joinedDate.getDate(),
-    ).getTime();
-
-    // Days since joining (inclusive)
-    const totalDaysSinceSignup = Math.max(
-      1,
-      Math.floor((today - joinedDay) / (1000 * 60 * 60 * 24)) + 1,
-    );
-    const xpGained = totalDaysSinceSignup * 20;
+    // First time streak tracking OR no previous streak data
+    // Instead of massive backfill, we just start them off with a standard daily bonus
+    // This fixed the "New XP = thousands" bug for old accounts
+    const xpGained = 20;
 
     const newXp = (user.xp || 0) + xpGained;
     const updatedUser: UserProfile = {
@@ -100,7 +100,7 @@ export const checkAndUpdateStreak = async (
       await createNotification(
         user.id,
         'লগইন বোনাস!',
-        `আপনি প্ল্যাটফর্মে যোগদানের জন্য +${xpGained} XP অর্জন করেছেন।`,
+        `আপনি স্ট্রিক শুরু করার জন্য +${xpGained} XP অর্জন করেছেন। চালিয়ে যান!`,
         'system',
         { icon: '🔥' },
       );
