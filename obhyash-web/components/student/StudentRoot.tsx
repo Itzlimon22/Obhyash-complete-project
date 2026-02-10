@@ -214,6 +214,7 @@ export default function StudentRoot({
   >(null);
   const [selectedUserProfile, setSelectedUserProfile] =
     useState<UserProfile | null>(null);
+  const [selectedUserRank, setSelectedUserRank] = useState<number>(0);
   const [navWarning, setNavWarning] = useState<{
     isOpen: boolean;
     targetTab: string | null;
@@ -430,8 +431,9 @@ export default function StudentRoot({
             title="লিডারবোর্ড"
           >
             <LeaderboardView
-              onUserClick={(user) => {
+              onUserClick={(user: UserProfile, rank: number) => {
                 setSelectedUserProfile(user);
+                setSelectedUserRank(rank || 0);
                 setActiveTab('user_profile');
               }}
             />
@@ -541,8 +543,7 @@ export default function StudentRoot({
             <UserProfileView
               user={selectedUserProfile}
               currentUser={currentUser}
-              rank={0}
-              history={examHistory}
+              rank={selectedUserRank}
               onBack={() => setActiveTab('leaderboard')}
             />
           </AppLayout>

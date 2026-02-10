@@ -41,10 +41,12 @@ const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   // Dynamic Subject Stats Logic
   const [subjectStats, setSubjectStats] = React.useState<SubjectStats[]>([]);
+  const [isLoadingStats, setIsLoadingStats] = React.useState(true);
 
   React.useEffect(() => {
     const fetchStats = async () => {
       if (!user) return;
+      setIsLoadingStats(true); // Ensure loading state is true on start
       const { getSubjects } = await import('@/services/database');
       try {
         // Fetch subjects based on user's stream/group
@@ -95,6 +97,8 @@ const Dashboard: React.FC<DashboardProps> = ({
         setSubjectStats(stats);
       } catch (e) {
         console.error('Failed to load dashboard stats', e);
+      } finally {
+        setIsLoadingStats(false);
       }
     };
 
@@ -353,7 +357,13 @@ const Dashboard: React.FC<DashboardProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="text-xs text-neutral-400">Loading...</div>
+                  <div className="flex items-center gap-2.5 animate-pulse">
+                    <div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-700"></div>
+                    <div className="flex-1 space-y-1.5">
+                      <div className="h-3 w-16 bg-neutral-200 dark:bg-neutral-700 rounded full" />
+                      <div className="h-2 w-10 bg-neutral-100 dark:bg-neutral-800 rounded-full" />
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -394,7 +404,11 @@ const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Subject Stats Section - Order 3 on Mobile, Bottom Left on Desktop */}
       <div className="lg:col-span-2">
-        <SubjectStat data={subjectStats} onSubjectClick={onSubjectClick} />
+        <SubjectStat
+          data={subjectStats}
+          onSubjectClick={onSubjectClick}
+          isLoading={isLoadingStats}
+        />
       </div>
     </div>
   );

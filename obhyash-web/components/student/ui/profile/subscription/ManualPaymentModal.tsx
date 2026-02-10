@@ -5,6 +5,7 @@ interface ManualPaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   plan: SubscriptionPlan | null;
+  savedMethods?: import('@/lib/types').PaymentMethod[];
   onConfirm: (data: { method: string; number: string; trxId: string }) => void;
 }
 
@@ -16,6 +17,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
   isOpen,
   onClose,
   plan,
+  savedMethods = [],
   onConfirm,
 }) => {
   const [activeTab, setActiveTab] = useState<TabId>('details');
@@ -170,6 +172,83 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                     </li>
                   </ul>
                 </div>
+
+                {/* Saved Methods Selection */}
+                {savedMethods && savedMethods.length > 0 && (
+                  <div className="space-y-3 mb-6">
+                    <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
+                      Saved Payment Methods
+                    </h4>
+                    <div className="grid grid-cols-1 gap-2">
+                      {savedMethods.map((method) => (
+                        <button
+                          key={method.id}
+                          onClick={() => {
+                            setPaymentMethod(
+                              method.type === 'bkash'
+                                ? 'bKash'
+                                : method.type === 'nagad'
+                                  ? 'Nagad'
+                                  : method.type,
+                            );
+                            setSenderNumber(method.number || '');
+                          }}
+                          className={`flex items-center justify-between p-3 rounded-xl border transition-all text-left group ${
+                            senderNumber === method.number &&
+                            paymentMethod.toLowerCase() ===
+                              method.type.toLowerCase()
+                              ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-500'
+                              : 'border-neutral-200 dark:border-neutral-700 hover:border-emerald-300 dark:hover:border-emerald-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center text-white text-[10px] font-black shadow-sm ${
+                                method.type === 'bkash'
+                                  ? 'bg-pink-500'
+                                  : method.type === 'nagad'
+                                    ? 'bg-orange-500'
+                                    : 'bg-neutral-500'
+                              }`}
+                            >
+                              {method.type === 'bkash'
+                                ? 'bK'
+                                : method.type === 'nagad'
+                                  ? 'N'
+                                  : 'C'}
+                            </div>
+                            <div>
+                              <p className="font-bold text-sm text-neutral-800 dark:text-white capitalize">
+                                {method.type}
+                              </p>
+                              <p className="text-xs text-neutral-500 dark:text-neutral-400 font-mono">
+                                {method.number}
+                              </p>
+                            </div>
+                          </div>
+                          {senderNumber === method.number &&
+                            paymentMethod.toLowerCase() ===
+                              method.type.toLowerCase() && (
+                              <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                  className="w-3.5 h-3.5 text-white"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </div>
+                            )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Input Form */}
                 <form onSubmit={handleSubmit} className="space-y-4">

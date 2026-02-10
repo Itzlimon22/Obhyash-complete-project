@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Bell, CheckCircle2, Clock, Trash2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCheck, Trash2, BellRing, X } from 'lucide-react';
 import { Notification } from '@/lib/types';
 import {
   getNotifications,
@@ -12,15 +13,21 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { bn } from 'date-fns/locale';
 import { toast } from 'sonner';
+import {
+  getNotificationStyle,
+  groupNotificationsByDate,
+  getRandomEmptyState,
+} from './notification-utils';
 
 const NotificationsView: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [emptyState, setEmptyState] = useState(getRandomEmptyState());
 
   const fetchNotifs = async () => {
     setIsLoading(true);
     try {
-      const data = await getNotifications(50); // Fetch last 50
+      const data = await getNotifications(50);
       setNotifications(data);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
@@ -33,137 +40,184 @@ const NotificationsView: React.FC = () => {
     fetchNotifs();
   }, []);
 
-  const handleMarkRead = async (id: string) => {
-    const success = await markNotificationAsRead(id);
-    if (success) {
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)),
-      );
-    }
+  const handleMarkRead = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Optimistic update
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)),
+    );
+    await markNotificationAsRead(id);
   };
 
   const handleMarkAllAsRead = async () => {
     const success = await markAllNotificationsAsRead();
     if (success) {
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-      toast.success('সব বার্তা পঠিত হিসেবে চিহ্নিত করা হয়েছে');
+      toast.success('সব বার্তা পঠিত হিসেবে চিহ্নিত করা হয়েছে! 👍');
     }
   };
 
-  const handleDelete = async (id: string) => {
-    const success = await deleteNotification(id);
-    if (success) {
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
-      toast.success('বার্তা মুছে ফেলা হয়েছে');
-    }
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Optimistic update
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    await deleteNotification(id);
+    toast.success('মুছে ফেলা হয়েছে 🗑️');
   };
+
+  const groupedNotifications = groupNotificationsByDate(notifications);
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between bg-white dark:bg-neutral-900 p-6 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-red-100 dark:bg-red-900/20 rounded-2xl">
-            <Bell className="w-6 h-6 text-red-600 dark:text-red-400" />
-          </div>
+    <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950 p-4 md:p-8">
+      <div className="max-w-2xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="flex items-end justify-between pb-4 border-b border-neutral-200 dark:border-neutral-800">
           <div>
-            <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">
-              সব নোটিফিকেশন
+            <h1 className="text-3xl font-black text-neutral-900 dark:text-white flex items-center gap-3">
+              নোটিফিকেশন <span className="text-2xl animate-bounce">🔔</span>
             </h1>
-            <p className="text-neutral-500 dark:text-neutral-400 text-sm">
-              আপনার সব আপডেট এখানে পাবেন
+            <p className="text-neutral-500 dark:text-neutral-400 mt-2 font-medium">
+              আপনার সব আপডেট এবং অ্যাক্টিভিটি।
             </p>
           </div>
+
+          {unreadCount > 0 && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleMarkAllAsRead}
+              className="px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-full text-sm font-bold text-neutral-600 dark:text-neutral-300 shadow-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors flex items-center gap-2"
+            >
+              <CheckCheck className="w-4 h-4 text-emerald-500" />
+              সব পড়ুন
+            </motion.button>
+          )}
         </div>
 
-        {notifications.length > 0 && (
-          <button
-            onClick={handleMarkAllAsRead}
-            className="text-sm font-bold text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-          >
-            সব পঠিত হিসেবে চিহ্নিত করুন
-          </button>
-        )}
-      </div>
-
-      <div className="space-y-3">
-        {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-24 bg-white dark:bg-neutral-900 rounded-2xl animate-pulse"
-              />
-            ))}
-          </div>
-        ) : notifications.length > 0 ? (
-          notifications.map((notif) => (
-            <div
-              key={notif.id}
-              className={`group p-4 rounded-2xl border transition-all ${
-                notif.is_read
-                  ? 'bg-neutral-50/50 dark:bg-neutral-900/30 border-neutral-200 dark:border-neutral-800 opacity-80'
-                  : 'bg-white dark:bg-neutral-900 border-red-100 dark:border-red-900/30 shadow-sm'
-              }`}
-            >
-              <div className="flex gap-4">
+        {/* Content Section */}
+        <div className="space-y-8">
+          {isLoading ? (
+            // Loading Skeletons
+            <div className="space-y-4">
+              {[1, 2, 3, 4].map((i) => (
                 <div
-                  className={`mt-1 h-2 w-2 rounded-full shrink-0 ${notif.is_read ? 'bg-transparent' : 'bg-red-500'}`}
+                  key={i}
+                  className="h-28 bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 animate-pulse"
                 />
+              ))}
+            </div>
+          ) : notifications.length > 0 ? (
+            // Notification List
+            <AnimatePresence mode="popLayout">
+              {groupedNotifications.map((group) => (
+                <motion.div
+                  key={group.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="space-y-4"
+                >
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400 pl-2">
+                    {group.label}
+                  </h3>
 
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center justify-between gap-4">
-                    <h4
-                      className={`font-bold text-neutral-900 dark:text-white ${notif.is_read ? 'text-base' : 'text-lg'}`}
-                    >
-                      {notif.title}
-                    </h4>
-                    <span className="text-[10px] md:text-xs text-neutral-400 font-medium flex items-center gap-1 shrink-0">
-                      <Clock className="w-3 h-3" />
-                      {formatDistanceToNow(new Date(notif.created_at), {
-                        addSuffix: true,
-                        locale: bn,
-                      })}
-                    </span>
-                  </div>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                    {notif.message}
-                  </p>
+                  {group.items.map((notif) => {
+                    const style = getNotificationStyle(notif.type);
+                    const Icon = style.icon;
 
-                  <div className="flex items-center gap-4 pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {!notif.is_read && (
-                      <button
-                        onClick={() => handleMarkRead(notif.id)}
-                        className="text-xs font-bold text-emerald-600 hover:underline flex items-center gap-1"
+                    return (
+                      <motion.div
+                        layout
+                        key={notif.id}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, x: -100 }}
+                        onClick={() =>
+                          !notif.is_read && handleMarkRead(notif.id, {} as any)
+                        }
+                        className={`relative group p-5 rounded-3xl border transition-all duration-300 cursor-pointer overflow-hidden
+                          ${
+                            notif.is_read
+                              ? 'bg-white/40 dark:bg-neutral-900/40 border-transparent hover:border-neutral-200 dark:hover:border-neutral-800'
+                              : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 shadow-lg shadow-neutral-100/50 dark:shadow-none translate-x-1'
+                          }
+                        `}
                       >
-                        <CheckCircle2 className="w-3 h-3" />
-                        পঠিত হিসেবে চিহ্নিত করুন
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleDelete(notif.id)}
-                      className="text-xs font-bold text-neutral-400 hover:text-red-500 hover:underline flex items-center gap-1"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                      মুছে ফেলুন
-                    </button>
-                  </div>
-                </div>
+                        {/* Unread Indicator Dot */}
+                        {!notif.is_read && (
+                          <div className="absolute top-5 right-5 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                        )}
+
+                        <div className="flex gap-5">
+                          {/* Icon Box */}
+                          <div
+                            className={`shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center ${style.bg} ${style.color}`}
+                          >
+                            <Icon className="w-6 h-6" />
+                          </div>
+
+                          <div className="flex-1 min-w-0 pt-1">
+                            <div className="flex justify-between items-start gap-4 mb-1">
+                              <h4
+                                className={`text-base font-bold truncate pr-6 ${notif.is_read ? 'text-neutral-600 dark:text-neutral-400' : 'text-neutral-900 dark:text-white'}`}
+                              >
+                                {notif.title}
+                              </h4>
+                            </div>
+
+                            <p className="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed mb-3 line-clamp-2">
+                              {notif.message}
+                            </p>
+
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
+                                {formatDistanceToNow(
+                                  new Date(notif.created_at),
+                                  { addSuffix: true, locale: bn },
+                                )}
+                              </span>
+
+                              {/* Action Buttons (Visible on Hover/Focus) */}
+                              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-200">
+                                <button
+                                  onClick={(e) => handleDelete(notif.id, e)}
+                                  className="p-2 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-neutral-400 hover:text-rose-500 rounded-xl transition-colors"
+                                  title="মুছে ফেলুন"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          ) : (
+            // Empty State
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center justify-center py-24 text-center px-4"
+            >
+              <div className="w-32 h-32 bg-gradient-to-tr from-violet-100 to-fuchsia-50 dark:from-neutral-800 dark:to-neutral-900 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-fuchsia-100 dark:shadow-none animate-float">
+                <span className="text-6xl filter drop-shadow-lg">
+                  {emptyState.icon}
+                </span>
               </div>
-            </div>
-          ))
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-20 h-20 bg-neutral-100 dark:bg-neutral-900 rounded-full flex items-center justify-center mb-4">
-              <Bell className="w-10 h-10 text-neutral-300 dark:text-neutral-700" />
-            </div>
-            <h3 className="text-xl font-bold text-neutral-600 dark:text-neutral-400">
-              কোনো নোটিফিকেশন নেই
-            </h3>
-            <p className="text-neutral-400 dark:text-neutral-500">
-              আপনার সব আপডেট এখানে দেখানো হবে
-            </p>
-          </div>
-        )}
+              <h3 className="text-2xl font-black text-neutral-800 dark:text-white mb-2">
+                {emptyState.message}
+              </h3>
+              <p className="text-neutral-500 dark:text-neutral-400 text-lg font-medium max-w-sm mx-auto">
+                {emptyState.subtext}
+              </p>
+            </motion.div>
+          )}
+        </div>
       </div>
     </div>
   );

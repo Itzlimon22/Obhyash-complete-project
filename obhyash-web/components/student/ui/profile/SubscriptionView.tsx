@@ -349,6 +349,7 @@ const SubscriptionView: React.FC = () => {
         isOpen={isPaymentModalOpen}
         onClose={() => setIsPaymentModalOpen(false)}
         plan={selectedPlan}
+        savedMethods={paymentMethods}
         onConfirm={handlePaymentConfirm}
       />
     </div>

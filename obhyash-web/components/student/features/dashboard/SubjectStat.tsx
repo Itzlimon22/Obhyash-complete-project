@@ -11,6 +11,7 @@ interface SubjectData {
 interface SubjectStatProps {
   data: SubjectData[];
   onSubjectClick: (subject: string) => void;
+  isLoading?: boolean;
 }
 
 const SubjectItem: React.FC<{ subject: SubjectData; onClick: () => void }> = ({
@@ -100,7 +101,7 @@ const SubjectItem: React.FC<{ subject: SubjectData; onClick: () => void }> = ({
               </div>
             </div>
 
-            <div className="relative h-2.5 w-full bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden flex mb-4">
+            <div className="relative h-2.5 w-full bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden flex">
               <div
                 style={{
                   width: `${(subject.correct / Math.max(subject.total, 1)) * 100}%`,
@@ -114,32 +115,6 @@ const SubjectItem: React.FC<{ subject: SubjectData; onClick: () => void }> = ({
                 className="h-full bg-gradient-to-r from-rose-400 to-rose-600 shadow-sm relative z-10"
               ></div>
             </div>
-
-            <div className="flex justify-center border-t border-neutral-200/60 dark:border-neutral-700/50 pt-3 mt-2">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClick();
-                }}
-                className="w-full py-2.5 text-xs font-bold text-white bg-neutral-900 dark:bg-neutral-100 dark:text-neutral-900 hover:bg-rose-600 dark:hover:bg-rose-500 hover:shadow-lg hover:shadow-rose-500/20 transition-all rounded-xl flex items-center justify-center gap-2 group/btn"
-              >
-                বিস্তারিত রিপোর্ট দেখো
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="w-3.5 h-3.5 group-hover/btn:tranneutral-x-1 transition-transform"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                  />
-                </svg>
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -147,7 +122,39 @@ const SubjectItem: React.FC<{ subject: SubjectData; onClick: () => void }> = ({
   );
 };
 
-const SubjectStat: React.FC<SubjectStatProps> = ({ data, onSubjectClick }) => {
+const SubjectStat: React.FC<SubjectStatProps> = ({
+  data,
+  onSubjectClick,
+  isLoading,
+}) => {
+  if (isLoading) {
+    return (
+      <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-sm border border-neutral-100 dark:border-neutral-800">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="font-bold text-lg text-neutral-800 dark:text-white">
+            সাবজেক্ট ভিত্তিক রিপোর্ট
+          </h3>
+        </div>
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="animate-pulse bg-neutral-100 dark:bg-neutral-800/50 rounded-2xl p-4 border border-neutral-200 dark:border-neutral-700"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-1.5 h-8 rounded-full bg-neutral-200 dark:bg-neutral-700" />
+                  <div className="h-4 w-24 bg-neutral-200 dark:bg-neutral-700 rounded" />
+                </div>
+                <div className="h-6 w-12 bg-neutral-200 dark:bg-neutral-700 rounded-lg" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-sm border border-neutral-100 dark:border-neutral-800">
       <div className="flex justify-between items-center mb-6">

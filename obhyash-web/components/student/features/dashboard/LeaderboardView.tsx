@@ -11,7 +11,7 @@ import {
 } from 'services/database';
 
 interface LeaderboardViewProps {
-  onUserClick?: (user: UserProfile) => void;
+  onUserClick?: (user: UserProfile, rank: number) => void;
 }
 
 const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
@@ -80,7 +80,12 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
         <LeaderboardTable
           users={leaderboardUsers}
           selectedLevel={selectedLevel}
-          onUserClick={onUserClick}
+          onUserClick={(user) => {
+            // Find the user's rank in the current list
+            const rank =
+              leaderboardUsers.findIndex((u) => u.id === user.id) + 1;
+            onUserClick?.(user, rank);
+          }}
           isLoading={isLoading}
         />
       </div>

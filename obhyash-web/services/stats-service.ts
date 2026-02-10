@@ -68,9 +68,10 @@ export const getLeaderboardUsers = async (
       const { data, error } = await supabase
         .from('public_profiles')
         .select(
-          'id, name, institute, xp, level, exams_taken, avatar_url, avatar_color',
+          'id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak',
         )
         .eq('level', level)
+        .eq('role', 'student') // Filter to show only students
         .order('xp', { ascending: false })
         .limit(100);
 
@@ -90,6 +91,7 @@ export const getLeaderboardUsers = async (
           examsTaken: user.exams_taken || 0,
           avatarUrl: user.avatar_url || undefined,
           avatarColor: user.avatar_color || generateAvatarColor(index),
+          streakCount: user.streak || 0,
         }));
       }
     } catch (error) {

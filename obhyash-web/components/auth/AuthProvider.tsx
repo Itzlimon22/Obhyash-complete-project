@@ -51,7 +51,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         console.error('Error fetching profile:', error);
         return null;
       }
-      return data as UserProfile;
+
+      const userProfile = data as UserProfile;
+      // Cache profile
+      localStorage.setItem('obhyash_user_profile', JSON.stringify(userProfile));
+      return userProfile;
     } catch (error) {
       console.error('Unexpected error fetching profile:', error);
       return null;
@@ -62,8 +66,23 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     let isMounted = true;
 
     const initializeAuth = async () => {
+      // 1. Try to load from cache first for immediate UI
       try {
-        // 1. Get current user (server-validated)
+        const cachedProfile = localStorage.getItem('obhyash_user_profile');
+        if (cachedProfile) {
+          const parsed = JSON.parse(cachedProfile);
+          if (isMounted) {
+            setProfile(parsed);
+            // We don't set user here because we need the Supabase User object
+            // But having profile allows UI to show something
+          }
+        }
+      } catch (e) {
+        console.error('Cache parse error', e);
+      }
+
+      try {
+        // 2. Get current user (server-validated)
         const {
           data: { user: currentUser },
           error: authError,
@@ -71,15 +90,26 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
         if (authError) {
           console.error('Auth check error:', authError);
+          // If auth fails, clear cache
+          if (isMounted) {
+            setUser(null);
+            setProfile(null);
+          }
+          localStorage.removeItem('obhyash_user_profile');
         }
 
         if (currentUser && isMounted) {
           setUser(currentUser);
-          // 2. Fetch Profile
+          // 3. Fetch Profile (Background validation/update)
           const userProfile = await fetchProfile(currentUser.id);
           if (userProfile && isMounted) {
             setProfile(userProfile);
           }
+        } else if (!currentUser && isMounted) {
+          // No user, clear everything
+          setUser(null);
+          setProfile(null);
+          localStorage.removeItem('obhyash_user_profile');
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
@@ -94,17 +124,17 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // console.log('Auth state changed:', event);
-
       if (session?.user) {
         if (isMounted) setUser(session.user);
 
-        // Refresh profile on specific events
-        if (
-          event === 'SIGNED_IN' ||
-          event === 'TOKEN_REFRESHED' ||
-          event === 'USER_UPDATED'
-        ) {
+        // Always ensure profile is loaded if user exists
+        const shouldFetchProfile =
+          !profile ||
+          profile.id !== session.user.id ||
+          event === 'USER_UPDATED' ||
+          event === 'TOKEN_REFRESHED';
+
+        if (shouldFetchProfile) {
           const userProfile = await fetchProfile(session.user.id);
           if (userProfile && isMounted) {
             setProfile(userProfile);
@@ -115,6 +145,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           setUser(null);
           setProfile(null);
         }
+        localStorage.removeItem('obhyash_user_profile');
+
         if (event === 'SIGNED_OUT') {
           router.push('/login');
         }
@@ -133,6 +165,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
+    localStorage.removeItem('obhyash_user_profile');
     router.push('/login');
   };
 
