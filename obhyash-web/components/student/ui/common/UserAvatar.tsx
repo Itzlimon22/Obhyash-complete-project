@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { UserProfile } from '@/lib/types';
+import { getRandomAvatar } from '@/lib/avatar-utils';
 
 interface UserAvatarProps {
   user?: UserProfile | null;
@@ -15,7 +16,8 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   className = '',
   showBorder = false,
 }) => {
-  const [error, setError] = useState(false);
+  const [customAvatarError, setCustomAvatarError] = useState(false);
+  const [fallbackAvatarError, setFallbackAvatarError] = useState(false);
 
   if (!user) {
     return (
@@ -26,26 +28,44 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   }
 
   const initials = user.name ? user.name.charAt(0).toUpperCase() : '?';
-  const hasAvatar = user.avatarUrl && !error;
+
+  // Logic:
+  // 1. Try custom avatar if it exists and hasn't failed.
+  // 2. If it fails or doesn't exist, try the gender-based DiceBear avatar.
+  // 3. If that also fails, show initials as the final fallback.
+
+  const hasCustomAvatar = !!user.avatarUrl && !customAvatarError;
+  const diceBearAvatar = getRandomAvatar(
+    user.gender || null,
+    user.id || user.name || 'default',
+  );
+  const hasFallbackAvatar = !fallbackAvatarError;
+
+  const showImage = hasCustomAvatar || (diceBearAvatar && hasFallbackAvatar);
+  const currentSrc = hasCustomAvatar ? user.avatarUrl! : diceBearAvatar;
 
   return (
     <div
       className={`
         relative flex items-center justify-center shrink-0 rounded-full overflow-hidden
         ${getSizeClasses(size)}
-        ${!hasAvatar ? user.avatarColor || 'bg-neutral-500' : ''}
+        ${!showImage ? user.avatarColor || 'bg-neutral-500' : 'bg-neutral-100 dark:bg-neutral-800'}
         ${showBorder ? 'ring-2 ring-white dark:ring-neutral-800 shadow-sm' : ''}
         ${className}
       `}
     >
-      {hasAvatar ? (
+      {showImage ? (
         <Image
-          src={user.avatarUrl!}
+          src={currentSrc}
           alt={user.name || 'User'}
           fill
+          unoptimized={currentSrc.includes('dicebear.com')}
           sizes={getSizesAttribute(size)}
           className="object-cover"
-          onError={() => setError(true)}
+          onError={() => {
+            if (hasCustomAvatar) setCustomAvatarError(true);
+            else setFallbackAvatarError(true);
+          }}
         />
       ) : (
         <span
