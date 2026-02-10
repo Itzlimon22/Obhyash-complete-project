@@ -69,8 +69,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 font-sans">
-      <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 relative z-10 animate-in fade-in zoom-in duration-300">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-black px-4 font-sans">
+      <div className="w-full max-w-md bg-white dark:bg-gray-950 rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 relative z-10 animate-in fade-in zoom-in duration-300">
         {/* Header Decor */}
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-500" />
 
@@ -156,7 +156,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white dark:bg-slate-900 px-2 text-slate-500 dark:text-slate-400 font-bold">
+              <span className="bg-white dark:bg-gray-950 px-2 text-slate-500 dark:text-slate-400 font-bold">
                 অথবা
               </span>
             </div>

@@ -146,32 +146,37 @@ export default function SignupPage() {
       if (signUpError) throw signUpError;
 
       if (data.user) {
-        // 2. Create User Profile
-        const { error: profileError } = await supabase.from('users').insert({
-          id: data.user.id,
-          email: formData.email,
-          name: formData.name,
-          phone: formData.phone,
-          gender: formData.gender || null,
-          institute: formData.institute,
-          stream: formData.stream,
-          division: formData.group, // Mapping group -> division
-          batch: formData.batch,
-          role: 'Student',
-          status: 'Active',
-          subscription: {
-            plan: 'Free',
-            expiry: new Date(
-              Date.now() + 365 * 24 * 60 * 60 * 1000,
-            ).toISOString(),
+        // 2. Create User Profile (upsert to handle DB trigger conflict)
+        // The handle_new_user trigger may have already created a minimal row,
+        // so we use upsert to merge the full signup data into it.
+        const { error: profileError } = await supabase.from('users').upsert(
+          {
+            id: data.user.id,
+            email: formData.email,
+            name: formData.name,
+            phone: formData.phone,
+            gender: formData.gender || null,
+            institute: formData.institute,
+            stream: formData.stream,
+            division: formData.group, // Mapping group -> division
+            batch: formData.batch,
+            role: 'Student',
             status: 'Active',
+            subscription: {
+              plan: 'Free',
+              expiry: new Date(
+                Date.now() + 365 * 24 * 60 * 60 * 1000,
+              ).toISOString(),
+              status: 'Active',
+            },
+            xp: 0,
+            level: 'Beginner',
+            exams_taken: 0,
+            enrolled_exams: 0,
+            last_active: new Date().toISOString(),
           },
-          xp: 0,
-          level: 'Beginner',
-          examsTaken: 0,
-          enrolledExams: 0,
-          lastActive: new Date().toISOString(),
-        });
+          { onConflict: 'id' },
+        );
 
         if (profileError) {
           console.error('Profile creation error:', profileError);
@@ -204,8 +209,8 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
-        <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl text-center border border-slate-100 dark:border-slate-800 animate-in fade-in zoom-in duration-300">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-black px-4">
+        <div className="w-full max-w-md bg-white dark:bg-gray-950 rounded-3xl p-8 shadow-xl text-center border border-slate-100 dark:border-slate-800 animate-in fade-in zoom-in duration-300">
           <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-6 text-emerald-600 dark:text-emerald-400">
             <CheckCircle2 className="w-10 h-10" />
           </div>
@@ -255,8 +260,8 @@ export default function SignupPage() {
   );
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950 p-4 font-sans max-md:pt-20">
-      <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 relative z-10">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-black p-4 font-sans max-md:pt-20">
+      <div className="w-full max-w-lg bg-white dark:bg-gray-950 rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 relative z-10">
         {/* Header Decor */}
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500" />
 
