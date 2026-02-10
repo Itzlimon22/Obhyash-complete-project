@@ -23,6 +23,7 @@ import Logo from '@/components/student/ui/Logo';
 import SocialLoginButton from '@/components/auth/SocialLoginButton';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/error-utils';
+import { getRandomAvatar } from '@/lib/avatar-utils';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -170,6 +171,7 @@ export default function SignupPage() {
             batch: formData.batch,
             role: 'Student',
             status: 'Active',
+            avatar_url: getRandomAvatar(formData.gender, data.user.id),
             subscription: {
               plan: 'Free',
               expiry: new Date(
