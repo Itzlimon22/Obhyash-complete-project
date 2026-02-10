@@ -362,23 +362,23 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                   {
                     icon: '📞',
                     title: 'সরাসরি কথা বলুন',
-                    sub: 'এখানে ক্লিক করুন',
+                    sub: 'কল করতে ক্লিক করুন',
                     color: 'bg-blue-50 text-blue-600',
-                    link: 'tel:+8801712345678',
+                    link: 'tel:+8801946855793', // Updated to match landing page
                   },
                   {
                     icon: '💬',
                     title: 'লাইভ চ্যাট (Messenger)',
                     sub: 'এখানে ক্লিক করুন',
                     color: 'bg-purple-50 text-purple-600',
-                    link: '#',
+                    link: 'https://m.me/obhyash',
                   },
                   {
                     icon: '📱',
                     title: 'লাইভ চ্যাট (WhatsApp)',
                     sub: 'এখানে ক্লিক করুন',
                     color: 'bg-emerald-50 text-emerald-600',
-                    link: '#',
+                    link: 'https://wa.me/8801946855793',
                   },
                   {
                     icon: '✉️',
