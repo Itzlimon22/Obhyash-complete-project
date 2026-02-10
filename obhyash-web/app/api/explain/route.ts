@@ -69,7 +69,7 @@ Explain in 2 simple sentences why the correct answer is right.
 };
 
 // ---------------- OPTIONS (CORS) ----------------
-const OPTIONS = () => {
+export const OPTIONS = () => {
   return new NextResponse(null, {
     status: 200,
     headers: {
@@ -79,6 +79,3 @@ const OPTIONS = () => {
     },
   });
 };
-
-// ✅ EXPORTS (THIS IS THE MAGIC FIX)
-export { POST, OPTIONS };
