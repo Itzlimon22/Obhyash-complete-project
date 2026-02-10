@@ -415,7 +415,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
         {/* Content */}
         <main
-          className={`flex-1 overflow-y-auto ${noPadding ? '' : 'p-4 md:p-8'} pb-32 lg:pb-8 relative scroll-smooth`}
+          className={`flex-1 overflow-y-auto ${noPadding ? '' : 'p-3 md:p-5'} pb-24 lg:pb-5 relative scroll-smooth`}
         >
           {children}
         </main>

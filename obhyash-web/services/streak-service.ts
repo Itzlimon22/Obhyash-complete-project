@@ -1,21 +1,35 @@
 import { UserProfile } from '@/lib/types';
-import { updateUserProfile } from './user-service';
+import { updateUserProfile, getUserProfile } from './user-service';
 import { calculateLevel } from '@/lib/utils';
 
 /**
  * Checks and updates the user's daily streak.
+ *
+ * IMPORTANT: This function fetches fresh user data from DB to avoid
+ * stale `lastStreakDate` from props/SSR causing duplicate XP awards.
+ *
  * Logic:
- * - If last active was today: do nothing.
+ * - If last active was today: do nothing (return null).
  * - If last active was yesterday: increment streak.
  * - If last active was before yesterday: reset streak to 1.
  *
- * @param user The current user profile
+ * @param user The current user profile (used for id and as fallback)
  * @returns The updated user profile if a change occurred, otherwise null
  */
 export const checkAndUpdateStreak = async (
   user: UserProfile,
 ): Promise<UserProfile | null> => {
   if (!user.id) return null;
+
+  // ✅ Fetch FRESH user data from DB to prevent stale lastStreakDate
+  let freshUser: UserProfile;
+  try {
+    const dbUser = await getUserProfile(user.id);
+    freshUser = dbUser || user;
+  } catch {
+    // If DB fetch fails, fall back to the passed-in user
+    freshUser = user;
+  }
 
   const now = new Date();
 
@@ -26,8 +40,8 @@ export const checkAndUpdateStreak = async (
 
   const today = getUtcDate(now);
 
-  const lastStreakDate = user.lastStreakDate
-    ? new Date(user.lastStreakDate)
+  const lastStreakDate = freshUser.lastStreakDate
+    ? new Date(freshUser.lastStreakDate)
     : null;
 
   if (lastStreakDate) {
@@ -38,18 +52,18 @@ export const checkAndUpdateStreak = async (
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) {
-      // Already active today
+      // Already active today — no XP, no celebration
       return null;
     } else {
-      // Login day (diffDays >= 1)
+      // New day login (diffDays >= 1)
       const xpGained = 20;
-      const newXp = (user.xp || 0) + xpGained;
+      const newXp = (freshUser.xp || 0) + xpGained;
 
       // If missed a day (diffDays > 1), reset to 1. If consecutive (diffDays === 1), increment.
-      const newStreak = diffDays === 1 ? (user.streakCount || 0) + 1 : 1;
+      const newStreak = diffDays === 1 ? (freshUser.streakCount || 0) + 1 : 1;
 
       const updatedUser: UserProfile = {
-        ...user,
+        ...freshUser,
         streakCount: newStreak,
         lastStreakDate: now.toISOString(),
         xp: newXp,
@@ -63,10 +77,10 @@ export const checkAndUpdateStreak = async (
         const message =
           diffDays === 1
             ? `আজকের লগইন এর জন্য আপনি +${xpGained} XP অর্জন করেছেন।`
-            : `ফিরে আসার জন্য +${xpGained} XP! প্রতিদিন লগইন করে স্ট্রিক বজায় রাখুন।`;
+            : `ফিরে আসার জন্য +${xpGained} XP! প্রতিদিন লগইন করে স্ট্রিক বজায় রাখুন।`;
 
         await createNotification(
-          user.id,
+          freshUser.id,
           'প্রতিদিনের বোনাস!',
           message,
           'system',
@@ -80,13 +94,11 @@ export const checkAndUpdateStreak = async (
     }
   } else {
     // First time streak tracking OR no previous streak data
-    // Instead of massive backfill, we just start them off with a standard daily bonus
-    // This fixed the "New XP = thousands" bug for old accounts
     const xpGained = 20;
 
-    const newXp = (user.xp || 0) + xpGained;
+    const newXp = (freshUser.xp || 0) + xpGained;
     const updatedUser: UserProfile = {
-      ...user,
+      ...freshUser,
       streakCount: 1,
       lastStreakDate: now.toISOString(),
       xp: newXp,
@@ -98,9 +110,9 @@ export const checkAndUpdateStreak = async (
     try {
       const { createNotification } = await import('./notification-service');
       await createNotification(
-        user.id,
+        freshUser.id,
         'লগইন বোনাস!',
-        `আপনি স্ট্রিক শুরু করার জন্য +${xpGained} XP অর্জন করেছেন। চালিয়ে যান!`,
+        `আপনি স্ট্রিক শুরু করার জন্য +${xpGained} XP অর্জন করেছেন। চালিয়ে যান!`,
         'system',
         { icon: '🔥' },
       );

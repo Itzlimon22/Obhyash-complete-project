@@ -153,7 +153,12 @@ export default function StudentRoot({
   };
 
   // Global User State
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('obhyash_active_tab') || 'dashboard';
+    }
+    return 'dashboard';
+  });
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(
     initialUser,
   );
@@ -170,7 +175,7 @@ export default function StudentRoot({
     if (initialUser) setCurrentUser(initialUser);
   }, [initialUser]);
 
-  // Streak System Check - Consolidated with initial load logic
+  // Streak System Check - Uses localStorage guard to run ONCE per calendar day
   useEffect(() => {
     let isMounted = true;
 
@@ -178,21 +183,29 @@ export default function StudentRoot({
       if (!currentUser?.id) return;
 
       try {
-        // 1. Streak Check
-        const { checkAndUpdateStreak } =
-          await import('@/services/streak-service');
-        const updatedUser = await checkAndUpdateStreak(currentUser);
+        // ✅ localStorage guard: only process streak once per calendar day per user
+        const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+        const streakKey = `streak_checked_${currentUser.id}`;
+        const lastCheckedDate = localStorage.getItem(streakKey);
 
-        if (updatedUser && isMounted) {
-          // If streak incremented, show celebration
-          if ((updatedUser.streakCount || 0) > (currentUser.streakCount || 0)) {
+        if (lastCheckedDate !== today) {
+          // First load of the day — run streak check
+          const { checkAndUpdateStreak } =
+            await import('@/services/streak-service');
+          const updatedUser = await checkAndUpdateStreak(currentUser);
+
+          if (updatedUser && isMounted) {
+            // Streak was updated (new day) — show celebration
             setNewStreakCount(updatedUser.streakCount || 0);
             setShowStreakCelebration(true);
+            setCurrentUser(updatedUser);
           }
-          setCurrentUser(updatedUser);
+
+          // Mark today as checked (even if no update — prevents re-check)
+          localStorage.setItem(streakKey, today);
         }
 
-        // 2. Fetch History
+        // 2. Fetch History (always, regardless of streak)
         const { getExamHistory } = await import('@/services/database');
         const dbHistory = await getExamHistory();
         if (dbHistory && dbHistory.length > 0 && isMounted) {
@@ -316,6 +329,7 @@ export default function StudentRoot({
       // if (tab === 'complaint') ... removed to allow internal navigation
 
       setActiveTab(tab);
+      sessionStorage.setItem('obhyash_active_tab', tab);
     }
   };
 

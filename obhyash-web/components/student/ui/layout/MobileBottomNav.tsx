@@ -12,78 +12,82 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   onTabChange,
   onMenuClick,
 }) => {
-  // Reordered: Home, History, Exam (center), Rank, Menu
   const items = [
     {
       id: 'dashboard',
-      label: 'Home',
+      label: 'হোম',
       icon: LayoutDashboard,
     },
     {
       id: 'history',
-      label: 'History',
+      label: 'ইতিহাস',
       icon: History,
     },
     {
       id: 'setup',
-      label: 'Exam',
+      label: 'পরীক্ষা',
       icon: FileEdit,
-      isCenter: true, // Special flag for center button
+      isCenter: true,
     },
     {
       id: 'leaderboard',
-      label: 'Rank',
+      label: 'র‍্যাংক',
       icon: Trophy,
     },
     {
       id: 'menu',
-      label: 'Menu',
+      label: 'মেনু',
       icon: Menu,
       action: 'menu',
     },
   ];
 
+  const handleTap = (item: (typeof items)[0]) => {
+    // Haptic vibration feedback
+    if (navigator.vibrate) {
+      navigator.vibrate(10);
+    }
+
+    if (item.action === 'menu') {
+      onMenuClick();
+    } else {
+      onTabChange(item.id);
+    }
+  };
+
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 lg:hidden">
-      <div className="bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-3xl shadow-xl shadow-black/10 dark:shadow-black/30 flex items-center justify-around p-2 pb-safe">
+    <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
+      {/* Top subtle shadow/border */}
+      <div className="bg-white dark:bg-neutral-950 border-t border-neutral-200/80 dark:border-neutral-800/80 flex items-stretch justify-around px-1 pb-safe">
         {items.map((item) => {
           const isActive = activeTab === item.id;
           const Icon = item.icon;
-          const isCenter = item.isCenter;
 
           return (
             <motion.button
               key={item.id}
               whileTap={{ scale: 0.85 }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-              onClick={() => {
-                if (item.action === 'menu') {
-                  onMenuClick();
-                } else {
-                  onTabChange(item.id);
-                }
-              }}
+              transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+              onClick={() => handleTap(item)}
               className={`
-                relative flex items-center justify-center transition-all duration-300
+                relative flex items-center justify-center flex-1 py-4 transition-colors duration-200
                 ${
                   isActive
-                    ? 'w-14 h-14 rounded-2xl bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400'
-                    : 'w-14 h-14 rounded-2xl text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                    ? 'text-rose-600 dark:text-rose-400'
+                    : 'text-neutral-400 dark:text-neutral-500 active:text-neutral-600 dark:active:text-neutral-300'
                 }
               `}
             >
-              <Icon
-                size={isCenter ? 32 : 28}
-                strokeWidth={isCenter || isActive ? 2.5 : 2}
-              />
+              {/* Active top indicator */}
               {isActive && (
                 <motion.div
-                  layoutId="activeTab"
-                  className="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-rose-600 dark:bg-rose-400"
-                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  layoutId="bottomNavIndicator"
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[2.5px] rounded-full bg-rose-500 dark:bg-rose-400"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
+
+              <Icon size={24} strokeWidth={isActive ? 2.2 : 1.8} />
             </motion.button>
           );
         })}

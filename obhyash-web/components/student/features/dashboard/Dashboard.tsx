@@ -281,30 +281,30 @@ const Dashboard: React.FC<DashboardProps> = ({
       <div className="lg:col-span-1 h-full">
         <div
           onClick={onLeaderboardClick}
-          className="relative bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden group cursor-pointer hover:border-amber-200 dark:hover:border-amber-900/50 transition-all active:scale-[0.99] duration-200 h-full"
+          className="relative bg-white dark:bg-neutral-900 rounded-3xl p-5 border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden group cursor-pointer hover:border-amber-200 dark:hover:border-amber-900/50 transition-all active:scale-[0.99] duration-200 h-full"
         >
           {/* Subtle Background Pattern */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-50 to-transparent dark:from-amber-900/10 dark:to-transparent rounded-bl-full -mr-4 -mt-4 opacity-50"></div>
 
-          <div className="flex justify-between items-center mb-6 relative z-10">
-            <h3 className="text-lg font-bold text-neutral-800 dark:text-white flex items-center gap-2">
-              <span className="p-2 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 rounded-xl">
+          <div className="flex justify-between items-center mb-4 relative z-10">
+            <h3 className="text-base font-bold text-neutral-800 dark:text-white flex items-center gap-2">
+              <span className="p-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 rounded-lg">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className="w-5 h-5"
+                  className="w-4 h-4"
                 >
                   <path
                     fillRule="evenodd"
-                    d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.625H9.21a.75.75 0 0 0 .375.093c.732 0 1.402.092 2.028.222.755.157 1.25.858 1.18 1.63a6.452 6.452 0 0 1-1.385 3.327.75.75 0 0 0 .97 1.133c1.768-1.516 3.037-3.66 3.426-6.079.035-.218.066-.437.093-.657.25-1.922 1.353-3.6 3.023-4.66a.75.75 0 0 0 .363-.63 6.753 6.753 0 0 0-6.138-5.625.75.75 0 0 0-.584-.858 47.76 47.76 0 0 0-3.07-.543V.87a.75.75 0 0 0-.75-.75h-2.25a.75.75 0 0 0-.75.75ZM3.496 6.004c1.625-.33 3.315-.563 5.048-.678.18-.012.355-.022.525-.03h.001a.75.75 0 0 0 .698-.695 5.55 5.55 0 0 1 .497-2.193 49.33 49.33 0 0 1 2.97.518c.28.056.55.116.81.178.683.163 1.346.36 1.988.586a5.253 5.253 0 0 0-2.31 4.254v.001c-.027.218-.057.435-.092.65a6.45 6.45 0 0 1-1.576 3.37.75.75 0 0 0 .172 1.023 8.35 8.35 0 0 0 2.214 1.037c-.77 2.37-2.613 4.253-4.992 5.163a.75.75 0 0 0-.46.852l.223.924a.75.75 0 0 0 1.058.534c4.32-1.652 7.348-5.836 7.348-10.706 0-1.293-.21-2.533-.596-3.702a.75.75 0 0 0-1.127-.406 3.753 3.753 0 0 1-2.83.69 5.25 5.25 0 0 0-4.22 1.572.75.75 0 0 0 .195 1.156c1.61.942 2.7 2.554 2.943 4.417.027.21.054.42.083.629a8.077 8.077 0 0 1-1.282 4.63.75.75 0 0 0 .97 1.134 9.578 9.578 0 0 0 1.58-5.32c-.033-.236-.064-.474-.095-.712a3.751 3.751 0 0 0-2.99-3.23.75.75 0 0 0-.586.13 6.75 6.75 0 0 0-6.138 5.625Z"
+                    d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.625 6.753 6.753 0 0 0 6.138-5.625.75.75 0 0 0-.584-.86 47.78 47.78 0 0 0-3.07-.542V2.62a.75.75 0 0 0-.75-.75h-3.467a.75.75 0 0 0-.75.75ZM12.75 21.696a.75.75 0 0 1-.75.75H12a.75.75 0 0 1-.75-.75v-3.803a6.753 6.753 0 0 1-5.625-6.138.75.75 0 0 1 .859-.584c.213.036.427.07.641.1V9.75a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 .75.75v1.521c.214-.03.428-.064.641-.1a.75.75 0 0 1 .859.584 6.753 6.753 0 0 1-5.625 6.138v3.803Z"
                     clipRule="evenodd"
                   />
                 </svg>
               </span>
               লিডারবোর্ড
             </h3>
-            <button className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1 group-hover:gap-1.5 transition-all bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-full">
+            <button className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1 group-hover:gap-1.5 transition-all bg-amber-50 dark:bg-amber-900/20 px-2.5 py-1 rounded-full">
               সব দেখুন
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -320,82 +320,69 @@ const Dashboard: React.FC<DashboardProps> = ({
               </svg>
             </button>
           </div>
-          <div className="flex flex-col gap-3 relative z-10">
-            <div className="flex items-center gap-4 bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-2xl border border-neutral-100 dark:border-neutral-700/50">
-              <div className="flex-1">
-                <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-bold uppercase tracking-wider mb-1">
-                  আপনার র‍্যাংক
-                </p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-black text-neutral-800 dark:text-white">
-                    #{userRank || '-'}
+
+          {/* Mini Leaderboard Table */}
+          <div className="relative z-10 space-y-2">
+            {/* Header Row */}
+            <div className="grid grid-cols-[2rem_2rem_1fr] gap-2.5 items-center px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+              <span>#</span>
+              <span></span>
+              <span>নাম</span>
+            </div>
+
+            {/* Topper Row */}
+            <div className="grid grid-cols-[2rem_2rem_1fr] gap-2.5 items-center px-3 py-2.5 rounded-xl bg-gradient-to-r from-amber-50 to-amber-50/30 dark:from-amber-900/20 dark:to-amber-900/5 border border-amber-100/60 dark:border-amber-800/30">
+              <span className="text-sm font-black text-amber-600 dark:text-amber-400">
+                🥇
+              </span>
+              {topUser ? (
+                <>
+                  <div
+                    className={`w-7 h-7 rounded-full ${topUser.avatarColor || 'bg-amber-500'} text-white text-[11px] flex items-center justify-center font-bold shadow-sm ring-2 ring-amber-200 dark:ring-amber-800`}
+                  >
+                    {topUser.name?.charAt(0)}
+                  </div>
+                  <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200 truncate">
+                    {topUser.name?.split(' ').slice(0, 2).join(' ')}
                   </span>
-                  <span className="text-xs font-medium text-neutral-400">
-                    / {totalUsers}
-                  </span>
-                </div>
+                </>
+              ) : (
+                <>
+                  <div className="w-7 h-7 rounded-full bg-neutral-200 dark:bg-neutral-700 animate-pulse"></div>
+                  <div className="h-3.5 w-24 bg-neutral-200 dark:bg-neutral-700 rounded-full animate-pulse"></div>
+                </>
+              )}
+            </div>
+
+            {/* Current User Row */}
+            <div className="grid grid-cols-[2rem_2rem_1fr] gap-2.5 items-center px-3 py-2.5 rounded-xl bg-gradient-to-r from-sky-50 to-sky-50/30 dark:from-sky-900/15 dark:to-sky-900/5 border border-sky-100/60 dark:border-sky-800/30">
+              <span className="text-sm font-black text-sky-600 dark:text-sky-400">
+                #{userRank || '-'}
+              </span>
+              <div
+                className={`w-7 h-7 rounded-full ${user.avatarColor || 'bg-sky-500'} text-white text-[11px] flex items-center justify-center font-bold shadow-sm ring-2 ring-sky-200 dark:ring-sky-800`}
+              >
+                {user.name?.charAt(0)}
               </div>
-              <div className="h-10 w-px bg-neutral-200 dark:bg-neutral-700"></div>
-              <div className="flex-1">
-                <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-bold uppercase tracking-wider mb-1">
-                  শীর্ষ স্থান
-                </p>
-                {topUser ? (
-                  <div className="flex items-center gap-2.5">
-                    <div
-                      className={`w-8 h-8 rounded-full ${topUser.avatarColor || 'bg-neutral-400'} text-white text-xs flex items-center justify-center font-bold shadow-sm ring-2 ring-white dark:ring-neutral-800`}
-                    >
-                      {topUser.name?.charAt(0)}
-                    </div>
-                    <div className="overflow-hidden">
-                      <div className="text-sm font-bold text-neutral-800 dark:text-neutral-200 truncate">
-                        {topUser.name?.split(' ')[0]}
-                      </div>
-                      <div className="text-[10px] text-amber-500 font-bold font-mono leading-none flex items-center gap-0.5">
-                        {topUser.xp} XP
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2.5 animate-pulse">
-                    <div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-700"></div>
-                    <div className="flex-1 space-y-1.5">
-                      <div className="h-3 w-16 bg-neutral-200 dark:bg-neutral-700 rounded full" />
-                      <div className="h-2 w-10 bg-neutral-100 dark:bg-neutral-800 rounded-full" />
-                    </div>
-                  </div>
-                )}
+              <div className="flex items-center gap-1.5 truncate">
+                <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200 truncate">
+                  {user.name?.split(' ').slice(0, 2).join(' ')}
+                </span>
+                <span className="text-[9px] font-bold text-sky-500 dark:text-sky-400 bg-sky-100 dark:bg-sky-900/30 px-1.5 py-0.5 rounded-full shrink-0">
+                  আপনি
+                </span>
               </div>
             </div>
 
-            {xpDiff > 0 ? (
-              <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 bg-amber-50/50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-100/50 dark:border-amber-900/20">
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></div>
-                <span>
-                  শীর্ষে পৌঁছাতে আরও{' '}
-                  <span className="font-bold text-neutral-800 dark:text-neutral-200">
-                    {xpDiff.toLocaleString()} XP
-                  </span>{' '}
-                  প্রয়োজন
-                </span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-900/10 p-3 rounded-xl border border-emerald-100/50 dark:border-emerald-900/20">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-4 h-4"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.497 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.491 4.491 0 0 1 3.497-1.307Zm4.402 4.05a.75.75 0 1 0-1.06-1.06l-3.667 3.667-1.06-1.06a.75.75 0 1 0-1.06 1.06l1.59 1.591a.75.75 0 0 0 1.061 0l4.242-4.243Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="font-bold">
-                  অভিনন্দন! আপনি এখন সবার শীর্ষে!
-                </span>
+            {/* XP Gap Indicator */}
+            {xpDiff > 0 && (
+              <div className="flex items-center gap-1.5 text-[11px] text-neutral-500 dark:text-neutral-400 px-3 pt-1">
+                <div className="w-1 h-1 rounded-full bg-amber-400 animate-pulse"></div>
+                শীর্ষে পৌঁছাতে আরও{' '}
+                <span className="font-bold text-neutral-700 dark:text-neutral-300">
+                  {xpDiff.toLocaleString()} XP
+                </span>{' '}
+                প্রয়োজন
               </div>
             )}
           </div>

@@ -25,6 +25,13 @@ export default function DashboardClient({
     return 'light';
   });
 
+  // Cache user profile locally for instant loading on next visit
+  useEffect(() => {
+    if (user?.id) {
+      localStorage.setItem('obhyash_user_profile', JSON.stringify(user));
+    }
+  }, [user]);
+
   // Load theme from local storage or preference
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
@@ -38,6 +45,9 @@ export default function DashboardClient({
   };
 
   const handleLogout = async () => {
+    // Clear cached data on logout
+    sessionStorage.removeItem('obhyash_active_tab');
+    localStorage.removeItem('obhyash_user_profile');
     await supabase.auth.signOut();
     router.refresh();
     router.replace('/');
