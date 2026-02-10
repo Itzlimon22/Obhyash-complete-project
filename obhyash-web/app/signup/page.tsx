@@ -45,7 +45,7 @@ export default function SignupPage() {
     institute: '',
     stream: 'HSC',
     group: 'Science',
-    batch: 'HSC 2025',
+    batch: 'HSC 2026',
 
     // Step 3: Credentials (Was Step 1)
     email: '',
@@ -56,7 +56,14 @@ export default function SignupPage() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'stream') {
+      // Auto-reset batch when stream changes
+      const firstBatch = `${value} 2026`;
+      setFormData({ ...formData, stream: value, batch: firstBatch });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
     setError(null);
   };
 
@@ -209,8 +216,8 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-black px-4">
-        <div className="w-full max-w-md bg-white dark:bg-gray-950 rounded-3xl p-8 shadow-xl text-center border border-slate-100 dark:border-slate-800 animate-in fade-in zoom-in duration-300">
+      <div className="flex min-h-screen items-center justify-center bg-neutral-100 dark:bg-black px-4">
+        <div className="w-full max-w-md bg-white dark:bg-neutral-950 rounded-3xl p-8 shadow-xl text-center border border-neutral-200 dark:border-neutral-800 animate-in fade-in zoom-in duration-300">
           <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-6 text-emerald-600 dark:text-emerald-400">
             <CheckCircle2 className="w-10 h-10" />
           </div>
@@ -241,7 +248,7 @@ export default function SignupPage() {
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
               step >= s
-                ? 'bg-rose-600 text-white shadow-lg shadow-rose-500/30 scale-100'
+                ? 'bg-red-600 text-white shadow-lg shadow-red-500/30 scale-100'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-400 scale-90'
             }`}
           >
@@ -250,7 +257,7 @@ export default function SignupPage() {
           {s < 3 && (
             <div
               className={`w-12 h-1 rounded-full mx-2 transition-all duration-500 ${
-                step > s ? 'bg-rose-600' : 'bg-slate-100 dark:bg-slate-800'
+                step > s ? 'bg-red-600' : 'bg-slate-100 dark:bg-slate-800'
               }`}
             />
           )}
@@ -260,10 +267,10 @@ export default function SignupPage() {
   );
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-black p-4 font-sans max-md:pt-20">
-      <div className="w-full max-w-lg bg-white dark:bg-gray-950 rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 relative z-10">
+    <div className="flex min-h-screen items-center justify-center bg-neutral-100 dark:bg-black p-4 font-sans max-md:pt-20">
+      <div className="w-full max-w-lg bg-white dark:bg-neutral-950 rounded-[2rem] shadow-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 relative z-10">
         {/* Header Decor */}
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-rose-500 via-purple-500 to-indigo-500" />
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 via-red-500 to-rose-500" />
 
         <div className="p-8 md:p-10">
           <div className="text-center mb-8">
@@ -289,14 +296,14 @@ export default function SignupPage() {
                     আপনার নাম
                   </label>
                   <div className="relative group">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="পূর্ণ নাম (Full Name)"
-                      className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200"
+                      className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
                     />
                   </div>
                 </div>
@@ -306,14 +313,14 @@ export default function SignupPage() {
                     ফোন নাম্বার
                   </label>
                   <div className="relative group">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
                       placeholder="017xxxxxxxx"
-                      className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200"
+                      className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
                     />
                   </div>
                 </div>
@@ -330,7 +337,7 @@ export default function SignupPage() {
                         onClick={() => setFormData({ ...formData, gender: g })}
                         className={`py-3 rounded-xl text-sm font-bold transition-all border ${
                           formData.gender === g
-                            ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-500 text-rose-600 dark:text-rose-400 shadow-sm'
+                            ? 'bg-red-50 dark:bg-red-900/20 border-red-500 text-red-600 dark:text-red-400 shadow-sm'
                             : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-white dark:hover:bg-slate-900 hover:border-slate-300'
                         }`}
                       >
@@ -342,7 +349,7 @@ export default function SignupPage() {
               </div>
             )}
 
-            {/* STEP 2: ACADEMIC INFO (Was Step 3) */}
+            {/* STEP 2: ACADEMIC INFO */}
             {step === 2 && (
               <div className="space-y-5 animate-in slide-in-from-right-4 fade-in duration-300">
                 <div className="space-y-1.5">
@@ -350,30 +357,49 @@ export default function SignupPage() {
                     শিক্ষা প্রতিষ্ঠান
                   </label>
                   <div className="relative group">
-                    <School className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                    <School className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
                     <input
                       type="text"
                       name="institute"
                       value={formData.institute}
                       onChange={handleChange}
                       placeholder="কলেজ / স্কুলের নাম"
-                      className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200"
+                      className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
                     />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                    স্ট্রিম (Stream)
+                  </label>
+                  <div className="relative">
+                    <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                    <select
+                      name="stream"
+                      value={formData.stream}
+                      onChange={handleChange}
+                      className="w-full pl-10 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 appearance-none cursor-pointer"
+                    >
+                      <option value="HSC">HSC</option>
+                      <option value="SSC">SSC</option>
+                      <option value="Admission">Admission</option>
+                    </select>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                      বিভাগ (Group)
+                      বিভাগ (Division)
                     </label>
                     <div className="relative">
-                      <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                      <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
                       <select
                         name="group"
                         value={formData.group}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200 appearance-none cursor-pointer"
+                        className="w-full pl-10 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 appearance-none cursor-pointer"
                       >
                         <option value="Science">Science</option>
                         <option value="Business Studies">
@@ -394,11 +420,16 @@ export default function SignupPage() {
                         name="batch"
                         value={formData.batch}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200 appearance-none cursor-pointer"
+                        className="w-full pl-10 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 appearance-none cursor-pointer"
                       >
-                        <option>HSC 2024</option>
-                        <option>HSC 2025</option>
-                        <option>HSC 2026</option>
+                        {[2024, 2025, 2026, 2027].map((year) => (
+                          <option
+                            key={year}
+                            value={`${formData.stream} ${year}`}
+                          >
+                            {formData.stream} {year}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
@@ -415,14 +446,14 @@ export default function SignupPage() {
                       ইমেইল এড্রেস
                     </label>
                     <div className="relative group">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
                       <input
                         type="email"
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="example@mail.com"
-                        className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200"
+                        className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
                       />
                     </div>
                   </div>
@@ -432,14 +463,14 @@ export default function SignupPage() {
                       পাসওয়ার্ড
                     </label>
                     <div className="relative group">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
                       <input
                         type={showPassword ? 'text' : 'password'}
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
                         placeholder="কমপক্ষে ৬ অক্ষর"
-                        className="w-full pl-12 pr-12 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200"
+                        className="w-full pl-12 pr-12 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
                       />
                       <button
                         type="button"
@@ -460,14 +491,14 @@ export default function SignupPage() {
                       পাসওয়ার্ড নিশ্চিত করুন
                     </label>
                     <div className="relative group">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
                       <input
                         type={showPassword ? 'text' : 'password'}
                         name="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleChange}
                         placeholder="পাসওয়ার্ডটি আবার লিখুন"
-                        className="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all font-medium text-slate-800 dark:text-slate-200"
+                        className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
                       />
                     </div>
                   </div>
@@ -491,7 +522,7 @@ export default function SignupPage() {
                 type="button"
                 onClick={step === 3 ? handleSignup : handleNext}
                 disabled={loading}
-                className="flex-1 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-700 hover:to-amber-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-rose-500/30 active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-emerald-500/30 active:scale-95 transition-all flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -514,7 +545,7 @@ export default function SignupPage() {
               আগেই অ্যাকাউন্ট আছে?{' '}
               <Link
                 href="/login"
-                className="text-rose-600 hover:text-rose-700 font-bold hover:underline"
+                className="text-red-600 hover:text-red-700 font-bold hover:underline"
               >
                 লগইন করুন
               </Link>
