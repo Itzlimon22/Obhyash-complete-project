@@ -68,7 +68,7 @@ export const getLeaderboardUsers = async (
       const { data, error } = await supabase
         .from('public_profiles')
         .select(
-          'id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak',
+          'id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak, role',
         )
         .eq('level', level)
         .eq('role', 'student') // Filter to show only students
