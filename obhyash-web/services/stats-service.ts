@@ -263,3 +263,44 @@ export const getOverallAnalytics = async (
     subjectData: [],
   };
 };
+// ... existing code ...
+
+export const getTeacherStats = async (
+  authorEmailOrName: string, // Match how questions.author is stored
+): Promise<{
+  totalQuestions: number;
+  approved: number;
+  pending: number;
+  rejected: number;
+}> => {
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      // We can use the getQuestionCount service we just updated, or do a direct aggregation
+      // Direct aggregation might be faster if we want all statuses at once
+      const { data, error } = await supabase
+        .from('questions')
+        .select('status')
+        .eq('author', authorEmailOrName);
+
+      if (error) throw error;
+
+      const stats = {
+        totalQuestions: data?.length || 0,
+        approved: data?.filter((q) => q.status === 'Approved').length || 0,
+        pending: data?.filter((q) => q.status === 'Pending').length || 0,
+        rejected: data?.filter((q) => q.status === 'Rejected').length || 0,
+      };
+
+      return stats;
+    } catch (error) {
+      console.error('Failed to fetch teacher stats:', error);
+    }
+  }
+
+  return {
+    totalQuestions: 0,
+    approved: 0,
+    pending: 0,
+    rejected: 0,
+  };
+};

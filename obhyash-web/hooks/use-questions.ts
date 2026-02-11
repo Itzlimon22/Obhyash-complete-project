@@ -15,6 +15,7 @@ export interface UseQuestionsOptions {
   initialPage?: number;
   initialPageSize?: number;
   initialFilters?: QuestionFilters;
+  baseFilters?: QuestionFilters; // Added baseFilters to enforce restrictions
 }
 
 export const useQuestions = (options: UseQuestionsOptions = {}) => {
@@ -22,6 +23,7 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
     initialPage = 1,
     initialPageSize = 20,
     initialFilters = {},
+    baseFilters = {}, // Default to empty object
   } = options;
 
   // State
@@ -31,7 +33,11 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [filters, setFilters] = useState<QuestionFilters>(initialFilters);
+  // Initialize filters with baseFilters
+  const [filters, setFilters] = useState<QuestionFilters>({
+    ...initialFilters,
+    ...baseFilters,
+  });
   const [sortBy, setSortBy] = useState<string>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(
@@ -60,7 +66,7 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
     } finally {
       setIsLoading(false);
     }
-  }, [page, pageSize, filters, sortBy, sortOrder]);
+  }, [page, pageSize, filters, sortBy, sortOrder]); // filters already contains baseFilters due to state initialization and updates
 
   // Pagination controls
   const goToPage = useCallback((newPage: number) => {
@@ -85,17 +91,20 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
   }, []);
 
   // Filter controls
-  const updateFilters = useCallback((newFilters: QuestionFilters) => {
-    setFilters(newFilters);
-    setPage(1); // Reset to first page when filters change
-    setSelectedQuestions(new Set());
-  }, []);
+  const updateFilters = useCallback(
+    (newFilters: QuestionFilters) => {
+      setFilters({ ...newFilters, ...baseFilters }); // Ensure baseFilters are always applied
+      setPage(1); // Reset to first page when filters change
+      setSelectedQuestions(new Set());
+    },
+    [baseFilters],
+  );
 
   const clearFilters = useCallback(() => {
-    setFilters({});
+    setFilters({ ...baseFilters }); // Reset to baseFilters instead of empty
     setPage(1);
     setSelectedQuestions(new Set());
-  }, []);
+  }, [baseFilters]);
 
   // Sorting controls
   const updateSort = useCallback((field: string, order: 'asc' | 'desc') => {

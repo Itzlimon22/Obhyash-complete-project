@@ -26,6 +26,7 @@ import UserStatsCards from '@/components/admin/user-management/UserStatsCards';
 import UserFilters from '@/components/admin/user-management/UserFilters';
 import UserTable from '@/components/admin/user-management/UserTable';
 import EditUserModal from '@/components/admin/user-management/EditUserModal';
+import TeacherStatsModal from '@/components/admin/user-management/TeacherStatsModal'; // Added import
 
 export default function UserManagementPage() {
   const {
@@ -79,6 +80,9 @@ export default function UserManagementPage() {
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [subscriptionUser, setSubscriptionUser] = useState<User | null>(null);
 
+  const [showTeacherStatsModal, setShowTeacherStatsModal] = useState(false); // Added state
+  const [teacherStatsUser, setTeacherStatsUser] = useState<User | null>(null); // Added state
+
   const [showBulkEmailModal, setShowBulkEmailModal] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [showBulkActions, setShowBulkActions] = useState(false);
@@ -103,6 +107,12 @@ export default function UserManagementPage() {
   const onManageSubscription = (user: User) => {
     setSubscriptionUser(user);
     setShowSubscriptionModal(true);
+  };
+
+  const onManageTeacherStats = (user: User) => {
+    // Added handler
+    setTeacherStatsUser(user);
+    setShowTeacherStatsModal(true);
   };
 
   const handleExport = () => {
@@ -374,6 +384,7 @@ export default function UserManagementPage() {
           } // Placeholder or pass logic
           onUpdateStatus={handleUpdateStatus}
           onDeleteUser={handleDeleteUser}
+          onViewStats={onManageTeacherStats} // Passed handler
         />
 
         {/* Modals */}
@@ -421,6 +432,15 @@ export default function UserManagementPage() {
             onUpdate={() => fetchUsers()}
           />
         )}
+
+        {showTeacherStatsModal &&
+          teacherStatsUser && ( // Render Modal
+            <TeacherStatsModal
+              isOpen={showTeacherStatsModal}
+              onClose={() => setShowTeacherStatsModal(false)}
+              user={teacherStatsUser}
+            />
+          )}
       </div>
     </div>
   );

@@ -42,12 +42,14 @@ export async function updateSession(request: NextRequest) {
   // 2. Define Paths
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
   const isStudentRoute = request.nextUrl.pathname.startsWith('/dashboard');
+  const isTeacherRoute = request.nextUrl.pathname.startsWith('/teacher'); // Added
   const isAuthRoute = ['/login', '/signup'].includes(request.nextUrl.pathname);
 
   // 3. Security Checks
 
   // SCENARIO A: Not Logged In -> Kick to Login
-  if (!user && (isAdminRoute || isStudentRoute)) {
+  if (!user && (isAdminRoute || isStudentRoute || isTeacherRoute)) {
+    // Added teacher route
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     // Optional: Add ?next= param to redirect back after login
@@ -71,6 +73,9 @@ export async function updateSession(request: NextRequest) {
       const url = request.nextUrl.clone();
       if (role.toLowerCase() === 'admin') {
         url.pathname = '/admin/dashboard';
+      } else if (role.toLowerCase() === 'teacher') {
+        // Added teacher redirect
+        url.pathname = '/teacher/dashboard';
       } else {
         url.pathname = '/dashboard';
       }
@@ -80,7 +85,8 @@ export async function updateSession(request: NextRequest) {
     // Check Role Access if already on protected route
     // Note: We avoid repetitive DB calls if possible, but middleware needs to be secure.
     // For performance, you might rely on layout checks, but middleware is safest.
-    if (isAdminRoute || isStudentRoute) {
+    if (isAdminRoute || isStudentRoute || isTeacherRoute) {
+      // Added teacher route
       const { data: profile } = await supabase
         .from('users')
         .select('role')
@@ -91,6 +97,11 @@ export async function updateSession(request: NextRequest) {
 
       // Protect Admin Area (case-insensitive)
       if (isAdminRoute && role.toLowerCase() !== 'admin') {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+      }
+
+      // Protect Teacher Area
+      if (isTeacherRoute && role.toLowerCase() !== 'teacher') {
         return NextResponse.redirect(new URL('/dashboard', request.url));
       }
 

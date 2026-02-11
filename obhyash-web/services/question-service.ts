@@ -10,6 +10,7 @@ export interface QuestionFilters {
   difficulty?: string | null;
   status?: string | null;
   search?: string | null;
+  author?: string | null; // Added author filter
 }
 
 export interface PaginatedQuestionsResponse {
@@ -50,6 +51,9 @@ export const getQuestionsPage = async (
       }
       if (filters.status) {
         query = query.eq('status', filters.status);
+      }
+      if (filters.author) {
+        query = query.eq('author', filters.author);
       }
 
       // Apply search (full-text search on question content)
@@ -130,6 +134,7 @@ export const getQuestionCount = async (
       if (filters.difficulty)
         query = query.eq('difficulty', filters.difficulty);
       if (filters.status) query = query.eq('status', filters.status);
+      if (filters.author) query = query.eq('author', filters.author);
       if (filters.search)
         query = query.ilike('question', `%${filters.search}%`);
 

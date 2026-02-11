@@ -37,6 +37,7 @@ interface UserTableProps {
   onResetPassword: (userId: string, email: string) => void;
   onUpdateStatus: (userId: string, status: string) => void;
   onDeleteUser: (userId: string) => void;
+  onViewStats?: (user: User) => void; // Added prop
 }
 
 const UserTable: React.FC<UserTableProps> = ({
@@ -53,6 +54,7 @@ const UserTable: React.FC<UserTableProps> = ({
   onResetPassword,
   onUpdateStatus,
   onDeleteUser,
+  onViewStats, // Destructured
 }) => {
   const [showActionMenu, setShowActionMenu] = useState<string | null>(null);
 
@@ -173,6 +175,21 @@ const UserTable: React.FC<UserTableProps> = ({
                         <Activity className="w-4 h-4" />
                         View Activity Log
                       </button>
+
+                      {/* Teacher Stats Button */}
+                      {user.role === 'Teacher' && onViewStats && (
+                        <button
+                          onClick={() => {
+                            onViewStats(user);
+                            setShowActionMenu(null);
+                          }}
+                          className="w-full px-4 py-2.5 text-left text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700 flex items-center gap-3 text-neutral-700 dark:text-neutral-300 transition-colors"
+                        >
+                          <Activity className="w-4 h-4 text-emerald-600" />
+                          View Analytics
+                        </button>
+                      )}
+
                       <button
                         onClick={() => {
                           onEditUser(user);
@@ -424,6 +441,21 @@ const UserTable: React.FC<UserTableProps> = ({
                               <Activity className="w-4 h-4" />
                               View Activity Log
                             </button>
+
+                            {/* Teacher Stats Button */}
+                            {user.role === 'Teacher' && onViewStats && (
+                              <button
+                                onClick={() => {
+                                  onViewStats(user);
+                                  setShowActionMenu(null);
+                                }}
+                                className="w-full px-4 py-2.5 text-left text-sm hover:bg-neutral-50 dark:hover:bg-neutral-700 flex items-center gap-3 text-neutral-700 dark:text-neutral-300 transition-colors"
+                              >
+                                <Activity className="w-4 h-4 text-emerald-600" />
+                                View Analytics
+                              </button>
+                            )}
+
                             <button
                               onClick={() => {
                                 onEditUser(user);
