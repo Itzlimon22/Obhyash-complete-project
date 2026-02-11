@@ -526,8 +526,8 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
   // Helper to resolve topic serials to names
   const resolveTopicSerials = async (questions: Partial<Question>[]) => {
-    // 1. Identify unique subjects
-    const subjects = Array.from(
+    // 1. Identify unique subjects from the uploaded data
+    const uploadedSubjects = Array.from(
       new Set(
         questions
           .map((q) => q.subject)
@@ -535,89 +535,165 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
       ),
     );
 
-    // 2. Fetch metadata for these subjects
-    // We need: Subject Mapping -> Chapter Mapping -> Topic Mapping
-    // This assumes names are used for Subject/Chapter in the Question object
+    console.log(
+      '[TopicResolver] Starting resolution for subjects:',
+      uploadedSubjects,
+    );
 
-    // Map: SubjectName -> { ChapterName -> { Serial -> TopicName } }
+    // Map: UploadedSubjectName -> { UploadedChapterName -> { Serial -> TopicName } }
     const topicMap: Record<string, Record<string, Record<string, string>>> = {};
 
     try {
-      // Fetch all subjects to get IDs (needed for chapters)
-      const allSubjects = await getSubjects(); // This gets all, might be optimized if we filter by name
+      // Fetch all subjects from DB to get IDs
+      const allSubjects = await getSubjects();
+      console.log(
+        '[TopicResolver] DB subjects:',
+        allSubjects.map((s) => ({
+          id: s.id,
+          name: s.name,
+          ...('name_bn' in s ? { name_bn: (s as any).name_bn } : {}),
+          ...('name_en' in s ? { name_en: (s as any).name_en } : {}),
+        })),
+      );
 
-      for (const subjectName of subjects) {
-        const subject = allSubjects.find(
-          (s) => s.name === subjectName || s.name === subjectName,
-        ); // match name
-        if (!subject) continue;
+      for (const uploadedName of uploadedSubjects) {
+        // Robust matching: try exact, then case-insensitive, then partial
+        const normalizedUpload = uploadedName.trim().toLowerCase();
+        const subject = allSubjects.find((s) => {
+          const dbName = (s.name || '').trim().toLowerCase();
+          const dbNameBn = ((s as any).name_bn || '').trim().toLowerCase();
+          const dbNameEn = ((s as any).name_en || '').trim().toLowerCase();
+          const dbId = (s.id || '').trim().toLowerCase();
+          return (
+            dbName === normalizedUpload ||
+            dbNameBn === normalizedUpload ||
+            dbNameEn === normalizedUpload ||
+            dbId === normalizedUpload ||
+            dbName.includes(normalizedUpload) ||
+            normalizedUpload.includes(dbName)
+          );
+        });
 
-        topicMap[subjectName] = {};
+        if (!subject) {
+          console.warn(
+            `[TopicResolver] ❌ No DB subject matched for uploaded name: "${uploadedName}"`,
+          );
+          continue;
+        }
 
-        // Fetch chapters
+        console.log(
+          `[TopicResolver] ✅ Matched subject: "${uploadedName}" -> DB id="${subject.id}", name="${subject.name}"`,
+        );
+        topicMap[uploadedName] = {};
+
+        // Fetch chapters for this subject
         const chapters = await getChapters(subject.id);
+        console.log(
+          `[TopicResolver] Chapters for "${subject.name}":`,
+          chapters.map((c) => ({ id: c.id, name: c.name })),
+        );
+
+        if (chapters.length === 0) {
+          console.warn(
+            `[TopicResolver] ⚠️ No chapters found for subject "${subject.name}" (id: ${subject.id})`,
+          );
+          continue;
+        }
+
         const chapterIds = chapters.map((c) => c.id);
 
         // Fetch topics for these chapters
         const topics = await getTopics(chapterIds);
+        console.log(
+          `[TopicResolver] Topics fetched (${topics.length}):`,
+          topics.map((t) => ({
+            id: t.id,
+            name: t.name,
+            serial: t.serial,
+            chapter_id: t.chapter_id,
+          })),
+        );
 
-        // Build map
+        // Build map: ChapterName -> { Serial -> TopicName }
         chapters.forEach((ch) => {
-          topicMap[subjectName][ch.name] = {};
-          // Filter topics for this chapter
+          topicMap[uploadedName][ch.name] = {};
           const chTopics = topics.filter((t) => t.chapter_id === ch.id);
+
+          if (chTopics.length === 0) {
+            console.warn(
+              `[TopicResolver] ⚠️ No topics for chapter "${ch.name}" (id: ${ch.id})`,
+            );
+          }
+
           chTopics.forEach((t) => {
-            if (t.serial) {
-              topicMap[subjectName][ch.name][String(t.serial)] = t.name;
+            if (t.serial !== undefined && t.serial !== null) {
+              topicMap[uploadedName][ch.name][String(t.serial)] = t.name;
             }
           });
         });
       }
 
       // 3. Apply mapping
-      console.log('Resolving topics for', questions.length, 'questions');
-      console.log('Topic Map built:', JSON.stringify(topicMap, null, 2));
+      console.log(
+        '[TopicResolver] Final Topic Map:',
+        JSON.stringify(topicMap, null, 2),
+      );
 
-      return questions.map((q) => {
-        // Only map if topic looks like a number
+      return questions.map((q, idx) => {
+        // Only try to map if topic looks like a number (serial)
         if (q.subject && q.chapter && q.topic && /^\d+$/.test(q.topic)) {
-          // Normalize user input for lookup
+          // Find subject key (case-insensitive, trim)
           const subjectKey = Object.keys(topicMap).find(
             (k) =>
               k.trim().toLowerCase() === (q.subject || '').trim().toLowerCase(),
           );
 
-          if (subjectKey) {
-            const chapterKey = Object.keys(topicMap[subjectKey]).find(
-              (k) =>
-                k.trim().toLowerCase() ===
-                (q.chapter || '').trim().toLowerCase(),
+          if (!subjectKey) {
+            console.warn(
+              `[TopicResolver] Row ${idx + 1}: Subject "${q.subject}" not in topic map`,
             );
+            return q;
+          }
 
-            if (chapterKey) {
-              const mappedName =
-                topicMap[subjectKey][chapterKey][String(q.topic)];
-              if (mappedName) {
-                console.log(`Mapped topic serial ${q.topic} -> ${mappedName}`);
-                return { ...q, topic: mappedName };
-              } else {
-                console.warn(
-                  `Topic serial ${q.topic} not found in chapter ${chapterKey}`,
-                );
-              }
-            } else {
-              console.warn(
-                `Chapter ${q.chapter} not found in map for subject ${subjectKey}`,
-              );
-            }
+          // Find chapter key (case-insensitive, trim, partial match)
+          const uploadedChapter = (q.chapter || '').trim().toLowerCase();
+          const chapterKey = Object.keys(topicMap[subjectKey]).find((k) => {
+            const dbChapter = k.trim().toLowerCase();
+            return (
+              dbChapter === uploadedChapter ||
+              dbChapter.includes(uploadedChapter) ||
+              uploadedChapter.includes(dbChapter)
+            );
+          });
+
+          if (!chapterKey) {
+            console.warn(
+              `[TopicResolver] Row ${idx + 1}: Chapter "${q.chapter}" not found for subject "${subjectKey}". Available: [${Object.keys(topicMap[subjectKey]).join(', ')}]`,
+            );
+            return q;
+          }
+
+          const serial = String(q.topic);
+          const mappedName = topicMap[subjectKey][chapterKey][serial];
+
+          if (mappedName) {
+            console.log(
+              `[TopicResolver] ✅ Row ${idx + 1}: topic "${serial}" -> "${mappedName}"`,
+            );
+            return { ...q, topic: mappedName };
           } else {
-            console.warn(`Subject ${q.subject} not found in map`);
+            const availableSerials = Object.keys(
+              topicMap[subjectKey][chapterKey],
+            );
+            console.warn(
+              `[TopicResolver] Row ${idx + 1}: Serial "${serial}" not found in chapter "${chapterKey}". Available serials: [${availableSerials.join(', ')}]`,
+            );
           }
         }
         return q;
       });
     } catch (err) {
-      console.error('Error resolving topics:', err);
+      console.error('[TopicResolver] ❌ Error resolving topics:', err);
       return questions; // Fallback to original
     }
   };
@@ -1078,6 +1154,16 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 font-bold">
                       {q.subject || '—'}
                     </span>
+                    {q.chapter && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold truncate max-w-[180px]">
+                        📖 {q.chapter}
+                      </span>
+                    )}
+                    {q.topic && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 font-bold truncate max-w-[180px]">
+                        🏷️ {q.topic}
+                      </span>
+                    )}
                     {q.correctAnswer && (
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 font-bold truncate max-w-[150px]">
                         ✓ {q.correctAnswer}

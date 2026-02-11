@@ -207,13 +207,27 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     const subjectLabel =
       availableSubjects.find((s) => s.id === subject)?.label || subject;
 
+    // Resolve IDs to Names — the questions table stores names, not IDs
+    const chapterNames =
+      selectedChapters.length > 0
+        ? availableChapters
+            .filter((c) => selectedChapters.includes(c.id))
+            .map((c) => c.name)
+        : [];
+    const topicNames =
+      selectedTopics.length > 0
+        ? availableTopics
+            .filter((t) => selectedTopics.includes(t.id))
+            .map((t) => t.name)
+        : [];
+
     try {
       await onStartExam({
         subject,
         subjectLabel,
         examType: examTypes.join(' + '),
-        chapters: selectedChapters.join(',') || 'All',
-        topics: selectedTopics.join(',') || 'General',
+        chapters: chapterNames.length > 0 ? chapterNames.join(',') : 'All',
+        topics: topicNames.length > 0 ? topicNames.join(',') : 'General',
         difficulty,
         questionCount,
         durationMinutes: duration,
