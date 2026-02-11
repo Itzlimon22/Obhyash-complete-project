@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { getUserProfile } from '@/services/user-service';
+import { getTeacherStats } from '@/services/stats-service';
 import TeacherProfileView from '@/components/teacher/ui/TeacherProfileView';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';

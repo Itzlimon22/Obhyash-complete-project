@@ -89,10 +89,10 @@ export default function TeacherProfileView({
   return (
     <div className="max-w-3xl mx-auto space-y-5 pb-24 animate-in fade-in duration-300">
       {/* ── Profile Hero ── */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 rounded-2xl p-6 md:p-8 text-white">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/3" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/3 -translate-x-1/4" />
+      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-800 to-emerald-950 rounded-2xl p-6 md:p-8 text-white shadow-lg shadow-emerald-900/10">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-400 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4" />
         </div>
 
         <div className="relative z-10 flex flex-col sm:flex-row items-center gap-5">
@@ -101,23 +101,23 @@ export default function TeacherProfileView({
               user={user}
               size="2xl"
               showBorder
-              className="ring-4 ring-white/20"
+              className="ring-4 ring-emerald-500/30"
             />
-            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-emerald-400 border-2 border-white flex items-center justify-center">
+            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-rose-500 border-2 border-emerald-900 flex items-center justify-center shadow-lg">
               <Shield size={12} className="text-white" />
             </div>
           </div>
 
           <div className="text-center sm:text-left flex-1 min-w-0">
-            <h1 className="text-2xl md:text-3xl font-black mb-1 truncate">
+            <h1 className="text-2xl md:text-3xl font-black mb-2 truncate text-white">
               {user.name}
             </h1>
             <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
-              <span className="px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-xs font-bold">
+              <span className="px-3 py-1 rounded-full bg-emerald-700/50 backdrop-blur-sm border border-emerald-600/30 text-emerald-100 text-xs font-bold">
                 👨‍🏫 শিক্ষক
               </span>
               {user.institute && (
-                <span className="px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-xs font-bold truncate max-w-[200px]">
+                <span className="px-3 py-1 rounded-full bg-emerald-700/50 backdrop-blur-sm border border-emerald-600/30 text-emerald-100 text-xs font-bold truncate max-w-[200px]">
                   🏫 {user.institute}
                 </span>
               )}
@@ -126,7 +126,7 @@ export default function TeacherProfileView({
 
           <Link
             href="/teacher/settings"
-            className="flex items-center gap-2 px-4 py-2.5 bg-white/15 backdrop-blur-sm rounded-xl text-sm font-bold hover:bg-white/25 transition-all flex-shrink-0"
+            className="flex items-center gap-2 px-4 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-rose-500/20 active:scale-95 transition-all flex-shrink-0"
           >
             <Edit3 size={14} />
             এডিট প্রোফাইল
@@ -137,11 +137,11 @@ export default function TeacherProfileView({
       {/* ── Contribution Stats ── */}
       {stats && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-2">
+          <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5 transition-all">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-2">
               <FileText
                 size={18}
-                className="text-blue-600 dark:text-blue-400"
+                className="text-emerald-700 dark:text-emerald-400"
               />
             </div>
             <p className="text-2xl font-black text-neutral-900 dark:text-white">
@@ -151,8 +151,8 @@ export default function TeacherProfileView({
               মোট প্রশ্ন
             </p>
           </div>
-          <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-2">
+          <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5 transition-all">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-2">
               <CheckCircle
                 size={18}
                 className="text-emerald-600 dark:text-emerald-400"
@@ -165,7 +165,7 @@ export default function TeacherProfileView({
               অনুমোদিত
             </p>
           </div>
-          <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/5 transition-all">
             <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center mb-2">
               <Clock size={18} className="text-amber-600 dark:text-amber-400" />
             </div>
@@ -176,7 +176,7 @@ export default function TeacherProfileView({
               অপেক্ষমান
             </p>
           </div>
-          <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-rose-500/30 hover:shadow-lg hover:shadow-rose-500/5 transition-all">
             <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center mb-2">
               <AlertCircle
                 size={18}
@@ -195,30 +195,30 @@ export default function TeacherProfileView({
 
       {/* ── Earnings Summary ── */}
       {stats && stats.approved > 0 && (
-        <div className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 rounded-2xl p-6 text-white">
+        <div className="relative overflow-hidden bg-gradient-to-br from-rose-600 to-rose-700 rounded-2xl p-6 text-white shadow-lg shadow-rose-600/20">
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-4 right-4">
               <Award size={100} strokeWidth={1} />
             </div>
           </div>
           <div className="relative z-10">
-            <p className="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-1">
+            <p className="text-[10px] font-black text-rose-200 uppercase tracking-widest mb-1">
               আনুমানিক আয়
             </p>
             <h2 className="text-3xl md:text-4xl font-black mb-1 tabular-nums">
               ৳{estimatedEarnings.toLocaleString('bn-BD')}
             </h2>
-            <p className="text-indigo-200 text-sm">
+            <p className="text-rose-100 text-sm">
               {stats.approved}টি অনুমোদিত প্রশ্ন × ৳১০ = মোট আয়
             </p>
             <div className="mt-4 flex items-center gap-4 text-xs">
               <div>
-                <p className="text-indigo-300 font-bold">অনুমোদনের হার</p>
+                <p className="text-rose-200 font-bold">অনুমোদনের হার</p>
                 <p className="text-lg font-black">{approvalRate}%</p>
               </div>
               <div className="w-px h-8 bg-white/20" />
               <div>
-                <p className="text-indigo-300 font-bold">প্রতি প্রশ্ন</p>
+                <p className="text-rose-200 font-bold">প্রতি প্রশ্ন</p>
                 <p className="text-lg font-black">৳১০</p>
               </div>
             </div>
@@ -229,7 +229,7 @@ export default function TeacherProfileView({
       {/* ── Personal Info ── */}
       <div className={cardClass}>
         <div className={headerClass}>
-          <User size={18} className="text-emerald-600" />
+          <User size={18} className="text-emerald-700 dark:text-emerald-500" />
           <h3 className={headerTitleClass}>ব্যক্তিগত তথ্য</h3>
         </div>
         <div className={bodyClass}>
@@ -245,7 +245,10 @@ export default function TeacherProfileView({
       {/* ── Professional Info ── */}
       <div className={cardClass}>
         <div className={headerClass}>
-          <Briefcase size={18} className="text-emerald-600" />
+          <Briefcase
+            size={18}
+            className="text-emerald-700 dark:text-emerald-500"
+          />
           <h3 className={headerTitleClass}>পেশাগত তথ্য</h3>
         </div>
         <div className={bodyClass}>
@@ -261,7 +264,10 @@ export default function TeacherProfileView({
       {teacherData.bio && (
         <div className={cardClass}>
           <div className={headerClass}>
-            <User size={18} className="text-emerald-600" />
+            <User
+              size={18}
+              className="text-emerald-700 dark:text-emerald-500"
+            />
             <h3 className={headerTitleClass}>সংক্ষিপ্ত পরিচিতি</h3>
           </div>
           <div className="p-6">
@@ -275,7 +281,10 @@ export default function TeacherProfileView({
       {/* ── Account Info ── */}
       <div className={cardClass}>
         <div className={headerClass}>
-          <Shield size={18} className="text-emerald-600" />
+          <Shield
+            size={18}
+            className="text-emerald-700 dark:text-emerald-500"
+          />
           <h3 className={headerTitleClass}>অ্যাকাউন্ট তথ্য</h3>
         </div>
         <div className={bodyClass}>
