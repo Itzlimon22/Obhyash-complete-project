@@ -15,6 +15,7 @@ import {
   X,
   Sparkles,
   GraduationCap,
+  UserCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -41,6 +42,25 @@ const TEACHER_NAVIGATION = [
         labelEn: 'Question Bank',
         icon: FileQuestion,
         href: '/teacher/question-management',
+      },
+    ],
+  },
+  {
+    title: 'অ্যাকাউন্ট',
+    items: [
+      {
+        id: 'profile',
+        label: 'প্রোফাইল',
+        labelEn: 'Profile',
+        icon: UserCircle,
+        href: '/teacher/profile',
+      },
+      {
+        id: 'settings',
+        label: 'সেটিংস',
+        labelEn: 'Settings',
+        icon: Settings,
+        href: '/teacher/settings',
       },
     ],
   },
@@ -235,10 +255,14 @@ export default function TeacherSidebar() {
                   </span>
                 </div>
                 <div className="flex gap-1.5">
-                  <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-700 dark:hover:text-neutral-200 transition-all">
+                  <Link
+                    href="/teacher/settings"
+                    onClick={() => setIsMobileOpen(false)}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-700 dark:hover:text-neutral-200 transition-all"
+                  >
                     <Settings size={14} />
                     সেটিংস
-                  </button>
+                  </Link>
                   <button
                     onClick={handleSignOut}
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all"
