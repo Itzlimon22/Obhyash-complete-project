@@ -554,11 +554,11 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
           <div>
             <SubjectStat
               data={subjectStats}
-              onSubjectClick={(subject) => {
-                if (user.isCurrentUser && onSubjectClick) {
-                  onSubjectClick(subject);
-                }
-              }}
+              onSubjectClick={
+                user.isCurrentUser && onSubjectClick
+                  ? (subject) => onSubjectClick(subject)
+                  : undefined
+              }
               isLoading={isLoading}
             />
           </div>

@@ -10,14 +10,14 @@ interface SubjectData {
 
 interface SubjectStatProps {
   data: SubjectData[];
-  onSubjectClick: (subject: string) => void;
+  onSubjectClick?: (subject: string) => void;
   isLoading?: boolean;
 }
 
-const SubjectItem: React.FC<{ subject: SubjectData; onClick: () => void }> = ({
-  subject,
-  onClick,
-}) => {
+const SubjectItem: React.FC<{
+  subject: SubjectData;
+  onClick?: () => void;
+}> = ({ subject, onClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const accuracy =
     subject.total > 0 ? Math.round((subject.correct / subject.total) * 100) : 0;
@@ -101,7 +101,7 @@ const SubjectItem: React.FC<{ subject: SubjectData; onClick: () => void }> = ({
               </div>
             </div>
 
-            <div className="relative h-2.5 w-full bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden flex">
+            <div className="relative h-2.5 w-full bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden flex mb-4">
               <div
                 style={{
                   width: `${(subject.correct / Math.max(subject.total, 1)) * 100}%`,
@@ -115,6 +115,35 @@ const SubjectItem: React.FC<{ subject: SubjectData; onClick: () => void }> = ({
                 className="h-full bg-gradient-to-r from-rose-400 to-rose-600 shadow-sm relative z-10"
               ></div>
             </div>
+
+            {/* Conditionally render Details button */}
+            {onClick && (
+              <div className="flex justify-end">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClick();
+                  }}
+                  className="text-xs font-bold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-white flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+                >
+                  বিস্তারিত রিপোর্ট
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-3 h-3"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -168,7 +197,9 @@ const SubjectStat: React.FC<SubjectStatProps> = ({
           <div key={idx} className="break-inside-avoid">
             <SubjectItem
               subject={subject}
-              onClick={() => onSubjectClick(subject.name)}
+              onClick={
+                onSubjectClick ? () => onSubjectClick(subject.name) : undefined
+              }
             />
           </div>
         ))}

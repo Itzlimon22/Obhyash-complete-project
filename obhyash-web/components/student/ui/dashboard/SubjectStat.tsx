@@ -10,10 +10,10 @@ interface SubjectData {
 
 interface SubjectStatProps {
   data: SubjectData[];
-  onSubjectClick: (subject: string) => void;
+  onSubjectClick?: (subject: string) => void;
 }
 
-const SubjectItem: React.FC<{ subject: SubjectData; onClick: () => void }> = ({
+const SubjectItem: React.FC<{ subject: SubjectData; onClick?: () => void }> = ({
   subject,
   onClick,
 }) => {
@@ -99,31 +99,33 @@ const SubjectItem: React.FC<{ subject: SubjectData; onClick: () => void }> = ({
             </div>
 
             {/* Footer Button (The "See Detailed Report" button) */}
-            <div className="flex justify-center border-t border-neutral-200 dark:border-neutral-700/50 pt-3">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClick();
-                }}
-                className="text-xs font-bold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 flex items-center gap-1.5 transition-colors bg-rose-50 dark:bg-rose-900/10 px-3 py-1.5 rounded-lg border border-rose-100 dark:border-rose-800"
-              >
-                বিস্তারিত রিপোর্ট দেখো
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-3 h-3"
+            {onClick && (
+              <div className="flex justify-center border-t border-neutral-200 dark:border-neutral-700/50 pt-3">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClick();
+                  }}
+                  className="text-xs font-bold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 flex items-center gap-1.5 transition-colors bg-rose-50 dark:bg-rose-900/10 px-3 py-1.5 rounded-lg border border-rose-100 dark:border-rose-800"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                  />
-                </svg>
-              </button>
-            </div>
+                  বিস্তারিত রিপোর্ট দেখো
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-3 h-3"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -145,7 +147,9 @@ const SubjectStat: React.FC<SubjectStatProps> = ({ data, onSubjectClick }) => {
           <SubjectItem
             key={idx}
             subject={subject}
-            onClick={() => onSubjectClick(subject.name)}
+            onClick={
+              onSubjectClick ? () => onSubjectClick(subject.name) : undefined
+            }
           />
         ))}
 

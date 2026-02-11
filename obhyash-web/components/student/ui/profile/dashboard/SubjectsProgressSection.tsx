@@ -11,10 +11,12 @@ interface SubjectStat {
 
 interface SubjectsProgressSectionProps {
   subjectStats: SubjectStat[];
+  onSubjectClick?: (subject: string) => void;
 }
 
 const SubjectsProgressSection: React.FC<SubjectsProgressSectionProps> = ({
   subjectStats,
+  onSubjectClick,
 }) => {
   if (subjectStats.length === 0) {
     return (
@@ -80,12 +82,38 @@ const SubjectsProgressSection: React.FC<SubjectsProgressSectionProps> = ({
             </div>
 
             {/* Progress Bar */}
-            <div className="h-2 sm:h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+            <div className="h-2 sm:h-3 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden mb-3">
               <div
                 className={`h-full ${getAccuracyColor(stat.accuracy)} transition-all duration-700`}
                 style={{ width: `${stat.accuracy}%` }}
               />
             </div>
+
+            {/* Footer Button - Only for private profile */}
+            {onSubjectClick && (
+              <div className="flex justify-end">
+                <button
+                  onClick={() => onSubjectClick(stat.subject)}
+                  className="text-xs font-bold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-white flex items-center gap-1.5 transition-colors px-2 py-1 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                >
+                  বিস্তারিত রিপোর্ট
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-3 h-3"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

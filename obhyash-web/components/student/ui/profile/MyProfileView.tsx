@@ -13,12 +13,14 @@ interface MyProfileViewProps {
   user: UserProfile;
   history?: ExamResult[];
   onEditProfile: () => void;
+  onSubjectClick?: (subject: string) => void;
 }
 
 const MyProfileView: React.FC<MyProfileViewProps> = ({
   user: propUser,
   history: propHistory,
   onEditProfile,
+  onSubjectClick,
 }) => {
   // Use hook for data if no history prop provided, otherwise use props (backward compatible)
   const hookData = useProfileData();
@@ -169,7 +171,10 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
         {/* Left Column */}
         <div className="space-y-6">
           {/* Subjects Progress Section */}
-          <SubjectsProgressSection subjectStats={subjectStats} />
+          <SubjectsProgressSection
+            subjectStats={subjectStats}
+            onSubjectClick={onSubjectClick}
+          />
         </div>
 
         {/* Right Column */}

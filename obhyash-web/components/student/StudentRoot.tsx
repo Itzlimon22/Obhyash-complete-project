@@ -475,6 +475,10 @@ export default function StudentRoot({
               user={currentUser!}
               history={examHistory}
               onEditProfile={() => setActiveTab('settings')}
+              onSubjectClick={(subject) => {
+                setSelectedSubjectReport(subject);
+                setActiveTab('subject_report');
+              }}
             />
           </AppLayout>
         );
