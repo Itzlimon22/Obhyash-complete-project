@@ -112,18 +112,6 @@ export default function TeacherProfileView({
             <h1 className="text-2xl md:text-3xl font-black mb-1 truncate">
               {user.name}
             </h1>
-            <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start mb-2">
-              {teacherData.designation && (
-                <span className="text-emerald-100 text-sm">
-                  {teacherData.designation}
-                </span>
-              )}
-              {teacherData.department && (
-                <span className="px-2 py-0.5 rounded-full bg-white/15 text-[11px] font-bold">
-                  {teacherData.department}
-                </span>
-              )}
-            </div>
             <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
               <span className="px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-xs font-bold">
                 👨‍🏫 শিক্ষক
@@ -131,11 +119,6 @@ export default function TeacherProfileView({
               {user.institute && (
                 <span className="px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-xs font-bold truncate max-w-[200px]">
                   🏫 {user.institute}
-                </span>
-              )}
-              {teacherData.experience_years && (
-                <span className="px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-xs font-bold">
-                  📅 {teacherData.experience_years} বছর অভিজ্ঞতা
                 </span>
               )}
             </div>
@@ -270,31 +253,6 @@ export default function TeacherProfileView({
             icon={Building2}
             label="শিক্ষা প্রতিষ্ঠান"
             value={user.institute}
-          />
-          <InfoRow icon={Award} label="পদবী" value={teacherData.designation} />
-          <InfoRow
-            icon={BookOpen}
-            label="বিভাগ"
-            value={teacherData.department}
-          />
-          <InfoRow
-            icon={GraduationCap}
-            label="সর্বোচ্চ শিক্ষাগত যোগ্যতা"
-            value={teacherData.highest_degree}
-          />
-          <InfoRow
-            icon={Calendar}
-            label="শিক্ষকতার অভিজ্ঞতা"
-            value={
-              teacherData.experience_years
-                ? `${teacherData.experience_years} বছর`
-                : undefined
-            }
-          />
-          <InfoRow
-            icon={BookOpen}
-            label="শিক্ষাদানের বিষয়সমূহ"
-            value={teacherData.teaching_subjects}
           />
         </div>
       </div>
