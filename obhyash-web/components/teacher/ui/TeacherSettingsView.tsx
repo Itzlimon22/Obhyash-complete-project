@@ -160,7 +160,15 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
   };
 
   return (
-    <div className="max-w-3xl mx-auto animate-fade-in pb-24">
+    <div className="max-w-3xl mx-auto animate-fade-in pb-24 space-y-6">
+      {/* ── Page Header ── */}
+      <div className="bg-gradient-to-r from-emerald-900 to-emerald-800 rounded-2xl p-6 text-white shadow-lg shadow-emerald-900/10 mb-8">
+        <h1 className="text-2xl font-bold mb-2">সেটিংস</h1>
+        <p className="text-emerald-100 text-sm">
+          আপনার ব্যক্তিগত এবং পেশাগত তথ্য এখানে আপডেট করুন।
+        </p>
+      </div>
+
       {/* Personal Info */}
       <div className={cardClass}>
         <div className={headerClass}>
@@ -176,7 +184,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
             />
             <label
               htmlFor="avatar-upload"
-              className="flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 cursor-pointer"
+              className="flex items-center gap-2 text-sm font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 cursor-pointer transition-colors"
             >
               {uploading ? 'Uploading...' : 'ছবি পরিবর্তন করুন'}
               <Camera className="w-4 h-4" />
@@ -191,7 +199,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
                 user={{ ...user, avatarUrl: avatarUrl }}
                 size="2xl"
                 showBorder
-                className="transition-transform duration-300 group-hover:scale-[1.02]"
+                className="transition-transform duration-300 group-hover:scale-[1.02] ring-4 ring-emerald-50 dark:ring-emerald-900/20"
               />
 
               <label
@@ -224,70 +232,72 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
             )}
           </div>
 
-          <div className={inputGroupClass}>
-            <label className={labelClass}>নাম</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="আপনার পূর্ণ নাম লিখুন"
-            />
-          </div>
-
-          <div className={inputGroupClass}>
-            <label className={labelClass}>
-              ফোন নম্বর
-              {user.phone && (
-                <span className="text-xs text-rose-500 ml-2">
-                  (পরিবর্তনযোগ্য নয়)
-                </span>
-              )}
-            </label>
-            <div className="relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className={inputGroupClass}>
+              <label className={labelClass}>নাম</label>
               <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
+                type="text"
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
-                className={`${inputClass} ${
-                  user.phone
-                    ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 cursor-not-allowed'
-                    : ''
-                }`}
-                placeholder="০১XXXXXXXXX"
-                maxLength={11}
-                readOnly={!!user.phone}
-                disabled={!!user.phone}
+                className={inputClass}
+                placeholder="আপনার পূর্ণ নাম লিখুন"
               />
             </div>
-          </div>
 
-          <div className={inputGroupClass}>
-            <label className={labelClass}>জন্ম তারিখ</label>
-            <input
-              type="date"
-              name="dob"
-              value={formData.dob}
-              onChange={handleChange}
-              className={inputClass}
-            />
-          </div>
+            <div className={inputGroupClass}>
+              <label className={labelClass}>
+                ফোন নম্বর
+                {user.phone && (
+                  <span className="text-xs text-emerald-600 ml-2">
+                    (ভেরিফাইড)
+                  </span>
+                )}
+              </label>
+              <div className="relative">
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className={`${inputClass} ${
+                    user.phone
+                      ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 cursor-not-allowed'
+                      : ''
+                  }`}
+                  placeholder="০১XXXXXXXXX"
+                  maxLength={11}
+                  readOnly={!!user.phone}
+                  disabled={!!user.phone}
+                />
+              </div>
+            </div>
 
-          <div className={inputGroupClass}>
-            <label className={labelClass}>লিঙ্গ (Gender)</label>
-            <div className="relative">
-              <select
-                name="gender"
-                value={formData.gender}
+            <div className={inputGroupClass}>
+              <label className={labelClass}>জন্ম তারিখ</label>
+              <input
+                type="date"
+                name="dob"
+                value={formData.dob}
                 onChange={handleChange}
-                className={selectClass}
-              >
-                <option value="">নির্বাচন করুন</option>
-                <option value="Male">পুরুষ (Male)</option>
-                <option value="Female">মহিলা (Female)</option>
-              </select>
+                className={inputClass}
+              />
+            </div>
+
+            <div className={inputGroupClass}>
+              <label className={labelClass}>লিঙ্গ (Gender)</label>
+              <div className="relative">
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  className={selectClass}
+                >
+                  <option value="">নির্বাচন করুন</option>
+                  <option value="Male">পুরুষ (Male)</option>
+                  <option value="Female">মহিলা (Female)</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -317,8 +327,8 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
         </div>
       </div>
 
-      {/* Professional Info - Simplified */}
-      <div className={`mt-6 ${cardClass}`}>
+      {/* Professional Info */}
+      <div className={cardClass}>
         <div className={headerClass}>
           <h3 className={headerTitleClass}>পেশাগত তথ্য</h3>
         </div>
@@ -338,7 +348,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
       </div>
 
       {/* Account Settings */}
-      <div className={`mt-6 ${cardClass}`}>
+      <div className={cardClass}>
         <div className={headerClass}>
           <h3 className={headerTitleClass}>অ্যাকাউন্ট সেটিংস</h3>
         </div>
@@ -353,10 +363,10 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
             />
           </div>
           <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800">
-            <h4 className="text-sm font-bold mb-4 text-neutral-700 dark:text-neutral-300">
-              পাসওয়ার্ড পরিবর্তন
+            <h4 className="text-sm font-bold mb-4 text-emerald-800 dark:text-emerald-400">
+              পাসওয়ার্ড পরিবর্তন (অপশনাল)
             </h4>
-            <div className="grid gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className={inputGroupClass}>
                 <label className={labelClass}>নতুন পাসওয়ার্ড</label>
                 <input
@@ -388,7 +398,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
       <div className="fixed bottom-6 right-6 lg:right-10 z-30">
         <button
           onClick={handleSubmit}
-          className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-full shadow-lg hover:shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+          className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full shadow-lg hover:shadow-red-600/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
         >
           সেভ করুন
         </button>
