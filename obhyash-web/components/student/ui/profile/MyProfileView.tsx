@@ -14,6 +14,7 @@ interface MyProfileViewProps {
   history?: ExamResult[];
   onEditProfile: () => void;
   onSubjectClick?: (subject: string) => void;
+  onViewNotifications?: () => void;
 }
 
 const MyProfileView: React.FC<MyProfileViewProps> = ({
@@ -21,6 +22,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
   history: propHistory,
   onEditProfile,
   onSubjectClick,
+  onViewNotifications,
 }) => {
   // Use hook for data if no history prop provided, otherwise use props (backward compatible)
   const hookData = useProfileData();
@@ -111,12 +113,22 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
             প্রোফাইল
           </h1>
         </div>
-        <button
-          onClick={onEditProfile}
-          className="px-5 py-2.5 sm:px-6 sm:py-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl font-bold text-base sm:text-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all active:scale-95 shadow-sm w-fit"
-        >
-          এডিট করুন
-        </button>
+        <div className="flex gap-3">
+          {onViewNotifications && (
+            <button
+              onClick={onViewNotifications}
+              className="px-5 py-2.5 sm:px-6 sm:py-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl font-bold text-base sm:text-lg text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all active:scale-95 shadow-sm"
+            >
+              নোটিফিকেশন
+            </button>
+          )}
+          <button
+            onClick={onEditProfile}
+            className="px-5 py-2.5 sm:px-6 sm:py-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl font-bold text-base sm:text-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all active:scale-95 shadow-sm w-fit"
+          >
+            এডিট করুন
+          </button>
+        </div>
       </div>
 
       {/* Level Progress Bar */}
@@ -175,6 +187,51 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
             subjectStats={subjectStats}
             onSubjectClick={onSubjectClick}
           />
+
+          {/* Recent Activity List - Moved to Left Column */}
+          <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
+            <div className="p-8 border-b border-neutral-100 dark:border-neutral-800">
+              <h3 className="text-2xl font-bold text-neutral-800 dark:text-white">
+                সর্বশেষ কার্যক্রম
+              </h3>
+            </div>
+            <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
+              {history.slice(0, 5).map((exam, idx) => (
+                <div
+                  key={exam.id || idx}
+                  className="p-6 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors"
+                >
+                  <div className="flex items-center gap-5">
+                    <div
+                      className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-sm ${exam.score / exam.totalMarks >= 0.8 ? 'bg-emerald-500' : exam.score / exam.totalMarks >= 0.5 ? 'bg-amber-500' : 'bg-red-500'}`}
+                    >
+                      {Math.round((exam.score / exam.totalMarks) * 100)}%
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-neutral-900 dark:text-white text-base md:text-lg">
+                        {exam.subjectLabel || exam.subject}
+                      </h4>
+                      <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
+                        {new Date(exam.date).toLocaleDateString('bn-BD', {
+                          day: 'numeric',
+                          month: 'short',
+                        })}{' '}
+                        • {exam.totalQuestions} প্রশ্ন
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-sm font-bold text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-3 py-1.5 rounded-lg">
+                    {exam.examType || 'Practice'}
+                  </span>
+                </div>
+              ))}
+              {history.length === 0 && (
+                <div className="p-12 text-center text-neutral-500 text-lg font-medium">
+                  এখনও কোনো পরীক্ষা দেওয়া হয়নি।
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Right Column */}
@@ -252,51 +309,6 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
                   />
                 </AreaChart>
               </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Recent Activity List - Limited to 5 items */}
-          <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
-            <div className="p-8 border-b border-neutral-100 dark:border-neutral-800">
-              <h3 className="text-2xl font-bold text-neutral-800 dark:text-white">
-                সর্বশেষ কার্যক্রম
-              </h3>
-            </div>
-            <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
-              {history.slice(0, 5).map((exam, idx) => (
-                <div
-                  key={exam.id || idx}
-                  className="p-6 flex items-center justify-between hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors"
-                >
-                  <div className="flex items-center gap-5">
-                    <div
-                      className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-sm ${exam.score / exam.totalMarks >= 0.8 ? 'bg-emerald-500' : exam.score / exam.totalMarks >= 0.5 ? 'bg-amber-500' : 'bg-red-500'}`}
-                    >
-                      {Math.round((exam.score / exam.totalMarks) * 100)}%
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-neutral-900 dark:text-white text-base md:text-lg">
-                        {exam.subjectLabel || exam.subject}
-                      </h4>
-                      <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
-                        {new Date(exam.date).toLocaleDateString('bn-BD', {
-                          day: 'numeric',
-                          month: 'short',
-                        })}{' '}
-                        • {exam.totalQuestions} প্রশ্ন
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-sm font-bold text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-3 py-1.5 rounded-lg">
-                    {exam.examType || 'Practice'}
-                  </span>
-                </div>
-              ))}
-              {history.length === 0 && (
-                <div className="p-12 text-center text-neutral-500 text-lg font-medium">
-                  এখনও কোনো পরীক্ষা দেওয়া হয়নি।
-                </div>
-              )}
             </div>
           </div>
         </div>

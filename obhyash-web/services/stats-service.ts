@@ -84,7 +84,7 @@ export const getLeaderboardUsers = async (
           'id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak, role',
         )
         .eq('level', level)
-        .eq('role', 'student')
+        .ilike('role', 'student')
         .order('xp', { ascending: false })
         .limit(100);
 

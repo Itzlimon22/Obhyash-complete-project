@@ -32,13 +32,14 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       <div
         className={cn(
           'fixed inset-0 z-[100] flex flex-col bg-white dark:bg-neutral-900 md:bg-transparent md:dark:bg-transparent',
-          'md:absolute md:inset-auto md:right-0 md:top-12 md:z-[100]',
+          'md:fixed md:inset-0 md:z-[100] md:flex md:justify-end',
         )}
       >
         <div
           className={cn(
-            'flex flex-col h-full w-full bg-white dark:bg-neutral-900 animate-in slide-in-from-bottom duration-300 md:animate-in md:fade-in md:slide-in-from-top-2',
-            'md:w-96 md:h-auto md:max-h-[600px] md:rounded-2xl md:shadow-2xl md:border md:border-neutral-200/50 md:dark:border-neutral-700/50 md:bg-white/95 md:dark:bg-neutral-900/95 md:backdrop-blur-xl md:overflow-hidden',
+            'flex flex-col h-full w-full bg-white dark:bg-neutral-900 animate-in slide-in-from-bottom duration-300',
+            // Desktop: Sidebar style (Drawer)
+            'md:w-[400px] md:h-full md:border-l md:border-neutral-200 md:dark:border-neutral-800 md:shadow-2xl md:animate-in md:slide-in-from-right duration-300',
           )}
         >
           {/* STICKY HEADER */}
@@ -77,7 +78,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
           </div>
 
           {/* LIST AREA — Only unread */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar md:max-h-[400px]">
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
             {isLoading ? (
               <div className="p-4 space-y-4">
                 {[...Array(5)].map((_, i) => (

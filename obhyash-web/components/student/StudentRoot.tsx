@@ -479,6 +479,7 @@ export default function StudentRoot({
                 setSelectedSubjectReport(subject);
                 setActiveTab('subject_report');
               }}
+              onViewNotifications={() => setActiveTab('notifications')}
             />
           </AppLayout>
         );
