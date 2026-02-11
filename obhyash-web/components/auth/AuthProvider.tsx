@@ -66,50 +66,46 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     let isMounted = true;
 
     const initializeAuth = async () => {
-      // 1. Try to load from cache first for immediate UI
       try {
-        const cachedProfile = localStorage.getItem('obhyash_user_profile');
-        if (cachedProfile) {
-          const parsed = JSON.parse(cachedProfile);
-          if (isMounted) {
-            setProfile(parsed);
-            // We don't set user here because we need the Supabase User object
-            // But having profile allows UI to show something
-          }
-        }
-      } catch (e) {
-        console.error('Cache parse error', e);
-      }
-
-      try {
-        // 2. Get current user (server-validated)
+        // 1. Get current user (server-validated via Cookie)
         const {
           data: { user: currentUser },
           error: authError,
         } = await supabase.auth.getUser();
 
-        if (authError) {
-          console.error('Auth check error:', authError);
-          // If auth fails, clear cache
+        if (authError || !currentUser) {
+          if (authError) console.error('Auth check error:', authError);
+          // No valid session, clear everything immediately
           if (isMounted) {
             setUser(null);
             setProfile(null);
           }
           localStorage.removeItem('obhyash_user_profile');
-        }
+        } else {
+          // Valid Session exists
+          if (isMounted) setUser(currentUser);
 
-        if (currentUser && isMounted) {
-          setUser(currentUser);
-          // 3. Fetch Profile (Background validation/update)
+          // 2. Try to load cached profile FOR THIS USER
+          const cachedProfileStr = localStorage.getItem('obhyash_user_profile');
+          let hasCachedProfile = false;
+
+          if (cachedProfileStr) {
+            try {
+              const cachedProfile = JSON.parse(cachedProfileStr) as UserProfile;
+              if (cachedProfile.id === currentUser.id) {
+                if (isMounted) setProfile(cachedProfile);
+                hasCachedProfile = true;
+              }
+            } catch (e) {
+              console.error('Cache parse error', e);
+            }
+          }
+
+          // 3. Fetch/Update Profile (Background validation)
           const userProfile = await fetchProfile(currentUser.id);
           if (userProfile && isMounted) {
             setProfile(userProfile);
           }
-        } else if (!currentUser && isMounted) {
-          // No user, clear everything
-          setUser(null);
-          setProfile(null);
-          localStorage.removeItem('obhyash_user_profile');
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
@@ -127,7 +123,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         if (isMounted) setUser(session.user);
 
-        // Always ensure profile is loaded if user exists
+        // Fetch profile if missing or user changed or token refreshed
         const shouldFetchProfile =
           !profile ||
           profile.id !== session.user.id ||
@@ -141,6 +137,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           }
         }
       } else {
+        // Signed out or session expired
         if (isMounted) {
           setUser(null);
           setProfile(null);
@@ -151,8 +148,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           router.push('/login');
         }
       }
-
-      if (isMounted) setLoading(false);
     });
 
     return () => {
