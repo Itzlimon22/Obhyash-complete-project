@@ -135,9 +135,11 @@ export const getChapters = async (
 
 export const getTopics = async (
   chapterIds: string | string[],
-): Promise<{ id: string; name: string; chapter_id: string }[]> => {
+): Promise<
+  { id: string; name: string; chapter_id: string; serial?: number }[]
+> => {
   if (isSupabaseConfigured() && supabase) {
-    let query = supabase.from('topics').select('id, name, chapter_id');
+    let query = supabase.from('topics').select('id, name, chapter_id, serial');
 
     if (Array.isArray(chapterIds)) {
       if (chapterIds.length === 0) return [];

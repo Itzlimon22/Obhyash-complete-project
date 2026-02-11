@@ -22,6 +22,11 @@ import { Question } from '@/lib/types';
 import { MathText } from './shared';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
+import {
+  getSubjects,
+  getChapters,
+  getTopics,
+} from '@/services/metadata-service';
 
 // ─── Types ───────────────────────────────────────────────────────────
 interface BulkUploadProps {
@@ -57,7 +62,10 @@ function normalizeRawRow(
   q.chapter = raw['chapter'] || '';
   q.topic = raw['topic'] || '';
   q.stream = raw['stream'] || '';
-  q.section = raw['section'] || '';
+  q.stream = raw['stream'] || '';
+  // Mapped 'section' from file to 'division' in DB as per requirement
+  q.division = raw['division'] || raw['section'] || '';
+  q.section = raw['section'] || ''; // Keep section for backward compat if needed, or leave empty if we strictly switch.
   q.explanation = raw['explanation'] || '';
   q.difficulty = (raw['difficulty'] as 'Easy' | 'Medium' | 'Hard') || 'Medium';
   q.examType = raw['examType'] || raw['exam_type'] || 'Academic';
@@ -503,6 +511,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   const [importSuccess, setImportSuccess] = useState(false);
 
   // ── Unified processor: raw rows -> Question[] ──
+  // ── Unified processor: raw rows -> Question[] ──
   const processRawData = useCallback(
     (rows: Record<string, string>[]): Partial<Question>[] => {
       const parseErrors: ParseError[] = [];
@@ -514,6 +523,69 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
     },
     [],
   );
+
+  // Helper to resolve topic serials to names
+  const resolveTopicSerials = async (questions: Partial<Question>[]) => {
+    // 1. Identify unique subjects
+    const subjects = Array.from(
+      new Set(questions.map((q) => q.subject).filter(Boolean)),
+    );
+
+    // 2. Fetch metadata for these subjects
+    // We need: Subject Mapping -> Chapter Mapping -> Topic Mapping
+    // This assumes names are used for Subject/Chapter in the Question object
+
+    // Map: SubjectName -> { ChapterName -> { Serial -> TopicName } }
+    const topicMap: Record<string, Record<string, Record<string, string>>> = {};
+
+    try {
+      // Fetch all subjects to get IDs (needed for chapters)
+      const allSubjects = await getSubjects(); // This gets all, might be optimized if we filter by name
+
+      for (const subjectName of subjects) {
+        const subject = allSubjects.find(
+          (s) => s.name === subjectName || s.name === subjectName,
+        ); // match name
+        if (!subject) continue;
+
+        topicMap[subjectName] = {};
+
+        // Fetch chapters
+        const chapters = await getChapters(subject.id);
+        const chapterIds = chapters.map((c) => c.id);
+
+        // Fetch topics for these chapters
+        const topics = await getTopics(chapterIds);
+
+        // Build map
+        chapters.forEach((ch) => {
+          topicMap[subjectName][ch.name] = {};
+          // Filter topics for this chapter
+          const chTopics = topics.filter((t) => t.chapter_id === ch.id);
+          chTopics.forEach((t) => {
+            if (t.serial) {
+              topicMap[subjectName][ch.name][String(t.serial)] = t.name;
+            }
+          });
+        });
+      }
+
+      // 3. Apply mapping
+      return questions.map((q) => {
+        // Only map if topic looks like a number
+        if (q.subject && q.chapter && q.topic && /^\d+$/.test(q.topic)) {
+          const mappedName = topicMap[q.subject]?.[q.chapter]?.[q.topic];
+          if (mappedName) {
+            return { ...q, topic: mappedName };
+          }
+        }
+        return q;
+      });
+    } catch (err) {
+      console.error('Error resolving topics:', err);
+      return questions; // Fallback to original
+    }
+  };
 
   // ── File handler ───────────────────────────────────────────────────
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -578,7 +650,12 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         throw new Error('ফাইলে কোনো ডাটা পাওয়া যায়নি।');
       }
 
-      const questions = processRawData(rawRows);
+      let questions = processRawData(rawRows);
+
+      // Resolve Topic Serials (Async)
+      // Show loading or something? We are in try/catch so it's fine.
+      questions = await resolveTopicSerials(questions);
+
       setParsedData(questions);
       setSelectedIndices(new Set(questions.map((_, i) => i)));
       setStep(2);
