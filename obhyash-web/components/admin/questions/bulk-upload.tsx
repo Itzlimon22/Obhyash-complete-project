@@ -575,12 +575,43 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
       }
 
       // 3. Apply mapping
+      console.log('Resolving topics for', questions.length, 'questions');
+      console.log('Topic Map built:', JSON.stringify(topicMap, null, 2));
+
       return questions.map((q) => {
         // Only map if topic looks like a number
         if (q.subject && q.chapter && q.topic && /^\d+$/.test(q.topic)) {
-          const mappedName = topicMap[q.subject]?.[q.chapter]?.[q.topic];
-          if (mappedName) {
-            return { ...q, topic: mappedName };
+          // Normalize user input for lookup
+          const subjectKey = Object.keys(topicMap).find(
+            (k) =>
+              k.trim().toLowerCase() === (q.subject || '').trim().toLowerCase(),
+          );
+
+          if (subjectKey) {
+            const chapterKey = Object.keys(topicMap[subjectKey]).find(
+              (k) =>
+                k.trim().toLowerCase() ===
+                (q.chapter || '').trim().toLowerCase(),
+            );
+
+            if (chapterKey) {
+              const mappedName =
+                topicMap[subjectKey][chapterKey][String(q.topic)];
+              if (mappedName) {
+                console.log(`Mapped topic serial ${q.topic} -> ${mappedName}`);
+                return { ...q, topic: mappedName };
+              } else {
+                console.warn(
+                  `Topic serial ${q.topic} not found in chapter ${chapterKey}`,
+                );
+              }
+            } else {
+              console.warn(
+                `Chapter ${q.chapter} not found in map for subject ${subjectKey}`,
+              );
+            }
+          } else {
+            console.warn(`Subject ${q.subject} not found in map`);
           }
         }
         return q;
