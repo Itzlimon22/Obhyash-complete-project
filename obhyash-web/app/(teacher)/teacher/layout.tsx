@@ -2,7 +2,6 @@
 
 import React from 'react';
 import TeacherSidebar from '@/components/teacher/layout/TeacherSidebar';
-import { Header } from '@/components/layout/header'; // Named import
 
 export default function TeacherLayout({
   children,
@@ -12,9 +11,11 @@ export default function TeacherLayout({
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
       <TeacherSidebar />
+      {/* Main content area offset by sidebar width */}
       <div className="lg:pl-72 transition-all duration-300">
-        <Header toggleSidebar={() => {}} /> {/* Pass dummy prop for now */}
-        <main className="p-4 md:p-6 max-w-[1600px] mx-auto animate-fade-in">
+        {/* Top spacer for mobile menu button */}
+        <div className="h-14 lg:h-0" />
+        <main className="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto">
           {children}
         </main>
       </div>
