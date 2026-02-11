@@ -59,6 +59,8 @@ export default function LoginPage() {
       // 3. Force Redirect based on role (case-insensitive)
       if (role.toLowerCase() === 'admin') {
         router.push('/admin/dashboard');
+      } else if (role.toLowerCase() === 'teacher') {
+        router.push('/teacher/dashboard');
       } else {
         router.push('/dashboard');
       }
