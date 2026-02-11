@@ -146,7 +146,9 @@ export const getLevelUserCounts = async (): Promise<Record<string, number>> => {
       if (!error && data) {
         const counts: Record<string, number> = {};
         data.forEach((item: { level: string; user_count: number }) => {
-          counts[item.level] = item.user_count;
+          // Normalize 'Beginner' to 'Rookie' for display
+          const levelKey = item.level === 'Beginner' ? 'Rookie' : item.level;
+          counts[levelKey] = (counts[levelKey] || 0) + item.user_count;
         });
 
         LEVELS.forEach((l: (typeof LEVELS)[number]) => {
@@ -171,8 +173,11 @@ export const getLevelUserCounts = async (): Promise<Record<string, number>> => {
       if (!profilesError && profilesData) {
         const counts = zeroCounts();
         profilesData.forEach((row: { level: string | null }) => {
-          if (row.level && row.level in counts) {
-            counts[row.level]++;
+          if (row.level) {
+            const levelKey = row.level === 'Beginner' ? 'Rookie' : row.level;
+            if (levelKey in counts) {
+              counts[levelKey]++;
+            }
           }
         });
         return counts;

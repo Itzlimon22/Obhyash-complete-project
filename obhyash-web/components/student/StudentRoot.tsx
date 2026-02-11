@@ -57,6 +57,9 @@ interface StudentRootProps {
   subjects?: any[];
 }
 
+import { useAuth } from '@/components/auth/AuthProvider';
+import InitialLoader from '@/components/student/ui/InitialLoader';
+
 export default function StudentRoot({
   user: initialUser,
   theme,
@@ -67,6 +70,14 @@ export default function StudentRoot({
   // ... (keeping existing hooks and state)
   const engine = useExamEngine();
   const supabase = createClient();
+  const {
+    user: authUser,
+    profile: authProfile,
+    loading: authLoading,
+  } = useAuth();
+
+  // Use authProfile if available, otherwise fall back to initialUser
+  const effectiveUser = authProfile || initialUser;
 
   const {
     appState,
@@ -159,8 +170,11 @@ export default function StudentRoot({
     }
     return 'dashboard';
   });
+
+  // Local state to track user updates (XP, level) that happen during session
+  // Initialize with the most reliable source
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(
-    initialUser,
+    effectiveUser,
   );
 
   // Pending Config for Pre-Fetch Instructions
@@ -170,10 +184,19 @@ export default function StudentRoot({
   const [showStreakCelebration, setShowStreakCelebration] = useState(false);
   const [newStreakCount, setNewStreakCount] = useState(0);
 
-  // Sync prop user to state
+  // Sync with AuthProvider updates, but respect local optimistic updates
   useEffect(() => {
-    if (initialUser) setCurrentUser(initialUser);
-  }, [initialUser]);
+    if (authProfile) {
+      // Only update if IDs match to avoid race condition where we might be signing out
+      if (!currentUser || currentUser.id === authProfile.id) {
+        // We use functional update to preserve local transient state if needed
+        // But usually authProfile is the source of truth
+        setCurrentUser(authProfile);
+      }
+    } else if (initialUser && !currentUser) {
+      setCurrentUser(initialUser);
+    }
+  }, [authProfile, initialUser]);
 
   // Streak System Check - Uses localStorage guard to run ONCE per calendar day
   useEffect(() => {
@@ -371,6 +394,8 @@ export default function StudentRoot({
   const handleExamSubmit = async (manual = true) => {
     await submitExam(manual);
   };
+
+  if (authLoading) return <InitialLoader />;
 
   if (!currentUser) return null; // Should not happen if page handles loading
 

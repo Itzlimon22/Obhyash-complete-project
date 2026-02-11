@@ -38,8 +38,11 @@ export interface ProfileData {
  * Hook to fetch profile data from Supabase on mount.
  * Cost-friendly: No realtime subscriptions, fetches once on mount.
  */
+import { useAuth } from '@/components/auth/AuthProvider';
+
 export const useProfileData = (userId?: string): ProfileData => {
   const supabase = createClient();
+  const { user: authUser, loading: authLoading } = useAuth();
 
   const [user, setUser] = useState<UserProfile | null>(null);
   const [examHistory, setExamHistory] = useState<ExamResult[]>([]);
@@ -47,21 +50,21 @@ export const useProfileData = (userId?: string): ProfileData => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
+    // Wait for global auth to initialize
+    if (authLoading) return;
+
     setIsLoading(true);
     setError(null);
 
     try {
-      // Get current user if userId not provided
-      let targetUserId = userId;
-      if (!targetUserId) {
-        const {
-          data: { user: authUser },
-        } = await supabase.auth.getUser();
-        targetUserId = authUser?.id;
-      }
+      // Get target user ID (prop or current auth user)
+      const targetUserId = userId || authUser?.id;
 
       if (!targetUserId) {
-        setError('User not authenticated');
+        // If auth finished loading but no user found, and no explicit ID passed
+        if (!userId) {
+          setError('User not authenticated');
+        }
         setIsLoading(false);
         return;
       }
@@ -108,8 +111,9 @@ export const useProfileData = (userId?: string): ProfileData => {
     } finally {
       setIsLoading(false);
     }
-  }, [supabase, userId]);
+  }, [supabase, userId, authUser, authLoading]);
 
+  // Trigger fetch when auth state stabilizes or ID changes
   useEffect(() => {
     fetchData();
   }, [fetchData]);
