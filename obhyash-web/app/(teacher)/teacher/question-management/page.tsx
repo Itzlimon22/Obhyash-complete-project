@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
 import QuestionManagementView from '@/components/shared/question-management-view';
-import { useAuth } from '@/components/auth/AuthProvider'; // Fixed import path
 import { Loader2 } from 'lucide-react';
 
 export default function TeacherQuestionManagementPage() {
@@ -10,23 +10,27 @@ export default function TeacherQuestionManagementPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-emerald-600" size={40} />
+      <div className="flex h-[50vh] w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
       </div>
     );
   }
 
-  if (!user) {
-    return null; // Value handled by middleware/redirects usually
+  if (!user || !user.email) {
+    return (
+      <div className="flex h-[50vh] w-full flex-col items-center justify-center gap-4 text-center">
+        <p className="text-lg font-semibold text-neutral-600 dark:text-neutral-400">
+          অনুগ্রহ করে লগ ইন করুন (Please log in to manage questions)
+        </p>
+      </div>
+    );
   }
 
   return (
     <QuestionManagementView
       title="আমার প্রশ্ন ব্যাংক (My Question Bank)"
-      baseFilters={{
-        author: user.email, // Filter questions by this teacher's email
-      }}
-      basePath="/teacher/questions"
+      baseFilters={{ author: user.email }}
+      basePath="/teacher/question-management"
     />
   );
 }
