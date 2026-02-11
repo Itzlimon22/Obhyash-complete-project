@@ -183,26 +183,35 @@ export default function StudentRoot({
       if (!currentUser?.id) return;
 
       try {
-        // ✅ localStorage guard: only process streak once per calendar day per user
-        const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+        // ✅ Immediately compute the display streak from existing data
+        // This prevents stale streak showing in header before async check runs
+        const { getDisplayStreak } = await import('@/services/streak-service');
+        const displayStreak = getDisplayStreak(currentUser);
+        if (isMounted && displayStreak !== (currentUser.streakCount || 0)) {
+          setCurrentUser((prev) =>
+            prev ? { ...prev, streakCount: displayStreak } : prev,
+          );
+        }
+
+        // ✅ localStorage guard: use LOCAL date (matching streak-service logic)
+        const now = new Date();
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
         const streakKey = `streak_checked_${currentUser.id}`;
         const lastCheckedDate = localStorage.getItem(streakKey);
 
         if (lastCheckedDate !== today) {
-          // First load of the day — run streak check
+          // ✅ Set guard IMMEDIATELY (optimistic lock) — prevents race on fast refreshes
+          localStorage.setItem(streakKey, today);
+
           const { checkAndUpdateStreak } =
             await import('@/services/streak-service');
           const updatedUser = await checkAndUpdateStreak(currentUser);
 
           if (updatedUser && isMounted) {
-            // Streak was updated (new day) — show celebration
             setNewStreakCount(updatedUser.streakCount || 0);
             setShowStreakCelebration(true);
             setCurrentUser(updatedUser);
           }
-
-          // Mark today as checked (even if no update — prevents re-check)
-          localStorage.setItem(streakKey, today);
         }
 
         // 2. Fetch History (always, regardless of streak)

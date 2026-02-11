@@ -593,93 +593,100 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </h2>
         </div>
 
-        {/* Current Features */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {/* Smart Analytics */}
-          <div className="group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-rose-500/10 hover:-tranneutral-y-1 transition-all duration-300">
-            <div className="w-14 h-14 bg-rose-50 dark:bg-rose-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <BarChart3 className="w-7 h-7 text-rose-600" />
-            </div>
-            <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-              স্মার্ট এনালাইসিস
-            </h3>
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-              প্রতিটি পরীক্ষার পর দেখুন আপনার সবল ও দুর্বল দিকগুলো। গ্রাফ এবং
-              চার্টের মাধ্যমে নিজের অগ্রগতি নিজেই যাচাই করুন।
-            </p>
+        {/* Current Features - Mobile Scroll Snap / Desktop Grid */}
+        <div className="relative">
+          {/* Mobile Scroll Hint */}
+          <div className="md:hidden flex justify-end mb-2 text-xs text-neutral-400 font-medium animate-pulse">
+            ডানে স্ক্রল করুন <ArrowRight className="w-3 h-3 ml-1" />
           </div>
 
-          {/* OMR Scanning */}
-          <div className="group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-orange-500/10 hover:-tranneutral-y-1 transition-all duration-300">
-            <div className="w-14 h-14 bg-orange-50 dark:bg-orange-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <ScanLine className="w-7 h-7 text-orange-600" />
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-8 -mx-4 px-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:pb-0 md:mx-0 md:px-0 no-scrollbar">
+            {/* Smart Analytics */}
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-rose-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
+              <div className="w-16 h-16 md:w-14 md:h-14 bg-rose-50 dark:bg-rose-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <BarChart3 className="w-8 h-8 md:w-7 md:h-7 text-rose-600" />
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
+                স্মার্ট এনালাইসিস
+              </h3>
+              <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                প্রতিটি পরীক্ষার পর দেখুন আপনার সবল ও দুর্বল দিকগুলো। গ্রাফ এবং
+                চার্টের মাধ্যমে নিজের অগ্রগতি নিজেই যাচাই করুন।
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-              OMR স্ক্যানিং
-            </h3>
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-              বাসায় বসে খাতায় পরীক্ষা দিয়ে অ্যাপ দিয়ে ছবি তুলুন। নিমিষেই পেয়ে
-              যাবেন নির্ভুল ফলাফল ও বিস্তারিত সমাধান।
-            </p>
-          </div>
 
-          {/* AI Question Generator */}
-          <div className="group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-amber-500/10 hover:-tranneutral-y-1 transition-all duration-300">
-            <div className="w-14 h-14 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <Sparkles className="w-7 h-7 text-amber-600" />
+            {/* OMR Scanning */}
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
+              <div className="w-16 h-16 md:w-14 md:h-14 bg-orange-50 dark:bg-orange-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <ScanLine className="w-8 h-8 md:w-7 md:h-7 text-orange-600" />
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
+                OMR স্ক্যানিং
+              </h3>
+              <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                বাসায় বসে খাতায় পরীক্ষা দিয়ে অ্যাপ দিয়ে ছবি তুলুন। নিমিষেই পেয়ে
+                যাবেন নির্ভুল ফলাফল ও বিস্তারিত সমাধান।
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-              AI প্রশ্ন জেনারেটর
-            </h3>
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-              আপনার সিলেবাস অনুযায়ী যেকোনো বিষয়ের উপর আনলিমিটেড কাস্টম
-              প্রশ্নপত্র তৈরি করুন এক ক্লিকেই।
-            </p>
-          </div>
 
-          {/* Leaderboard */}
-          <div className="group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-yellow-500/10 hover:-tranneutral-y-1 transition-all duration-300">
-            <div className="w-14 h-14 bg-yellow-50 dark:bg-yellow-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <Trophy className="w-7 h-7 text-yellow-600" />
+            {/* AI Question Generator */}
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
+              <div className="w-16 h-16 md:w-14 md:h-14 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Sparkles className="w-8 h-8 md:w-7 md:h-7 text-amber-600" />
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
+                AI প্রশ্ন জেনারেটর
+              </h3>
+              <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                আপনার সিলেবাস অনুযায়ী যেকোনো বিষয়ের উপর আনলিমিটেড কাস্টম
+                প্রশ্নপত্র তৈরি করুন এক ক্লিকেই।
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-              লিডারবোর্ড
-            </h3>
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-              সারা দেশের শিক্ষার্থীদের সাথে মেধা তালিকায় নিজের অবস্থান যাচাই
-              করুন এবং নিজেকে এগিয়ে রাখুন।
-            </p>
-          </div>
 
-          {/* Exam History */}
-          <div className="group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 hover:-tranneutral-y-1 transition-all duration-300">
-            <div className="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <History className="w-7 h-7 text-blue-600" />
+            {/* Leaderboard */}
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-yellow-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
+              <div className="w-16 h-16 md:w-14 md:h-14 bg-yellow-50 dark:bg-yellow-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Trophy className="w-8 h-8 md:w-7 md:h-7 text-yellow-600" />
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
+                লিডারবোর্ড
+              </h3>
+              <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                সারা দেশের শিক্ষার্থীদের সাথে মেধা তালিকায় নিজের অবস্থান যাচাই
+                করুন এবং নিজেকে এগিয়ে রাখুন।
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-              এক্সাম হিস্ট্রি
-            </h3>
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-              আপনার পুরনো সব এক্সাম এবং ভুলগুলোর বিস্তারিত সমাধান দেখুন যেকোনো
-              সময়।
-            </p>
-          </div>
 
-          {/* Smart Adaptive System (NEW) */}
-          <div className="group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-cyan-500/10 hover:-tranneutral-y-1 transition-all duration-300 relative overflow-hidden">
-            <div className="absolute top-0 right-0 px-3 py-1 bg-rose-600 text-white text-[10px] font-bold rounded-bl-xl shadow-lg z-10">
-              NEW
+            {/* Exam History */}
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
+              <div className="w-16 h-16 md:w-14 md:h-14 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <History className="w-8 h-8 md:w-7 md:h-7 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
+                এক্সাম হিস্ট্রি
+              </h3>
+              <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                আপনার পুরনো সব এক্সাম এবং ভুলগুলোর বিস্তারিত সমাধান দেখুন যেকোনো
+                সময়।
+              </p>
             </div>
-            <div className="w-14 h-14 bg-cyan-50 dark:bg-cyan-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-              <Zap className="w-7 h-7 text-cyan-600" />
+
+            {/* Smart Adaptive System (NEW) */}
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-cyan-500/10 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col items-center text-center md:items-start md:text-left">
+              <div className="absolute top-0 right-0 px-3 py-1 bg-rose-600 text-white text-[10px] font-bold rounded-bl-xl shadow-lg z-10">
+                NEW
+              </div>
+              <div className="w-16 h-16 md:w-14 md:h-14 bg-cyan-50 dark:bg-cyan-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Zap className="w-8 h-8 md:w-7 md:h-7 text-cyan-600" />
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
+                স্মার্ট প্রশ্ন ব্যাংক
+              </h3>
+              <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                সিস্টেম আপনার দুর্বল টপিকগুলো মনে রাখে এবং সেই অনুযায়ী প্রশ্ন
+                করে, যাতে আপনার প্রস্তুতি হয় পূর্ণাঙ্গ।
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-              স্মার্ট প্রশ্ন ব্যাংক
-            </h3>
-            <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-              সিস্টেম আপনার দুর্বল টপিকগুলো মনে রাখে এবং সেই অনুযায়ী প্রশ্ন করে,
-              যাতে আপনার প্রস্তুতি হয় পূর্ণাঙ্গ।
-            </p>
           </div>
         </div>
 
