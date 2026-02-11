@@ -528,7 +528,11 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   const resolveTopicSerials = async (questions: Partial<Question>[]) => {
     // 1. Identify unique subjects
     const subjects = Array.from(
-      new Set(questions.map((q) => q.subject).filter(Boolean)),
+      new Set(
+        questions
+          .map((q) => q.subject)
+          .filter((s): s is string => typeof s === 'string' && s.length > 0),
+      ),
     );
 
     // 2. Fetch metadata for these subjects
