@@ -14,6 +14,12 @@ export default function TeacherProfilePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [fetching, setFetching] = useState(true);
+  const [stats, setStats] = useState<{
+    totalQuestions: number;
+    approved: number;
+    pending: number;
+    rejected: number;
+  } | null>(null);
 
   useEffect(() => {
     if (!loading) {
@@ -22,31 +28,36 @@ export default function TeacherProfilePage() {
         return;
       }
 
-      const loadProfile = async () => {
+      const loadData = async () => {
         try {
-          const data = await getUserProfile(user.id);
-          // Cast role to string to avoid TS error: "Types have no overlap"
+          const [profileData, statsData] = await Promise.all([
+            getUserProfile(user.id),
+            user.email ? getTeacherStats(user.email) : null,
+          ]);
+
+          // Cast role to string to avoid TS error
           if (
-            data &&
-            ((data.role as string) === 'Teacher' ||
-              (data.role as string) === 'teacher' ||
-              data.role === 'Admin')
+            profileData &&
+            ((profileData.role as string) === 'Teacher' ||
+              (profileData.role as string) === 'teacher' ||
+              profileData.role === 'Admin')
           ) {
-            setProfile(data);
+            setProfile(profileData);
           } else {
-            // Optional: Handle wrong role, maybe redirect to student dashboard?
-            // For now just allow viewing or redirect to login
-            // router.push('/login');
-            setProfile(data); // Let's try to show it anyway for debugging
+            setProfile(profileData);
+          }
+
+          if (statsData) {
+            setStats(statsData);
           }
         } catch (error) {
-          console.error('Error loading profile:', error);
+          console.error('Error loading profile/stats:', error);
         } finally {
           setFetching(false);
         }
       };
 
-      loadProfile();
+      loadData();
     }
   }, [user, loading, router]);
 
@@ -59,16 +70,8 @@ export default function TeacherProfilePage() {
   }
 
   if (!profile) {
-    return null; // or error state
+    return null;
   }
 
-  // TODO: Fetch real stats from stats-service
-  const stats = {
-    totalQuestions: 154,
-    approved: 142,
-    pending: 8,
-    rejected: 4,
-  };
-
-  return <TeacherProfileView user={profile} stats={stats} />;
+  return <TeacherProfileView user={profile} stats={stats || undefined} />;
 }

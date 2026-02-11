@@ -322,6 +322,22 @@ export default function TeacherDashboard() {
         </Link>
 
         <Link
+          href="/teacher/questions/bulk-upload"
+          className="group relative overflow-hidden bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-violet-500/50 hover:shadow-lg hover:shadow-violet-500/5 transition-all"
+        >
+          <div className="w-12 h-12 rounded-xl bg-violet-50 dark:bg-violet-900/20 flex items-center justify-center mb-4 text-violet-600 dark:text-violet-400 group-hover:scale-110 transition-transform">
+            <Upload size={24} />
+          </div>
+          <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-100 mb-1 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+            বাল্ক আপলোড
+          </h3>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            একসাথে অনেক প্রশ্ন আপলোড করুন (CSV/JSON)
+          </p>
+          <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/5 rounded-bl-full -mr-4 -mt-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none" />
+        </Link>
+
+        <Link
           href="/teacher/profile"
           className="group relative overflow-hidden bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/5 transition-all"
         >
