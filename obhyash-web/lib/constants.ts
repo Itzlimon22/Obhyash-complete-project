@@ -132,9 +132,9 @@ export const SUBJECT_OPTIONS = [
 
 export const EXAM_TYPE_OPTIONS = [
   { id: 'Academic', label: 'Academic', desc: 'Board Standard' },
-  { id: 'Medical Admission', label: 'Medical', desc: 'Admission Test' },
-  { id: 'Engineering Admission', label: 'Engineering', desc: 'BUET/CKRUET' },
-  { id: 'Varsity Admission', label: 'Varsity', desc: 'A Unit Standard' },
+  { id: 'Medical', label: 'Medical', desc: 'Admission Test' },
+  { id: 'Engineering', label: 'Engineering', desc: 'BUET/CKRUET' },
+  { id: 'Varsity', label: 'Varsity', desc: 'A Unit Standard' },
   { id: 'Main Book', label: 'Textbook', desc: 'Chapter-wise' },
 ];
 

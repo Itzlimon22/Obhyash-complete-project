@@ -25,6 +25,7 @@ import { TopicSelector } from '@/components/student/features/exam/setup/TopicSel
 import { SubjectSelector } from '@/components/student/features/exam/setup/SubjectSelector';
 import { OmrConfigModal } from '@/components/student/features/omr/OmrConfigModal';
 import { printOMRSheet } from '@/services/print-service';
+import { EXAM_TYPE_OPTIONS } from '@/lib/constants';
 
 interface ExamSetupFormProps {
   onStartExam: (config: ExamConfig) => void;
@@ -36,6 +37,7 @@ interface Subject {
   label: string;
   icon: string | React.ReactNode;
   name: string;
+  rawName?: string; // Added rawName
 }
 
 interface Item {
@@ -72,7 +74,10 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const [subject, setSubject] = useState('');
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [examTypes, setExamTypes] = useState<string[]>(['Academic']);
+  // CHANGED: Default to ALL exam types
+  const [examTypes, setExamTypes] = useState<string[]>(
+    EXAM_TYPE_OPTIONS.map((o) => o.id),
+  );
   const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.Mixed);
   const [questionCount, setQuestionCount] = useState<number>(25);
   const [duration, setDuration] = useState<number>(25);
@@ -115,6 +120,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 STATIC_SUBJECT_ICONS[sub.id] ||
                 STATIC_SUBJECT_ICONS.default,
               name: label,
+              rawName: nameBn, // Added rawName
             };
           });
 
@@ -204,8 +210,9 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       return;
     }
 
-    const subjectLabel =
-      availableSubjects.find((s) => s.id === subject)?.label || subject;
+    // CHANGED: Use rawName
+    const subjectObj = availableSubjects.find((s) => s.id === subject);
+    const subjectLabel = subjectObj?.rawName || subjectObj?.label || subject;
 
     // Resolve IDs to Names — the questions table stores names, not IDs
     const chapterNames =
@@ -378,7 +385,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               </div>
             )}
           </section>
-          |{/* 3. Question Count Selection Card */}
+          {/* 3. Question Count Selection Card */}
           <section className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm">
             <QuestionCountSelection
               questionCount={questionCount}
