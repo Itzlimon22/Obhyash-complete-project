@@ -58,6 +58,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       return userProfile;
     } catch (error) {
       console.error('Unexpected error fetching profile:', error);
+      toast.error('Failed to load user profile. Please refresh.');
       return null;
     }
   };
@@ -104,12 +105,23 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           if (cachedProfileStr) {
             try {
               const cachedProfile = JSON.parse(cachedProfileStr) as UserProfile;
-              if (cachedProfile.id === currentUser.id) {
+              // START FIX: Ensure cached profile matches current user AND has valid data
+              if (
+                cachedProfile &&
+                cachedProfile.id === currentUser.id &&
+                cachedProfile.role
+              ) {
                 if (isMounted) setProfile(cachedProfile);
                 hasCachedProfile = true;
+              } else {
+                // Invalid cache (wrong user or malformed), clear it
+                console.warn('Clearing invalid/stale profile cache');
+                localStorage.removeItem('obhyash_user_profile');
               }
+              // END FIX
             } catch (e) {
               console.error('Cache parse error', e);
+              localStorage.removeItem('obhyash_user_profile');
             }
           }
 

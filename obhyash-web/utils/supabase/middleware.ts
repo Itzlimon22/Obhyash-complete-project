@@ -49,19 +49,20 @@ export async function updateSession(request: NextRequest) {
 
   // SCENARIO A: Not Logged In -> Kick to Login
   if (!user && (isAdminRoute || isStudentRoute || isTeacherRoute)) {
-    // Added teacher route
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    // Optional: Add ?next= param to redirect back after login
-    // url.searchParams.set('next', request.nextUrl.pathname);
-    return NextResponse.redirect(url);
+    // Use the base response to ensure cookies are carried over
+    const redirectResponse = NextResponse.redirect(url);
+    response.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
+    });
+    return redirectResponse;
   }
 
   // SCENARIO B: Logged In -> Check Roles
   if (user) {
     // If accessing Auth routes while logged in, redirect to appropriate dashboard
     if (isAuthRoute) {
-      // Fetch Role from DB to know where to send them
       const { data: profile } = await supabase
         .from('users')
         .select('role')
@@ -69,24 +70,25 @@ export async function updateSession(request: NextRequest) {
         .single();
 
       const role = profile?.role || 'Student';
-
       const url = request.nextUrl.clone();
+
       if (role.toLowerCase() === 'admin') {
         url.pathname = '/admin/dashboard';
       } else if (role.toLowerCase() === 'teacher') {
-        // Added teacher redirect
         url.pathname = '/teacher/dashboard';
       } else {
         url.pathname = '/dashboard';
       }
-      return NextResponse.redirect(url);
+
+      const redirectResponse = NextResponse.redirect(url);
+      response.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
+      });
+      return redirectResponse;
     }
 
-    // Check Role Access if already on protected route
-    // Note: We avoid repetitive DB calls if possible, but middleware needs to be secure.
-    // For performance, you might rely on layout checks, but middleware is safest.
+    // Role-based protection
     if (isAdminRoute || isStudentRoute || isTeacherRoute) {
-      // Added teacher route
       const { data: profile } = await supabase
         .from('users')
         .select('role')
@@ -95,18 +97,25 @@ export async function updateSession(request: NextRequest) {
 
       const role = profile?.role || 'Student';
 
-      // Protect Admin Area (case-insensitive)
       if (isAdminRoute && role.toLowerCase() !== 'admin') {
-        return NextResponse.redirect(new URL('/dashboard', request.url));
+        const redirectResponse = NextResponse.redirect(
+          new URL('/dashboard', request.url),
+        );
+        response.cookies.getAll().forEach((cookie) => {
+          redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
+        });
+        return redirectResponse;
       }
 
-      // Protect Teacher Area
       if (isTeacherRoute && role.toLowerCase() !== 'teacher') {
-        return NextResponse.redirect(new URL('/dashboard', request.url));
+        const redirectResponse = NextResponse.redirect(
+          new URL('/dashboard', request.url),
+        );
+        response.cookies.getAll().forEach((cookie) => {
+          redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
+        });
+        return redirectResponse;
       }
-
-      // Protect Student Area? (Usually admins can access everything, but if strict separation needed:)
-      // if (isStudentRoute && role === 'Admin') { ... }
     }
   }
 
