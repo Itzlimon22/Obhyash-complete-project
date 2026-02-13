@@ -140,8 +140,56 @@ export const fetchQuestions = async (
         debug.resultCount = data.length;
 
         if (data.length === 0) {
-          debug.diagnosis.push('⚠️ RPC returned 0 questions.');
+          debug.diagnosis.push('⚠️ RPC returned 0 questions with Subject ID.');
+
+          // --- FALLBACK TO SUBJECT NAME (LABEL) ---
+          if (config.subject !== config.subjectLabel) {
+            console.log(
+              `🔄 Retrying with Subject Name: "${config.subjectLabel}"`,
+            );
+            debug.diagnosis.push(
+              `🔄 Retrying with Subject Name: "${config.subjectLabel}"`,
+            );
+
+            const rpcParamsName = {
+              ...rpcParams,
+              p_subject: config.subjectLabel,
+            };
+            const { data: dataName, error: errorName } = await supabase.rpc(
+              'get_smart_exam_questions',
+              rpcParamsName,
+            );
+
+            if (!errorName && dataName && dataName.length > 0) {
+              console.log(
+                `✅ Success with Subject Name! Got ${dataName.length} questions.`,
+              );
+              debug.diagnosis.push(
+                `✅ Success! Fetched ${dataName.length} questions using Subject Name.`,
+              );
+              debug.resultCount = dataName.length;
+              console.groupEnd();
+
+              return (dataName as unknown as QuestionDbRow[]).map((q) => ({
+                ...q,
+                createdAt: q.created_at,
+                correctAnswer: q.correct_answer,
+                correctAnswerIndex: q.correct_answer_index,
+                correctAnswerIndices: q.correct_answer_indices || [],
+                imageUrl: q.image_url,
+                optionImages: q.option_images || [],
+                explanationImageUrl: q.explanation_image_url,
+                examType: q.exam_type,
+              })) as unknown as Question[];
+            } else {
+              debug.diagnosis.push(
+                '❌ Retry with Subject Name also returned 0 or failed.',
+              );
+            }
+          }
+
           if (!config.subject) debug.diagnosis.push('  → Subject is EMPTY');
+          // (Rest of diagnosis...)
           if (resolvedChapters)
             debug.diagnosis.push(
               `  → Filtering by ${resolvedChapters.length} chapters: ${resolvedChapters.join(', ')}`,

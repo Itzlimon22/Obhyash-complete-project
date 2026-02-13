@@ -7,7 +7,7 @@ import {
   ExamResult,
   ExamConfig,
 } from '@/lib/types';
-import { fetchExamQuestions } from '../services/exam-service.legacy';
+import { fetchQuestions } from '@/services/exam-service';
 import { evaluateOMRScript } from '../services/gemini-service';
 import { saveExamResult } from '../services/database';
 
@@ -121,7 +121,7 @@ export const useExamEngine = () => {
     setSelectedScript(null);
 
     try {
-      const generatedQuestions = await fetchExamQuestions(config);
+      const generatedQuestions = await fetchQuestions(config);
 
       if (!generatedQuestions || generatedQuestions.length === 0) {
         setAppState(AppState.IDLE);
