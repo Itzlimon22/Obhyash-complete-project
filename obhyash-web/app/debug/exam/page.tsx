@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getSubjects } from '@/services/metadata-service';
+import { getSubjects, getUserProfile } from '@/services/database';
+import { getSubjectMetadata, SubjectMetadata } from '@/services/database';
 import {
   fetchQuestionsWithDiagnostics,
   ExamDebugInfo,
@@ -28,10 +29,16 @@ export default function ExamDebugPage() {
   const [subjects, setSubjects] = useState<SubjectOption[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Form State
+  // Metadata State
+  const [metadata, setMetadata] = useState<SubjectMetadata | null>(null);
+  const [chapterOptions, setChapterOptions] = useState<string[]>([]);
+  const [topicOptions, setTopicOptions] = useState<string[]>([]);
+  const [isMetaLoading, setIsMetaLoading] = useState(false);
+
+  // Selection State
   const [selectedSubject, setSelectedSubject] = useState<string>('');
-  const [chapters, setChapters] = useState<string>('');
-  const [topics, setTopics] = useState<string>('');
+  const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [examType, setExamType] = useState<string>('');
   const [count, setCount] = useState<number>(10);
   const [difficulty, setDifficulty] = useState<QuestionDifficulty>('Mixed');
@@ -46,8 +53,20 @@ export default function ExamDebugPage() {
   useEffect(() => {
     async function load() {
       try {
-        const subs = await getSubjects('HSC', 'Science'); // Defaulting to Science for debug, or fetch all if possible
-        setSubjects(subs);
+        const user = await getUserProfile('me');
+        if (user) {
+          // Fetch subjects based on user profile, just like ExamSetupForm
+          const subs = await getSubjects(
+            user.division,
+            user.stream,
+            user.optional_subject,
+          );
+          setSubjects(subs);
+        } else {
+          // Fallback if no user (e.g. admin browsing? mostly relies on user context)
+          const subs = await getSubjects('HSC', 'Science');
+          setSubjects(subs);
+        }
       } catch (e) {
         console.error(e);
       } finally {
@@ -56,6 +75,55 @@ export default function ExamDebugPage() {
     }
     load();
   }, []);
+
+  // Load Metadata when Subject changes
+  useEffect(() => {
+    if (selectedSubject) {
+      setIsMetaLoading(true);
+      getSubjectMetadata(selectedSubject).then((data) => {
+        if (data) {
+          setMetadata(data);
+          setChapterOptions(data.chapters);
+          setTopicOptions([]); // Reset topics until chapters selected
+        } else {
+          setChapterOptions([]);
+          setTopicOptions([]);
+        }
+        setIsMetaLoading(false);
+      });
+      setSelectedChapters([]);
+      setSelectedTopics([]);
+    }
+  }, [selectedSubject]);
+
+  // Load Topics when Chapters change (simplified logic)
+  useEffect(() => {
+    if (selectedChapters.length > 0 && metadata) {
+      const aggregatedTopics = new Set<string>();
+      selectedChapters.forEach((chapter) => {
+        if (metadata.topics[chapter]) {
+          metadata.topics[chapter].forEach((t) => aggregatedTopics.add(t));
+        }
+      });
+      setTopicOptions(Array.from(aggregatedTopics));
+    } else if (metadata) {
+      // If no chapter selected, maybe show all topics? Or none.
+      // ExamForm shows none. Let's stick to exam form.
+      setTopicOptions([]);
+    }
+  }, [selectedChapters, metadata]);
+
+  const toggleChapter = (c: string) => {
+    setSelectedChapters((prev) =>
+      prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c],
+    );
+  };
+
+  const toggleTopic = (t: string) => {
+    setSelectedTopics((prev) =>
+      prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t],
+    );
+  };
 
   const handleTestFetch = async () => {
     if (!selectedSubject) {
@@ -71,8 +139,9 @@ export default function ExamDebugPage() {
     const config: ExamConfig = {
       subject: selectedSubject,
       subjectLabel: subjectObj?.name || '',
-      chapters: chapters || 'All',
-      topics: topics || 'All',
+      chapters:
+        selectedChapters.length > 0 ? selectedChapters.join(', ') : 'All',
+      topics: selectedTopics.length > 0 ? selectedTopics.join(', ') : 'All',
       examType: examType || 'Mixed',
       durationMinutes: 10,
       questionCount: count,
@@ -139,28 +208,76 @@ export default function ExamDebugPage() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Chapters
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Chapters */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium">
+                  Chapters{' '}
+                  {isMetaLoading && (
+                    <span className="text-xs text-gray-500 animate-pulse">
+                      (Loading...)
+                    </span>
+                  )}
                 </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Motion, Force"
-                  className="w-full p-2 border rounded-md text-sm"
-                  value={chapters}
-                  onChange={(e) => setChapters(e.target.value)}
-                />
+                <div className="h-40 overflow-y-auto border rounded-md p-2 bg-gray-50 text-sm space-y-1">
+                  {!selectedSubject ? (
+                    <div className="text-gray-400 text-xs text-center py-4">
+                      Select a subject first
+                    </div>
+                  ) : chapterOptions.length === 0 && !isMetaLoading ? (
+                    <div className="text-gray-400 text-xs text-center py-4">
+                      No chapters found
+                    </div>
+                  ) : (
+                    chapterOptions.map((c) => (
+                      <div
+                        key={c}
+                        onClick={() => toggleChapter(c)}
+                        className={`cursor-pointer px-2 py-1 rounded flex items-center gap-2 ${selectedChapters.includes(c) ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-200'}`}
+                      >
+                        <div
+                          className={`w-3 h-3 rounded border ${selectedChapters.includes(c) ? 'bg-blue-600 border-blue-600' : 'border-gray-400'}`}
+                        ></div>
+                        {c}
+                      </div>
+                    ))
+                  )}
+                </div>
+                <div className="text-xs text-right text-gray-500">
+                  {selectedChapters.length} selected
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Topics</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Newton"
-                  className="w-full p-2 border rounded-md text-sm"
-                  value={topics}
-                  onChange={(e) => setTopics(e.target.value)}
-                />
+
+              {/* Topics */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium">Topics</label>
+                <div className="h-40 overflow-y-auto border rounded-md p-2 bg-gray-50 text-sm space-y-1">
+                  {selectedChapters.length === 0 ? (
+                    <div className="text-gray-400 text-xs text-center py-4">
+                      Select chapters first
+                    </div>
+                  ) : topicOptions.length === 0 ? (
+                    <div className="text-gray-400 text-xs text-center py-4">
+                      No topics found
+                    </div>
+                  ) : (
+                    topicOptions.map((t) => (
+                      <div
+                        key={t}
+                        onClick={() => toggleTopic(t)}
+                        className={`cursor-pointer px-2 py-1 rounded flex items-center gap-2 ${selectedTopics.includes(t) ? 'bg-green-100 text-green-700' : 'hover:bg-gray-200'}`}
+                      >
+                        <div
+                          className={`w-3 h-3 rounded border ${selectedTopics.includes(t) ? 'bg-green-600 border-green-600' : 'border-gray-400'}`}
+                        ></div>
+                        {t}
+                      </div>
+                    ))
+                  )}
+                </div>
+                <div className="text-xs text-right text-gray-500">
+                  {selectedTopics.length} selected
+                </div>
               </div>
             </div>
 
