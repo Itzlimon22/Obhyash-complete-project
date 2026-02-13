@@ -211,12 +211,39 @@ export const useExamEngine = () => {
     }
   };
 
-  const beginTimer = () => {
-    if (examDetails) {
-      setTimeLeft(examDetails.durationMinutes * 60);
+  // --- Refs for stable values in effects/callbacks ---
+  const stateRef = useRef(appState);
+  const timeLeftRef = useRef(timeLeft);
+  const examDetailsRef = useRef(examDetails);
+
+  useEffect(() => {
+    stateRef.current = appState;
+  }, [appState]);
+  useEffect(() => {
+    timeLeftRef.current = timeLeft;
+  }, [timeLeft]);
+  useEffect(() => {
+    examDetailsRef.current = examDetails;
+  }, [examDetails]);
+
+  const beginTimer = useCallback((durationOverride?: number) => {
+    const duration =
+      durationOverride ||
+      (examDetailsRef.current?.durationMinutes
+        ? examDetailsRef.current.durationMinutes * 60
+        : 0);
+
+    if (duration > 0) {
+      console.log('⏱️ [ExamEngine] Starting timer with duration:', duration);
+      setTimeLeft(duration);
       setAppState(AppState.ACTIVE);
+    } else {
+      console.warn(
+        '⚠️ [ExamEngine] Cannot start timer: No duration. Details:',
+        examDetailsRef.current,
+      );
     }
-  };
+  }, []);
 
   /**
    * Submits the current exam attempt.
@@ -228,12 +255,26 @@ export const useExamEngine = () => {
    */
   const submitExam = useCallback(
     async (manualSubmit = false) => {
+      // console.log(
+      //   '🏁 [ExamEngine] submitExam called. Manual:',
+      //   manualSubmit,
+      //   'State:',
+      //   stateRef.current,
+      // );
+
+      if (
+        stateRef.current === AppState.COMPLETED ||
+        stateRef.current === AppState.SUBMITTED
+      ) {
+        return { success: false, error: 'Already submitted' };
+      }
+
       // OMR Check
       if (
-        (isOmrMode || appState === AppState.GRACE_PERIOD) &&
+        (isOmrMode || stateRef.current === AppState.GRACE_PERIOD) &&
         !selectedScript
       ) {
-        if (appState === AppState.ACTIVE) {
+        if (stateRef.current === AppState.ACTIVE) {
           setAppState(AppState.GRACE_PERIOD);
           setGraceTimeLeft(300);
           return { requiresUpload: true };
@@ -245,30 +286,31 @@ export const useExamEngine = () => {
 
       setIsEvaluating(true);
 
-      const duration = examDetails
-        ? examDetails.durationMinutes * 60 - timeLeft
+      const currentTimeLeft = timeLeftRef.current;
+      const duration = examDetailsRef.current
+        ? examDetailsRef.current.durationMinutes * 60 - currentTimeLeft
         : 0;
       setTimeTaken(duration);
 
       const resultId = dbSessionId || Date.now().toString();
       const newResult: ExamResult = {
         id: resultId,
-        subject: examDetails?.subject || 'Unknown',
-        subjectLabel: examDetails?.subjectLabel,
-        examType: examDetails?.examType,
+        subject: examDetailsRef.current?.subject || 'Unknown',
+        subjectLabel: examDetailsRef.current?.subjectLabel,
+        examType: examDetailsRef.current?.examType,
         date: new Date().toISOString(),
         score: 0,
-        totalMarks: examDetails?.totalMarks || 0,
+        totalMarks: examDetailsRef.current?.totalMarks || 0,
         totalQuestions: questions.length,
         correctCount: 0,
         wrongCount: 0,
         timeTaken: duration,
-        negativeMarking: examDetails?.negativeMarking || 0,
+        negativeMarking: examDetailsRef.current?.negativeMarking || 0,
         questions: questions,
         // Persist Flagged Questions
         flaggedQuestions: Array.from(flaggedQuestions),
         submissionType:
-          isOmrMode || appState === AppState.GRACE_PERIOD
+          isOmrMode || stateRef.current === AppState.GRACE_PERIOD
             ? 'script'
             : 'digital',
       };
@@ -277,7 +319,7 @@ export const useExamEngine = () => {
         const stats = calculateExamStats(
           questions,
           userAnswers,
-          examDetails?.negativeMarking || 0,
+          examDetailsRef.current?.negativeMarking || 0,
         );
         newResult.score = stats.finalScore;
         newResult.correctCount = stats.correctCount;
@@ -295,7 +337,7 @@ export const useExamEngine = () => {
             const stats = calculateExamStats(
               questions,
               detectedAnswers,
-              examDetails?.negativeMarking || 0,
+              examDetailsRef.current?.negativeMarking || 0,
             );
             newResult.userAnswers = detectedAnswers;
             newResult.score = stats.finalScore;
@@ -321,38 +363,33 @@ export const useExamEngine = () => {
       setExamHistory((prev) => [...prev, newResult]);
 
       setAppState(AppState.COMPLETED);
+      // console.log('✅ [ExamEngine] Exam State moved to COMPLETED');
       setIsEvaluating(false);
       return { success: true, result: newResult };
     },
     [
       isOmrMode,
-      appState,
       selectedScript,
-      examDetails,
-      timeLeft,
       questions,
       userAnswers,
       flaggedQuestions,
+      dbSessionId,
     ],
   );
 
   useEffect(() => {
-    if (appState === AppState.ACTIVE && timeLeft > 0) {
-      timerRef.current = window.setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            if (isOmrMode) {
-              setAppState(AppState.GRACE_PERIOD);
-              setGraceTimeLeft(300);
-              return 0;
-            } else {
-              submitExam();
+    if (appState === AppState.ACTIVE) {
+      if (timeLeft > 0) {
+        timerRef.current = window.setInterval(() => {
+          setTimeLeft((prev) => {
+            if (prev <= 1) {
+              submitExam(false);
               return 0;
             }
-          }
-          return prev - 1;
-        });
-      }, 1000);
+            return prev - 1;
+          });
+        }, 1000);
+      }
     } else if (appState === AppState.GRACE_PERIOD && graceTimeLeft > 0) {
       timerRef.current = window.setInterval(() => {
         setGraceTimeLeft((prev) => {
@@ -363,9 +400,12 @@ export const useExamEngine = () => {
     }
 
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     };
-  }, [appState, timeLeft, graceTimeLeft, isOmrMode, submitExam]);
+  }, [appState, timeLeft > 0, graceTimeLeft > 0, submitExam]);
 
   return {
     appState,

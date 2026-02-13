@@ -134,9 +134,9 @@ export default function StudentRoot({
       const success = await startExam(pendingConfig);
 
       // 2. If success, Auto-Start Timer
-      if (success) {
-        beginTimer();
-      } else {
+      if (success && pendingConfig) {
+        beginTimer(pendingConfig.durationMinutes * 60);
+      } else if (!success) {
         // This usually falls into AppState.ERROR, but engine might throw specifically
         toast.error(
           'দুঃখিত, কোনো প্রশ্ন পাওয়া যায়নি। অন্য টপিক নির্বাচন করুন।',
