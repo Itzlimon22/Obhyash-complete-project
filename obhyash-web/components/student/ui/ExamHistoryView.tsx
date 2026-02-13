@@ -22,27 +22,34 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   const [filterDate, setFilterDate] = useState('');
   const [visibleCount, setVisibleCount] = useState(5);
 
-  // Extract unique subjects for dropdown (Merge DB subjects + History subjects)
-  const uniqueSubjects = useMemo(() => {
-    const subjectSet = new Set<string>();
-
-    // Add subjects from DB
-    subjects.forEach((s) => {
-      if (s.name) subjectSet.add(s.name);
+  // Build subject lookup: show only user's dedicated subjects from profile
+  const subjectOptions = useMemo(() => {
+    if (subjects.length > 0) {
+      return subjects
+        .filter((s) => s.name)
+        .map((s) => ({ id: s.id || s.name, name: s.name }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    }
+    // Fallback: extract from history if no subjects prop
+    const seen = new Map<string, string>();
+    history.forEach((item) => {
+      if (!seen.has(item.subject)) {
+        seen.set(item.subject, item.subjectLabel || item.subject);
+      }
     });
-
-    // Add subjects from history (in case some are missing from DB)
-    history.forEach((item) => subjectSet.add(item.subject));
-
-    return Array.from(subjectSet).sort();
+    return Array.from(seen.entries())
+      .map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   }, [history, subjects]);
 
-  // Filter Logic
+  // Filter Logic — match by subject ID or subject label
   const filteredHistory = useMemo(() => {
     return history
       .filter((item) => {
         const matchSubject = filterSubject
-          ? item.subject.toLowerCase() === filterSubject.toLowerCase()
+          ? item.subject === filterSubject ||
+            (item.subjectLabel || '').toLowerCase() ===
+              filterSubject.toLowerCase()
           : true;
         const matchDate = filterDate ? item.date.startsWith(filterDate) : true;
         return matchSubject && matchDate;
@@ -174,13 +181,16 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   </label>
                   <select
                     value={filterSubject}
-                    onChange={(e) => setFilterSubject(e.target.value)}
+                    onChange={(e) => {
+                      setFilterSubject(e.target.value);
+                      setVisibleCount(5);
+                    }}
                     className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/10 focus:border-rose-500 transition-all text-sm font-medium appearance-none"
                   >
                     <option value="">সব বিষয় (All Subjects)</option>
-                    {uniqueSubjects.map((idx) => (
-                      <option key={idx} value={idx}>
-                        {idx}
+                    {subjectOptions.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
                       </option>
                     ))}
                   </select>
@@ -206,60 +216,60 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
 
           {/* Stats & History Column (Right - 8 cols on lg, full on md) */}
           <div className="md:col-span-2 lg:col-span-8 space-y-6">
-            {/* Horizontal Stats Row */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div className="bg-white dark:bg-neutral-900 p-6 rounded-[2rem] shadow-sm border border-neutral-200 dark:border-neutral-800 flex items-center gap-5 group hover:border-rose-500/30 transition-all">
-                <div className="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-900/10 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-7 h-7"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <span className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-1">
+            {/* Compact Stats Row */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/20 dark:to-neutral-900 p-4 md:p-5 rounded-2xl shadow-sm border border-rose-100 dark:border-rose-900/30 group hover:shadow-md transition-all">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-500 dark:text-rose-400">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-4 h-4"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+                      />
+                    </svg>
+                  </div>
+                  <span className="text-[10px] font-bold text-rose-600/70 dark:text-rose-400/70 uppercase tracking-wider">
                     মোট পরীক্ষা
                   </span>
-                  <span className="text-3xl font-black text-neutral-900 dark:text-white">
-                    {totalExams}
-                  </span>
                 </div>
+                <span className="text-2xl md:text-3xl font-black text-neutral-900 dark:text-white">
+                  {totalExams}
+                </span>
               </div>
 
-              <div className="bg-white dark:bg-neutral-900 p-6 rounded-[2rem] shadow-sm border border-neutral-200 dark:border-neutral-800 flex items-center gap-5 group hover:border-emerald-500/30 transition-all">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-900/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-7 h-7"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <span className="block text-xs font-bold text-neutral-500 uppercase tracking-wider mb-1">
-                    গড় স্কোর
-                  </span>
-                  <span className="text-3xl font-black text-neutral-900 dark:text-white">
-                    {averageScore}%
+              <div className="bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/20 dark:to-neutral-900 p-4 md:p-5 rounded-2xl shadow-sm border border-emerald-100 dark:border-emerald-900/30 group hover:shadow-md transition-all">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-500 dark:text-emerald-400">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-4 h-4"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
+                      />
+                    </svg>
+                  </div>
+                  <span className="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-400/70 uppercase tracking-wider">
+                    গড় স্কোর
                   </span>
                 </div>
+                <span className="text-2xl md:text-3xl font-black text-neutral-900 dark:text-white">
+                  {averageScore}%
+                </span>
               </div>
             </div>
 
