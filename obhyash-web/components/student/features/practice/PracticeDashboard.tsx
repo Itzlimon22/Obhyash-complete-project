@@ -225,7 +225,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
 
             {/* List */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-neutral-50/30 dark:bg-black/20">
-              {currentList.map((question) => (
+              {currentList.map((question, idx) => (
                 <div
                   key={question.id}
                   className={`
@@ -255,6 +255,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                       </div>
                       <QuestionCard
                         question={question}
+                        serialNumber={idx + 1}
                         selectedOptionIndex={question.correctAnswerIndex} // Show correct answer visually for learning
                         isFlagged={activeTab === 'bookmarks'}
                         onSelectOption={() => {}}

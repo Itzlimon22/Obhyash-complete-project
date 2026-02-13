@@ -21,7 +21,8 @@ const PracticeRow: React.FC<{
     flagged: boolean;
   };
   isMistakeTab?: boolean;
-}> = ({ item, isMistakeTab }) => {
+  index: number;
+}> = ({ item, isMistakeTab, index }) => {
   const [selectedOpt, setSelectedOpt] = useState<number | undefined>(undefined);
   const [revealed, setRevealed] = useState(false);
 
@@ -90,6 +91,7 @@ const PracticeRow: React.FC<{
 
       <QuestionCard
         question={item.question}
+        serialNumber={index}
         selectedOptionIndex={selectedOpt}
         isFlagged={item.flagged}
         onSelectOption={handleSelect}
@@ -677,6 +679,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                         key={`${item.examDate}-${idx}`}
                         item={item}
                         isMistakeTab={true}
+                        index={idx + 1}
                       />
                     ))}
                   </div>
@@ -731,6 +734,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                       <PracticeRow
                         key={`${item.examDate}-${idx}`}
                         item={item}
+                        index={idx + 1}
                       />
                     ))}
                   </div>

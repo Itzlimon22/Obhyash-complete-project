@@ -1,9 +1,11 @@
 import React from 'react';
 import { Question } from '@/lib/types';
 import LatexText from '../common/LatexText';
+import { toBengaliNumeral } from '@/lib/utils';
 
 interface QuestionCardProps {
   question: Question;
+  serialNumber?: number;
   selectedOptionIndex: number | undefined;
   isFlagged: boolean;
   onSelectOption: (optionIndex: number) => void;
@@ -20,6 +22,7 @@ const BANGLA_INDICES = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 
 
 const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
+  serialNumber,
   selectedOptionIndex,
   isFlagged,
   onSelectOption,
@@ -52,7 +55,9 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       <div className="flex items-start justify-between px-5 pt-5 pb-2">
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-            Question {question.id}
+            {serialNumber
+              ? `প্রশ্ন ${toBengaliNumeral(serialNumber)}`
+              : `Question ${question.id}`}
           </span>
           {isFlagged && (
             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">

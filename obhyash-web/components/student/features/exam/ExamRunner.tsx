@@ -189,13 +189,14 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
           </div>
 
           <div className="space-y-6">
-            {questions.map((q) => {
+            {questions.map((q, idx) => {
               const questionId =
                 typeof q.id === 'string' ? parseInt(q.id) : q.id;
               return (
                 <QuestionCard
                   key={q.id}
                   question={q}
+                  serialNumber={idx + 1}
                   selectedOptionIndex={userAnswers[q.id]}
                   isFlagged={flaggedQuestions.has(questionId)}
                   onSelectOption={(optIdx) =>
