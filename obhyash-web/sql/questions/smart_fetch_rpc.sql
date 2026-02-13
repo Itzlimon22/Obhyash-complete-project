@@ -5,12 +5,13 @@
 
 CREATE OR REPLACE FUNCTION get_smart_exam_questions(
   p_user_id UUID,
-  p_subject TEXT,
+  p_subject TEXT,         -- Subject ID (UUID)
   p_limit INT,
   p_chapters TEXT[] DEFAULT NULL,
   p_topics TEXT[] DEFAULT NULL,
   p_difficulty TEXT DEFAULT NULL,
-  p_exam_types TEXT[] DEFAULT NULL
+  p_exam_types TEXT[] DEFAULT NULL,
+  p_subject_name TEXT DEFAULT NULL -- New parameter for Dual-Match
 ) RETURNS SETOF questions AS $$
 DECLARE
   v_needed INT := p_limit;
@@ -18,31 +19,26 @@ DECLARE
 BEGIN
   -- ---------------------------------------------------------
   -- 1. UNUSED QUESTIONS (Priority: Highest)
-  -- Questions the user has never attempted (no record in analytics)
   -- ---------------------------------------------------------
   RETURN QUERY
   SELECT q.*
   FROM questions q
   LEFT JOIN user_question_analytics uqa 
     ON q.id = uqa.question_id AND uqa.user_id = p_user_id
-  WHERE q.subject = p_subject
-    AND uqa.question_id IS NULL -- Key: User has no record
+  WHERE (q.subject = p_subject OR (p_subject_name IS NOT NULL AND q.subject = p_subject_name))
+    AND uqa.question_id IS NULL
     AND (p_chapters IS NULL OR q.chapter = ANY(p_chapters))
     AND (p_topics IS NULL OR q.topic = ANY(p_topics))
-    -- Difficulty: If NULL or 'Mixed', ignore filter
     AND (p_difficulty IS NULL OR p_difficulty = 'Mixed' OR q.difficulty = p_difficulty)
-    -- Exam Type: If NULL or contains 'Mixed', ignore filter
     AND (p_exam_types IS NULL OR 'Mixed' = ANY(p_exam_types) OR q.exam_type = ANY(p_exam_types))
-  ORDER BY random() -- True random shuffle
+  ORDER BY random()
   LIMIT v_needed;
   
-  -- Calculate how many we got
   GET DIAGNOSTICS v_count = ROW_COUNT;
   v_needed := v_needed - v_count;
 
   -- ---------------------------------------------------------
   -- 2. MISTAKEN QUESTIONS (Priority: Medium)
-  -- Questions the user previously got WRONG (is_mistaken = true)
   -- ---------------------------------------------------------
   IF v_needed > 0 THEN
     RETURN QUERY
@@ -50,13 +46,13 @@ BEGIN
     FROM questions q
     JOIN user_question_analytics uqa 
       ON q.id = uqa.question_id AND uqa.user_id = p_user_id
-    WHERE q.subject = p_subject
+    WHERE (q.subject = p_subject OR (p_subject_name IS NOT NULL AND q.subject = p_subject_name))
       AND uqa.is_mistaken = true
       AND (p_chapters IS NULL OR q.chapter = ANY(p_chapters))
       AND (p_topics IS NULL OR q.topic = ANY(p_topics))
       AND (p_difficulty IS NULL OR p_difficulty = 'Mixed' OR q.difficulty = p_difficulty)
       AND (p_exam_types IS NULL OR 'Mixed' = ANY(p_exam_types) OR q.exam_type = ANY(p_exam_types))
-    ORDER BY uqa.last_attempted_at ASC -- Spaced Repetition
+    ORDER BY uqa.last_attempted_at ASC
     LIMIT v_needed;
     
     GET DIAGNOSTICS v_count = ROW_COUNT;
@@ -65,13 +61,12 @@ BEGIN
 
   -- ---------------------------------------------------------
   -- 3. RANDOM FILL (Priority: Lowest)
-  -- If we still need questions, pick random
   -- ---------------------------------------------------------
   IF v_needed > 0 THEN
     RETURN QUERY
     SELECT q.*
     FROM questions q
-    WHERE q.subject = p_subject
+    WHERE (q.subject = p_subject OR (p_subject_name IS NOT NULL AND q.subject = p_subject_name))
       AND (p_chapters IS NULL OR q.chapter = ANY(p_chapters))
       AND (p_topics IS NULL OR q.topic = ANY(p_topics))
       AND (p_difficulty IS NULL OR p_difficulty = 'Mixed' OR q.difficulty = p_difficulty)

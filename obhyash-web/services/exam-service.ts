@@ -122,6 +122,7 @@ export const fetchQuestions = async (
         p_topics: resolvedTopics,
         p_difficulty: resolvedDifficulty,
         p_exam_types: resolvedExamTypes,
+        p_subject_name: config.subjectLabel, // DUAL-MATCH: Pass name to match against if ID fails
       };
       console.log('📤 RPC Params:', rpcParams);
 
@@ -140,56 +141,11 @@ export const fetchQuestions = async (
         debug.resultCount = data.length;
 
         if (data.length === 0) {
-          debug.diagnosis.push('⚠️ RPC returned 0 questions with Subject ID.');
-
-          // --- FALLBACK TO SUBJECT NAME (LABEL) ---
-          if (config.subject !== config.subjectLabel) {
-            console.log(
-              `🔄 Retrying with Subject Name: "${config.subjectLabel}"`,
-            );
-            debug.diagnosis.push(
-              `🔄 Retrying with Subject Name: "${config.subjectLabel}"`,
-            );
-
-            const rpcParamsName = {
-              ...rpcParams,
-              p_subject: config.subjectLabel,
-            };
-            const { data: dataName, error: errorName } = await supabase.rpc(
-              'get_smart_exam_questions',
-              rpcParamsName,
-            );
-
-            if (!errorName && dataName && dataName.length > 0) {
-              console.log(
-                `✅ Success with Subject Name! Got ${dataName.length} questions.`,
-              );
-              debug.diagnosis.push(
-                `✅ Success! Fetched ${dataName.length} questions using Subject Name.`,
-              );
-              debug.resultCount = dataName.length;
-              console.groupEnd();
-
-              return (dataName as unknown as QuestionDbRow[]).map((q) => ({
-                ...q,
-                createdAt: q.created_at,
-                correctAnswer: q.correct_answer,
-                correctAnswerIndex: q.correct_answer_index,
-                correctAnswerIndices: q.correct_answer_indices || [],
-                imageUrl: q.image_url,
-                optionImages: q.option_images || [],
-                explanationImageUrl: q.explanation_image_url,
-                examType: q.exam_type,
-              })) as unknown as Question[];
-            } else {
-              debug.diagnosis.push(
-                '❌ Retry with Subject Name also returned 0 or failed.',
-              );
-            }
-          }
-
+          debug.diagnosis.push(
+            '⚠️ RPC returned 0 questions (searched by ID and Name).',
+          );
           if (!config.subject) debug.diagnosis.push('  → Subject is EMPTY');
-          // (Rest of diagnosis...)
+          // (Diagnostics continue...)
           if (resolvedChapters)
             debug.diagnosis.push(
               `  → Filtering by ${resolvedChapters.length} chapters: ${resolvedChapters.join(', ')}`,
@@ -207,7 +163,7 @@ export const fetchQuestions = async (
               `  → Filtering by exam types: ${resolvedExamTypes.join(', ')}`,
             );
           debug.diagnosis.push(
-            '💡 TIP: Try widening filters (use All difficulty, all exam types, no chapter filter)',
+            '💡 TIP: Check if questions exist for this subject/filters.',
           );
         } else {
           debug.diagnosis.push(
@@ -244,7 +200,14 @@ export const fetchQuestions = async (
     let query = supabase.from('questions').select('*');
 
     if (config.subject) {
-      query = query.eq('subject', config.subject);
+      // DUAL-MATCH for Legacy: If ID and Name differ, look for either
+      if (config.subject !== config.subjectLabel && config.subjectLabel) {
+        query = query.or(
+          `subject.eq.${config.subject},subject.eq.${config.subjectLabel}`,
+        );
+      } else {
+        query = query.eq('subject', config.subject);
+      }
     }
 
     if (config.chapters && config.chapters !== 'All') {
@@ -373,13 +336,113 @@ const updateQuestionAnalytics = async (
   }
 };
 
+// --- DB SYNC METHODS ---
+
+export const initiateExamSession = async (
+  config: ExamConfig,
+  questions: Question[],
+): Promise<string | null> => {
+  if (!isSupabaseConfigured() || !supabase) return null;
+
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return null;
+
+    // Insert new row with 'started' status (implicit via 0 score/null completion data)
+    // We store the question IDs or full questions to ensure history matches what was taken
+    const { data, error } = await supabase
+      .from('exam_results')
+      .insert({
+        user_id: user.id,
+        subject: config.subject,
+        exam_type: config.examType,
+        date: new Date().toISOString(),
+        score: 0, // Placeholder
+        total_marks: questions.reduce((acc, q) => acc + (q.points || 1), 0),
+        total_questions: questions.length,
+        correct_count: 0,
+        wrong_count: 0,
+        time_taken: 0,
+        negative_marking: config.negativeMarking,
+        questions: questions, // Store full questions to preserve context
+        chapters: config.chapters || 'General',
+        submission_type: 'started', // Use this to denote in-progress if allowed, else 'digital'
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      console.error('Failed to initiate exam session:', error);
+      return null;
+    }
+
+    return data.id;
+  } catch (err) {
+    console.error('Error initiating exam session:', err);
+    return null;
+  }
+};
+
+export const updateExamResult = async (
+  examId: string,
+  result: ExamResult,
+): Promise<boolean> => {
+  if (!isSupabaseConfigured() || !supabase) return false;
+
+  try {
+    const { error } = await supabase
+      .from('exam_results')
+      .update({
+        score: result.score,
+        correct_count: result.correctCount,
+        wrong_count: result.wrongCount,
+        time_taken: result.timeTaken,
+        user_answers: result.userAnswers,
+        submission_type: result.submissionType || 'digital',
+        script_image_data: result.scriptImageData,
+        // Update total marks/questions just in case they changed (unlikely)
+      })
+      .eq('id', examId);
+
+    if (error) {
+      console.error('Failed to update exam result:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Error updating exam result:', err);
+    return false;
+  }
+};
+
 export const saveExamResult = async (result: ExamResult): Promise<void> => {
   if (!isSupabaseConfigured() || !supabase) {
     throw new Error('Database configuration missing');
   }
 
   try {
-    // Get the current user ID
+    // Check if this result has a valid UUID (meaning it was initiated in DB)
+    // Legacy results have Date.now() IDs which are numbers-as-strings (usually shorter or different format)
+    const isUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        result.id,
+      );
+
+    if (isUuid) {
+      // Update existing session
+      const success = await updateExamResult(result.id, result);
+      if (success) {
+        console.log('✅ Exam session updated successfully');
+        return; // Done
+      } else {
+        console.warn('⚠️ Update failed, falling back to insert...');
+      }
+    }
+
+    // Fallback: Insert new row (Legacy behavior or if init failed)
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -409,21 +472,7 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
         console.error('Error saving exam result:', error);
         throw error;
       } else {
-        console.log('✅ Exam result saved successfully');
-
-        // --- 🚀 NEW: Update Smart Analytics ---
-        // Fire and forget (don't block the UI)
-        if (result.userAnswers) {
-          // We need to know which questions were correct
-          // The 'result' object usually has 'score' but maybe not per-question correctness explicitly
-          // unless we re-evaluate or if 'userAnswers' contains it.
-          // Types.ts definition of ExamResult: userAnswers?: UserAnswers (Record<string | number, number>)
-          // We need the original questions or validity map to know correctness.
-          // If 'correctAnswers' or 'scoreDetails' is not in ExamResult, we might skip this
-          // OR we rely on the component to call a separate 'submitAnalytics'
-          // TODO: The ExamResult type needs to support detailed correctness for this to work perfectly here.
-          // Alternatively, we can assume the UI/Frontend has calculated it.
-        }
+        console.log('✅ Exam result saved successfully (New Insert)');
       }
     } else {
       console.warn(
@@ -449,10 +498,17 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
       // If malformed, we'll start with a clean slate
       existingHistory = [];
     }
-    const updatedHistory = [...existingHistory, result];
+    // Update if exists, else append
+    const index = existingHistory.findIndex((r) => r.id === result.id);
+    if (index >= 0) {
+      existingHistory[index] = result;
+    } else {
+      existingHistory.push(result);
+    }
+
     localStorage.setItem(
       'obhyash_exam_history',
-      JSON.stringify(updatedHistory),
+      JSON.stringify(existingHistory),
     );
   }
 };

@@ -7,9 +7,13 @@ import {
   ExamResult,
   ExamConfig,
 } from '@/lib/types';
-import { fetchQuestions } from '@/services/exam-service';
+import {
+  fetchQuestions,
+  initiateExamSession,
+  saveExamResult,
+} from '@/services/exam-service';
 import { evaluateOMRScript } from '../services/gemini-service';
-import { saveExamResult } from '../services/database';
+// import { saveExamResult } from '../services/database'; // Using direct service import now
 
 /**
  * Core hook for the Exam Engine logic.
@@ -31,6 +35,7 @@ export const useExamEngine = () => {
   const [flaggedQuestions, setFlaggedQuestions] = useState<Set<number>>(
     new Set(),
   );
+  const [dbSessionId, setDbSessionId] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string>('');
 
   // --- Timer State ---
@@ -148,6 +153,18 @@ export const useExamEngine = () => {
       setUserAnswers({});
       setFlaggedQuestions(new Set());
       setAppState(AppState.INSTRUCTIONS);
+
+      // --- DB SYNC: START SESSION ---
+      initiateExamSession(config, generatedQuestions).then((sid) => {
+        if (sid) {
+          console.log('✅ Exam Session Initiated:', sid);
+          setDbSessionId(sid);
+        } else {
+          console.warn(
+            '⚠️ Failed to initiate DB session, running in offline mode',
+          );
+        }
+      });
       return true;
     } catch (e: unknown) {
       console.error(e);
@@ -233,7 +250,7 @@ export const useExamEngine = () => {
         : 0;
       setTimeTaken(duration);
 
-      const resultId = Date.now().toString();
+      const resultId = dbSessionId || Date.now().toString();
       const newResult: ExamResult = {
         id: resultId,
         subject: examDetails?.subject || 'Unknown',
