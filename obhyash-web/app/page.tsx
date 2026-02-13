@@ -38,7 +38,7 @@ export default function Home() {
 
   // Sync auth state from AuthProvider
   const { profile, loading: authLoading } = useAuth();
-  
+
   useEffect(() => {
     if (!authLoading) {
       setCurrentUser(profile);

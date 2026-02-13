@@ -65,7 +65,16 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isMounted = true;
 
+    // START of initializeAuth
     const initializeAuth = async () => {
+      // Safety Timeout to prevent infinite loading
+      const timeoutId = setTimeout(() => {
+        if (isMounted && loading) {
+          console.warn('⚠️ Auth check timed out - Forcing load completion');
+          setLoading(false);
+        }
+      }, 5000); // 5 seconds max wait
+
       try {
         // 1. Get current user (server-validated via Cookie)
         const {
@@ -114,6 +123,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         console.error('Auth initialization error:', error);
       } finally {
         if (isMounted) setLoading(false);
+        clearTimeout(timeoutId); // Clear timeout if successful
       }
     };
 
