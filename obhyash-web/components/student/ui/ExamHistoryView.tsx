@@ -167,7 +167,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 </h3>
               </div>
 
-              <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-neutral-500 uppercase ml-1">
                     বিষয় অনুযায়ী খুঁজুন
@@ -207,7 +207,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
           {/* Stats & History Column (Right - 8 cols on lg, full on md) */}
           <div className="md:col-span-2 lg:col-span-8 space-y-6">
             {/* Horizontal Stats Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="bg-white dark:bg-neutral-900 p-6 rounded-[2rem] shadow-sm border border-neutral-200 dark:border-neutral-800 flex items-center gap-5 group hover:border-rose-500/30 transition-all">
                 <div className="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-900/10 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform">
                   <svg
