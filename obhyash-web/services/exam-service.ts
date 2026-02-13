@@ -120,77 +120,83 @@ export const fetchQuestionsWithDiagnostics = async (
     console.log('📋 Input Config:', debug.input);
     console.log('🎯 Resolved Params:', debug.resolvedParams);
 
+    // --- NORMALIZE SUBJECT NAME ---
+    // Bengali characters often trigger mismatches (NFC vs NFD).
+    // We try both forms if they differ, ensuring robustness against data encoding.
+    const subjectName = config.subjectLabel || '';
+    const nameForms = [subjectName];
+
+    // Add NFD form if different (e.g., 'য়' vs 'য' + '়')
+    const nfd = subjectName.normalize('NFD');
+    if (nfd !== subjectName) {
+      nameForms.push(nfd);
+    }
+    // Also try NFC just in case input was NFD and DB is NFC (less likely but possible)
+    const nfc = subjectName.normalize('NFC');
+    if (nfc !== subjectName && !nameForms.includes(nfc)) {
+      nameForms.push(nfc);
+    }
+
+    debug.diagnosis.push(
+      `🔍 Subject Name Forms: ${nameForms.map((n) => `"${n}"`).join(', ')}`,
+    );
+
     // If user is logged in, use SMART FETCH (RPC)
     if (user) {
       debug.fetchMethod = 'SMART_RPC';
       console.log('⚡ Method: Smart Fetch (RPC) for user:', user.id);
 
-      const rpcParams = {
-        p_user_id: user.id,
-        p_subject: config.subject,
-        p_limit: config.questionCount,
-        p_chapters: resolvedChapters,
-        p_topics: resolvedTopics,
-        p_difficulty: resolvedDifficulty,
-        p_exam_types: resolvedExamTypes,
-        p_subject_name: config.subjectLabel, // DUAL-MATCH: Pass name to match against if ID fails
-      };
-      console.log('📤 RPC Params:', rpcParams);
+      let rpcSuccess = false;
+      let finalData: QuestionDbRow[] = [];
 
-      const { data, error } = await supabase.rpc(
-        'get_smart_exam_questions',
-        rpcParams,
-      );
+      // Try each form until we get results
+      for (const formName of nameForms) {
+        const rpcParams = {
+          p_user_id: user.id,
+          p_subject: config.subject,
+          p_limit: config.questionCount,
+          p_chapters: resolvedChapters,
+          p_topics: resolvedTopics,
+          p_difficulty: resolvedDifficulty,
+          p_exam_types: resolvedExamTypes,
+          p_subject_name: formName, // Try this specific form
+        };
+        console.log(`📤 RPC Params (Name="${formName}"):`, rpcParams);
 
-      if (error) {
-        debug.rpcError = error.message;
-        debug.diagnosis.push(`❌ RPC Error: ${error.message}`);
-        debug.diagnosis.push('↪️ Falling back to Legacy Fetch...');
-        console.error('❌ Smart Fetch RPC Error:', error);
-        // Fallback to legacy fetch if RPC fails
-      } else if (data) {
-        debug.resultCount = data.length;
+        const { data, error } = await supabase.rpc(
+          'get_smart_exam_questions',
+          rpcParams,
+        );
 
-        if (data.length === 0) {
+        if (error) {
+          debug.rpcError = error.message;
           debug.diagnosis.push(
-            '⚠️ RPC returned 0 questions (searched by ID and Name).',
+            `❌ RPC Error with name "${formName}": ${error.message}`,
           );
-          if (!config.subject) debug.diagnosis.push('  → Subject is EMPTY');
-          // (Diagnostics continue...)
-          if (resolvedChapters)
-            debug.diagnosis.push(
-              `  → Filtering by ${resolvedChapters.length} chapters: ${resolvedChapters.join(', ')}`,
-            );
-          if (resolvedTopics)
-            debug.diagnosis.push(
-              `  → Filtering by ${resolvedTopics.length} topics: ${resolvedTopics.join(', ')}`,
-            );
-          if (resolvedDifficulty)
-            debug.diagnosis.push(
-              `  → Filtering by difficulty: ${resolvedDifficulty}`,
-            );
-          if (resolvedExamTypes)
-            debug.diagnosis.push(
-              `  → Filtering by exam types: ${resolvedExamTypes.join(', ')}`,
-            );
+          // Continue to next form or fallback
+        } else if (data && data.length > 0) {
+          debug.resultCount = data.length;
           debug.diagnosis.push(
-            '💡 TIP: Check if questions exist for this subject/filters.',
+            `✅ RPC Success with name "${formName}" (${data.length} questions)`,
           );
+          finalData = data as unknown as QuestionDbRow[];
+          rpcSuccess = true;
+          break; // Stop trying forms if we found data
         } else {
           debug.diagnosis.push(
-            `✅ Successfully fetched ${data.length} questions via RPC`,
+            `⚠️ RPC returned 0 questions for name "${formName}"`,
           );
         }
+      }
 
-        console.log(`📊 Result: ${data.length} questions`);
-        if (data.length === 0) {
-          console.warn('⚠️ DIAGNOSIS:', debug.diagnosis.join('\n'));
-        }
+      if (rpcSuccess) {
+        // Process found data
+        // ... (existing processing code)
+        console.log(`📊 Result: ${finalData.length} questions`);
         console.groupEnd();
 
-        // Map snake_case to camelCase
         return {
-          questions: (data as unknown as QuestionDbRow[]).map((q) => ({
+          questions: finalData.map((q) => ({
             ...q,
             createdAt: q.created_at,
             correctAnswer: q.correct_answer,
@@ -203,6 +209,10 @@ export const fetchQuestionsWithDiagnostics = async (
           })) as unknown as Question[],
           debug,
         };
+      } else {
+        debug.diagnosis.push(
+          '↪️ All RPC attempts returned 0. Falling back to Legacy Fetch...',
+        );
       }
     }
 
@@ -214,14 +224,22 @@ export const fetchQuestionsWithDiagnostics = async (
     let query = supabase.from('questions').select('*');
 
     if (config.subject) {
-      // DUAL-MATCH for Legacy: If ID and Name differ, look for either
+      // DUAL-MATCH for Legacy: Match ID OR any known Name Form
+      const matchConditions = [`subject.eq.${config.subject}`];
+
+      // Add standard label match
       if (config.subject !== config.subjectLabel && config.subjectLabel) {
-        query = query.or(
-          `subject.eq.${config.subject},subject.eq.${config.subjectLabel}`,
-        );
-      } else {
-        query = query.eq('subject', config.subject);
+        matchConditions.push(`subject.eq.${config.subjectLabel}`);
       }
+
+      // Add normalized forms match
+      nameForms.forEach((form) => {
+        if (form !== config.subject && form !== config.subjectLabel) {
+          matchConditions.push(`subject.eq.${form}`);
+        }
+      });
+
+      query = query.or(matchConditions.join(','));
     }
 
     if (config.chapters && config.chapters !== 'All') {
