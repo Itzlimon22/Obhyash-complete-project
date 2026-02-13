@@ -74,7 +74,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         } = await supabase.auth.getUser();
 
         if (authError || !currentUser) {
-          if (authError) console.error('Auth check error:', authError);
+          // AuthSessionMissingError is expected when no user is logged in — don't spam console
+          if (authError && authError.name !== 'AuthSessionMissingError') {
+            console.error('Auth check error:', authError);
+          }
           // No valid session, clear everything immediately
           if (isMounted) {
             setUser(null);
