@@ -469,7 +469,6 @@ export default function StudentRoot({
                 setAppState(AppState.COMPLETED);
               }}
               onRecheckRequest={(id) => alert('Recheck requested for: ' + id)}
-              subjects={subjects}
             />
           </AppLayout>
         );
