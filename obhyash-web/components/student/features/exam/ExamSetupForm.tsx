@@ -195,7 +195,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     }
 
     onStartExam({
-      subject: subjectLabel,
+      subject: subject, // FIXED: Pass ID, not name
       subjectLabel: subjectLabel,
       examType: examTypes.join(' + '),
       chapters:

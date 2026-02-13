@@ -83,7 +83,11 @@ export const fetchQuestions = async (
         p_difficulty:
           config.difficulty && config.difficulty !== 'Mixed'
             ? config.difficulty
-            : null,
+            : null, // 'Mixed' or null means all difficulties
+        p_exam_types:
+          config.examType && config.examType !== 'Mixed'
+            ? config.examType.split('+').map((t) => t.trim())
+            : null, // 'Mixed' or null means all types
       });
 
       if (error) {

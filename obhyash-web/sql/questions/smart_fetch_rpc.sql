@@ -9,7 +9,8 @@ CREATE OR REPLACE FUNCTION get_smart_exam_questions(
   p_limit INT,
   p_chapters TEXT[] DEFAULT NULL,
   p_topics TEXT[] DEFAULT NULL,
-  p_difficulty TEXT DEFAULT NULL
+  p_difficulty TEXT DEFAULT NULL,
+  p_exam_types TEXT[] DEFAULT NULL
 ) RETURNS SETOF questions AS $$
 DECLARE
   v_needed INT := p_limit;
@@ -28,9 +29,11 @@ BEGIN
     AND uqa.question_id IS NULL -- Key: User has no record
     AND (p_chapters IS NULL OR q.chapter = ANY(p_chapters))
     AND (p_topics IS NULL OR q.topic = ANY(p_topics))
-    AND (p_difficulty IS NULL OR q.difficulty = p_difficulty)
-    AND q.random_id > random() -- Efficient O(log N) random seek
-  ORDER BY q.random_id
+    -- Difficulty: If NULL or 'Mixed', ignore filter
+    AND (p_difficulty IS NULL OR p_difficulty = 'Mixed' OR q.difficulty = p_difficulty)
+    -- Exam Type: If NULL or contains 'Mixed', ignore filter
+    AND (p_exam_types IS NULL OR 'Mixed' = ANY(p_exam_types) OR q.exam_type = ANY(p_exam_types))
+  ORDER BY random() -- True random shuffle
   LIMIT v_needed;
   
   -- Calculate how many we got
@@ -51,8 +54,9 @@ BEGIN
       AND uqa.is_mistaken = true
       AND (p_chapters IS NULL OR q.chapter = ANY(p_chapters))
       AND (p_topics IS NULL OR q.topic = ANY(p_topics))
-      AND (p_difficulty IS NULL OR q.difficulty = p_difficulty)
-    ORDER BY uqa.last_attempted_at ASC -- Spaced Repetition: Show oldest mistakes first
+      AND (p_difficulty IS NULL OR p_difficulty = 'Mixed' OR q.difficulty = p_difficulty)
+      AND (p_exam_types IS NULL OR 'Mixed' = ANY(p_exam_types) OR q.exam_type = ANY(p_exam_types))
+    ORDER BY uqa.last_attempted_at ASC -- Spaced Repetition
     LIMIT v_needed;
     
     GET DIAGNOSTICS v_count = ROW_COUNT;
@@ -61,7 +65,7 @@ BEGIN
 
   -- ---------------------------------------------------------
   -- 3. RANDOM FILL (Priority: Lowest)
-  -- If we still need questions (user mastered everything), pick random
+  -- If we still need questions, pick random
   -- ---------------------------------------------------------
   IF v_needed > 0 THEN
     RETURN QUERY
@@ -70,9 +74,9 @@ BEGIN
     WHERE q.subject = p_subject
       AND (p_chapters IS NULL OR q.chapter = ANY(p_chapters))
       AND (p_topics IS NULL OR q.topic = ANY(p_topics))
-      AND (p_difficulty IS NULL OR q.difficulty = p_difficulty)
-      AND q.random_id > random() 
-    ORDER BY q.random_id
+      AND (p_difficulty IS NULL OR p_difficulty = 'Mixed' OR q.difficulty = p_difficulty)
+      AND (p_exam_types IS NULL OR 'Mixed' = ANY(p_exam_types) OR q.exam_type = ANY(p_exam_types))
+    ORDER BY random()
     LIMIT v_needed;
   END IF;
 END;
