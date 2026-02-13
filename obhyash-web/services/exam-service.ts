@@ -48,9 +48,20 @@ interface ExamResultDbRow {
   script_image_data?: string;
 }
 
-export const fetchQuestions = async (
+export interface ExamDebugInfo {
+  timestamp: string;
+  input: ExamConfig;
+  resolvedParams: Record<string, unknown>;
+  fetchMethod: string;
+  rpcError: string | null;
+  queryError: string | null;
+  resultCount: number;
+  diagnosis: string[];
+}
+
+export const fetchQuestionsWithDiagnostics = async (
   config: ExamConfig,
-): Promise<Question[]> => {
+): Promise<{ questions: Question[]; debug: ExamDebugInfo }> => {
   if (!isSupabaseConfigured() || !supabase) {
     throw new Error('Database configuration missing');
   }
@@ -178,17 +189,20 @@ export const fetchQuestions = async (
         console.groupEnd();
 
         // Map snake_case to camelCase
-        return (data as unknown as QuestionDbRow[]).map((q) => ({
-          ...q,
-          createdAt: q.created_at,
-          correctAnswer: q.correct_answer,
-          correctAnswerIndex: q.correct_answer_index,
-          correctAnswerIndices: q.correct_answer_indices || [],
-          imageUrl: q.image_url,
-          optionImages: q.option_images || [],
-          explanationImageUrl: q.explanation_image_url,
-          examType: q.exam_type,
-        })) as unknown as Question[];
+        return {
+          questions: (data as unknown as QuestionDbRow[]).map((q) => ({
+            ...q,
+            createdAt: q.created_at,
+            correctAnswer: q.correct_answer,
+            correctAnswerIndex: q.correct_answer_index,
+            correctAnswerIndices: q.correct_answer_indices || [],
+            imageUrl: q.image_url,
+            optionImages: q.option_images || [],
+            explanationImageUrl: q.explanation_image_url,
+            examType: q.exam_type,
+          })) as unknown as Question[],
+          debug,
+        };
       }
     }
 
@@ -265,7 +279,7 @@ export const fetchQuestions = async (
       );
       console.log('📋 Full Debug Report:', debug);
       console.groupEnd();
-      return [];
+      return { questions: [], debug };
     }
 
     debug.resultCount = data.length;
@@ -280,24 +294,34 @@ export const fetchQuestions = async (
     const shuffled = data.sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, config.questionCount);
 
-    return (selected as unknown as QuestionDbRow[]).map((q) => ({
-      ...q,
-      createdAt: q.created_at,
-      correctAnswer: q.correct_answer,
-      correctAnswerIndex: q.correct_answer_index,
-      correctAnswerIndices: q.correct_answer_indices || [],
-      imageUrl: q.image_url,
-      optionImages: q.option_images || [],
-      explanationImageUrl: q.explanation_image_url,
-      examType: q.exam_type,
-    })) as unknown as Question[];
+    return {
+      questions: (selected as unknown as QuestionDbRow[]).map((q) => ({
+        ...q,
+        createdAt: q.created_at,
+        correctAnswer: q.correct_answer,
+        correctAnswerIndex: q.correct_answer_index,
+        correctAnswerIndices: q.correct_answer_indices || [],
+        imageUrl: q.image_url,
+        optionImages: q.option_images || [],
+        explanationImageUrl: q.explanation_image_url,
+        examType: q.exam_type,
+      })) as unknown as Question[],
+      debug,
+    };
   } catch (err) {
     debug.diagnosis.push(`💥 Exception: ${err}`);
     console.error('💥 [Exam Debug] FATAL:', err);
     console.log('📋 Full Debug Report:', debug);
     console.groupEnd();
-    return [];
+    return { questions: [], debug };
   }
+};
+
+export const fetchQuestions = async (
+  config: ExamConfig,
+): Promise<Question[]> => {
+  const { questions } = await fetchQuestionsWithDiagnostics(config);
+  return questions;
 };
 
 // Helper to update analytics for a single question
