@@ -151,11 +151,11 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   // --- Handlers ---
 
+  // ... inside component ...
   const toggleExamType = (typeId: string) => {
     setExamTypes((prev) => {
       if (prev.includes(typeId)) {
-        if (prev.length === 1) return prev;
-        return prev.filter((t) => t !== typeId);
+        return prev.filter((id) => id !== typeId);
       } else {
         return [...prev, typeId];
       }
@@ -182,6 +182,14 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     });
   };
 
+  const handleSelectAllExamTypes = () => {
+    if (examTypes.length === EXAM_TYPE_OPTIONS.length) {
+      setExamTypes([]); // Deselect all
+    } else {
+      setExamTypes(EXAM_TYPE_OPTIONS.map((opt) => opt.id)); // Select all
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError(null);
@@ -197,11 +205,14 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     onStartExam({
       subject: subject, // FIXED: Pass ID, not name
       subjectLabel: subjectLabel,
-      examType: examTypes.join(' + '),
+      examType:
+        examTypes.length === EXAM_TYPE_OPTIONS.length
+          ? 'Mixed'
+          : examTypes.join(' + '), // Pass 'Mixed' if all selected
       chapters:
         selectedChapters.length > 0 ? selectedChapters.join(', ') : 'All',
       topics: selectedTopics.length > 0 ? selectedTopics.join(', ') : 'General',
-      difficulty,
+      difficulty: difficulty === 'Mixed' ? 'Mixed' : difficulty, // Explicitly pass 'Mixed' for All
       questionCount,
       durationMinutes: duration,
       negativeMarking,
@@ -432,9 +443,20 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 space-y-6">
             {/* Exam Type */}
             <div>
-              <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">
-                পরীক্ষার ধরণ
-              </label>
+              <div className="flex justify-between items-center mb-3">
+                <label className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+                  পরীক্ষার ধরণ
+                </label>
+                <button
+                  type="button"
+                  onClick={handleSelectAllExamTypes}
+                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  {examTypes.length === EXAM_TYPE_OPTIONS.length
+                    ? 'সব মুছুন'
+                    : 'সব নির্বাচন করুন'}
+                </button>
+              </div>
               <div className="grid grid-cols-2 gap-2">
                 {EXAM_TYPE_OPTIONS.map((type) => {
                   const isSelected = examTypes.includes(type.id);
@@ -474,14 +496,26 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">
                 কঠিনতা
               </label>
-              <div className="flex bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-xl">
+              <div className="flex bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-xl gap-1 overflow-x-auto">
+                <button
+                  type="button"
+                  onClick={() => setDifficulty(Difficulty.Mixed)}
+                  className={cn(
+                    'flex-1 min-w-[60px] py-2 rounded-lg text-xs font-semibold transition-all',
+                    difficulty === Difficulty.Mixed
+                      ? 'bg-white dark:bg-neutral-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                      : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white',
+                  )}
+                >
+                  সব (All)
+                </button>
                 {DIFFICULTY_OPTIONS.map((opt) => (
                   <button
                     key={opt.id}
                     type="button"
                     onClick={() => setDifficulty(opt.id as Difficulty)}
                     className={cn(
-                      'flex-1 py-2 rounded-lg text-xs font-semibold transition-all',
+                      'flex-1 min-w-[60px] py-2 rounded-lg text-xs font-semibold transition-all',
                       difficulty === opt.id
                         ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
                         : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white',

@@ -136,14 +136,12 @@ export const EXAM_TYPE_OPTIONS = [
   { id: 'Engineering Admission', label: 'Engineering', desc: 'BUET/CKRUET' },
   { id: 'Varsity Admission', label: 'Varsity', desc: 'A Unit Standard' },
   { id: 'Main Book', label: 'Textbook', desc: 'Chapter-wise' },
-  { id: 'Mixed', label: 'Mixed', desc: 'Randomized' },
 ];
 
 export const DIFFICULTY_OPTIONS = [
   { id: Difficulty.Easy, label: 'সহজ', color: 'emerald' },
   { id: Difficulty.Medium, label: 'মধ্যম', color: 'amber' },
   { id: Difficulty.Hard, label: 'কঠিন', color: 'red' },
-  { id: Difficulty.Mixed, label: 'মিশ্র', color: 'rose' },
 ];
 
 export const NEGATIVE_MARKING_OPTIONS = [0, 0.25, 0.5, 1.0];

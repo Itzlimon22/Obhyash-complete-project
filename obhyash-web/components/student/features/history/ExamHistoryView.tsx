@@ -456,8 +456,8 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
           {activeTab === 'exams' && (
             <div className="space-y-5 animate-fade-in">
               {/* Stats Overview */}
-              <div className="grid grid-cols-3 gap-2 md:gap-4">
-                <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-2.5 md:p-4 text-white shadow-lg shadow-indigo-500/20 flex flex-col justify-center items-center md:items-start">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
+                <div className="col-span-2 md:col-span-1 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-2.5 md:p-4 text-white shadow-lg shadow-indigo-500/20 flex flex-col justify-center items-center md:items-start">
                   <div className="flex items-center gap-2 mb-0.5 md:mb-1 opacity-80">
                     <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-center md:text-left">
                       মোট পরীক্ষা
