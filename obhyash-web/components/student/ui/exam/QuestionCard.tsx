@@ -20,7 +20,7 @@ interface QuestionCardProps {
 
 const BANGLA_INDICES = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ'];
 
-const QuestionCard: React.FC<QuestionCardProps> = ({
+export default function QuestionCard({
   question,
   serialNumber,
   selectedOptionIndex,
@@ -32,7 +32,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   showFeedback = false,
   readOnly = false,
   showAnswer = false,
-}) => {
+}: QuestionCardProps) {
   const isAnswered = selectedOptionIndex !== undefined;
 
   return (
@@ -261,4 +261,4 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   );
 };
 
-export default QuestionCard;
+}

@@ -45,7 +45,7 @@ import { ExamInstructionsView } from '@/components/student/features/exam/ExamIns
 import ExamRunner from '@/components/student/features/exam/ExamRunner';
 
 // History & Results
-import ExamHistoryView from '@/components/student/ui/ExamHistoryView';
+import ExamHistoryView from '@/components/student/features/history/ExamHistoryView';
 import ResultView from '@/components/student/ui/ResultView';
 import ResultSkeleton from '@/components/student/ui/results/ResultSkeleton';
 

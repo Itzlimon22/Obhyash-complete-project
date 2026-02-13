@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ExamResult, Question } from '@/lib/types'; // Updated to likely correct path
 import LatexText from '@/components/student/ui/LatexText';
-import QuestionCard from '../exam/QuestionCard';
+import QuestionCard from '@/components/student/ui/exam/QuestionCard';
 
 interface ExamHistoryViewProps {
   history: ExamResult[];
