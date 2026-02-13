@@ -151,7 +151,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   // --- Handlers ---
 
-  // ... inside component ...
   const toggleExamType = (typeId: string) => {
     setExamTypes((prev) => {
       if (prev.includes(typeId)) {
@@ -202,17 +201,28 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       return;
     }
 
+    if (examTypes.length === 0) {
+      setValidationError(
+        'অনুগ্রহ করে কমপক্ষে একটি পরীক্ষার ধরণ নির্বাচন করুন।',
+      );
+      return;
+    }
+
+    // When ALL exam types are selected, pass 'Mixed' as wildcard
+    // Otherwise pass the selected types joined with ' + '
+    const examTypeValue =
+      examTypes.length === EXAM_TYPE_OPTIONS.length
+        ? 'Mixed'
+        : examTypes.join(' + ');
+
     onStartExam({
-      subject: subject, // FIXED: Pass ID, not name
+      subject: subject,
       subjectLabel: subjectLabel,
-      examType:
-        examTypes.length === EXAM_TYPE_OPTIONS.length
-          ? 'Mixed'
-          : examTypes.join(' + '), // Pass 'Mixed' if all selected
+      examType: examTypeValue,
       chapters:
         selectedChapters.length > 0 ? selectedChapters.join(', ') : 'All',
       topics: selectedTopics.length > 0 ? selectedTopics.join(', ') : 'General',
-      difficulty: difficulty === 'Mixed' ? 'Mixed' : difficulty, // Explicitly pass 'Mixed' for All
+      difficulty, // Difficulty.Mixed acts as 'All' wildcard
       questionCount,
       durationMinutes: duration,
       negativeMarking,

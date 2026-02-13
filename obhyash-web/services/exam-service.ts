@@ -55,45 +55,124 @@ export const fetchQuestions = async (
     throw new Error('Database configuration missing');
   }
 
-  console.log('Fetching questions for config:', config);
+  // ═══════════════════════════════════════════════
+  // DEBUG SYSTEM: Question Fetch Diagnostics
+  // ═══════════════════════════════════════════════
+  const debug = {
+    timestamp: new Date().toISOString(),
+    input: { ...config },
+    resolvedParams: {} as Record<string, unknown>,
+    fetchMethod: 'none',
+    rpcError: null as string | null,
+    queryError: null as string | null,
+    resultCount: 0,
+    diagnosis: [] as string[],
+  };
 
   try {
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
+    // Resolve parameters once for both paths
+    const resolvedChapters =
+      config.chapters && config.chapters !== 'All'
+        ? config.chapters.split(',').map((c) => c.trim())
+        : null;
+
+    const resolvedTopics =
+      config.topics && config.topics !== 'General' && config.topics !== 'All'
+        ? config.topics.split(',').map((t) => t.trim())
+        : null;
+
+    const resolvedDifficulty =
+      config.difficulty && config.difficulty !== 'Mixed'
+        ? config.difficulty
+        : null;
+
+    const resolvedExamTypes =
+      config.examType && config.examType !== 'Mixed'
+        ? config.examType.split('+').map((t) => t.trim())
+        : null;
+
+    debug.resolvedParams = {
+      userId: user?.id || 'GUEST (no user)',
+      subject: config.subject || '⚠️ EMPTY',
+      limit: config.questionCount,
+      chapters: resolvedChapters || '✅ ALL (wildcard)',
+      topics: resolvedTopics || '✅ ALL (wildcard)',
+      difficulty: resolvedDifficulty || '✅ ALL (wildcard)',
+      examTypes: resolvedExamTypes || '✅ ALL (wildcard)',
+    };
+
+    console.group('🔍 [Exam Debug] Question Fetch Started');
+    console.log('📋 Input Config:', debug.input);
+    console.log('🎯 Resolved Params:', debug.resolvedParams);
+
     // If user is logged in, use SMART FETCH (RPC)
     if (user) {
-      console.log('Using Smart Fetch for user:', user.id);
+      debug.fetchMethod = 'SMART_RPC';
+      console.log('⚡ Method: Smart Fetch (RPC) for user:', user.id);
 
-      const { data, error } = await supabase.rpc('get_smart_exam_questions', {
+      const rpcParams = {
         p_user_id: user.id,
-        p_subject: config.subject, // Assuming strict match or handled by UI
+        p_subject: config.subject,
         p_limit: config.questionCount,
-        p_chapters:
-          config.chapters && config.chapters !== 'All'
-            ? config.chapters.split(',').map((c) => c.trim())
-            : null,
-        p_topics:
-          config.topics &&
-          config.topics !== 'General' &&
-          config.topics !== 'All'
-            ? config.topics.split(',').map((t) => t.trim())
-            : null,
-        p_difficulty:
-          config.difficulty && config.difficulty !== 'Mixed'
-            ? config.difficulty
-            : null, // 'Mixed' or null means all difficulties
-        p_exam_types:
-          config.examType && config.examType !== 'Mixed'
-            ? config.examType.split('+').map((t) => t.trim())
-            : null, // 'Mixed' or null means all types
-      });
+        p_chapters: resolvedChapters,
+        p_topics: resolvedTopics,
+        p_difficulty: resolvedDifficulty,
+        p_exam_types: resolvedExamTypes,
+      };
+      console.log('📤 RPC Params:', rpcParams);
+
+      const { data, error } = await supabase.rpc(
+        'get_smart_exam_questions',
+        rpcParams,
+      );
 
       if (error) {
-        console.error('Smart Fetch RPC Error:', error);
+        debug.rpcError = error.message;
+        debug.diagnosis.push(`❌ RPC Error: ${error.message}`);
+        debug.diagnosis.push('↪️ Falling back to Legacy Fetch...');
+        console.error('❌ Smart Fetch RPC Error:', error);
         // Fallback to legacy fetch if RPC fails
       } else if (data) {
+        debug.resultCount = data.length;
+
+        if (data.length === 0) {
+          debug.diagnosis.push('⚠️ RPC returned 0 questions.');
+          if (!config.subject) debug.diagnosis.push('  → Subject is EMPTY');
+          if (resolvedChapters)
+            debug.diagnosis.push(
+              `  → Filtering by ${resolvedChapters.length} chapters: ${resolvedChapters.join(', ')}`,
+            );
+          if (resolvedTopics)
+            debug.diagnosis.push(
+              `  → Filtering by ${resolvedTopics.length} topics: ${resolvedTopics.join(', ')}`,
+            );
+          if (resolvedDifficulty)
+            debug.diagnosis.push(
+              `  → Filtering by difficulty: ${resolvedDifficulty}`,
+            );
+          if (resolvedExamTypes)
+            debug.diagnosis.push(
+              `  → Filtering by exam types: ${resolvedExamTypes.join(', ')}`,
+            );
+          debug.diagnosis.push(
+            '💡 TIP: Try widening filters (use All difficulty, all exam types, no chapter filter)',
+          );
+        } else {
+          debug.diagnosis.push(
+            `✅ Successfully fetched ${data.length} questions via RPC`,
+          );
+        }
+
+        console.log(`📊 Result: ${data.length} questions`);
+        if (data.length === 0) {
+          console.warn('⚠️ DIAGNOSIS:', debug.diagnosis.join('\n'));
+        }
+        console.groupEnd();
+
         // Map snake_case to camelCase
         return (data as unknown as QuestionDbRow[]).map((q) => ({
           ...q,
@@ -110,7 +189,10 @@ export const fetchQuestions = async (
     }
 
     // --- FALLBACK / LEGACY FETCH (For guest users or RPC failure) ---
-    console.log('Using Legacy Fetch');
+    debug.fetchMethod =
+      debug.fetchMethod === 'SMART_RPC' ? 'LEGACY_FALLBACK' : 'LEGACY_GUEST';
+    console.log(`⚡ Method: ${debug.fetchMethod}`);
+
     let query = supabase.from('questions').select('*');
 
     if (config.subject) {
@@ -139,20 +221,50 @@ export const fetchQuestions = async (
       query = query.eq('difficulty', config.difficulty);
     }
 
+    // Exam type filter for legacy path
+    if (config.examType && config.examType !== 'Mixed') {
+      const types = config.examType.split('+').map((t) => t.trim());
+      if (types.length > 0) {
+        query = query.in('exam_type', types);
+      }
+    }
+
     // Legacy random fetch logic
     query = query.limit(config.questionCount * 2);
 
     const { data, error } = await query;
 
     if (error) {
-      console.error('Supabase Query Error:', error);
+      debug.queryError = error.message;
+      debug.diagnosis.push(`❌ Legacy Query Error: ${error.message}`);
+      console.error('❌ Legacy Fetch Error:', error);
+      console.warn('⚠️ DIAGNOSIS:', debug.diagnosis.join('\n'));
+      console.groupEnd();
       throw error;
     }
 
     if (!data || data.length === 0) {
-      console.warn('No questions found for criteria');
+      debug.diagnosis.push('⚠️ Legacy query returned 0 questions.');
+      debug.diagnosis.push(
+        '💡 TIP: Check if questions exist in DB for this subject with matching filters',
+      );
+      console.warn(
+        '⚠️ No questions found. DIAGNOSIS:',
+        debug.diagnosis.join('\n'),
+      );
+      console.log('📋 Full Debug Report:', debug);
+      console.groupEnd();
       return [];
     }
+
+    debug.resultCount = data.length;
+    debug.diagnosis.push(
+      `✅ Legacy fetch returned ${data.length} raw, serving ${Math.min(data.length, config.questionCount)}`,
+    );
+    console.log(
+      `📊 Result: ${data.length} raw → ${Math.min(data.length, config.questionCount)} served`,
+    );
+    console.groupEnd();
 
     const shuffled = data.sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, config.questionCount);
@@ -169,7 +281,10 @@ export const fetchQuestions = async (
       examType: q.exam_type,
     })) as unknown as Question[];
   } catch (err) {
-    console.error('Failed to fetch questions:', err);
+    debug.diagnosis.push(`💥 Exception: ${err}`);
+    console.error('💥 [Exam Debug] FATAL:', err);
+    console.log('📋 Full Debug Report:', debug);
+    console.groupEnd();
     return [];
   }
 };
