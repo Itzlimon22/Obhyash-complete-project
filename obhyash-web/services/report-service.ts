@@ -130,3 +130,30 @@ export const resolveReport = async (
     throw error;
   }
 };
+
+export const getUserReports = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('reports')
+      .select(
+        `
+        *,
+        question:questions!question_id (
+          id,
+          question,
+          options,
+          correct_answer,
+          explanation
+        )
+      `,
+      )
+      .eq('reporter_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Get User Reports Error:', error);
+    return [];
+  }
+};
