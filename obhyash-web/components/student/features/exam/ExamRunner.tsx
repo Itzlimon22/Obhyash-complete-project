@@ -203,14 +203,31 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                   onSelectOption={(optIdx) =>
                     setUserAnswers((prev) => ({ ...prev, [q.id]: optIdx }))
                   }
-                  onToggleFlag={() =>
+                  onToggleFlag={() => {
+                    const isFlagged = flaggedQuestions.has(questionId);
+                    // Local Update
                     setFlaggedQuestions((prev) => {
                       const next = new Set(prev);
                       if (next.has(questionId)) next.delete(questionId);
                       else next.add(questionId);
                       return next;
-                    })
-                  }
+                    });
+
+                    // Database Update (Fire and forget)
+                    if (currentUser?.id) {
+                      import('@/services/bookmark-service').then(
+                        ({ toggleBookmark }) => {
+                          toggleBookmark(
+                            currentUser.id,
+                            questionId,
+                            isFlagged,
+                          ).catch((err) =>
+                            console.error('Bookmark sync failed', err),
+                          );
+                        },
+                      );
+                    }
+                  }}
                   onReport={() =>
                     setReportModalState({
                       isOpen: true,

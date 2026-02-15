@@ -50,13 +50,51 @@ const ResultView: React.FC<ResultViewProps> = ({
     null,
   );
 
-  const toggleBookmark = (id: number) => {
+  // Fetch Bookmarks from DB on mount
+  useEffect(() => {
+    const fetchBookmarks = async () => {
+      if (currentUser?.id) {
+        const { getUserBookmarks } =
+          await import('@/services/bookmark-service');
+        const dbBookmarks = await getUserBookmarks(currentUser.id);
+        // Merge with initial (flagged) if any, or just use DB
+        setBookmarked((prev) => {
+          const newSet = new Set(prev);
+          dbBookmarks.forEach((id) => newSet.add(id));
+          return newSet;
+        });
+      }
+    };
+    fetchBookmarks();
+  }, [currentUser?.id]);
+
+  const toggleBookmark = async (id: number) => {
+    // Optimistic Update
+    const isCurrentlyBookmarked = bookmarked.has(id);
     setBookmarked((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(id)) newSet.delete(id);
       else newSet.add(id);
       return newSet;
     });
+
+    // DB Update
+    if (currentUser?.id) {
+      try {
+        const { toggleBookmark: toggleDbBookmark } =
+          await import('@/services/bookmark-service');
+        await toggleDbBookmark(currentUser.id, id, isCurrentlyBookmarked);
+      } catch (error) {
+        console.error('Failed to toggle bookmark:', error);
+        // Revert on error
+        setBookmarked((prev) => {
+          const newSet = new Set(prev);
+          if (isCurrentlyBookmarked) newSet.add(id);
+          else newSet.delete(id);
+          return newSet;
+        });
+      }
+    }
   };
 
   const openReportModal = (id: number) => {
