@@ -5,9 +5,9 @@ import LatexText from '../common/LatexText';
 interface ReviewListProps {
   questions: Question[];
   userAnswers: UserAnswers;
-  bookmarked: Set<number>;
-  toggleBookmark: (id: number) => void;
-  openReportModal: (id: number) => void;
+  bookmarked: Set<number | string>;
+  toggleBookmark: (id: number | string) => void;
+  openReportModal: (id: number | string) => void;
 }
 
 const BANGLA_INDICES = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ'];
@@ -44,7 +44,7 @@ const ReviewList: React.FC<ReviewListProps> = ({
       {questions.map((q) => {
         const userAnswer = userAnswers[q.id];
         const isCorrect = userAnswer === q.correctAnswerIndex;
-        const isBookmarked = bookmarked.has(Number(q.id));
+        const isBookmarked = bookmarked.has(q.id);
         const correctOptionLabel =
           typeof q.correctAnswerIndex === 'number' &&
           BANGLA_INDICES[q.correctAnswerIndex] !== undefined
@@ -103,7 +103,7 @@ const ReviewList: React.FC<ReviewListProps> = ({
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => openReportModal(Number(q.id))}
+                  onClick={() => openReportModal(q.id)}
                   className="p-2.5 rounded-full text-neutral-400 dark:text-neutral-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                   title="রিপোর্ট করুন"
                 >
@@ -123,7 +123,7 @@ const ReviewList: React.FC<ReviewListProps> = ({
                   </svg>
                 </button>
                 <button
-                  onClick={() => toggleBookmark(Number(q.id))}
+                  onClick={() => toggleBookmark(q.id)}
                   className={`
                         transition-all duration-200 p-2.5 rounded-full 
                         ${isBookmarked ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-500 dark:text-amber-400' : 'text-neutral-400 dark:text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-600 dark:hover:text-neutral-300'}

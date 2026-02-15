@@ -19,7 +19,7 @@ interface ResultViewProps {
   onDownloadResultWithExplanations?: () => void;
   submissionType?: 'digital' | 'script';
   onChallengeEvaluation?: () => void;
-  initialBookmarks?: Set<number>;
+  initialBookmarks?: Set<number | string>;
   currentUser?: UserProfile | null;
 }
 
@@ -40,15 +40,15 @@ const ResultView: React.FC<ResultViewProps> = ({
   currentUser,
 }) => {
   // Local state for bookmarks in result view
-  const [bookmarked, setBookmarked] = useState<Set<number>>(
+  const [bookmarked, setBookmarked] = useState<Set<number | string>>(
     initialBookmarks || new Set(),
   );
 
   // State for Report Modal
   const [reportModalOpen, setReportModalOpen] = useState(false);
-  const [reportingQuestionId, setReportingQuestionId] = useState<number | null>(
-    null,
-  );
+  const [reportingQuestionId, setReportingQuestionId] = useState<
+    number | string | null
+  >(null);
 
   // Fetch Bookmarks from DB on mount
   useEffect(() => {
@@ -68,7 +68,7 @@ const ResultView: React.FC<ResultViewProps> = ({
     fetchBookmarks();
   }, [currentUser?.id]);
 
-  const toggleBookmark = async (id: number) => {
+  const toggleBookmark = async (id: number | string) => {
     // Optimistic Update
     const isCurrentlyBookmarked = bookmarked.has(id);
     setBookmarked((prev) => {
@@ -97,7 +97,7 @@ const ResultView: React.FC<ResultViewProps> = ({
     }
   };
 
-  const openReportModal = (id: number) => {
+  const openReportModal = (id: number | string) => {
     setReportingQuestionId(id);
     setReportModalOpen(true);
   };
@@ -525,7 +525,7 @@ const ResultView: React.FC<ResultViewProps> = ({
 
         <div className="space-y-6">
           {questions.map((q, idx) => {
-            const questionId = typeof q.id === 'string' ? parseInt(q.id) : q.id;
+            const questionId = q.id;
             return (
               <QuestionCard
                 key={q.id}

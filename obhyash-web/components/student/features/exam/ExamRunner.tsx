@@ -40,9 +40,11 @@ interface ExamRunnerProps {
   /** State setter for user answers */
   setUserAnswers: React.Dispatch<React.SetStateAction<UserAnswers>>;
   /** Set of question IDs marked for review */
-  flaggedQuestions: Set<number>;
+  flaggedQuestions: Set<number | string>;
   /** State setter for flagged questions */
-  setFlaggedQuestions: React.Dispatch<React.SetStateAction<Set<number>>>;
+  setFlaggedQuestions: React.Dispatch<
+    React.SetStateAction<Set<number | string>>
+  >;
   /** Remaining time in seconds */
   timeLeft: number;
   /** Grace period time remaining in seconds (for OMR upload) */
@@ -123,7 +125,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [reportModalState, setReportModalState] = useState<{
     isOpen: boolean;
-    questionId: number | null;
+    questionId: number | string | null;
   }>({ isOpen: false, questionId: null });
   // Fetch initial bookmarks
   React.useEffect(() => {
@@ -135,8 +137,8 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
             setFlaggedQuestions((prev) => {
               const newSet = new Set(prev);
               bookmarks.forEach((id) => {
-                // Only add if the question is in the current exam
-                if (questions.some((q) => Number(q.id) === id)) {
+                // Only add if the question is in the current exam. ID match is now direct.
+                if (questions.some((q) => q.id == id)) {
                   newSet.add(id);
                 }
               });
@@ -214,8 +216,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
 
           <div className="space-y-6">
             {questions.map((q, idx) => {
-              const questionId =
-                typeof q.id === 'string' ? parseInt(q.id) : q.id;
+              const questionId = q.id;
               return (
                 <QuestionCard
                   key={q.id}
@@ -254,8 +255,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                   onReport={() =>
                     setReportModalState({
                       isOpen: true,
-                      questionId:
-                        typeof q.id === 'string' ? parseInt(q.id) : q.id,
+                      questionId: q.id,
                     })
                   }
                   isOmrMode={isOmrMode}

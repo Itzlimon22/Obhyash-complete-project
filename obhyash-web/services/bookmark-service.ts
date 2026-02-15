@@ -11,8 +11,7 @@ export const toggleBookmark = async (
   }
 
   try {
-    const qId =
-      typeof questionId === 'string' ? parseInt(questionId) : questionId;
+    const qId = questionId;
 
     if (isBookmarked) {
       // Remove bookmark
@@ -43,7 +42,7 @@ export const toggleBookmark = async (
 
 export const getUserBookmarks = async (
   userId: string,
-): Promise<Set<number>> => {
+): Promise<Set<number | string>> => {
   if (!isSupabaseConfigured()) return new Set();
 
   try {
@@ -54,7 +53,7 @@ export const getUserBookmarks = async (
 
     if (error) throw error;
 
-    const bookmarkSet = new Set<number>();
+    const bookmarkSet = new Set<number | string>();
     data?.forEach((item: any) => {
       bookmarkSet.add(item.question_id);
     });

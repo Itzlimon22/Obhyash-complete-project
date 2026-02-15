@@ -193,9 +193,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
             examDate: exam.date,
             subject: exam.subject,
             userAns: ua,
-            flagged: flags.has(
-              typeof q.id === 'string' ? parseInt(q.id) : q.id,
-            ),
+            flagged: flags.has(q.id),
           });
         }
       });
@@ -229,7 +227,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       const flags = new Set(exam.flaggedQuestions);
 
       exam.questions.forEach((q) => {
-        if (flags.has(typeof q.id === 'string' ? parseInt(q.id) : q.id)) {
+        if (flags.has(q.id)) {
           allBookmarks.push({
             question: q,
             examDate: exam.date,

@@ -4,8 +4,8 @@ import { Question, UserAnswers } from '@/lib/types';
 interface QuestionPaletteProps {
   questions: Question[];
   userAnswers: UserAnswers;
-  flaggedQuestions: Set<number>;
-  onQuestionClick: (id: number) => void;
+  flaggedQuestions: Set<number | string>;
+  onQuestionClick: (id: number | string) => void;
 }
 
 const QuestionPalette: React.FC<QuestionPaletteProps> = ({
@@ -14,7 +14,7 @@ const QuestionPalette: React.FC<QuestionPaletteProps> = ({
   flaggedQuestions,
   onQuestionClick,
 }) => {
-  const getStatusClass = (id: number) => {
+  const getStatusClass = (id: number | string) => {
     const isAnswered = userAnswers[id] !== undefined;
     const isFlagged = flaggedQuestions.has(id);
 
@@ -43,14 +43,10 @@ const QuestionPalette: React.FC<QuestionPaletteProps> = ({
           {questions.map((q, idx) => (
             <button
               key={q.id}
-              onClick={() =>
-                onQuestionClick(
-                  typeof q.id === 'string' ? parseInt(q.id) : q.id,
-                )
-              }
+              onClick={() => onQuestionClick(q.id)}
               className={`
                 aspect-square rounded-lg flex items-center justify-center text-xs font-bold border transition-all duration-200
-                ${getStatusClass(typeof q.id === 'string' ? parseInt(q.id) : q.id)}
+                ${getStatusClass(q.id)}
               `}
             >
               {idx + 1}

@@ -166,7 +166,7 @@ export interface ExamResult {
   // Detailed Data
   questions?: Question[];
   userAnswers?: UserAnswers;
-  flaggedQuestions?: number[]; // IDs of flagged questions
+  flaggedQuestions?: (number | string)[]; // IDs of flagged questions
 
   // Submission Metadata
   submissionType: 'digital' | 'script';

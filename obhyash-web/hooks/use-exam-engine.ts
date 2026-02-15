@@ -32,9 +32,9 @@ export const useExamEngine = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [examDetails, setExamDetails] = useState<ExamDetails | null>(null);
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
-  const [flaggedQuestions, setFlaggedQuestions] = useState<Set<number>>(
-    new Set(),
-  );
+  const [flaggedQuestions, setFlaggedQuestions] = useState<
+    Set<number | string>
+  >(new Set());
   const [dbSessionId, setDbSessionId] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string>('');
 
