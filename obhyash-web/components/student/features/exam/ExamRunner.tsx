@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
-// ... imports ...
 import AppLayout from '@/components/student/ui/layout/AppLayout';
 import ExamHeader from '@/components/student/ui/ExamHeader';
 import QuestionCard from '@/components/student/ui/exam/QuestionCard';
+import ExamDetailsCard from '@/components/student/ui/exam/ExamDetailsCard';
 
 // Common Modals (Moved to student/ui/common)
 import ConfirmationModal from '@/components/student/ui/common/ConfirmationModal';
@@ -22,7 +22,7 @@ import {
   UserAnswers,
   UserProfile,
 } from '@/lib/types';
-import { printQuestionPaper, printOMRSheet } from '@/services/print-service'; // Added printOMRSheet
+import { printQuestionPaper, printOMRSheet } from '@/services/print-service';
 
 /**
  * Props for the ExamRunner component.
@@ -172,7 +172,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
           onDownloadQuestionPaper={() =>
             printQuestionPaper(examDetails, questions)
           }
-          onDownloadOMR={() => printOMRSheet(examDetails, questions.length)} // Updated
+          onDownloadOMR={() => printOMRSheet(examDetails, questions.length)}
           onExit={() => setIsSubmitModalOpen(true)}
           answeredCount={Object.keys(userAnswers).length}
           totalQuestions={questions.length}
@@ -182,11 +182,12 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
       <div className="relative min-h-full flex flex-col bg-[#f8fafc] dark:bg-black">
         {/* Exam Container (Scrollable) */}
         <div className="flex-1 px-4 py-6 md:px-8 max-w-4xl mx-auto w-full">
-          {/* Header Info */}
-          <div className="flex justify-between items-center mb-6 text-sm text-neutral-500 dark:text-neutral-400 font-medium sticky top-0 bg-[#f8fafc] dark:bg-black z-10 py-2 border-b border-neutral-200 dark:border-neutral-800">
-            <span>মোট: {questions.length} টি প্রশ্ন</span>
-            <span>উত্তর দেওয়া: {Object.keys(userAnswers).length}</span>
-          </div>
+          {/* Header Info - REPLACED with ExamDetailsCard */}
+          <ExamDetailsCard
+            details={examDetails}
+            totalQuestions={questions.length}
+            negativeMarking={examDetails.negativeMarking || 0.25}
+          />
 
           <div className="space-y-6">
             {questions.map((q, idx) => {

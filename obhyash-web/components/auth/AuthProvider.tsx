@@ -111,7 +111,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                 cachedProfile.id === currentUser.id &&
                 cachedProfile.role
               ) {
-                if (isMounted) setProfile(cachedProfile);
+                if (isMounted) {
+                  setProfile(cachedProfile);
+                  // ✅ OPTIMISTIC UI: We have a valid user and profile, stop loading immediately
+                  setLoading(false);
+                }
                 hasCachedProfile = true;
               } else {
                 // Invalid cache (wrong user or malformed), clear it
@@ -126,6 +130,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           }
 
           // 3. Fetch/Update Profile (Background validation)
+          // Even if we loaded from cache, we fetch fresh data to update transparently
           const userProfile = await fetchProfile(currentUser.id);
           if (userProfile && isMounted) {
             setProfile(userProfile);
@@ -134,6 +139,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error('Auth initialization error:', error);
       } finally {
+        // Prepare to stop loading if not already stopped by cache hit
         if (isMounted) setLoading(false);
         clearTimeout(timeoutId); // Clear timeout if successful
       }

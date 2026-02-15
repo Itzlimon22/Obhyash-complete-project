@@ -114,7 +114,6 @@ export default function QuestionCard({
             onClick={onToggleFlag}
             className={`p-2 rounded-full transition-colors ${isFlagged ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'text-neutral-300 hover:text-neutral-500 dark:text-neutral-600 dark:hover:text-neutral-400'}`}
             title="Bookmark"
-            disabled={readOnly} // Optional: allow bookmarking even in history? User requested "ready to connect db", bookmarking history is usually separate logic. For now let's keep it clickable but logic is up to parent.
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -343,7 +343,7 @@ export const fetchQuestions = async (
 };
 
 // Helper to update analytics for a single question
-const updateQuestionAnalytics = async (
+export const updateQuestionAnalytics = async (
   userId: string,
   questionId: string,
   isCorrect: boolean,
@@ -476,6 +476,23 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
     if (isUuid) {
       // Update existing session
       const success = await updateExamResult(result.id, result);
+
+      // Update Question Analytics (Best Effort)
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user && result.questions && result.userAnswers) {
+        result.questions.forEach((q) => {
+          const userAnswer = result.userAnswers![q.id];
+          if (userAnswer !== undefined) {
+            const isCorrect = userAnswer === q.correctAnswerIndex;
+            const qId = String(q.id);
+            // Fire and forget
+            updateQuestionAnalytics(user.id, qId, isCorrect);
+          }
+        });
+      }
+
       if (success) {
         console.log('✅ Exam session updated successfully');
         return; // Done
@@ -515,6 +532,18 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
         throw error;
       } else {
         console.log('✅ Exam result saved successfully (New Insert)');
+
+        // Update Question Analytics (Best Effort)
+        if (result.questions && result.userAnswers) {
+          result.questions.forEach((q) => {
+            const userAnswer = result.userAnswers![q.id];
+            if (userAnswer !== undefined) {
+              const isCorrect = userAnswer === q.correctAnswerIndex;
+              const qId = String(q.id);
+              updateQuestionAnalytics(user.id, qId, isCorrect);
+            }
+          });
+        }
       }
     } else {
       console.warn(

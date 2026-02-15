@@ -395,7 +395,7 @@ export default function StudentRoot({
     await submitExam(manual);
   };
 
-  if (authLoading) return <InitialLoader />;
+  if (authLoading && !effectiveUser) return <InitialLoader />;
 
   if (!currentUser) return null; // Should not happen if page handles loading
 
@@ -453,6 +453,7 @@ export default function StudentRoot({
               onViewResult={(res) => {
                 setQuestions(res.questions || []);
                 setUserAnswers(res.userAnswers || {});
+                setFlaggedQuestions(new Set(res.flaggedQuestions || [])); // Hydrate bookmarks
                 setExamDetails({
                   subject: res.subject,
                   subjectLabel: res.subjectLabel || res.subject,
@@ -741,6 +742,7 @@ export default function StudentRoot({
             questions={questions}
             userAnswers={userAnswers}
             timeTaken={timeTaken}
+            initialBookmarks={flaggedQuestions} // Pass the hydrated bookmarks
             onRestart={() => {
               setAppState(AppState.IDLE);
               setIsReviewingHistory(false);

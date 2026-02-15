@@ -285,87 +285,98 @@ export const useExamEngine = () => {
       }
 
       setIsEvaluating(true);
+      setErrorDetails('');
 
-      const currentTimeLeft = timeLeftRef.current;
-      const duration = examDetailsRef.current
-        ? examDetailsRef.current.durationMinutes * 60 - currentTimeLeft
-        : 0;
-      setTimeTaken(duration);
+      try {
+        const currentTimeLeft = timeLeftRef.current;
+        const duration = examDetailsRef.current
+          ? examDetailsRef.current.durationMinutes * 60 - currentTimeLeft
+          : 0;
+        setTimeTaken(duration);
 
-      const resultId = dbSessionId || Date.now().toString();
-      const newResult: ExamResult = {
-        id: resultId,
-        subject: examDetailsRef.current?.subject || 'Unknown',
-        subjectLabel: examDetailsRef.current?.subjectLabel,
-        examType: examDetailsRef.current?.examType,
-        date: new Date().toISOString(),
-        score: 0,
-        totalMarks: examDetailsRef.current?.totalMarks || 0,
-        totalQuestions: questions.length,
-        correctCount: 0,
-        wrongCount: 0,
-        timeTaken: duration,
-        negativeMarking: examDetailsRef.current?.negativeMarking || 0,
-        questions: questions,
-        // Persist Flagged Questions
-        flaggedQuestions: Array.from(flaggedQuestions),
-        submissionType:
-          isOmrMode || stateRef.current === AppState.GRACE_PERIOD
-            ? 'script'
-            : 'digital',
-      };
+        const resultId = dbSessionId || Date.now().toString();
+        const newResult: ExamResult = {
+          id: resultId,
+          subject: examDetailsRef.current?.subject || 'Unknown',
+          subjectLabel: examDetailsRef.current?.subjectLabel,
+          examType: examDetailsRef.current?.examType,
+          date: new Date().toISOString(),
+          score: 0,
+          totalMarks: examDetailsRef.current?.totalMarks || 0,
+          totalQuestions: questions.length,
+          correctCount: 0,
+          wrongCount: 0,
+          timeTaken: duration,
+          negativeMarking: examDetailsRef.current?.negativeMarking || 0,
+          questions: questions,
+          // Persist Flagged Questions
+          flaggedQuestions: Array.from(flaggedQuestions),
+          submissionType:
+            isOmrMode || stateRef.current === AppState.GRACE_PERIOD
+              ? 'script'
+              : 'digital',
+        };
 
-      if (newResult.submissionType === 'digital') {
-        const stats = calculateExamStats(
-          questions,
-          userAnswers,
-          examDetailsRef.current?.negativeMarking || 0,
-        );
-        newResult.score = stats.finalScore;
-        newResult.correctCount = stats.correctCount;
-        newResult.wrongCount = stats.wrongCount;
-        newResult.userAnswers = userAnswers;
-        newResult.status = 'evaluated';
-      } else {
-        newResult.scriptImageData = selectedScript?.base64;
-        try {
-          if (selectedScript?.base64) {
-            const detectedAnswers = await evaluateOMRScript(
-              selectedScript.base64,
-              questions,
-            );
-            const stats = calculateExamStats(
-              questions,
-              detectedAnswers,
-              examDetailsRef.current?.negativeMarking || 0,
-            );
-            newResult.userAnswers = detectedAnswers;
-            newResult.score = stats.finalScore;
-            newResult.correctCount = stats.correctCount;
-            newResult.wrongCount = stats.wrongCount;
-            newResult.status = 'evaluated';
+        if (newResult.submissionType === 'digital') {
+          const stats = calculateExamStats(
+            questions,
+            userAnswers,
+            examDetailsRef.current?.negativeMarking || 0,
+          );
+          newResult.score = stats.finalScore;
+          newResult.correctCount = stats.correctCount;
+          newResult.wrongCount = stats.wrongCount;
+          newResult.userAnswers = userAnswers;
+          newResult.status = 'evaluated';
+        } else {
+          newResult.scriptImageData = selectedScript?.base64;
+          try {
+            if (selectedScript?.base64) {
+              const detectedAnswers = await evaluateOMRScript(
+                selectedScript.base64,
+                questions,
+              );
+              const stats = calculateExamStats(
+                questions,
+                detectedAnswers,
+                examDetailsRef.current?.negativeMarking || 0,
+              );
+              newResult.userAnswers = detectedAnswers;
+              newResult.score = stats.finalScore;
+              newResult.correctCount = stats.correctCount;
+              newResult.wrongCount = stats.wrongCount;
+              newResult.status = 'evaluated';
+            }
+          } catch (error: unknown) {
+            console.error('Auto-evaluation failed', error);
+            if (error instanceof Error) {
+              setOmrError(error.message);
+            } else {
+              setOmrError('An unknown error occurred during auto-evaluation.');
+            }
+            newResult.status = 'pending';
           }
-        } catch (error: unknown) {
-          console.error('Auto-evaluation failed', error);
-          if (error instanceof Error) {
-            setOmrError(error.message);
-          } else {
-            setOmrError('An unknown error occurred during auto-evaluation.');
-          }
-          newResult.status = 'pending';
         }
+
+        // Save using central database service
+        await saveExamResult(newResult);
+
+        // Update local state
+        setExamHistory((prev) => [...prev, newResult]);
+
+        setAppState(AppState.COMPLETED);
+        // console.log('✅ [ExamEngine] Exam State moved to COMPLETED');
+        return { success: true, result: newResult };
+      } catch (error: unknown) {
+        console.error('Submit Exam Failed:', error);
+        let errorMsg = 'Failed to submit exam.';
+        if (error instanceof Error) errorMsg = error.message;
+        setErrorDetails(errorMsg);
+        setAppState(AppState.ERROR);
+        return { success: false, error: errorMsg };
+      } finally {
+        setIsEvaluating(false);
       }
-
-      // Save using central database service
-      await saveExamResult(newResult);
-
-      // Update local state
-      setExamHistory((prev) => [...prev, newResult]);
-
-      setAppState(AppState.COMPLETED);
-      // console.log('✅ [ExamEngine] Exam State moved to COMPLETED');
-      setIsEvaluating(false);
-      return { success: true, result: newResult };
     },
     [
       isOmrMode,
@@ -376,6 +387,113 @@ export const useExamEngine = () => {
       dbSessionId,
     ],
   );
+
+  // --- PERSISTENCE MANAGER ---
+  const PERSISTENCE_KEY = 'obhyash_active_exam_session';
+
+  // 1. SAVE STATE: Persist exam state whenever critical data changes
+  useEffect(() => {
+    // Only save if exam is ACTIVE or in Grace Period
+    if (
+      appState === AppState.ACTIVE ||
+      appState === AppState.GRACE_PERIOD ||
+      (appState === AppState.INSTRUCTIONS && questions.length > 0)
+    ) {
+      if (!examDetails) return;
+
+      const stateToSave = {
+        questions,
+        examDetails,
+        userAnswers,
+        flaggedQuestions: Array.from(flaggedQuestions),
+        dbSessionId,
+        // We save the TARGET end time to calculate remaining time accurately on reload
+        // storedTimeLeft is just a snapshot, but targetEndTime is absolute
+        targetEndTime: Date.now() + timeLeft * 1000,
+        graceTimeLeft,
+        isOmrMode,
+        appState,
+        lastUpdated: Date.now(),
+      };
+
+      localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(stateToSave));
+    } else if (
+      appState === AppState.COMPLETED ||
+      appState === AppState.SUBMITTED ||
+      appState === AppState.IDLE
+    ) {
+      // Clear persistence when exam is done or explicitly idle
+      localStorage.removeItem(PERSISTENCE_KEY);
+    }
+  }, [
+    questions,
+    examDetails,
+    userAnswers,
+    flaggedQuestions,
+    dbSessionId,
+    timeLeft,
+    graceTimeLeft,
+    isOmrMode,
+    appState,
+  ]);
+
+  // 2. HYDRATE STATE: Restore on Mount
+  useEffect(() => {
+    // Only try to restore if we are IDLE (initial load)
+    if (appState === AppState.IDLE) {
+      const stored = localStorage.getItem(PERSISTENCE_KEY);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          const now = Date.now();
+
+          // Validate expiry (e.g. 24 hours max retention for safety)
+          if (now - parsed.lastUpdated > 24 * 60 * 60 * 1000) {
+            localStorage.removeItem(PERSISTENCE_KEY);
+            return;
+          }
+
+          // Calculate remaining time based on absolute target
+          // If we saved targetEndTime, use it. usage: (target - now) / 1000
+          let restoredTimeLeft = 0;
+          if (parsed.targetEndTime) {
+            restoredTimeLeft = Math.floor((parsed.targetEndTime - now) / 1000);
+          } else {
+            // Fallback for older saves? or just use snapshot
+            // Ideally we want the timer to Keep Running while window is closed
+            restoredTimeLeft = parsed.timeLeft || 0;
+          }
+
+          if (restoredTimeLeft <= 0 && parsed.appState === AppState.ACTIVE) {
+            // Expired while away!
+            // We should probably auto-submit or strictly show error.
+            // For now, let's restore but set time to 0 so it triggers submit immediately
+            console.warn('⚠️ Exam expired while away');
+            restoredTimeLeft = 0;
+          }
+
+          console.log('♻️ Restoring Exam Session:', parsed);
+
+          setQuestions(parsed.questions || []);
+          setExamDetails(parsed.examDetails || null);
+          setUserAnswers(parsed.userAnswers || {});
+          setFlaggedQuestions(new Set(parsed.flaggedQuestions || []));
+          setDbSessionId(parsed.dbSessionId || null);
+          setTimeLeft(restoredTimeLeft);
+          setGraceTimeLeft(parsed.graceTimeLeft || 0);
+          setIsOmrMode(parsed.isOmrMode || false);
+
+          // Restore state (Triggering UI to show ExamRunner)
+          // If time is 0, the runner will see it and trigger auto-submit logic
+          setAppState(parsed.appState || AppState.IDLE);
+        } catch (e) {
+          console.error('Failed to hydrate exam state:', e);
+          localStorage.removeItem(PERSISTENCE_KEY);
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run ONCE on mount
 
   useEffect(() => {
     if (appState === AppState.ACTIVE) {
@@ -389,6 +507,9 @@ export const useExamEngine = () => {
             return prev - 1;
           });
         }, 1000);
+      } else {
+        // Immediate submit if time is already 0 (e.g. hydrated with 0 time)
+        submitExam(false);
       }
     } else if (appState === AppState.GRACE_PERIOD && graceTimeLeft > 0) {
       timerRef.current = window.setInterval(() => {
