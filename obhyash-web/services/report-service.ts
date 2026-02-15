@@ -1,4 +1,4 @@
-import { supabase } from './core';
+import { supabase, isSupabaseConfigured } from './core';
 import { Report, ReportStatus, ReportReason } from '@/lib/types';
 import { extendSubscription } from './subscription-service';
 import { toast } from 'sonner';
@@ -15,6 +15,10 @@ export interface SubmitReportData {
 }
 
 export const submitReport = async (data: SubmitReportData) => {
+  if (!isSupabaseConfigured()) {
+    throw new Error('Database not configured');
+  }
+
   try {
     let imageUrl = null;
 
@@ -41,9 +45,13 @@ export const submitReport = async (data: SubmitReportData) => {
     }
 
     // 2. Insert Report into DB
+    // Handle 'guest' reporterId: set to null if it's 'guest' to avoid UUID error
+    const reporterId =
+      data.reporterId === 'guest' || !data.reporterId ? null : data.reporterId;
+
     const { error: insertError } = await supabase.from('reports').insert({
       question_id: data.questionId,
-      reporter_id: data.reporterId,
+      reporter_id: reporterId,
       reporter_name: data.reporterName,
       reason: data.type,
       description: data.comment,
@@ -56,7 +64,7 @@ export const submitReport = async (data: SubmitReportData) => {
 
     return { success: true };
   } catch (error) {
-    console.error('Submit Report Error:', error);
+    console.error('Submit Report Error Details:', error);
     throw error;
   }
 };
