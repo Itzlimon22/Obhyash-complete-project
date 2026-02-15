@@ -1,205 +1,266 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { createClient } from '@/utils/supabase/client';
+import React, { useEffect, useState } from 'react';
+import { getReports } from '@/services/report-service';
+import ReportDetailsModal from '@/components/admin/reports/ReportDetailsModal';
+import {
+  CheckCircle,
+  Clock,
+  XCircle,
+  Filter,
+  Search,
+  RefreshCcw,
+  AlertTriangle,
+} from 'lucide-react';
 import { toast } from 'sonner';
-import { Report, Question, ReportStatus } from '@/lib/types';
-import { ReportTable } from '@/components/admin/reports/report-table';
-import { ReportStats } from '@/components/admin/reports/report-stats';
-import { ResolutionModal } from '@/components/admin/reports/resolution-modal';
-import { Flag, RefreshCw } from 'lucide-react';
 
-export default function ReportsPage() {
-  const [reports, setReports] = useState<Report[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+export default function AdminReportsPage() {
+  const [reports, setReports] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState<
+    'All' | 'Pending' | 'Resolved' | 'Ignored'
+  >('Pending');
+  const [selectedReport, setSelectedReport] = useState<any | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchReports();
-  }, []);
-
-  const fetchReports = async (showToast = false) => {
-    if (showToast) setIsRefreshing(true);
-    const supabase = createClient();
-
+  const fetchReports = async () => {
+    setLoading(true);
     try {
-      // 1. Fetch Reports
-      const { data: reportsData, error: reportsError } = await supabase
-        .from('reports')
-        .select(
-          `
-          *,
-          reporter:users (
-            name
-          )
-        `,
-        )
-        .order('created_at', { ascending: false });
-
-      if (reportsError) throw reportsError;
-
-      if (!reportsData || reportsData.length === 0) {
-        setReports([]);
-        return;
-      }
-
-      // 2. Fetch Related Questions (Manual Join)
-      const questionIds = Array.from(
-        new Set(reportsData.map((r) => r.question_id)),
-      );
-
-      const { data: questionsData, error: questionsError } = await supabase
-        .from('questions')
-        .select('*')
-        .in('id', questionIds);
-
-      if (questionsError) throw questionsError;
-
-      const questionsMap = new Map<string, Question>();
-      questionsData?.forEach((q) => questionsMap.set(q.id, q as Question));
-
-      // 3. Combine Data
-      const formattedReports: Report[] = reportsData.map((r) => ({
-        id: r.id,
-        questionId: r.question_id,
-        questionPreview: questionsMap.get(r.question_id) || ({} as Question),
-        reporterName:
-          (r.reporter as { name: string } | null)?.name || 'Unknown User',
-        reason: r.reason,
-        description: r.description,
-        status: r.status,
-        createdAt: new Date(r.created_at).toLocaleDateString(),
-        severity: r.severity || 'Medium',
-      }));
-
-      setReports(formattedReports);
-      if (showToast) toast.success('Reports refreshed');
+      const status = filterStatus === 'All' ? undefined : filterStatus;
+      const data = await getReports(status);
+      setReports(data || []);
     } catch (error) {
-      console.error('Failed to fetch reports:', error);
-      toast.error('Failed to load reports');
+      console.error('Error fetching reports:', error);
+      toast.error('রিপোর্ট লোড করতে সমস্যা হয়েছে।');
     } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
+      setLoading(false);
     }
   };
 
-  const handleResolve = async (
-    action: 'fix' | 'ignore' | 'delete',
-    updatedQuestion?: Partial<Question>,
-  ) => {
-    if (!selectedReport) return;
-    const supabase = createClient();
+  useEffect(() => {
+    fetchReports();
+  }, [filterStatus]);
 
-    try {
-      if (action === 'delete') {
-        // Delete the REPORT, not the question? Or delete report
-        // Usually admins checking report might want to delete report if it's spam
-        // The modal typically implies "Resolving the REPORT"
-        // If action is delete, it likely means deleting the report itself.
-        const { error } = await supabase
-          .from('reports')
-          .delete()
-          .eq('id', selectedReport.id);
-        if (error) throw error;
-        toast.success('Report deleted');
-      } else {
-        let newStatus: ReportStatus = 'Pending';
+  const handleViewDetails = (report: any) => {
+    setSelectedReport(report);
+    setIsDetailsModalOpen(true);
+  };
 
-        if (action === 'fix') {
-          // Update Question Content if provided
-          if (updatedQuestion && Object.keys(updatedQuestion).length > 0) {
-            const { error: qError } = await supabase
-              .from('questions')
-              .update(updatedQuestion)
-              .eq('id', selectedReport.questionId);
-            if (qError) throw qError;
-          }
-          newStatus = 'Resolved';
-        } else if (action === 'ignore') {
-          newStatus = 'Ignored';
-        }
-
-        // Update Report Status
-        const { error } = await supabase
-          .from('reports')
-          .update({ status: newStatus })
-          .eq('id', selectedReport.id);
-
-        if (error) throw error;
-        toast.success(`Report marked as ${newStatus}`);
-      }
-
-      // Close and Refresh
-      setSelectedReport(null);
-      fetchReports();
-    } catch (error) {
-      console.error('Resolution failed:', error);
-      toast.error('Failed to process report');
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Pending':
+        return 'bg-amber-100 text-amber-700 border-amber-200';
+      case 'Resolved':
+        return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+      case 'Ignored':
+        return 'bg-red-100 text-red-700 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
     }
   };
 
   const stats = {
+    total: reports.length,
     pending: reports.filter((r) => r.status === 'Pending').length,
-    highSeverity: reports.filter(
-      (r) => r.status === 'Pending' && r.severity === 'High',
-    ).length,
+    resolved: reports.filter((r) => r.status === 'Resolved').length,
+    ignored: reports.filter((r) => r.status === 'Ignored').length,
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black p-4 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-0.5">
-            <h1 className="text-xl md:text-3xl font-black text-neutral-900 dark:text-white flex items-center gap-2.5 tracking-tight">
-              <Flag className="text-rose-600" size={24} />
-              Reports
-            </h1>
-            <p className="text-neutral-500 dark:text-neutral-400 text-[11px] md:text-sm font-medium">
-              Review and resolve user-submitted content issues
-            </p>
-          </div>
-          <div className="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto">
-            <ReportStats {...stats} />
-            <button
-              onClick={() => fetchReports(true)}
-              className="p-2 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-500 hover:text-rose-600 dark:hover:text-rose-400 transition-all shadow-sm shrink-0 active:scale-95"
-            >
-              <RefreshCw
-                size={16}
-                className={isRefreshing ? 'animate-spin' : ''}
-              />
-            </button>
-          </div>
-        </div>
-
-        <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800">
-          <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-widest">
-            Showing{' '}
-            <span className="text-neutral-900 dark:text-white">
-              {reports.length}
-            </span>{' '}
-            active report(s)
+    <div className="p-6 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+      {/* Header & Stats */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
+            রিপোর্ট ম্যানেজমেন্ট
+          </h1>
+          <p className="text-neutral-500 dark:text-neutral-400">
+            শিক্ষার্থীদের পাঠানো অভিযোগ পর্যালোচনা ও সমাধান করুন
           </p>
         </div>
-
-        {/* Main Table */}
-        <ReportTable
-          reports={reports}
-          isLoading={isLoading}
-          onReview={setSelectedReport}
-        />
-
-        {/* Modal */}
-        {selectedReport && (
-          <ResolutionModal
-            report={selectedReport}
-            onClose={() => setSelectedReport(null)}
-            onResolve={handleResolve}
+        <button
+          onClick={fetchReports}
+          className="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+          title="Refresh"
+        >
+          <RefreshCcw
+            size={20}
+            className={`text-neutral-500 ${loading ? 'animate-spin' : ''}`}
           />
+        </button>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-neutral-900 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+          <div className="flex justify-between items-start mb-2">
+            <span className="text-neutral-500 text-sm font-bold">
+              মোট রিপোর্ট
+            </span>
+            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+              <Filter size={16} />
+            </div>
+          </div>
+          <div className="text-2xl font-bold text-neutral-900 dark:text-white">
+            {stats.total}
+          </div>
+        </div>
+        <div className="bg-white dark:bg-neutral-900 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+          <div className="flex justify-between items-start mb-2">
+            <span className="text-neutral-500 text-sm font-bold">
+              অপেক্ষমান
+            </span>
+            <div className="p-1.5 bg-amber-50 text-amber-600 rounded-lg">
+              <Clock size={16} />
+            </div>
+          </div>
+          <div className="text-2xl font-bold text-amber-600">
+            {stats.pending}
+          </div>
+        </div>
+        <div className="bg-white dark:bg-neutral-900 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+          <div className="flex justify-between items-start mb-2">
+            <span className="text-neutral-500 text-sm font-bold">গৃহীত</span>
+            <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
+              <CheckCircle size={16} />
+            </div>
+          </div>
+          <div className="text-2xl font-bold text-emerald-600">
+            {stats.resolved}
+          </div>
+        </div>
+        <div className="bg-white dark:bg-neutral-900 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+          <div className="flex justify-between items-start mb-2">
+            <span className="text-neutral-500 text-sm font-bold">বাতিল</span>
+            <div className="p-1.5 bg-red-50 text-red-600 rounded-lg">
+              <XCircle size={16} />
+            </div>
+          </div>
+          <div className="text-2xl font-bold text-red-600">{stats.ignored}</div>
+        </div>
+      </div>
+
+      {/* Filters & Actions */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white dark:bg-neutral-900 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+        <div className="flex gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
+          {['Pending', 'Resolved', 'Ignored', 'All'].map((status) => (
+            <button
+              key={status}
+              onClick={() => setFilterStatus(status as any)}
+              className={`px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap transition-all ${
+                filterStatus === status
+                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-md'
+                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+              }`}
+            >
+              {status === 'Pending' && 'অপেক্ষমান'}
+              {status === 'Resolved' && 'গৃহীত'}
+              {status === 'Ignored' && 'বাতিল'}
+              {status === 'All' && 'সবগুলো'}
+            </button>
+          ))}
+        </div>
+
+        {/* Search - Placeholder for now */}
+        <div className="relative w-full sm:w-64">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
+            size={16}
+          />
+          <input
+            type="text"
+            placeholder="আইডি বা নাম দিয়ে খুঁজুন..."
+            className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white"
+          />
+        </div>
+      </div>
+
+      {/* Reports List */}
+      <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden min-h-[400px]">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center h-64 gap-3">
+            <div className="w-8 h-8 border-4 border-neutral-200 border-t-neutral-800 rounded-full animate-spin"></div>
+            <p className="text-neutral-500 text-sm">রিপোর্ট লোড হচ্ছে...</p>
+          </div>
+        ) : reports.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 gap-4 text-neutral-400">
+            <div className="bg-neutral-100 dark:bg-neutral-800 p-6 rounded-full">
+              <AlertTriangle size={32} />
+            </div>
+            <p>কোনো রিপোর্ট পাওয়া যায়নি</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800 text-neutral-500 uppercase tracking-wider font-bold">
+                <tr>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Reporter</th>
+                  <th className="px-6 py-4">Question ID</th>
+                  <th className="px-6 py-4">Reason</th>
+                  <th className="px-6 py-4">Date</th>
+                  <th className="px-6 py-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+                {reports.map((report) => (
+                  <tr
+                    key={report.id}
+                    className="hover:bg-neutral-50 dark:hover:bg-neutral-800/20 transition-colors"
+                  >
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-2 py-1 rounded-md text-xs font-bold border ${getStatusColor(report.status)}`}
+                      >
+                        {report.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-bold text-neutral-900 dark:text-white">
+                        {report.reporter_name || 'Anonymous'}
+                      </div>
+                      <div className="text-xs text-neutral-500 font-mono">
+                        {report.reporter_id?.slice(0, 6)}...
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 font-mono text-neutral-600 dark:text-neutral-300">
+                      #{report.question_id}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="font-medium text-neutral-800 dark:text-neutral-200">
+                        {report.reason}
+                      </span>
+                      {report.image_url && (
+                        <span className="ml-2 inline-flex items-center text-[10px] bg-blue-50 text-blue-600 px-1.5 rounded border border-blue-100">
+                          IMG
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-neutral-500 whitespace-nowrap">
+                      {new Date(report.created_at).toLocaleDateString('bn-BD')}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => handleViewDetails(report)}
+                        className="px-3 py-1.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg text-xs font-bold hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors"
+                      >
+                        বিস্তারিত
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
+
+      <ReportDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+        report={selectedReport}
+        onUpdate={fetchReports}
+      />
     </div>
   );
 }

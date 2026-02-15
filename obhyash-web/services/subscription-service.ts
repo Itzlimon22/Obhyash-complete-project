@@ -351,3 +351,68 @@ export const updatePaymentStatus = async (
   if (error) throw error;
   return true;
 };
+
+// Actual implementation for extending subscription
+export const extendSubscription = async (
+  userId: string,
+  days: number,
+): Promise<boolean> => {
+  if (!isSupabaseConfigured() || !supabase) {
+    throw new Error('Database configuration missing');
+  }
+
+  try {
+    // 1. Get latest active subscription
+    const { data: sub, error } = await supabase
+      .from('subscription_history')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .gt('expires_at', new Date().toISOString())
+      .order('expires_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error finding subscription to extend:', error);
+      return false;
+    }
+
+    if (!sub) {
+      console.log('No active subscription found to extend for user:', userId);
+      // Optional: Could grant a new 1-day subscription here if desired logic
+      return false;
+    }
+
+    // 2. Calculate new date
+    const currentExpiry = new Date(sub.expires_at);
+    const newExpiry = new Date(
+      currentExpiry.getTime() + days * 24 * 60 * 60 * 1000,
+    );
+
+    // 3. Update DB
+    const { error: updateError } = await supabase
+      .from('subscription_history')
+      .update({ expires_at: newExpiry.toISOString() })
+      .eq('id', sub.id);
+
+    if (updateError) throw updateError;
+
+    // 4. Notify User
+    await createNotification(
+      userId,
+      'বোনাস সাবস্ক্রিপশন!',
+      `আপনার রিপোর্টের জন্য ধন্যবাদ। পুরস্কার হিসেবে আপনার সাবস্ক্রিপশনের মেয়াদ ${days} দিন বাড়ানো হয়েছে!`,
+      'success',
+      {
+        actionUrl: '/subscription',
+        priority: 'high',
+      },
+    );
+
+    return true;
+  } catch (err) {
+    console.error('Failed to extend subscription:', err);
+    return false;
+  }
+};

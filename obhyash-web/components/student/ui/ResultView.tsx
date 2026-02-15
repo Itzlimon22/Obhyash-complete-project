@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Question, UserAnswers } from '@/lib/types';
+import { Question, UserAnswers, UserProfile } from '@/lib/types';
 
 import { useCountUp } from '@/hooks/use-count-up';
 import { celebration } from '@/lib/confetti';
 import QuestionCard from '@/components/student/ui/exam/QuestionCard';
+import ReportModal from '@/components/student/ui/common/ReportModal';
 
 interface ResultViewProps {
   questions: Question[];
@@ -19,6 +20,7 @@ interface ResultViewProps {
   submissionType?: 'digital' | 'script';
   onChallengeEvaluation?: () => void;
   initialBookmarks?: Set<number>;
+  currentUser?: UserProfile | null;
 }
 
 const ResultView: React.FC<ResultViewProps> = ({
@@ -35,6 +37,7 @@ const ResultView: React.FC<ResultViewProps> = ({
   submissionType,
   onChallengeEvaluation,
   initialBookmarks,
+  currentUser,
 }) => {
   // Local state for bookmarks in result view
   const [bookmarked, setBookmarked] = useState<Set<number>>(
@@ -46,7 +49,6 @@ const ResultView: React.FC<ResultViewProps> = ({
   const [reportingQuestionId, setReportingQuestionId] = useState<number | null>(
     null,
   );
-  const [reportReason, setReportReason] = useState('');
 
   const toggleBookmark = (id: number) => {
     setBookmarked((prev) => {
@@ -59,23 +61,12 @@ const ResultView: React.FC<ResultViewProps> = ({
 
   const openReportModal = (id: number) => {
     setReportingQuestionId(id);
-    setReportReason('');
     setReportModalOpen(true);
   };
 
   const closeReportModal = () => {
     setReportModalOpen(false);
     setReportingQuestionId(null);
-  };
-
-  const submitReport = () => {
-    if (reportingQuestionId && reportReason.trim()) {
-      console.log(
-        `Report submitted for Q${reportingQuestionId}: ${reportReason}`,
-      );
-      alert('রিপোর্ট সফলভাবে জমা দেওয়া হয়েছে!');
-      closeReportModal();
-    }
   };
 
   // Logic to calculate final score including Negative Marking
@@ -563,42 +554,14 @@ const ResultView: React.FC<ResultViewProps> = ({
       </div>
 
       {/* Report Modal */}
-      {reportModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-2xl max-w-md w-full p-6 border border-neutral-100 dark:border-neutral-800 transform transition-all scale-100">
-            <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
-              প্রশ্ন {reportingQuestionId} রিপোর্ট করুন
-            </h3>
-            <p className="text-base text-neutral-600 dark:text-neutral-400 mb-4">
-              অনুগ্রহ করে সমস্যাটির কারণ উল্লেখ করুন:
-            </p>
-
-            <textarea
-              value={reportReason}
-              onChange={(e) => setReportReason(e.target.value)}
-              placeholder="যেমন: সঠিক উত্তরটি ভুল, অথবা প্রশ্নে বানান ভুল আছে..."
-              className="w-full h-32 p-3 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 outline-none resize-none mb-6 text-base"
-              autoFocus
-            />
-
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={closeReportModal}
-                className="px-5 py-2.5 rounded-lg border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 font-medium hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-              >
-                বাতিল
-              </button>
-              <button
-                onClick={submitReport}
-                disabled={!reportReason.trim()}
-                className="px-5 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                জমা দিন
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ReportModal
+        isOpen={reportModalOpen}
+        onClose={closeReportModal}
+        onSubmit={() => {}} // Internal submission used
+        questionId={reportingQuestionId}
+        reporterId={currentUser?.id}
+        reporterName={currentUser?.name}
+      />
     </div>
   );
 };

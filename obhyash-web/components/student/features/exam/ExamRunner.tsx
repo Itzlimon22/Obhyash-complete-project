@@ -311,8 +311,10 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
           onClose={() =>
             setReportModalState({ isOpen: false, questionId: null })
           }
-          onSubmit={handleReportSubmit}
+          onSubmit={() => {}} // Internal submission used
           questionId={reportModalState.questionId}
+          reporterId={currentUser?.id}
+          reporterName={currentUser?.name}
         />
         <NavigationWarningModal
           isOpen={navWarning.isOpen}

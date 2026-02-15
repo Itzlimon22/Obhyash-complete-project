@@ -764,6 +764,7 @@ export default function StudentRoot({
               examDetails &&
               printResultWithExplanations(examDetails, questions, userAnswers)
             }
+            currentUser={currentUser}
           />
         </AppLayout>
       );
