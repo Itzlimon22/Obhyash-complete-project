@@ -46,8 +46,9 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
 
       // Process Bookmarks
       if (result.questions && result.flaggedQuestions) {
-        result.flaggedQuestions.forEach((idx) => {
-          const q = result.questions?.[idx];
+        result.flaggedQuestions.forEach((id) => {
+          // Now that id is string | number (from ExamResult), we find the question by its .id
+          const q = result.questions?.find((q) => q.id === id);
           if (q) {
             bookmarkMap.set(q.id, q);
           }
