@@ -100,8 +100,16 @@ export const uploadScriptImage = async (file: File) => {
 /**
  * Helper to upload Question images to Cloudflare R2.
  */
+// ... existing code ...
 export const uploadQuestionImage = async (file: File) => {
   return uploadFile(file, 'questions');
+};
+
+/**
+ * Helper to upload Report images to Cloudflare R2.
+ */
+export const uploadReportImage = async (file: File) => {
+  return uploadFile(file, 'reports');
 };
 
 export const getAvatarUrl = (path: string | null | undefined) => {

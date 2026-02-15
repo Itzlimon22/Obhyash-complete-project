@@ -3,7 +3,7 @@ import { Report, ReportStatus, ReportReason } from '@/lib/types';
 import { extendSubscription } from './subscription-service';
 import { toast } from 'sonner';
 
-const REPORT_BUCKET = 'reports';
+import { uploadReportImage } from './storage-service';
 
 export interface SubmitReportData {
   questionId: number | string;
@@ -24,24 +24,8 @@ export const submitReport = async (data: SubmitReportData) => {
 
     // 1. Upload Image if exists
     if (data.imageFile) {
-      const fileExt = data.imageFile.name.split('.').pop();
-      const fileName = `${data.reporterId}_${Date.now()}.${fileExt}`;
-      const config = {
-        cacheControl: '3600',
-        upsert: false,
-      };
-
-      const { error: uploadError, data: uploadData } = await supabase.storage
-        .from(REPORT_BUCKET)
-        .upload(fileName, data.imageFile, config);
-
-      if (uploadError) throw uploadError;
-
-      const { data: publicUrlData } = supabase.storage
-        .from(REPORT_BUCKET)
-        .getPublicUrl(fileName);
-
-      imageUrl = publicUrlData.publicUrl;
+      const { url } = await uploadReportImage(data.imageFile);
+      imageUrl = url;
     }
 
     // 2. Insert Report into DB

@@ -125,6 +125,29 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
     isOpen: boolean;
     questionId: number | null;
   }>({ isOpen: false, questionId: null });
+  // Fetch initial bookmarks
+  React.useEffect(() => {
+    const fetchBookmarks = async () => {
+      if (currentUser?.id) {
+        import('@/services/bookmark-service').then(
+          async ({ getUserBookmarks }) => {
+            const bookmarks = await getUserBookmarks(currentUser.id);
+            setFlaggedQuestions((prev) => {
+              const newSet = new Set(prev);
+              bookmarks.forEach((id) => {
+                // Only add if the question is in the current exam
+                if (questions.some((q) => Number(q.id) === id)) {
+                  newSet.add(id);
+                }
+              });
+              return newSet;
+            });
+          },
+        );
+      }
+    };
+    fetchBookmarks();
+  }, [currentUser?.id, questions]);
 
   // ... (Handlers) ...
   const handleSubmitRequest = () => {
