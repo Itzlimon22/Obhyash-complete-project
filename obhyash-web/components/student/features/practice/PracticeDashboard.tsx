@@ -1,12 +1,16 @@
-import React, { useState, useMemo } from 'react';
-import { Question, ExamResult, ExamDetails } from '@/lib/types';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Question, ExamResult, ExamDetails, UserProfile } from '@/lib/types';
 import QuestionCard from '@/components/student/ui/exam/QuestionCard';
+import { getUserBookmarks, toggleBookmark } from '@/services/bookmark-service';
+import { getQuestionsByIds } from '@/services/question-service';
+import { toast } from 'sonner';
 
 interface PracticeDashboardProps {
   history: ExamResult[];
   onStartPractice: (questions: Question[], details: ExamDetails) => void;
   onNavigateToMock: () => void;
   subjects?: any[];
+  currentUser?: UserProfile | null;
 }
 
 type Tab = 'mistakes' | 'bookmarks';
@@ -16,20 +20,22 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   onStartPractice,
   onNavigateToMock,
   subjects,
+  currentUser,
 }) => {
   const [activeTab, setActiveTab] = useState<Tab>('mistakes');
   const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(
     new Set(),
   );
 
-  // --- Process Data ---
-  const { mistakes, bookmarks } = useMemo(() => {
-    // 1. Deduplication using Maps (Already implemented in previous step, ensuring it persists)
-    const mistakeMap = new Map<string, Question>();
-    const bookmarkMap = new Map<string, Question>();
+  // Global Bookmarks State
+  const [globalBookmarks, setGlobalBookmarks] = useState<Question[]>([]);
+  const [isLoadingBookmarks, setIsLoadingBookmarks] = useState(false);
+  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
 
+  // Deduplicated Mistakes from History
+  const mistakes = useMemo(() => {
+    const mistakeMap = new Map<string, Question>();
     history.forEach((result) => {
-      // Process Mistakes
       if (result.questions && result.userAnswers) {
         result.questions.forEach((q) => {
           const userAns = result.userAnswers?.[q.id];
@@ -38,36 +44,89 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
             userAns !== q.correctAnswerIndex &&
             q.correctAnswerIndex !== undefined
           ) {
-            // Only add if not already present (Map handles this by key)
             mistakeMap.set(q.id, q);
           }
         });
       }
-
-      // Process Bookmarks
-      if (result.questions && result.flaggedQuestions) {
-        result.flaggedQuestions.forEach((id) => {
-          // Now that id is string | number (from ExamResult), we find the question by its .id
-          const q = result.questions?.find((q) => q.id === id);
-          if (q) {
-            bookmarkMap.set(q.id, q);
-          }
-        });
-      }
     });
-
-    return {
-      mistakes: Array.from(mistakeMap.values()),
-      bookmarks: Array.from(bookmarkMap.values()),
-    };
+    return Array.from(mistakeMap.values());
   }, [history]);
 
-  const currentList = activeTab === 'mistakes' ? mistakes : bookmarks;
+  // Fetch Global Bookmarks on Mount
+  useEffect(() => {
+    const fetchBookmarks = async () => {
+      if (!currentUser?.id) return;
+
+      setIsLoadingBookmarks(true);
+      try {
+        // 1. Get IDs
+        const idsSet = await getUserBookmarks(currentUser.id);
+        const ids = Array.from(idsSet).map(String);
+        setBookmarkedIds(new Set(ids));
+
+        if (ids.length > 0) {
+          // 2. Fetch Question Details
+          const questions = await getQuestionsByIds(ids);
+          setGlobalBookmarks(questions);
+        } else {
+          setGlobalBookmarks([]);
+        }
+      } catch (error) {
+        console.error('Failed to load bookmarks:', error);
+        toast.error('বুকমার্ক লোড করতে সমস্যা হয়েছে।');
+      } finally {
+        setIsLoadingBookmarks(false);
+      }
+    };
+
+    fetchBookmarks();
+  }, [currentUser?.id]);
+
+  // Handle Bookmark Toggle
+  const handleToggleBookmark = async (questionId: string) => {
+    if (!currentUser?.id) return;
+
+    // Optimistic Update
+    const isCurrentlyBookmarked = bookmarkedIds.has(questionId);
+    const newBookmarkedIds = new Set(bookmarkedIds);
+
+    if (isCurrentlyBookmarked) {
+      newBookmarkedIds.delete(questionId);
+      setGlobalBookmarks((prev) => prev.filter((q) => q.id !== questionId));
+    } else {
+      newBookmarkedIds.add(questionId);
+      // We can't easily add the full question object here if it's not in the view,
+      // but usually we toggle from a list where we HAVE the question.
+      // If adding from 'mistakes' tab, we have the question.
+      if (activeTab === 'mistakes') {
+        const q = mistakes.find((q) => q.id === questionId);
+        if (q) setGlobalBookmarks((prev) => [...prev, q]);
+      }
+    }
+
+    setBookmarkedIds(newBookmarkedIds);
+
+    try {
+      await toggleBookmark(currentUser.id, questionId, isCurrentlyBookmarked);
+      toast.success(
+        isCurrentlyBookmarked
+          ? 'বুকমার্ক রিমুভ করা হয়েছে'
+          : 'বুকমার্ক সেভ করা হয়েছে',
+      );
+    } catch (error) {
+      console.error('Bookmark toggle failed:', error);
+      toast.error('বুকমার্ক আপডেট করতে সমস্যা হয়েছে।');
+      // Revert on error
+      setBookmarkedIds(bookmarkedIds);
+    }
+  };
+
+  const currentList = activeTab === 'mistakes' ? mistakes : globalBookmarks;
+
+  // Filter selection to only include items currently in the view
   const currentSelection = new Set(
     [...selectedQuestions].filter((id) => currentList.some((q) => q.id === id)),
   );
-
-  // --- Handlers ---
 
   const toggleSelection = (id: string) => {
     setSelectedQuestions((prev) => {
@@ -148,14 +207,18 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                 : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700'
             }`}
           >
-            বুকমার্ক ({bookmarks.length})
+            বুকমার্ক ({globalBookmarks.length})
           </button>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-sm min-h-[500px] flex flex-col">
-        {currentList.length === 0 ? (
+        {isLoadingBookmarks && activeTab === 'bookmarks' ? (
+          <div className="flex-1 flex items-center justify-center p-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600"></div>
+          </div>
+        ) : currentList.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
             <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mb-4">
               <svg
@@ -247,26 +310,28 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                         className="w-5 h-5 rounded border-neutral-300 text-rose-600 focus:ring-rose-500"
                       />
                     </div>
-                    <div className="flex-1 pointer-events-none">
+                    <div className="flex-1">
                       {/* Simplified View using QuestionCard read-only logic or custom render */}
                       <div className="mb-2">
                         <span className="inline-block px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-500">
                           {question.subject}
                         </span>
                       </div>
-                      <QuestionCard
-                        question={question}
-                        serialNumber={idx + 1}
-                        selectedOptionIndex={question.correctAnswerIndex} // Show correct answer visually for learning
-                        isFlagged={activeTab === 'bookmarks'}
-                        onSelectOption={() => {}}
-                        onToggleFlag={() => {}}
-                        onReport={() => {}}
-                        readOnly={true}
-                        showAnswer={true} // Enhance visual feedback
-                      />
-                      {/* Overlay to intercept clicks for selection */}
-                      <div className="absolute inset-0 z-10" />
+                      {/* Pointer events none removal to allow interaction with bookmark button */}
+                      <div className="pointer-events-auto">
+                        <QuestionCard
+                          question={question}
+                          serialNumber={idx + 1}
+                          selectedOptionIndex={question.correctAnswerIndex} // Show correct answer visually for learning
+                          isFlagged={bookmarkedIds.has(question.id)}
+                          onSelectOption={() => {}}
+                          onToggleFlag={() => handleToggleBookmark(question.id)}
+                          onReport={() => {}}
+                          readOnly={true}
+                          showAnswer={true} // Enhance visual feedback
+                        />
+                      </div>
+                      {/* Overlay to intercept clicks for selection - REMOVED to allow interaction */}
                     </div>
                   </label>
                 </div>

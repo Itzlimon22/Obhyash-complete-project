@@ -241,13 +241,19 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                     if (currentUser?.id) {
                       import('@/services/bookmark-service').then(
                         ({ toggleBookmark }) => {
-                          toggleBookmark(
-                            currentUser.id,
-                            questionId,
-                            isFlagged,
-                          ).catch((err) =>
-                            console.error('Bookmark sync failed', err),
-                          );
+                          toggleBookmark(currentUser.id, questionId, isFlagged)
+                            .then(() => {
+                              import('sonner').then(({ toast }) => {
+                                toast.success(
+                                  isFlagged
+                                    ? 'বুকমার্ক রিমুভ করা হয়েছে'
+                                    : 'বুকমার্ক সেভ করা হয়েছে',
+                                );
+                              });
+                            })
+                            .catch((err) =>
+                              console.error('Bookmark sync failed', err),
+                            );
                         },
                       );
                     }

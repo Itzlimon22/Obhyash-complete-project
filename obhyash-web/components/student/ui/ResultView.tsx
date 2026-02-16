@@ -84,8 +84,18 @@ const ResultView: React.FC<ResultViewProps> = ({
         const { toggleBookmark: toggleDbBookmark } =
           await import('@/services/bookmark-service');
         await toggleDbBookmark(currentUser.id, id, isCurrentlyBookmarked);
+        import('sonner').then(({ toast }) => {
+          toast.success(
+            isCurrentlyBookmarked
+              ? 'বুকমার্ক রিমুভ করা হয়েছে'
+              : 'বুকমার্ক সেভ করা হয়েছে',
+          );
+        });
       } catch (error) {
         console.error('Failed to toggle bookmark:', error);
+        import('sonner').then(({ toast }) => {
+          toast.error('বুকমার্ক আপডেট করতে সমস্যা হয়েছে');
+        });
         // Revert on error
         setBookmarked((prev) => {
           const newSet = new Set(prev);

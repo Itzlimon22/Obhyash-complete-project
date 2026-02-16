@@ -473,3 +473,45 @@ export const bulkCreateQuestions = async (
 
   return { success: false, count: 0, errors: ['Supabase not configured'] };
 };
+/**
+ * Get multiple questions by IDs
+ */
+export const getQuestionsByIds = async (
+  ids: string[],
+): Promise<Question[]> => {
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      if (ids.length === 0) return [];
+
+      const { data, error } = await supabase
+        .from('questions')
+        .select('*')
+        .in('id', ids);
+
+      if (error) {
+        console.error('Error fetching questions by IDs:', error);
+        return [];
+      }
+
+      return (data || []).map(
+        (q: Record<string, unknown>) =>
+          ({
+            ...q,
+            createdAt: q.created_at || new Date().toISOString(),
+            correctAnswer: q.correct_answer,
+            correctAnswerIndex: q.correct_answer_index,
+            correctAnswerIndices: q.correct_answer_indices || [],
+            imageUrl: q.image_url,
+            optionImages: q.option_images || [],
+            explanationImageUrl: q.explanation_image_url,
+            examType: q.exam_type,
+            institutes: q.institutes || [],
+            years: q.years || [],
+          }) as Question,
+      );
+    } catch (error) {
+      console.error('Failed to fetch questions by IDs:', error);
+    }
+  }
+  return [];
+};

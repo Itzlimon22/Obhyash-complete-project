@@ -2,6 +2,7 @@ import React from 'react';
 import { Question } from '@/lib/types';
 import LatexText from '../common/LatexText';
 import { toBengaliNumeral } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 interface QuestionCardProps {
   question: Question;
@@ -110,10 +111,20 @@ export default function QuestionCard({
           </button>
 
           {/* Bookmark Button */}
-          <button
+          <motion.button
+            whileTap={{ scale: 0.8 }}
+            whileHover={{ scale: 1.1 }}
+            animate={{
+              scale: isFlagged ? 1.1 : 1,
+              color: isFlagged ? '#f59e0b' : '#d4d4d4', // amber-500 : neutral-300
+            }}
             onClick={onToggleFlag}
-            className={`p-2 rounded-full transition-colors ${isFlagged ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'text-neutral-300 hover:text-neutral-500 dark:text-neutral-600 dark:hover:text-neutral-400'}`}
-            title="Bookmark"
+            className={`p-2 rounded-full transition-colors ${
+              isFlagged
+                ? 'bg-amber-50 dark:bg-amber-900/20'
+                : 'hover:text-neutral-500 dark:text-neutral-600 dark:hover:text-neutral-400'
+            }`}
+            title={isFlagged ? 'Remove Bookmark' : 'Bookmark'}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +140,7 @@ export default function QuestionCard({
                 d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 11.186 0Z"
               />
             </svg>
-          </button>
+          </motion.button>
         </div>
       </div>
 

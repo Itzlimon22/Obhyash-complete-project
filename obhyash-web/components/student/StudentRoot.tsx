@@ -531,6 +531,7 @@ export default function StudentRoot({
               onStartPractice={startCustomExam}
               onNavigateToMock={() => setActiveTab('setup')}
               subjects={subjects}
+              currentUser={currentUser}
             />
           </AppLayout>
         );
