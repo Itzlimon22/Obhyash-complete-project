@@ -642,3 +642,67 @@ export const getExamHistory = async (): Promise<ExamResult[]> => {
   }
   return [];
 };
+
+export const clearExamHistory = async (): Promise<boolean> => {
+  if (!isSupabaseConfigured() || !supabase) return false;
+
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return false;
+
+    // Delete from DB
+    const { error } = await supabase
+      .from('exam_results')
+      .delete()
+      .eq('user_id', user.id);
+
+    if (error) {
+      console.error('Failed to clear exam history from DB:', error);
+      return false;
+    }
+
+    // Clear local storage as well
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('obhyash_exam_history');
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error clearing exam history:', error);
+    return false;
+  }
+};
+
+export const deleteExamResult = async (examId: string): Promise<boolean> => {
+  if (!isSupabaseConfigured() || !supabase) return false;
+
+  try {
+    const { error } = await supabase
+      .from('exam_results')
+      .delete()
+      .eq('id', examId);
+
+    if (error) {
+      console.error(`Failed to delete exam result ${examId}:`, error);
+      return false;
+    }
+
+    // Update local storage
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('obhyash_exam_history');
+      if (stored) {
+        const history: ExamResult[] = JSON.parse(stored);
+        const updated = history.filter((r) => r.id !== examId);
+        localStorage.setItem('obhyash_exam_history', JSON.stringify(updated));
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error(`Error deleting exam result ${examId}:`, error);
+    return false;
+  }
+};

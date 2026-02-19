@@ -447,9 +447,16 @@ export default function StudentRoot({
             <ExamHistoryView
               history={examHistory}
               onBack={() => setActiveTab('dashboard')}
-              onClearHistory={() => {
-                setExamHistory([]);
-                localStorage.removeItem('obhyash_exam_history');
+              onClearHistory={async () => {
+                const { clearExamHistory } =
+                  await import('@/services/database');
+                const success = await clearExamHistory();
+                if (success) {
+                  setExamHistory([]);
+                  toast.success('ইতিহাস মুছে ফেলা হয়েছে');
+                } else {
+                  toast.error('ইতিহাস মুছতে সমস্যা হয়েছে');
+                }
               }}
               onViewResult={(res) => {
                 setQuestions(res.questions || []);
