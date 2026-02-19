@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Question, UserAnswers, UserProfile } from '@/lib/types';
 
 import { useCountUp } from '@/hooks/use-count-up';
@@ -13,14 +13,19 @@ interface ResultViewProps {
   onRestart: () => void; // Used as "Back" in history mode
   isDarkMode: boolean;
   onToggleTheme: () => void;
-  isHistoryMode?: boolean; // New prop to indicate if we are reviewing past history
+  isHistoryMode?: boolean;
   negativeMarking?: number;
   onDownloadQuestionPaper?: () => void;
   onDownloadResultWithExplanations?: () => void;
   submissionType?: 'digital' | 'script';
   onChallengeEvaluation?: () => void;
+  /** @deprecated use bookmarkedIds instead */
   initialBookmarks?: Set<number | string>;
   currentUser?: UserProfile | null;
+  /** DB-synced bookmark set from useBookmarks hook */
+  bookmarkedIds?: Set<string>;
+  /** Toggle a bookmark via useBookmarks hook */
+  onToggleBookmark?: (questionId: string | number) => void;
 }
 
 const ResultView: React.FC<ResultViewProps> = ({
@@ -36,76 +41,15 @@ const ResultView: React.FC<ResultViewProps> = ({
   onDownloadResultWithExplanations,
   submissionType,
   onChallengeEvaluation,
-  initialBookmarks,
   currentUser,
+  bookmarkedIds,
+  onToggleBookmark,
 }) => {
-  // Local state for bookmarks in result view
-  const [bookmarked, setBookmarked] = useState<Set<number | string>>(
-    initialBookmarks || new Set(),
-  );
-
   // State for Report Modal
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportingQuestionId, setReportingQuestionId] = useState<
     number | string | null
   >(null);
-
-  // Fetch Bookmarks from DB on mount
-  useEffect(() => {
-    const fetchBookmarks = async () => {
-      if (currentUser?.id) {
-        const { getUserBookmarks } =
-          await import('@/services/bookmark-service');
-        const dbBookmarks = await getUserBookmarks(currentUser.id);
-        // Merge with initial (flagged) if any, or just use DB
-        setBookmarked((prev) => {
-          const newSet = new Set(prev);
-          dbBookmarks.forEach((id) => newSet.add(id));
-          return newSet;
-        });
-      }
-    };
-    fetchBookmarks();
-  }, [currentUser?.id]);
-
-  const toggleBookmark = async (id: number | string) => {
-    // Optimistic Update
-    const isCurrentlyBookmarked = bookmarked.has(id);
-    setBookmarked((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) newSet.delete(id);
-      else newSet.add(id);
-      return newSet;
-    });
-
-    // DB Update
-    if (currentUser?.id) {
-      try {
-        const { toggleBookmark: toggleDbBookmark } =
-          await import('@/services/bookmark-service');
-        await toggleDbBookmark(currentUser.id, id, isCurrentlyBookmarked);
-        import('sonner').then(({ toast }) => {
-          toast.success(
-            isCurrentlyBookmarked
-              ? 'বুকমার্ক রিমুভ করা হয়েছে'
-              : 'বুকমার্ক সেভ করা হয়েছে',
-          );
-        });
-      } catch (error) {
-        console.error('Failed to toggle bookmark:', error);
-        import('sonner').then(({ toast }) => {
-          toast.error('বুকমার্ক আপডেট করতে সমস্যা হয়েছে');
-        });
-        // Revert on error
-        setBookmarked((prev) => {
-          const newSet = new Set(prev);
-          if (isCurrentlyBookmarked) newSet.add(id);
-          else newSet.delete(id);
-          return newSet;
-        });
-      }
-    }
-  };
 
   const openReportModal = (id: number | string) => {
     setReportingQuestionId(id);
@@ -542,13 +486,20 @@ const ResultView: React.FC<ResultViewProps> = ({
                 question={q}
                 serialNumber={idx + 1}
                 selectedOptionIndex={userAnswers[q.id]}
-                isFlagged={bookmarked.has(questionId)}
+                isFlagged={false}
                 onSelectOption={() => {}} // Read-only
-                onToggleFlag={() => toggleBookmark(questionId)}
+                onToggleFlag={() => {}}
                 onReport={() => openReportModal(questionId)}
                 readOnly={true}
                 showFeedback={true}
-                // showAnswer={true} // showFeedback implies showing answers/correctness
+                isBookmarked={
+                  bookmarkedIds ? bookmarkedIds.has(String(questionId)) : false
+                }
+                onToggleBookmark={
+                  onToggleBookmark
+                    ? () => onToggleBookmark(questionId)
+                    : undefined
+                }
               />
             );
           })}

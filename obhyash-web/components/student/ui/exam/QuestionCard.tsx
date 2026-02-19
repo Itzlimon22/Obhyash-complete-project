@@ -8,6 +8,7 @@ interface QuestionCardProps {
   question: Question;
   serialNumber?: number;
   selectedOptionIndex: number | undefined;
+  /** Exam review flag — marks a question for review during the exam. Local only. */
   isFlagged: boolean;
   onSelectOption: (optionIndex: number) => void;
   onToggleFlag: () => void;
@@ -17,6 +18,9 @@ interface QuestionCardProps {
   showFeedback?: boolean;
   readOnly?: boolean;
   showAnswer?: boolean;
+  /** DB-synced bookmark state — persists across sessions */
+  isBookmarked?: boolean;
+  onToggleBookmark?: () => void;
 }
 
 const BANGLA_INDICES = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ'];
@@ -33,6 +37,8 @@ export default function QuestionCard({
   showFeedback = false,
   readOnly = false,
   showAnswer = false,
+  isBookmarked = false,
+  onToggleBookmark,
 }: QuestionCardProps) {
   const isAnswered = selectedOptionIndex !== undefined;
 
@@ -115,16 +121,17 @@ export default function QuestionCard({
             whileTap={{ scale: 0.8 }}
             whileHover={{ scale: 1.1 }}
             animate={{
-              scale: isFlagged ? 1.1 : 1,
-              color: isFlagged ? '#f59e0b' : '#d4d4d4', // amber-500 : neutral-300
+              scale: isBookmarked ? 1.1 : 1,
+              color: isBookmarked ? '#f59e0b' : '#d4d4d4',
             }}
-            onClick={onToggleFlag}
+            onClick={onToggleBookmark}
+            disabled={!onToggleBookmark}
             className={`p-2 rounded-full transition-colors ${
-              isFlagged
+              isBookmarked
                 ? 'bg-amber-50 dark:bg-amber-900/20'
                 : 'hover:text-neutral-500 dark:text-neutral-600 dark:hover:text-neutral-400'
-            }`}
-            title={isFlagged ? 'Remove Bookmark' : 'Bookmark'}
+            } ${!onToggleBookmark ? 'opacity-30 cursor-default' : ''}`}
+            title={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করুন'}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

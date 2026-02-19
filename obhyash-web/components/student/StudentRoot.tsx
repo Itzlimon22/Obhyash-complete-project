@@ -14,6 +14,7 @@ import { createClient } from '@/utils/supabase/client';
 
 // Hooks
 import { useExamEngine } from '@/hooks/use-exam-engine';
+import { useBookmarks } from '@/hooks/use-bookmarks';
 
 // Components - Layout & Common
 import AppLayout from '@/components/student/ui/layout/AppLayout';
@@ -180,6 +181,13 @@ export default function StudentRoot({
 
   // Pending Config for Pre-Fetch Instructions
   const [pendingConfig, setPendingConfig] = useState<ExamConfig | null>(null);
+
+  // ── Centralised bookmark state (decoupled from exam flags) ─────────────────
+  const {
+    bookmarkedIds,
+    isBookmarked,
+    toggle: toggleBookmark,
+  } = useBookmarks(currentUser?.id);
 
   // Streak Celebration State
   const [showStreakCelebration, setShowStreakCelebration] = useState(false);
@@ -478,6 +486,8 @@ export default function StudentRoot({
                 setAppState(AppState.COMPLETED);
               }}
               onRecheckRequest={(id) => alert('Recheck requested for: ' + id)}
+              bookmarkedIds={bookmarkedIds}
+              onToggleBookmark={toggleBookmark}
             />
           </AppLayout>
         );
@@ -720,6 +730,8 @@ export default function StudentRoot({
             handleLogoutClick={handleLogoutClick}
             toggleTheme={toggleTheme}
             isDarkMode={theme === 'dark'}
+            bookmarkedIds={bookmarkedIds}
+            onToggleBookmark={toggleBookmark}
           />
           {isTimeoutModalOpen && (
             <TimeoutModal
@@ -786,6 +798,8 @@ export default function StudentRoot({
               printResultWithExplanations(examDetails, questions, userAnswers)
             }
             currentUser={currentUser}
+            bookmarkedIds={bookmarkedIds}
+            onToggleBookmark={toggleBookmark}
           />
         </AppLayout>
       );

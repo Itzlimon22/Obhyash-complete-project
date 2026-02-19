@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
 import AppLayout from '@/components/student/ui/layout/AppLayout';
 import ExamHeader from '@/components/student/ui/ExamHeader';
@@ -93,6 +93,10 @@ interface ExamRunnerProps {
   toggleTheme: () => void;
   /** Current theme state */
   isDarkMode: boolean;
+  /** Set of bookmarked question IDs (from useBookmarks hook — separate from exam flags) */
+  bookmarkedIds: Set<string>;
+  /** Toggle a bookmark in the DB and update state */
+  onToggleBookmark: (questionId: string | number) => void;
 }
 
 const ExamRunner: React.FC<ExamRunnerProps> = ({
@@ -120,6 +124,8 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
   handleLogoutClick,
   toggleTheme,
   isDarkMode,
+  bookmarkedIds,
+  onToggleBookmark,
 }) => {
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -127,29 +133,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
     isOpen: boolean;
     questionId: number | string | null;
   }>({ isOpen: false, questionId: null });
-  // Fetch initial bookmarks
-  React.useEffect(() => {
-    const fetchBookmarks = async () => {
-      if (currentUser?.id) {
-        import('@/services/bookmark-service').then(
-          async ({ getUserBookmarks }) => {
-            const bookmarks = await getUserBookmarks(currentUser.id);
-            setFlaggedQuestions((prev) => {
-              const newSet = new Set(prev);
-              bookmarks.forEach((id) => {
-                // Only add if the question is in the current exam. ID match is now direct.
-                if (questions.some((q) => q.id == id)) {
-                  newSet.add(id);
-                }
-              });
-              return newSet;
-            });
-          },
-        );
-      }
-    };
-    fetchBookmarks();
-  }, [currentUser?.id, questions]);
+  // (bookmark fetching has been moved to the useBookmarks hook in StudentRoot)
 
   // ... (Handlers) ...
   const handleSubmitRequest = () => {
@@ -228,36 +212,16 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                     setUserAnswers((prev) => ({ ...prev, [q.id]: optIdx }))
                   }
                   onToggleFlag={() => {
-                    const isFlagged = flaggedQuestions.has(questionId);
-                    // Local Update
+                    // Toggles the EXAM FLAG (mark for review) -- separate from bookmarks
                     setFlaggedQuestions((prev) => {
                       const next = new Set(prev);
                       if (next.has(questionId)) next.delete(questionId);
                       else next.add(questionId);
                       return next;
                     });
-
-                    // Database Update (Fire and forget)
-                    if (currentUser?.id) {
-                      import('@/services/bookmark-service').then(
-                        ({ toggleBookmark }) => {
-                          toggleBookmark(currentUser.id, questionId, isFlagged)
-                            .then(() => {
-                              import('sonner').then(({ toast }) => {
-                                toast.success(
-                                  isFlagged
-                                    ? 'বুকমার্ক রিমুভ করা হয়েছে'
-                                    : 'বুকমার্ক সেভ করা হয়েছে',
-                                );
-                              });
-                            })
-                            .catch((err) =>
-                              console.error('Bookmark sync failed', err),
-                            );
-                        },
-                      );
-                    }
                   }}
+                  isBookmarked={bookmarkedIds.has(String(questionId))}
+                  onToggleBookmark={() => onToggleBookmark(questionId)}
                   onReport={() =>
                     setReportModalState({
                       isOpen: true,

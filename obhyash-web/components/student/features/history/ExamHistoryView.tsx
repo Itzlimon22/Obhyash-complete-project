@@ -10,6 +10,10 @@ interface ExamHistoryViewProps {
   onClearHistory: () => Promise<void> | void;
   onViewResult: (result: ExamResult) => void;
   onRecheckRequest: (id: string) => void;
+  /** DB-synced bookmark set from useBookmarks hook */
+  bookmarkedIds?: Set<string>;
+  /** Toggle a bookmark via useBookmarks hook */
+  onToggleBookmark?: (questionId: string | number) => void;
 }
 
 // Helper component for Practicable Question Item
