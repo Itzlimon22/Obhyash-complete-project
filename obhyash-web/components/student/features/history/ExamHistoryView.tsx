@@ -115,6 +115,8 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   onClearHistory,
   onViewResult,
   onRecheckRequest,
+  bookmarkedIds,
+  onToggleBookmark,
 }) => {
   const [activeTab, setActiveTab] = useState<'marked' | 'mistakes' | 'exams'>(
     'exams',
@@ -212,6 +214,8 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   const hasMoreMistakes = visibleCount < mistakes.length;
 
   // -- BOOKMARKED TAB LOGIC --
+  // Uses DB-synced bookmarkedIds (from useBookmarks hook) when available,
+  // otherwise falls back to exam.flaggedQuestions stored in history records.
   const bookmarks = useMemo(() => {
     const allBookmarks: {
       question: Question;
@@ -220,21 +224,25 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       userAns: number | undefined;
       flagged: boolean;
     }[] = [];
+
+    // Deduplicate by question id (a question may appear in multiple exams)
+    const seenIds = new Set<string | number>();
+
     history.forEach((exam) => {
       if (filterSubject && exam.subject !== filterSubject) return;
       if (filterDate && !exam.date.startsWith(filterDate)) return;
-
-      if (
-        !exam.questions ||
-        !exam.flaggedQuestions ||
-        exam.flaggedQuestions.length === 0
-      )
-        return;
-
-      const flags = new Set(exam.flaggedQuestions);
+      if (!exam.questions) return;
 
       exam.questions.forEach((q) => {
-        if (flags.has(q.id)) {
+        if (seenIds.has(q.id)) return;
+
+        // Prefer DB bookmark set; fall back to per-exam flaggedQuestions
+        const isMarked = bookmarkedIds
+          ? bookmarkedIds.has(String(q.id))
+          : !!(exam.flaggedQuestions && exam.flaggedQuestions.includes(q.id));
+
+        if (isMarked) {
+          seenIds.add(q.id);
           allBookmarks.push({
             question: q,
             examDate: exam.date,
@@ -246,7 +254,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       });
     });
     return allBookmarks.reverse();
-  }, [history, filterSubject, filterDate]);
+  }, [history, filterSubject, filterDate, bookmarkedIds]);
 
   const displayedBookmarks = bookmarks.slice(0, visibleCount);
   const hasMoreBookmarks = visibleCount < bookmarks.length;
