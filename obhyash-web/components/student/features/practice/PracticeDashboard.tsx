@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,14 +13,13 @@ import PracticeSummary from './PracticeSummary';
 
 interface PracticeDashboardProps {
   history: ExamResult[];
-  onStartPractice: (questions: Question[], details: ExamDetails) => void;
+  onStartPractice: (questions: Question[], details: ExamDetails) => void; // kept for compatibility
   onNavigateToMock: () => void;
   subjects?: any[];
   currentUser?: UserProfile | null;
 }
 
 type Tab = 'mistakes' | 'bookmarks';
-type PracticeMode = 'flashcard' | 'exam';
 type ViewState = 'list' | 'flashcard' | 'summary';
 
 // ─── Spaced Repetition Helpers ─────────────────────────────────────────────
@@ -64,7 +63,6 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   );
   const [subjectFilter, setSubjectFilter] = useState<string>('all');
   const [shuffle, setShuffle] = useState(false);
-  const [modePickerOpen, setModePickerOpen] = useState(false);
   const [viewState, setViewState] = useState<ViewState>('list');
   const [flashcardQuestions, setFlashcardQuestions] = useState<Question[]>([]);
   const [flashcardResults, setFlashcardResults] = useState<FlashcardResult[]>(
@@ -252,25 +250,13 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     return qs;
   };
 
-  const handleLaunch = (mode: PracticeMode) => {
+  const handleLaunch = () => {
     const qs = getSelectedQuestions();
     if (qs.length === 0) return;
-    setModePickerOpen(false);
     markReviewed(qs.map((q) => q.id));
     setReviewedMap(getLastReviewedMap());
-
-    if (mode === 'flashcard') {
-      setFlashcardQuestions(qs);
-      setViewState('flashcard');
-    } else {
-      onStartPractice(
-        qs,
-        buildDetails(
-          qs,
-          activeTab === 'mistakes' ? 'Mistakes Review' : 'Bookmarks Review',
-        ),
-      );
-    }
+    setFlashcardQuestions(qs);
+    setViewState('flashcard');
   };
 
   const handleFlashcardComplete = (results: FlashcardResult[]) => {
@@ -359,13 +345,13 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       </div>
 
       {/* ── Tabs ── */}
-      <div className="flex bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl w-fit">
+      <div className="flex bg-neutral-100 dark:bg-neutral-900 p-1 rounded-xl w-fit border border-neutral-200 dark:border-neutral-800">
         <button
           onClick={() => setActiveTab('mistakes')}
           className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
             activeTab === 'mistakes'
-              ? 'bg-white dark:bg-neutral-700 text-rose-600 shadow-sm'
-              : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700'
+              ? 'bg-white dark:bg-neutral-800 text-emerald-700 dark:text-emerald-400 shadow-sm'
+              : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
           }`}
         >
           ভুল সমূহ ({mistakes.length})
@@ -374,8 +360,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
           onClick={() => setActiveTab('bookmarks')}
           className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
             activeTab === 'bookmarks'
-              ? 'bg-white dark:bg-neutral-700 text-rose-600 shadow-sm'
-              : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700'
+              ? 'bg-white dark:bg-neutral-800 text-emerald-700 dark:text-emerald-400 shadow-sm'
+              : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
           }`}
         >
           বুকমার্ক ({globalBookmarks.length})
@@ -482,76 +468,18 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                 </button>
               </div>
 
-              {/* Start practice button */}
-              <div className="relative">
-                <button
-                  onClick={() =>
-                    currentSelection.size > 0 && setModePickerOpen((o) => !o)
-                  }
-                  disabled={currentSelection.size === 0}
-                  className={`px-5 py-2 rounded-lg text-sm font-bold transition-all transform active:scale-95 ${
-                    currentSelection.size > 0
-                      ? 'bg-rose-600 text-white shadow-md shadow-rose-600/20 hover:bg-rose-700'
-                      : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'
-                  }`}
-                >
-                  অনুশীলন শুরু করুন ▾
-                </button>
-
-                {/* Mode picker dropdown */}
-                <AnimatePresence>
-                  {modePickerOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -6, scale: 0.96 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -6, scale: 0.96 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-xl z-50 overflow-hidden"
-                    >
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 px-4 pt-3 pb-1">
-                        মোড বেছে নিন
-                      </p>
-                      <button
-                        onClick={() => handleLaunch('flashcard')}
-                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors text-left"
-                      >
-                        <span className="text-2xl">📇</span>
-                        <div>
-                          <div className="text-sm font-bold text-neutral-900 dark:text-white">
-                            ফ্ল্যাশকার্ড
-                          </div>
-                          <div className="text-xs text-neutral-500">
-                            এক এক করে, নিজে নিজে যাচাই
-                          </div>
-                        </div>
-                      </button>
-                      <div className="h-px bg-neutral-100 dark:bg-neutral-700" />
-                      <button
-                        onClick={() => handleLaunch('exam')}
-                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors text-left"
-                      >
-                        <span className="text-2xl">📝</span>
-                        <div>
-                          <div className="text-sm font-bold text-neutral-900 dark:text-white">
-                            পরীক্ষা মোড
-                          </div>
-                          <div className="text-xs text-neutral-500">
-                            সময় ধরে পরীক্ষার মতো
-                          </div>
-                        </div>
-                      </button>
-                      <div className="p-2">
-                        <button
-                          onClick={() => setModePickerOpen(false)}
-                          className="w-full text-xs text-neutral-400 hover:text-neutral-600 transition-colors py-1"
-                        >
-                          বাতিল
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              {/* Start practice button — flashcard only */}
+              <button
+                onClick={handleLaunch}
+                disabled={currentSelection.size === 0}
+                className={`px-5 py-2 rounded-lg text-sm font-bold transition-all transform active:scale-95 ${
+                  currentSelection.size > 0
+                    ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20 hover:bg-emerald-800'
+                    : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'
+                }`}
+              >
+                📇 ফ্ল্যাশকার্ড শুরু করুন
+              </button>
             </div>
 
             {/* Question list */}
