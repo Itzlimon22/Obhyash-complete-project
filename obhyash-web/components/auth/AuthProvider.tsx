@@ -52,8 +52,37 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         return null;
       }
 
-      const userProfile = data as UserProfile;
-      // Cache profile
+      if (!data) return null;
+
+      // Explicitly map snake_case DB columns → camelCase UserProfile fields
+      // so that streak, examsTaken, etc. are always correct throughout the app.
+      const userProfile: UserProfile = {
+        ...data,
+        // Streak
+        streakCount: data.streak || data.streak_count || 0,
+        lastStreakDate: data.last_streak_date ?? null,
+        // Stats
+        examsTaken: data.exams_taken || 0,
+        enrolledExams: data.enrolled_exams || 0,
+        // Avatar
+        avatarUrl: data.avatar_url ?? data.avatarUrl,
+        avatarColor: data.avatar_color ?? data.avatarColor ?? 'bg-slate-500',
+        // Timestamps
+        createdAt: data.created_at,
+        // Defaults
+        xp: data.xp || 0,
+        level: data.level || 'Beginner',
+        role: data.role || 'Student',
+        status: data.status || 'Active',
+        subscription: data.subscription || {
+          plan: 'Free',
+          status: 'Active',
+          expiry: '',
+        },
+        recentExams: data.recentExams || [],
+      };
+
+      // Cache the correctly-mapped profile in local storage
       localStorage.setItem('obhyash_user_profile', JSON.stringify(userProfile));
       return userProfile;
     } catch (error) {
