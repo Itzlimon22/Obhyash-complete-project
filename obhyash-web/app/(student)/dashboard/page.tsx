@@ -24,38 +24,57 @@ export default async function DashboardPage() {
   // SAFEST: Fetch raw data here or ensure service is server-safe.
   // Given we refactored code, let's just fetch raw profile here to be safe and pass to Client Component.
 
-  const { data: profile } = await supabase
+  const { data: dbProfile } = await supabase
     .from('users')
     .select('*')
     .eq('id', user.id)
     .single();
 
-  if (!profile) {
-    if (!user) {
-      return redirect('/login');
-    }
+  if (!dbProfile && !user) {
+    return redirect('/login');
   }
 
   // Fetch Subjects for History & OMR
   const { data: subjectsData } = await supabase.from('subjects').select('*');
   const subjects = subjectsData || [];
 
-  // Safe fallback if user exists in auth but not DB (shouldn't happen often)
-  // But if it does, we can construct a basic profile from Auth data or wait for trigger
-  const userProfile = profile || {
-    id: user.id,
-    email: user.email,
-    name: user.user_metadata?.full_name || 'Student',
-    role: 'Student',
-    status: 'Active',
-    // ... defaults
-    xp: 0,
-    level: 'Beginner',
-    examsTaken: 0,
-    enrolledExams: 0,
-    subscription: { plan: 'Free', status: 'Active', expiry: '' },
-    recentExams: [],
-  };
+  // Map DB snake_case fields to application camelCase UserProfile interface
+  const userProfile = dbProfile
+    ? {
+        ...dbProfile,
+        // Explicitly map mismatched fields
+        streakCount: dbProfile.streak || dbProfile.streak_count || 0,
+        lastStreakDate: dbProfile.last_streak_date,
+        examsTaken: dbProfile.exams_taken || 0,
+        enrolledExams: dbProfile.enrolled_exams || 0,
+        avatarUrl: dbProfile.avatar_url,
+        avatarColor: dbProfile.avatar_color,
+        createdAt: dbProfile.created_at,
+        // Ensure strictly typed fields exist
+        role: dbProfile.role || 'Student',
+        status: dbProfile.status || 'Active',
+        xp: dbProfile.xp || 0,
+        level: dbProfile.level || 'Beginner',
+        subscription: dbProfile.subscription || {
+          plan: 'Free',
+          status: 'Active',
+          expiry: '',
+        },
+        recentExams: [], // Loaded separately via client-side calls if needed
+      }
+    : {
+        id: user.id,
+        email: user.email,
+        name: user.user_metadata?.full_name || 'Student',
+        role: 'Student',
+        status: 'Active',
+        xp: 0,
+        level: 'Beginner',
+        examsTaken: 0,
+        enrolledExams: 0,
+        subscription: { plan: 'Free', status: 'Active', expiry: '' },
+        recentExams: [],
+      };
 
   return <DashboardClient user={userProfile} subjects={subjects} />;
 }
