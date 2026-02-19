@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface DeleteConfirmModalProps {
@@ -22,58 +23,62 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   confirmLabel = 'মুছে ফেলুন',
   isLoading = false,
 }) => {
-  return (
+  // Lock body scroll while open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  // Only run on client (portal requirement)
+  if (typeof document === 'undefined') return null;
+
+  const modal = (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop — deep dark with subtle chromatic noise */}
+          {/* ── Full-screen backdrop (rendered in <body>, covers everything) ── */}
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.22 }}
-            className="fixed inset-0 z-[200]"
-            style={{ background: 'rgba(5, 5, 10, 0.72)' }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[9998] backdrop-blur-md
+                       bg-white/30 dark:bg-black/50"
             onClick={onClose}
           />
 
-          {/* Centering wrapper */}
-          <div className="fixed inset-0 z-[201] flex items-center justify-center p-4 pointer-events-none">
+          {/* ── Dialog card ── */}
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
             <motion.div
               key="panel"
-              initial={{ scale: 0.88, opacity: 0, y: 24 }}
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.88, opacity: 0, y: 24 }}
-              transition={{ type: 'spring', stiffness: 420, damping: 30 }}
-              className="pointer-events-auto relative w-full max-w-[360px] overflow-hidden"
-              style={{
-                borderRadius: '20px',
-                background: 'linear-gradient(160deg, #1c1c24 0%, #141418 100%)',
-                boxShadow:
-                  '0 32px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.07)',
-              }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className="pointer-events-auto relative w-full max-w-[360px] rounded-2xl overflow-hidden
+                         bg-white dark:bg-neutral-900
+                         border border-neutral-200 dark:border-neutral-700/60
+                         shadow-2xl shadow-black/10 dark:shadow-black/50"
+              onClick={(e) => e.stopPropagation()}
             >
-              {/* Decorative glow */}
-              <div
-                className="pointer-events-none absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full opacity-25"
-                style={{
-                  background:
-                    'radial-gradient(circle, rgba(239,68,68,0.6) 0%, transparent 70%)',
-                  filter: 'blur(24px)',
-                }}
-              />
+              {/* Top accent strip */}
+              <div className="h-1 w-full bg-gradient-to-r from-red-500 via-rose-500 to-red-600" />
 
-              <div className="relative px-7 pt-8 pb-7">
+              <div className="px-6 pt-6 pb-6">
                 {/* Icon */}
                 <div
-                  className="mx-auto mb-5 flex items-center justify-center w-[60px] h-[60px] rounded-[18px]"
-                  style={{
-                    background:
-                      'linear-gradient(135deg, rgba(239,68,68,0.18) 0%, rgba(185,28,28,0.12) 100%)',
-                    border: '1px solid rgba(239,68,68,0.25)',
-                    boxShadow: '0 4px 20px rgba(239,68,68,0.15)',
-                  }}
+                  className="mx-auto mb-4 flex items-center justify-center
+                                w-14 h-14 rounded-2xl
+                                bg-red-50 dark:bg-red-900/20
+                                border border-red-100 dark:border-red-800/30
+                                text-red-500 dark:text-red-400"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -81,7 +86,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
                     viewBox="0 0 24 24"
                     strokeWidth={1.8}
                     stroke="currentColor"
-                    className="w-7 h-7 text-red-400"
+                    className="w-7 h-7"
                   >
                     <path
                       strokeLinecap="round"
@@ -93,69 +98,50 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
 
                 {/* Title */}
                 <h3
-                  className="text-center text-[1.15rem] font-bold tracking-tight mb-2"
-                  style={{ color: '#f1f1f4' }}
+                  className="text-center text-[1.1rem] font-bold tracking-tight
+                               text-neutral-900 dark:text-white mb-1.5"
                 >
                   {title}
                 </h3>
 
                 {/* Description */}
                 <p
-                  className="text-center text-sm leading-relaxed mb-7"
-                  style={{ color: '#8b8ba8' }}
+                  className="text-center text-sm leading-relaxed
+                              text-neutral-500 dark:text-neutral-400 mb-6"
                 >
                   {description}
                 </p>
 
                 {/* Divider */}
-                <div
-                  className="mb-5 h-px w-full"
-                  style={{ background: 'rgba(255,255,255,0.06)' }}
-                />
+                <div className="mb-5 h-px bg-neutral-100 dark:bg-neutral-800" />
 
-                {/* Buttons */}
+                {/* Action buttons */}
                 <div className="flex gap-3">
+                  {/* Cancel */}
                   <button
                     onClick={onClose}
                     disabled={isLoading}
-                    className="flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold transition-all disabled:opacity-40"
-                    style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.09)',
-                      color: '#a0a0b8',
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.background =
-                        'rgba(255,255,255,0.09)')
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.background =
-                        'rgba(255,255,255,0.05)')
-                    }
+                    className="flex-1 py-2.5 rounded-xl text-sm font-semibold
+                               border border-neutral-200 dark:border-neutral-700
+                               text-neutral-700 dark:text-neutral-300
+                               bg-neutral-50 dark:bg-neutral-800
+                               hover:bg-neutral-100 dark:hover:bg-neutral-700
+                               transition-colors disabled:opacity-50"
                   >
                     বাতিল
                   </button>
 
+                  {/* Confirm / Delete */}
                   <button
                     onClick={onConfirm}
                     disabled={isLoading}
-                    className="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-60 flex items-center justify-center gap-2"
-                    style={{
-                      background:
-                        'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
-                      boxShadow: '0 4px 16px rgba(239,68,68,0.35)',
-                      border: '1px solid rgba(239,68,68,0.3)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow =
-                        '0 6px 22px rgba(239,68,68,0.55)';
-                      e.currentTarget.style.transform = 'translateY(-1px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow =
-                        '0 4px 16px rgba(239,68,68,0.35)';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                    }}
+                    className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white
+                               bg-gradient-to-br from-red-500 to-red-700
+                               hover:from-red-600 hover:to-red-800
+                               shadow-md shadow-red-200 dark:shadow-red-900/30
+                               hover:shadow-lg hover:shadow-red-200 dark:hover:shadow-red-900/40
+                               hover:-translate-y-px
+                               transition-all disabled:opacity-60 flex items-center justify-center gap-2"
                   >
                     {isLoading ? (
                       <svg
@@ -183,7 +169,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
-                        strokeWidth={2}
+                        strokeWidth={2.2}
                         stroke="currentColor"
                         className="w-4 h-4"
                       >
@@ -204,6 +190,9 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
       )}
     </AnimatePresence>
   );
+
+  // Portal renders directly into <body> — escapes all layout stacking contexts
+  return createPortal(modal, document.body);
 };
 
 export default DeleteConfirmModal;
