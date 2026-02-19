@@ -8,7 +8,6 @@ import { Question } from '@/lib/types';
 interface PracticeSummaryProps {
   results: FlashcardResult[];
   mode: 'flashcard' | 'exam';
-  /** For exam mode: pass the questions that were practiced */
   practicedQuestions?: Question[];
   onPracticeStruggling: (questions: Question[]) => void;
   onBack: () => void;
@@ -16,7 +15,6 @@ interface PracticeSummaryProps {
 
 export const PracticeSummary: React.FC<PracticeSummaryProps> = ({
   results,
-  mode,
   onPracticeStruggling,
   onBack,
 }) => {
@@ -45,19 +43,15 @@ export const PracticeSummary: React.FC<PracticeSummaryProps> = ({
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.08 },
-    },
+    visible: { opacity: 1, transition: { staggerChildren: 0.07 } },
   };
-
   const itemVariants = {
-    hidden: { opacity: 0, y: 16 },
+    hidden: { opacity: 0, y: 14 },
     visible: { opacity: 1, y: 0 },
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-neutral-100 dark:bg-neutral-950 flex items-center justify-center p-6">
       <motion.div
         className="w-full max-w-md"
         variants={containerVariants}
@@ -67,8 +61,12 @@ export const PracticeSummary: React.FC<PracticeSummaryProps> = ({
         {/* Header */}
         <motion.div variants={itemVariants} className="text-center mb-8">
           <div className="text-5xl mb-3">{feedbackEmoji}</div>
-          <h2 className="text-2xl font-bold text-white mb-1">অনুশীলন শেষ!</h2>
-          <p className="text-neutral-400 text-sm">{feedbackText}</p>
+          <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-1">
+            অনুশীলন শেষ!
+          </h2>
+          <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+            {feedbackText}
+          </p>
         </motion.div>
 
         {/* Score ring */}
@@ -85,14 +83,14 @@ export const PracticeSummary: React.FC<PracticeSummaryProps> = ({
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="10"
-                className="text-neutral-800"
+                className="text-neutral-200 dark:text-neutral-800"
               />
               <motion.circle
                 cx="60"
                 cy="60"
                 r="54"
                 fill="none"
-                stroke="url(#scoreGradient)"
+                stroke="url(#scoreGrad)"
                 strokeWidth="10"
                 strokeLinecap="round"
                 strokeDasharray={circumference}
@@ -105,22 +103,24 @@ export const PracticeSummary: React.FC<PracticeSummaryProps> = ({
               />
               <defs>
                 <linearGradient
-                  id="scoreGradient"
+                  id="scoreGrad"
                   x1="0%"
                   y1="0%"
                   x2="100%"
                   y2="0%"
                 >
-                  <stop offset="0%" stopColor="#10b981" />
-                  <stop offset="100%" stopColor="#34d399" />
+                  <stop offset="0%" stopColor="#15803d" />
+                  <stop offset="100%" stopColor="#22c55e" />
                 </linearGradient>
               </defs>
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-3xl font-bold text-white">
+              <span className="text-3xl font-bold text-neutral-900 dark:text-white">
                 {percentage}%
               </span>
-              <span className="text-xs text-neutral-400">পারলাম</span>
+              <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                পারলাম
+              </span>
             </div>
           </div>
         </motion.div>
@@ -131,26 +131,32 @@ export const PracticeSummary: React.FC<PracticeSummaryProps> = ({
           className="grid grid-cols-3 gap-3 mb-6"
         >
           {[
-            { label: 'মোট', value: total, color: 'text-white' },
+            {
+              label: 'মোট',
+              value: total,
+              color: 'text-neutral-900 dark:text-white',
+            },
             {
               label: 'পারলাম',
               value: gotItCount,
-              color: 'text-emerald-400',
+              color: 'text-emerald-700 dark:text-emerald-400',
             },
             {
               label: 'কঠিন',
               value: strugglingCount,
-              color: 'text-rose-400',
+              color: 'text-red-600 dark:text-red-400',
             },
           ].map(({ label, value, color }) => (
             <div
               key={label}
-              className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 text-center"
+              className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 text-center shadow-sm"
             >
               <div className={`text-2xl font-bold ${color} mb-0.5`}>
                 {value}
               </div>
-              <div className="text-xs text-neutral-500">{label}</div>
+              <div className="text-xs text-neutral-500 dark:text-neutral-400">
+                {label}
+              </div>
             </div>
           ))}
         </motion.div>
@@ -159,9 +165,9 @@ export const PracticeSummary: React.FC<PracticeSummaryProps> = ({
         {struggling.length > 0 && (
           <motion.div
             variants={itemVariants}
-            className="bg-rose-950/30 border border-rose-900/40 rounded-xl p-4 mb-6"
+            className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-xl p-4 mb-6"
           >
-            <p className="text-sm font-bold text-rose-400 mb-3 flex items-center gap-2">
+            <p className="text-sm font-bold text-red-600 dark:text-red-400 mb-3 flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
@@ -178,12 +184,15 @@ export const PracticeSummary: React.FC<PracticeSummaryProps> = ({
             </p>
             <div className="space-y-2">
               {struggling.slice(0, 3).map((q, i) => (
-                <p key={q.id} className="text-xs text-rose-300/80 line-clamp-1">
+                <p
+                  key={q.id}
+                  className="text-xs text-red-700 dark:text-red-300/80 line-clamp-1"
+                >
                   {i + 1}. {q.question}
                 </p>
               ))}
               {struggling.length > 3 && (
-                <p className="text-xs text-rose-400/60 italic">
+                <p className="text-xs text-red-500/70 dark:text-red-400/60 italic">
                   এবং আরও {struggling.length - 3}টি...
                 </p>
               )}
@@ -191,12 +200,12 @@ export const PracticeSummary: React.FC<PracticeSummaryProps> = ({
           </motion.div>
         )}
 
-        {/* Action buttons */}
+        {/* Buttons */}
         <motion.div variants={itemVariants} className="space-y-3">
           {struggling.length > 0 && (
             <button
               onClick={() => onPracticeStruggling(struggling)}
-              className="w-full px-6 py-3.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-rose-900/30 active:scale-95 transition-all flex items-center justify-center gap-2"
+              className="w-full px-6 py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -215,7 +224,7 @@ export const PracticeSummary: React.FC<PracticeSummaryProps> = ({
           )}
           <button
             onClick={onBack}
-            className="w-full px-6 py-3.5 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-bold text-sm active:scale-95 transition-all"
+            className="w-full px-6 py-3.5 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-700 rounded-xl font-bold text-sm active:scale-[0.98] transition-all"
           >
             অনুশীলনে ফিরে যান
           </button>
