@@ -32,19 +32,117 @@ const Logo: React.FC<LogoProps> = ({
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Abstract "O" Icon / Pen Nib Symbol */}
+        {/* Document Base */}
         <path
-          d="M30 10C18.9543 10 10 18.9543 10 30C10 41.0457 18.9543 50 30 50C41.0457 50 50 41.0457 50 30C50 18.9543 41.0457 10 30 10Z"
-          fill="white"
-          stroke={accentColor}
-          strokeWidth="4"
-        />
-        <path
-          d="M30 20C24.4772 20 20 24.4772 20 30C20 35.5228 24.4772 40 30 40C35.5228 40 40 35.5228 40 30C40 24.4772 35.5228 20 30 20Z"
+          d="M 14 11 C 14 9.3 15.3 8 17 8 H 36 L 46 18 V 49 C 46 50.7 44.7 52 43 52 H 17 C 15.3 52 14 50.7 14 49 Z"
           fill={accentColor}
+          fillOpacity="0.1"
         />
-        {/* Nib shape overlay */}
-        <path d="M30 40L25 55L30 52L35 55L30 40Z" fill={accentColor} />
+        <path
+          d="M 14 11 C 14 9.3 15.3 8 17 8 H 36 L 46 18 V 49 C 46 50.7 44.7 52 43 52 H 17 C 15.3 52 14 50.7 14 49 Z"
+          stroke={accentColor}
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+
+        {/* Folded Corner Detail */}
+        <path
+          d="M 36 8 V 18 H 46"
+          stroke={accentColor}
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+
+        {/* Horizontal Ruled Lines */}
+        <path
+          d="M 20 24 H 40"
+          stroke={accentColor}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <path
+          d="M 20 31 H 40"
+          stroke={accentColor}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <path
+          d="M 20 38 H 40"
+          stroke={accentColor}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <path
+          d="M 20 45 H 32"
+          stroke={accentColor}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          fill="none"
+        />
+
+        {/* Stylus / Pen */}
+        <g transform="translate(36, 28) rotate(-45)">
+          {/* Drop shadow */}
+          <path
+            d="M -24 -1.5 L -21 -3 L -11 -4 L 20 -4 L 22 -4 C 23.5 -4, 24 -3, 24 -1.5 V 1.5 C 24 3, 23.5 4, 22 4 L 20 4 L -11 4 L -21 3 L -24 1.5 Z"
+            fill="#000000"
+            fillOpacity={colorMode === 'dark' ? 0.3 : 0.15}
+            transform="translate(0, 4)"
+          />
+
+          {/* Pen Base Shapes */}
+          <path
+            d="M -8 -4 L 20 -4 L 20 4 L -8 4 Z"
+            fill={colorMode === 'dark' ? '#f8fafc' : '#e5e7eb'}
+          />
+          <path
+            d="M 20 -4 L 22 -4 C 23.5 -4, 24 -3, 24 -1.5 V 1.5 C 24 3, 23.5 4, 22 4 L 20 4 Z"
+            fill="#9ca3af"
+          />
+          <path
+            d="M -11 -4 L -8 -4 L -8 4 L -11 4 Z"
+            fill={colorMode === 'dark' ? '#d1d5db' : '#9ca3af'}
+          />
+          <path
+            d="M -21 -1.5 L -11 -4 L -11 4 L -21 1.5 Z"
+            fill={colorMode === 'dark' ? '#4b5563' : '#374151'}
+          />
+          <path
+            d="M -24 -0.5 L -21 -1.5 L -21 1.5 L -24 0.5 Z"
+            fill="#9ca3af"
+          />
+
+          {/* 3D Shading Overlay */}
+          <path
+            d="M -24 0 L 24 0 V 1.5 C 24 3, 23.5 4, 22 4 L 20 4 L -11 4 L -21 1.5 L -24 0.5 Z"
+            fill="#000000"
+            fillOpacity="0.2"
+          />
+
+          {/* Highlight Overlay */}
+          <path
+            d="M -22 -1 L 22 -3 V -1 L -22 0 Z"
+            fill="#ffffff"
+            fillOpacity={colorMode === 'dark' ? 0.4 : 0.8}
+          />
+
+          {/* Circular reflection detail */}
+          <ellipse
+            cx="14"
+            cy="-2"
+            rx="2"
+            ry="1"
+            fill="#ffffff"
+            fillOpacity={colorMode === 'dark' ? 0.4 : 0.8}
+          />
+        </g>
 
         {variant === 'full' && (
           <text
