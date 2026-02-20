@@ -634,14 +634,27 @@ const mapDbResultToExamResult = (data: ExamResultDbRow): ExamResult => {
 
 export const getExamHistory = async (): Promise<ExamResult[]> => {
   if (isSupabaseConfigured() && supabase) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      console.warn('getExamHistory: No user found');
+      return [];
+    }
+
     const { data, error } = await supabase
       .from('exam_results')
       .select(
-        'id, user_id, subject, subject_label, exam_type, date, score, total_marks, total_questions, correct_count, wrong_count, time_taken, negative_marking, chapters, status, submission_type',
+        'id, user_id, subject, subject_label, exam_type, date, score, total_marks, total_questions, correct_count, wrong_count, time_taken, negative_marking, chapters, status, submission_type, questions, user_answers',
       )
+      .eq('user_id', user.id)
       .order('date', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('getExamHistory error:', error);
+      throw error;
+    }
     if (data) {
       const results = (data as unknown as ExamResultDbRow[]).map(
         mapDbResultToExamResult,
