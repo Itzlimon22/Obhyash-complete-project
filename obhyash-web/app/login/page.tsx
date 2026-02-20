@@ -65,7 +65,7 @@ export default function LoginPage() {
         router.push('/dashboard');
       }
 
-      // Force a hard refresh to ensure middleware picks up the new cookie
+      // Force a hard refresh to ensure middleware picks up the new cookiee
       router.refresh();
     }
   };
