@@ -93,7 +93,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
 
             <div className="flex-col min-w-0 hidden md:flex">
               <h1 className="text-sm md:text-base font-bold text-neutral-900 dark:text-white truncate">
-                {details.subject}
+                {details.subjectLabel || details.subject}
               </h1>
               {!minimal && (
                 <span className="text-[10px] md:text-xs text-neutral-500 dark:text-neutral-400 truncate">

@@ -13,7 +13,7 @@ export const OmrSheet: React.FC<OmrSheetProps> = ({
   totalQuestions = 50,
 }) => {
   const qrData = JSON.stringify({
-    s: details.subject,
+    s: details.subjectLabel || details.subject,
     t: details.examType,
     m: details.totalMarks,
     q: totalQuestions,
@@ -36,7 +36,7 @@ export const OmrSheet: React.FC<OmrSheetProps> = ({
           <p className="text-[10px] font-bold mt-1 text-neutral-800 uppercase font-mono">
             EXAM:{' '}
             <span className="underline decoration-1 underline-offset-2">
-              {details.subject.substring(0, 25)}
+              {(details.subjectLabel || details.subject).substring(0, 25)}
             </span>{' '}
             &nbsp;|&nbsp; TYPE: {details.examType}
           </p>

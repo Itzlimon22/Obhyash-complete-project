@@ -59,9 +59,9 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
               </div>
               <div
                 className="text-lg md:text-xl font-bold text-neutral-900 dark:text-white truncate"
-                title={details.subject}
+                title={details.subjectLabel || details.subject}
               >
-                {details.subject}
+                {details.subjectLabel || details.subject}
               </div>
             </div>
 

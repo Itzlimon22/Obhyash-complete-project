@@ -251,9 +251,9 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                         {isCorrect ? 'সঠিক' : 'ভুল'}
                       </span>
                     )}
-                    {current.subject && (
+                    {(current.subjectLabel || current.subject) && (
                       <span className="px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-[10px] font-bold">
-                        {current.subject}
+                        {current.subjectLabel || current.subject}
                       </span>
                     )}
                   </div>

@@ -21,6 +21,7 @@ const PracticeRow: React.FC<{
   item: {
     examDate: string;
     subject: string;
+    subjectLabel?: string;
     userAns: number | undefined;
     question: Question;
     flagged: boolean;
@@ -50,7 +51,7 @@ const PracticeRow: React.FC<{
               day: 'numeric',
               month: 'short',
             })}{' '}
-            • {item.subject}
+            • {item.subjectLabel || item.subject}
           </span>
           {revealed && item.userAns !== undefined && isMistakeTab && (
             <span className="text-[10px] text-neutral-400 mt-0.5">
@@ -182,6 +183,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       question: Question;
       examDate: string;
       subject: string;
+      subjectLabel?: string;
       userAns: number;
       flagged: boolean;
     }[] = [];
@@ -201,6 +203,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
             question: q,
             examDate: exam.date,
             subject: exam.subject,
+            subjectLabel: exam.subjectLabel,
             userAns: ua,
             flagged: flags.has(q.id),
           });
@@ -221,6 +224,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       question: Question;
       examDate: string;
       subject: string;
+      subjectLabel?: string;
       userAns: number | undefined;
       flagged: boolean;
     }[] = [];
@@ -247,6 +251,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
             question: q,
             examDate: exam.date,
             subject: exam.subject,
+            subjectLabel: exam.subjectLabel,
             userAns: exam.userAnswers?.[q.id],
             flagged: true,
           });
@@ -583,7 +588,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                             </span>
                           </div>
                           <h3 className="text-base font-bold text-neutral-900 dark:text-white line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                            {item.subject}
+                            {item.subjectLabel || item.subject}
                           </h3>
                           <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mb-3 font-medium">
                             {item.examType || 'Practice Exam'}
