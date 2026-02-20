@@ -24,11 +24,14 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { getUserProfile } from '@/services/database';
+import { UserProfile } from '@/lib/types';
+import UserAvatar from '@/components/student/ui/common/UserAvatar';
 
 export function UserNav() {
   const [email, setEmail] = useState<string>('');
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const router = useRouter();
 
   // ✅ New Client Initialization
@@ -38,13 +41,21 @@ export function UserNav() {
   );
 
   useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) setEmail(user.email || '');
+    const fetchUser = async () => {
+      try {
+        const {
+          data: { user: authUser },
+        } = await supabase.auth.getUser();
+        if (authUser) {
+          setEmail(authUser.email || '');
+          const profile = await getUserProfile(authUser.id);
+          setUserProfile(profile);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+      }
     };
-    getUser();
+    fetchUser();
   }, [supabase]);
 
   const handleLogout = async () => {
@@ -56,12 +67,7 @@ export function UserNav() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10 border border-white/10">
-            <AvatarImage src="/avatars/01.png" alt="@admin" />
-            <AvatarFallback className="bg-[#27272a] text-white">
-              A
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar user={userProfile} size="sm" showBorder />
         </Button>
       </DropdownMenuTrigger>
 
@@ -72,7 +78,9 @@ export function UserNav() {
       >
         <DropdownMenuLabel className="font-normal p-2">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none text-white">Admin</p>
+            <p className="text-sm font-medium leading-none text-white">
+              {userProfile?.name || 'Admin'}
+            </p>
             <p className="text-xs leading-none text-gray-500">
               {email || 'admin@hsc.com'}
             </p>

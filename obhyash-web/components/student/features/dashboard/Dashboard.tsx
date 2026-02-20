@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { ExamResult, UserProfile } from '@/lib/types';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import { DashboardSkeleton } from '@/components/student/ui/common/Skeletons';
+import UserAvatar from '@/components/student/ui/common/UserAvatar';
 
 interface SubjectStats {
   id: string;
@@ -20,6 +21,8 @@ interface LeaderboardUser {
   name: string;
   xp: number;
   avatarColor?: string;
+  avatarUrl?: string;
+  gender?: string;
 }
 
 interface DashboardProps {
@@ -351,11 +354,11 @@ const Dashboard: React.FC<DashboardProps> = ({
               </span>
               {topUser ? (
                 <>
-                  <div
-                    className={`w-7 h-7 rounded-full ${topUser.avatarColor || 'bg-amber-500'} text-white text-[11px] flex items-center justify-center font-bold shadow-sm ring-2 ring-amber-200 dark:ring-amber-800`}
-                  >
-                    {topUser.name?.charAt(0)}
-                  </div>
+                  <UserAvatar
+                    user={topUser as unknown as UserProfile}
+                    size="sm"
+                    className="w-7 h-7 text-[11px] shadow-sm ring-2 ring-amber-200 dark:ring-amber-800"
+                  />
                   <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200 truncate">
                     {topUser.name?.split(' ').slice(0, 2).join(' ')}
                   </span>
@@ -373,11 +376,11 @@ const Dashboard: React.FC<DashboardProps> = ({
               <span className="text-sm font-black text-sky-600 dark:text-sky-400">
                 #{userRank || '-'}
               </span>
-              <div
-                className={`w-7 h-7 rounded-full ${user.avatarColor || 'bg-sky-500'} text-white text-[11px] flex items-center justify-center font-bold shadow-sm ring-2 ring-sky-200 dark:ring-sky-800`}
-              >
-                {user.name?.charAt(0)}
-              </div>
+              <UserAvatar
+                user={user}
+                size="sm"
+                className="w-7 h-7 text-[11px] shadow-sm ring-2 ring-sky-200 dark:ring-sky-800"
+              />
               <div className="flex items-center gap-1.5 truncate">
                 <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200 truncate">
                   {user.name?.split(' ').slice(0, 2).join(' ')}

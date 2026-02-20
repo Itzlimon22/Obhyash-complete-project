@@ -16,6 +16,7 @@ import { createClientComponentClient } from '@/lib/utils/supabase';
 import { getUserProfile } from '@/services/database';
 import { UserProfile } from '@/lib/types';
 import Link from 'next/link';
+import UserAvatar from '@/components/student/ui/common/UserAvatar';
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -152,19 +153,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-3 pl-1 pr-3 py-1.5 rounded-full hover:bg-paper-100 dark:hover:bg-obsidian-900 border border-transparent hover:border-paper-200 dark:hover:border-obsidian-800 transition-all group"
           >
-            {user?.avatarUrl ? (
-              <img
-                src={user.avatarUrl}
-                alt="Avatar"
-                className="w-8 h-8 rounded-full border-2 border-white dark:border-obsidian-800"
-              />
-            ) : (
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold shadow-md shadow-brand-500/20 ring-2 ring-white dark:ring-obsidian-950 bg-gradient-to-tr from-brand-500 to-indigo-600`}
-              >
-                {user?.name?.[0]?.toUpperCase() || 'A'}
-              </div>
-            )}
+            <UserAvatar user={user} size="sm" showBorder />
 
             <div className="hidden md:flex flex-col items-start text-left">
               <span className="text-xs font-semibold text-paper-900 dark:text-gray-200 leading-none mb-1 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
@@ -189,7 +178,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                 onClick={() => setIsDropdownOpen(false)}
               />
 
-              <div className="w-full absolute right-0 mt-2 w-48 bg-white dark:bg-obsidian-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-lg border border-gray-100 dark:border-obsidian-800 py-1 z-20 animate-in fade-in zoom-in-95 duration-200">
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-obsidian-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl shadow-lg border border-gray-100 dark:border-obsidian-800 py-1 z-20 animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 fade-in duration-200">
                 <div className="px-4 py-2 border-b border-gray-100 dark:border-obsidian-800">
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                     {user?.name || 'Admin User'}
