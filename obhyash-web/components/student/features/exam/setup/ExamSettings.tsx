@@ -71,35 +71,48 @@ export const ExamTypeSelection: React.FC<ExamTypeSelectionProps> = ({
 };
 
 interface DifficultySelectionProps {
-  difficulty: Difficulty;
-  setDifficulty: (d: Difficulty) => void;
+  difficulties: string[];
+  setDifficulties: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export const DifficultySelection: React.FC<DifficultySelectionProps> = ({
-  difficulty,
-  setDifficulty,
+  difficulties,
+  setDifficulties,
 }) => {
+  const toggleDifficulty = (id: string) => {
+    setDifficulties((prev) => {
+      if (prev.includes(id)) {
+        if (prev.length === 1) return prev;
+        return prev.filter((d) => d !== id);
+      }
+      return [...prev, id];
+    });
+  };
+
   return (
     <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
       <label className="block text-base font-bold text-neutral-900 dark:text-white mb-2">
         কঠিনতা (Difficulty)
       </label>
-      <div className="bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-2xl flex gap-1.5">
-        {DIFFICULTY_OPTIONS.map((opt) => (
-          <button
-            key={opt.id}
-            type="button"
-            onClick={() => setDifficulty(opt.id as Difficulty)}
-            className={cn(
-              'flex-1 py-3 rounded-xl text-xs font-bold transition-all duration-300',
-              difficulty === opt.id
-                ? 'bg-white dark:bg-neutral-700 text-emerald-700 dark:text-emerald-400 shadow-md scale-[1.02]'
-                : 'text-neutral-500 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200',
-            )}
-          >
-            {opt.label}
-          </button>
-        ))}
+      <div className="bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-2xl flex gap-1.5 overflow-x-auto">
+        {DIFFICULTY_OPTIONS.map((opt) => {
+          const isSelected = difficulties.includes(opt.id);
+          return (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => toggleDifficulty(opt.id)}
+              className={cn(
+                'flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all duration-300 min-w-[70px]',
+                isSelected
+                  ? 'bg-white dark:bg-neutral-700 text-emerald-700 dark:text-emerald-400 shadow-md scale-[1.02]'
+                  : 'text-neutral-500 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200',
+              )}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -132,15 +145,15 @@ export const QuestionCountSelection: React.FC<QuestionCountSelectionProps> = ({
       <div className="px-1">
         <input
           type="range"
-          min={5}
+          min={1}
           max={100}
-          step={5}
+          step={1}
           value={questionCount}
           onChange={(e) => setQuestionCount(parseInt(e.target.value))}
           className="w-full h-2.5 bg-neutral-200 dark:bg-neutral-700 rounded-full appearance-none cursor-pointer accent-emerald-600"
         />
         <div className="flex justify-between mt-3 text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-          <span>Min: 5</span>
+          <span>Min: 1</span>
           <span>Max: 100</span>
         </div>
       </div>
@@ -182,15 +195,15 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
       <div className="px-1">
         <input
           type="range"
-          min={5}
+          min={1}
           max={180}
-          step={5}
+          step={1}
           value={duration}
           onChange={(e) => setDuration(parseInt(e.target.value))}
           className="w-full h-2.5 bg-neutral-200 dark:bg-neutral-700 rounded-full appearance-none cursor-pointer accent-emerald-600"
         />
         <div className="flex justify-between mt-3 text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-          <span>5 min</span>
+          <span>1 min</span>
           <span>180 min</span>
         </div>
       </div>

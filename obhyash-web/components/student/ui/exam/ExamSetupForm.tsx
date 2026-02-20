@@ -74,11 +74,8 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const [subject, setSubject] = useState('');
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  // CHANGED: Default to ALL exam types
-  const [examTypes, setExamTypes] = useState<string[]>(
-    EXAM_TYPE_OPTIONS.map((o) => o.id),
-  );
-  const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.Mixed);
+  const [examTypes, setExamTypes] = useState<string[]>(['Academic']);
+  const [difficulties, setDifficulties] = useState<string[]>(['Medium']);
   const [questionCount, setQuestionCount] = useState<number>(25);
   const [duration, setDuration] = useState<number>(25);
   const [negativeMarking, setNegativeMarking] = useState<number>(0.25);
@@ -184,6 +181,11 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     fetchTopics();
   }, [selectedChapters]);
 
+  // Sync duration with question limit
+  useEffect(() => {
+    setDuration(questionCount);
+  }, [questionCount]);
+
   // --- Handlers ---
 
   const handleTopicSelectionChange = (
@@ -235,7 +237,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         examType: examTypes.join(' + '),
         chapters: chapterNames.length > 0 ? chapterNames.join(',') : 'All',
         topics: topicNames.length > 0 ? topicNames.join(',') : 'General',
-        difficulty,
+        difficulty: difficulties.join(' + '),
         questionCount,
         durationMinutes: duration,
         negativeMarking,
@@ -311,7 +313,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           {/* 1. Subject Selection Card */}
           <section className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm">
             <h3 className="text-xl font-black text-neutral-900 dark:text-white mb-8 flex items-center gap-3">
-              <div className="w-2 h-8 bg-emerald-600 rounded-full" />
               বিষয় নির্বাচন
             </h3>
             <SubjectSelector
@@ -333,7 +334,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             )}
           >
             <h3 className="text-xl font-black text-neutral-900 dark:text-white mb-8 flex items-center gap-3">
-              <div className="w-2 h-8 bg-emerald-600 rounded-full" />
               অধ্যায় ও টপিক
             </h3>
             <div className="grid gap-8">
@@ -405,8 +405,8 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           />
 
           <DifficultySelection
-            difficulty={difficulty}
-            setDifficulty={setDifficulty}
+            difficulties={difficulties}
+            setDifficulties={setDifficulties}
           />
 
           <TimeSelection duration={duration} setDuration={setDuration} />

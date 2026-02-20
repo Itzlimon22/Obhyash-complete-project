@@ -50,9 +50,9 @@ export default function QuestionCard({
         border border-neutral-200/80 dark:border-neutral-800 shadow-sm hover:shadow-md
         ${
           isFlagged
-            ? 'ring-2 ring-amber-400/50 border-amber-400/50'
+            ? 'ring-2 ring-amber-400/50'
             : isAnswered
-              ? 'ring-1 ring-emerald-500/30 border-emerald-500/30'
+              ? 'ring-1 ring-emerald-500/30'
               : ''
         }
         ${isOmrMode ? 'opacity-90' : ''}
