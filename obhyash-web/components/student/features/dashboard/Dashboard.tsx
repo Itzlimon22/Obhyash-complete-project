@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
+import useSWR from 'swr';
 import SubjectStat from './SubjectStat';
 import { celebration } from '@/lib/confetti';
 import { toast } from 'sonner';
@@ -35,6 +36,33 @@ interface DashboardProps {
   history: ExamResult[];
 }
 
+const fetchSubjectsOnly = async ([
+  _,
+  userId,
+  division,
+  stream,
+  optional_subject,
+]: [
+  string,
+  string,
+  string | undefined,
+  string | undefined,
+  string | undefined,
+]) => {
+  const { getSubjects } = await import('@/services/database');
+  return await getSubjects(
+    division || undefined,
+    stream || undefined,
+    optional_subject || undefined,
+  );
+};
+
+const fetchLeaderboardStats = async ([_, level]: [string, string]) => {
+  const { getLeaderboardUsers } = await import('@/services/database');
+  const users = await getLeaderboardUsers(level);
+  return [...users].sort((a, b) => b.xp - a.xp);
+};
+
 const Dashboard: React.FC<DashboardProps> = ({
   user,
   onMockExamClick,
@@ -44,125 +72,101 @@ const Dashboard: React.FC<DashboardProps> = ({
   onAnalysisClick,
   history,
 }) => {
-  // Dynamic Subject Stats Logic
-  const [subjectStats, setSubjectStats] = React.useState<SubjectStats[]>([]);
-  const [isLoadingStats, setIsLoadingStats] = React.useState(true);
+  const { data: subjects = [], isLoading: isLoadingStats } = useSWR(
+    user
+      ? [
+          'userSubjects',
+          user.id,
+          user.division,
+          user.stream,
+          user.optional_subject,
+        ]
+      : null,
+    fetchSubjectsOnly,
+    { revalidateOnFocus: false, dedupingInterval: 60000 },
+  );
 
-  React.useEffect(() => {
-    const fetchStats = async () => {
-      if (!user) return;
-      setIsLoadingStats(true); // Ensure loading state is true on start
-      const { getSubjects } = await import('@/services/database');
-      try {
-        // Fetch subjects based on user's stream/group
-        const subjects = await getSubjects(
-          user.division || undefined,
-          user.stream || undefined,
-          user.optional_subject || undefined,
-        );
+  const subjectStats = useMemo(() => {
+    return subjects.map((sub) => {
+      const subName = sub.name.toLowerCase();
+      const subId = sub.id.toLowerCase();
 
-        // Calculate stats for each subject
-        const stats = subjects.map((sub) => {
-          const subName = sub.name.toLowerCase();
-          const subId = sub.id.toLowerCase();
+      let correct = 0;
+      let wrong = 0;
+      let skipped = 0;
+      let total = 0;
 
-          let correct = 0;
-          let wrong = 0;
-          let skipped = 0;
-          let total = 0;
+      history.forEach((exam) => {
+        const hSub = (exam.subjectLabel || exam.subject).toLowerCase();
+        const hSubId = exam.subject.toLowerCase();
+        const isMatch =
+          hSubId === subId ||
+          hSub.includes(subName) ||
+          hSub.includes(subId) ||
+          (subName === 'পদার্থবিজ্ঞান' && hSub.includes('physics')) ||
+          (subName === 'রসায়ন' && hSub.includes('chemistry')) ||
+          (subName === 'গণিত' && hSub.includes('math')) ||
+          (subName === 'জীববিজ্ঞান' && hSub.includes('biology')) ||
+          (subName === 'বাংলা' && hSub.includes('bangla')) ||
+          (subName === 'ইংরেজি' && hSub.includes('english')) ||
+          (subName === 'সাধারণ জ্ঞান' && hSub.includes('gk')) ||
+          (subName === 'আইসিটি' && hSub.includes('ict'));
 
-          history.forEach((exam) => {
-            const hSub = (exam.subjectLabel || exam.subject).toLowerCase();
-            const hSubId = exam.subject.toLowerCase();
-            // Match exactly by DB UUID or fallback logic for legacy data
-            const isMatch =
-              hSubId === subId ||
-              hSub.includes(subName) ||
-              hSub.includes(subId) ||
-              (subName === 'পদার্থবিজ্ঞান' && hSub.includes('physics')) ||
-              (subName === 'রসায়ন' && hSub.includes('chemistry')) ||
-              (subName === 'গণিত' && hSub.includes('math')) ||
-              (subName === 'জীববিজ্ঞান' && hSub.includes('biology')) ||
-              (subName === 'বাংলা' && hSub.includes('bangla')) ||
-              (subName === 'ইংরেজি' && hSub.includes('english')) ||
-              (subName === 'সাধারণ জ্ঞান' && hSub.includes('gk')) ||
-              (subName === 'আইসিটি' && hSub.includes('ict'));
+        if (isMatch) {
+          correct += exam.correctCount;
+          wrong += exam.wrongCount;
+          total += exam.totalQuestions;
+          skipped += exam.totalQuestions - exam.correctCount - exam.wrongCount;
+        }
+      });
 
-            if (isMatch) {
-              correct += exam.correctCount;
-              wrong += exam.wrongCount;
-              total += exam.totalQuestions;
-              skipped +=
-                exam.totalQuestions - exam.correctCount - exam.wrongCount;
-            }
-          });
-
-          return {
-            id: sub.id,
-            name: getSubjectDisplayName(sub.id),
-            correct,
-            wrong,
-            skipped,
-            total,
-          };
-        });
-
-        setSubjectStats(stats);
-      } catch (e) {
-        console.error('Failed to load dashboard stats', e);
-      } finally {
-        setIsLoadingStats(false);
-      }
-    };
-
-    fetchStats();
-  }, [history, user]);
-
-  // Leaderboard Preview Logic
-  const [topUser, setTopUser] = React.useState<LeaderboardUser | null>(null);
-  const [userRank, setUserRank] = React.useState<number>(0);
-  const [totalUsers, setTotalUsers] = React.useState<number>(0);
-  const [xpDiff, setXpDiff] = React.useState<number>(0);
+      return {
+        id: sub.id,
+        name: getSubjectDisplayName(sub.id),
+        correct,
+        wrong,
+        skipped,
+        total,
+      };
+    });
+  }, [subjects, history]);
 
   const prevRankRef = useRef<number>(0);
 
-  React.useEffect(() => {
-    const fetchLeaderboardStats = async () => {
-      if (!user) return;
-      const { getLeaderboardUsers } = await import('@/services/database');
+  const { data: leaderboardUsers = [], isLoading: isLoadingLeaderboard } =
+    useSWR(
+      user ? ['leaderboardUsers', user.level || 'Level 1'] : null,
+      fetchLeaderboardStats,
+      { revalidateOnFocus: false, dedupingInterval: 60000 },
+    );
 
-      try {
-        const level = user.level || 'Level 1';
-        const users = await getLeaderboardUsers(level);
+  const { topUser, userRank, totalUsers, xpDiff } = useMemo(() => {
+    if (!leaderboardUsers.length || !user)
+      return { topUser: null, userRank: 0, totalUsers: 0, xpDiff: 0 };
 
-        const sorted = [...users].sort((a, b) => b.xp - a.xp);
-        const rank = sorted.findIndex((u) => u.id === user.id) + 49; // Mock slightly boosted rank display offset if wanted, or just exact rank
-        // Real rank
-        const realRank = sorted.findIndex((u) => u.id === user.id) + 1;
+    const rank = leaderboardUsers.findIndex((u) => u.id === user.id) + 1;
+    const top = leaderboardUsers[0];
+    const diff = top ? Math.max(0, top.xp - user.xp) : 0;
 
-        const top = sorted[0];
-        const diff = top ? Math.max(0, top.xp - user.xp) : 0;
-
-        // Rank up celebration
-        if (prevRankRef.current > 0 && realRank < prevRankRef.current) {
-          celebration.achievement();
-          toast.success('অভিনন্দন! তোমার র‍্যাংক উন্নত হয়েছে!', {
-            description: `তুমি এখন #${realRank} স্থানে আছো।`,
-          });
-        }
-        prevRankRef.current = realRank;
-
-        setTopUser(top);
-        setUserRank(realRank);
-        setTotalUsers(sorted.length);
-        setXpDiff(diff);
-      } catch (e) {
-        console.error('Failed to fetch leaderboard stats', e);
-      }
+    return {
+      topUser: top,
+      userRank: rank,
+      totalUsers: leaderboardUsers.length,
+      xpDiff: diff,
     };
+  }, [leaderboardUsers, user]);
 
-    fetchLeaderboardStats();
-  }, [user]);
+  React.useEffect(() => {
+    if (userRank > 0) {
+      if (prevRankRef.current > 0 && userRank < prevRankRef.current) {
+        celebration.achievement();
+        toast.success('অভিনন্দন! তোমার র‍্যাংক উন্নত হয়েছে!', {
+          description: `তুমি এখন #${userRank} স্থানে আছো।`,
+        });
+      }
+      prevRankRef.current = userRank;
+    }
+  }, [userRank]);
 
   if (isLoadingStats && !subjectStats.length) {
     return <DashboardSkeleton />;
