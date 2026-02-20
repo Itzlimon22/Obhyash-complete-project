@@ -204,6 +204,21 @@ const SubscriptionView: React.FC = () => {
     { icon: Clock, label: 'তাৎক্ষণিক অ্যাক্সেস', color: 'text-emerald-500' },
   ];
 
+  if (isPaymentModalOpen && selectedPlan) {
+    return (
+      <ManualPaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => {
+          setIsPaymentModalOpen(false);
+          setSelectedPlan(null);
+        }}
+        plan={selectedPlan}
+        savedMethods={paymentMethods}
+        onConfirm={handlePaymentConfirm}
+      />
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8 animate-fade-in pb-24 sm:pb-20 px-1">
       {/* HERO SECTION - REPLACED WITH CURRENT PLAN CARD & BANNER */}
@@ -236,13 +251,35 @@ const SubscriptionView: React.FC = () => {
                     Active
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
-                  মেয়াদ শেষ হবে:{' '}
-                  <span className="font-bold text-neutral-700 dark:text-neutral-300">
-                    {/* Placeholder for expiry date - in real app would come from subscription data */}
-                    (অ্যাক্টিভ)
-                  </span>
-                </p>
+                <div className="space-y-1">
+                  <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+                    মেয়াদ শেষ হবে:{' '}
+                    <span className="font-bold text-neutral-700 dark:text-neutral-300">
+                      {currentPlan.expiresAt
+                        ? new Date(currentPlan.expiresAt).toLocaleDateString(
+                            'bn-BD',
+                            {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric',
+                            },
+                          )
+                        : '(অ্যাক্টিভ)'}
+                    </span>
+                  </p>
+                  {currentPlan.expiresAt && (
+                    <p className="text-[10px] sm:text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      বাকি আছে:{' '}
+                      {Math.ceil(
+                        (new Date(currentPlan.expiresAt).getTime() -
+                          new Date().getTime()) /
+                          (1000 * 60 * 60 * 24),
+                      )}{' '}
+                      দিন
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -342,15 +379,6 @@ const SubscriptionView: React.FC = () => {
         onClose={() => setIsAddMethodOpen(false)}
         onSubmit={handleAddPaymentMethod}
         isLoading={isAddingMethod}
-      />
-
-      {/* Manual Payment Processing Modal */}
-      <ManualPaymentModal
-        isOpen={isPaymentModalOpen}
-        onClose={() => setIsPaymentModalOpen(false)}
-        plan={selectedPlan}
-        savedMethods={paymentMethods}
-        onConfirm={handlePaymentConfirm}
       />
     </div>
   );

@@ -239,7 +239,7 @@ export const getUserActiveSubscription =
 
     const { data, error } = await supabase
       .from('subscription_history')
-      .select('plan:subscription_plans(*)')
+      .select('*, plan:subscription_plans(*)')
       .eq('user_id', user.id)
       .eq('is_active', true)
       .gt('expires_at', new Date().toISOString())
@@ -276,6 +276,7 @@ export const getUserActiveSubscription =
             ? 'indigo'
             : 'slate',
         isPopular: plan.display_name.toLowerCase().includes('offer'),
+        expiresAt: data.expires_at, // Include expiry date from subscription_history
       };
     }
     return null;

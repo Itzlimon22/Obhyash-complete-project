@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { SubscriptionPlan } from '@/lib/types';
+import {
+  SubscriptionPlan,
+  PaymentMethod,
+  PaymentSubmission,
+} from '@/lib/types';
+import { ArrowLeft, Clock, Info, Headphones } from 'lucide-react';
 
 interface ManualPaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   plan: SubscriptionPlan | null;
-  savedMethods?: import('@/lib/types').PaymentMethod[];
+  savedMethods?: PaymentMethod[];
   onConfirm: (data: { method: string; number: string; trxId: string }) => void;
 }
 
 type TabId = 'details' | 'support' | 'info';
-
-import Portal from '@/components/ui/portal';
 
 const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
   isOpen,
@@ -31,20 +34,17 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic presence check
     if (!senderNumber || !trxId) {
       alert('অনুগ্রহ করে সব তথ্য পূরণ করুন');
       return;
     }
 
-    // Phone number validation: 11 digits, starts with 01
     const phoneRegex = /^01\d{9}$/;
     if (!phoneRegex.test(senderNumber)) {
       alert('সঠিক মোবাইল নম্বর দিন (১১ ডিজিট, শুরু হতে হবে ০১ দিয়ে)');
       return;
     }
 
-    // Transaction ID validation: 10 characters, Capital letters and digits
     const trxIdRegex = /^[A-Z0-9]{10}$/;
     if (!trxIdRegex.test(trxId.toUpperCase())) {
       alert(
@@ -54,7 +54,6 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
     }
 
     setIsSubmitting(true);
-    // Simulate API delay
     setTimeout(() => {
       onConfirm({
         method: paymentMethod,
@@ -71,22 +70,30 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
   };
 
   const renderTabs = () => (
-    <div className="flex border-b border-neutral-200 dark:border-neutral-700 mb-6">
+    <div className="flex border-b border-neutral-200 dark:border-neutral-700 mb-6 bg-white dark:bg-neutral-900 sticky top-0 z-10">
       {[
-        { id: 'details', label: 'বিস্তারিত', icon: 'ⓘ' },
-        { id: 'support', label: 'সাপোর্ট', icon: '🎧' },
+        {
+          id: 'details',
+          label: 'বিস্তারিত',
+          icon: <Info className="w-4 h-4" />,
+        },
+        {
+          id: 'support',
+          label: 'সাপোর্ট',
+          icon: <Headphones className="w-4 h-4" />,
+        },
         { id: 'info', label: 'তথ্য', icon: '?' },
       ].map((tab) => (
         <button
           key={tab.id}
           onClick={() => setActiveTab(tab.id as TabId)}
-          className={`flex-1 py-3 text-sm font-bold transition-all relative ${
+          className={`flex-1 py-4 text-sm font-bold transition-all relative flex items-center justify-center gap-2 ${
             activeTab === tab.id
               ? 'text-emerald-600 dark:text-emerald-400'
               : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400'
           }`}
         >
-          <span className="mr-2">{tab.icon}</span>
+          {tab.icon}
           {tab.label}
           {activeTab === tab.id && (
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 dark:bg-emerald-400 rounded-t-full"></div>
@@ -97,392 +104,316 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
   );
 
   return (
-    <Portal>
-      <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-neutral-900/60 backdrop-blur-sm animate-fade-in">
-        <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-          {/* Header */}
-          <div className="p-4 flex justify-between items-center border-b border-neutral-100 dark:border-neutral-800">
-            <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
-              পেমেন্ট প্রসেসিং
-            </h3>
-            <button
-              onClick={onClose}
-              className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18 18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
+    <div className="min-h-[80vh] flex flex-col bg-white dark:bg-neutral-900 animate-in slide-in-from-right duration-300">
+      {/* Top Header with Back Button */}
+      <div className="p-4 sm:p-6 flex items-center gap-4 border-b border-neutral-100 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md sticky top-0 z-20">
+        <button
+          onClick={onClose}
+          className="p-2 -ml-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-colors text-neutral-500 dark:text-neutral-400"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+        <h3 className="text-xl font-bold text-neutral-900 dark:text-white">
+          পেমেন্ট প্রসেসিং
+        </h3>
+      </div>
 
-          {renderTabs()}
+      <div className="max-w-xl mx-auto w-full flex-1 flex flex-col">
+        {renderTabs()}
 
-          <div className="flex-1 overflow-y-auto p-6 pt-0 custom-scrollbar">
-            {/* TAB 1: DETAILS (Payment Form) */}
-            {activeTab === 'details' && (
-              <div className="space-y-6 animate-fade-in">
-                {/* Summary Card */}
-                <div className="flex gap-4">
-                  <div className="flex-1 bg-neutral-50 dark:bg-neutral-800 p-4 rounded-xl text-center border border-neutral-200 dark:border-neutral-700">
-                    <span className="text-xs font-bold text-neutral-500 uppercase">
-                      প্যাকেজ
-                    </span>
-                    <div className="text-lg font-bold text-neutral-900 dark:text-white">
-                      {plan.name}
-                    </div>
-                  </div>
-                  <div className="flex-1 bg-red-50 dark:bg-red-900/20 p-4 rounded-xl text-center border border-red-100 dark:border-red-900/30">
-                    <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase">
-                      পরিশোধ করতে হবে
-                    </span>
-                    <div className="text-lg font-bold text-red-600 dark:text-red-400">
-                      ৳ {plan.price}.00
-                    </div>
+        <div className="flex-1 p-6 pt-0">
+          {/* TAB 1: DETAILS */}
+          {activeTab === 'details' && (
+            <div className="space-y-6 animate-fade-in">
+              <div className="flex gap-4">
+                <div className="flex-1 bg-neutral-50 dark:bg-neutral-800 p-4 rounded-xl text-center border border-neutral-200 dark:border-neutral-700">
+                  <span className="text-xs font-bold text-neutral-500 uppercase">
+                    প্যাকেজ
+                  </span>
+                  <div className="text-lg font-bold text-neutral-900 dark:text-white">
+                    {plan.name}
                   </div>
                 </div>
+                <div className="flex-1 bg-red-50 dark:bg-red-900/20 p-4 rounded-xl text-center border border-red-100 dark:border-red-900/30">
+                  <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase">
+                    পরিশোধ করতে হবে
+                  </span>
+                  <div className="text-lg font-bold text-red-600 dark:text-red-400">
+                    ৳ {plan.price}.00
+                  </div>
+                </div>
+              </div>
 
-                {/* Instructions Box */}
-                <div className="w-full bg-white dark:bg-black border-2 border-dashed border-emerald-200 dark:border-emerald-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-5 text-center">
-                  <h4 className="text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-3">
-                    অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করুন
-                  </h4>
-
-                  <div
-                    className="bg-neutral-100 dark:bg-neutral-800 p-3 rounded-lg mb-3 flex items-center justify-between group cursor-pointer"
-                    onClick={() => copyToClipboard('01234567890')}
+              <div className="w-full bg-white dark:bg-black border-2 border-dashed border-emerald-200 dark:border-emerald-900 rounded-xl p-5 text-center">
+                <h4 className="text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-3">
+                  অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করুন
+                </h4>
+                <div
+                  className="bg-neutral-100 dark:bg-neutral-800 p-3 rounded-lg mb-3 flex items-center justify-between group cursor-pointer"
+                  onClick={() => copyToClipboard('01234567890')}
+                >
+                  <span className="text-xs font-medium text-neutral-500">
+                    bKash/Nagad (Send Money)
+                  </span>
+                  <span className="font-mono font-bold text-lg text-neutral-800 dark:text-white tracking-wider">
+                    01234567890
+                  </span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-4 h-4 text-neutral-400 group-hover:text-emerald-500"
                   >
-                    <span className="text-xs font-medium text-neutral-500">
-                      bKash/Nagad (Send Money)
-                    </span>
-                    <span className="font-mono font-bold text-lg text-neutral-800 dark:text-white tracking-wider">
-                      01234567890
-                    </span>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
+                    />
+                  </svg>
+                </div>
+                <ul className="text-xs text-neutral-500 dark:text-neutral-400 text-left space-y-1.5 list-disc pl-4">
+                  <li>
+                    উপরের নম্বরে <strong>Send Money</strong> করুন।
+                  </li>
+                  <li>Reference হিসেবে আপনার মোবাইল নম্বর দিন।</li>
+                  <li>
+                    নিচের ফর্মে আপনার পেমেন্ট মেথড, মোবাইল নম্বর এবং TrxID দিন।
+                  </li>
+                </ul>
+              </div>
+
+              {savedMethods.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
+                    Saved Payment Methods
+                  </h4>
+                  <div className="grid grid-cols-1 gap-2">
+                    {savedMethods.map((method) => (
+                      <button
+                        key={method.id}
+                        onClick={() => {
+                          setPaymentMethod(
+                            method.type === 'bkash'
+                              ? 'bKash'
+                              : method.type === 'nagad'
+                                ? 'Nagad'
+                                : method.type,
+                          );
+                          setSenderNumber(method.number || '');
+                        }}
+                        className={`flex items-center justify-between p-3 rounded-xl border transition-all text-left ${
+                          senderNumber === method.number &&
+                          paymentMethod.toLowerCase() ===
+                            method.type.toLowerCase()
+                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-500'
+                            : 'border-neutral-200 dark:border-neutral-700 hover:border-emerald-300 dark:hover:border-emerald-700'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center text-white text-[10px] font-black ${method.type === 'bkash' ? 'bg-pink-500' : method.type === 'nagad' ? 'bg-orange-500' : 'bg-neutral-500'}`}
+                          >
+                            {method.type === 'bkash'
+                              ? 'bK'
+                              : method.type === 'nagad'
+                                ? 'N'
+                                : 'C'}
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm text-neutral-800 dark:text-white capitalize">
+                              {method.type}
+                            </p>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 font-mono">
+                              {method.number}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
+                    Payment Method
+                  </label>
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white outline-none font-medium"
+                  >
+                    <option value="bKash">bKash</option>
+                    <option value="Nagad">Nagad</option>
+                    <option value="Rocket">Rocket</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
+                    Your Mobile Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={senderNumber}
+                    onChange={(e) => setSenderNumber(e.target.value)}
+                    placeholder="e.g., 01xxxxxxxxx"
+                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white outline-none font-mono"
+                    required
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
+                    Transaction ID (TrxID)
+                  </label>
+                  <input
+                    type="text"
+                    value={trxId}
+                    onChange={(e) => setTrxId(e.target.value)}
+                    placeholder="Enter the TrxID"
+                    className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white outline-none font-mono uppercase"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg disabled:opacity-50 flex justify-center items-center gap-2 mt-4"
+                >
+                  {isSubmitting ? 'যাচাই করা হচ্ছে...' : 'Verify Payment'}
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* TAB 2: SUPPORT */}
+          {activeTab === 'support' && (
+            <div className="space-y-4 animate-fade-in pb-4">
+              {[
+                {
+                  icon: '📞',
+                  title: 'সরাসরি কথা বলুন',
+                  sub: 'কল করতে ক্লিক করুন',
+                  color: 'bg-blue-50 text-blue-600',
+                  link: 'tel:+8801946855793',
+                },
+                {
+                  icon: '💬',
+                  title: 'লাইভ চ্যাট (Messenger)',
+                  sub: 'এখানে ক্লিক করুন',
+                  color: 'bg-purple-50 text-purple-600',
+                  link: 'https://m.me/obhyash',
+                },
+                {
+                  icon: '📱',
+                  title: 'লাইভ চ্যাট (WhatsApp)',
+                  sub: 'এখানে ক্লিক করুন',
+                  color: 'bg-emerald-50 text-emerald-600',
+                  link: 'https://wa.me/8801946855793',
+                },
+                {
+                  icon: '✉️',
+                  title: 'সাপোর্টে ইমেইল',
+                  sub: 'এখানে ক্লিক করুন',
+                  color: 'bg-amber-50 text-amber-600',
+                  link: 'mailto:support@obhyash.com',
+                },
+              ].map((item, idx) => (
+                <a
+                  key={idx}
+                  href={item.link}
+                  className="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-800 hover:shadow-md transition-all group"
+                >
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center text-xl ${item.color} group-hover:scale-110 transition-transform`}
+                  >
+                    {item.icon}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-neutral-900 dark:text-white">
+                      {item.title}
+                    </h4>
+                    <p className="text-xs text-neutral-500">{item.sub}</p>
+                  </div>
+                </a>
+              ))}
+              <div className="mt-8">
+                <button
+                  onClick={() => setActiveTab('details')}
+                  className="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl"
+                >
+                  Go to Payment
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: INFO */}
+          {activeTab === 'info' && (
+            <div className="space-y-3 animate-fade-in pb-4">
+              {[
+                {
+                  q: 'কিভাবে পেমেন্ট করবেন?',
+                  a: '১. আপনার বিকাশ/নগদ অ্যাপে যান। ২. সেন্ড মানি অপশনে যান। ৩. আমাদের নম্বর দিন। ৪. রেফারেন্সে আপনার নম্বর দিন। ৫. পেমেন্ট শেষে TrxID ফর্ম এ জমা দিন।',
+                },
+                {
+                  q: 'পেমেন্ট করার কতক্ষণ পর একাউন্ট আপগ্রেড হবে?',
+                  a: 'আমাদের টিম আপনার তথ্য যাচাই করে ৩০ মিনিট থেকে ২ ঘন্টার মধ্যে আপনার একাউন্ট আপগ্রেড করে দিবে।',
+                },
+                {
+                  q: 'ট্রানজেকশন আইডি (TrxID) খুঁজে না পেলে কী করব?',
+                  a: 'আপনার পেমেন্ট অ্যাপের স্টেটমেন্ট অথবা মেসেজ অপশন চেক করুন। তবুও না পেলে আমাদের সাপোর্টে যোগাযোগ করুন।',
+                },
+                {
+                  q: 'ভুল নম্বরে টাকা পাঠালে কী হবে?',
+                  a: 'ভুল নম্বরে টাকা পাঠালে আমরা দায়ী থাকবো না। দয়া করে নম্বরটি দুইবার যাচাই করুন।',
+                },
+                {
+                  q: 'প্রিমিয়াম প্যাকেজে কী কী থাকছে?',
+                  a: 'আনলিমিটেড এক্সাম, OMR চেকিং, এবং বিস্তারিত এনালাইসিস রিপোর্ট।',
+                },
+              ].map((faq, idx) => (
+                <details
+                  key={idx}
+                  className="group bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700"
+                >
+                  <summary className="flex justify-between items-center p-4 cursor-pointer font-bold text-neutral-800 dark:text-neutral-200 text-sm">
+                    {faq.q}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
-                      strokeWidth={1.5}
+                      strokeWidth={2}
                       stroke="currentColor"
-                      className="w-4 h-4 text-neutral-400 group-hover:text-emerald-500"
+                      className="w-4 h-4 transition-transform group-open:rotate-180"
                     >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
+                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
                       />
                     </svg>
+                  </summary>
+                  <div className="p-4 pt-0 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed border-t border-neutral-200 dark:border-neutral-700/50 mt-2">
+                    {faq.a}
                   </div>
-
-                  <ul className="text-xs text-neutral-500 dark:text-neutral-400 text-left space-y-1.5 list-disc pl-4">
-                    <li>
-                      উপরের নম্বরে <strong>Send Money</strong> করুন।
-                    </li>
-                    <li>Reference হিসেবে আপনার মোবাইল নম্বর দিন।</li>
-                    <li>
-                      নিচের ফর্মে আপনার পেমেন্ট মেথড, মোবাইল নম্বর এবং TrxID
-                      দিন।
-                    </li>
-                  </ul>
-                </div>
-
-                {/* Saved Methods Selection */}
-                {savedMethods && savedMethods.length > 0 && (
-                  <div className="space-y-3 mb-6">
-                    <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
-                      Saved Payment Methods
-                    </h4>
-                    <div className="grid grid-cols-1 gap-2">
-                      {savedMethods.map((method) => (
-                        <button
-                          key={method.id}
-                          onClick={() => {
-                            setPaymentMethod(
-                              method.type === 'bkash'
-                                ? 'bKash'
-                                : method.type === 'nagad'
-                                  ? 'Nagad'
-                                  : method.type,
-                            );
-                            setSenderNumber(method.number || '');
-                          }}
-                          className={`flex items-center justify-between p-3 rounded-xl border transition-all text-left group ${
-                            senderNumber === method.number &&
-                            paymentMethod.toLowerCase() ===
-                              method.type.toLowerCase()
-                              ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-500'
-                              : 'border-neutral-200 dark:border-neutral-700 hover:border-emerald-300 dark:hover:border-emerald-700'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`w-8 h-8 rounded-lg flex items-center justify-center text-white text-[10px] font-black shadow-sm ${
-                                method.type === 'bkash'
-                                  ? 'bg-pink-500'
-                                  : method.type === 'nagad'
-                                    ? 'bg-orange-500'
-                                    : 'bg-neutral-500'
-                              }`}
-                            >
-                              {method.type === 'bkash'
-                                ? 'bK'
-                                : method.type === 'nagad'
-                                  ? 'N'
-                                  : 'C'}
-                            </div>
-                            <div>
-                              <p className="font-bold text-sm text-neutral-800 dark:text-white capitalize">
-                                {method.type}
-                              </p>
-                              <p className="text-xs text-neutral-500 dark:text-neutral-400 font-mono">
-                                {method.number}
-                              </p>
-                            </div>
-                          </div>
-                          {senderNumber === method.number &&
-                            paymentMethod.toLowerCase() ===
-                              method.type.toLowerCase() && (
-                              <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                  className="w-3.5 h-3.5 text-white"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                              </div>
-                            )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Input Form */}
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
-                      Payment Method
-                    </label>
-                    <select
-                      value={paymentMethod}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none font-medium"
-                    >
-                      <option value="bKash">bKash</option>
-                      <option value="Nagad">Nagad</option>
-                      <option value="Rocket">Rocket</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
-                      Your Mobile Number
-                    </label>
-                    <input
-                      type="tel"
-                      value={senderNumber}
-                      onChange={(e) => setSenderNumber(e.target.value)}
-                      placeholder="e.g., 01xxxxxxxxx"
-                      className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none font-mono"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block text-xs font-bold text-neutral-700 dark:text-neutral-300">
-                      Transaction ID (TrxID)
-                    </label>
-                    <input
-                      type="text"
-                      value={trxId}
-                      onChange={(e) => setTrxId(e.target.value)}
-                      placeholder="Enter the TrxID"
-                      className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none font-mono uppercase"
-                      required
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 mt-4"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <svg
-                          className="animate-spin h-4 w-4 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        যাচাই করা হচ্ছে...
-                      </>
-                    ) : (
-                      'Verify Payment'
-                    )}
-                  </button>
-                </form>
+                </details>
+              ))}
+              <div className="mt-6">
+                <button
+                  onClick={() => setActiveTab('details')}
+                  className="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl"
+                >
+                  Go to Payment
+                </button>
               </div>
-            )}
-
-            {/* TAB 2: SUPPORT */}
-            {activeTab === 'support' && (
-              <div className="space-y-4 animate-fade-in pb-4">
-                {[
-                  {
-                    icon: '📞',
-                    title: 'সরাসরি কথা বলুন',
-                    sub: 'কল করতে ক্লিক করুন',
-                    color: 'bg-blue-50 text-blue-600',
-                    link: 'tel:+8801946855793', // Updated to match landing page
-                  },
-                  {
-                    icon: '💬',
-                    title: 'লাইভ চ্যাট (Messenger)',
-                    sub: 'এখানে ক্লিক করুন',
-                    color: 'bg-purple-50 text-purple-600',
-                    link: 'https://m.me/obhyash',
-                  },
-                  {
-                    icon: '📱',
-                    title: 'লাইভ চ্যাট (WhatsApp)',
-                    sub: 'এখানে ক্লিক করুন',
-                    color: 'bg-emerald-50 text-emerald-600',
-                    link: 'https://wa.me/8801946855793',
-                  },
-                  {
-                    icon: '✉️',
-                    title: 'সাপোর্টে ইমেইল',
-                    sub: 'এখানে ক্লিক করুন',
-                    color: 'bg-amber-50 text-amber-600',
-                    link: 'mailto:support@obhyash.com',
-                  },
-                ].map((item, idx) => (
-                  <a
-                    key={idx}
-                    href={item.link}
-                    className="flex items-center gap-4 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-800 hover:shadow-md transition-all group"
-                  >
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center text-xl ${item.color} group-hover:scale-110 transition-transform`}
-                    >
-                      {item.icon}
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-neutral-900 dark:text-white">
-                        {item.title}
-                      </h4>
-                      <p className="text-xs text-neutral-500">{item.sub}</p>
-                    </div>
-                  </a>
-                ))}
-                <div className="mt-8">
-                  <button
-                    onClick={() => setActiveTab('details')}
-                    className="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl"
-                  >
-                    Go to Payment
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 3: INFO (FAQ) */}
-            {activeTab === 'info' && (
-              <div className="space-y-3 animate-fade-in pb-4">
-                {[
-                  {
-                    q: 'কিভাবে পেমেন্ট করবেন?',
-                    a: '১. আপনার বিকাশ/নগদ অ্যাপে যান। ২. সেন্ড মানি অপশনে যান। ৩. আমাদের নম্বর দিন। ৪. রেফারেন্সে আপনার নম্বর দিন। ৫. পেমেন্ট শেষে TrxID ফর্ম এ জমা দিন।',
-                  },
-                  {
-                    q: 'পেমেন্ট করার কতক্ষণ পর একাউন্ট আপগ্রেড হবে?',
-                    a: 'আমাদের টিম আপনার তথ্য যাচাই করে ৩০ মিনিট থেকে ২ ঘন্টার মধ্যে আপনার একাউন্ট আপগ্রেড করে দিবে।',
-                  },
-                  {
-                    q: 'ট্রানজেকশন আইডি (TrxID) খুঁজে না পেলে কী করব?',
-                    a: 'আপনার পেমেন্ট অ্যাপের স্টেটমেন্ট অথবা মেসেজ অপশন চেক করুন। তবুও না পেলে আমাদের সাপোর্টে যোগাযোগ করুন।',
-                  },
-                  {
-                    q: 'ভুল নম্বরে টাকা পাঠালে কী হবে?',
-                    a: 'ভুল নম্বরে টাকা পাঠালে আমরা দায়ী থাকবো না। দয়া করে নম্বরটি দুইবার যাচাই করুন।',
-                  },
-                  {
-                    q: 'প্রিমিয়াম প্যাকেজে কী কী থাকছে?',
-                    a: 'আনলিমিটেড এক্সাম, OMR চেকিং, এবং বিস্তারিত এনালাইসিস রিপোর্ট।',
-                  },
-                ].map((faq, idx) => (
-                  <details
-                    key={idx}
-                    className="group bg-neutral-50 dark:bg-neutral-800 rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-700"
-                  >
-                    <summary className="flex justify-between items-center p-4 cursor-pointer font-bold text-neutral-800 dark:text-neutral-200 text-sm select-none">
-                      {faq.q}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
-                        className="w-4 h-4 transition-transform group-open:rotate-180"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                        />
-                      </svg>
-                    </summary>
-                    <div className="p-4 pt-0 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed border-t border-neutral-200 dark:border-neutral-700/50 mt-2">
-                      {faq.a}
-                    </div>
-                  </details>
-                ))}
-
-                <div className="mt-6">
-                  <button
-                    onClick={() => setActiveTab('details')}
-                    className="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl"
-                  >
-                    Go to Payment
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
-    </Portal>
+    </div>
   );
 };
 

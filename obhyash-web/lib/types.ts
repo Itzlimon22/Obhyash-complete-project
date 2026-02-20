@@ -276,6 +276,7 @@ export interface SubscriptionPlan {
   isPopular?: boolean;
   isRecommended?: boolean;
   colorTheme?: string; // Tailwind class
+  expiresAt?: string;
 }
 
 export interface Transaction {
