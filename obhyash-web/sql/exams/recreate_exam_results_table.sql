@@ -56,6 +56,10 @@ CREATE POLICY "Users can update their own results"
 ON public.exam_results FOR UPDATE 
 USING (auth.uid() = user_id);
 
+CREATE POLICY "Users can delete their own results" 
+ON public.exam_results FOR DELETE 
+USING (auth.uid() = user_id);
+
 -- 5. TRIGGER FOR EXAMS TAKEN
 -- Auto-increment the "exams_taken" count in users table
 CREATE OR REPLACE FUNCTION public.increment_exams_taken()

@@ -6,10 +6,14 @@ CREATE TABLE public.reports (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   question_id TEXT NOT NULL,
   reporter_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+  reporter_name TEXT,
   reason TEXT NOT NULL,
   description TEXT,
+  image_url TEXT,
   status TEXT DEFAULT 'Pending' CHECK (status IN ('Pending', 'Resolved', 'Ignored')),
   severity TEXT DEFAULT 'Medium' CHECK (severity IN ('Low', 'Medium', 'High')),
+  resolved_at TIMESTAMPTZ,
+  admin_comment TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
