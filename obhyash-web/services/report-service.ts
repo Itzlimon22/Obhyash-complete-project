@@ -141,13 +141,23 @@ export const resolveReport = async (
   }
 };
 
-export const getUserReports = async (userId: string): Promise<Report[]> => {
+export const getUserReports = async (
+  userId: string,
+  page: number = 1,
+  pageSize: number = 10,
+): Promise<Report[]> => {
   try {
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
     const { data, error } = await supabase
       .from('reports')
-      .select('*')
+      .select(
+        'id, question_id, reporter_id, reporter_name, reason, description, image_url, status, admin_comment, created_at, resolved_at',
+      )
       .eq('reporter_id', userId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(from, to);
 
     if (error) throw error;
 

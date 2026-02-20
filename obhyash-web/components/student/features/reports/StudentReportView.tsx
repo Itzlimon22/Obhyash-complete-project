@@ -11,8 +11,10 @@ import {
 } from 'lucide-react';
 import { UserProfile } from '@/lib/types';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
-import { Eye, ChevronRight } from 'lucide-react';
+import { Eye, ChevronRight, RefreshCw } from 'lucide-react';
 import { ReportSkeleton } from '@/components/student/ui/common/Skeletons';
+import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
 import {
   Dialog,
   DialogContent,
@@ -26,21 +28,31 @@ interface StudentReportViewProps {
 }
 
 const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
-  const [reports, setReports] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [expandedReport, setExpandedReport] = useState<string | null>(null);
+  const [pageSize] = useState(5);
 
-  useEffect(() => {
-    const fetchReports = async () => {
-      if (user?.id) {
-        setLoading(true);
-        const data = await getUserReports(user.id);
-        setReports(data || []);
-        setLoading(false);
-      }
-    };
-    fetchReports();
-  }, [user?.id]);
+  const {
+    data: reportsPages,
+    error,
+    size,
+    setSize,
+    isValidating,
+    isLoading,
+  } = useSWRInfinite(
+    (index) =>
+      user?.id ? ['user_reports', user.id, index + 1, pageSize] : null,
+    ([, userId, page]) => getUserReports(userId, page, pageSize),
+    {
+      revalidateOnFocus: false,
+      persistSize: true,
+    },
+  );
+
+  const reports = reportsPages ? reportsPages.flat() : [];
+  const isEmpty = reportsPages?.[0]?.length === 0;
+  const isReachingEnd =
+    isEmpty ||
+    (reportsPages && reportsPages[reportsPages.length - 1]?.length < pageSize);
 
   const toggleExpand = (id: string) => {
     setExpandedReport(expandedReport === id ? null : id);
@@ -111,7 +123,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
     );
   };
 
-  if (loading) {
+  if (isLoading && !reportsPages) {
     return <ReportSkeleton />;
   }
 
@@ -154,7 +166,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                   <div className="space-y-1">
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="font-black text-neutral-900 dark:text-white">
-                        {getSubjectDisplayName(report.question?.subject_id)}
+                        {getSubjectDisplayName(report.question?.subject ?? '')}
                       </span>
                       {getStatusBadge(report.status)}
                     </div>
@@ -280,6 +292,24 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
               </div>
             </div>
           ))}
+          {!isReachingEnd && (
+            <div className="flex justify-center pt-4">
+              <button
+                onClick={() => setSize(size + 1)}
+                disabled={isValidating}
+                className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 text-sm font-bold rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all active:scale-95 shadow-sm disabled:opacity-50"
+              >
+                {isValidating ? (
+                  <>
+                    <RefreshCw size={16} className="animate-spin" /> লোড
+                    হচ্ছে...
+                  </>
+                ) : (
+                  'আরো দেখুন'
+                )}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

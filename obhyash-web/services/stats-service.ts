@@ -343,16 +343,23 @@ export const getOverallAnalytics = async (
   timeFilter: 'all' | 'month' | 'week',
 ): Promise<OverallAnalytics> => {
   if (isSupabaseConfigured() && supabase) {
+    // 1. Try the new optimized RPC for summary stats
+    const { data: summary, error: summaryError } = await supabase.rpc(
+      'get_dashboard_summary',
+      { p_user_id: userId },
+    );
+
     const { data, error } = await supabase.rpc('get_overall_analytics', {
       p_user_id: userId,
       p_time_filter: timeFilter,
     });
 
     if (!error && data) {
+      // Merge results: Use summary from the new RPC if available
       return {
-        totalExams: data.totalExams || 0,
-        avgScore: data.avgScore || 0,
-        avgAccuracy: data.avgAccuracy || 0,
+        totalExams: summary?.totalExams ?? data.totalExams ?? 0,
+        avgScore: summary?.avgScore ?? data.avgScore ?? 0,
+        avgAccuracy: summary?.avgAccuracy ?? data.avgAccuracy ?? 0,
         totalTime: data.totalTime || 0,
         timelineData: data.timelineData || [],
         subjectData: data.subjectData || [],

@@ -16,6 +16,7 @@ import {
 } from '@/services/stats-service';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import { supabase } from '@/services/core';
+import useSWR from 'swr';
 
 import { AnalysisSkeleton } from '@/components/student/ui/common/Skeletons';
 
@@ -30,45 +31,30 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
 }) => {
   const [timeFilter, setTimeFilter] = useState<'all' | 'month' | 'week'>('all');
 
-  // ✅ FIX: Use useEffect for async data fetching
-  const [analytics, setAnalytics] = useState<OverallAnalytics | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let isMounted = true;
-    const fetchAnalytics = async () => {
-      // Find a user ID from history if user is not in state yet
-      // This is a backup if the direct auth getUser() is slow
-      let userId = '';
-
-      try {
-        setIsLoading(true);
-        if (history && history.length > 0) {
-          userId = history[0].user_id || '';
-        }
-
-        if (!userId) {
-          const {
-            data: { user },
-          } = await supabase.auth.getUser();
-          userId = user?.id || '';
-        }
-
-        if (userId && isMounted) {
-          const data = await getOverallAnalytics(userId, timeFilter);
-          if (isMounted) setAnalytics(data);
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        if (isMounted) setIsLoading(false);
+  const {
+    data: analytics,
+    error,
+    isLoading,
+  } = useSWR(
+    history && history.length > 0
+      ? ['overall_analytics', history[0].user_id, timeFilter]
+      : ['overall_analytics', 'guest', timeFilter],
+    async () => {
+      let userId = history?.[0]?.user_id;
+      if (!userId) {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        userId = user?.id || '';
       }
-    };
-    fetchAnalytics();
-    return () => {
-      isMounted = false;
-    };
-  }, [history, timeFilter]);
+      if (!userId) return null;
+      return getOverallAnalytics(userId, timeFilter);
+    },
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 60000, // 1 minute
+    },
+  );
 
   const formatTime = (seconds: number) => {
     const hrs = Math.floor(seconds / 3600);
