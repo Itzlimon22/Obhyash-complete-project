@@ -192,20 +192,19 @@ const SubjectStat: React.FC<SubjectStatProps> = ({
         </h3>
       </div>
 
-      <div className="columns-1 md:columns-2 gap-3 md:gap-4 space-y-3 md:space-y-4">
+      <div className="space-y-3 md:space-y-4">
         {data.map((subject, idx) => (
-          <div key={idx} className="break-inside-avoid">
-            <SubjectItem
-              subject={subject}
-              onClick={
-                onSubjectClick ? () => onSubjectClick(subject.name) : undefined
-              }
-            />
-          </div>
+          <SubjectItem
+            key={idx}
+            subject={subject}
+            onClick={
+              onSubjectClick ? () => onSubjectClick(subject.name) : undefined
+            }
+          />
         ))}
 
         {data.length === 0 && (
-          <div className="break-inside-avoid text-center py-8 text-neutral-400 text-sm bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-dashed border-neutral-200 dark:border-neutral-700">
+          <div className="text-center py-8 text-neutral-400 text-sm bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-dashed border-neutral-200 dark:border-neutral-700">
             এখনও কোনো পরীক্ষা দেওয়া হয়নি।
           </div>
         )}

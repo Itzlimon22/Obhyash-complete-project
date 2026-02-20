@@ -190,9 +190,9 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chart */}
-        <div className="lg:col-span-2 bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
+        <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-bold text-lg text-neutral-800 dark:text-white">
               ফলাফলের গ্রাফ
@@ -273,7 +273,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
 
         {/* Subject Breakdown */}
-        <div className="lg:col-span-1">
+        <div className="">
           <SubjectStat
             data={localizedSubjectData}
             onSubjectClick={(subject) =>

@@ -121,9 +121,6 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-white font-serif-exam">
           আমার রিপোর্টসমূহ
         </h1>
-        <p className="text-neutral-500 dark:text-neutral-400 text-sm">
-          আপনার পাঠানো সব রিপোর্ট এবং তাদের বর্তমান অবস্থা এখানে দেখতে পাবেন।
-        </p>
       </div>
 
       {reports.length === 0 ? (
@@ -162,10 +159,6 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                       {getStatusBadge(report.status)}
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500 dark:text-neutral-400 font-medium">
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-1 h-1 rounded-full bg-neutral-300" />
-                        আইডি: #{report.question_id}
-                      </span>
                       <span className="flex items-center gap-1.5">
                         <span className="w-1 h-1 rounded-full bg-neutral-300" />
                         {new Date(report.created_at).toLocaleDateString(
@@ -232,17 +225,6 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                             "{report.description || 'কোনো বিবরণ নেই'}"
                           </p>
                         </div>
-
-                        {report.question && (
-                          <div className="p-1">
-                            <h4 className="text-[10px] uppercase tracking-widest font-black text-neutral-400 mb-2">
-                              প্রশ্নের সারসংক্ষেপ
-                            </h4>
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
-                              {report.question.question}
-                            </p>
-                          </div>
-                        )}
                       </div>
 
                       <div className="space-y-5">
