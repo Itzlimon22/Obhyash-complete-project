@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, ReactNode, useRef, useEffect } from 'react';
 import {
@@ -394,7 +394,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                         </span>
                         <button
                           onClick={toggleTheme}
-                          className={`w-8 h-4.5 rounded-full relative transition-colors ${isDarkMode ? 'bg-emerald-600' : 'bg-neutral-200 dark:bg-neutral-700'}`}
+                          className={`w-8 h-4.5 rounded-full relative transition-colors ${isDarkMode ? 'bg-emerald-600' : 'bg-neutral-300 dark:bg-neutral-700'}`}
                         >
                           <div
                             className={`absolute top-0.5 left-0.5 w-3.5 h-3.5 bg-white rounded-full transition-transform shadow-sm ${isDarkMode ? 'translate-x-3.5' : 'translate-x-0'}`}

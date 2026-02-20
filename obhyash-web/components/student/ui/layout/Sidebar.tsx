@@ -276,7 +276,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 hover:text-neutral-600 dark:hover:text-neutral-300 transition-all"
+                className="p-2 rounded-lg text-neutral-500 hover:bg-white dark:hover:bg-neutral-800 hover:text-neutral-600 dark:hover:text-neutral-300 transition-all"
                 title={isDarkMode ? 'Light Mode' : 'Dark Mode'}
               >
                 {isDarkMode ? (
@@ -315,7 +315,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               {/* Logout Button */}
               <button
                 onClick={onLogout}
-                className="p-2 rounded-lg text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 hover:text-rose-600 transition-all"
+                className="p-2 rounded-lg text-neutral-500 hover:bg-white dark:hover:bg-neutral-800 hover:text-rose-600 transition-all"
                 title="Logout"
               >
                 <svg

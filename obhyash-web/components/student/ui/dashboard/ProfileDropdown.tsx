@@ -136,7 +136,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
               >
                 <div
                   className={`w-4 h-4 rounded-full bg-white shadow-sm transform transition-transform duration-300 ${
-                    isDarkMode ? 'tranneutral-x-4' : 'tranneutral-x-0'
+                    isDarkMode ? 'translate-x-4' : 'translate-x-0'
                   }`}
                 />
               </div>

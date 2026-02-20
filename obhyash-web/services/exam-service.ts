@@ -67,18 +67,15 @@ export const fetchQuestionsWithDiagnostics = async (
     throw new Error('Database configuration missing');
   }
 
-  // ═══════════════════════════════════════════════
-  // DEBUG SYSTEM: Question Fetch Diagnostics
-  // ═══════════════════════════════════════════════
-  const debug = {
+  const debug: ExamDebugInfo = {
     timestamp: new Date().toISOString(),
     input: { ...config },
-    resolvedParams: {} as Record<string, unknown>,
+    resolvedParams: {},
     fetchMethod: 'none',
-    rpcError: null as string | null,
-    queryError: null as string | null,
+    rpcError: null,
+    queryError: null,
     resultCount: 0,
-    diagnosis: [] as string[],
+    diagnosis: [],
   };
 
   try {
@@ -86,7 +83,21 @@ export const fetchQuestionsWithDiagnostics = async (
       data: { user },
     } = await supabase.auth.getUser();
 
-    // Resolve parameters once for both paths
+    // 1. Resolve multi-select parameters
+    const difficultyList =
+      config.difficulty &&
+      config.difficulty !== 'Mixed' &&
+      config.difficulty !== 'All'
+        ? config.difficulty.split('+').map((d) => d.trim())
+        : [null];
+
+    const examTypeList =
+      config.examType &&
+      config.examType !== 'Mixed' &&
+      config.examType !== 'All'
+        ? config.examType.split('+').map((t) => t.trim())
+        : [null];
+
     const resolvedChapters =
       config.chapters && config.chapters !== 'All'
         ? config.chapters.split(',').map((c) => c.trim())
@@ -97,256 +108,180 @@ export const fetchQuestionsWithDiagnostics = async (
         ? config.topics.split(',').map((t) => t.trim())
         : null;
 
-    const resolvedDifficulty =
-      config.difficulty && config.difficulty !== 'Mixed'
-        ? config.difficulty
-        : null;
-
-    const resolvedExamTypes =
-      config.examType && config.examType !== 'Mixed'
-        ? config.examType.split('+').map((t) => t.trim())
-        : null;
-
-    debug.resolvedParams = {
-      userId: user?.id || 'GUEST (no user)',
-      subject: config.subject || '⚠️ EMPTY',
-      limit: config.questionCount,
-      chapters: resolvedChapters || '✅ ALL (wildcard)',
-      topics: resolvedTopics || '✅ ALL (wildcard)',
-      difficulty: resolvedDifficulty || '✅ ALL (wildcard)',
-      examTypes: resolvedExamTypes || '✅ ALL (wildcard)',
-    };
-
-    console.group('🔍 [Exam Debug] Question Fetch Started');
-    console.log('📋 Input Config:', debug.input);
-    console.log('🎯 Resolved Params:', debug.resolvedParams);
-
-    // --- NORMALIZE SUBJECT NAME ---
-    // Bengali characters often trigger mismatches (NFC vs NFD).
-    // We try both forms if they differ, ensuring robustness against data encoding.
+    // 2. Normalize subject name for Dual-Match robustness
     const subjectName = config.subjectLabel || '';
     const nameForms = [subjectName];
-
-    // Add NFD form if different (e.g., 'য়' vs 'য' + '়')
     const nfd = subjectName.normalize('NFD');
-    if (nfd !== subjectName) {
-      nameForms.push(nfd);
-    }
-    // Also try NFC just in case input was NFD and DB is NFC (less likely but possible)
+    if (nfd !== subjectName) nameForms.push(nfd);
     const nfc = subjectName.normalize('NFC');
-    if (nfc !== subjectName && !nameForms.includes(nfc)) {
-      nameForms.push(nfc);
-    }
+    if (nfc !== subjectName && !nameForms.includes(nfc)) nameForms.push(nfc);
+
+    debug.diagnosis.push(`🔍 Subject Name Forms: ${nameForms.join(', ')}`);
+
+    // 3. Bucket Strategy: Calculate combinations and distribution
+    const combinations: {
+      difficulty: string | null;
+      examType: string | null;
+    }[] = [];
+    difficultyList.forEach((d) => {
+      examTypeList.forEach((t) => {
+        combinations.push({ difficulty: d, examType: t });
+      });
+    });
+
+    const totalNeeded = config.questionCount;
+    const bucketSize = Math.floor(totalNeeded / combinations.length);
+    const remainder = totalNeeded % combinations.length;
 
     debug.diagnosis.push(
-      `🔍 Subject Name Forms: ${nameForms.map((n) => `"${n}"`).join(', ')}`,
+      `🎯 Multi-bucket strategy: ${combinations.length} combinations, ~${bucketSize} per bucket`,
     );
 
-    // If user is logged in, use SMART FETCH (RPC)
-    if (user) {
-      debug.fetchMethod = 'SMART_RPC';
-      console.log('⚡ Method: Smart Fetch (RPC) for user:', user.id);
+    let allCollectedQuestions: Question[] = [];
+    const seenIds = new Set<string | number>();
 
-      let rpcSuccess = false;
-      let finalData: QuestionDbRow[] = [];
+    // 4. Fetch per bucket
+    for (let i = 0; i < combinations.length; i++) {
+      const bucket = combinations[i];
+      const neededForThisBucket = bucketSize + (i < remainder ? 1 : 0);
 
-      // Try each form until we get results
-      for (const formName of nameForms) {
-        const rpcParams = {
-          p_user_id: user.id,
-          p_subject: config.subject,
-          p_limit: config.questionCount,
-          p_chapters: resolvedChapters,
-          p_topics: resolvedTopics,
-          p_difficulty: resolvedDifficulty,
-          p_exam_types: resolvedExamTypes,
-          p_subject_name: formName, // Try this specific form
-        };
-        console.log(`📤 RPC Params (Name="${formName}"):`, rpcParams);
+      debug.diagnosis.push(
+        `📦 Bucket ${i + 1}: Difficulty=${bucket.difficulty || 'All'}, ExamType=${bucket.examType || 'All'}, Target=${neededForThisBucket}`,
+      );
 
-        const { data, error } = await supabase.rpc(
-          'get_smart_exam_questions',
-          rpcParams,
-        );
+      // --- FETCH LOGIC FOR ONE BUCKET ---
+      let bucketQuestions: Question[] = [];
 
-        if (error) {
-          debug.rpcError = error.message;
-          debug.diagnosis.push(
-            `❌ RPC Error with name "${formName}": ${error.message}`,
+      if (user) {
+        // Try RPC Smart Fetch
+        let rpcSuccess = false;
+        for (const formName of nameForms) {
+          const { data, error } = await supabase.rpc(
+            'get_smart_exam_questions',
+            {
+              p_user_id: user.id,
+              p_subject: config.subject,
+              p_limit: neededForThisBucket * 2, // Fetch extra for deduplication margin
+              p_chapters: resolvedChapters,
+              p_topics: resolvedTopics,
+              p_difficulty: bucket.difficulty,
+              p_exam_types: bucket.examType ? [bucket.examType] : null,
+              p_subject_name: formName,
+            },
           );
-          // Continue to next form or fallback
-        } else if (data && data.length > 0) {
-          debug.resultCount = data.length;
-          debug.diagnosis.push(
-            `✅ RPC Success with name "${formName}" (${data.length} questions)`,
-          );
-          finalData = data as unknown as QuestionDbRow[];
-          rpcSuccess = true;
-          break; // Stop trying forms if we found data
-        } else {
-          debug.diagnosis.push(
-            `⚠️ RPC returned 0 questions for name "${formName}"`,
-          );
-        }
-      }
 
-      if (rpcSuccess) {
-        // --- JS Deduplication Safeguard ---
-        const uniqueData: QuestionDbRow[] = [];
-        const seenIds = new Set<string | number>();
-        for (const q of finalData) {
-          if (!seenIds.has(q.id)) {
-            uniqueData.push(q);
-            seenIds.add(q.id);
+          if (error) {
+            debug.rpcError = error.message;
+            continue;
+          }
+
+          if (data && data.length > 0) {
+            bucketQuestions = (data as unknown as QuestionDbRow[]).map(
+              (q) =>
+                ({
+                  ...q,
+                  createdAt: q.created_at,
+                  correctAnswer: q.correct_answer,
+                  correctAnswerIndex: q.correct_answer_index,
+                  correctAnswerIndices: q.correct_answer_indices || [],
+                  imageUrl: q.image_url,
+                  optionImages: q.option_images || [],
+                  explanationImageUrl: q.explanation_image_url,
+                  examType: q.exam_type,
+                }) as unknown as Question,
+            );
+            rpcSuccess = true;
+            break;
           }
         }
 
-        if (uniqueData.length !== finalData.length) {
+        if (rpcSuccess) {
+          debug.fetchMethod = 'SMART_RPC_MULTI';
+        } else {
           debug.diagnosis.push(
-            `⚠️ Removed ${finalData.length - uniqueData.length} duplicates in JS fallback`,
+            `⚠️ Bucket ${i + 1} RPC returned 0, falling back`,
           );
-          finalData = uniqueData;
         }
-
-        console.log(`📊 Result: ${finalData.length} questions`);
-        console.groupEnd();
-
-        return {
-          questions: finalData.map((q) => ({
-            ...q,
-            createdAt: q.created_at,
-            correctAnswer: q.correct_answer,
-            correctAnswerIndex: q.correct_answer_index,
-            correctAnswerIndices: q.correct_answer_indices || [],
-            imageUrl: q.image_url,
-            optionImages: q.option_images || [],
-            explanationImageUrl: q.explanation_image_url,
-            examType: q.exam_type,
-          })) as unknown as Question[],
-          debug,
-        };
-      } else {
-        debug.diagnosis.push(
-          '↪️ All RPC attempts returned 0. Falling back to Legacy Fetch...',
-        );
-      }
-    }
-
-    // --- FALLBACK / LEGACY FETCH (For guest users or RPC failure) ---
-    debug.fetchMethod =
-      debug.fetchMethod === 'SMART_RPC' ? 'LEGACY_FALLBACK' : 'LEGACY_GUEST';
-    console.log(`⚡ Method: ${debug.fetchMethod}`);
-
-    let query = supabase.from('questions').select('*');
-
-    if (config.subject) {
-      // DUAL-MATCH for Legacy: Match ID OR any known Name Form
-      const matchConditions = [`subject.eq.${config.subject}`];
-
-      // Add standard label match
-      if (config.subject !== config.subjectLabel && config.subjectLabel) {
-        matchConditions.push(`subject.eq.${config.subjectLabel}`);
       }
 
-      // Add normalized forms match
-      nameForms.forEach((form) => {
-        if (form !== config.subject && form !== config.subjectLabel) {
-          matchConditions.push(`subject.eq.${form}`);
+      // Fallback to Legacy Fetch for bucket
+      if (bucketQuestions.length === 0) {
+        let query = supabase.from('questions').select('*');
+
+        // Subject filter
+        const matchConditions = [`subject.eq.${config.subject}`];
+        if (config.subject !== config.subjectLabel && config.subjectLabel) {
+          matchConditions.push(`subject.eq.${config.subjectLabel}`);
         }
-      });
+        nameForms.forEach((form) => {
+          if (form !== config.subject && form !== config.subjectLabel) {
+            matchConditions.push(`subject.eq.${form}`);
+          }
+        });
+        query = query.or(matchConditions.join(','));
 
-      query = query.or(matchConditions.join(','));
-    }
+        if (resolvedChapters) query = query.in('chapter', resolvedChapters);
+        if (resolvedTopics) query = query.in('topic', resolvedTopics);
+        if (bucket.difficulty)
+          query = query.eq('difficulty', bucket.difficulty);
+        if (bucket.examType) query = query.eq('exam_type', bucket.examType);
 
-    if (config.chapters && config.chapters !== 'All') {
-      const chapters = config.chapters.split(',').map((c) => c.trim());
-      if (chapters.length > 0) {
-        query = query.in('chapter', chapters);
+        query = query.limit(neededForThisBucket * 3); // Overfetch for random selection
+
+        const { data, error } = await query;
+        if (error) {
+          debug.queryError = error.message;
+          debug.diagnosis.push(
+            `❌ Bucket ${i + 1} Legacy Error: ${error.message}`,
+          );
+        } else if (data && data.length > 0) {
+          bucketQuestions = (data as unknown as QuestionDbRow[]).map(
+            (q) =>
+              ({
+                ...q,
+                createdAt: q.created_at,
+                correctAnswer: q.correct_answer,
+                correctAnswerIndex: q.correct_answer_index,
+                correctAnswerIndices: q.correct_answer_indices || [],
+                imageUrl: q.image_url,
+                optionImages: q.option_images || [],
+                explanationImageUrl: q.explanation_image_url,
+                examType: q.exam_type,
+              }) as unknown as Question,
+          );
+          if (debug.fetchMethod === 'none') debug.fetchMethod = 'LEGACY_MULTI';
+        }
       }
-    }
 
-    if (
-      config.topics &&
-      config.topics !== 'General' &&
-      config.topics !== 'All'
-    ) {
-      const topics = config.topics.split(',').map((t) => t.trim());
-      if (topics.length > 0) {
-        query = query.in('topic', topics);
+      // Add unique questions from this bucket
+      let addedFromThisBucket = 0;
+      const shuffledBucket = bucketQuestions.sort(() => 0.5 - Math.random());
+      for (const q of shuffledBucket) {
+        if (!seenIds.has(q.id)) {
+          allCollectedQuestions.push(q);
+          seenIds.add(q.id);
+          addedFromThisBucket++;
+          if (addedFromThisBucket >= neededForThisBucket) break;
+        }
       }
-    }
 
-    if (config.difficulty && config.difficulty !== 'Mixed') {
-      query = query.eq('difficulty', config.difficulty);
-    }
-
-    // Exam type filter for legacy path
-    if (config.examType && config.examType !== 'Mixed') {
-      const types = config.examType.split('+').map((t) => t.trim());
-      if (types.length > 0) {
-        query = query.in('exam_type', types);
-      }
-    }
-
-    // Legacy random fetch logic
-    query = query.limit(config.questionCount * 2);
-
-    const { data, error } = await query;
-
-    if (error) {
-      debug.queryError = error.message;
-      debug.diagnosis.push(`❌ Legacy Query Error: ${error.message}`);
-      console.error('❌ Legacy Fetch Error:', error);
-      console.warn('⚠️ DIAGNOSIS:', debug.diagnosis.join('\n'));
-      console.groupEnd();
-      throw error;
-    }
-
-    if (!data || data.length === 0) {
-      debug.diagnosis.push('⚠️ Legacy query returned 0 questions.');
       debug.diagnosis.push(
-        '💡 TIP: Check if questions exist in DB for this subject with matching filters',
+        `✅ Bucket ${i + 1} added: ${addedFromThisBucket}/${neededForThisBucket}`,
       );
-      console.warn(
-        '⚠️ No questions found. DIAGNOSIS:',
-        debug.diagnosis.join('\n'),
-      );
-      console.log('📋 Full Debug Report:', debug);
-      console.groupEnd();
-      return { questions: [], debug };
     }
 
-    debug.resultCount = data.length;
-    debug.diagnosis.push(
-      `✅ Legacy fetch returned ${data.length} raw, serving ${Math.min(data.length, config.questionCount)}`,
-    );
-    console.log(
-      `📊 Result: ${data.length} raw → ${Math.min(data.length, config.questionCount)} served`,
-    );
-    console.groupEnd();
+    // 5. Final Shuffle and Truncate
+    const finalQuestions = allCollectedQuestions
+      .sort(() => 0.5 - Math.random())
+      .slice(0, totalNeeded);
 
-    const shuffled = data.sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, config.questionCount);
+    debug.resultCount = finalQuestions.length;
+    debug.diagnosis.push(`🏁 Final total questions: ${finalQuestions.length}`);
 
-    return {
-      questions: (selected as unknown as QuestionDbRow[]).map((q) => ({
-        ...q,
-        createdAt: q.created_at,
-        correctAnswer: q.correct_answer,
-        correctAnswerIndex: q.correct_answer_index,
-        correctAnswerIndices: q.correct_answer_indices || [],
-        imageUrl: q.image_url,
-        optionImages: q.option_images || [],
-        explanationImageUrl: q.explanation_image_url,
-        examType: q.exam_type,
-      })) as unknown as Question[],
-      debug,
-    };
+    return { questions: finalQuestions, debug };
   } catch (err) {
     debug.diagnosis.push(`💥 Exception: ${err}`);
     console.error('💥 [Exam Debug] FATAL:', err);
-    console.log('📋 Full Debug Report:', debug);
-    console.groupEnd();
     return { questions: [], debug };
   }
 };
