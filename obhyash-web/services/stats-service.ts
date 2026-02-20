@@ -243,6 +243,7 @@ export const getSubjectAnalysis = async (
             if (!exam.subject) return false;
             const sLower = exam.subject.toLowerCase();
             return (
+              sLower === targetSubjLower ||
               sLower.includes(targetSubjLower) ||
               (targetSubjLower === 'physics' &&
                 sLower.includes('পদার্থবিজ্ঞান')) ||
@@ -250,7 +251,11 @@ export const getSubjectAnalysis = async (
               (targetSubjLower === 'math' &&
                 (sLower.includes('গণিত') || sLower.includes('math'))) ||
               (targetSubjLower === 'biology' &&
-                (sLower.includes('জীববিজ্ঞান') || sLower.includes('bio')))
+                (sLower.includes('জীববিজ্ঞান') || sLower.includes('bio'))) ||
+              (targetSubjLower === 'bangla' && sLower.includes('বাংলা')) ||
+              (targetSubjLower === 'english' && sLower.includes('ইংরেজি')) ||
+              (targetSubjLower === 'gk' && sLower.includes('সাধারণ জ্ঞান')) ||
+              (targetSubjLower === 'ict' && sLower.includes('আইসিটি'))
             );
           });
 

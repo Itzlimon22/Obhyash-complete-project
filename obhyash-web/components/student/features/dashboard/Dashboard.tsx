@@ -69,14 +69,21 @@ const Dashboard: React.FC<DashboardProps> = ({
           let total = 0;
 
           history.forEach((exam) => {
-            const hSub = exam.subject.toLowerCase();
+            const hSub = (exam.subjectLabel || exam.subject).toLowerCase();
+            const hSubId = exam.subject.toLowerCase();
+            // Match exactly by DB UUID or fallback logic for legacy data
             const isMatch =
+              hSubId === subId ||
               hSub.includes(subName) ||
               hSub.includes(subId) ||
               (subName === 'পদার্থবিজ্ঞান' && hSub.includes('physics')) ||
               (subName === 'রসায়ন' && hSub.includes('chemistry')) ||
               (subName === 'গণিত' && hSub.includes('math')) ||
-              (subName === 'জীববিজ্ঞান' && hSub.includes('biology'));
+              (subName === 'জীববিজ্ঞান' && hSub.includes('biology')) ||
+              (subName === 'বাংলা' && hSub.includes('bangla')) ||
+              (subName === 'ইংরেজি' && hSub.includes('english')) ||
+              (subName === 'সাধারণ জ্ঞান' && hSub.includes('gk')) ||
+              (subName === 'আইসিটি' && hSub.includes('ict'));
 
             if (isMatch) {
               correct += exam.correctCount;

@@ -645,9 +645,7 @@ export const getExamHistory = async (): Promise<ExamResult[]> => {
 
     const { data, error } = await supabase
       .from('exam_results')
-      .select(
-        'id, user_id, subject, subject_label, exam_type, date, score, total_marks, total_questions, correct_count, wrong_count, time_taken, negative_marking, chapters, status, submission_type, questions, user_answers',
-      )
+      .select('*')
       .eq('user_id', user.id)
       .order('date', { ascending: false });
 
