@@ -46,7 +46,7 @@ const PracticeRow: React.FC<{
     <div className="mb-8">
       <div className="flex justify-between items-center px-2 mb-2">
         <div className="flex flex-col">
-          <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400">
+          <span className="text-xs font-black text-black/60 dark:text-white/60">
             {new Date(item.examDate).toLocaleDateString('bn-BD', {
               day: 'numeric',
               month: 'short',
@@ -54,7 +54,7 @@ const PracticeRow: React.FC<{
             • {item.subjectLabel || item.subject}
           </span>
           {revealed && item.userAns !== undefined && isMistakeTab && (
-            <span className="text-[10px] text-neutral-400 mt-0.5">
+            <span className="text-[10px] text-black/50 dark:text-white/50 mt-0.5 font-bold uppercase tracking-wider">
               আপনার পূর্বের উত্তর:{' '}
               <span
                 className={
@@ -74,7 +74,7 @@ const PracticeRow: React.FC<{
         {revealed && (
           <button
             onClick={handleRetry}
-            className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+            className="text-[10px] font-black text-emerald-700 dark:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 uppercase tracking-widest"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -561,60 +561,66 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                         : 0;
 
                     let badgeClass =
-                      'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400';
+                      'bg-black/5 text-black/80 dark:bg-white/10 dark:text-white/80 border border-black/10 dark:border-white/20';
                     let statusText = `${scorePercent}%`;
 
                     if (isPending) {
                       badgeClass =
-                        'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
+                        'bg-black text-white dark:bg-white dark:text-black';
                       statusText = 'Pending';
                     } else if (isRejected) {
                       badgeClass =
-                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+                        'bg-red-600 text-white dark:bg-red-500 dark:text-white';
                       statusText = 'Rejected';
                     } else if (scorePercent >= 80) {
                       badgeClass =
-                        'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
+                        'bg-emerald-700 text-white dark:bg-emerald-600 dark:text-white shadow-sm';
+                    } else if (scorePercent < 40) {
+                      badgeClass =
+                        'bg-red-100 text-red-700 border border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-900/50';
                     }
 
                     return (
                       <div
                         key={item.id}
-                        className="group bg-white dark:bg-neutral-900 rounded-xl p-4 border border-neutral-200 dark:border-neutral-800 hover:shadow-lg hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all duration-200 flex flex-col justify-between h-full relative overflow-hidden"
+                        className="group bg-white dark:bg-black rounded-2xl p-5 border border-black/10 dark:border-white/10 hover:shadow-2xl hover:border-emerald-700/50 dark:hover:border-emerald-700/50 transition-all duration-300 flex flex-col justify-between h-full relative overflow-hidden"
                       >
-                        <div className="mb-3">
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="flex items-center gap-1.5 text-[10px] text-neutral-400 dark:text-neutral-500 font-bold uppercase tracking-wider">
+                        <div className="mb-4">
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="flex items-center gap-1.5 text-[10px] text-black/60 dark:text-white/60 font-black uppercase tracking-widest">
                               {formatDate(item.date)}
                             </div>
                             <span
-                              className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${badgeClass}`}
+                              className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest ${badgeClass}`}
                             >
                               {statusText}
                             </span>
                           </div>
-                          <h3 className="text-base font-bold text-neutral-900 dark:text-white line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                          <h3 className="text-lg font-black text-black dark:text-white line-clamp-1 group-hover:text-emerald-700 dark:group-hover:text-emerald-500 transition-colors tracking-tight mb-1">
                             {item.subjectLabel || item.subject}
                           </h3>
-                          <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mb-3 font-medium">
+                          <p className="text-xs text-black/60 dark:text-white/60 mb-5 font-bold uppercase tracking-wider">
                             {item.examType || 'Practice Exam'}
                           </p>
 
                           {!isPending && !isRejected && (
-                            <div className="flex items-center justify-between text-xs bg-neutral-50 dark:bg-neutral-800/50 p-2 rounded-lg border border-neutral-100 dark:border-neutral-800/50">
+                            <div className="flex items-center justify-between text-xs bg-black/5 dark:bg-white/5 p-3 rounded-xl border border-black/5 dark:border-white/5">
                               <div className="flex flex-col">
-                                <span className="text-[9px] text-neutral-400 uppercase font-bold">
+                                <span className="text-[10px] text-black/50 dark:text-white/50 uppercase font-black tracking-widest mb-0.5">
                                   Score
                                 </span>
-                                <span className="font-bold text-neutral-700 dark:text-neutral-200">
-                                  {item.score.toFixed(1)} / {item.totalMarks}
+                                <span className="text-sm font-black text-black dark:text-white">
+                                  {item.score.toFixed(1)}{' '}
+                                  <span className="text-black/40 dark:text-white/40 font-bold">
+                                    / {item.totalMarks}
+                                  </span>
                                 </span>
                               </div>
                               <div className="flex flex-col text-right">
-                                <span className="text-[9px] text-neutral-400 uppercase font-bold">
+                                <span className="text-[10px] text-black/50 dark:text-white/50 uppercase font-black tracking-widest mb-0.5">
                                   Time
                                 </span>
-                                <span className="font-bold text-neutral-700 dark:text-neutral-200">
+                                <span className="text-sm font-black text-black dark:text-white">
                                   {formatDuration(item.timeTaken)}
                                 </span>
                               </div>
@@ -629,7 +635,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                                 : () => onViewResult(item)
                             }
                             disabled={isPending}
-                            className="w-full py-2 flex items-center justify-center gap-1.5 text-white font-bold text-xs bg-neutral-900 dark:bg-indigo-600 hover:bg-neutral-800 dark:hover:bg-indigo-500 rounded-lg shadow-sm transition-all active:scale-[0.98] disabled:opacity-50 disabled:bg-neutral-400"
+                            className="w-full py-3 flex items-center justify-center gap-2 text-white font-black text-xs uppercase tracking-widest bg-black dark:bg-white dark:text-black hover:bg-emerald-700 dark:hover:bg-emerald-500 dark:hover:text-white rounded-xl shadow-md transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:bg-black/20 dark:disabled:bg-white/20"
                           >
                             {isRejected ? 'Request Recheck' : 'View Result'}
                           </button>

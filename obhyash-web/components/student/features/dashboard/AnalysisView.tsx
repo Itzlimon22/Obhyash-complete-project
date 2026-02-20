@@ -10,7 +10,10 @@ import {
 } from 'recharts';
 import { ExamResult } from '@/lib/types';
 import SubjectStat from './SubjectStat';
-import { getOverallAnalytics, OverallAnalytics } from '@/services/database';
+import {
+  getOverallAnalytics,
+  OverallAnalytics,
+} from '@/services/stats-service';
 import { supabase } from '@/services/core';
 
 interface AnalysisViewProps {
