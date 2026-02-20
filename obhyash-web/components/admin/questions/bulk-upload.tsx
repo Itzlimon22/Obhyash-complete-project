@@ -187,8 +187,8 @@ const QuestionPreview: React.FC<{
   question: Partial<Question>;
   onClose: () => void;
 }> = ({ question: q, onClose }) => (
-  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-    <div className="bg-white dark:bg-neutral-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-auto shadow-2xl border border-neutral-200 dark:border-neutral-800">
+  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-[100] p-0 sm:p-4">
+    <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 max-w-2xl w-full max-h-[90vh] overflow-auto shadow-2xl border border-neutral-200 dark:border-neutral-800">
       <div className="p-5 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center sticky top-0 bg-white dark:bg-neutral-900 z-10">
         <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
           প্রশ্ন প্রিভিউ
@@ -293,8 +293,8 @@ const EditModal: React.FC<{
   };
 
   return (
-    <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl max-w-xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col">
+    <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-[100] p-0 sm:p-4">
+      <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 max-w-xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col">
         <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center">
           <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
             প্রশ্ন সম্পাদনা
@@ -885,7 +885,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   // ── STEP 1: Upload ─────────────────────────────────────────────────
   if (step === 1) {
     return (
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-xl max-w-3xl mx-auto overflow-hidden">
+      <div className="w-full bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-neutral-200 dark:border-neutral-800 shadow-xl max-w-3xl mx-auto overflow-hidden">
         {/* Header */}
         <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center">
           <div>
@@ -992,7 +992,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
   // ── STEP 2: Review & Import ────────────────────────────────────────
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-xl max-w-5xl mx-auto overflow-hidden flex flex-col max-h-[95vh]">
+    <div className="w-full bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-neutral-200 dark:border-neutral-800 shadow-xl max-w-5xl mx-auto overflow-hidden flex flex-col max-h-[95vh]">
       {/* Modals */}
       {previewQuestion && (
         <QuestionPreview

@@ -98,8 +98,8 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-sm animate-fade-in">
-        <div className="bg-white dark:bg-neutral-900 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-neutral-900/60 backdrop-blur-sm animate-fade-in">
+        <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
           {/* Header */}
           <div className="p-4 flex justify-between items-center border-b border-neutral-100 dark:border-neutral-800">
             <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
@@ -153,7 +153,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 </div>
 
                 {/* Instructions Box */}
-                <div className="bg-white dark:bg-black border-2 border-dashed border-emerald-200 dark:border-emerald-900 rounded-xl p-5 text-center">
+                <div className="w-full bg-white dark:bg-black border-2 border-dashed border-emerald-200 dark:border-emerald-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-5 text-center">
                   <h4 className="text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-3">
                     অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করুন
                   </h4>

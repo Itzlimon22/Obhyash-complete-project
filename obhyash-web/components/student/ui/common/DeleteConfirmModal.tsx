@@ -55,7 +55,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           />
 
           {/* ── Dialog card ── */}
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
+          <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none">
             <motion.div
               key="panel"
               initial={{ scale: 0.9, opacity: 0, y: 20 }}

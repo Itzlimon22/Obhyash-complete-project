@@ -74,7 +74,7 @@ export function ComplaintResolutionModal({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[200] flex items-center justify-center p-0 sm:p-4">
+      <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-0 sm:p-4">
         <div
           className="absolute inset-0 bg-neutral-900/80 backdrop-blur-md transition-opacity"
           onClick={onClose}
@@ -171,7 +171,7 @@ export function ComplaintResolutionModal({
             <div className="flex gap-2.5 w-full sm:w-auto">
               <button
                 onClick={() => handleAction('In Progress')}
-                className="flex-1 sm:flex-none px-5 py-2.5 text-xs font-black text-neutral-500 dark:text-neutral-400 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl transition-all active:scale-[0.98] uppercase tracking-tight shadow-sm"
+                className="w-full flex-1 sm:flex-none px-5 py-2.5 text-xs font-black text-neutral-500 dark:text-neutral-400 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 transition-all active:scale-[0.98] uppercase tracking-tight shadow-sm"
               >
                 Working
               </button>

@@ -54,8 +54,8 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-        <div className="bg-white dark:bg-black w-full max-w-2xl rounded-2xl shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="bg-white dark:bg-black w-full max-w-2xl rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
           {/* Header */}
           <div className="px-6 py-4 border-b border-black/10 dark:border-white/10 flex justify-between items-center">
             <h3 className="text-lg font-black text-black dark:text-white flex items-center gap-2">
@@ -72,7 +72,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
 
           <div className="p-6 overflow-y-auto flex-1">
             {/* Reporter Info */}
-            <div className="flex items-center gap-3 mb-6 p-4 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5">
+            <div className="w-full flex items-center gap-3 mb-6 p-4 bg-black/5 dark:bg-white/5 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-black/5 dark:border-white/5">
               <div className="w-10 h-10 rounded-full bg-emerald-700 flex items-center justify-center text-white font-black text-sm">
                 <User size={18} />
               </div>
@@ -86,7 +86,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
                 </p>
               </div>
               {report.reporter_id && (
-                <div className="ml-auto px-3 py-1 bg-white dark:bg-black rounded-lg border border-black/10 dark:border-white/10 text-xs font-black text-black/50 dark:text-white/50">
+                <div className="w-full ml-auto px-3 py-1 bg-white dark:bg-black rounded-t-2xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-black/10 dark:border-white/10 text-xs font-black text-black/50 dark:text-white/50">
                   {report.reporter_id.slice(0, 8)}...
                 </div>
               )}
@@ -97,7 +97,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
               <h4 className="text-xs font-black text-black/40 dark:text-white/40 uppercase tracking-widest mb-3">
                 প্রশ্ন ও সমস্যা
               </h4>
-              <div className="bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl p-4 mb-4">
+              <div className="w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-4 mb-4">
                 <div className="flex justify-between mb-2">
                   <span className="text-xs font-black text-black/40 dark:text-white/40 uppercase tracking-widest">
                     Question #{String(report.question_id).slice(0, 8)}
@@ -128,7 +128,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
                     <span className="font-black text-black/60 dark:text-white/60 uppercase tracking-wide text-xs min-w-[100px] mt-1">
                       বিবরণ
                     </span>
-                    <div className="flex-1 flex items-start gap-2 bg-black/5 dark:bg-white/5 p-3 rounded-lg border border-black/5 dark:border-white/5">
+                    <div className="w-full flex-1 flex items-start gap-2 bg-black/5 dark:bg-white/5 p-3 rounded-t-2xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-black/5 dark:border-white/5">
                       <MessageSquare
                         size={14}
                         className="text-black/30 dark:text-white/30 mt-0.5 shrink-0"

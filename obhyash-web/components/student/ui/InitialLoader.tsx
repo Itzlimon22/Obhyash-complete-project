@@ -3,7 +3,7 @@ import { PenTool, BookOpen } from 'lucide-react';
 
 const InitialLoader: React.FC = () => {
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white dark:bg-black overflow-hidden">
+    <div className="fixed inset-0 z-[9999] flex flex-col items-end sm:items-center justify-center bg-white dark:bg-black overflow-hidden">
       {/* Background Micro-elements */}
       <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
         <div className="absolute top-10 left-10 animate-pulse">

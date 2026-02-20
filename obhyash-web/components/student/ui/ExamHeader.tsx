@@ -189,7 +189,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
 
           {/* Download Menu */}
           {showDownloads && (
-            <div className="absolute top-10 right-0 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-xl py-2 w-48 z-[60]">
+            <div className="w-full absolute top-10 right-0 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-t-2xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-xl py-2 w-48 z-[60]">
               <button
                 onClick={() => {
                   onDownloadQuestionPaper();

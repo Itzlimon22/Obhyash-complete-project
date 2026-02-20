@@ -26,8 +26,8 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+      <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-violet-600 p-6 rounded-t-2xl flex items-center justify-between z-10">
           <div>
@@ -41,7 +41,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="text-white/80 hover:text-white hover:bg-white/20 p-2 rounded-lg transition-colors"
+            className="w-full text-white/80 hover:text-white hover:bg-white/20 p-2 rounded-t-2xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>

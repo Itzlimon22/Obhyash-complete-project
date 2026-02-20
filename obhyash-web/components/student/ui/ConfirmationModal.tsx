@@ -19,8 +19,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-neutral-900/40 backdrop-blur-sm animate-fade-in">
-        <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-2xl max-w-md w-full p-6 border border-neutral-100 dark:border-neutral-700 transform transition-all scale-100">
+      <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-neutral-900/40 backdrop-blur-sm animate-fade-in">
+        <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-2xl max-w-md w-full p-6 border border-neutral-100 dark:border-neutral-700 transform transition-all duration-300">
           <div className="flex items-start gap-4">
             <div
               className={`flex-shrink-0 p-3 rounded-full ${unansweredCount > 0 ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' : 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'}`}

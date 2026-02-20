@@ -65,8 +65,8 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({ isOpen, onClose
   );
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header */}
         <div className="p-4 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
@@ -99,7 +99,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({ isOpen, onClose
                     </div>
 
                     {/* Instructions Box */}
-                    <div className="bg-white dark:bg-black border-2 border-dashed border-indigo-200 dark:border-indigo-900 rounded-xl p-5 text-center">
+                    <div className="w-full bg-white dark:bg-black border-2 border-dashed border-indigo-200 dark:border-indigo-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-5 text-center">
                         <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করুন</h4>
                         
                         <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mb-3 flex items-center justify-between group cursor-pointer" onClick={() => copyToClipboard('01234567890')}>

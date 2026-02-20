@@ -89,7 +89,7 @@ export const ExamDemo = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-neutral-900 border border-red-100 dark:border-neutral-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden group hover:border-indigo-500 dark:hover:border-indigo-900 transition-colors h-[320px] flex flex-col">
+    <div className="w-full bg-white dark:bg-neutral-900 border border-red-100 dark:border-neutral-800 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-6 shadow-2xl relative overflow-hidden group hover:border-indigo-500 dark:hover:border-indigo-900 transition-colors h-[320px] flex flex-col">
       <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-600 to-rose-600"></div>
 
       {/* Header */}
@@ -411,7 +411,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 onClick={() =>
                   window.scrollTo({ top: 800, behavior: 'smooth' })
                 }
-                className="px-8 py-4 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl font-bold text-base hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all"
+                className="w-full px-8 py-4 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 font-bold text-base hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all"
               >
                 ফিচারগুলো দেখুন
               </button>
@@ -451,7 +451,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Right Interactive Demo */}
           <div className="lg:w-1/2 w-full">
-            <div className="relative bg-white dark:bg-neutral-900 rounded-2xl border border-red-100 dark:border-neutral-800 shadow-2xl shadow-neutral-200/50 dark:shadow-black/50 overflow-hidden">
+            <div className="w-full relative bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-red-100 dark:border-neutral-800 shadow-2xl shadow-neutral-200/50 dark:shadow-black/50 overflow-hidden">
               {/* Fake Browser Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
                 <div className="flex gap-2">

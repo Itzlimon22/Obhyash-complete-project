@@ -63,8 +63,8 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-2xl max-w-lg w-full p-6 border border-neutral-100 dark:border-neutral-800 flex flex-col max-h-[95vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-neutral-900/60 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-2xl max-w-lg w-full p-6 border border-neutral-100 dark:border-neutral-800 flex flex-col max-h-[95vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-bold text-neutral-900 dark:text-white">
             OMR স্ক্রিপ্ট আপলোড

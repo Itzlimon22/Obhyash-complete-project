@@ -174,7 +174,7 @@ export default function OmrDashboard({ initialData }: OmrDashboardProps) {
       </div>
 
       {/* 2. Data Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+      <div className="w-full bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800">
@@ -262,8 +262,8 @@ export default function OmrDashboard({ initialData }: OmrDashboardProps) {
 
       {/* 3. Review Modal */}
       {viewingScript && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-xl overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
             {/* Modal Header */}
             <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800">
               <div>
@@ -436,7 +436,7 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
+    <div className="w-full bg-white dark:bg-slate-900 p-5 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
       <div className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">
         {label}
       </div>

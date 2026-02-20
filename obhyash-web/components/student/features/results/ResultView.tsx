@@ -220,8 +220,8 @@ const ResultView: React.FC<ResultViewProps> = ({
 
       {/* Modal: Report Question Issue */}
       {reportModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-2xl max-w-md w-full p-5 border border-neutral-100 dark:border-neutral-800 transform transition-all scale-100">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-neutral-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-2xl max-w-md w-full p-5 border border-neutral-100 dark:border-neutral-800 transform transition-all duration-300">
             <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">
               প্রশ্ন {reportingQuestionId} রিপোর্ট করুন
             </h3>

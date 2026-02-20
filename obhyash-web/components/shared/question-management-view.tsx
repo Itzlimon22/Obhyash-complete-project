@@ -133,7 +133,7 @@ export default function QuestionManagementView({
             <div className="flex gap-2 sm:gap-3">
               <button
                 onClick={handleCreate} // Use handleCreate explicitly
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-900 dark:text-white rounded-xl text-sm font-medium transition-colors shadow-sm"
+                className="w-full flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-900 dark:text-white rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 text-sm font-medium transition-colors shadow-sm"
               >
                 <Plus size={16} /> নতুন প্রশ্ন
               </button>
@@ -244,7 +244,7 @@ export default function QuestionManagementView({
 
           {/* Questions Table */}
           {isLoading ? (
-            <div className="py-20 flex justify-center bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800">
+            <div className="w-full py-20 flex justify-center bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-neutral-200 dark:border-neutral-800">
               <Loader2 className="animate-spin text-rose-600" size={32} />
             </div>
           ) : (
@@ -294,8 +294,8 @@ export default function QuestionManagementView({
 
       {/* Preview Modal */}
       {previewData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/60 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl w-full max-w-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm bg-black/60 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 w-full max-w-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col max-h-[90vh]">
             <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-start">
               <div>
                 <div className="flex items-center gap-2 mb-1">

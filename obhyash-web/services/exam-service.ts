@@ -416,7 +416,6 @@ export const initiateExamSession = async (
       .insert({
         user_id: user.id,
         subject: config.subject,
-        subject_label: config.subjectLabel || config.subject,
         exam_type: config.examType,
         date: new Date().toISOString(),
         score: 0, // Placeholder
@@ -528,7 +527,6 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
       const { error } = await supabase.from('exam_results').insert({
         user_id: user.id,
         subject: result.subject,
-        subject_label: result.subjectLabel || result.subject,
         exam_type: result.examType,
         date: result.date || new Date().toISOString(),
         score: result.score,

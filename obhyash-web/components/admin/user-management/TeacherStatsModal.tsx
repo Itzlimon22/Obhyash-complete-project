@@ -45,8 +45,8 @@ export default function TeacherStatsModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/60 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl w-full max-w-lg border border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm bg-black/60 animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 w-full max-w-lg border border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col">
         {/* Header */}
         <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center">
           <div>
@@ -82,7 +82,7 @@ export default function TeacherStatsModal({
                     {stats?.totalQuestions || 0}
                   </p>
                 </div>
-                <div className="p-3 bg-white dark:bg-neutral-800 rounded-lg shadow-sm">
+                <div className="w-full p-3 bg-white dark:bg-neutral-800 rounded-t-2xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-sm">
                   <FileText className="text-blue-500" size={24} />
                 </div>
               </div>

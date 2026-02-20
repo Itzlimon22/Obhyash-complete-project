@@ -20,8 +20,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const isWarning = !isOmrMode && unansweredCount > 0;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neutral-900/40 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-2xl max-w-md w-full p-6 border border-neutral-100 dark:border-neutral-700 transform transition-all scale-100">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-neutral-900/40 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-2xl max-w-md w-full p-6 border border-neutral-100 dark:border-neutral-700 transform transition-all duration-300">
         <div className="flex items-start gap-4">
           <div
             className={`flex-shrink-0 p-3 rounded-full ${isWarning ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' : 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400'}`}

@@ -189,7 +189,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                 onClick={() => setIsDropdownOpen(false)}
               />
 
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-obsidian-900 rounded-xl shadow-lg border border-gray-100 dark:border-obsidian-800 py-1 z-20 animate-in fade-in zoom-in-95 duration-200">
+              <div className="w-full absolute right-0 mt-2 w-48 bg-white dark:bg-obsidian-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-lg border border-gray-100 dark:border-obsidian-800 py-1 z-20 animate-in fade-in zoom-in-95 duration-200">
                 <div className="px-4 py-2 border-b border-gray-100 dark:border-obsidian-800">
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                     {user?.name || 'Admin User'}

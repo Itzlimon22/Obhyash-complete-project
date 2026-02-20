@@ -104,8 +104,8 @@ export default function BulkEmailModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl w-full max-w-lg shadow-xl border border-neutral-200 dark:border-neutral-800">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 w-full max-w-lg shadow-xl border border-neutral-200 dark:border-neutral-800">
         <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">

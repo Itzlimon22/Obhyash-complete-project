@@ -90,8 +90,8 @@ export default function ManageSubscriptionModal({
   if (!isOpen || !user) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-md border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-2xl w-full max-w-md border border-neutral-200 dark:border-neutral-800 overflow-hidden">
         {/* Header */}
         <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center bg-neutral-50 dark:bg-neutral-900/50">
           <div>
@@ -177,7 +177,7 @@ export default function ManageSubscriptionModal({
                 onChange={(e) =>
                   setExtensionDays(parseInt(e.target.value) || 0)
                 }
-                className="flex-1 px-3 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md text-sm outline-none focus:border-blue-500"
+                className="w-full flex-1 px-3 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-t-2xl sm:rounded-md rounded-b-none sm:rounded-b-md animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 text-sm outline-none focus:border-blue-500"
               />
             </div>
           </div>

@@ -88,7 +88,7 @@ export default function TeacherSidebar() {
       {/* Mobile Trigger */}
       <button
         onClick={() => setIsMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 bg-white dark:bg-neutral-900 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:scale-105 active:scale-95 transition-all"
+        className="w-full lg:hidden fixed top-4 left-4 z-50 p-2.5 bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-lg border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:scale-105 active:scale-95 transition-all"
       >
         <Menu size={20} />
       </button>

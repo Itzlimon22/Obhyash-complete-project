@@ -375,8 +375,8 @@ export default function BulkUploadDialog({
   });
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white w-full max-w-5xl h-[85vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+      <div className="bg-white w-full max-w-5xl h-[85vh] rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 flex flex-col overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="p-6 border-b flex justify-between items-center bg-neutral-50">
           <div>

@@ -53,7 +53,7 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-0 sm:p-4">
       <div
         className="absolute inset-0 bg-neutral-900/80 backdrop-blur-md transition-opacity"
         onClick={onClose}
@@ -89,7 +89,7 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
           {/* Left: Details */}
           <div className="w-full md:w-1/3 p-5 border-b md:border-b-0 md:border-r border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30">
             <div className="space-y-4">
-              <div className="bg-white dark:bg-black p-4 rounded-xl border border-neutral-100 dark:border-neutral-800 shadow-sm">
+              <div className="w-full bg-white dark:bg-black p-4 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-neutral-100 dark:border-neutral-800 shadow-sm">
                 <div className="flex items-center gap-1.5 mb-1.5">
                   <Flag size={12} className="text-rose-600" />
                   <span className="text-xs font-black text-rose-600 dark:text-rose-400 uppercase tracking-tight">
@@ -198,7 +198,7 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
             <div className="flex gap-2.5 w-full sm:w-auto">
               <button
                 onClick={() => handleAction('ignore')}
-                className="flex-1 sm:flex-none px-5 py-2.5 text-xs font-black text-neutral-500 dark:text-neutral-400 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl transition-all active:scale-[0.98] uppercase tracking-tight shadow-sm"
+                className="w-full flex-1 sm:flex-none px-5 py-2.5 text-xs font-black text-neutral-500 dark:text-neutral-400 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 transition-all active:scale-[0.98] uppercase tracking-tight shadow-sm"
               >
                 Ignore
               </button>

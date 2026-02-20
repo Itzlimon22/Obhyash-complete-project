@@ -408,7 +408,7 @@ const UserForm = ({
                   </div>
                 </InputGroup>
 
-                <div className="flex items-center justify-between p-3 bg-white dark:bg-obsidian-900 border border-paper-200 dark:border-obsidian-800 rounded-lg">
+                <div className="w-full flex items-center justify-between p-3 bg-white dark:bg-obsidian-900 border border-paper-200 dark:border-obsidian-800 rounded-t-2xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200">
                   <span className="text-sm font-medium dark:text-gray-300">
                     লিংক অ্যাকাউন্ট
                   </span>

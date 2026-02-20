@@ -284,7 +284,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         <button
           type="button"
           onClick={() => setIsOmrModalOpen(true)}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-xl font-semibold text-sm hover:shadow-lg transition-all active:scale-95"
+          className="w-full inline-flex items-center gap-2 px-5 py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 font-semibold text-sm hover:shadow-lg transition-all active:scale-95"
         >
           <FileQuestion className="w-4 h-4" />
           OMR শিট ডাউনলোড
@@ -309,7 +309,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         {/* LEFT COLUMN - SELECTION */}
         <div className="lg:col-span-2 space-y-6">
           {/* Subject Selection */}
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800">
+          <div className="w-full bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-6 border border-neutral-200 dark:border-neutral-800">
             <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-4">
               বিষয় নির্বাচন করুন
             </label>
@@ -450,7 +450,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         {/* RIGHT COLUMN - SETTINGS */}
         <div className="space-y-6">
           {/* Exam Type & Difficulty */}
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 space-y-6">
+          <div className="w-full bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-6 border border-neutral-200 dark:border-neutral-800 space-y-6">
             {/* Exam Type */}
             <div>
               <div className="flex justify-between items-center mb-3">
@@ -539,7 +539,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           </div>
 
           {/* Time & Marks */}
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 space-y-6">
+          <div className="w-full bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-6 border border-neutral-200 dark:border-neutral-800 space-y-6">
             {/* Question Count */}
             <div>
               <div className="flex justify-between items-center mb-3">
@@ -621,7 +621,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           <button
             type="submit"
             disabled={isLoading || !subject || examTypes.length === 0}
-            className="w-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-bold py-4 rounded-xl hover:shadow-lg transition-all active:scale-[0.99] flex justify-center items-center gap-3 text-base disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-bold py-4 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 hover:shadow-lg transition-all active:scale-[0.99] flex justify-center items-center gap-3 text-base disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>
@@ -641,7 +641,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       {/* Chapter Selection Modal */}
       {isChapterModalOpen && (
         <div
-          className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in"
+          className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-md animate-in fade-in"
           onClick={() => setIsChapterModalOpen(false)}
         >
           <div
@@ -738,7 +738,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             <div className="p-6 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 rounded-b-3xl">
               <button
                 onClick={() => setIsChapterModalOpen(false)}
-                className="w-full py-4 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-2xl font-bold text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                className="w-full py-4 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 font-bold text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
               >
                 সম্পন্ন করুন
               </button>
@@ -751,7 +751,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       {/* Similar design update for Topic Modal */}
       {isTopicModalOpen && (
         <div
-          className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in"
+          className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-md animate-in fade-in"
           onClick={() => setIsTopicModalOpen(false)}
         >
           <div
@@ -844,7 +844,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             <div className="p-6 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 rounded-b-3xl">
               <button
                 onClick={() => setIsTopicModalOpen(false)}
-                className="w-full py-4 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-2xl font-bold text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                className="w-full py-4 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 font-bold text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
               >
                 সম্পন্ন করুন
               </button>
@@ -856,7 +856,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       {/* OMR Modal (Restored & Fixed Layout) */}
       {isOmrModalOpen && (
         <div
-          className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in"
+          className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-md animate-in fade-in"
           onClick={() => setIsOmrModalOpen(false)}
         >
           <div
