@@ -26,6 +26,7 @@ interface ResultViewProps {
   bookmarkedIds?: Set<string>;
   /** Toggle a bookmark via useBookmarks hook */
   onToggleBookmark?: (questionId: string | number) => void;
+  examDetails?: any;
 }
 
 const ResultView: React.FC<ResultViewProps> = ({
@@ -44,6 +45,7 @@ const ResultView: React.FC<ResultViewProps> = ({
   currentUser,
   bookmarkedIds,
   onToggleBookmark,
+  examDetails,
 }) => {
   // State for Report Modal
   const [reportModalOpen, setReportModalOpen] = useState(false);
@@ -136,9 +138,6 @@ const ResultView: React.FC<ResultViewProps> = ({
 
   // Count animations
   const animatedScore = useCountUp(finalScore, 1500);
-  const totalXpGained =
-    correctCount * 10 + 50 + (correctCount === questions.length ? 100 : 0);
-  const animatedXp = useCountUp(totalXpGained, 2000);
 
   // Trigger Perfect Score Celebration
   useEffect(() => {
@@ -232,56 +231,110 @@ const ResultView: React.FC<ResultViewProps> = ({
           )}
         </div>
       </div>
+      {/* Exam Details Section */}
+      <div className="bg-neutral-50 dark:bg-neutral-800/40 border-y sm:border border-neutral-100 dark:border-neutral-800 py-3.5 mb-8 -mx-4 sm:mx-0 px-4 sm:rounded-2xl flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] sm:text-xs md:text-sm font-bold text-neutral-500 dark:text-neutral-400">
+        <div className="flex items-center gap-1.5">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2.5}
+            stroke="currentColor"
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25"
+            />
+          </svg>
+          {examDetails?.subjectLabel || 'বিষয়'}
+        </div>
+        <div className="flex items-center gap-1.5">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2.5}
+            stroke="currentColor"
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
+            />
+          </svg>
+          {isHistoryMode ? 'ইতিহাস' : 'আজকের পরীক্ষা'}
+        </div>
+        <div className="flex items-center gap-1.5">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2.5}
+            stroke="currentColor"
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-500"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+            />
+          </svg>
+          মোট প্রশ্ন: {questions.length}
+        </div>
+      </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-12">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 mb-12">
         {/* Accuracy */}
-        <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
-          <div className="relative w-32 h-32 flex items-center justify-center mb-4">
+        <div className="bg-white dark:bg-neutral-900 p-3 sm:p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
+          <div className="relative w-16 h-16 sm:w-32 sm:h-32 flex items-center justify-center mb-2 sm:mb-4">
             <svg className="w-full h-full transform -rotate-90">
               <circle
-                cx="64"
-                cy="64"
-                r="56"
+                cx="50%"
+                cy="50%"
+                r="44%"
                 stroke="currentColor"
-                strokeWidth="12"
+                strokeWidth="8"
                 fill="transparent"
                 className="text-neutral-100 dark:text-neutral-800"
               />
               <circle
-                cx="64"
-                cy="64"
-                r="56"
+                cx="50%"
+                cy="50%"
+                r="44%"
                 stroke="currentColor"
-                strokeWidth="12"
+                strokeWidth="8"
                 fill="transparent"
-                strokeDasharray={351}
-                strokeDashoffset={351 - (351 * percentage) / 100}
+                strokeDasharray={283}
+                strokeDashoffset={283 - (283 * percentage) / 100}
                 className={`transition-all duration-1000 ease-out ${percentage >= 70 ? 'text-emerald-500' : percentage >= 40 ? 'text-amber-500' : 'text-red-500'}`}
                 strokeLinecap="round"
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-3xl font-bold text-neutral-800 dark:text-white">
+              <span className="text-sm sm:text-3xl font-bold text-neutral-800 dark:text-white">
                 {percentage}%
               </span>
             </div>
           </div>
-          <div className="text-neutral-600 dark:text-neutral-300 font-semibold text-lg">
+          <div className="text-neutral-600 dark:text-neutral-300 font-bold text-[10px] sm:text-lg">
             সঠিকতা
           </div>
         </div>
 
         {/* Points */}
-        <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
-          <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-4 text-emerald-600 dark:text-emerald-400">
+        <div className="bg-white dark:bg-neutral-900 p-3 sm:p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
+          <div className="w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center mb-2 sm:mb-4 text-rose-600 dark:text-rose-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              strokeWidth={2}
+              strokeWidth={2.5}
               stroke="currentColor"
-              className="w-8 h-8"
+              className="w-4 h-4 sm:w-8 sm:h-8"
             >
               <path
                 strokeLinecap="round"
@@ -290,77 +343,27 @@ const ResultView: React.FC<ResultViewProps> = ({
               />
             </svg>
           </div>
-          <div className="text-3xl font-bold text-neutral-800 dark:text-white mb-1">
+          <div className="text-sm sm:text-3xl font-bold text-neutral-800 dark:text-white mb-0.5">
             {animatedScore.toFixed(1)}{' '}
-            <span className="text-lg text-neutral-500 dark:text-neutral-400 font-normal">
+            <span className="text-[10px] sm:text-lg text-neutral-500 dark:text-neutral-400 font-normal">
               / {totalPoints}
             </span>
           </div>
-          <div className="text-neutral-600 dark:text-neutral-300 font-semibold text-lg">
+          <div className="text-neutral-600 dark:text-neutral-300 font-bold text-[10px] sm:text-lg">
             প্রাপ্ত নম্বর
           </div>
         </div>
 
-        {/* XP Gained */}
-        <div
-          className={`bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border ${correctCount === questions.length && questions.length > 0 ? 'border-amber-400 dark:border-amber-600 bg-amber-50/10' : 'border-neutral-200 dark:border-neutral-800'} flex flex-col items-center justify-center transition-colors relative overflow-hidden group`}
-        >
-          <div
-            className={`absolute top-0 right-0 w-16 h-16 ${correctCount === questions.length && questions.length > 0 ? 'bg-amber-500/10' : 'bg-emerald-500/5'} rounded-bl-full pointer-events-none group-hover:scale-110 transition-transform`}
-          />
-          <div
-            className={`w-16 h-16 rounded-full ${correctCount === questions.length && questions.length > 0 ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600' : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600'} flex items-center justify-center mb-4 dark:text-emerald-400`}
-          >
-            {correctCount === questions.length && questions.length > 0 ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-8 h-8"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-8 h-8"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
-                />
-              </svg>
-            )}
-          </div>
-          <div
-            className={`text-3xl font-bold ${correctCount === questions.length && questions.length > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-neutral-800 dark:text-white'} mb-1`}
-          >
-            +{animatedXp}
-          </div>
-          <div className="text-neutral-600 dark:text-neutral-300 font-semibold text-lg flex items-center gap-1">
-            XP অর্জিত
-          </div>
-        </div>
-
-        {/* Time */}
-        <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
-          <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-4 text-emerald-600 dark:text-emerald-400">
+        {/* Time taken replaced XP gained */}
+        <div className="bg-white dark:bg-neutral-900 p-3 sm:p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
+          <div className="w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-2 sm:mb-4 text-emerald-600 dark:text-emerald-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              strokeWidth={2}
+              strokeWidth={2.5}
               stroke="currentColor"
-              className="w-8 h-8"
+              className="w-4 h-4 sm:w-8 sm:h-8"
             >
               <path
                 strokeLinecap="round"
@@ -369,10 +372,10 @@ const ResultView: React.FC<ResultViewProps> = ({
               />
             </svg>
           </div>
-          <div className="text-xl font-bold text-neutral-800 dark:text-white mb-1 text-center">
+          <div className="text-[10px] sm:text-xl font-bold text-neutral-800 dark:text-white mb-0.5 text-center">
             {formatDuration(timeTaken)}
           </div>
-          <div className="text-neutral-600 dark:text-neutral-300 font-semibold text-lg">
+          <div className="text-neutral-600 dark:text-neutral-300 font-bold text-[10px] sm:text-lg">
             সময় লেগেছে
           </div>
         </div>

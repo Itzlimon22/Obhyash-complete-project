@@ -800,6 +800,7 @@ export default function StudentRoot({
             currentUser={currentUser}
             bookmarkedIds={bookmarkedIds}
             onToggleBookmark={toggleBookmark}
+            examDetails={examDetails}
           />
         </AppLayout>
       );
