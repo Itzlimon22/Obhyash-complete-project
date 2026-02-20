@@ -169,11 +169,13 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   const baseList = activeTab === 'mistakes' ? mistakes : globalBookmarks;
 
   const allSubjects = useMemo(() => {
-    const subjects = new Set<string>();
+    const subjectMap = new Map<string, string>();
     baseList.forEach((q) => {
-      if (q.subject) subjects.add(q.subject);
+      if (q.subject && !subjectMap.has(q.subject)) {
+        subjectMap.set(q.subject, q.subjectLabel || q.subject);
+      }
     });
-    return Array.from(subjects);
+    return Array.from(subjectMap.entries());
   }, [baseList]);
 
   // Reset filter when tab changes
@@ -371,19 +373,21 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       {/* ── Subject filter pills ── */}
       {allSubjects.length > 0 && (
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-          {['all', ...allSubjects].map((s) => (
-            <button
-              key={s}
-              onClick={() => setSubjectFilter(s)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
-                subjectFilter === s
-                  ? 'bg-rose-600 text-white border-rose-600 shadow'
-                  : 'bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-rose-400'
-              }`}
-            >
-              {s === 'all' ? 'সব বিষয়' : s}
-            </button>
-          ))}
+          {([['all', 'সব বিষয়']] as [string, string][])
+            .concat(allSubjects)
+            .map(([code, label]) => (
+              <button
+                key={code}
+                onClick={() => setSubjectFilter(code)}
+                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                  subjectFilter === code
+                    ? 'bg-rose-600 text-white border-rose-600 shadow'
+                    : 'bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-rose-400'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
         </div>
       )}
 

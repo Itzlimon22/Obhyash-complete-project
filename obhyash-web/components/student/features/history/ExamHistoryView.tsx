@@ -128,11 +128,17 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Extract unique subjects for dropdown
+  // Extract unique subjects for dropdown — value = raw code, label = display name
   const uniqueSubjects = useMemo(() => {
-    const subjects = new Set<string>();
-    history.forEach((item) => subjects.add(item.subject));
-    return Array.from(subjects).sort();
+    const subjectMap = new Map<string, string>();
+    history.forEach((item) => {
+      if (!subjectMap.has(item.subject)) {
+        subjectMap.set(item.subject, item.subjectLabel || item.subject);
+      }
+    });
+    return Array.from(subjectMap.entries()).sort((a, b) =>
+      a[1].localeCompare(b[1]),
+    );
   }, [history]);
 
   // -- EXAMS TAB LOGIC --
@@ -432,9 +438,9 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 className="w-full appearance-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl pl-9 pr-8 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm cursor-pointer"
               >
                 <option value="">সকল বিষয়</option>
-                {uniqueSubjects.map((sub) => (
-                  <option key={sub} value={sub}>
-                    {sub}
+                {uniqueSubjects.map(([code, label]) => (
+                  <option key={code} value={code}>
+                    {label}
                   </option>
                 ))}
               </select>
