@@ -89,6 +89,38 @@ const mapProfileToDbRow = (user: UserProfile): UserDatabaseRow => {
   };
 };
 
+/**
+ * MAPPER: Backend -> Frontend
+ * Pure function to convert UserDatabaseRow to UserProfile.
+ */
+export const mapDbRowToProfile = (
+  data: any,
+  authEmail?: string,
+  authPhone?: string,
+  authCreatedAt?: string,
+): UserProfile => {
+  return {
+    ...data,
+    // Map DB snake_case to Frontend camelCase
+    avatarUrl: data.avatar_url || data.avatarUrl,
+    avatarColor: data.avatar_color || data.avatarColor,
+    examsTaken: data.exams_taken || 0,
+    ssc_roll: data.ssc_roll,
+    // Ensure we populate email/phone from Auth if missing in DB Profile
+    email: data.email || authEmail,
+    phone: data.phone || authPhone,
+    // Map created_at for "Joined" date
+    createdAt: data.created_at || authCreatedAt,
+
+    name: data.name || 'User',
+    level: data.level || 'Rookie',
+    // Gamification
+    streakCount: data.streak || data.streak_count || 0,
+    lastStreakDate: data.last_streak_date || null,
+    xp: data.xp || 0,
+  } as UserProfile;
+};
+
 export const getUserProfile = async (
   userId: string,
 ): Promise<UserProfile | null> => {
@@ -120,25 +152,7 @@ export const getUserProfile = async (
         .single();
 
       if (!error && data) {
-        return {
-          ...data,
-          // Map DB snake_case to Frontend camelCase
-          avatarUrl: data.avatar_url,
-          avatarColor: data.avatar_color,
-          examsTaken: data.exams_taken || 0,
-          ssc_roll: data.ssc_roll,
-          // Ensure we populate email/phone from Auth if missing in DB Profile
-          email: data.email || authEmail,
-          phone: data.phone || authPhone,
-          // Map created_at for "Joined" date
-          createdAt: data.created_at || authCreatedAt,
-
-          name: data.name || 'User',
-          level: data.level || 'Rookie',
-          // No bio in DB
-          streakCount: data.streak || data.streak_count || 0, // Handle potential DB column variations for read
-          lastStreakDate: data.last_streak_date || null,
-        } as UserProfile;
+        return mapDbRowToProfile(data, authEmail, authPhone, authCreatedAt);
       }
       if (error) console.error('Error fetching user profile:', error);
     }

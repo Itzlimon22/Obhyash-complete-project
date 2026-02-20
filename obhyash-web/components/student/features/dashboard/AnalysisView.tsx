@@ -68,6 +68,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
     if (!analytics?.subjectData) return [];
     return analytics.subjectData.map((s) => ({
       ...s,
+      id: s.name,
       name: getSubjectDisplayName(s.name),
     }));
   }, [analytics?.subjectData]);

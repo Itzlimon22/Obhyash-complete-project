@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 interface SubjectData {
+  id?: string;
   name: string;
   correct: number;
   wrong: number;
@@ -164,7 +165,7 @@ const SubjectStat: React.FC<SubjectStatProps> = ({
             সাবজেক্ট ভিত্তিক রিপোর্ট
           </h3>
         </div>
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
@@ -192,13 +193,15 @@ const SubjectStat: React.FC<SubjectStatProps> = ({
         </h3>
       </div>
 
-      <div className="space-y-3 md:space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         {data.map((subject, idx) => (
           <SubjectItem
             key={idx}
             subject={subject}
             onClick={
-              onSubjectClick ? () => onSubjectClick(subject.name) : undefined
+              onSubjectClick
+                ? () => onSubjectClick(subject.id || subject.name)
+                : undefined
             }
           />
         ))}

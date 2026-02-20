@@ -7,6 +7,7 @@ import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import { DashboardSkeleton } from '@/components/student/ui/common/Skeletons';
 
 interface SubjectStats {
+  id: string;
   name: string;
   correct: number;
   wrong: number;
@@ -85,6 +86,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           });
 
           return {
+            id: sub.id,
             name: getSubjectDisplayName(sub.id),
             correct,
             wrong,

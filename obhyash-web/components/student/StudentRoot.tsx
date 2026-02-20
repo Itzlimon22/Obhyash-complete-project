@@ -193,15 +193,10 @@ export default function StudentRoot({
   const [showStreakCelebration, setShowStreakCelebration] = useState(false);
   const [newStreakCount, setNewStreakCount] = useState(0);
 
-  // Sync with AuthProvider updates, but respect local optimistic updates
+  // Sync with AuthProvider updates
   useEffect(() => {
     if (authProfile) {
-      // Only update if IDs match to avoid race condition where we might be signing out
-      if (!currentUser || currentUser.id === authProfile.id) {
-        // We use functional update to preserve local transient state if needed
-        // But usually authProfile is the source of truth
-        setCurrentUser(authProfile);
-      }
+      setCurrentUser(authProfile);
     } else if (initialUser && !currentUser) {
       setCurrentUser(initialUser);
     }

@@ -12,6 +12,7 @@ import { createClient } from '@/utils/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { UserProfile } from '@/lib/types';
 import { toast } from 'sonner';
+import { mapDbRowToProfile } from '@/services/user-service';
 
 interface AuthContextType {
   user: User | null;
@@ -54,33 +55,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!data) return null;
 
-      // Explicitly map snake_case DB columns → camelCase UserProfile fields
-      // so that streak, examsTaken, etc. are always correct throughout the app.
-      const userProfile: UserProfile = {
-        ...data,
-        // Streak
-        streakCount: data.streak || data.streak_count || 0,
-        lastStreakDate: data.last_streak_date ?? null,
-        // Stats
-        examsTaken: data.exams_taken || 0,
-        enrolledExams: data.enrolled_exams || 0,
-        // Avatar
-        avatarUrl: data.avatar_url ?? data.avatarUrl,
-        avatarColor: data.avatar_color ?? data.avatarColor ?? 'bg-slate-500',
-        // Timestamps
-        createdAt: data.created_at,
-        // Defaults
-        xp: data.xp || 0,
-        level: data.level || 'Beginner',
-        role: data.role || 'Student',
-        status: data.status || 'Active',
-        subscription: data.subscription || {
-          plan: 'Free',
-          status: 'Active',
-          expiry: '',
-        },
-        recentExams: data.recentExams || [],
-      };
+      // Use centralized mapping logic
+      const userProfile = mapDbRowToProfile(data);
 
       // Cache the correctly-mapped profile in local storage
       localStorage.setItem('obhyash_user_profile', JSON.stringify(userProfile));
@@ -210,11 +186,42 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
+    // 5. Realtime Subscription for Profile Updates
+    const profileSubscription = supabase
+      .channel(`public:users:id=eq.${user?.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'users',
+          filter: `id=eq.${user?.id}`,
+        },
+        (payload) => {
+          console.log('🔄 Realtime Profile Update Detected:', payload);
+          if (payload.new) {
+            const updatedProfile = mapDbRowToProfile(
+              payload.new,
+              user?.email,
+              user?.phone,
+              user?.created_at,
+            );
+            setProfile(updatedProfile);
+            localStorage.setItem(
+              'obhyash_user_profile',
+              JSON.stringify(updatedProfile),
+            );
+          }
+        },
+      )
+      .subscribe();
+
     return () => {
       isMounted = false;
       subscription.unsubscribe();
+      supabase.removeChannel(profileSubscription);
     };
-  }, [supabase, router]);
+  }, [supabase, router, user?.id]);
 
   const signOut = async () => {
     await supabase.auth.signOut();

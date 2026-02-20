@@ -16,6 +16,7 @@ import { getSubjectAnalysis, SubjectAnalysis } from 'services/database';
 import { printSubjectReport } from '@/services/print-service';
 import { supabase } from 'services/core';
 import LatexText from 'components/student/ui/LatexText';
+import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 
 interface SubjectReportViewProps {
   subject: string;
@@ -138,7 +139,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
           </button>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white">
-              {subject}
+              {getSubjectDisplayName(subject)}
             </h1>
             <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5 font-medium">
               বিস্তারিত পারফরম্যান্স রিপোর্ট
