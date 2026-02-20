@@ -8,6 +8,7 @@ import SubjectsProgressSection from './dashboard/SubjectsProgressSection';
 import StreakCalendar from './dashboard/StreakCalendar';
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import useProfileData from '@/hooks/use-profile-data';
+import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 
 interface MyProfileViewProps {
   user: UserProfile;
@@ -24,7 +25,6 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
   onSubjectClick,
   onViewNotifications,
 }) => {
-  // Use hook for data if no history prop provided, otherwise use props (backward compatible)
   const hookData = useProfileData();
 
   const user = propUser || hookData.user;
@@ -165,7 +165,15 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
         <div className="mt-3 sm:mt-4 flex justify-between text-[10px] sm:text-xs font-bold text-neutral-400 uppercase tracking-widest px-1">
           <span>{user.level || 'Level 1'}</span>
           <span>
-            Level {parseInt((user.level || 'Level 1').split(' ')[1]) + 1}
+            {(() => {
+              const currentLevelStr = user.level || 'Level 1';
+              const match = currentLevelStr.match(/\d+/);
+              if (match) {
+                return `Level ${parseInt(match[0]) + 1}`;
+              }
+              // Fallback: If level is a name (like ROOKIE), calculate next numeric level from XP
+              return `Level ${Math.floor((user.xp || 0) / 1000) + 2}`;
+            })()}
           </span>
         </div>
       </div>
@@ -209,7 +217,9 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
                     </div>
                     <div>
                       <h4 className="font-bold text-neutral-900 dark:text-white text-base md:text-lg">
-                        {exam.subjectLabel || exam.subject}
+                        {getSubjectDisplayName(
+                          exam.subjectLabel || exam.subject,
+                        )}
                       </h4>
                       <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
                         {new Date(exam.date).toLocaleDateString('bn-BD', {

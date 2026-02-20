@@ -139,6 +139,8 @@ export const useProfileData = (userId?: string): ProfileData => {
   };
 };
 
+import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
+
 /**
  * Calculate per-subject statistics from exam history.
  * Only includes subjects the user has actually attempted.
@@ -147,7 +149,9 @@ function calculateSubjectStats(history: ExamResult[]): SubjectStat[] {
   const statsMap: Record<string, SubjectStat> = {};
 
   history.forEach((exam) => {
-    const subject = exam.subjectLabel || exam.subject;
+    // Resolve Bengali display name for the subject
+    const subject = getSubjectDisplayName(exam.subjectLabel || exam.subject);
+
     if (!statsMap[subject]) {
       statsMap[subject] = {
         subject,

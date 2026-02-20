@@ -11,6 +11,7 @@ import {
 import { UserProfile, ExamResult } from '@/lib/types';
 import { calculateActivityStats } from '@/lib/stats-utils';
 import SubjectStat from './SubjectStat';
+import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 
 interface UserProfileViewProps {
   user: UserProfile;
@@ -76,10 +77,15 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
       });
 
       history.forEach((exam) => {
+        // Resolve Bengali display name for the subject
+        const subjectName = getSubjectDisplayName(
+          exam.subjectLabel || exam.subject,
+        );
+
         // Find matching subject key or use full name
         const subjectKey =
-          Object.keys(stats).find((k) => exam.subject.includes(k)) ||
-          exam.subject;
+          Object.keys(stats).find((k) => subjectName.includes(k)) ||
+          subjectName;
 
         if (!stats[subjectKey]) {
           stats[subjectKey] = { correct: 0, wrong: 0, skipped: 0, total: 0 };

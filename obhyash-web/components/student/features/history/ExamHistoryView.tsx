@@ -134,7 +134,10 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
     const subjectMap = new Map<string, string>();
     history.forEach((item) => {
       if (!subjectMap.has(item.subject)) {
-        subjectMap.set(item.subject, item.subjectLabel || item.subject);
+        subjectMap.set(
+          item.subject,
+          item.subjectLabel || getSubjectDisplayName(item.subject),
+        );
       }
     });
     return Array.from(subjectMap.entries()).sort((a, b) =>
