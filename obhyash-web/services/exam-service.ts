@@ -1,5 +1,6 @@
 import { ExamConfig, Question, ExamResult, UserAnswers } from '@/lib/types';
 import { supabase, isSupabaseConfigured } from './core';
+import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 
 // --- DB TYPES ---
 interface QuestionDbRow {
@@ -587,11 +588,19 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
 };
 
 const mapDbResultToExamResult = (data: ExamResultDbRow): ExamResult => {
+  // Resolve the display label: prefer stored subject_label, then look up locally,
+  // then fall back to the raw subject ID.
+  const rawLabel = data.subject_label || data.subject;
+  const resolvedLabel =
+    rawLabel === data.subject
+      ? getSubjectDisplayName(data.subject)
+      : rawLabel;
+
   return {
     id: data.id,
     user_id: data.user_id,
     subject: data.subject,
-    subjectLabel: data.subject_label || data.subject, // Handle potential DB naming
+    subjectLabel: resolvedLabel,
     examType: data.exam_type,
     date: data.date,
     score: data.score,
@@ -624,10 +633,21 @@ export const getExamHistory = async (): Promise<ExamResult[]> => {
       );
 
       // --- Enrich missing subject labels for old records ---
-      // Old records have subject_label = NULL. Resolve them from the subjects table.
+      // Step 1: Resolve string-key subjects (e.g. 'hsc_chemistry_1') from local map.
+      const enrichedResults = results.map((r) => {
+        if (!r.subjectLabel || r.subjectLabel === r.subject) {
+          const localName = getSubjectDisplayName(r.subject);
+          if (localName !== r.subject) {
+            return { ...r, subjectLabel: localName };
+          }
+        }
+        return r;
+      });
+
+      // Step 2: For UUID subjects with no label, resolve from DB subjects table.
       const subjectIdsToResolve = [
         ...new Set(
-          results
+          enrichedResults
             .filter((r) => !r.subjectLabel || r.subjectLabel === r.subject)
             .map((r) => r.subject)
             .filter((s) =>
@@ -651,7 +671,7 @@ export const getExamHistory = async (): Promise<ExamResult[]> => {
             ).map((s) => [s.id, s.name_bn || s.name || s.id]),
           );
 
-          return results.map((r) => {
+          return enrichedResults.map((r) => {
             if (
               subjectLabelMap.has(r.subject) &&
               (!r.subjectLabel || r.subjectLabel === r.subject)
@@ -663,7 +683,7 @@ export const getExamHistory = async (): Promise<ExamResult[]> => {
         }
       }
 
-      return results;
+      return enrichedResults;
     }
   }
 
