@@ -400,6 +400,7 @@ export const initiateExamSession = async (
       .insert({
         user_id: user.id,
         subject: config.subject,
+        subject_label: config.subjectLabel || config.subject,
         exam_type: config.examType,
         date: new Date().toISOString(),
         score: 0, // Placeholder
@@ -510,6 +511,7 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
       const { error } = await supabase.from('exam_results').insert({
         user_id: user.id,
         subject: result.subject,
+        subject_label: result.subjectLabel || result.subject,
         exam_type: result.examType,
         date: result.date || new Date().toISOString(),
         score: result.score,
@@ -616,10 +618,53 @@ export const getExamHistory = async (): Promise<ExamResult[]> => {
       .order('date', { ascending: false });
 
     if (error) throw error;
-    if (data)
-      return (data as unknown as ExamResultDbRow[]).map(
+    if (data) {
+      const results = (data as unknown as ExamResultDbRow[]).map(
         mapDbResultToExamResult,
       );
+
+      // --- Enrich missing subject labels for old records ---
+      // Old records have subject_label = NULL. Resolve them from the subjects table.
+      const subjectIdsToResolve = [
+        ...new Set(
+          results
+            .filter((r) => !r.subjectLabel || r.subjectLabel === r.subject)
+            .map((r) => r.subject)
+            .filter((s) =>
+              /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+                s,
+              ),
+            ),
+        ),
+      ];
+
+      if (subjectIdsToResolve.length > 0) {
+        const { data: subjectsData } = await supabase
+          .from('subjects')
+          .select('id, name_bn, name')
+          .in('id', subjectIdsToResolve);
+
+        if (subjectsData && subjectsData.length > 0) {
+          const subjectLabelMap = new Map<string, string>(
+            (
+              subjectsData as { id: string; name_bn?: string; name?: string }[]
+            ).map((s) => [s.id, s.name_bn || s.name || s.id]),
+          );
+
+          return results.map((r) => {
+            if (
+              subjectLabelMap.has(r.subject) &&
+              (!r.subjectLabel || r.subjectLabel === r.subject)
+            ) {
+              return { ...r, subjectLabel: subjectLabelMap.get(r.subject)! };
+            }
+            return r;
+          });
+        }
+      }
+
+      return results;
+    }
   }
 
   // Fallback to local storage if DB is not configured (or maybe we strictly want DB?)
