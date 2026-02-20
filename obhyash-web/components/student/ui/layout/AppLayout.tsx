@@ -42,6 +42,8 @@ interface AppLayoutProps {
   simpleHeader?: boolean;
   customHeader?: ReactNode;
   user?: UserProfile;
+  isLiveExam?: boolean;
+  onSubmit?: () => void;
 }
 
 const AppLayout: React.FC<AppLayoutProps> = ({
@@ -56,6 +58,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   simpleHeader = false,
   customHeader,
   user,
+  isLiveExam,
+  onSubmit,
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -425,6 +429,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             activeTab={activeTab}
             onTabChange={onTabChange}
             onMenuClick={() => setIsSidebarOpen(true)}
+            isLiveExam={isLiveExam}
+            onSubmit={onSubmit}
           />
         )}
       </div>

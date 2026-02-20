@@ -5,13 +5,42 @@ interface MobileBottomNavProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   onMenuClick: () => void;
+  isLiveExam?: boolean;
+  onSubmit?: () => void;
 }
 
 const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   activeTab,
   onTabChange,
   onMenuClick,
+  isLiveExam,
+  onSubmit,
 }) => {
+  if (isLiveExam) {
+    return (
+      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
+        <div className="bg-white/90 dark:bg-neutral-950/90 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between px-6 py-3 pb-safe shadow-[0_-4px_12px_-2px_rgba(0,0,0,0.05)]">
+          <button
+            onClick={onSubmit}
+            className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm py-3.5 px-6 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-[0.97] transition-all flex items-center justify-center gap-2"
+          >
+            <div className="w-5 h-5 flex items-center justify-center bg-rose-500/30 rounded-full">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+            </div>
+            পরীক্ষা শেষ করুন
+          </button>
+
+          <button
+            onClick={onMenuClick}
+            className="ml-4 p-3.5 bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 rounded-2xl border border-neutral-200 dark:border-neutral-800 active:scale-[0.9] transition-all"
+          >
+            <Menu size={22} strokeWidth={2.5} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const items = [
     {
       id: 'dashboard',

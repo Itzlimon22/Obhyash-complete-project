@@ -170,6 +170,8 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
       toggleTheme={toggleTheme}
       isDarkMode={isDarkMode}
       noPadding={true}
+      isLiveExam={true}
+      onSubmit={handleSubmitRequest}
       customHeader={
         <ExamHeader
           details={examDetails}
@@ -235,8 +237,8 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
           </div>
         </div>
 
-        {/* Sticky Footer for Submit */}
-        <div className="sticky bottom-0 left-0 right-0 py-4 px-4 bg-white/90 dark:bg-black/90 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+        {/* Sticky Footer for Submit - HIDDEN ON MOBILE (moved to bottom nav) */}
+        <div className="sticky bottom-0 left-0 right-0 py-4 px-4 bg-white/90 dark:bg-black/90 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] hidden sm:block">
           <div className="max-w-3xl mx-auto flex justify-center">
             {isOmrMode ? (
               <div className="flex gap-3 w-full sm:w-auto">

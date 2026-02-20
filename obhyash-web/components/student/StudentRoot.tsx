@@ -419,6 +419,7 @@ export default function StudentRoot({
                 setActiveTab('subject_report');
               }}
               onLeaderboardClick={() => setActiveTab('leaderboard')}
+              onAnalysisClick={() => setActiveTab('analysis')}
               history={examHistory}
             />
           </AppLayout>

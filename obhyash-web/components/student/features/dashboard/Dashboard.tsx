@@ -28,6 +28,7 @@ interface DashboardProps {
   onHistoryClick: () => void;
   onSubjectClick: (subject: string) => void;
   onLeaderboardClick: () => void;
+  onAnalysisClick: () => void;
   history: ExamResult[];
 }
 
@@ -37,6 +38,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   onHistoryClick,
   onSubjectClick,
   onLeaderboardClick,
+  onAnalysisClick,
   history,
 }) => {
   // Dynamic Subject Stats Logic
@@ -248,7 +250,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </button>
 
         <button
-          onClick={() => onLeaderboardClick()}
+          onClick={onAnalysisClick}
           className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-emerald-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_8px_-2px_rgba(5,150,105,0.1)] dark:shadow-none border border-emerald-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-3 hover:border-emerald-200 dark:hover:border-emerald-900/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
         >
           <div className="absolute top-0 right-0 w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-emerald-100/20 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
