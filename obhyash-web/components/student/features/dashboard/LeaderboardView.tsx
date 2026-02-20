@@ -10,6 +10,8 @@ import {
   getUserProfile,
 } from 'services/database';
 
+import { LeaderboardSkeleton } from '@/components/student/ui/common/Skeletons';
+
 interface LeaderboardViewProps {
   onUserClick?: (user: UserProfile, rank: number) => void;
 }
@@ -59,6 +61,10 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
     }
     return 0;
   }, [currentUser, leaderboardUsers, selectedLevel]);
+
+  if (isLoading && !leaderboardUsers.length) {
+    return <LeaderboardSkeleton />;
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-2 md:p-6 animate-fade-in transition-colors pb-24">

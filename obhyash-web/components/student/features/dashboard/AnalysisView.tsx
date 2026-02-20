@@ -16,6 +16,8 @@ import {
 } from '@/services/stats-service';
 import { supabase } from '@/services/core';
 
+import { AnalysisSkeleton } from '@/components/student/ui/common/Skeletons';
+
 interface AnalysisViewProps {
   history: ExamResult[];
   onSubjectClick?: (subject: string) => void;
@@ -76,13 +78,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
 
   // Check if we have no data
   if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-6 animate-pulse">
-        <div className="w-20 h-20 bg-neutral-200 dark:bg-neutral-800 rounded-full mb-4"></div>
-        <div className="h-6 w-48 bg-neutral-200 dark:bg-neutral-800 rounded mb-2"></div>
-        <div className="h-4 w-64 bg-neutral-100 dark:bg-neutral-900 rounded"></div>
-      </div>
-    );
+    return <AnalysisSkeleton />;
   }
 
   if (!analytics || analytics.totalExams === 0) {

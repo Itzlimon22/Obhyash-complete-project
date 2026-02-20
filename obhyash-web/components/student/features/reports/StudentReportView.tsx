@@ -10,6 +10,7 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { UserProfile } from '@/lib/types';
+import { ReportSkeleton } from '@/components/student/ui/common/Skeletons';
 
 interface StudentReportViewProps {
   user: UserProfile;
@@ -62,12 +63,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mb-4"></div>
-        <p className="text-neutral-500">রিপোর্ট লোড হচ্ছে...</p>
-      </div>
-    );
+    return <ReportSkeleton />;
   }
 
   return (
