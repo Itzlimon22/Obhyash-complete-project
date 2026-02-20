@@ -27,17 +27,18 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
   onResolve,
 }) => {
   const [editMode, setEditMode] = useState(false);
-  const [editedQuestion, setEditedQuestion] = useState<Partial<Question>>(
-    () => report?.questionPreview || {},
+  const [editedQuestion, setEditedQuestion] = useState<Partial<Question>>(() =>
+    report?.question ? (report.question as Partial<Question>) : {},
   );
   const [isSaving, setIsSaving] = useState(false);
 
   // Reset state when report changes
   useEffect(() => {
     if (report) {
-      // Use a micro-task to avoid synchronous setState
       Promise.resolve().then(() => {
-        setEditedQuestion(report.questionPreview);
+        setEditedQuestion(
+          report.question ? (report.question as Partial<Question>) : {},
+        );
         setEditMode(false);
       });
     }
@@ -71,7 +72,7 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
               <div className="flex items-center gap-1.5 text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">
                 <span>#{report.id.slice(0, 8)}</span>
                 <span>•</span>
-                <span>{report.createdAt}</span>
+                <span>{report.created_at.split('T')[0]}</span>
               </div>
             </div>
           </div>
@@ -105,10 +106,10 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
                 </p>
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-lg bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center text-[10px] font-black uppercase shadow-inner">
-                    {report.reporterName.charAt(0)}
+                    {(report.reporter_name || 'G').charAt(0)}
                   </div>
                   <span className="text-[13px] font-bold text-neutral-900 dark:text-white">
-                    {report.reporterName}
+                    {report.reporter_name || 'Anonymous'}
                   </span>
                 </div>
               </div>

@@ -391,18 +391,34 @@ export type ReportReason =
   | 'Typo/Grammar'
   | 'Inappropriate Content'
   | 'Duplicate'
+  | 'অসম্পূর্ণ প্রশ্ন'
+  | 'ভুল উত্তর'
+  | 'প্রশ্নে ডাউট'
+  | 'ভুল ক্যাটাগরি'
+  | 'অসম্পূর্ণ সলিউশন'
   | 'Other';
 
 export interface Report {
   id: string;
-  questionId: string;
-  questionPreview: Question;
-  reporterName: string;
-  reason: ReportReason;
+  question_id: string | number;
+  reporter_id: string | null;
+  reporter_name: string;
+  reason: string; // ReportReason (kept as string for DB flexibility)
   description?: string;
+  image_url?: string | null;
   status: ReportStatus;
-  createdAt: string;
-  severity: 'Low' | 'Medium' | 'High';
+  created_at: string;
+  resolved_at?: string | null;
+  admin_comment?: string | null;
+  // Joined from questions table
+  question?: {
+    id: string;
+    question: string;
+    options?: string[];
+    correct_answer?: string;
+    explanation?: string;
+    subject?: string;
+  } | null;
 }
 
 export interface Dataset {

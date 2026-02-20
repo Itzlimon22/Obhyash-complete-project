@@ -1,8 +1,7 @@
 import { supabase, isSupabaseConfigured } from './core';
-import { Report, ReportStatus, ReportReason } from '@/lib/types';
+import { Report, ReportStatus } from '@/lib/types';
 import { extendSubscription } from './subscription-service';
 import { toast } from 'sonner';
-
 import { uploadReportImage } from './storage-service';
 
 export interface SubmitReportData {
@@ -53,7 +52,9 @@ export const submitReport = async (data: SubmitReportData) => {
   }
 };
 
-export const getReports = async (statusFilter?: ReportStatus) => {
+export const getReports = async (
+  statusFilter?: ReportStatus,
+): Promise<Report[]> => {
   try {
     let query = supabase
       .from('reports')
@@ -65,7 +66,8 @@ export const getReports = async (statusFilter?: ReportStatus) => {
           question,
           options,
           correct_answer,
-          explanation
+          explanation,
+          subject
         )
       `,
       )
@@ -77,7 +79,7 @@ export const getReports = async (statusFilter?: ReportStatus) => {
 
     const { data, error } = await query;
     if (error) throw error;
-    return data;
+    return (data as unknown as Report[]) || [];
   } catch (error) {
     console.error('Get Reports Error:', error);
     return [];
@@ -123,7 +125,7 @@ export const resolveReport = async (
   }
 };
 
-export const getUserReports = async (userId: string) => {
+export const getUserReports = async (userId: string): Promise<Report[]> => {
   try {
     const { data, error } = await supabase
       .from('reports')
@@ -135,7 +137,8 @@ export const getUserReports = async (userId: string) => {
           question,
           options,
           correct_answer,
-          explanation
+          explanation,
+          subject
         )
       `,
       )
@@ -143,7 +146,7 @@ export const getUserReports = async (userId: string) => {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data;
+    return (data as unknown as Report[]) || [];
   } catch (error) {
     console.error('Get User Reports Error:', error);
     return [];

@@ -35,23 +35,23 @@ export const useReports = () => {
 
       if (error) throw error;
 
-      // Map to safe types
+      // Map to correctly-typed Report objects
       const mappedReports: Report[] = data.map((r: ReportRow) => ({
         id: r.id,
-        questionId: r.question_id,
-        reporterName: r.reporter_name || 'Anonymous',
-        reason: r.reason as Report['reason'],
+        question_id: r.question_id,
+        reporter_id: null,
+        reporter_name: r.reporter_name || 'Anonymous',
+        reason: r.reason,
         description: r.description,
         status: r.status as ReportStatus,
-        severity: (r.severity || 'Low') as 'Low' | 'Medium' | 'High',
-        createdAt: new Date(r.created_at).toLocaleDateString(),
-        questionPreview: r.questions
+        created_at: r.created_at,
+        question: r.questions
           ? {
-              ...r.questions,
-              // Ensure we have fallback if content is missing
-              content: r.questions.question || 'Content unavailable',
+              id: r.questions.id || 'unknown',
+              question: r.questions.question || 'Content unavailable',
+              explanation: r.questions.explanation,
             }
-          : ({ question: 'Question deleted', id: 'deleted' } as Question),
+          : null,
       }));
 
       setReports(mappedReports);
@@ -59,9 +59,7 @@ export const useReports = () => {
       // Calculate Stats
       setStats({
         pending: mappedReports.filter((r) => r.status === 'Pending').length,
-        highSeverity: mappedReports.filter(
-          (r) => r.status === 'Pending' && r.severity === 'High',
-        ).length,
+        highSeverity: 0, // severity column not present in DB
       });
     } catch (error) {
       console.error('Failed to fetch reports:', error);
