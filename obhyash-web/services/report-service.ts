@@ -58,19 +58,7 @@ export const getReports = async (
   try {
     let query = supabase
       .from('reports')
-      .select(
-        `
-        *,
-        question:questions!question_id (
-          id,
-          question,
-          options,
-          correct_answer,
-          explanation,
-          subject
-        )
-      `,
-      )
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (statusFilter) {
@@ -79,7 +67,35 @@ export const getReports = async (
 
     const { data, error } = await query;
     if (error) throw error;
-    return (data as unknown as Report[]) || [];
+
+    const reports = data || [];
+    if (reports.length === 0) return [];
+
+    // Manually fetch questions to avoid Foreign Key relation errors
+    const questionIds = Array.from(
+      new Set(reports.map((r) => r.question_id).filter(Boolean)),
+    );
+
+    if (questionIds.length > 0) {
+      const { data: questionsData } = await supabase
+        .from('questions')
+        .select(
+          'id, question, options, correct_answer_indices, explanation, subject',
+        )
+        .in('id', questionIds);
+
+      if (questionsData) {
+        const questionMap = new Map(questionsData.map((q) => [q.id, q]));
+
+        // Map questions back to reports
+        return reports.map((report) => ({
+          ...report,
+          question: questionMap.get(report.question_id) || null,
+        })) as unknown as Report[];
+      }
+    }
+
+    return reports as unknown as Report[];
   } catch (error) {
     console.error('Get Reports Error:', error);
     return [];
@@ -129,24 +145,40 @@ export const getUserReports = async (userId: string): Promise<Report[]> => {
   try {
     const { data, error } = await supabase
       .from('reports')
-      .select(
-        `
-        *,
-        question:questions!question_id (
-          id,
-          question,
-          options,
-          correct_answer,
-          explanation,
-          subject
-        )
-      `,
-      )
+      .select('*')
       .eq('reporter_id', userId)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return (data as unknown as Report[]) || [];
+
+    const reports = data || [];
+    if (reports.length === 0) return [];
+
+    // Manually fetch questions to avoid Foreign Key relation errors
+    const questionIds = Array.from(
+      new Set(reports.map((r) => r.question_id).filter(Boolean)),
+    );
+
+    if (questionIds.length > 0) {
+      const { data: questionsData } = await supabase
+        .from('questions')
+        .select(
+          'id, question, options, correct_answer_indices, explanation, subject',
+        )
+        .in('id', questionIds);
+
+      if (questionsData) {
+        const questionMap = new Map(questionsData.map((q) => [q.id, q]));
+
+        // Map questions back to reports
+        return reports.map((report) => ({
+          ...report,
+          question: questionMap.get(report.question_id) || null,
+        })) as unknown as Report[];
+      }
+    }
+
+    return reports as unknown as Report[];
   } catch (error) {
     console.error('Get User Reports Error:', error);
     return [];
