@@ -51,7 +51,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
         className="mb-6 flex items-center gap-2 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300 transition-colors"
       >
         <ArrowLeft size={18} />
-        <span className="font-bold">সেটআপে ফিরে যান (Back to Setup)</span>
+        <span className="font-bold">সেটআপে ফিরে যাও</span>
       </button>
 
       <div className="grid md:grid-cols-3 gap-8">
@@ -99,8 +99,8 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
                 <strong className="block text-neutral-900 dark:text-white mb-2">
                   সতর্কতা:
                 </strong>
-                পরীক্ষা চলাকালীন উইন্ডো বা ট্যাব পরিবর্তন করলে আপনার পরীক্ষা
-                বাতিল হতে পারে। একটি স্থিতিশীল ইন্টারনেট সংযোগ নিশ্চিত করুন।
+                পরীক্ষা চলাকালীন উইন্ডো বা ট্যাব পরিবর্তন করলে তোমার পরীক্ষা
+                বাতিল হতে পারে। ভালো ইন্টারনেট সংযোগ আছে কিনা দেখে নাও।
               </div>
             </div>
           </div>
@@ -146,7 +146,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
                   </>
                 ) : (
                   <>
-                    <span>পরীক্ষা শুরু করুন</span>
+                    <span>পরীক্ষা শুরু করো</span>
                     <Play size={18} fill="currentColor" />
                   </>
                 )}

@@ -106,8 +106,8 @@ const ReviewList: React.FC<ReviewListProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => openReportModal(Number(q.id))}
-                  className="p-2.5 rounded-full text-neutral-400 dark:text-neutral-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-                  title="রিপোর্ট করুন"
+                  className="p-2.5 rounded-full text-red-400 dark:text-red-500/50 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                  title="রিপোর্ট করো"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -128,9 +128,9 @@ const ReviewList: React.FC<ReviewListProps> = ({
                   onClick={() => toggleBookmark(Number(q.id))}
                   className={`
                         transition-all duration-200 p-2.5 rounded-full 
-                        ${isBookmarked ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-500 dark:text-amber-400' : 'text-neutral-400 dark:text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-600 dark:hover:text-neutral-300'}
+                        ${isBookmarked ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 dark:text-emerald-400' : 'text-neutral-400 dark:text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-600 dark:hover:text-neutral-300'}
                       `}
-                  title={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করুন'}
+                  title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
                 >
                   {isBookmarked ? (
                     <svg
@@ -232,7 +232,7 @@ const ReviewList: React.FC<ReviewListProps> = ({
                     );
                     badge = (
                       <span className="text-xs font-bold text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/60 px-2 py-0.5 rounded ml-2 whitespace-nowrap">
-                        আপনার উত্তর
+                        তোমার উত্তর
                       </span>
                     );
                   }

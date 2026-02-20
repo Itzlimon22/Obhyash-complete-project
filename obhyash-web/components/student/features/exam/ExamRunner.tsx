@@ -156,7 +156,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
 
   const handleReportSubmit = (data: Record<string, unknown>) => {
     console.log('Report:', data);
-    alert('রিপোর্ট জমা নেওয়া হয়েছে। ধন্যবাদ!');
+    alert('রিপোর্ট জমা নেওয়া হয়েছে। ধন্যবাদ!');
   };
 
   if (!examDetails) return null;
@@ -267,7 +267,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                   disabled={!selectedScript}
                   className="flex-1 sm:flex-none px-8 py-3 bg-indigo-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
                 >
-                  স্ক্রিপ্ট জমা দিন
+                  স্ক্রিপ্ট জমা দাও
                 </button>
               </div>
             ) : (
@@ -289,7 +289,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                     d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                   />
                 </svg>
-                পরীক্ষা শেষ করুন
+                পরীক্ষা শেষ করো
               </button>
             )}
           </div>
@@ -314,7 +314,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
         {/* Using direct modal rendering or portal would be better, but keeping inline for simplicity with existing architecture */}
         {appState === AppState.GRACE_PERIOD && (
           <div className="fixed bottom-20 right-4 z-50 bg-amber-100 dark:bg-amber-900 border border-amber-300 text-amber-800 dark:text-amber-200 px-4 py-2 rounded-lg shadow-lg animate-bounce">
-            সময় শেষ! অনুগ্রহ করে এখনই জমা দিন।
+            সময় শেষ! তাড়াতাড়ি জমা দাও।
           </div>
         )}
 

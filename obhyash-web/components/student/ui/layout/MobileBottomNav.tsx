@@ -19,22 +19,25 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   if (isLiveExam) {
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
-        <div className="bg-white/90 dark:bg-neutral-950/90 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between px-6 py-3 pb-safe shadow-[0_-4px_12px_-2px_rgba(0,0,0,0.05)]">
+        <div className="bg-white/95 dark:bg-neutral-950/95 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-4 px-6 py-4 pb-safe shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
+          {/* Submit Button */}
           <button
             onClick={onSubmit}
-            className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm py-3.5 px-6 rounded-2xl shadow-lg shadow-rose-500/20 active:scale-[0.97] transition-all flex items-center justify-center gap-2"
+            className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold text-[15px] py-3.5 px-6 rounded-2xl shadow-lg shadow-rose-500/25 active:scale-[0.96] transition-all flex items-center justify-center gap-2.5"
           >
-            <div className="w-5 h-5 flex items-center justify-center bg-rose-500/30 rounded-full">
+            <div className="w-5 h-5 flex items-center justify-center bg-white/20 rounded-full">
               <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
             </div>
-            পরীক্ষা শেষ করুন
+            জমা দিন
           </button>
 
+          {/* Menu Button (3-line hamburger) */}
           <button
             onClick={onMenuClick}
-            className="ml-4 p-3.5 bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 rounded-2xl border border-neutral-200 dark:border-neutral-800 active:scale-[0.9] transition-all"
+            className="p-3.5 bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 rounded-2xl border border-neutral-200 dark:border-neutral-800 active:scale-[0.9] transition-all hover:bg-neutral-200 dark:hover:bg-neutral-800"
+            aria-label="Menu"
           >
-            <Menu size={22} strokeWidth={2.5} />
+            <Menu size={24} strokeWidth={2.5} />
           </button>
         </div>
       </div>

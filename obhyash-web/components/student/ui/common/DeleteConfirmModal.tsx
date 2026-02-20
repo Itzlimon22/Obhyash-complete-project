@@ -18,9 +18,9 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
-  title = 'আপনি কি নিশ্চিত?',
-  description = 'এই পদক্ষেপটি পূর্বাবস্থায় ফেরানো যাবে না।',
-  confirmLabel = 'মুছে ফেলুন',
+  title = 'তুমি কি নিশ্চিত?',
+  description = 'এই পদক্ষেপটি আর ফিরে পাওয়া যাবে না।',
+  confirmLabel = 'মুছে ফেলো',
   isLoading = false,
 }) => {
   // Lock body scroll while open

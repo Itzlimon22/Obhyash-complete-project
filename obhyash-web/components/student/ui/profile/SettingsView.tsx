@@ -286,7 +286,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
               htmlFor="avatar-upload"
               className="flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 cursor-pointer"
             >
-              {uploading ? 'Uploading...' : 'ছবি পরিবর্তন করুন'}
+              {uploading ? 'লোডিং...' : 'ছবি পরিবর্তন করো'}
               <Camera className="w-4 h-4" />
             </label>
           </div>
@@ -327,7 +327,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
                 className="mt-4 flex items-center gap-1.5 text-xs font-bold text-rose-500 hover:text-rose-600 transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                ছবি সরিয়ে ফেলুন
+                ছবি সরিয়ে ফেলো
               </button>
             )}
 
@@ -344,7 +344,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
               value={formData.name}
               onChange={handleChange}
               className={inputClass}
-              placeholder="আপনার পূর্ণ নাম লিখুন"
+              placeholder="তোমার পুরো নাম লেখো"
             />
           </div>
 
@@ -412,7 +412,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
                 onChange={handleChange}
                 className={selectClass}
               >
-                <option value="">নির্বাচন করুন</option>
+                <option value="">বেছে নাও</option>
                 <option value="Male">পুরুষ (Male)</option>
                 <option value="Female">মহিলা (Female)</option>
               </select>
@@ -602,7 +602,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
               value={formData.sscRoll}
               onChange={handleChange}
               className={inputClass}
-              placeholder="রোল নম্বর লিখুন"
+              placeholder="রোল নম্বর লেখো"
             />
           </div>
 
@@ -614,7 +614,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
               value={formData.sscReg}
               onChange={handleChange}
               className={inputClass}
-              placeholder="রেজিস্ট্রেশন নম্বর লিখুন"
+              placeholder="রেজিস্ট্রেশন নম্বর লেখো"
             />
           </div>
 
@@ -814,7 +814,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
             পরিবর্তন করতে না চাইলে খালি রাখো
           </p>
           <div className={inputGroupClass}>
-            <label className={labelClass}>New Password</label>
+            <label className={labelClass}>নতুন পাসওয়ার্ড</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -868,7 +868,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
             </div>
           </div>
           <div className={inputGroupClass}>
-            <label className={labelClass}>Confirm New Password</label>
+            <label className={labelClass}>পাসওয়ার্ড নিশ্চিত করো</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -930,7 +930,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
           onClick={handleSubmit}
           className="w-full md:w-auto px-10 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
         >
-          Save Changes
+          সব সেভ করো
         </button>
       </div>
     </div>

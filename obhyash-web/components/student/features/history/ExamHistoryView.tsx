@@ -56,7 +56,7 @@ const PracticeRow: React.FC<{
           </span>
           {revealed && item.userAns !== undefined && isMistakeTab && (
             <span className="text-[10px] text-black/50 dark:text-white/50 mt-0.5 font-bold uppercase tracking-wider">
-              আপনার পূর্বের উত্তর:{' '}
+              তোমার আগের উত্তর:{' '}
               <span
                 className={
                   item.userAns === item.question.correctAnswerIndex
@@ -66,7 +66,7 @@ const PracticeRow: React.FC<{
               >
                 {/* ✅ UPDATED: Now supports Math/LaTeX rendering */}
                 <LatexText
-                  text={item.question.options[item.userAns] || 'উত্তর দেননি'}
+                  text={item.question.options[item.userAns] || 'উত্তর দাওনি'}
                 />
               </span>
             </span>
@@ -91,7 +91,7 @@ const PracticeRow: React.FC<{
                 d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
               />
             </svg>
-            আবার চেষ্টা করুন
+            আবার চেষ্টা করো
           </button>
         )}
       </div>
@@ -550,7 +550,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                         d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
                       />
                     </svg>
-                    সব ইতিহাস মুছুন
+                    সব ইতিহাস মোছো
                   </button>
                 </div>
               )}
@@ -559,7 +559,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
               {displayedHistory.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 bg-white dark:bg-neutral-900 rounded-2xl border border-dashed border-neutral-200 dark:border-neutral-800">
                   <p className="text-neutral-500 dark:text-neutral-400 font-medium text-sm">
-                    কোন ফলাফল পাওয়া যায়নি
+                    কোনো ফলাফল পাওয়া যায়নি
                   </p>
                 </div>
               ) : (
@@ -668,7 +668,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                     onClick={() => setVisibleCount((p) => p + 9)}
                     className="px-6 py-2.5 bg-neutral-200 dark:bg-neutral-800 rounded-xl font-bold text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-neutral-700 transition-colors"
                   >
-                    আরও দেখুন
+                    আরও দেখো
                   </button>
                 </div>
               )}
@@ -697,10 +697,10 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                     </svg>
                   </div>
                   <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
-                    কোনো ভুল পাওয়া যায়নি!
+                    কোনো ভুল পাওয়া যায়নি!
                   </h3>
                   <p className="text-neutral-500 dark:text-neutral-400 mt-1">
-                    আপনি সব প্রশ্নের সঠিক উত্তর দিয়েছেন।
+                    তুমি সব প্রশ্নের সঠিক উত্তর দিয়েছো।
                   </p>
                 </div>
               ) : (
@@ -721,7 +721,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                       </svg>
                     </div>
                     <p className="text-xs text-amber-800 dark:text-amber-400 font-medium">
-                      এখানে আপনি ভুল করা প্রশ্নগুলো পুনরায় চর্চা করতে পারবেন।
+                      এখানে তুমি ভুল করা প্রশ্নগুলো আবার প্র্যাকটিস করতে পারবে।
                     </p>
                   </div>
 
@@ -776,7 +776,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                     কোনো প্রশ্ন বুকমার্ক করা নেই
                   </h3>
                   <p className="text-neutral-500 dark:text-neutral-400 text-sm max-w-xs text-center">
-                    গুরুত্বপূর্ণ প্রশ্ন বুকমার্ক করে এখানে সংরক্ষণ করুন।
+                    গুরুত্বপূর্ণ প্রশ্ন বুকমার্ক করে এখানে জমিয়ে রাখো।
                   </p>
                 </div>
               ) : (
@@ -797,7 +797,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                         onClick={() => setVisibleCount((p) => p + 9)}
                         className="px-6 py-2.5 bg-neutral-200 dark:bg-neutral-800 rounded-xl font-bold text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-neutral-700 transition-colors"
                       >
-                        আরও দেখুন
+                        আরও দেখো
                       </button>
                     </div>
                   )}
@@ -818,9 +818,9 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
           setIsDeleting(false);
           setShowDeleteModal(false);
         }}
-        title="সব ইতিহাস মুছবেন?"
-        description="এই পদক্ষেপটি স্থায়ী। আপনার সমস্ত পরীক্ষার ইতিহাস ডেটাবেজ থেকে মুছে যাবে এবং পূর্বাবস্থায় ফেরানো যাবে না।"
-        confirmLabel="হ্যাঁ, মুছে ফেলুন"
+        title="সব ইতিহাস মুছবে?"
+        description="এই পদক্ষেপটি স্থায়ী। তোমার সব পরীক্ষার ইতিহাস ডেটাবেজ থেকে মুছে যাবে এবং আর ফিরে পাওয়া যাবে না।"
+        confirmLabel="হ্যাঁ, মুছে ফেলো"
         isLoading={isDeleting}
       />
     </div>

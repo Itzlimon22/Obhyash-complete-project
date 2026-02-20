@@ -126,7 +126,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
           setGlobalBookmarks([]);
         }
       } catch {
-        toast.error('বুকমার্ক লোড করতে সমস্যা হয়েছে।');
+        toast.error('বুকমার্ক লোড করতে সমস্যা হয়েছে।');
       } finally {
         setIsLoadingBookmarks(false);
       }
@@ -155,11 +155,11 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
         await toggleBookmark(currentUser.id, questionId, isCurrentlyBookmarked);
         toast.success(
           isCurrentlyBookmarked
-            ? 'বুকমার্ক রিমুভ করা হয়েছে'
-            : 'বুকমার্ক সেভ করা হয়েছে',
+            ? 'বুকমার্ক সরানো হয়েছে'
+            : 'বুকমার্ক সেভ করা হয়েছে',
         );
       } catch {
-        toast.error('বুকমার্ক আপডেট করতে সমস্যা হয়েছে।');
+        toast.error('বুকমার্ক আপডেট করতে সমস্যা হয়েছে।');
         setBookmarkedIds(bookmarkedIds);
       }
     },
@@ -300,7 +300,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     const cfg =
       count >= 3
         ? {
-            bg: 'bg-rose-900/50 text-rose-400 border-rose-800/50',
+            bg: 'bg-emerald-900/50 text-emerald-400 border-emerald-800/50',
             label: `${count}× ভুল`,
           }
         : count === 2
@@ -331,7 +331,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
           {
             label: 'বুকমার্ক',
             value: globalBookmarks.length,
-            color: 'text-amber-500',
+            color: 'text-emerald-500',
           },
           { label: 'রিভিউ বাকি', value: dueCount, color: 'text-indigo-400' },
         ].map(({ label, value, color }) => (
@@ -417,20 +417,20 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
               </svg>
             </div>
             <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">
-              কোনো তথ্য পাওয়া যায়নি
+              কোনো তথ্য পাওয়া যায়নি
             </h3>
             <p className="text-neutral-500 text-sm max-w-md mb-6">
               {activeTab === 'mistakes'
                 ? subjectFilter !== 'all'
-                  ? `"${subjectFilter}" বিষয়ে কোনো ভুল পাওয়া যায়নি।`
-                  : 'আপনি এখনো কোনো পরীক্ষায় ভুল করেননি।'
-                : 'আপনি এখনো কোনো প্রশ্ন বুকমার্ক করেননি।'}
+                  ? `"${subjectFilter}" বিষয়ে কোনো ভুল পাওয়া যায়নি।`
+                  : 'তুমি এখনো কোনো পরীক্ষায় ভুল করোনি।'
+                : 'তুমি এখনো কোনো প্রশ্ন বুকমার্ক করোনি।'}
             </p>
             <button
               onClick={onNavigateToMock}
               className="px-6 py-2 bg-rose-600 text-white rounded-lg text-sm font-bold shadow hover:bg-rose-700 transition-colors"
             >
-              নতুন পরীক্ষা দিন
+              নতুন পরীক্ষা দাও
             </button>
           </div>
         ) : (
@@ -454,7 +454,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                 {/* Shuffle toggle */}
                 <button
                   onClick={() => setShuffle((s) => !s)}
-                  title="এলোমেলো করুন"
+                  title="এলোমেলো করো"
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold border transition-all ${
                     shuffle
                       ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-indigo-300 dark:border-indigo-700'
@@ -483,7 +483,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                     : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'
                 }`}
               >
-                📇 ফ্ল্যাশকার্ড শুরু করুন
+                📇 ফ্ল্যাশকার্ড শুরু করো
               </button>
             </div>
 
@@ -553,7 +553,9 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                           )}
                           {activeTab === 'mistakes' &&
                             bookmarkedIds.has(question.id) && (
-                              <span className="text-amber-500 text-sm">🔖</span>
+                              <span className="text-emerald-500 text-sm">
+                                🔖
+                              </span>
                             )}
                         </div>
 
@@ -579,8 +581,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                         }}
                         className={`flex-shrink-0 p-1.5 rounded-lg transition-colors ${
                           bookmarkedIds.has(question.id)
-                            ? 'text-amber-500'
-                            : 'text-neutral-400 hover:text-amber-500'
+                            ? 'text-emerald-500'
+                            : 'text-neutral-400 hover:text-emerald-500'
                         }`}
                         title="বুকমার্ক"
                       >

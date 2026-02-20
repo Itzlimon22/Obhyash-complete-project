@@ -84,10 +84,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             </h3>
             <p className="mt-2 text-base text-neutral-600 dark:text-neutral-400 leading-relaxed">
               {isOmrMode
-                ? 'আপনি কি আপনার OMR উত্তরপত্র জমা দিয়ে মূল্যায়নের জন্য পাঠাতে প্রস্তুত?'
+                ? 'তুমি কি তোমার OMR উত্তরপত্র জমা দিয়ে মূল্যায়নের জন্য পাঠাতে প্রস্তুত?'
                 : isWarning
-                  ? `আপনি এখনও ${unansweredCount}টি প্রশ্নের উত্তর দেননি। আপনি কি নিশ্চিত যে আপনি এখনই পরীক্ষা জমা দিতে চান?`
-                  : 'আপনি সব প্রশ্নের উত্তর দিয়েছেন। আপনি কি আপনার উত্তরপত্র জমা দিতে প্রস্তুত?'}
+                  ? `তুমি এখনো ${unansweredCount}টি প্রশ্নের উত্তর দাওনি। তুমি কি নিশ্চিত যে পরীক্ষা জমা দিতে চাও?`
+                  : 'তুমি সব প্রশ্নের উত্তর দিয়েছো। তুমি কি উত্তরপত্র জমা দিতে প্রস্তুত?'}
             </p>
           </div>
         </div>
@@ -97,7 +97,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             onClick={onClose}
             className="px-5 py-2.5 rounded-lg border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 font-medium hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors text-base"
           >
-            ফিরে যান
+            ফিরে যাও
           </button>
           <button
             onClick={onConfirm}
@@ -106,7 +106,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               ${isWarning ? 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-500' : 'bg-emerald-700 hover:bg-emerald-800'}
             `}
           >
-            জমা দিন
+            জমা দাও
           </button>
         </div>
       </div>

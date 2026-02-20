@@ -134,7 +134,7 @@ const ResultView: React.FC<ResultViewProps> = ({
             <div className="mb-4 max-w-xl mx-auto bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-left">
                 <h4 className="font-bold text-amber-800 dark:text-amber-200 text-xs md:text-sm">
-                  OMR মূল্যায়ন নিয়ে সন্তুষ্ট নন?
+                  OMR মূল্যায়ন নিয়ে খুশি নও?
                 </h4>
                 <p className="text-[10px] md:text-xs text-amber-700 dark:text-amber-300">
                   যান্ত্রিক ত্রুটির কারণে ফলাফল ভুল হতে পারে।
@@ -154,7 +154,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                 onClick={onChallengeEvaluation}
                 className="px-3 py-1.5 bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 text-xs font-bold rounded hover:bg-amber-100 dark:hover:bg-neutral-700 transition-colors whitespace-nowrap"
               >
-                পুনরায় যাচাই করুন
+                আবার যাচাই করো
               </button>
             </div>
           )}
@@ -236,10 +236,10 @@ const ResultView: React.FC<ResultViewProps> = ({
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-neutral-900/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 shadow-2xl max-w-md w-full p-5 border border-neutral-100 dark:border-neutral-800 transform transition-all">
             <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">
-              প্রশ্ন {reportingQuestionId} রিপোর্ট করুন
+              প্রশ্ন {reportingQuestionId} রিপোর্ট করো
             </h3>
             <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-4">
-              অনুগ্রহ করে সমস্যাটির কারণ উল্লেখ করুন:
+              সমস্যাটির কারণ লেখো:
             </p>
 
             <textarea
@@ -262,7 +262,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                 disabled={!reportReason.trim()}
                 className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed text-xs"
               >
-                জমা দিন
+                জমা দাও
               </button>
             </div>
           </div>

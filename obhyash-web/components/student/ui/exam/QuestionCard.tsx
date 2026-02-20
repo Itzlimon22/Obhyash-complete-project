@@ -97,7 +97,7 @@ export default function QuestionCard({
           {/* Report Button */}
           <button
             onClick={onReport}
-            className="p-2 rounded-full transition-colors text-neutral-300 hover:text-red-500 dark:text-neutral-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+            className="p-2 rounded-full transition-colors text-red-400 hover:text-red-600 dark:text-red-500/50 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
             title="Report Issue"
           >
             <svg
@@ -122,16 +122,16 @@ export default function QuestionCard({
             whileHover={{ scale: 1.1 }}
             animate={{
               scale: isBookmarked ? 1.1 : 1,
-              color: isBookmarked ? '#f59e0b' : '#d4d4d4',
+              color: isBookmarked ? '#10b981' : '#d4d4d4',
             }}
             onClick={onToggleBookmark}
             disabled={!onToggleBookmark}
             className={`p-2 rounded-full transition-colors ${
               isBookmarked
-                ? 'bg-amber-50 dark:bg-amber-900/20'
+                ? 'bg-emerald-50 dark:bg-emerald-900/20'
                 : 'hover:text-neutral-500 dark:text-neutral-600 dark:hover:text-neutral-400'
             } ${!onToggleBookmark ? 'opacity-30 cursor-default' : ''}`}
-            title={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করুন'}
+            title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

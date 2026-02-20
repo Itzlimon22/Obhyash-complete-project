@@ -146,8 +146,8 @@ const Dashboard: React.FC<DashboardProps> = ({
         // Rank up celebration
         if (prevRankRef.current > 0 && realRank < prevRankRef.current) {
           celebration.achievement();
-          toast.success('অভিনন্দন! আপনার র‍্যাংক উন্নত হয়েছে!', {
-            description: `আপনি এখন #${realRank} স্থানে আছেন।`,
+          toast.success('অভিনন্দন! তোমার র‍্যাংক উন্নত হয়েছে!', {
+            description: `তুমি এখন #${realRank} স্থানে আছো।`,
           });
         }
         prevRankRef.current = realRank;
@@ -322,7 +322,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               লিডারবোর্ড
             </h3>
             <button className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1 group-hover:gap-1.5 transition-all bg-amber-50 dark:bg-amber-900/20 px-2.5 py-1 rounded-full">
-              সব দেখুন
+              সব দেখো
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
@@ -386,7 +386,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   {user.name?.split(' ').slice(0, 2).join(' ')}
                 </span>
                 <span className="text-[9px] font-bold text-sky-500 dark:text-sky-400 bg-sky-100 dark:bg-sky-900/30 px-1.5 py-0.5 rounded-full shrink-0">
-                  আপনি
+                  তুমি
                 </span>
               </div>
             </div>
@@ -399,7 +399,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <span className="font-bold text-neutral-700 dark:text-neutral-300">
                   {xpDiff.toLocaleString()} XP
                 </span>{' '}
-                প্রয়োজন
+                লাগবে
               </div>
             )}
           </div>
