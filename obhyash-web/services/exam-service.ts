@@ -191,8 +191,23 @@ export const fetchQuestionsWithDiagnostics = async (
       }
 
       if (rpcSuccess) {
-        // Process found data
-        // ... (existing processing code)
+        // --- JS Deduplication Safeguard ---
+        const uniqueData: QuestionDbRow[] = [];
+        const seenIds = new Set<string | number>();
+        for (const q of finalData) {
+          if (!seenIds.has(q.id)) {
+            uniqueData.push(q);
+            seenIds.add(q.id);
+          }
+        }
+
+        if (uniqueData.length !== finalData.length) {
+          debug.diagnosis.push(
+            `⚠️ Removed ${finalData.length - uniqueData.length} duplicates in JS fallback`,
+          );
+          finalData = uniqueData;
+        }
+
         console.log(`📊 Result: ${finalData.length} questions`);
         console.groupEnd();
 
