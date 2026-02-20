@@ -487,7 +487,10 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                       সর্বাধিক ভুল (Top Mistake Area)
                     </h4>
                     <p className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white mt-1">
-                      {weakChapters[0]?.name || 'N/A'}
+                      {weakChapters[0]?.name &&
+                      weakChapters[0]?.name !== 'General'
+                        ? weakChapters[0]?.name
+                        : 'অজানা টপিক / All'}
                     </p>
                     <p className="text-xs text-orange-600 dark:text-orange-300 mt-1 font-medium">
                       {weakChapters[0]?.wrong}টি ভুল উত্তর
@@ -500,7 +503,10 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                     <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300 leading-relaxed">
                       আপনার{' '}
                       <span className="font-bold text-indigo-600 dark:text-indigo-400">
-                        {weakChapters[0]?.name}
+                        {weakChapters[0]?.name &&
+                        weakChapters[0]?.name !== 'General'
+                          ? weakChapters[0]?.name
+                          : 'এই'}
                       </span>{' '}
                       অধ্যায়ে দুর্বলতা রয়েছে। মূল বইয়ের কনসেপ্টগুলো আবার ঝালিয়ে
                       নিন এবং বেশি করে প্র্যাকটিস করুন।
@@ -522,7 +528,9 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                         <div className="flex-1 min-w-0 pr-4">
                           <div className="flex items-center justify-between mb-2">
                             <h5 className="font-bold text-neutral-900 dark:text-white text-sm md:text-base truncate">
-                              {chapter.name}
+                              {chapter.name && chapter.name !== 'General'
+                                ? chapter.name
+                                : 'অজানা টপিক / All'}
                             </h5>
                             <span className="text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 px-2 py-0.5 rounded-md shrink-0">
                               {chapter.wrong} Mistakes

@@ -230,7 +230,7 @@ export const getSubjectAnalysis = async (
         const { data: rawData, error: fallbackError } = await supabase
           .from('exam_results')
           .select(
-            'id, total_questions, correct_count, wrong_count, time_taken, date, subject, chapters',
+            'id, total_questions, correct_count, wrong_count, time_taken, date, subject, chapters, questions, user_answers',
           )
           .eq('user_id', userId)
           .eq('status', 'evaluated')
@@ -278,25 +278,53 @@ export const getSubjectAnalysis = async (
                 ((exam.correct_count || 0) + (exam.wrong_count || 0)),
             );
 
-            // Basic chapter extraction
-            const chaptersText = exam.chapters || 'General';
-            const chaptersArray = chaptersText
-              .split(',')
-              .map((c: string) => c.trim())
-              .filter(Boolean);
-            const wTotal =
-              (exam.total_questions || 0) / Math.max(1, chaptersArray.length);
-            const wCorrect =
-              (exam.correct_count || 0) / Math.max(1, chaptersArray.length);
+            // Better chapter extraction using actual questions and answers
+            if (exam.questions && Array.isArray(exam.questions)) {
+              const answers = exam.user_answers || {};
 
-            chaptersArray.forEach((chap: string) => {
-              if (!chapterMap.has(chap)) {
-                chapterMap.set(chap, { name: chap, total: 0, correct: 0 });
+              exam.questions.forEach((q: any) => {
+                // Determine chapter/topic name (Fallback to 'General' if both missing)
+                const cName = q.topic || q.chapter || 'General';
+
+                if (!chapterMap.has(cName)) {
+                  chapterMap.set(cName, { name: cName, total: 0, correct: 0 });
+                }
+
+                const cData = chapterMap.get(cName);
+                cData.total += 1; // 1 Question
+
+                const userAnswer = answers[q.id];
+                if (
+                  userAnswer !== undefined &&
+                  userAnswer === q.correctAnswerIndex
+                ) {
+                  cData.correct += 1;
+                }
+              });
+            } else {
+              // Legacy fallback if `questions` array is missing
+              const chaptersText = exam.chapters || 'General';
+              const chaptersArray = chaptersText
+                .split(',')
+                .map((c: string) => c.trim())
+                .filter(Boolean);
+
+              if (chaptersArray.length > 0) {
+                const wTotal =
+                  (exam.total_questions || 0) / chaptersArray.length;
+                const wCorrect =
+                  (exam.correct_count || 0) / chaptersArray.length;
+
+                chaptersArray.forEach((chap: string) => {
+                  if (!chapterMap.has(chap)) {
+                    chapterMap.set(chap, { name: chap, total: 0, correct: 0 });
+                  }
+                  const cData = chapterMap.get(chap);
+                  cData.total += wTotal;
+                  cData.correct += wCorrect;
+                });
               }
-              const cData = chapterMap.get(chap);
-              cData.total += wTotal;
-              cData.correct += wCorrect;
-            });
+            }
           });
 
           const chapterPerformance = Array.from(chapterMap.values())
