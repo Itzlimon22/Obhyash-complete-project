@@ -40,6 +40,8 @@ const SubscriptionView: React.FC = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [currentPlanId, setCurrentPlanId] = useState<string>('free');
+  const [activeSubscription, setActiveSubscription] =
+    useState<SubscriptionPlan | null>(null);
 
   // User Data for Invoice
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
@@ -56,18 +58,20 @@ const SubscriptionView: React.FC = () => {
   );
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
-  const currentPlan: SubscriptionPlan = plans.find(
-    (p) => p.id === currentPlanId,
-  ) ||
-    plans[0] || {
-      id: 'loading',
-      name: 'Loading...',
-      price: 0,
-      billingCycle: '',
-      currency: '',
-      features: [],
-      colorTheme: 'neutral',
-    };
+  // Fix: Prefer activeSubscription data if it matches the currentPlanId to get expiresAt
+  const currentPlan: SubscriptionPlan =
+    activeSubscription && activeSubscription.id === currentPlanId
+      ? activeSubscription
+      : plans.find((p) => p.id === currentPlanId) ||
+        plans[0] || {
+          id: 'loading',
+          name: 'Loading...',
+          price: 0,
+          billingCycle: '',
+          currency: '',
+          features: [],
+          colorTheme: 'neutral',
+        };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,6 +88,7 @@ const SubscriptionView: React.FC = () => {
         setInvoices(fetchedInvoices);
         setPaymentMethods(fetchedMethods);
         setCurrentUser(user);
+        setActiveSubscription(activeSub);
 
         // Determine active plan
         if (activeSub) {
