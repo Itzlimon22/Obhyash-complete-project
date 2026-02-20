@@ -17,8 +17,8 @@ export const SUBJECT_NAME_MAP: Record<string, string> = {
   hsc_chemistry_2: 'রসায়ন ২য় পত্র',
   hsc_biology_1: 'জীববিজ্ঞান ১ম পত্র',
   hsc_biology_2: 'জীববিজ্ঞান ২য় পত্র',
-  hsc_higher_math_1: 'উচ্চতর গণিত ১ম পত্র',
-  hsc_higher_math_2: 'উচ্চতর গণিত ২য় পত্র',
+  hsc_math_1: 'উচ্চতর গণিত ১ম পত্র',
+  hsc_math_2: 'উচ্চতর গণিত ২য় পত্র',
 
   // Commerce
   hsc_accounting_1: 'হিসাববিজ্ঞান ১ম পত্র',
