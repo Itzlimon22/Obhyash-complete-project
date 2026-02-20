@@ -5,6 +5,11 @@ import { MathText, RichText } from './shared';
 import { RichTextEditor } from './rich-text-editor';
 import { useFileUpload } from '@/hooks/use-file-upload'; // ✅ Import Hook
 import Image from 'next/image';
+import {
+  getSubjects,
+  getChapters,
+  getTopics,
+} from '@/services/metadata-service';
 
 interface QuestionFormProps {
   initialData: Partial<Question>;
@@ -34,6 +39,89 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 }) => {
   const [data, setData] = useState<Partial<Question>>(initialData);
   const { uploadFile, isUploading } = useFileUpload(); // ✅ Hook ব্যবহার
+
+  // --- Data State for Dropdowns ---
+  const [availableSubjects, setAvailableSubjects] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [availableChapters, setAvailableChapters] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [availableTopics, setAvailableTopics] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
+
+  // 1. Fetch Subjects on Mount
+  React.useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        setIsLoadingMetadata(true);
+        const subjects = await getSubjects();
+        // The service returns objects with `{ id, name, label, icon }`
+        setAvailableSubjects(
+          subjects.map((s) => ({
+            id: s.id,
+            name: (s as any).rawName || s.name,
+          })),
+        );
+      } catch (err) {
+        console.error('Failed to load subjects:', err);
+      } finally {
+        setIsLoadingMetadata(false);
+      }
+    };
+    fetchSubjects();
+  }, []);
+
+  // 2. Fetch Chapters when Subject changes
+  React.useEffect(() => {
+    if (!data.subject) {
+      setAvailableChapters([]);
+      setAvailableTopics([]);
+      return;
+    }
+    const fetchChapters = async () => {
+      try {
+        // Find subject ID
+        const matchedSubject = availableSubjects.find(
+          (s) => s.name.toLowerCase() === data.subject?.toLowerCase(),
+        );
+        const subjectId = matchedSubject ? matchedSubject.id : data.subject;
+        if (subjectId) {
+          const chapters = await getChapters(subjectId);
+          setAvailableChapters(chapters);
+        }
+      } catch (err) {
+        console.error('Failed to load chapters:', err);
+      }
+    };
+    fetchChapters();
+  }, [data.subject, availableSubjects]);
+
+  // 3. Fetch Topics when Chapter changes
+  React.useEffect(() => {
+    if (!data.chapter) {
+      setAvailableTopics([]);
+      return;
+    }
+    const fetchTopics = async () => {
+      try {
+        // Find chapter ID
+        const matchedChapter = availableChapters.find(
+          (c) => c.name.toLowerCase() === data.chapter?.toLowerCase(),
+        );
+        const chapterId = matchedChapter ? matchedChapter.id : data.chapter;
+        if (chapterId) {
+          const topics = await getTopics(chapterId);
+          setAvailableTopics(topics.map((t) => ({ id: t.id, name: t.name })));
+        }
+      } catch (err) {
+        console.error('Failed to load topics:', err);
+      }
+    };
+    fetchTopics();
+  }, [data.chapter, availableChapters]);
 
   // --- ইমেজ আপলোড হ্যান্ডলার ---
   const handleImageUpload = async (
@@ -93,7 +181,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 
       <div className="p-4 sm:p-8 space-y-6 sm:space-y-8">
         {/* মেটাডাটা গ্রিড */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
           <div>
             <Label>স্ট্রিম (Stream)</Label>
             <Input
@@ -104,19 +192,77 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
           </div>
           <div>
             <Label>বিষয় (Subject)</Label>
-            <Input
-              value={data.subject || ''}
-              onChange={(e) => setData({ ...data, subject: e.target.value })}
-              placeholder="যেমন: Physics"
-            />
+            <div className="relative">
+              <select
+                value={data.subject || ''}
+                onChange={(e) => {
+                  setData({
+                    ...data,
+                    subject: e.target.value,
+                    chapter: '',
+                    topic: '',
+                  });
+                }}
+                className="w-full px-3 py-2.5 rounded-xl border border-paper-200 dark:border-obsidian-800 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none appearance-none cursor-pointer dark:text-gray-200"
+              >
+                <option value="">নির্বাচন করুন</option>
+                {availableSubjects.map((s) => (
+                  <option key={s.id} value={s.name}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                size={14}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+              />
+            </div>
           </div>
           <div>
             <Label>অধ্যায় (Chapter)</Label>
-            <Input
-              value={data.chapter || ''}
-              onChange={(e) => setData({ ...data, chapter: e.target.value })}
-              placeholder="যেমন: Motion"
-            />
+            <div className="relative">
+              <select
+                value={data.chapter || ''}
+                onChange={(e) =>
+                  setData({ ...data, chapter: e.target.value, topic: '' })
+                }
+                disabled={!data.subject}
+                className="w-full px-3 py-2.5 rounded-xl border border-paper-200 dark:border-obsidian-800 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none appearance-none cursor-pointer dark:text-gray-200 disabled:opacity-50"
+              >
+                <option value="">নির্বাচন করুন</option>
+                {availableChapters.map((c) => (
+                  <option key={c.id} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                size={14}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+              />
+            </div>
+          </div>
+          <div>
+            <Label>টপিক (Topic)</Label>
+            <div className="relative">
+              <select
+                value={data.topic || ''}
+                onChange={(e) => setData({ ...data, topic: e.target.value })}
+                disabled={!data.chapter}
+                className="w-full px-3 py-2.5 rounded-xl border border-paper-200 dark:border-obsidian-800 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none appearance-none cursor-pointer dark:text-gray-200 disabled:opacity-50"
+              >
+                <option value="">নির্বাচন করুন</option>
+                {availableTopics.map((t) => (
+                  <option key={t.id} value={t.name}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                size={14}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+              />
+            </div>
           </div>
           <div>
             <Label>কঠিন্য (Difficulty)</Label>

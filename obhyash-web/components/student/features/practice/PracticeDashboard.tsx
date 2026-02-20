@@ -91,8 +91,9 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
           const userAns = result.userAnswers?.[q.id];
           if (
             userAns !== undefined &&
-            userAns !== q.correctAnswerIndex &&
-            q.correctAnswerIndex !== undefined
+            userAns !== null &&
+            userAns !== -1 &&
+            userAns !== q.correctAnswerIndex
           ) {
             mistakeMap.set(q.id, q);
             freq.set(q.id, (freq.get(q.id) ?? 0) + 1);

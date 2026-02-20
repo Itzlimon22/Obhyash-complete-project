@@ -1,4 +1,5 @@
 import { Question } from './types';
+import { hscSubjects } from './data/hsc';
 
 /**
  * Upload format interface - the format users provide
@@ -200,6 +201,55 @@ export function validateUploadQuestion(
 }
 
 /**
+ * Resolves a topic serial number to a topic name based on provided subject and chapter.
+ */
+function resolveTopicName(
+  subjectInput?: string,
+  chapterInput?: string,
+  topicInput?: string,
+): string | undefined {
+  if (!topicInput || !subjectInput) return topicInput;
+
+  const serial = parseInt(topicInput.trim(), 10);
+  // If it's not a pure number, assume it's already a string name or something else
+  if (isNaN(serial)) return topicInput;
+
+  const targetSubjLower = subjectInput.toLowerCase().trim();
+  const matchedSubjects = hscSubjects.filter(
+    (s) =>
+      s.id.toLowerCase() === targetSubjLower ||
+      s.name.toLowerCase() === targetSubjLower ||
+      s.name.toLowerCase().includes(targetSubjLower),
+  );
+
+  if (matchedSubjects.length === 0) return topicInput;
+
+  let chaptersToSearch = matchedSubjects.flatMap((s) => s.chapters);
+
+  if (chapterInput) {
+    const targetChapLower = chapterInput.toLowerCase().trim();
+    const filteredChapters = chaptersToSearch.filter(
+      (c) =>
+        c.id.toLowerCase() === targetChapLower ||
+        c.name.toLowerCase() === targetChapLower ||
+        c.name.toLowerCase().includes(targetChapLower),
+    );
+
+    if (filteredChapters.length > 0) {
+      chaptersToSearch = filteredChapters;
+    }
+  }
+
+  // Iterate over whatever chapters we have and find the serial
+  for (const chapter of chaptersToSearch) {
+    const topic = chapter.topics.find((t) => t.serial === serial);
+    if (topic) return topic.name;
+  }
+
+  return topicInput; // Fallback to raw string if not found
+}
+
+/**
  * Transform upload format to database format
  */
 export function transformUploadToDatabase(
@@ -302,7 +352,11 @@ export function transformUploadToDatabase(
     // Academic Info
     subject: uploadQuestion.subject,
     chapter: uploadQuestion.chapter,
-    topic: uploadQuestion.topic,
+    topic: resolveTopicName(
+      uploadQuestion.subject,
+      uploadQuestion.chapter,
+      uploadQuestion.topic,
+    ),
     stream: uploadQuestion.stream,
     division: uploadQuestion.division,
     section: uploadQuestion.section,

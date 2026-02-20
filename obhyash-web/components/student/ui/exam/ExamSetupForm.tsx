@@ -79,6 +79,62 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const [questionCount, setQuestionCount] = useState<number>(25);
   const [duration, setDuration] = useState<number>(25);
   const [negativeMarking, setNegativeMarking] = useState<number>(0.25);
+  const [isFormHydrated, setIsFormHydrated] = useState(false);
+
+  // --- Hydrate Form State from SessionStorage ---
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('obhyash_setup_form_state');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed.subject) setSubject(parsed.subject);
+          if (parsed.selectedChapters)
+            setSelectedChapters(parsed.selectedChapters);
+          if (parsed.selectedTopics) setSelectedTopics(parsed.selectedTopics);
+          if (parsed.examTypes) setExamTypes(parsed.examTypes);
+          if (parsed.difficulties) setDifficulties(parsed.difficulties);
+          if (parsed.questionCount) setQuestionCount(parsed.questionCount);
+          if (parsed.duration) setDuration(parsed.duration);
+          if (parsed.negativeMarking !== undefined)
+            setNegativeMarking(parsed.negativeMarking);
+        } catch (e) {
+          console.error('Failed to parse setup form state', e);
+        }
+      }
+      setIsFormHydrated(true);
+    }
+  }, []);
+
+  // --- Save Form State to SessionStorage ---
+  useEffect(() => {
+    if (isFormHydrated && typeof window !== 'undefined') {
+      const stateToSave = {
+        subject,
+        selectedChapters,
+        selectedTopics,
+        examTypes,
+        difficulties,
+        questionCount,
+        duration,
+        negativeMarking,
+      };
+      sessionStorage.setItem(
+        'obhyash_setup_form_state',
+        JSON.stringify(stateToSave),
+      );
+    }
+  }, [
+    isFormHydrated,
+    subject,
+    selectedChapters,
+    selectedTopics,
+    examTypes,
+    difficulties,
+    questionCount,
+    duration,
+    negativeMarking,
+  ]);
 
   // --- Modals State ---
   const [isOmrConfigOpen, setIsOmrConfigOpen] = useState(false);

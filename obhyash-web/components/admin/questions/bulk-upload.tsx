@@ -292,6 +292,82 @@ const EditModal: React.FC<{
     onChange({ ...data, options: opts });
   };
 
+  // --- Data State for Dropdowns ---
+  const [availableSubjects, setAvailableSubjects] = React.useState<
+    { id: string; name: string }[]
+  >([]);
+  const [availableChapters, setAvailableChapters] = React.useState<
+    { id: string; name: string }[]
+  >([]);
+  const [availableTopics, setAvailableTopics] = React.useState<
+    { id: string; name: string }[]
+  >([]);
+
+  // 1. Fetch Subjects on Mount
+  React.useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const subjects = await getSubjects();
+        setAvailableSubjects(
+          subjects.map((s) => ({
+            id: s.id,
+            name: (s as any).rawName || s.name,
+          })),
+        );
+      } catch (err) {
+        console.error('Failed to load subjects:', err);
+      }
+    };
+    fetchSubjects();
+  }, []);
+
+  // 2. Fetch Chapters when Subject changes
+  React.useEffect(() => {
+    if (!data.subject) {
+      setAvailableChapters([]);
+      setAvailableTopics([]);
+      return;
+    }
+    const fetchChapters = async () => {
+      try {
+        const matchedSubject = availableSubjects.find(
+          (s) => s.name.toLowerCase() === data.subject?.toLowerCase(),
+        );
+        const subjectId = matchedSubject ? matchedSubject.id : data.subject;
+        if (subjectId) {
+          const chapters = await getChapters(subjectId);
+          setAvailableChapters(chapters);
+        }
+      } catch (err) {
+        console.error('Failed to load chapters:', err);
+      }
+    };
+    fetchChapters();
+  }, [data.subject, availableSubjects]);
+
+  // 3. Fetch Topics when Chapter changes
+  React.useEffect(() => {
+    if (!data.chapter) {
+      setAvailableTopics([]);
+      return;
+    }
+    const fetchTopics = async () => {
+      try {
+        const matchedChapter = availableChapters.find(
+          (c) => c.name.toLowerCase() === data.chapter?.toLowerCase(),
+        );
+        const chapterId = matchedChapter ? matchedChapter.id : data.chapter;
+        if (chapterId) {
+          const topics = await getTopics(chapterId);
+          setAvailableTopics(topics.map((t) => ({ id: t.id, name: t.name })));
+        }
+      } catch (err) {
+        console.error('Failed to load topics:', err);
+      }
+    };
+    fetchTopics();
+  }, [data.chapter, availableChapters]);
+
   return (
     <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-[100] p-0 sm:p-4">
       <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 max-w-xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col">
@@ -358,59 +434,107 @@ const EditModal: React.FC<{
           </div>
 
           {/* Metadata */}
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              {
-                label: 'বিষয়',
-                key: 'subject',
-                type: 'text' as const,
-              },
-              {
-                label: 'অধ্যায়',
-                key: 'chapter',
-                type: 'text' as const,
-              },
-              {
-                label: 'কঠিন্য',
-                key: 'difficulty',
-                type: 'select' as const,
-                selectOptions: ['Easy', 'Medium', 'Hard'],
-              },
-              {
-                label: 'স্ট্রিম',
-                key: 'stream',
-                type: 'text' as const,
-              },
-            ].map((field) => (
-              <div key={field.key}>
-                <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
-                  {field.label}
-                </label>
-                {field.type === 'select' ? (
-                  <select
-                    value={
-                      (data[field.key as keyof Question] as string) || 'Medium'
-                    }
-                    onChange={(e) =>
-                      onChange({ ...data, [field.key]: e.target.value })
-                    }
-                    className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
-                  >
-                    {field.selectOptions?.map((o) => (
-                      <option key={o}>{o}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    value={(data[field.key as keyof Question] as string) || ''}
-                    onChange={(e) =>
-                      onChange({ ...data, [field.key]: e.target.value })
-                    }
-                    className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
-                  />
-                )}
-              </div>
-            ))}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {/* Subject Dropdown */}
+            <div>
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+                বিষয়
+              </label>
+              <select
+                value={data.subject || ''}
+                onChange={(e) =>
+                  onChange({
+                    ...data,
+                    subject: e.target.value,
+                    chapter: '',
+                    topic: '',
+                  })
+                }
+                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
+              >
+                <option value="">নির্বাচন করুন</option>
+                {availableSubjects.map((s) => (
+                  <option key={s.id} value={s.name}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Chapter Dropdown */}
+            <div>
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+                অধ্যায়
+              </label>
+              <select
+                value={data.chapter || ''}
+                onChange={(e) =>
+                  onChange({ ...data, chapter: e.target.value, topic: '' })
+                }
+                disabled={!data.subject}
+                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm disabled:opacity-50"
+              >
+                <option value="">নির্বাচন করুন</option>
+                {availableChapters.map((c) => (
+                  <option key={c.id} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Topic Dropdown */}
+            <div>
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+                টপিক
+              </label>
+              <select
+                value={data.topic || ''}
+                onChange={(e) => onChange({ ...data, topic: e.target.value })}
+                disabled={!data.chapter}
+                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm disabled:opacity-50"
+              >
+                <option value="">নির্বাচন করুন</option>
+                {availableTopics.map((t) => (
+                  <option key={t.id} value={t.name}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Difficulty Dropdown */}
+            <div>
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+                কঠিন্য
+              </label>
+              <select
+                value={data.difficulty || 'Medium'}
+                onChange={(e) =>
+                  onChange({
+                    ...data,
+                    difficulty: e.target.value as 'Easy' | 'Medium' | 'Hard',
+                  })
+                }
+                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
+              >
+                <option>Easy</option>
+                <option>Medium</option>
+                <option>Hard</option>
+              </select>
+            </div>
+
+            {/* Stream */}
+            <div>
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+                স্ট্রিম
+              </label>
+              <input
+                value={data.stream || ''}
+                onChange={(e) => onChange({ ...data, stream: e.target.value })}
+                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
+              />
+            </div>
           </div>
 
           {/* Explanation */}

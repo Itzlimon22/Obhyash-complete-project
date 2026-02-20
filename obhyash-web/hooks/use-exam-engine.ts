@@ -390,9 +390,12 @@ export const useExamEngine = () => {
 
   // --- PERSISTENCE MANAGER ---
   const PERSISTENCE_KEY = 'obhyash_active_exam_session';
+  const isHydrated = useRef(false);
 
   // 1. SAVE STATE: Persist exam state whenever critical data changes
   useEffect(() => {
+    if (!isHydrated.current) return;
+
     // Only save if exam is ACTIVE or in Grace Period
     if (
       appState === AppState.ACTIVE ||
@@ -491,6 +494,7 @@ export const useExamEngine = () => {
           localStorage.removeItem(PERSISTENCE_KEY);
         }
       }
+      isHydrated.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run ONCE on mount

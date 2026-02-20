@@ -194,6 +194,10 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       userAns: number;
       flagged: boolean;
     }[] = [];
+
+    // Deduplicate by question id so the same wrong answer multiple times isn't duplicated
+    const seenMistakes = new Set<string | number>();
+
     history.forEach((exam) => {
       if (filterSubject && exam.subject !== filterSubject) return;
       if (filterDate && !exam.date.startsWith(filterDate)) return;
@@ -205,15 +209,23 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       exam.questions.forEach((q) => {
         const ua = exam.userAnswers?.[q.id];
         // Check if attempted and wrong
-        if (ua !== undefined && ua !== q.correctAnswerIndex) {
-          allMistakes.push({
-            question: q,
-            examDate: exam.date,
-            subject: exam.subject,
-            subjectLabel: exam.subjectLabel,
-            userAns: ua,
-            flagged: flags.has(q.id),
-          });
+        if (
+          ua !== undefined &&
+          ua !== null &&
+          ua !== -1 &&
+          ua !== q.correctAnswerIndex
+        ) {
+          if (!seenMistakes.has(q.id)) {
+            seenMistakes.add(q.id);
+            allMistakes.push({
+              question: q,
+              examDate: exam.date,
+              subject: exam.subject,
+              subjectLabel: exam.subjectLabel,
+              userAns: ua,
+              flagged: flags.has(q.id),
+            });
+          }
         }
       });
     });
