@@ -45,6 +45,23 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
         )
       : 0;
 
+  // -- Rank System --
+  const getRankName = (xp: number) => {
+    if (xp < 1000) return 'রকি';
+    if (xp < 2000) return 'স্কাউট';
+    if (xp < 3000) return 'ওয়ারিয়র';
+    if (xp < 4000) return 'টাইটান';
+    return 'লিজেন্ড';
+  };
+
+  const getNextRankName = (xp: number) => {
+    if (xp < 1000) return 'স্কাউট';
+    if (xp < 2000) return 'ওয়ারিয়র';
+    if (xp < 3000) return 'টাইটান';
+    if (xp < 4000) return 'লিজেন্ড';
+    return 'লিজেন্ড';
+  };
+
   // Real Data from History
   const activityData = useMemo(
     () => calculateActivityStats(history),
@@ -139,7 +156,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
           <div>
             <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-2">
               <span className="px-3 py-1 sm:px-4 sm:py-1.5 bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 text-sm sm:text-base font-black rounded-lg uppercase tracking-wider">
-                {user.level || 'Level 1'}
+                {getRankName(user.xp || 0)}
               </span>
               <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-neutral-800 dark:text-white">
                 পরবর্তী লেভেল রিভার্ড
@@ -163,18 +180,8 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
         </div>
 
         <div className="mt-3 sm:mt-4 flex justify-between text-[10px] sm:text-xs font-bold text-neutral-400 uppercase tracking-widest px-1">
-          <span>{user.level || 'Level 1'}</span>
-          <span>
-            {(() => {
-              const currentLevelStr = user.level || 'Level 1';
-              const match = currentLevelStr.match(/\d+/);
-              if (match) {
-                return `Level ${parseInt(match[0]) + 1}`;
-              }
-              // Fallback: If level is a name (like ROOKIE), calculate next numeric level from XP
-              return `Level ${Math.floor((user.xp || 0) / 1000) + 2}`;
-            })()}
-          </span>
+          <span>{getRankName(user.xp || 0)}</span>
+          <span>{getNextRankName(user.xp || 0)}</span>
         </div>
       </div>
 
