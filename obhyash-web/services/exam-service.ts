@@ -445,6 +445,7 @@ export const updateExamResult = async (
         wrong_count: result.wrongCount,
         time_taken: result.timeTaken,
         user_answers: result.userAnswers,
+        status: 'evaluated', // Mark as complete so analytics can pick it up
         submission_type: result.submissionType || 'digital',
         script_image_data: result.scriptImageData,
         // Update total marks/questions just in case they changed (unlikely)
@@ -524,6 +525,7 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
         negative_marking: result.negativeMarking,
         questions: result.questions,
         user_answers: result.userAnswers,
+        status: 'evaluated', // Mark as complete so analytics can pick it up
         flagged_questions: result.flaggedQuestions, // If db supports it
         chapters: result.chapters || 'General',
         submission_type: result.submissionType || 'digital',
@@ -592,9 +594,7 @@ const mapDbResultToExamResult = (data: ExamResultDbRow): ExamResult => {
   // then fall back to the raw subject ID.
   const rawLabel = data.subject_label || data.subject;
   const resolvedLabel =
-    rawLabel === data.subject
-      ? getSubjectDisplayName(data.subject)
-      : rawLabel;
+    rawLabel === data.subject ? getSubjectDisplayName(data.subject) : rawLabel;
 
   return {
     id: data.id,

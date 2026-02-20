@@ -1,0 +1,1 @@
+UPDATE public.exam_results SET status = 'evaluated' WHERE score IS NOT NULL AND (status IS NULL OR status = '');
