@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import DeleteConfirmModal from '@/components/student/ui/common/DeleteConfirmModal';
 import { ExamResult, Question } from '@/lib/types'; // Updated to likely correct path
+import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import LatexText from '@/components/student/ui/LatexText';
 import QuestionCard from '@/components/student/ui/exam/QuestionCard';
 
@@ -51,7 +52,7 @@ const PracticeRow: React.FC<{
               day: 'numeric',
               month: 'short',
             })}{' '}
-            • {item.subjectLabel || item.subject}
+            • {item.subjectLabel || getSubjectDisplayName(item.subject)}
           </span>
           {revealed && item.userAns !== undefined && isMistakeTab && (
             <span className="text-[10px] text-black/50 dark:text-white/50 mt-0.5 font-bold uppercase tracking-wider">

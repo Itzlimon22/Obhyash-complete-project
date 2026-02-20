@@ -1,5 +1,7 @@
 import React from 'react';
 import { ExamDetails } from '@/lib/types';
+import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
+import { Clock, BookOpen, AlertCircle, TrendingDown } from 'lucide-react';
 
 interface ExamDetailsCardProps {
   details: ExamDetails;
@@ -22,7 +24,7 @@ const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({
               বিষয় (Subject)
             </h3>
             <p className="text-lg font-bold text-neutral-800 dark:text-neutral-100">
-              {details.subjectLabel || details.subject}
+              {details.subjectLabel || getSubjectDisplayName(details.subject)}
             </p>
           </div>
           <div>

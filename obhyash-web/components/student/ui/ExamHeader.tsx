@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ExamDetails, AppState } from '@/lib/types';
+import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 
 interface ExamHeaderProps {
   details: ExamDetails;
@@ -136,7 +137,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
             Zenith পরীক্ষা
           </h1>
           <p className="text-xs md:text-sm text-neutral-600 dark:text-neutral-400 font-medium truncate max-w-[150px] md:max-w-[200px]">
-            {details.subjectLabel || details.subject}
+            {details.subjectLabel || getSubjectDisplayName(details.subject)}
           </p>
         </div>
       </div>
@@ -189,7 +190,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
 
           {/* Download Menu */}
           {showDownloads && (
-            <div className="w-full absolute top-10 right-0 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-t-2xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-xl py-2 w-48 z-[60]">
+            <div className="absolute top-10 right-0 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-t-2xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-xl py-2 w-48 z-[60]">
               <button
                 onClick={() => {
                   onDownloadQuestionPaper();

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Question, UserAnswers } from '@/lib/types';
+import { Question, UserAnswers, ExamResult } from '@/lib/types';
+import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import ResultStats from '@/components/student/ui/results/ResultStats';
 import ReviewList from './ReviewList';
 
@@ -16,6 +17,7 @@ interface ResultViewProps {
   onDownloadResultWithExplanations?: () => void;
   submissionType?: 'digital' | 'script';
   onChallengeEvaluation?: () => void;
+  result: ExamResult; // Added result prop
 }
 
 const ResultView: React.FC<ResultViewProps> = ({
@@ -28,6 +30,7 @@ const ResultView: React.FC<ResultViewProps> = ({
   onDownloadResultWithExplanations,
   submissionType,
   onChallengeEvaluation,
+  result, // Destructure result prop
 }) => {
   // Local state for bookmarks in result view
   const [bookmarked, setBookmarked] = useState<Set<number>>(new Set());
@@ -136,6 +139,16 @@ const ResultView: React.FC<ResultViewProps> = ({
                 <p className="text-[10px] md:text-xs text-amber-700 dark:text-amber-300">
                   যান্ত্রিক ত্রুটির কারণে ফলাফল ভুল হতে পারে।
                 </p>
+                <div className="flex flex-wrap items-center gap-2 mt-1">
+                  <span className="text-sm font-bold text-neutral-500 flex items-center gap-1.5">
+                    <div className="w-1 h-1 rounded-full bg-neutral-300" />
+                    {getSubjectDisplayName(result.subject)}
+                  </span>
+                  <span className="text-sm font-bold text-neutral-500 flex items-center gap-1.5">
+                    <div className="w-1 h-1 rounded-full bg-neutral-300" />
+                    ID: #{result.id.toString().slice(0, 8)}
+                  </span>
+                </div>
               </div>
               <button
                 onClick={onChallengeEvaluation}
@@ -221,7 +234,7 @@ const ResultView: React.FC<ResultViewProps> = ({
       {/* Modal: Report Question Issue */}
       {reportModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-neutral-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-2xl max-w-md w-full p-5 border border-neutral-100 dark:border-neutral-800 transform transition-all duration-300">
+          <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 shadow-2xl max-w-md w-full p-5 border border-neutral-100 dark:border-neutral-800 transform transition-all">
             <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">
               প্রশ্ন {reportingQuestionId} রিপোর্ট করুন
             </h3>

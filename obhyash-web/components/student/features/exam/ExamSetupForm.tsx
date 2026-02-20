@@ -54,9 +54,9 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
 
   // Exam Config
-  const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.Mixed);
-  const [questionCount, setQuestionCount] = useState<number>(20);
-  const [duration, setDuration] = useState<number>(20);
+  const [difficulties, setDifficulties] = useState<string[]>(['Medium']);
+  const [questionCount, setQuestionCount] = useState<number>(25);
+  const [duration, setDuration] = useState<number>(25);
   const [negativeMarking, setNegativeMarking] = useState<number>(0.25);
 
   // Metadata Cache & Loading
@@ -83,7 +83,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   // --- Effects ---
 
-  // Load Subjects
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
@@ -106,6 +105,11 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     };
     fetchSubjects();
   }, []);
+
+  // Sync duration with question limit
+  useEffect(() => {
+    setDuration(questionCount);
+  }, [questionCount]);
 
   // Load Chapters when Subject changes
   useEffect(() => {
@@ -171,6 +175,24 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     });
   };
 
+  const toggleDifficulty = (levelId: string) => {
+    setDifficulties((prev) => {
+      if (prev.includes(levelId)) {
+        if (prev.length === 1) return prev; // Prevent deselecting all
+        return prev.filter((id) => id !== levelId);
+      }
+      return [...prev, levelId];
+    });
+  };
+
+  const handleSelectAllDifficulties = () => {
+    if (difficulties.length === DIFFICULTY_OPTIONS.length) {
+      setDifficulties(['Medium']);
+    } else {
+      setDifficulties(DIFFICULTY_OPTIONS.map((opt) => opt.id));
+    }
+  };
+
   const toggleTopicSelection = (topic: string) => {
     setSelectedTopics((prev) => {
       if (prev.includes(topic)) {
@@ -208,12 +230,15 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       return;
     }
 
-    // When ALL exam types are selected, pass 'Mixed' as wildcard
-    // Otherwise pass the selected types joined with ' + '
     const examTypeValue =
       examTypes.length === EXAM_TYPE_OPTIONS.length
         ? 'Mixed'
         : examTypes.join(' + ');
+
+    const difficultyValue =
+      difficulties.length === DIFFICULTY_OPTIONS.length
+        ? 'Mixed'
+        : difficulties.join(' , ');
 
     onStartExam({
       subject: subject,
@@ -222,7 +247,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       chapters:
         selectedChapters.length > 0 ? selectedChapters.join(', ') : 'All',
       topics: selectedTopics.length > 0 ? selectedTopics.join(', ') : 'General',
-      difficulty, // Difficulty.Mixed acts as 'All' wildcard
+      difficulty: difficultyValue, // Handled properly now
       questionCount,
       durationMinutes: duration,
       negativeMarking,
@@ -309,7 +334,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         {/* LEFT COLUMN - SELECTION */}
         <div className="lg:col-span-2 space-y-6">
           {/* Subject Selection */}
-          <div className="w-full bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-6 border border-neutral-200 dark:border-neutral-800">
+          <div className="w-full bg-white dark:bg-neutral-900 rounded-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-5 sm:p-6 border border-neutral-200/80 dark:border-neutral-800 shadow-sm">
             <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-4">
               বিষয় নির্বাচন করুন
             </label>
@@ -356,7 +381,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           {/* Chapters & Topics Selection */}
           <div
             className={cn(
-              'bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 space-y-6',
+              'bg-white dark:bg-neutral-900 rounded-2xl p-5 sm:p-6 border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-6',
               !subject && 'opacity-70 pointer-events-none cursor-not-allowed',
             )}
           >
@@ -450,7 +475,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         {/* RIGHT COLUMN - SETTINGS */}
         <div className="space-y-6">
           {/* Exam Type & Difficulty */}
-          <div className="w-full bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-6 border border-neutral-200 dark:border-neutral-800 space-y-6">
+          <div className="w-full bg-white dark:bg-neutral-900 rounded-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-5 sm:p-6 border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-6">
             {/* Exam Type */}
             <div>
               <div className="flex justify-between items-center mb-3">
@@ -509,37 +534,40 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               <div className="flex bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-xl gap-1 overflow-x-auto">
                 <button
                   type="button"
-                  onClick={() => setDifficulty(Difficulty.Mixed)}
+                  onClick={handleSelectAllDifficulties}
                   className={cn(
                     'flex-1 min-w-[60px] py-2 rounded-lg text-xs font-semibold transition-all',
-                    difficulty === Difficulty.Mixed
+                    difficulties.length === DIFFICULTY_OPTIONS.length
                       ? 'bg-white dark:bg-neutral-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
                       : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white',
                   )}
                 >
                   সব (All)
                 </button>
-                {DIFFICULTY_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => setDifficulty(opt.id as Difficulty)}
-                    className={cn(
-                      'flex-1 min-w-[60px] py-2 rounded-lg text-xs font-semibold transition-all',
-                      difficulty === opt.id
-                        ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
-                        : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white',
-                    )}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
+                {DIFFICULTY_OPTIONS.map((opt) => {
+                  const isSelected = difficulties.includes(opt.id);
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => toggleDifficulty(opt.id)}
+                      className={cn(
+                        'flex-1 min-w-[60px] py-2 rounded-lg text-xs font-semibold transition-all',
+                        isSelected
+                          ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
+                          : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white',
+                      )}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
 
           {/* Time & Marks */}
-          <div className="w-full bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-6 border border-neutral-200 dark:border-neutral-800 space-y-6">
+          <div className="w-full bg-white dark:bg-neutral-900 rounded-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-5 sm:p-6 border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-6">
             {/* Question Count */}
             <div>
               <div className="flex justify-between items-center mb-3">
@@ -552,15 +580,15 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               </div>
               <input
                 type="range"
-                min="5"
+                min="1"
                 max="100"
-                step="5"
+                step="1"
                 value={questionCount}
                 onChange={(e) => setQuestionCount(parseInt(e.target.value))}
                 className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-rose-500"
               />
               <div className="flex justify-between text-xs text-neutral-500 mt-2">
-                <span>5</span>
+                <span>1</span>
                 <span>100</span>
               </div>
             </div>
@@ -577,15 +605,15 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               </div>
               <input
                 type="range"
-                min="5"
+                min="1"
                 max="180"
-                step="5"
+                step="1"
                 value={duration}
                 onChange={(e) => setDuration(parseInt(e.target.value))}
                 className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-rose-500"
               />
               <div className="flex justify-between text-xs text-neutral-500 mt-2">
-                <span>5m</span>
+                <span>1m</span>
                 <span>3h</span>
               </div>
             </div>
@@ -621,7 +649,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           <button
             type="submit"
             disabled={isLoading || !subject || examTypes.length === 0}
-            className="w-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-bold py-4 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 hover:shadow-lg transition-all active:scale-[0.99] flex justify-center items-center gap-3 text-base disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-bold py-3.5 sm:py-4 rounded-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 hover:shadow-lg shadow-md transition-all active:scale-[0.99] flex justify-center items-center gap-3 text-base disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>

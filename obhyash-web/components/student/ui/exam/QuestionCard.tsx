@@ -46,14 +46,14 @@ export default function QuestionCard({
     <div
       id={`question-${question.id}`}
       className={`
-        bg-white dark:bg-neutral-900 rounded-xl mb-6 scroll-mt-32 transition-all duration-300
-        border-l-4 shadow-sm hover:shadow-md
+        bg-white dark:bg-neutral-900 rounded-2xl mb-5 scroll-mt-32 transition-all duration-300
+        border border-neutral-200/80 dark:border-neutral-800 shadow-sm hover:shadow-md
         ${
           isFlagged
-            ? 'border-l-amber-400 border-y border-r border-neutral-100 dark:border-y-neutral-800 dark:border-r-neutral-800'
+            ? 'ring-2 ring-amber-400/50 border-amber-400/50'
             : isAnswered
-              ? 'border-l-emerald-500 border-y border-r border-neutral-100 dark:border-y-neutral-800 dark:border-r-neutral-800'
-              : 'border-l-neutral-200 dark:border-l-neutral-700 border-y border-r border-neutral-100 dark:border-y-neutral-800 dark:border-r-neutral-800'
+              ? 'ring-1 ring-emerald-500/30 border-emerald-500/30'
+              : ''
         }
         ${isOmrMode ? 'opacity-90' : ''}
       `}
@@ -151,7 +151,7 @@ export default function QuestionCard({
         </div>
       </div>
 
-      <div className="px-5 pb-6">
+      <div className="px-5 pb-5">
         {/* Question Text */}
         <h3 className="text-neutral-900 dark:text-neutral-100 font-serif-exam text-lg md:text-xl leading-relaxed mb-6">
           <LatexText text={question.question} />
@@ -206,7 +206,7 @@ export default function QuestionCard({
               <label
                 key={idx}
                 className={`
-                  group relative flex items-start gap-4 p-4 rounded-xl transition-all duration-200 border h-full
+                  group relative flex items-start gap-3.5 p-3.5 sm:p-4 rounded-xl transition-all duration-200 border h-full
                   ${isOmrMode || readOnly ? 'cursor-default' : 'cursor-pointer'}
                   ${bgClass} ${borderClass}
                 `}

@@ -3,10 +3,7 @@ import SubjectStat from './SubjectStat';
 import { celebration } from '@/lib/confetti';
 import { toast } from 'sonner';
 import { ExamResult, UserProfile } from '@/lib/types';
-// Actually the previous step removed usage. So I can delete this line.
-// But wait, replace_file_content cannot delete lines easily without replacement.
-// I will replace it with empty string or comment.
-
+import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import { DashboardSkeleton } from '@/components/student/ui/common/Skeletons';
 
 interface SubjectStats {
@@ -88,7 +85,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           });
 
           return {
-            name: sub.name,
+            name: getSubjectDisplayName(sub.id),
             correct,
             wrong,
             skipped,

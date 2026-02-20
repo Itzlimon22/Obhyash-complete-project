@@ -14,6 +14,7 @@ import {
   getOverallAnalytics,
   OverallAnalytics,
 } from '@/services/stats-service';
+import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import { supabase } from '@/services/core';
 
 import { AnalysisSkeleton } from '@/components/student/ui/common/Skeletons';
@@ -75,6 +76,15 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
     if (hrs > 0) return `${hrs}h ${mins}m`;
     return `${mins}m`;
   };
+
+  // Transform subject names to Bengali
+  const localizedSubjectData = useMemo(() => {
+    if (!analytics?.subjectData) return [];
+    return analytics.subjectData.map((s) => ({
+      ...s,
+      name: getSubjectDisplayName(s.name),
+    }));
+  }, [analytics?.subjectData]);
 
   // Check if we have no data
   if (isLoading) {
@@ -265,7 +275,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
         {/* Subject Breakdown */}
         <div className="lg:col-span-1">
           <SubjectStat
-            data={analytics.subjectData}
+            data={localizedSubjectData}
             onSubjectClick={(subject) =>
               onSubjectClick && onSubjectClick(subject)
             }

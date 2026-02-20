@@ -117,7 +117,7 @@ export interface ExamConfig {
   examType: string; // Daily, Weekly, Model Test
   chapters: string; // Comma separated IDs or names
   topics: string;
-  difficulty: QuestionDifficulty;
+  difficulty: QuestionDifficulty | string;
   questionCount: number;
   durationMinutes: number;
   negativeMarking: number;
