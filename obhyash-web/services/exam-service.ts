@@ -223,8 +223,9 @@ export const fetchQuestionsWithDiagnostics = async (
         if (resolvedChapters) query = query.in('chapter', resolvedChapters);
         if (resolvedTopics) query = query.in('topic', resolvedTopics);
         if (bucket.difficulty)
-          query = query.eq('difficulty', bucket.difficulty);
-        if (bucket.examType) query = query.eq('exam_type', bucket.examType);
+          query = query.ilike('difficulty', `%${bucket.difficulty}%`);
+        if (bucket.examType)
+          query = query.ilike('exam_type', `%${bucket.examType}%`);
 
         query = query.limit(neededForThisBucket * 3); // Overfetch for random selection
 

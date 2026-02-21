@@ -483,7 +483,9 @@ export interface QuestionFormData {
   difficulty: string;
   examType: string;
   institute: string;
+  institutes?: string[];
   year: string;
+  years?: number[];
 
   created_at?: string;
   created_by?: string;

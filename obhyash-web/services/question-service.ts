@@ -47,7 +47,7 @@ export const getQuestionsPage = async (
         query = query.eq('topic', filters.topic);
       }
       if (filters.difficulty) {
-        query = query.eq('difficulty', filters.difficulty);
+        query = query.ilike('difficulty', `%${filters.difficulty}%`);
       }
       if (filters.status) {
         query = query.eq('status', filters.status);
@@ -56,9 +56,12 @@ export const getQuestionsPage = async (
         query = query.eq('author', filters.author);
       }
 
-      // Apply search (full-text search on question content)
+      // Apply search (full-text search on question content and metadata)
       if (filters.search && filters.search.trim()) {
-        query = query.ilike('question', `%${filters.search.trim()}%`);
+        const searchTerm = filters.search.trim();
+        query = query.or(
+          `question.ilike.%${searchTerm}%,exam_type.ilike.%${searchTerm}%,institute.ilike.%${searchTerm}%,institutes.cs.{${searchTerm}}`,
+        );
       }
 
       // Apply sorting
@@ -132,11 +135,15 @@ export const getQuestionCount = async (
       if (filters.chapter) query = query.eq('chapter', filters.chapter);
       if (filters.topic) query = query.eq('topic', filters.topic);
       if (filters.difficulty)
-        query = query.eq('difficulty', filters.difficulty);
+        query = query.ilike('difficulty', `%${filters.difficulty}%`);
       if (filters.status) query = query.eq('status', filters.status);
       if (filters.author) query = query.eq('author', filters.author);
-      if (filters.search)
-        query = query.ilike('question', `%${filters.search}%`);
+      if (filters.search) {
+        const searchTerm = filters.search.trim();
+        query = query.or(
+          `question.ilike.%${searchTerm}%,exam_type.ilike.%${searchTerm}%,institute.ilike.%${searchTerm}%,institutes.cs.{${searchTerm}}`,
+        );
+      }
 
       const { count, error } = await query;
 
@@ -476,9 +483,7 @@ export const bulkCreateQuestions = async (
 /**
  * Get multiple questions by IDs
  */
-export const getQuestionsByIds = async (
-  ids: string[],
-): Promise<Question[]> => {
+export const getQuestionsByIds = async (ids: string[]): Promise<Question[]> => {
   if (isSupabaseConfigured() && supabase) {
     try {
       if (ids.length === 0) return [];

@@ -1,0 +1,2 @@
+# Ignore mobile app flutter project in Vercel builds to save upload time and prevent build context limits
+obhyash-flutter/

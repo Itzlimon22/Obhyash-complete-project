@@ -22,6 +22,7 @@ import { Question } from '@/lib/types';
 import { MathText } from './shared';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
+import { hscSubjects } from '@/lib/data/hsc';
 import {
   getSubjects,
   getChapters,
@@ -127,9 +128,12 @@ function normalizeRawRow(
         q.correctAnswerIndices = [idx];
       }
     }
-    // Try numeric index "0", "1", "2"
+    // Try numeric index "1", "2", "3", "4" -> maps to 0, 1, 2, 3
     else if (/^\d+$/.test(answerRef)) {
-      const idx = parseInt(answerRef);
+      const parsedNum = parseInt(answerRef);
+      // Assuming 1-based input (e.g. 1=A, 4=D). If the user means 0-based, it could conflict.
+      // But typically, a user inputs 1 for Option 1.
+      const idx = parsedNum > 0 ? parsedNum - 1 : 0;
       if (options[idx]) {
         q.correctAnswerIndex = idx;
         q.correctAnswer = options[idx];
@@ -535,6 +539,46 @@ const EditModal: React.FC<{
                 className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
               />
             </div>
+
+            {/* Exam Type */}
+            <div>
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+                পরীক্ষার ধরন
+              </label>
+              <input
+                value={data.examType || ''}
+                onChange={(e) =>
+                  onChange({ ...data, examType: e.target.value })
+                }
+                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
+              />
+            </div>
+
+            {/* Institute */}
+            <div>
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+                প্রতিষ্ঠান
+              </label>
+              <input
+                value={data.institute || ''}
+                onChange={(e) =>
+                  onChange({ ...data, institute: e.target.value })
+                }
+                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
+              />
+            </div>
+
+            {/* Year */}
+            <div>
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+                বছর
+              </label>
+              <input
+                value={data.year || ''}
+                onChange={(e) => onChange({ ...data, year: e.target.value })}
+                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
+              />
+            </div>
           </div>
 
           {/* Explanation */}
@@ -648,178 +692,69 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
     [],
   );
 
-  // Helper to resolve topic serials to names
-  const resolveTopicSerials = async (questions: Partial<Question>[]) => {
-    // 1. Identify unique subjects from the uploaded data
-    const uploadedSubjects = Array.from(
-      new Set(
-        questions
-          .map((q) => q.subject)
-          .filter((s): s is string => typeof s === 'string' && s.length > 0),
-      ),
-    );
+  // Helper to resolve topic serials to names using local hscSubjects data
+  const resolveTopicSerialsLocally = (questions: Partial<Question>[]) => {
+    return questions.map((q) => {
+      let resolvedSubject = q.subject || '';
+      let resolvedChapter = q.chapter || '';
+      let resolvedTopic = q.topic || '';
 
-    console.log(
-      '[TopicResolver] Starting resolution for subjects:',
-      uploadedSubjects,
-    );
+      if (!resolvedSubject) return q;
 
-    // Map: UploadedSubjectName -> { UploadedChapterName -> { Serial -> TopicName } }
-    const topicMap: Record<string, Record<string, Record<string, string>>> = {};
-
-    try {
-      // Fetch all subjects from DB to get IDs
-      const allSubjects = await getSubjects();
-      console.log(
-        '[TopicResolver] DB subjects:',
-        allSubjects.map((s) => ({
-          id: s.id,
-          name: s.name,
-          ...('name_bn' in s ? { name_bn: (s as any).name_bn } : {}),
-          ...('name_en' in s ? { name_en: (s as any).name_en } : {}),
-        })),
+      const subjLower = resolvedSubject.toLowerCase().trim();
+      const foundSubject = hscSubjects.find(
+        (s) =>
+          s.name.toLowerCase() === subjLower ||
+          s.name.toLowerCase().includes(subjLower) ||
+          subjLower.includes(s.name.toLowerCase()),
       );
 
-      for (const uploadedName of uploadedSubjects) {
-        // Robust matching: try exact, then case-insensitive, then partial
-        const normalizedUpload = uploadedName.trim().toLowerCase();
-        const subject = allSubjects.find((s) => {
-          const dbName = (s.name || '').trim().toLowerCase();
-          const dbNameBn = ((s as any).name_bn || '').trim().toLowerCase();
-          const dbNameEn = ((s as any).name_en || '').trim().toLowerCase();
-          const dbId = (s.id || '').trim().toLowerCase();
-          return (
-            dbName === normalizedUpload ||
-            dbNameBn === normalizedUpload ||
-            dbNameEn === normalizedUpload ||
-            dbId === normalizedUpload ||
-            dbName.includes(normalizedUpload) ||
-            normalizedUpload.includes(dbName)
+      if (foundSubject) {
+        resolvedSubject = foundSubject.name; // Keep exact DB string format
+
+        if (resolvedChapter) {
+          const chapLower = resolvedChapter.toLowerCase().trim();
+          const foundChapter = foundSubject.chapters?.find(
+            (c) =>
+              c.name.toLowerCase() === chapLower ||
+              c.name.toLowerCase().includes(chapLower) ||
+              chapLower.includes(c.name.toLowerCase()),
           );
-        });
 
-        if (!subject) {
-          console.warn(
-            `[TopicResolver] ❌ No DB subject matched for uploaded name: "${uploadedName}"`,
-          );
-          continue;
-        }
+          if (foundChapter) {
+            resolvedChapter = foundChapter.name; // Keep exact DB string format
 
-        console.log(
-          `[TopicResolver] ✅ Matched subject: "${uploadedName}" -> DB id="${subject.id}", name="${subject.name}"`,
-        );
-        topicMap[uploadedName] = {};
+            if (resolvedTopic) {
+              const topicRaw = resolvedTopic.trim();
+              const topicLower = topicRaw.toLowerCase();
+              const isSerial = /^\d+$/.test(topicRaw);
 
-        // Fetch chapters for this subject
-        const chapters = await getChapters(subject.id);
-        console.log(
-          `[TopicResolver] Chapters for "${subject.name}":`,
-          chapters.map((c) => ({ id: c.id, name: c.name })),
-        );
+              const foundTopic = foundChapter.topics?.find((t) => {
+                if (isSerial) {
+                  return t.serial?.toString() === topicRaw;
+                }
+                return (
+                  t.name.toLowerCase() === topicLower ||
+                  t.name.toLowerCase().includes(topicLower) ||
+                  topicLower.includes(t.name.toLowerCase())
+                );
+              });
 
-        if (chapters.length === 0) {
-          console.warn(
-            `[TopicResolver] ⚠️ No chapters found for subject "${subject.name}" (id: ${subject.id})`,
-          );
-          continue;
-        }
-
-        const chapterIds = chapters.map((c) => c.id);
-
-        // Fetch topics for these chapters
-        const topics = await getTopics(chapterIds);
-        console.log(
-          `[TopicResolver] Topics fetched (${topics.length}):`,
-          topics.map((t) => ({
-            id: t.id,
-            name: t.name,
-            serial: t.serial,
-            chapter_id: t.chapter_id,
-          })),
-        );
-
-        // Build map: ChapterName -> { Serial -> TopicName }
-        chapters.forEach((ch) => {
-          topicMap[uploadedName][ch.name] = {};
-          const chTopics = topics.filter((t) => t.chapter_id === ch.id);
-
-          if (chTopics.length === 0) {
-            console.warn(
-              `[TopicResolver] ⚠️ No topics for chapter "${ch.name}" (id: ${ch.id})`,
-            );
-          }
-
-          chTopics.forEach((t) => {
-            if (t.serial !== undefined && t.serial !== null) {
-              topicMap[uploadedName][ch.name][String(t.serial)] = t.name;
+              if (foundTopic) {
+                resolvedTopic = foundTopic.name; // Keep exact DB string format
+              }
             }
-          });
-        });
+          }
+        }
       }
 
-      // 3. Apply mapping
-      console.log(
-        '[TopicResolver] Final Topic Map:',
-        JSON.stringify(topicMap, null, 2),
-      );
-
-      return questions.map((q, idx) => {
-        // Only try to map if topic looks like a number (serial)
-        if (q.subject && q.chapter && q.topic && /^\d+$/.test(q.topic)) {
-          // Find subject key (case-insensitive, trim)
-          const subjectKey = Object.keys(topicMap).find(
-            (k) =>
-              k.trim().toLowerCase() === (q.subject || '').trim().toLowerCase(),
-          );
-
-          if (!subjectKey) {
-            console.warn(
-              `[TopicResolver] Row ${idx + 1}: Subject "${q.subject}" not in topic map`,
-            );
-            return q;
-          }
-
-          // Find chapter key (case-insensitive, trim, partial match)
-          const uploadedChapter = (q.chapter || '').trim().toLowerCase();
-          const chapterKey = Object.keys(topicMap[subjectKey]).find((k) => {
-            const dbChapter = k.trim().toLowerCase();
-            return (
-              dbChapter === uploadedChapter ||
-              dbChapter.includes(uploadedChapter) ||
-              uploadedChapter.includes(dbChapter)
-            );
-          });
-
-          if (!chapterKey) {
-            console.warn(
-              `[TopicResolver] Row ${idx + 1}: Chapter "${q.chapter}" not found for subject "${subjectKey}". Available: [${Object.keys(topicMap[subjectKey]).join(', ')}]`,
-            );
-            return q;
-          }
-
-          const serial = String(q.topic);
-          const mappedName = topicMap[subjectKey][chapterKey][serial];
-
-          if (mappedName) {
-            console.log(
-              `[TopicResolver] ✅ Row ${idx + 1}: topic "${serial}" -> "${mappedName}"`,
-            );
-            return { ...q, topic: mappedName };
-          } else {
-            const availableSerials = Object.keys(
-              topicMap[subjectKey][chapterKey],
-            );
-            console.warn(
-              `[TopicResolver] Row ${idx + 1}: Serial "${serial}" not found in chapter "${chapterKey}". Available serials: [${availableSerials.join(', ')}]`,
-            );
-          }
-        }
-        return q;
-      });
-    } catch (err) {
-      console.error('[TopicResolver] ❌ Error resolving topics:', err);
-      return questions; // Fallback to original
-    }
+      return {
+        ...q,
+        subject: resolvedSubject,
+        chapter: resolvedChapter,
+        topic: resolvedTopic,
+      };
+    });
   };
 
   // ── File handler ───────────────────────────────────────────────────
@@ -887,9 +822,8 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
       let questions = processRawData(rawRows);
 
-      // Resolve Topic Serials (Async)
-      // Show loading or something? We are in try/catch so it's fine.
-      questions = await resolveTopicSerials(questions);
+      // Resolve Topic Serials Synchronously using hscSubjects
+      questions = resolveTopicSerialsLocally(questions);
 
       setParsedData(questions);
       setSelectedIndices(new Set(questions.map((_, i) => i)));

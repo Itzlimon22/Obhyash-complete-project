@@ -43,7 +43,9 @@ export default function BulkUploadDialog({
 }) {
   const [step, setStep] = useState(1);
   const [parsedData, setParsedData] = useState<QuestionFormData[]>([]);
-  const [failedData, setFailedData] = useState<{ question: string; error: string }[]>([]);
+  const [failedData, setFailedData] = useState<
+    { question: string; error: string }[]
+  >([]);
   const [uploading, setUploading] = useState(false);
   const [isAiReviewing, setIsAiReviewing] = useState(false);
   const [aiProgress, setAiProgress] = useState(0);
@@ -71,7 +73,10 @@ export default function BulkUploadDialog({
   };
 
   // ✅ HELPER: Smart Case-Insensitive Search
-  const findValue = (row: Record<string, unknown>, possibleKeys: string[]): string => {
+  const findValue = (
+    row: Record<string, unknown>,
+    possibleKeys: string[],
+  ): string => {
     const rowKeys = Object.keys(row);
     for (const target of possibleKeys) {
       const foundKey = rowKeys.find(
@@ -84,12 +89,59 @@ export default function BulkUploadDialog({
     return '';
   };
 
-  const processParsedData = (rawData: Record<string, unknown>[]): QuestionFormData[] => {
+  const processParsedData = (
+    rawData: Record<string, unknown>[],
+  ): QuestionFormData[] => {
     return rawData
       .map((row) => {
         // 1. MATCH IDs
-        const matchedSubjectName = findValue(row, ['subject', 'Subject']) || '';
-        const matchedChapterName = findValue(row, ['chapter', 'Chapter']) || '';
+        const rawSubject = findValue(row, ['subject', 'Subject']) || '';
+        const rawChapter = findValue(row, ['chapter', 'Chapter']) || '';
+        const rawTopic = findValue(row, ['topic', 'Topic']) || '';
+
+        let matchedSubjectName = rawSubject;
+        let matchedChapterName = rawChapter;
+        let matchedTopicName = rawTopic;
+
+        // Try to resolve exactly from allSubjectsData
+        if (rawSubject) {
+          const subjLower = rawSubject.toLowerCase().trim();
+          const foundSubject = allSubjectsData.find(
+            (s) =>
+              s.name.toLowerCase() === subjLower ||
+              s.name.toLowerCase().includes(subjLower) ||
+              subjLower.includes(s.name.toLowerCase()),
+          );
+          if (foundSubject) {
+            matchedSubjectName = foundSubject.name;
+            const chapLower = rawChapter.toLowerCase().trim();
+            const foundChapter = foundSubject.chapters?.find(
+              (c) =>
+                c.name.toLowerCase() === chapLower ||
+                c.name.toLowerCase().includes(chapLower) ||
+                chapLower.includes(c.name.toLowerCase()),
+            );
+            if (foundChapter) {
+              matchedChapterName = foundChapter.name;
+              const topicRaw = rawTopic.trim();
+              const topicLower = topicRaw.toLowerCase();
+              const isSerial = /^\d+$/.test(topicRaw);
+              const foundTopic = foundChapter.topics?.find((t) => {
+                if (isSerial) {
+                  return t.serial?.toString() === topicRaw;
+                }
+                return (
+                  t.name.toLowerCase() === topicLower ||
+                  t.name.toLowerCase().includes(topicLower) ||
+                  topicLower.includes(t.name.toLowerCase())
+                );
+              });
+              if (foundTopic) {
+                matchedTopicName = foundTopic.name;
+              }
+            }
+          }
+        }
 
         // 2. PARSE OPTIONS (Updated for numeric/text variations)
         const optA = findValue(row, [
@@ -172,7 +224,7 @@ export default function BulkUploadDialog({
           section: findValue(row, ['section', 'Section']),
           subject: matchedSubjectName,
           chapter: matchedChapterName,
-          topic: findValue(row, ['topic', 'Topic']),
+          topic: matchedTopicName,
 
           question: findValue(row, ['question', 'Question', 'q']),
           image_url: findValue(row, [
@@ -195,9 +247,17 @@ export default function BulkUploadDialog({
           ]),
 
           difficulty: findValue(row, ['difficulty', 'Difficulty']) || 'Medium',
-          examType: findValue(row, ['examType', 'Exam Type']),
+          examType: findValue(row, ['examType', 'Exam Type']) || 'Academic',
           institute: findValue(row, ['institute', 'Institute']),
+          institutes: findValue(row, ['institute', 'Institute'])
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean),
           year: findValue(row, ['year', 'Year']),
+          years: findValue(row, ['year', 'Year'])
+            .split(',')
+            .map((s) => parseInt(s.trim()))
+            .filter((n) => !isNaN(n)),
 
           status: 'Pending',
         } as QuestionFormData;
@@ -223,7 +283,8 @@ export default function BulkUploadDialog({
           updated[i].explanation = result.formattedExplanation;
         }
       } catch (err: Error | unknown) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        const errorMessage =
+          err instanceof Error ? err.message : 'Unknown error';
         errors.push({ question: updated[i].question, error: errorMessage });
       }
       setAiProgress(((i + 1) / updated.length) * 100);
@@ -269,9 +330,11 @@ export default function BulkUploadDialog({
         explanation: q.explanation,
         explanation_image_url: q.explanation_image_url, // ✅ Pass explanation image
         difficulty: q.difficulty,
-        examType: q.examType,
+        exam_type: q.examType,
         institute: q.institute,
+        institutes: q.institutes || [],
         year: q.year,
+        years: q.years || [],
         status: 'Pending',
         created_by: userId,
       }));

@@ -76,6 +76,10 @@ export function QuestionFormDialog({
     return getInitialFormData();
   });
 
+  useEffect(() => {
+    setFormData(getInitialFormData());
+  }, [question]);
+
   if (!formData) return null;
 
   const handleUpdate = async () => {
@@ -211,6 +215,18 @@ export function QuestionFormDialog({
                 value={formData.year || ''}
                 onChange={(e) =>
                   setFormData({ ...formData, year: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-neutral-500 uppercase">
+                Institute
+              </Label>
+              <Input
+                placeholder="e.g. DMC"
+                value={formData.institute || ''}
+                onChange={(e) =>
+                  setFormData({ ...formData, institute: e.target.value })
                 }
               />
             </div>
