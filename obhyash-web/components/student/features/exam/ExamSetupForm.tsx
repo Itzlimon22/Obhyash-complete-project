@@ -323,33 +323,20 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   return (
     <div className="w-full max-w-6xl mx-auto animate-fade-in pb-24">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-          <h2 className="text-xl md:text-3xl font-extrabold text-neutral-900 dark:text-white mb-1 md:mb-2 flex items-center gap-3">
-            মক টেস্ট সেটআপ
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-[10px] uppercase tracking-wider font-extrabold">
-              <Sparkles className="w-3 h-3" />
-              Smart AI Active
-            </span>
-          </h2>
-          <p className="text-neutral-600 dark:text-neutral-400 text-sm flex items-center gap-2">
-            আপনার প্রয়োজন অনুযায়ী পরীক্ষা কাস্টমাইজ করুন
-            <span className="sm:hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 text-[10px] font-bold">
-              <Sparkles className="w-3 h-3" /> AI Active
-            </span>
-          </p>
-        </div>
-
-        {/* OMR Button */}
-        <button
-          type="button"
-          onClick={() => setIsOmrModalOpen(true)}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 rounded-xl font-semibold text-xs md:text-sm border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition-all active:scale-95"
-        >
-          <FileQuestion className="w-4 h-4" />
-          OMR শিট ডাউনলোড
-        </button>
+      <div className="mb-6 md:mb-8">
+        <h2 className="text-xl md:text-3xl font-extrabold text-neutral-900 dark:text-white mb-1 md:mb-2 flex items-center gap-3">
+          মক টেস্ট সেটআপ
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-[10px] uppercase tracking-wider font-extrabold">
+            <Sparkles className="w-3 h-3" />
+            Smart AI Active
+          </span>
+        </h2>
+        <p className="text-neutral-600 dark:text-neutral-400 text-sm flex items-center gap-2">
+          আপনার প্রয়োজন অনুযায়ী পরীক্ষা কাস্টমাইজ করুন
+          <span className="sm:hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 text-[10px] font-bold">
+            <Sparkles className="w-3 h-3" /> AI Active
+          </span>
+        </p>
       </div>
 
       {validationError && (
@@ -646,8 +633,19 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           </div>
         </div>
 
-        {/* Start Button */}
-        <div className="lg:col-span-3">
+        {/* Action Buttons — side by side */}
+        <div className="lg:col-span-3 grid grid-cols-2 gap-3">
+          {/* OMR Download — secondary action */}
+          <button
+            type="button"
+            onClick={() => setIsOmrModalOpen(true)}
+            className="w-full inline-flex items-center justify-center gap-2 py-3 bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 rounded-2xl font-semibold text-sm border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition-all active:scale-[0.98]"
+          >
+            <FileQuestion className="w-4 h-4" />
+            OMR ডাউনলোড
+          </button>
+
+          {/* Start Exam — primary CTA */}
           <button
             type="submit"
             disabled={isLoading || !subject || examTypes.length === 0}
@@ -661,13 +659,12 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             ) : (
               <>
                 <Zap className="w-5 h-5 fill-current" />
-                পরীক্ষা শুরু করুন
+                শুরু করুন
               </>
             )}
           </button>
         </div>
       </form>
-
       {/* Subject Selection Bottom Sheet */}
       {isSubjectModalOpen && (
         <div

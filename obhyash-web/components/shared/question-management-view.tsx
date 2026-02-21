@@ -129,16 +129,14 @@ export default function QuestionManagementView({
       {viewMode === 'list' && (
         <>
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-6">
-            <div>
-              <h1 className="text-xl md:text-3xl font-bold text-neutral-900 dark:text-white tracking-tight">
-                {title}
-              </h1>
-            </div>
-            <div className="flex gap-2 sm:gap-3">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-6">
+            <h1 className="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white tracking-tight shrink-0">
+              {title}
+            </h1>
+            <div className="grid grid-cols-3 md:flex md:flex-wrap gap-2 md:gap-3 shrink-0">
               <button
                 onClick={handleCreate}
-                className="w-full flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-900 dark:text-white rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 text-sm font-medium transition-colors shadow-sm"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-900 dark:text-white rounded-xl text-sm font-medium transition-colors shadow-sm"
               >
                 <Plus size={16} /> নতুন প্রশ্ন
               </button>
@@ -147,7 +145,7 @@ export default function QuestionManagementView({
               <div className="relative">
                 <button
                   onClick={() => setShowExportMenu(!showExportMenu)}
-                  className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-900 dark:text-white rounded-xl text-sm font-medium transition-colors shadow-sm"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-900 dark:text-white rounded-xl text-sm font-medium transition-colors shadow-sm"
                 >
                   <Download size={16} /> এক্সপোর্ট
                 </button>
@@ -177,7 +175,7 @@ export default function QuestionManagementView({
 
               <button
                 onClick={() => setViewMode('upload')}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-medium shadow-lg shadow-rose-500/20 transition-all active:scale-95"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-sm font-medium shadow-lg shadow-emerald-700/20 transition-all active:scale-95"
               >
                 <Upload size={16} /> বাল্ক আপলোড
               </button>
