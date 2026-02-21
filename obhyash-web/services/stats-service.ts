@@ -59,11 +59,27 @@ const generateAvatarColor = (index: number): string => {
   return colors[index % colors.length];
 };
 
+interface LeaderboardUserRow {
+  id: string;
+  name: string | null;
+  institute: string | null;
+  xp: number | null;
+  level: string | null;
+  exams_taken: number | null;
+  avatar_url: string | null;
+  avatar_color: string | null;
+  streak: number | null;
+  role?: string | null;
+}
+
 export const getLeaderboardUsers = async (
   level: string,
 ): Promise<UserProfile[]> => {
   if (isSupabaseConfigured() && supabase) {
-    const mapUsers = (data: any[], fallbackLevel: string): UserProfile[] =>
+    const mapUsers = (
+      data: LeaderboardUserRow[],
+      fallbackLevel: string,
+    ): UserProfile[] =>
       data.map((user, index) => ({
         id: user.id,
         name: user.name || 'Unknown User',
@@ -265,7 +281,10 @@ export const getSubjectAnalysis = async (
           let totalTime = 0;
           let skipped = 0;
 
-          const chapterMap = new Map<string, any>();
+          const chapterMap = new Map<
+            string,
+            { name: string; total: number; correct: number }
+          >();
 
           filteredExams.forEach((exam) => {
             totalQuestions += exam.total_questions || 0;
@@ -282,25 +301,31 @@ export const getSubjectAnalysis = async (
             if (exam.questions && Array.isArray(exam.questions)) {
               const answers = exam.user_answers || {};
 
-              exam.questions.forEach((q: any) => {
-                // Determine chapter/topic name (Fallback to 'General' if both missing)
-                const cName = q.topic || q.chapter || 'General';
+              exam.questions.forEach(
+                (q: Question & Record<string, unknown>) => {
+                  // Determine chapter/topic name (Fallback to 'General' if both missing)
+                  const cName = q.topic || q.chapter || 'General';
 
-                if (!chapterMap.has(cName)) {
-                  chapterMap.set(cName, { name: cName, total: 0, correct: 0 });
-                }
+                  if (!chapterMap.has(cName)) {
+                    chapterMap.set(cName, {
+                      name: cName,
+                      total: 0,
+                      correct: 0,
+                    });
+                  }
 
-                const cData = chapterMap.get(cName);
-                cData.total += 1; // 1 Question
+                  const cData = chapterMap.get(cName)!;
+                  cData.total += 1; // 1 Question
 
-                const userAnswer = answers[q.id];
-                if (
-                  userAnswer !== undefined &&
-                  userAnswer === q.correctAnswerIndex
-                ) {
-                  cData.correct += 1;
-                }
-              });
+                  const userAnswer = answers[q.id];
+                  if (
+                    userAnswer !== undefined &&
+                    userAnswer === q.correctAnswerIndex
+                  ) {
+                    cData!.correct += 1;
+                  }
+                },
+              );
             } else {
               // Legacy fallback if `questions` array is missing
               const chaptersText = exam.chapters || 'General';
@@ -319,7 +344,7 @@ export const getSubjectAnalysis = async (
                   if (!chapterMap.has(chap)) {
                     chapterMap.set(chap, { name: chap, total: 0, correct: 0 });
                   }
-                  const cData = chapterMap.get(chap);
+                  const cData = chapterMap.get(chap)!;
                   cData.total += wTotal;
                   cData.correct += wCorrect;
                 });
@@ -429,8 +454,20 @@ export const getOverallAnalytics = async (
           let totalTime = 0;
           let scoreSum = 0;
 
-          const subjectMap = new Map<string, any>();
-          const timelineMap = new Map<string, any>();
+          const subjectMap = new Map<
+            string,
+            {
+              name: string;
+              correct: number;
+              wrong: number;
+              skipped: number;
+              total: number;
+            }
+          >();
+          const timelineMap = new Map<
+            string,
+            { name: string; score: number; _count: number; fullDate: string }
+          >();
 
           rawData.forEach((exam) => {
             totalQuestions += exam.total_questions || 0;
@@ -452,7 +489,7 @@ export const getOverallAnalytics = async (
                 total: 0,
               });
             }
-            const sData = subjectMap.get(subj);
+            const sData = subjectMap.get(subj)!;
             sData.correct += exam.correct_count || 0;
             sData.wrong += exam.wrong_count || 0;
             sData.total += exam.total_questions || 0;
@@ -476,7 +513,7 @@ export const getOverallAnalytics = async (
                 fullDate: exam.date,
               });
             }
-            const tData = timelineMap.get(dateStr);
+            const tData = timelineMap.get(dateStr)!;
             tData._count += 1;
             tData.score +=
               exam.total_marks > 0 ? (exam.score / exam.total_marks) * 100 : 0;

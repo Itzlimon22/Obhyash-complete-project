@@ -94,7 +94,7 @@ const mapProfileToDbRow = (user: UserProfile): UserDatabaseRow => {
  * Pure function to convert UserDatabaseRow to UserProfile.
  */
 export const mapDbRowToProfile = (
-  data: any,
+  data: Partial<UserDatabaseRow> & Record<string, unknown>,
   authEmail?: string,
   authPhone?: string,
   authCreatedAt?: string,
