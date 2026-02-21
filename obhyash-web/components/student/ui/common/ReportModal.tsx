@@ -97,7 +97,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
     <Portal>
       <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
         {/* Modal / Bottom Sheet */}
-        <div className="bg-white dark:bg-black w-full max-w-md sm:rounded-3xl rounded-t-3xl shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden transform transition-all animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+        <div className="bg-white dark:bg-black w-full max-w-md sm:rounded-3xl rounded-t-3xl shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden transform transition-all animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-200 max-h-[50vh] sm:max-h-[85vh] flex flex-col">
           {/* Header */}
           <div className="px-6 py-5 border-b border-black/10 dark:border-white/10 flex justify-between items-center">
             <div className="flex items-center gap-3">

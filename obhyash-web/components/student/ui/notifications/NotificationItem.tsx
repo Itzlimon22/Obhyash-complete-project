@@ -14,7 +14,6 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
   onClick,
 }) => {
-  // Format relative time in Bengali
   const getRelativeTime = (dateString: string) => {
     try {
       return formatDistanceToNow(new Date(dateString), {
@@ -26,44 +25,44 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     }
   };
 
-  // Get icon and color based on notification type
+  // Per-type icon + palette — deep green, red, black/white only (no rose/amber)
   const getIconConfig = () => {
     switch (notification.type) {
       case 'exam_result':
         return {
           icon: <TrendingUp className="w-4 h-4" />,
-          bgColor: 'bg-emerald-100 dark:bg-emerald-900/30',
-          textColor: 'text-emerald-600 dark:text-emerald-400',
+          bgColor: 'bg-emerald-700',
+          textColor: 'text-white',
         };
       case 'achievement':
         return {
           icon: <Trophy className="w-4 h-4" />,
-          bgColor: 'bg-amber-100 dark:bg-amber-900/30',
-          textColor: 'text-amber-600 dark:text-amber-400',
+          bgColor: 'bg-neutral-900 dark:bg-white',
+          textColor: 'text-white dark:text-black',
         };
       case 'level_up':
         return {
           icon: <TrendingUp className="w-4 h-4" />,
-          bgColor: 'bg-rose-100 dark:bg-rose-900/30',
-          textColor: 'text-rose-600 dark:text-rose-400',
+          bgColor: 'bg-emerald-900',
+          textColor: 'text-white',
         };
       case 'announcement':
         return {
           icon: <Megaphone className="w-4 h-4" />,
-          bgColor: 'bg-rose-100 dark:bg-rose-900/30',
-          textColor: 'text-rose-600 dark:text-rose-400',
+          bgColor: 'bg-red-600',
+          textColor: 'text-white',
         };
       case 'system':
         return {
           icon: <Settings className="w-4 h-4" />,
-          bgColor: 'bg-neutral-100 dark:bg-neutral-800',
-          textColor: 'text-neutral-600 dark:text-neutral-400',
+          bgColor: 'bg-neutral-200 dark:bg-neutral-700',
+          textColor: 'text-neutral-700 dark:text-neutral-300',
         };
       default:
         return {
           icon: <Bell className="w-4 h-4" />,
-          bgColor: 'bg-neutral-100 dark:bg-neutral-800',
-          textColor: 'text-neutral-600 dark:text-neutral-400',
+          bgColor: 'bg-neutral-200 dark:bg-neutral-700',
+          textColor: 'text-neutral-700 dark:text-neutral-300',
         };
     }
   };
@@ -74,22 +73,22 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     <div
       onClick={onClick}
       className={cn(
-        'group px-5 py-4 cursor-pointer relative overflow-hidden transition-all duration-200 active:bg-neutral-100 dark:active:bg-neutral-800 tap-highlight-transparent',
+        'group px-5 py-4 cursor-pointer relative overflow-hidden transition-all duration-150 active:bg-neutral-100 dark:active:bg-neutral-800',
         !notification.is_read
-          ? 'bg-rose-50/20 dark:bg-rose-900/5'
-          : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/50',
+          ? 'bg-emerald-50/30 dark:bg-emerald-950/10'
+          : 'hover:bg-neutral-50 dark:hover:bg-neutral-900/50',
       )}
     >
-      {/* Unread Indicator Bar */}
+      {/* Unread indicator bar — deep green */}
       {!notification.is_read && (
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.4)]"></div>
+        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-emerald-700" />
       )}
 
-      <div className="flex items-start gap-4 relative z-10">
-        {/* Icon */}
+      <div className="flex items-start gap-3.5 relative z-10">
+        {/* Square icon badge */}
         <div
           className={cn(
-            'flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-105 group-active:scale-95',
+            'flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center shadow-sm transition-transform duration-200 group-hover:scale-105 group-active:scale-95',
             config.bgColor,
             config.textColor,
           )}
@@ -99,24 +98,34 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 
         {/* Content */}
         <div className="flex-1 min-w-0 pt-0.5">
-          <div className="flex items-center justify-between gap-2 mb-1">
+          <div className="flex items-start justify-between gap-2 mb-1">
             <h4
               className={cn(
-                'text-[13px] md:text-sm font-bold leading-snug transition-colors',
+                'text-[13px] font-bold leading-snug flex-1',
                 !notification.is_read
                   ? 'text-neutral-900 dark:text-white'
-                  : 'text-neutral-700 dark:text-neutral-300 group-hover:text-rose-600 dark:group-hover:text-rose-400',
+                  : 'text-neutral-600 dark:text-neutral-400',
               )}
             >
               {notification.title}
             </h4>
-            <span className="text-[10px] font-medium text-neutral-400 dark:text-neutral-500 whitespace-nowrap">
+            <span className="text-[10px] font-medium text-neutral-400 dark:text-neutral-500 whitespace-nowrap flex-shrink-0 mt-px">
               {getRelativeTime(notification.created_at)}
             </span>
           </div>
           <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed line-clamp-2">
             {notification.message}
           </p>
+
+          {/* Unread dot */}
+          {!notification.is_read && (
+            <div className="mt-2 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-700 flex-shrink-0" />
+              <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-500">
+                নতুন
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

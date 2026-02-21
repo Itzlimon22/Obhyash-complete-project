@@ -61,11 +61,11 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed z-50 grid w-full gap-4 border p-6 shadow-2xl duration-300 outline-none',
+          'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed z-50 grid w-full gap-4 border p-6 shadow-2xl duration-300 outline-none max-h-[50vh] overflow-y-auto',
           // Mobile: Bottom sheet
           'bottom-0 left-0 rounded-t-3xl slide-in-from-bottom-1/2 data-[state=closed]:slide-out-to-bottom-1/2',
           // Desktop: Centered modal
-          'sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl sm:slide-in-from-bottom-0 sm:data-[state=closed]:slide-out-to-bottom-0',
+          'sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl sm:slide-in-from-bottom-0 sm:data-[state=closed]:slide-out-to-bottom-0 sm:max-h-[85vh]',
           className,
         )}
         {...props}

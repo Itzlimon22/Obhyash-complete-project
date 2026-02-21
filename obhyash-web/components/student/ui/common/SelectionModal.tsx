@@ -39,7 +39,7 @@ const SelectionModal: React.FC<SelectionModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-lg max-h-[88vh] flex flex-col animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 ease-out"
+        className="relative w-full max-w-lg max-h-[50vh] sm:max-h-[85vh] flex flex-col animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 ease-out"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top accent — deep green */}
