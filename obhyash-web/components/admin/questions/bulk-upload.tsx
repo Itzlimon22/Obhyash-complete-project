@@ -658,16 +658,55 @@ const EditModal: React.FC<{
                         >
                           {String.fromCharCode(65 + i)}
                         </button>
-                        <input
-                          value={opt}
-                          onChange={(e) => updateOption(i, e.target.value)}
-                          placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                          className={`flex-1 p-2 rounded-lg border text-sm transition-all outline-none ${
-                            data.correctAnswerIndex === i
-                              ? 'border-emerald-300 bg-emerald-50 focus:ring-1 focus:ring-emerald-500'
-                              : 'border-neutral-200 bg-white focus:ring-1 focus:ring-emerald-500'
-                          }`}
-                        />
+
+                        <div className="flex-1 space-y-2">
+                          <input
+                            value={opt}
+                            onChange={(e) => updateOption(i, e.target.value)}
+                            placeholder={`Option ${String.fromCharCode(65 + i)}`}
+                            className={`w-full p-2 rounded-lg border text-sm transition-all outline-none ${
+                              data.correctAnswerIndex === i
+                                ? 'border-emerald-300 bg-emerald-50 focus:ring-1 focus:ring-emerald-500'
+                                : 'border-neutral-200 bg-white focus:ring-1 focus:ring-emerald-500'
+                            }`}
+                          />
+
+                          {/* Option Image Preview if exists */}
+                          {data.optionImages?.[i] && (
+                            <div className="relative w-full h-20 rounded-lg border border-neutral-200 overflow-hidden bg-white group">
+                              <img
+                                src={data.optionImages[i]}
+                                alt="Option"
+                                className="w-full h-full object-contain"
+                              />
+                              <button
+                                onClick={() => {
+                                  const newOpts = [
+                                    ...(data.optionImages || []),
+                                  ];
+                                  newOpts[i] = '';
+                                  onChange({ ...data, optionImages: newOpts });
+                                }}
+                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Image Uploader Component */}
+                        <div className="shrink-0 self-start mt-0.5">
+                          <ImageUploader
+                            folder="options"
+                            onUploadComplete={(url) => {
+                              const newOpts = [...(data.optionImages || [])];
+                              while (newOpts.length <= i) newOpts.push('');
+                              newOpts[i] = url;
+                              onChange({ ...data, optionImages: newOpts });
+                            }}
+                          />
+                        </div>
                       </div>
 
                       {/* Option Math Preview */}

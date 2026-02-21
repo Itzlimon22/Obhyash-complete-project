@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { Save, X, ChevronDown, Loader2 } from 'lucide-react'; // Loader2 যোগ করা হয়েছে
+import { Save, X, Trash2 } from 'lucide-react';
 import { Question } from '@/lib/types';
-import { MathText, RichText } from './shared';
-import { RichTextEditor } from './rich-text-editor';
-import { useFileUpload } from '@/hooks/use-file-upload'; // ✅ Import Hook
-import Image from 'next/image';
+import { MathRenderer } from '@/components/common/MathRenderer';
+import { ImageUploader } from '@/components/ui/image-uploader';
 import {
   getSubjects,
   getChapters,
@@ -17,48 +15,35 @@ interface QuestionFormProps {
   onCancel: () => void;
 }
 
-// Helper for Input Labels
-const Label = ({ children }: { children: React.ReactNode }) => (
-  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 font-sans">
-    {children}
-  </label>
-);
-
-// Helper for Input Fields
-const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
-  <input
-    {...props}
-    className="w-full px-3 py-2 rounded-lg border border-paper-200 dark:border-obsidian-800 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all placeholder:text-gray-400 dark:text-gray-200"
-  />
-);
-
 export const QuestionForm: React.FC<QuestionFormProps> = ({
   initialData,
   onSave,
   onCancel,
 }) => {
   const [data, setData] = useState<Partial<Question>>(initialData);
-  const { uploadFile, isUploading } = useFileUpload(); // ✅ Hook ব্যবহার
+
+  const updateOption = (idx: number, val: string) => {
+    const opts = [...(data.options || [])];
+    opts[idx] = val;
+    setData({ ...data, options: opts });
+  };
 
   // --- Data State for Dropdowns ---
-  const [availableSubjects, setAvailableSubjects] = useState<
+  const [availableSubjects, setAvailableSubjects] = React.useState<
     { id: string; name: string }[]
   >([]);
-  const [availableChapters, setAvailableChapters] = useState<
+  const [availableChapters, setAvailableChapters] = React.useState<
     { id: string; name: string }[]
   >([]);
-  const [availableTopics, setAvailableTopics] = useState<
+  const [availableTopics, setAvailableTopics] = React.useState<
     { id: string; name: string }[]
   >([]);
-  const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
 
   // 1. Fetch Subjects on Mount
   React.useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        setIsLoadingMetadata(true);
         const subjects = await getSubjects();
-        // The service returns objects with `{ id, name, label, icon }`
         setAvailableSubjects(
           subjects.map((s) => ({
             id: s.id,
@@ -67,8 +52,6 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
         );
       } catch (err) {
         console.error('Failed to load subjects:', err);
-      } finally {
-        setIsLoadingMetadata(false);
       }
     };
     fetchSubjects();
@@ -83,7 +66,6 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
     }
     const fetchChapters = async () => {
       try {
-        // Find subject ID
         const matchedSubject = availableSubjects.find(
           (s) => s.name.toLowerCase() === data.subject?.toLowerCase(),
         );
@@ -107,7 +89,6 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
     }
     const fetchTopics = async () => {
       try {
-        // Find chapter ID
         const matchedChapter = availableChapters.find(
           (c) => c.name.toLowerCase() === data.chapter?.toLowerCase(),
         );
@@ -123,376 +104,406 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
     fetchTopics();
   }, [data.chapter, availableChapters]);
 
-  // --- ইমেজ আপলোড হ্যান্ডলার ---
-  const handleImageUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    field: 'imageUrl' | 'explanationImageUrl' | { optionIndex: number },
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // ফাইল আপলোড শুরু
-    const publicUrl = await uploadFile(file);
-    console.log('Upload finished. Public URL:', publicUrl);
-
-    if (publicUrl) {
-      if (field === 'imageUrl') {
-        console.log('Setting imageUrl:', publicUrl);
-        setData((prev) => ({ ...prev, imageUrl: publicUrl }));
-      } else if (field === 'explanationImageUrl') {
-        setData((prev) => ({ ...prev, explanationImageUrl: publicUrl }));
-      } else if (typeof field === 'object') {
-        const newOptionImages = [...(data.optionImages || [])];
-        // Ensure array size
-        while (newOptionImages.length <= field.optionIndex)
-          newOptionImages.push('');
-
-        newOptionImages[field.optionIndex] = publicUrl;
-        setData((prev) => ({ ...prev, optionImages: newOptionImages }));
-      }
-    } else {
-      console.error('Upload failed: publicUrl is null');
-    }
-  };
-
   return (
-    <div className="bg-white dark:bg-obsidian-900 rounded-2xl border border-paper-200 dark:border-obsidian-800 shadow-xl max-w-4xl mx-auto animate-fade-in relative overflow-hidden">
-      {/* গ্লোবাল লোডিং ওভারলে (যদি আপলোড চলে) */}
-      {isUploading && (
-        <div className="absolute inset-0 bg-white/50 dark:bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
-          <div className="bg-white dark:bg-obsidian-800 px-6 py-4 rounded-xl shadow-lg flex items-center gap-3">
-            <Loader2 className="animate-spin text-brand-600" />
-            <span className="text-sm font-medium">ছবি আপলোড হচ্ছে...</span>
-          </div>
-        </div>
-      )}
-
-      <div className="p-4 sm:p-6 border-b border-paper-200 dark:border-obsidian-800 flex justify-between items-center bg-white dark:bg-obsidian-900 sticky top-0 z-20">
-        <h2 className="text-base sm:text-lg font-bold text-paper-900 dark:text-white">
-          {data.id ? 'প্রশ্ন এডিট করুন' : 'নতুন প্রশ্ন তৈরি করুন'}
-        </h2>
+    <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-xl max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-200">
+      <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-white sticky top-0 z-10 rounded-t-2xl">
+        <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
+          {data.id ? 'প্রশ্ন সম্পাদনা' : 'নতুন প্রশ্ন তৈরি করুন'}
+        </h3>
         <button
           onClick={onCancel}
-          className="p-2 hover:bg-paper-100 dark:hover:bg-obsidian-800 rounded-full text-gray-500 transition-colors"
+          className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg text-neutral-500"
         >
           <X size={20} />
         </button>
       </div>
 
-      <div className="p-4 sm:p-8 space-y-6 sm:space-y-8">
-        {/* মেটাডাটা গ্রিড */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
-          <div>
-            <Label>স্ট্রিম (Stream)</Label>
-            <Input
+      <div className="p-6 space-y-6 bg-white">
+        {/* Metadata & Hierarchy */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 bg-neutral-50 rounded-xl border border-neutral-100">
+          {/* Subject */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+              বিষয়
+            </label>
+            <select
+              value={data.subject || ''}
+              onChange={(e) =>
+                setData({
+                  ...data,
+                  subject: e.target.value,
+                  chapter: '',
+                  topic: '',
+                })
+              }
+              className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
+            >
+              <option value="">নির্বাচন করুন</option>
+              {availableSubjects.map((s) => (
+                <option key={s.id} value={s.name}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Chapter */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+              অধ্যায়
+            </label>
+            <select
+              value={data.chapter || ''}
+              onChange={(e) =>
+                setData({ ...data, chapter: e.target.value, topic: '' })
+              }
+              disabled={!data.subject}
+              className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none disabled:opacity-50"
+            >
+              <option value="">নির্বাচন করুন</option>
+              {availableChapters.map((c) => (
+                <option key={c.id} value={c.name}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Topic */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+              টপিক
+            </label>
+            <select
+              value={data.topic || ''}
+              onChange={(e) => setData({ ...data, topic: e.target.value })}
+              disabled={!data.chapter}
+              className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none disabled:opacity-50"
+            >
+              <option value="">নির্বাচন করুন</option>
+              {availableTopics.map((t) => (
+                <option key={t.id} value={t.name}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Difficulty */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+              কাঠিন্য মাত্রা
+            </label>
+            <select
+              value={data.difficulty || 'Medium'}
+              onChange={(e) =>
+                setData({
+                  ...data,
+                  difficulty: e.target.value as 'Easy' | 'Medium' | 'Hard',
+                })
+              }
+              className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
+            >
+              <option>Easy</option>
+              <option>Medium</option>
+              <option>Hard</option>
+            </select>
+          </div>
+
+          {/* Stream */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+              স্ট্রিম (Stream)
+            </label>
+            <input
               value={data.stream || ''}
               onChange={(e) => setData({ ...data, stream: e.target.value })}
-              placeholder="যেমন: Science"
+              placeholder="e.g. HSC"
+              className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
             />
           </div>
-          <div>
-            <Label>বিষয় (Subject)</Label>
-            <div className="relative">
-              <select
-                value={data.subject || ''}
-                onChange={(e) => {
-                  setData({
-                    ...data,
-                    subject: e.target.value,
-                    chapter: '',
-                    topic: '',
-                  });
-                }}
-                className="w-full px-3 py-2.5 rounded-xl border border-paper-200 dark:border-obsidian-800 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none appearance-none cursor-pointer dark:text-gray-200"
-              >
-                <option value="">নির্বাচন করুন</option>
-                {availableSubjects.map((s) => (
-                  <option key={s.id} value={s.name}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                size={14}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-              />
-            </div>
-          </div>
-          <div>
-            <Label>অধ্যায় (Chapter)</Label>
-            <div className="relative">
-              <select
-                value={data.chapter || ''}
-                onChange={(e) =>
-                  setData({ ...data, chapter: e.target.value, topic: '' })
-                }
-                disabled={!data.subject}
-                className="w-full px-3 py-2.5 rounded-xl border border-paper-200 dark:border-obsidian-800 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none appearance-none cursor-pointer dark:text-gray-200 disabled:opacity-50"
-              >
-                <option value="">নির্বাচন করুন</option>
-                {availableChapters.map((c) => (
-                  <option key={c.id} value={c.name}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                size={14}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-              />
-            </div>
-          </div>
-          <div>
-            <Label>টপিক (Topic)</Label>
-            <div className="relative">
-              <select
-                value={data.topic || ''}
-                onChange={(e) => setData({ ...data, topic: e.target.value })}
-                disabled={!data.chapter}
-                className="w-full px-3 py-2.5 rounded-xl border border-paper-200 dark:border-obsidian-800 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none appearance-none cursor-pointer dark:text-gray-200 disabled:opacity-50"
-              >
-                <option value="">নির্বাচন করুন</option>
-                {availableTopics.map((t) => (
-                  <option key={t.id} value={t.name}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                size={14}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-              />
-            </div>
-          </div>
-          <div>
-            <Label>কঠিন্য (Difficulty)</Label>
-            <div className="relative">
-              <select
-                value={data.difficulty || 'Medium'}
-                onChange={(e) =>
-                  setData({
-                    ...data,
-                    difficulty: e.target.value as 'Easy' | 'Medium' | 'Hard',
-                  })
-                }
-                className="w-full px-3 py-2.5 rounded-xl border border-paper-200 dark:border-obsidian-800 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none appearance-none cursor-pointer dark:text-gray-200"
-              >
-                <option>Easy</option>
-                <option>Medium</option>
-                <option>Hard</option>
-              </select>
-              <ChevronDown
-                size={14}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-              />
-            </div>
-          </div>
-        </div>
 
-        {/* প্রশ্ন লেখার এরিয়া */}
-        <div className="space-y-3 sm:space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-0">
-            <h3 className="text-sm font-semibold text-paper-900 dark:text-white">
-              মূল প্রশ্ন (Question Content)
-            </h3>
-            <span className="self-start sm:self-auto text-[10px] font-medium px-2 py-0.5 bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300 rounded border border-brand-100 dark:border-brand-800">
-              LaTeX সমর্থিত ($...$)
-            </span>
+          {/* Section */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+              বিভাগ (Section)
+            </label>
+            <input
+              value={data.section || data.division || ''}
+              onChange={(e) => setData({ ...data, section: e.target.value })}
+              placeholder="e.g. Science"
+              className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
+            />
           </div>
-          <RichTextEditor
-            value={data.question || ''}
-            onChange={(val) => setData({ ...data, question: val })}
-            placeholder="আপনার প্রশ্নটি এখানে লিখুন..."
-          />
-        </div>
 
-        {/* Live Preview */}
-        {data.question && (
-          <div className="p-4 rounded-xl border border-paper-200 dark:border-obsidian-800 bg-paper-50 dark:bg-obsidian-950/50">
-            <Label>প্রিভিউ (Preview)</Label>
-            <div className="text-sm text-paper-900 dark:text-gray-200 min-h-[20px] mt-1 overflow-x-auto">
-              <RichText text={data.question} />
-            </div>
+          {/* Exam Type */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+              পরীক্ষার ধরন
+            </label>
+            <input
+              value={data.examType || ''}
+              onChange={(e) => setData({ ...data, examType: e.target.value })}
+              placeholder="e.g. Medical,Varsity"
+              className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
+            />
           </div>
-        )}
 
-        <div>
-          <Label>প্রশ্নের ছবি (Question Image)</Label>
-          <div className="mt-2 text-center">
-            <UploadBox
-              image={data.imageUrl}
-              onUpload={(e) => handleImageUpload(e, 'imageUrl')}
-              onRemove={() => setData({ ...data, imageUrl: undefined })}
+          {/* Year */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+              বছর
+            </label>
+            <input
+              value={data.year || ''}
+              onChange={(e) => setData({ ...data, year: e.target.value })}
+              placeholder="e.g. 2023"
+              className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
+            />
+          </div>
+
+          {/* Institute */}
+          <div className="space-y-1.5 md:col-span-2">
+            <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+              প্রতিষ্ঠান (Institute)
+            </label>
+            <input
+              value={data.institute || data.institutes?.join(',') || ''}
+              onChange={(e) => setData({ ...data, institute: e.target.value })}
+              placeholder="e.g. Buet,Ruet,DMC"
+              className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
             />
           </div>
         </div>
 
-        {/* অপশন সমূহ (Options) */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-paper-900 dark:text-white">
-            অপশন সমূহ (Options)
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[0, 1, 2, 3].map((idx) => (
-              <div
-                key={idx}
-                className="p-3.5 rounded-2xl border border-paper-200 dark:border-obsidian-800 bg-paper-50/50 dark:bg-obsidian-900/50 flex flex-col gap-3"
-              >
-                <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-full bg-paper-200 dark:bg-obsidian-800 flex items-center justify-center text-[10px] font-bold text-gray-500 mt-1 shrink-0">
-                    {String.fromCharCode(65 + idx)}
-                  </div>
-                  <textarea
-                    value={data.options?.[idx] || ''}
-                    onChange={(e) => {
-                      const newOptions = [
-                        ...(data.options || ['', '', '', '']),
-                      ];
-                      newOptions[idx] = e.target.value;
-                      setData({ ...data, options: newOptions });
-                    }}
-                    className="flex-1 bg-transparent text-sm outline-none resize-none h-16 text-paper-900 dark:text-gray-200 placeholder:text-gray-400 leading-relaxed"
-                    placeholder={`অপশন ${String.fromCharCode(65 + idx)}`}
-                  />
-                </div>
-                {/* অপশন ইমেজ আপলোড */}
-                <div className="pl-9">
-                  <UploadBox
-                    height="h-20"
-                    label="IMG"
-                    image={data.optionImages?.[idx]}
-                    onUpload={(e) => handleImageUpload(e, { optionIndex: idx })}
-                    onRemove={() => {
-                      const newImgs = [...(data.optionImages || [])];
-                      newImgs[idx] = '';
-                      setData({ ...data, optionImages: newImgs });
-                    }}
-                  />
-                </div>
+        {/* Core Content */}
+        <div className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Question */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-end">
+                <label className="text-sm font-bold text-neutral-700 block">
+                  প্রশ্ন
+                </label>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-blue-50 text-blue-600 font-semibold border border-blue-100">
+                  LaTeX Supported ($...$)
+                </span>
               </div>
-            ))}
-          </div>
-        </div>
+              <textarea
+                value={data.question || ''}
+                onChange={(e) => setData({ ...data, question: e.target.value })}
+                className="w-full p-3 rounded-xl border border-neutral-200 bg-neutral-50 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                rows={4}
+                placeholder="প্রশ্নের বিবরণ লিখুন..."
+              />
 
-        {/* সঠিক উত্তর ও ব্যাখ্যা */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-4 rounded-2xl bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-500/20">
-            <Label>সঠিক উত্তর (Correct Answer)</Label>
-            <div className="relative mt-2">
-              <select
-                value={data.correctAnswer || ''}
-                onChange={(e) =>
-                  setData({ ...data, correctAnswer: e.target.value })
-                }
-                className="w-full px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none appearance-none cursor-pointer dark:text-gray-200"
-              >
-                <option value="">সঠিক উত্তর নির্বাচন করুন</option>
-                {(data.options || []).map((opt, i) => (
-                  <option key={i} value={opt || `Option ${i + 1}`}>
-                    অপশন {String.fromCharCode(65 + i)}
-                  </option>
+              {data.question && (
+                <div className="p-4 bg-neutral-50 border border-neutral-100 rounded-xl min-h-[60px]">
+                  <span className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold mb-2 block">
+                    প্রিভিউ
+                  </span>
+                  <MathRenderer text={data.question} />
+                </div>
+              )}
+
+              <div className="pt-2">
+                <label className="text-sm font-bold text-neutral-700 block mb-2">
+                  প্রশ্নের ছবি (ঐচ্ছিক)
+                </label>
+                <div className="inline-block">
+                  <ImageUploader
+                    folder="questions"
+                    defaultValue={data.imageUrl}
+                    onUploadComplete={(url) => {
+                      setData({ ...data, imageUrl: url });
+                    }}
+                  />
+                </div>
+                {data.imageUrl && (
+                  <div className="relative mt-2 w-full h-32 border rounded-xl overflow-hidden bg-neutral-100 group">
+                    <img
+                      src={data.imageUrl}
+                      alt="Question"
+                      className="w-full h-full object-contain"
+                    />
+                    <button
+                      onClick={() => setData({ ...data, imageUrl: undefined })}
+                      className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Options */}
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-neutral-700 block mb-3">
+                অপশনসমূহ
+                <span className="text-xs font-normal text-neutral-500 ml-2">
+                  (সঠিক উত্তরে ক্লিক করুন)
+                </span>
+              </label>
+              <div className="grid grid-cols-1 gap-3">
+                {(data.options || ['', '', '', '']).map((opt, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col gap-1 p-3 rounded-xl border border-neutral-100 bg-neutral-50"
+                  >
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setData({
+                            ...data,
+                            correctAnswerIndex: i,
+                            correctAnswer: data.options?.[i] || '',
+                            correctAnswerIndices: [i],
+                          })
+                        }
+                        className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center font-mono text-sm font-bold transition-all ${
+                          data.correctAnswerIndex === i
+                            ? 'bg-emerald-500 text-white border-emerald-500 ring-2 ring-emerald-500/20'
+                            : 'bg-white text-neutral-500 border-neutral-300 hover:border-emerald-400 border'
+                        }`}
+                      >
+                        {String.fromCharCode(65 + i)}
+                      </button>
+
+                      <div className="flex-1 space-y-2">
+                        <input
+                          value={opt}
+                          onChange={(e) => updateOption(i, e.target.value)}
+                          placeholder={`Option ${String.fromCharCode(65 + i)}`}
+                          className={`w-full p-2 rounded-lg border text-sm transition-all outline-none ${
+                            data.correctAnswerIndex === i
+                              ? 'border-emerald-300 bg-emerald-50 focus:ring-1 focus:ring-emerald-500'
+                              : 'border-neutral-200 bg-white focus:ring-1 focus:ring-emerald-500'
+                          }`}
+                        />
+
+                        {/* Option Image Preview if exists */}
+                        {data.optionImages?.[i] && (
+                          <div className="relative w-full h-20 rounded-lg border border-neutral-200 overflow-hidden bg-white group">
+                            <img
+                              src={data.optionImages[i]}
+                              alt="Option"
+                              className="w-full h-full object-contain"
+                            />
+                            <button
+                              onClick={() => {
+                                const newOpts = [...(data.optionImages || [])];
+                                newOpts[i] = '';
+                                setData({ ...data, optionImages: newOpts });
+                              }}
+                              className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Image Uploader Component */}
+                      <div className="shrink-0 self-start mt-0.5">
+                        <ImageUploader
+                          folder="options"
+                          onUploadComplete={(url) => {
+                            const newOpts = [...(data.optionImages || [])];
+                            while (newOpts.length <= i) newOpts.push('');
+                            newOpts[i] = url;
+                            setData({ ...data, optionImages: newOpts });
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Option Math Preview */}
+                    {opt && (
+                      <div className="ml-10 mt-1 pb-1 text-xs text-neutral-700">
+                        <MathRenderer text={opt} />
+                      </div>
+                    )}
+                  </div>
                 ))}
-              </select>
-              <ChevronDown
-                size={16}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 pointer-events-none"
-              />
+              </div>
             </div>
           </div>
 
-          <div>
-            <Label>ব্যাখ্যা (Explanation Image)</Label>
-            <div className="mt-2 text-center">
-              <UploadBox
-                height="h-24"
-                label="ব্যাখ্যার ছবি আপলোড করুন"
-                image={data.explanationImageUrl}
-                onUpload={(e) => handleImageUpload(e, 'explanationImageUrl')}
-                onRemove={() =>
-                  setData({ ...data, explanationImageUrl: undefined })
-                }
-              />
+          {/* Explanation */}
+          <div className="mt-6 space-y-2">
+            <div className="flex justify-between items-center">
+              <label className="text-sm font-bold text-neutral-700 block">
+                ব্যাখ্যা / সমাধান
+              </label>
+              <div className="inline-block scale-90 origin-right">
+                <ImageUploader
+                  folder="explanations"
+                  defaultValue={data.explanationImageUrl}
+                  onUploadComplete={(url) => {
+                    setData({ ...data, explanationImageUrl: url });
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div>
-          <Label>ব্যাখ্যা টেক্সট (Explanation Text)</Label>
-          <textarea
-            rows={4}
-            value={data.explanation || ''}
-            onChange={(e) => setData({ ...data, explanation: e.target.value })}
-            className="w-full px-4 py-3.5 mt-2 rounded-2xl border border-paper-200 dark:border-obsidian-700 bg-white dark:bg-obsidian-950 text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none resize-y placeholder:text-gray-400 dark:text-gray-200 leading-relaxed"
-            placeholder="গাণিতিক ব্যাখ্যা দিন..."
-          />
+            {/* Explanation Image Preview */}
+            {data.explanationImageUrl && (
+              <div className="relative w-full md:w-1/2 h-32 border rounded-xl overflow-hidden bg-neutral-100 group mb-3">
+                <img
+                  src={data.explanationImageUrl}
+                  alt="Explanation"
+                  className="w-full h-full object-contain"
+                />
+                <button
+                  onClick={() =>
+                    setData({ ...data, explanationImageUrl: undefined })
+                  }
+                  className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            )}
+
+            <textarea
+              value={data.explanation || ''}
+              onChange={(e) =>
+                setData({ ...data, explanation: e.target.value })
+              }
+              className="w-full p-3 rounded-xl border border-neutral-200 bg-neutral-50 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+              rows={3}
+              placeholder="সঠিক উত্তরের ব্যাখ্যা লিখুন..."
+            />
+
+            {data.explanation && (
+              <div className="p-4 bg-neutral-50 border border-neutral-100 rounded-xl min-h-[60px]">
+                <span className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold mb-2 block">
+                  সমাধান প্রিভিউ
+                </span>
+                <MathRenderer text={data.explanation} />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="p-4 sm:p-6 border-t border-paper-200 dark:border-obsidian-800 flex flex-col sm:flex-row justify-end gap-3 bg-paper-50 dark:bg-obsidian-950">
+      {/* Footer Actions */}
+      <div className="p-5 bg-neutral-50 border-t border-neutral-100 flex justify-end gap-3 rounded-b-2xl">
         <button
           onClick={onCancel}
-          disabled={isUploading}
-          className="order-2 sm:order-1 px-6 py-3 rounded-xl border border-paper-300 dark:border-obsidian-700 bg-white dark:bg-obsidian-900 text-gray-700 dark:text-gray-300 font-medium hover:bg-paper-50 dark:hover:bg-obsidian-800 transition-colors w-full sm:w-auto"
+          className="px-6 py-2.5 text-sm font-bold text-neutral-600 hover:bg-neutral-200 rounded-xl transition-colors"
         >
           বাতিল করুন
         </button>
         <button
           onClick={() => onSave(data)}
-          disabled={isUploading}
-          className="order-1 sm:order-2 px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-medium shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-70 w-full sm:w-auto"
+          className="px-6 py-2.5 text-sm font-bold bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center gap-2"
         >
-          <Save size={18} /> সংরক্ষণ করুন
+          <Save size={16} /> সংরক্ষণ করুন
         </button>
       </div>
     </div>
   );
 };
-
-// --- Reusable Upload Box ---
-import { Trash2, Image as ImageIcon } from 'lucide-react';
-
-const UploadBox: React.FC<{
-  label?: string;
-  height?: string;
-  image?: string;
-  onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onRemove: () => void;
-}> = ({ label, height = 'h-32', image, onUpload, onRemove }) => (
-  <div
-    className={`relative w-full ${height} border-2 border-dashed ${image ? 'border-brand-500/50' : 'border-paper-300 dark:border-obsidian-700 hover:border-brand-400 dark:hover:border-brand-600'} rounded-2xl flex flex-col items-center justify-center transition-colors bg-paper-50/50 dark:bg-obsidian-950/30 overflow-hidden group`}
-  >
-    {image ? (
-      <>
-        <Image
-          src={image}
-          alt="Preview"
-          className="w-full h-full object-contain p-2"
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          unoptimized
-        />
-        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-          <button
-            onClick={onRemove}
-            className="bg-red-500 text-white p-2.5 rounded-full hover:bg-red-600 transition-colors shadow-lg"
-          >
-            <Trash2 size={18} />
-          </button>
-        </div>
-      </>
-    ) : (
-      <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer text-gray-400 hover:text-brand-500 dark:hover:text-brand-400">
-        <input
-          type="file"
-          className="hidden"
-          accept="image/*"
-          onChange={onUpload}
-        />
-        <ImageIcon size={22} className="mb-1.5 opacity-50" />
-        <span className="text-[11px] font-bold uppercase tracking-wider">
-          {label || 'Upload'}
-        </span>
-      </label>
-    )}
-  </div>
-);
