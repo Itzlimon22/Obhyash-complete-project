@@ -1,2 +1,2 @@
-// Consolidated — re-exports from canonical location
+// Consolidated —re-exports from canonical location
 export { default } from '@/components/student/ui/omr/OmrErrorModal';
