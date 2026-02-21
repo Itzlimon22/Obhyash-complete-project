@@ -231,14 +231,14 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             {/* Left: Mobile Toggle & Title */}
             <div className="flex items-center gap-3">
               <h1
-                className={`font-bold text-neutral-800 dark:text-white tracking-tight flex items-center gap-2 truncate ${simpleHeader ? 'text-sm' : 'text-base md:text-xl'}`}
+                className={`font-extrabold text-neutral-800 dark:text-white tracking-tight flex items-center gap-2 truncate ${simpleHeader ? 'text-sm' : 'text-lg md:text-xl'}`}
               >
                 {title}
               </h1>
             </div>
 
             {/* Right: Actions */}
-            <div className="flex items-center gap-2 md:gap-5">
+            <div className="flex items-center gap-3 md:gap-5">
               {/* Streak Icon */}
               <motion.button
                 whileTap={{ scale: 0.9 }}
@@ -314,7 +314,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                   <UserAvatar
                     user={user}
                     size="md"
-                    className="ring-2 ring-transparent group-hover:ring-rose-100 dark:group-hover:ring-rose-900"
+                    className="ring-2 ring-transparent group-hover:ring-emerald-100 dark:group-hover:ring-emerald-900"
                   />
                 </button>
 
@@ -366,7 +366,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                         <Settings className="w-4 h-4 text-neutral-400" />
                         সেটিংস
                       </button>
-                      |
+
                       <button
                         onClick={() => {
                           setIsProfileOpen(false);

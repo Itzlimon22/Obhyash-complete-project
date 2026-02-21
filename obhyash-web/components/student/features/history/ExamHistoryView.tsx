@@ -439,7 +439,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                                     flex-1 md:flex-none flex items-center justify-center gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-xs md:text-sm font-bold transition-all duration-300
                                     ${
                                       isActive
-                                        ? 'bg-white dark:bg-neutral-700 shadow-sm text-indigo-600 dark:text-indigo-400 scale-[1.02]'
+                                        ? 'bg-white dark:bg-neutral-700 shadow-sm text-emerald-700 dark:text-emerald-400 scale-[1.02]'
                                         : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50'
                                     }
                                 `}
@@ -481,7 +481,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 }}
                 placeholder="খুঁজুন..."
                 aria-label="পরীক্ষার ইতিহাস খুঁজুন"
-                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm placeholder:text-neutral-400"
+                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all shadow-sm placeholder:text-neutral-400"
               />
             </div>
             {/* Subject Filter */}
@@ -509,7 +509,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   setVisibleCount(9); // ✅ Reset visible count here
                 }}
                 aria-label="বিষয় অনুযায়ী ফিল্টার"
-                className="w-full appearance-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl pl-9 pr-8 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm cursor-pointer"
+                className="w-full appearance-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl pl-9 pr-8 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all shadow-sm cursor-pointer"
               >
                 <option value="">সকল বিষয়</option>
                 {uniqueSubjects.map(([code, label]) => (
@@ -545,7 +545,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   setVisibleCount(9); // ✅ Reset visible count here
                 }}
                 aria-label="তারিখ অনুযায়ী ফিল্টার"
-                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm h-full"
+                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all shadow-sm h-full"
               />
             </div>
 
@@ -560,7 +560,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   setVisibleCount(9);
                 }}
                 aria-label="ক্রম অনুযায়ী সাজান"
-                className="w-full appearance-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm cursor-pointer"
+                className="w-full appearance-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all shadow-sm cursor-pointer"
               >
                 <option value="date">তারিখ অনুযায়ী</option>
                 <option value="score-high">স্কোর: বেশি আগে</option>
@@ -577,7 +577,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
             <div className="space-y-5 animate-fade-in">
               {/* Stats Overview */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
-                <div className="col-span-2 md:col-span-1 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-2.5 md:p-4 text-white shadow-lg shadow-indigo-500/20 flex flex-col justify-center items-center md:items-start">
+                <div className="col-span-2 md:col-span-1 bg-gradient-to-br from-emerald-700 to-emerald-800 rounded-xl p-2.5 md:p-4 text-white shadow-lg shadow-emerald-700/20 flex flex-col justify-center items-center md:items-start">
                   <div className="flex items-center gap-2 mb-0.5 md:mb-1 opacity-80">
                     <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-center md:text-left">
                       মোট পরীক্ষা
@@ -783,8 +783,8 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 </div>
               ) : (
                 <>
-                  <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 p-3 rounded-xl flex items-center gap-3">
-                    <div className="p-1.5 bg-amber-100 dark:bg-amber-900/30 rounded-full text-amber-600">
+                  <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 p-3 rounded-xl flex items-center gap-3">
+                    <div className="p-1.5 bg-red-100 dark:bg-red-900/30 rounded-full text-red-600">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"

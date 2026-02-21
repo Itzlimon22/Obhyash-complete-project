@@ -67,7 +67,7 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-2 md:p-6 animate-fade-in transition-colors pb-24">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-4 md:p-6 animate-fade-in transition-colors pb-24">
       <div className="max-w-7xl mx-auto">
         <LevelSelector
           selectedLevel={selectedLevel}

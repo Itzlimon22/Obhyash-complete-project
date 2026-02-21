@@ -326,7 +326,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2 flex items-center gap-3">
+          <h2 className="text-xl md:text-3xl font-extrabold text-neutral-900 dark:text-white mb-1 md:mb-2 flex items-center gap-3">
             মক টেস্ট সেটআপ
             <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-[10px] uppercase tracking-wider font-extrabold">
               <Sparkles className="w-3 h-3" />
@@ -345,7 +345,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         <button
           type="button"
           onClick={() => setIsOmrModalOpen(true)}
-          className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-xl font-semibold text-sm hover:shadow-lg transition-all active:scale-95"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 rounded-xl font-semibold text-xs md:text-sm border border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-sm transition-all active:scale-95"
         >
           <FileQuestion className="w-4 h-4" />
           OMR শিট ডাউনলোড
@@ -587,7 +587,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 step="1"
                 value={questionCount}
                 onChange={(e) => setQuestionCount(parseInt(e.target.value))}
-                className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-emerald-700"
+                className="w-full h-2.5 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-emerald-700"
               />
               <div className="flex justify-between text-xs text-neutral-500 mt-2">
                 <span>1</span>
@@ -612,7 +612,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 step="1"
                 value={duration}
                 onChange={(e) => setDuration(parseInt(e.target.value))}
-                className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-emerald-700"
+                className="w-full h-2.5 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-emerald-700"
               />
               <div className="flex justify-between text-xs text-neutral-500 mt-2">
                 <span>1m</span>
@@ -651,7 +651,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           <button
             type="submit"
             disabled={isLoading || !subject || examTypes.length === 0}
-            className="w-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-bold py-3.5 sm:py-4 rounded-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 hover:shadow-lg shadow-md transition-all active:scale-[0.99] flex justify-center items-center gap-3 text-base disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-emerald-800 dark:bg-emerald-700 text-white font-extrabold py-4 sm:py-4.5 rounded-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 hover:bg-emerald-900 dark:hover:bg-emerald-600 shadow-lg shadow-emerald-800/20 transition-all active:scale-[0.98] flex justify-center items-center gap-3 text-base md:text-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>

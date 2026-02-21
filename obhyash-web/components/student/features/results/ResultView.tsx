@@ -131,12 +131,12 @@ const ResultView: React.FC<ResultViewProps> = ({
         {submissionType === 'script' &&
           onChallengeEvaluation &&
           !isHistoryMode && (
-            <div className="mb-4 max-w-xl mx-auto bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="mb-4 max-w-xl mx-auto bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-left">
-                <h4 className="font-bold text-amber-800 dark:text-amber-200 text-xs md:text-sm">
+                <h4 className="font-bold text-red-800 dark:text-red-200 text-xs md:text-sm">
                   OMR মূল্যায়ন নিয়ে খুশি নও?
                 </h4>
-                <p className="text-[10px] md:text-xs text-amber-700 dark:text-amber-300">
+                <p className="text-[10px] md:text-xs text-red-700 dark:text-red-300">
                   যান্ত্রিক ত্রুটির কারণে ফলাফল ভুল হতে পারে।
                 </p>
                 <div className="flex flex-wrap items-center gap-2 mt-1">
@@ -152,7 +152,7 @@ const ResultView: React.FC<ResultViewProps> = ({
               </div>
               <button
                 onClick={onChallengeEvaluation}
-                className="px-3 py-1.5 bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 text-xs font-bold rounded hover:bg-amber-100 dark:hover:bg-neutral-700 transition-colors whitespace-nowrap"
+                className="px-3 py-1.5 bg-white dark:bg-neutral-800 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 text-xs font-bold rounded hover:bg-red-100 dark:hover:bg-neutral-700 transition-colors whitespace-nowrap"
               >
                 আবার যাচাই করো
               </button>
@@ -164,7 +164,7 @@ const ResultView: React.FC<ResultViewProps> = ({
           {onDownloadQuestionPaper && (
             <button
               onClick={onDownloadQuestionPaper}
-              className="flex-1 min-w-0 inline-flex items-center justify-center gap-1 px-2 py-2.5 bg-neutral-100 dark:bg-neutral-800 text-indigo-600 dark:text-indigo-400 rounded-lg text-[10px] sm:text-xs font-bold hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors border border-neutral-200 dark:border-neutral-700 whitespace-nowrap"
+              className="flex-1 min-w-0 inline-flex items-center justify-center gap-1 px-2 py-2.5 bg-neutral-100 dark:bg-neutral-800 text-emerald-700 dark:text-emerald-400 rounded-lg text-[10px] sm:text-xs font-bold hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors border border-neutral-200 dark:border-neutral-700 whitespace-nowrap"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -187,7 +187,7 @@ const ResultView: React.FC<ResultViewProps> = ({
           {onDownloadResultWithExplanations && (
             <button
               onClick={onDownloadResultWithExplanations}
-              className="flex-1 min-w-0 inline-flex items-center justify-center gap-1 px-2 py-2.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg text-[10px] sm:text-xs font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors border border-indigo-100 dark:border-indigo-800 whitespace-nowrap"
+              className="flex-1 min-w-0 inline-flex items-center justify-center gap-1 px-2 py-2.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg text-[10px] sm:text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-100 dark:border-emerald-800 whitespace-nowrap"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -246,7 +246,7 @@ const ResultView: React.FC<ResultViewProps> = ({
               value={reportReason}
               onChange={(e) => setReportReason(e.target.value)}
               placeholder="যেমন: সঠিক উত্তরটি ভুল, অথবা প্রশ্নে বানান ভুল আছে..."
-              className="w-full h-28 p-3 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 outline-none resize-none mb-4 text-sm"
+              className="w-full h-28 p-3 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 outline-none resize-none mb-4 text-sm"
               autoFocus
             />
 
