@@ -10,6 +10,7 @@ import {
   findHscSubject,
   findHscChapter,
 } from '@/lib/data/hsc-helpers';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface QuestionFormProps {
   initialData: Partial<Question>;
@@ -54,9 +55,17 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/60 overflow-y-auto">
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-xl w-full max-w-4xl my-auto animate-in fade-in slide-in-from-bottom-8 duration-200 flex flex-col max-h-[90vh]">
-        <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-white sticky top-0 z-10 rounded-t-2xl shrink-0">
+    <Dialog
+      open={true}
+      onOpenChange={(open) => {
+        if (!open) onCancel();
+      }}
+    >
+      <DialogContent
+        className="sm:max-w-4xl max-h-[90vh] p-0 flex flex-col overflow-hidden"
+        showCloseButton={false}
+      >
+        <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-white dark:bg-neutral-900 sticky top-0 z-10 shrink-0">
           <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
             {data.id ? 'প্রশ্ন সম্পাদনা' : 'নতুন প্রশ্ন তৈরি করুন'}
           </h3>
@@ -465,7 +474,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
             <Save size={16} /> সংরক্ষণ করুন
           </button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };

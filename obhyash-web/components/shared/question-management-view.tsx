@@ -13,6 +13,7 @@ import {
   Clock,
   Download,
 } from 'lucide-react';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { Question } from '@/lib/types';
 import { useQuestions } from '@/hooks/use-questions';
 import { QuestionList } from '@/components/admin/questions/question-list';
@@ -23,6 +24,7 @@ import { QuestionFiltersPanel } from '@/components/admin/questions/question-filt
 import { BulkActions } from '@/components/admin/questions/bulk-actions';
 import { MathText, StatusBadge } from '@/components/admin/questions/shared';
 import { QuestionFilters } from '@/services/database';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface QuestionManagementViewProps {
   title?: string;
@@ -64,6 +66,10 @@ export default function QuestionManagementView({
   } = useQuestions({ baseFilters });
 
   const router = useRouter();
+  const { user, profile } = useAuth();
+
+  const currentAuthorName =
+    profile?.name || user?.email || (baseFilters.author as string) || 'Admin';
 
   // View state management
   const [viewMode, setViewMode] = useState<'list' | 'upload' | 'edit'>('list');
@@ -97,7 +103,8 @@ export default function QuestionManagementView({
       type: 'MCQ',
       options: ['', '', '', ''],
       difficulty: 'Medium',
-      author: baseFilters.author || undefined, // Pre-fill author if available in baseFilters
+      author: currentAuthorName,
+      author_name: currentAuthorName,
     });
     setViewMode('edit');
   };
@@ -106,7 +113,8 @@ export default function QuestionManagementView({
     // Ensure author is preserved/set
     const questionToSave = {
       ...q,
-      ...(baseFilters.author ? { author: baseFilters.author } : {}),
+      author: q.author || currentAuthorName,
+      author_name: q.author_name || currentAuthorName,
     };
     const success = await saveQuestion(questionToSave);
     if (success) setViewMode('list');
@@ -116,7 +124,8 @@ export default function QuestionManagementView({
     // Ensure author is preserved/set for bulk import
     const dataToImport = data.map((q) => ({
       ...q,
-      ...(baseFilters.author ? { author: baseFilters.author } : {}),
+      author: currentAuthorName,
+      author_name: currentAuthorName,
     }));
     const success = await bulkImport(dataToImport);
     if (success) setViewMode('list');
@@ -332,9 +341,17 @@ export default function QuestionManagementView({
 
       {/* Preview Modal */}
       {previewData && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm bg-black/60 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 w-full max-w-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xl flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-start">
+        <Dialog
+          open={!!previewData}
+          onOpenChange={(open) => {
+            if (!open) setPreviewData(null);
+          }}
+        >
+          <DialogContent
+            className="sm:max-w-2xl p-0 overflow-hidden flex flex-col"
+            showCloseButton={false}
+          >
+            <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-start shrink-0">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xs font-mono text-neutral-400">
@@ -400,8 +417,8 @@ export default function QuestionManagementView({
                 </div>
               )}
             </div>
-          </div>
-        </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

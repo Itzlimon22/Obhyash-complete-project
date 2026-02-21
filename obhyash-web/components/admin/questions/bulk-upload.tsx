@@ -24,6 +24,7 @@ import { MathText } from './shared';
 import { MathRenderer } from '@/components/common/MathRenderer';
 import { ImageUploader } from '@/components/ui/image-uploader';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 
@@ -238,9 +239,17 @@ const QuestionPreview: React.FC<{
   question: Partial<Question>;
   onClose: () => void;
 }> = ({ question: q, onClose }) => (
-  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-[100] p-0 sm:p-4">
-    <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 max-w-2xl w-full max-h-[90vh] overflow-auto shadow-2xl border border-neutral-200 dark:border-neutral-800">
-      <div className="p-5 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center sticky top-0 bg-white dark:bg-neutral-900 z-10">
+  <Dialog
+    open={true}
+    onOpenChange={(open) => {
+      if (!open) onClose();
+    }}
+  >
+    <DialogContent
+      className="sm:max-w-2xl p-0 overflow-hidden flex flex-col"
+      showCloseButton={false}
+    >
+      <div className="p-5 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center sticky top-0 bg-white dark:bg-neutral-900 z-10 shrink-0">
         <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
           প্রশ্ন প্রিভিউ
         </h3>
@@ -326,8 +335,8 @@ const QuestionPreview: React.FC<{
           ))}
         </div>
       </div>
-    </div>
-  </div>
+    </DialogContent>
+  </Dialog>
 );
 
 // ─── Edit Modal ──────────────────────────────────────────────────────
@@ -380,10 +389,18 @@ const EditModal: React.FC<{
     'text-[10px] font-extrabold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest mb-1 block';
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center z-[100] p-0 sm:p-4">
-      <div className="bg-white dark:bg-neutral-900 rounded-t-3xl sm:rounded-2xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl border border-neutral-200/50 dark:border-neutral-800 flex flex-col animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
+    <Dialog
+      open={true}
+      onOpenChange={(open) => {
+        if (!open) onCancel();
+      }}
+    >
+      <DialogContent
+        className="sm:max-w-4xl max-h-[90vh] p-0 flex flex-col overflow-hidden"
+        showCloseButton={false}
+      >
         {/* Header */}
-        <div className="flex justify-between items-center px-5 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/80 sticky top-0 z-10">
+        <div className="flex justify-between items-center px-5 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/80 sticky top-0 z-10 shrink-0">
           <div>
             <h3 className="text-base font-extrabold text-neutral-900 dark:text-white">
               প্রশ্ন সম্পাদনা
@@ -713,7 +730,7 @@ const EditModal: React.FC<{
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-4 bg-neutral-50 dark:bg-neutral-900/80 border-t border-neutral-100 dark:border-neutral-800 flex gap-3">
+        <div className="px-5 py-4 bg-neutral-50 dark:bg-neutral-900/80 border-t border-neutral-100 dark:border-neutral-800 flex gap-3 shrink-0">
           <button
             onClick={onCancel}
             className="flex-1 py-3 text-sm font-extrabold text-neutral-600 dark:text-neutral-400 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-all active:scale-[0.98]"
@@ -727,8 +744,8 @@ const EditModal: React.FC<{
             সংরক্ষণ করুন
           </button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -1652,9 +1669,17 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
       {/* JSON Editor Modal */}
       {showJsonEditor && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
-          <div className="bg-white dark:bg-neutral-900 rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-neutral-200 dark:border-neutral-800">
-            <div className="flex justify-between items-center px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900">
+        <Dialog
+          open={showJsonEditor}
+          onOpenChange={(open) => {
+            if (!open) setShowJsonEditor(false);
+          }}
+        >
+          <DialogContent
+            className="sm:max-w-5xl max-h-[90vh] flex flex-col p-0 overflow-hidden"
+            showCloseButton={false}
+          >
+            <div className="flex justify-between items-center px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 shrink-0">
               <div className="flex items-center gap-2 text-rose-600 dark:text-rose-500">
                 <FileJson size={20} />
                 <h3 className="font-extrabold text-sm tracking-wide">
@@ -1715,8 +1740,8 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                 সংরক্ষণ ও চেষ্টা করুন
               </button>
             </div>
-          </div>
-        </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
