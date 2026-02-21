@@ -480,6 +480,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   setVisibleCount(9);
                 }}
                 placeholder="খুঁজুন..."
+                aria-label="পরীক্ষার ইতিহাস খুঁজুন"
                 className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm placeholder:text-neutral-400"
               />
             </div>
@@ -507,6 +508,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   setFilterSubject(e.target.value);
                   setVisibleCount(9); // ✅ Reset visible count here
                 }}
+                aria-label="বিষয় অনুযায়ী ফিল্টার"
                 className="w-full appearance-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl pl-9 pr-8 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm cursor-pointer"
               >
                 <option value="">সকল বিষয়</option>
@@ -542,6 +544,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   setFilterDate(e.target.value);
                   setVisibleCount(9); // ✅ Reset visible count here
                 }}
+                aria-label="তারিখ অনুযায়ী ফিল্টার"
                 className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm h-full"
               />
             </div>
@@ -556,6 +559,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   );
                   setVisibleCount(9);
                 }}
+                aria-label="ক্রম অনুযায়ী সাজান"
                 className="w-full appearance-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm cursor-pointer"
               >
                 <option value="date">তারিখ অনুযায়ী</option>
