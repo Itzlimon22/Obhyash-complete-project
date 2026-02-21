@@ -5,6 +5,7 @@ import {
   updateQuestion,
   deleteQuestions,
   bulkUpdateQuestionStatus,
+  bulkUpdateMetadata,
   QuestionFilters,
 } from '@/services/database';
 import { Question, QuestionStatus } from '@/lib/types';
@@ -242,24 +243,216 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
     }
   };
 
-  // Bulk import (keeping for compatibility)
-  const bulkImport = async (data: Partial<Question>[]) => {
-    try {
-      const results = await Promise.all(data.map((q) => createQuestion(q)));
-      const successCount = results.filter((r) => r.success).length;
+  // Bulk import: sequential with progress tracking
+  const [importProgress, setImportProgress] = useState<{
+    total: number;
+    completed: number;
+    failed: number;
+    failedRows: number[];
+    isImporting: boolean;
+  }>({ total: 0, completed: 0, failed: 0, failedRows: [], isImporting: false });
 
-      if (successCount > 0) {
-        toast.success(`${successCount} টি প্রশ্ন ইম্পোর্ট করা হয়েছে`);
+  const bulkImport = async (data: Partial<Question>[]) => {
+    const total = data.length;
+    setImportProgress({
+      total,
+      completed: 0,
+      failed: 0,
+      failedRows: [],
+      isImporting: true,
+    });
+
+    let completed = 0;
+    let failed = 0;
+    const failedRows: number[] = [];
+
+    for (let i = 0; i < data.length; i++) {
+      try {
+        const result = await createQuestion(data[i]);
+        if (result.success) {
+          completed++;
+        } else {
+          failed++;
+          failedRows.push(i + 1);
+        }
+      } catch {
+        failed++;
+        failedRows.push(i + 1);
+      }
+      setImportProgress({
+        total,
+        completed,
+        failed,
+        failedRows: [...failedRows],
+        isImporting: true,
+      });
+    }
+
+    setImportProgress({
+      total,
+      completed,
+      failed,
+      failedRows,
+      isImporting: false,
+    });
+
+    if (completed > 0) {
+      toast.success(
+        `${completed} টি প্রশ্ন ইম্পোর্ট হয়েছে${failed > 0 ? `, ${failed} টি ব্যর্থ` : ''}`,
+      );
+      await fetchQuestions();
+      return true;
+    } else {
+      toast.error('ইম্পোর্ট ব্যর্থ হয়েছে');
+      return false;
+    }
+  };
+
+  // Batch update metadata (subject, chapter, topic) for selected questions — with undo
+  const updateSelectedMetadata = async (fields: {
+    subject?: string;
+    chapter?: string;
+    topic?: string;
+  }) => {
+    if (selectedQuestions.size === 0) {
+      toast.error('কোন প্রশ্ন নির্বাচন করা হয়নি');
+      return;
+    }
+
+    // Snapshot old values for undo
+    const ids = Array.from(selectedQuestions);
+    const oldValues = new Map<
+      string,
+      { subject: string; chapter: string; topic: string }
+    >();
+    questions
+      .filter((q) => ids.includes(q.id))
+      .forEach((q) => {
+        oldValues.set(q.id, {
+          subject: q.subject || '',
+          chapter: q.chapter || '',
+          topic: q.topic || '',
+        });
+      });
+
+    try {
+      const result = await bulkUpdateMetadata(ids, fields);
+      if (result.success) {
+        const parts: string[] = [];
+        if (fields.subject) parts.push(`বিষয়: ${fields.subject}`);
+        if (fields.chapter) parts.push(`অধ্যায়: ${fields.chapter}`);
+        if (fields.topic) parts.push(`টপিক: ${fields.topic}`);
+
+        toast.success(
+          `${result.updatedCount} টি প্রশ্নের ${parts.join(', ')} আপডেট হয়েছে`,
+          {
+            duration: 8000,
+            action: {
+              label: '↩ আনডু',
+              onClick: async () => {
+                // Restore per question with its original values
+                let restored = 0;
+                for (const [id, old] of oldValues) {
+                  const restoreFields: {
+                    subject?: string;
+                    chapter?: string;
+                    topic?: string;
+                  } = {};
+                  if (fields.subject !== undefined)
+                    restoreFields.subject = old.subject;
+                  if (fields.chapter !== undefined)
+                    restoreFields.chapter = old.chapter;
+                  if (fields.topic !== undefined)
+                    restoreFields.topic = old.topic;
+                  const r = await bulkUpdateMetadata([id], restoreFields);
+                  if (r.success) restored++;
+                }
+                toast.success(
+                  `${restored} টি প্রশ্ন পূর্বাবস্থায় ফিরিয়ে আনা হয়েছে`,
+                );
+                await fetchQuestions();
+              },
+            },
+          },
+        );
+        setSelectedQuestions(new Set());
         await fetchQuestions();
-        return true;
       } else {
-        toast.error('ইম্পোর্ট ব্যর্থ হয়েছে');
-        return false;
+        toast.error(getErrorMessage(result.error));
       }
     } catch (err) {
-      console.error(err);
       toast.error(getErrorMessage(err));
-      return false;
+    }
+  };
+
+  // Export filtered questions as JSON or CSV
+  const exportQuestions = async (format: 'json' | 'csv' = 'json') => {
+    try {
+      toast.info('এক্সপোর্ট হচ্ছে...');
+      // Fetch all questions matching current filters (up to 10k, no pagination)
+      const response = await getQuestionsPage(
+        1,
+        10000,
+        filters,
+        sortBy,
+        sortOrder,
+      );
+      const data = response.questions;
+
+      if (data.length === 0) {
+        toast.error('এক্সপোর্ট করার মতো কোনো প্রশ্ন নেই');
+        return;
+      }
+
+      // Map to flat export format
+      const exportRows = data.map((q) => ({
+        question: q.question || '',
+        option1: q.options?.[0] || '',
+        option2: q.options?.[1] || '',
+        option3: q.options?.[2] || '',
+        option4: q.options?.[3] || '',
+        answer:
+          q.correctAnswerIndex !== undefined
+            ? String.fromCharCode(65 + q.correctAnswerIndex)
+            : '',
+        explanation: q.explanation || '',
+        subject: q.subject || '',
+        chapter: q.chapter || '',
+        topic: q.topic || '',
+        difficulty: q.difficulty || '',
+        stream: q.stream || '',
+        section: q.section || q.division || '',
+        examType: q.examType || '',
+        institute: q.institutes?.join(',') || '',
+        year: q.years?.join(',') || '',
+        status: q.status || '',
+      }));
+
+      let blob: Blob;
+      let fileName: string;
+
+      if (format === 'csv') {
+        const Papa = (await import('papaparse')).default;
+        const csv = Papa.unparse(exportRows);
+        blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' }); // BOM for Bengali
+        fileName = `questions_export_${new Date().toISOString().slice(0, 10)}.csv`;
+      } else {
+        const json = JSON.stringify(exportRows, null, 2);
+        blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+        fileName = `questions_export_${new Date().toISOString().slice(0, 10)}.json`;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      toast.success(`${data.length} টি প্রশ্ন এক্সপোর্ট হয়েছে`);
+    } catch (err) {
+      console.error('Export error:', err);
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -275,6 +468,7 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
     sortBy,
     sortOrder,
     selectedQuestions,
+    importProgress,
 
     // Pagination
     goToPage,
@@ -302,5 +496,7 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
     updateStatus,
     updateSelectedStatus,
     bulkImport,
+    exportQuestions,
+    updateSelectedMetadata,
   };
 };

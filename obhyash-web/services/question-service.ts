@@ -412,6 +412,101 @@ export const bulkUpdateQuestionStatus = async (
 };
 
 /**
+ * Bulk update question metadata (subject, chapter, topic)
+ */
+export const bulkUpdateMetadata = async (
+  ids: string[],
+  fields: { subject?: string; chapter?: string; topic?: string },
+): Promise<{ success: boolean; error?: string; updatedCount?: number }> => {
+  if (isSupabaseConfigured() && supabase) {
+    try {
+      const updateData: Record<string, string> = {
+        updated_at: new Date().toISOString(),
+      };
+      if (fields.subject !== undefined) updateData.subject = fields.subject;
+      if (fields.chapter !== undefined) updateData.chapter = fields.chapter;
+      if (fields.topic !== undefined) updateData.topic = fields.topic;
+
+      const { error, count } = await supabase
+        .from('questions')
+        .update(updateData)
+        .in('id', ids);
+
+      if (error) {
+        console.error('Error updating question metadata:', error);
+        return { success: false, error: error.message };
+      }
+
+      return { success: true, updatedCount: count || ids.length };
+    } catch (error) {
+      console.error('Failed to update question metadata:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  return { success: false, error: 'Database not configured' };
+};
+
+/**
+ * Check which question texts already exist in the database.
+ * Returns a Set of indices (0-based) that are duplicates.
+ */
+export const checkDuplicateQuestions = async (
+  questionTexts: string[],
+): Promise<Set<number>> => {
+  const duplicateIndices = new Set<number>();
+  if (!isSupabaseConfigured() || !supabase || questionTexts.length === 0) {
+    return duplicateIndices;
+  }
+
+  try {
+    // Batch: check 20 at a time to avoid overly large queries
+    const BATCH_SIZE = 20;
+    for (let i = 0; i < questionTexts.length; i += BATCH_SIZE) {
+      const batch = questionTexts.slice(i, i + BATCH_SIZE);
+      const trimmedBatch = batch
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0);
+
+      if (trimmedBatch.length === 0) continue;
+
+      // Build OR filter for exact matches
+      const orFilter = trimmedBatch
+        .map((text) => `question.eq.${text}`)
+        .join(',');
+
+      const { data } = await supabase
+        .from('questions')
+        .select('question')
+        .or(orFilter)
+        .limit(BATCH_SIZE);
+
+      if (data && data.length > 0) {
+        const existingTexts = new Set(
+          data.map((d: { question: string }) =>
+            d.question.trim().toLowerCase(),
+          ),
+        );
+
+        batch.forEach((text, batchIdx) => {
+          if (existingTexts.has(text.trim().toLowerCase())) {
+            duplicateIndices.add(i + batchIdx);
+          }
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Duplicate check error:', err);
+    // Don't block the upload if dedup fails
+  }
+
+  return duplicateIndices;
+};
+
+/**
  * Bulk create questions (for imports from bulk upload)
  * Accepts database format with snake_case fields
  */

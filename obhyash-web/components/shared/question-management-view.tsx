@@ -11,6 +11,7 @@ import {
   CheckCircle,
   AlertCircle,
   Clock,
+  Download,
 } from 'lucide-react';
 import { Question } from '@/lib/types';
 import { useQuestions } from '@/hooks/use-questions';
@@ -57,6 +58,9 @@ export default function QuestionManagementView({
     updateStatus,
     updateSelectedStatus,
     bulkImport,
+    exportQuestions,
+    importProgress,
+    updateSelectedMetadata,
   } = useQuestions({ baseFilters });
 
   const router = useRouter();
@@ -65,6 +69,7 @@ export default function QuestionManagementView({
   const [viewMode, setViewMode] = useState<'list' | 'upload' | 'edit'>('list');
   const [editingData, setEditingData] = useState<Partial<Question>>({});
   const [previewData, setPreviewData] = useState<Question | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   // Stats
   const stats = useMemo(
@@ -132,13 +137,46 @@ export default function QuestionManagementView({
             </div>
             <div className="flex gap-2 sm:gap-3">
               <button
-                onClick={handleCreate} // Use handleCreate explicitly
+                onClick={handleCreate}
                 className="w-full flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-900 dark:text-white rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 text-sm font-medium transition-colors shadow-sm"
               >
                 <Plus size={16} /> নতুন প্রশ্ন
               </button>
+
+              {/* Export Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowExportMenu(!showExportMenu)}
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-900 dark:text-white rounded-xl text-sm font-medium transition-colors shadow-sm"
+                >
+                  <Download size={16} /> এক্সপোর্ট
+                </button>
+                {showExportMenu && (
+                  <div className="absolute right-0 top-full mt-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-xl z-20 overflow-hidden min-w-[140px] animate-in fade-in slide-in-from-top-2 duration-150">
+                    <button
+                      onClick={() => {
+                        exportQuestions('json');
+                        setShowExportMenu(false);
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-2 text-neutral-700 dark:text-neutral-300"
+                    >
+                      📄 JSON
+                    </button>
+                    <button
+                      onClick={() => {
+                        exportQuestions('csv');
+                        setShowExportMenu(false);
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-2 text-neutral-700 dark:text-neutral-300 border-t border-neutral-100 dark:border-neutral-800"
+                    >
+                      📊 CSV
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <button
-                onClick={() => setViewMode('upload')} // Switch view mode locally
+                onClick={() => setViewMode('upload')}
                 className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-medium shadow-lg shadow-rose-500/20 transition-all active:scale-95"
               >
                 <Upload size={16} /> বাল্ক আপলোড
@@ -240,6 +278,7 @@ export default function QuestionManagementView({
             onClearSelection={clearSelection}
             onDeleteSelected={deleteSelected}
             onUpdateStatus={updateSelectedStatus}
+            onUpdateMetadata={updateSelectedMetadata}
           />
 
           {/* Questions Table */}
@@ -289,6 +328,7 @@ export default function QuestionManagementView({
         <BulkUpload
           onImport={handleImport}
           onCancel={() => setViewMode('list')}
+          importProgress={importProgress}
         />
       )}
 

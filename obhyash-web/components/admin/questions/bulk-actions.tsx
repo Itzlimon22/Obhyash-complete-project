@@ -1,6 +1,13 @@
-import React from 'react';
-import { Trash2, CheckCircle2, XCircle, FileEdit } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import {
+  Trash2,
+  CheckCircle2,
+  XCircle,
+  FileEdit,
+  ChevronDown,
+} from 'lucide-react';
 import { QuestionStatus } from '@/lib/types';
+import { getHscSubjectList, getHscChapterList } from '@/lib/data/hsc-helpers';
 
 interface BulkActionsProps {
   selectedCount: number;
@@ -9,6 +16,11 @@ interface BulkActionsProps {
   onClearSelection: () => void;
   onDeleteSelected: () => void;
   onUpdateStatus: (status: QuestionStatus) => void;
+  onUpdateMetadata?: (fields: {
+    subject?: string;
+    chapter?: string;
+    topic?: string;
+  }) => void;
 }
 
 export const BulkActions: React.FC<BulkActionsProps> = ({
@@ -18,7 +30,22 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
   onClearSelection,
   onDeleteSelected,
   onUpdateStatus,
+  onUpdateMetadata,
 }) => {
+  const [showSubjectPicker, setShowSubjectPicker] = useState(false);
+  const [showChapterPicker, setShowChapterPicker] = useState(false);
+  const [selectedSubjectForChapter, setSelectedSubjectForChapter] =
+    useState('');
+
+  const subjects = useMemo(() => getHscSubjectList(), []);
+  const chapters = useMemo(
+    () =>
+      selectedSubjectForChapter
+        ? getHscChapterList(selectedSubjectForChapter)
+        : [],
+    [selectedSubjectForChapter],
+  );
+
   if (selectedCount === 0) return null;
 
   const handleDelete = () => {
@@ -29,6 +56,17 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
     ) {
       onDeleteSelected();
     }
+  };
+
+  const handleSubjectChange = (subjectName: string) => {
+    onUpdateMetadata?.({ subject: subjectName, chapter: '', topic: '' });
+    setShowSubjectPicker(false);
+  };
+
+  const handleChapterChange = (chapterName: string) => {
+    onUpdateMetadata?.({ chapter: chapterName, topic: '' });
+    setShowChapterPicker(false);
+    setSelectedSubjectForChapter('');
   };
 
   return (
@@ -65,7 +103,94 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+      <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
+        {/* Batch Edit Subject */}
+        {onUpdateMetadata && (
+          <div className="flex items-center gap-1">
+            {/* Subject Picker */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowSubjectPicker(!showSubjectPicker);
+                  setShowChapterPicker(false);
+                }}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors flex items-center gap-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800"
+              >
+                <FileEdit size={14} />
+                <span className="hidden xs:inline">বিষয়</span>
+                <ChevronDown size={12} />
+              </button>
+              {showSubjectPicker && (
+                <div className="absolute right-0 top-full mt-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-xl z-30 max-h-60 overflow-y-auto min-w-[200px] animate-in fade-in slide-in-from-top-2 duration-150">
+                  {subjects.map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => handleSubjectChange(s.name)}
+                      className="w-full text-left px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-b border-neutral-50 dark:border-neutral-800 last:border-0"
+                    >
+                      {s.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Chapter Picker */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowChapterPicker(!showChapterPicker);
+                  setShowSubjectPicker(false);
+                }}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors flex items-center gap-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800"
+              >
+                <FileEdit size={14} />
+                <span className="hidden xs:inline">অধ্যায়</span>
+                <ChevronDown size={12} />
+              </button>
+              {showChapterPicker && (
+                <div className="absolute right-0 top-full mt-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-xl z-30 max-h-72 overflow-y-auto min-w-[220px] animate-in fade-in slide-in-from-top-2 duration-150">
+                  {/* First pick subject */}
+                  {!selectedSubjectForChapter ? (
+                    <>
+                      <div className="px-3 py-2 text-[10px] font-bold text-neutral-400 uppercase tracking-wider bg-neutral-50 dark:bg-neutral-800 sticky top-0">
+                        প্রথমে বিষয় নির্বাচন করুন
+                      </div>
+                      {subjects.map((s) => (
+                        <button
+                          key={s.id}
+                          onClick={() => setSelectedSubjectForChapter(s.name)}
+                          className="w-full text-left px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-b border-neutral-50 dark:border-neutral-800 last:border-0"
+                        >
+                          {s.name}
+                        </button>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setSelectedSubjectForChapter('')}
+                        className="w-full text-left px-3 py-2 text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 sticky top-0"
+                      >
+                        ← {selectedSubjectForChapter}
+                      </button>
+                      {chapters.map((c) => (
+                        <button
+                          key={c.id}
+                          onClick={() => handleChapterChange(c.name)}
+                          className="w-full text-left px-3 py-2 text-xs hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-b border-neutral-50 dark:border-neutral-800 last:border-0"
+                        >
+                          {c.name}
+                        </button>
+                      ))}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Update Status */}
         <div className="flex items-center gap-1 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-1 flex-1 sm:flex-none justify-center">
           <button

@@ -31,11 +31,19 @@ import {
   getHscChapterList,
   getHscTopicList,
 } from '@/lib/data/hsc-helpers';
+import { checkDuplicateQuestions } from '@/services/question-service';
 
 // ─── Types ───────────────────────────────────────────────────────────
 interface BulkUploadProps {
   onImport: (questions: Partial<Question>[]) => Promise<boolean>;
   onCancel: () => void;
+  importProgress?: {
+    total: number;
+    completed: number;
+    failed: number;
+    failedRows: number[];
+    isImporting: boolean;
+  };
 }
 
 interface ParseError {
@@ -808,6 +816,7 @@ const TEMPLATE_ROWS = [
 export const BulkUpload: React.FC<BulkUploadProps> = ({
   onImport,
   onCancel,
+  importProgress,
 }) => {
   const [step, setStep] = useState<1 | 2>(1);
   const [parsedData, setParsedData] = useState<Partial<Question>[]>([]);
@@ -825,14 +834,31 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   );
   const [importSuccess, setImportSuccess] = useState(false);
 
-  // ── Unified processor: raw rows -> Question[] ──
-  // ── Unified processor: raw rows -> Question[] ──
+  // ── Unified processor: raw rows -> Question[] with dedup ──
   const processRawData = useCallback(
     (rows: Record<string, string>[]): Partial<Question>[] => {
       const parseErrors: ParseError[] = [];
       const questions = rows.map((row, i) =>
         normalizeRawRow(row, i, parseErrors),
       );
+
+      // In-batch duplicate detection
+      const seen = new Map<string, number>();
+      questions.forEach((q, i) => {
+        const key = (q.question || '').trim().toLowerCase();
+        if (!key) return;
+        const prevIndex = seen.get(key);
+        if (prevIndex !== undefined) {
+          parseErrors.push({
+            row: i + 1,
+            field: 'question',
+            message: `ডুপ্লিকেট: সারি ${prevIndex + 1} এর সাথে মিলে গেছে`,
+          });
+        } else {
+          seen.set(key, i);
+        }
+      });
+
       setErrors(parseErrors);
       return questions;
     },
@@ -905,9 +931,24 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   };
 
   // ── File handler ───────────────────────────────────────────────────
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const MAX_ROW_COUNT = 500;
+
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // File size validation
+    if (file.size > MAX_FILE_SIZE) {
+      setErrors([
+        {
+          row: 0,
+          field: 'file',
+          message: `ফাইল সাইজ ${(file.size / 1024 / 1024).toFixed(1)}MB — সর্বোচ্চ 5MB অনুমোদিত`,
+        },
+      ]);
+      return;
+    }
 
     setIsProcessing(true);
     setFileName(file.name);
@@ -967,10 +1008,31 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         throw new Error('ফাইলে কোনো ডাটা পাওয়া যায়নি।');
       }
 
+      if (rawRows.length > MAX_ROW_COUNT) {
+        throw new Error(
+          `ফাইলে ${rawRows.length} টি সারি আছে — সর্বোচ্চ ${MAX_ROW_COUNT} টি অনুমোদিত। ফাইল ভাগ করে আপলোড করুন।`,
+        );
+      }
+
       let questions = processRawData(rawRows);
 
       // Resolve Topic Serials Synchronously using hscSubjects
       questions = resolveTopicSerialsLocally(questions);
+
+      // Cross-upload duplicate check against DB
+      const questionTexts = questions.map((q) => q.question || '');
+      const dbDuplicates = await checkDuplicateQuestions(questionTexts);
+      if (dbDuplicates.size > 0) {
+        const dupErrors: ParseError[] = [];
+        dbDuplicates.forEach((idx) => {
+          dupErrors.push({
+            row: idx + 1,
+            field: 'question',
+            message: 'ডাটাবেসে ইতিমধ্যে বিদ্যমান — ডুপ্লিকেট',
+          });
+        });
+        setErrors((prev) => [...prev, ...dupErrors]);
+      }
 
       setParsedData(questions);
       setSelectedIndices(new Set(questions.map((_, i) => i)));
@@ -1400,11 +1462,52 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         })}
       </div>
 
+      {/* Progress Bar */}
+      {importProgress &&
+        (importProgress.isImporting ||
+          (importProgress.completed > 0 && isProcessing)) && (
+          <div className="px-5 py-4 bg-white dark:bg-neutral-900 border-t border-neutral-100 dark:border-neutral-800">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300">
+                ইমপোর্ট প্রগ্রেস
+              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-mono text-neutral-500">
+                  {importProgress.completed + importProgress.failed}/
+                  {importProgress.total}
+                </span>
+                {importProgress.failed > 0 && (
+                  <span className="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded-full font-bold">
+                    {importProgress.failed} ব্যর্থ
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="w-full h-3 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-300 ease-out"
+                style={{
+                  width: `${importProgress.total > 0 ? ((importProgress.completed + importProgress.failed) / importProgress.total) * 100 : 0}%`,
+                }}
+              />
+            </div>
+            {!importProgress.isImporting && importProgress.completed > 0 && (
+              <p className="text-xs text-emerald-600 font-bold mt-2">
+                ✅ {importProgress.completed} টি সফল
+                {importProgress.failed > 0
+                  ? `, ${importProgress.failed} টি ব্যর্থ`
+                  : ''}
+              </p>
+            )}
+          </div>
+        )}
+
       {/* Footer */}
       <div className="p-4 sm:p-5 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 flex flex-col sm:flex-row justify-end gap-3 sticky bottom-0">
         <button
           onClick={() => setStep(1)}
-          className="px-6 py-3 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 font-bold hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all w-full sm:w-auto"
+          disabled={isProcessing}
+          className="px-6 py-3 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 font-bold hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all w-full sm:w-auto disabled:opacity-50"
         >
           পিছে যান
         </button>
@@ -1416,7 +1519,10 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           {isProcessing ? (
             <>
               <Loader2 className="animate-spin" size={18} />
-              ইমপোর্ট হচ্ছে...
+              ইমপোর্ট হচ্ছে...{' '}
+              {importProgress
+                ? `(${importProgress.completed + importProgress.failed}/${importProgress.total})`
+                : ''}
             </>
           ) : (
             <>
