@@ -128,6 +128,10 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   const [visibleCount, setVisibleCount] = useState(9);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [sortBy, setSortBy] = useState<'date' | 'score-high' | 'score-low'>(
+    'date',
+  );
+  const [searchText, setSearchText] = useState('');
 
   // Extract unique subjects for dropdown — value = raw code, label = display name
   const uniqueSubjects = useMemo(() => {
@@ -147,16 +151,39 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
 
   // -- EXAMS TAB LOGIC --
   const filteredHistory = useMemo(() => {
-    return history
-      .filter((item) => {
-        const matchSubject = filterSubject
-          ? item.subject === filterSubject
-          : true;
-        const matchDate = filterDate ? item.date.startsWith(filterDate) : true;
-        return matchSubject && matchDate;
-      })
-      .reverse();
-  }, [history, filterSubject, filterDate]);
+    const filtered = history.filter((item) => {
+      const matchSubject = filterSubject
+        ? item.subject === filterSubject
+        : true;
+      const matchDate = filterDate ? item.date.startsWith(filterDate) : true;
+      const matchSearch = searchText
+        ? (item.subjectLabel || item.subject || '')
+            .toLowerCase()
+            .includes(searchText.toLowerCase()) ||
+          (item.examType || '').toLowerCase().includes(searchText.toLowerCase())
+        : true;
+      return matchSubject && matchDate && matchSearch;
+    });
+
+    // Sort
+    if (sortBy === 'score-high') {
+      filtered.sort((a, b) => {
+        const aP = a.totalMarks > 0 ? a.score / a.totalMarks : 0;
+        const bP = b.totalMarks > 0 ? b.score / b.totalMarks : 0;
+        return bP - aP;
+      });
+    } else if (sortBy === 'score-low') {
+      filtered.sort((a, b) => {
+        const aP = a.totalMarks > 0 ? a.score / a.totalMarks : 0;
+        const bP = b.totalMarks > 0 ? b.score / b.totalMarks : 0;
+        return aP - bP;
+      });
+    } else {
+      filtered.reverse(); // date descending (newest first)
+    }
+
+    return filtered;
+  }, [history, filterSubject, filterDate, searchText, sortBy]);
 
   // ✅ FIXED: Removed the useEffect causing the error.
   // We now reset visibleCount(9) directly in the onChange/onClick handlers below.
@@ -427,6 +454,35 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
 
           {/* Filters Row */}
           <div className="grid grid-cols-2 md:flex md:justify-end gap-2 md:gap-3">
+            {/* Search Input */}
+            <div className="relative col-span-2 md:w-auto md:min-w-[180px]">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-neutral-500">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-3.5 h-3.5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                  />
+                </svg>
+              </div>
+              <input
+                type="text"
+                value={searchText}
+                onChange={(e) => {
+                  setSearchText(e.target.value);
+                  setVisibleCount(9);
+                }}
+                placeholder="খুঁজুন..."
+                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm placeholder:text-neutral-400"
+              />
+            </div>
             {/* Subject Filter */}
             <div className="relative col-span-1 md:w-auto md:min-w-[200px]">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-neutral-500">
@@ -488,6 +544,24 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 }}
                 className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm h-full"
               />
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="relative col-span-1 md:w-auto">
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(
+                    e.target.value as 'date' | 'score-high' | 'score-low',
+                  );
+                  setVisibleCount(9);
+                }}
+                className="w-full appearance-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-semibold rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-sm cursor-pointer"
+              >
+                <option value="date">তারিখ অনুযায়ী</option>
+                <option value="score-high">স্কোর: বেশি আগে</option>
+                <option value="score-low">স্কোর: কম আগে</option>
+              </select>
             </div>
           </div>
         </div>

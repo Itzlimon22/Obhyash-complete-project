@@ -294,6 +294,59 @@ export const fetchQuestions = async (
   return questions;
 };
 
+/**
+ * Quick count of available questions matching the given filters.
+ * Uses head:true (no data transfer) for speed.
+ */
+export const getAvailableQuestionCount = async (
+  subject: string,
+  subjectLabel?: string,
+  chapters?: string[] | null,
+  difficulty?: string | null,
+): Promise<number> => {
+  if (!isSupabaseConfigured() || !supabase) return 0;
+
+  try {
+    // Build OR conditions for subject (handle NFC/NFD)
+    const matchConditions = [`subject.eq.${subject}`];
+    if (subjectLabel && subjectLabel !== subject) {
+      matchConditions.push(`subject.eq.${subjectLabel}`);
+    }
+    const nfd = (subjectLabel || subject).normalize('NFD');
+    const nfc = (subjectLabel || subject).normalize('NFC');
+    if (nfd !== subject && !matchConditions.includes(`subject.eq.${nfd}`)) {
+      matchConditions.push(`subject.eq.${nfd}`);
+    }
+    if (nfc !== subject && !matchConditions.includes(`subject.eq.${nfc}`)) {
+      matchConditions.push(`subject.eq.${nfc}`);
+    }
+
+    let query = supabase
+      .from('questions')
+      .select('id', { count: 'exact', head: true })
+      .or(matchConditions.join(','));
+
+    if (chapters && chapters.length > 0) {
+      query = query.in('chapter', chapters);
+    }
+    if (difficulty && difficulty !== 'Mixed' && difficulty !== 'All') {
+      const diffs = difficulty.split('+').map((d) => d.trim());
+      if (diffs.length === 1) {
+        query = query.ilike('difficulty', `%${diffs[0]}%`);
+      }
+    }
+
+    const { count, error } = await query;
+    if (error) {
+      console.error('Count query error:', error);
+      return 0;
+    }
+    return count || 0;
+  } catch {
+    return 0;
+  }
+};
+
 // Helper to update analytics for a single question
 export const updateQuestionAnalytics = async (
   userId: string,

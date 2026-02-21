@@ -26,6 +26,7 @@ import { SubjectSelector } from '@/components/student/features/exam/setup/Subjec
 import { OmrConfigModal } from '@/components/student/features/omr/OmrConfigModal';
 import { printOMRSheet } from '@/services/print-service';
 import { EXAM_TYPE_OPTIONS } from '@/lib/constants';
+import { getAvailableQuestionCount } from '@/services/exam-service';
 
 interface ExamSetupFormProps {
   onStartExam: (config: ExamConfig) => void;
@@ -80,6 +81,10 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const [duration, setDuration] = useState<number>(25);
   const [negativeMarking, setNegativeMarking] = useState<number>(0.25);
   const [isFormHydrated, setIsFormHydrated] = useState(false);
+
+  // Available question count preview
+  const [availableCount, setAvailableCount] = useState<number | null>(null);
+  const [isCountLoading, setIsCountLoading] = useState(false);
 
   // --- Hydrate Form State from SessionStorage ---
   useEffect(() => {
@@ -138,6 +143,42 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   // --- Modals State ---
   const [isOmrConfigOpen, setIsOmrConfigOpen] = useState(false);
+
+  // Fetch available question count when subject/chapters/difficulty change
+  useEffect(() => {
+    if (!subject) {
+      setAvailableCount(null);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setIsCountLoading(true);
+      const subjectObj = availableSubjects.find((s) => s.id === subject);
+      const subjectLabel = subjectObj?.name || subjectObj?.rawName || subject;
+      const chapterNames =
+        selectedChapters.length > 0
+          ? availableChapters
+              .filter((c) => selectedChapters.includes(c.id))
+              .map((c) => c.name)
+          : null;
+      const difficultyValue =
+        difficulties.length >= 3 ? null : difficulties.join('+');
+      const count = await getAvailableQuestionCount(
+        subject,
+        subjectLabel,
+        chapterNames,
+        difficultyValue,
+      );
+      setAvailableCount(count);
+      setIsCountLoading(false);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [
+    subject,
+    selectedChapters,
+    difficulties,
+    availableSubjects,
+    availableChapters,
+  ]);
 
   // --- Data Fetching ---
 
@@ -448,6 +489,39 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               setQuestionCount={setQuestionCount}
               noContainer
             />
+            {/* Available Count Badge */}
+            {subject && (
+              <div className="mt-4 flex items-center gap-2">
+                {isCountLoading ? (
+                  <span className="text-xs text-neutral-400 animate-pulse">
+                    গণনা হচ্ছে...
+                  </span>
+                ) : availableCount !== null ? (
+                  <>
+                    <span
+                      className={cn(
+                        'text-xs font-bold px-2.5 py-1 rounded-lg',
+                        availableCount >= questionCount
+                          ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
+                          : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',
+                      )}
+                    >
+                      ডাটাবেসে আছে: {availableCount} টি
+                    </span>
+                    {availableCount < questionCount && availableCount > 0 && (
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                        ⚠ চাহিদার চেয়ে কম — {availableCount} টি পাবেন
+                      </span>
+                    )}
+                    {availableCount === 0 && (
+                      <span className="text-[10px] text-red-600 dark:text-red-400 font-medium">
+                        ⚠ কোনো প্রশ্ন নেই — অন্য ফিল্টার ব্যবহার করুন
+                      </span>
+                    )}
+                  </>
+                ) : null}
+              </div>
+            )}
           </section>
           {/* Desktop Submit Button */}
           <StartExamButton className="hidden xl:block" />

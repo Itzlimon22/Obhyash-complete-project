@@ -259,6 +259,57 @@ export default function StudentRoot({
     };
   }, [currentUser?.id]);
 
+  // Resume detection: check for unfinished exam on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('obhyash_exam_draft');
+      if (!raw) return;
+
+      const draft = JSON.parse(raw);
+      const age = Date.now() - (draft.savedAt || 0);
+      const THREE_HOURS = 3 * 60 * 60 * 1000;
+
+      if (age > THREE_HOURS) {
+        localStorage.removeItem('obhyash_exam_draft');
+        return;
+      }
+
+      // How many questions were answered?
+      const answeredCount = Object.keys(draft.userAnswers || {}).length;
+      const totalCount = (draft.questions || []).length;
+
+      toast.info(
+        `আপনার একটি অসম্পন্ন পরীক্ষা আছে (${answeredCount}/${totalCount} উত্তর দেওয়া)`,
+        {
+          duration: 15000,
+          action: {
+            label: '↩ চালিয়ে যান',
+            onClick: () => {
+              try {
+                setQuestions(draft.questions || []);
+                setExamDetails(draft.examDetails || null);
+                setUserAnswers(draft.userAnswers || {});
+                setFlaggedQuestions(new Set(draft.flaggedQuestions || []));
+                if (draft.pendingConfig) {
+                  setPendingConfig(draft.pendingConfig);
+                }
+                // Resume with remaining time
+                const remainingTime = Math.max(draft.timeLeft || 60, 60); // at least 1 min
+                beginTimer(remainingTime);
+                toast.success('পরীক্ষা পুনরুদ্ধার হয়েছে!');
+              } catch {
+                toast.error('পরীক্ষা পুনরুদ্ধার করতে ব্যর্থ');
+                localStorage.removeItem('obhyash_exam_draft');
+              }
+            },
+          },
+        },
+      );
+    } catch {
+      localStorage.removeItem('obhyash_exam_draft');
+    }
+  }, []);
+
   // Navigation State
   const [isReviewingHistory, setIsReviewingHistory] = useState(false);
   const [selectedSubjectReport, setSelectedSubjectReport] = useState<
@@ -330,6 +381,32 @@ export default function StudentRoot({
       if (latestResult && currentUser) {
         handleExamComplete(latestResult);
       }
+    }
+  }, [appState]);
+
+  // Auto-save exam progress to localStorage for crash recovery
+  useEffect(() => {
+    if (
+      (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) &&
+      questions.length > 0
+    ) {
+      const draft = {
+        userAnswers,
+        flaggedQuestions: Array.from(flaggedQuestions),
+        questions,
+        examDetails,
+        timeLeft,
+        pendingConfig,
+        savedAt: Date.now(),
+      };
+      localStorage.setItem('obhyash_exam_draft', JSON.stringify(draft));
+    }
+  }, [userAnswers, flaggedQuestions, appState]);
+
+  // Clear draft when exam completes or goes back to idle
+  useEffect(() => {
+    if (appState === AppState.COMPLETED || appState === AppState.IDLE) {
+      localStorage.removeItem('obhyash_exam_draft');
     }
   }, [appState]);
 

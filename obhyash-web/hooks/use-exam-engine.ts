@@ -13,7 +13,7 @@ import {
   saveExamResult,
 } from '@/services/exam-service';
 import { evaluateOMRScript } from '../services/gemini-service';
-// import { saveExamResult } from '../services/database'; // Using direct service import now
+import { cacheQuestions, getCachedQuestions } from '@/services/question-cache';
 
 /**
  * Core hook for the Exam Engine logic.
@@ -125,37 +125,29 @@ export const useExamEngine = () => {
     setIsOmrMode(false);
     setSelectedScript(null);
 
-    try {
-      const generatedQuestions = await fetchQuestions(config);
-
-      if (!generatedQuestions || generatedQuestions.length === 0) {
-        setAppState(AppState.IDLE);
-        throw new Error(
-          'No questions found for the selected criteria. Please try different topics.',
-        );
-      }
-
-      setQuestions(generatedQuestions);
+    /** Helper: set up exam state from a question array (used by both fetch & cache paths) */
+    const setupExamFromQuestions = (
+      qs: Question[],
+      cfg: ExamConfig,
+    ): boolean => {
+      setQuestions(qs);
       setExamDetails({
-        subject: config.subject,
-        subjectLabel: config.subjectLabel,
-        examType: config.examType,
-        chapters: config.chapters,
-        topics: config.topics,
-        totalQuestions: generatedQuestions.length,
-        durationMinutes: config.durationMinutes,
-        totalMarks: generatedQuestions.reduce(
-          (acc, q) => acc + (q.points || 0),
-          0,
-        ),
-        negativeMarking: config.negativeMarking,
+        subject: cfg.subject,
+        subjectLabel: cfg.subjectLabel,
+        examType: cfg.examType,
+        chapters: cfg.chapters,
+        topics: cfg.topics,
+        totalQuestions: qs.length,
+        durationMinutes: cfg.durationMinutes,
+        totalMarks: qs.reduce((acc, q) => acc + (q.points || 0), 0),
+        negativeMarking: cfg.negativeMarking,
       });
       setUserAnswers({});
       setFlaggedQuestions(new Set());
       setAppState(AppState.INSTRUCTIONS);
 
-      // --- DB SYNC: START SESSION ---
-      initiateExamSession(config, generatedQuestions).then((sid) => {
+      // DB sync (fire and forget)
+      initiateExamSession(cfg, qs).then((sid) => {
         if (sid) {
           console.log('✅ Exam Session Initiated:', sid);
           setDbSessionId(sid);
@@ -166,6 +158,37 @@ export const useExamEngine = () => {
         }
       });
       return true;
+    };
+
+    try {
+      const generatedQuestions = await fetchQuestions(config);
+
+      if (!generatedQuestions || generatedQuestions.length === 0) {
+        // Try offline cache as fallback
+        const chaptersArr =
+          config.chapters && config.chapters !== 'All'
+            ? config.chapters.split(',').map((c) => c.trim())
+            : null;
+        const cached = getCachedQuestions(config.subject, chaptersArr);
+        if (cached && cached.length > 0) {
+          console.log('📦 Using cached questions (offline fallback)');
+          return setupExamFromQuestions(cached, config);
+        }
+
+        setAppState(AppState.IDLE);
+        throw new Error(
+          'No questions found for the selected criteria. Please try different topics.',
+        );
+      }
+
+      // Cache for offline use
+      const chaptersArr =
+        config.chapters && config.chapters !== 'All'
+          ? config.chapters.split(',').map((c) => c.trim())
+          : null;
+      cacheQuestions(config.subject, generatedQuestions, chaptersArr);
+
+      return setupExamFromQuestions(generatedQuestions, config);
     } catch (e: unknown) {
       console.error(e);
       let msg = 'Failed to load questions from database.';
@@ -178,6 +201,17 @@ export const useExamEngine = () => {
         setAppState(AppState.IDLE);
         // We re-throw so the UI component can toast/alert
         throw e;
+      }
+
+      // Try offline cache on network failure
+      const chaptersArr =
+        config.chapters && config.chapters !== 'All'
+          ? config.chapters.split(',').map((c) => c.trim())
+          : null;
+      const cached = getCachedQuestions(config.subject, chaptersArr);
+      if (cached && cached.length > 0) {
+        console.log('📦 Network error — using cached questions');
+        return setupExamFromQuestions(cached, config);
       }
 
       setErrorDetails(msg);

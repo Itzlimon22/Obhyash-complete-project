@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
-import { printQuestionPaper, printOMRSheet } from '@/services/print-service'; // Added printOMRSheet
+import { printQuestionPaper, printOMRSheet } from '@/services/print-service';
 import { getSubjectMetadata, SubjectMetadata } from '@/services/database';
+import { getAvailableQuestionCount } from '@/services/exam-service';
 import {
   EXAM_TYPE_OPTIONS,
   DIFFICULTY_OPTIONS,
@@ -27,6 +28,7 @@ import {
   Download,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../../../ui/alert';
+import SelectionModal from '@/components/student/ui/common/SelectionModal';
 
 interface ExamSetupFormProps {
   onStartExam: (config: ExamConfig) => void;
@@ -80,6 +82,10 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const [isOmrModalOpen, setIsOmrModalOpen] = useState(false);
   const [omrCount, setOmrCount] = useState(50);
   const [omrIsBlank, setOmrIsBlank] = useState(false);
+
+  // Available question count
+  const [availableCount, setAvailableCount] = useState<number | null>(null);
+  const [isCountLoading, setIsCountLoading] = useState(false);
 
   // --- Effects ---
 
@@ -152,6 +158,35 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       setTopicOptions([]);
     }
   }, [selectedChapters, metadata]);
+
+  // Fetch available question count when subject/chapters/difficulty change
+  useEffect(() => {
+    if (!subject) {
+      setAvailableCount(null);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsCountLoading(true);
+      const subjectLabel =
+        availableSubjects.find((s) => s.id === subject)?.name || subject;
+      const chapters = selectedChapters.length > 0 ? selectedChapters : null;
+      const difficultyValue =
+        difficulties.length === DIFFICULTY_OPTIONS.length
+          ? null
+          : difficulties.join('+');
+      const count = await getAvailableQuestionCount(
+        subject,
+        subjectLabel,
+        chapters,
+        difficultyValue,
+      );
+      setAvailableCount(count);
+      setIsCountLoading(false);
+    }, 400); // debounce
+
+    return () => clearTimeout(timer);
+  }, [subject, selectedChapters, difficulties, availableSubjects]);
 
   // --- Handlers ---
 
@@ -591,6 +626,35 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 <span>1</span>
                 <span>100</span>
               </div>
+
+              {/* Available Count Badge */}
+              {subject && (
+                <div className="mt-3 flex items-center gap-2">
+                  {isCountLoading ? (
+                    <span className="text-xs text-neutral-400 animate-pulse">
+                      গণনা হচ্ছে...
+                    </span>
+                  ) : availableCount !== null ? (
+                    <>
+                      <span
+                        className={cn(
+                          'text-xs font-bold px-2.5 py-1 rounded-lg',
+                          availableCount >= questionCount
+                            ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
+                            : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',
+                        )}
+                      >
+                        ডাটাবেসে আছে: {availableCount} টি
+                      </span>
+                      {availableCount < questionCount && (
+                        <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                          ⚠ চাহিদার চেয়ে কম — {availableCount} টি পাবেন
+                        </span>
+                      )}
+                    </>
+                  ) : null}
+                </div>
+              )}
             </div>
 
             {/* Duration */}
@@ -667,219 +731,28 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       </form>
 
       {/* Chapter Selection Modal */}
-      {isChapterModalOpen && (
-        <div
-          className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-md animate-in fade-in"
-          onClick={() => setIsChapterModalOpen(false)}
-        >
-          <div
-            className="bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl max-w-md w-full max-h-[85vh] flex flex-col border border-neutral-200 dark:border-neutral-800 animate-in slide-in-from-bottom-5 zoom-in-95 duration-300"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="p-6 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-neutral-50/50 dark:bg-neutral-900/50 rounded-t-3xl">
-              <div>
-                <h3 className="text-xl font-extrabold text-neutral-900 dark:text-white">
-                  অধ্যায় নির্বাচন
-                </h3>
-                <p className="text-xs font-medium text-neutral-500 mt-1">
-                  {selectedChapters.length} টি নির্বাচিত
-                </p>
-              </div>
-              <button
-                onClick={() => setIsChapterModalOpen(false)}
-                className="p-2 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5 text-neutral-500" />
-              </button>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="flex gap-4 p-3 border-b border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 sticky top-0 z-10">
-              <button
-                onClick={() => setSelectedChapters([...chapterOptions])}
-                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 px-3 py-1.5 rounded-lg transition-colors"
-              >
-                সবগুলো সিলেক্ট
-              </button>
-              <div className="w-px bg-neutral-200 dark:bg-neutral-800 h-6 my-auto"></div>
-              <button
-                onClick={() => setSelectedChapters([])}
-                className="text-xs font-bold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 px-3 py-1.5 rounded-lg transition-colors"
-              >
-                মুছে ফেলুন
-              </button>
-            </div>
-
-            {/* List */}
-            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-              {chapterOptions.length === 0 ? (
-                <div className="text-center text-neutral-400 py-12 text-sm flex flex-col items-center gap-2">
-                  <AlertTriangle className="w-8 h-8 opacity-50" />
-                  কোন অধ্যায় পাওয়া যায়নি
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {chapterOptions.map((chapter) => {
-                    const isSelected = selectedChapters.includes(chapter);
-                    return (
-                      <div
-                        key={chapter}
-                        onClick={() => toggleChapterSelection(chapter)}
-                        className={cn(
-                          'flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all duration-200 group',
-                          isSelected
-                            ? 'bg-indigo-50 dark:bg-indigo-900/20 ring-1 ring-indigo-500/20 shadow-sm'
-                            : 'hover:bg-neutral-50 dark:hover:bg-neutral-800 border border-transparent',
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            'w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all duration-300',
-                            isSelected
-                              ? 'bg-indigo-600 border-indigo-600 scale-100'
-                              : 'border-neutral-300 dark:border-neutral-600 bg-transparent group-hover:border-indigo-400',
-                          )}
-                        >
-                          {isSelected && (
-                            <CheckSquare className="w-4 h-4 text-white" />
-                          )}
-                        </div>
-                        <span
-                          className={cn(
-                            'text-sm font-semibold leading-snug',
-                            isSelected
-                              ? 'text-indigo-900 dark:text-indigo-100'
-                              : 'text-neutral-700 dark:text-neutral-300',
-                          )}
-                        >
-                          {chapter}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="p-6 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 rounded-b-3xl">
-              <button
-                onClick={() => setIsChapterModalOpen(false)}
-                className="w-full py-4 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 font-bold text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-              >
-                সম্পন্ন করুন
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SelectionModal
+        isOpen={isChapterModalOpen}
+        onClose={() => setIsChapterModalOpen(false)}
+        title="অধ্যায় নির্বাচন"
+        items={chapterOptions}
+        selectedItems={selectedChapters}
+        onToggle={toggleChapterSelection}
+        onSelectAll={() => setSelectedChapters([...chapterOptions])}
+        onClearAll={() => setSelectedChapters([])}
+      />
 
       {/* Topic Selection Modal */}
-      {/* Similar design update for Topic Modal */}
-      {isTopicModalOpen && (
-        <div
-          className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-md animate-in fade-in"
-          onClick={() => setIsTopicModalOpen(false)}
-        >
-          <div
-            className="bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl max-w-md w-full max-h-[85vh] flex flex-col border border-neutral-200 dark:border-neutral-800 animate-in slide-in-from-bottom-5 zoom-in-95 duration-300"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-6 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-neutral-50/50 dark:bg-neutral-900/50 rounded-t-3xl">
-              <div>
-                <h3 className="text-xl font-extrabold text-neutral-900 dark:text-white">
-                  টপিক নির্বাচন
-                </h3>
-                <p className="text-xs font-medium text-neutral-500 mt-1">
-                  {selectedTopics.length} টি নির্বাচিত
-                </p>
-              </div>
-              <button
-                onClick={() => setIsTopicModalOpen(false)}
-                className="p-2 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5 text-neutral-500" />
-              </button>
-            </div>
-
-            <div className="flex gap-4 p-3 border-b border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 sticky top-0 z-10">
-              <button
-                onClick={() => setSelectedTopics([...topicOptions])}
-                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 px-3 py-1.5 rounded-lg transition-colors"
-              >
-                সবগুলো সিলেক্ট
-              </button>
-              <div className="w-px bg-neutral-200 dark:bg-neutral-800 h-6 my-auto"></div>
-              <button
-                onClick={() => setSelectedTopics([])}
-                className="text-xs font-bold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 px-3 py-1.5 rounded-lg transition-colors"
-              >
-                মুছে ফেলুন
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-              {topicOptions.length === 0 ? (
-                <div className="text-center text-neutral-400 py-12 text-sm flex flex-col items-center gap-2">
-                  <AlertTriangle className="w-8 h-8 opacity-50" />
-                  কোন টপিক পাওয়া যায়নি
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {topicOptions.map((topic) => {
-                    const isSelected = selectedTopics.includes(topic);
-                    return (
-                      <div
-                        key={topic}
-                        onClick={() => toggleTopicSelection(topic)}
-                        className={cn(
-                          'flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all duration-200 group',
-                          isSelected
-                            ? 'bg-indigo-50 dark:bg-indigo-900/20 ring-1 ring-indigo-500/20 shadow-sm'
-                            : 'hover:bg-neutral-50 dark:hover:bg-neutral-800 border border-transparent',
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            'w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all duration-300',
-                            isSelected
-                              ? 'bg-indigo-600 border-indigo-600 scale-100'
-                              : 'border-neutral-300 dark:border-neutral-600 bg-transparent group-hover:border-indigo-400',
-                          )}
-                        >
-                          {isSelected && (
-                            <CheckSquare className="w-4 h-4 text-white" />
-                          )}
-                        </div>
-                        <span
-                          className={cn(
-                            'text-sm font-semibold leading-snug',
-                            isSelected
-                              ? 'text-indigo-900 dark:text-indigo-100'
-                              : 'text-neutral-700 dark:text-neutral-300',
-                          )}
-                        >
-                          {topic}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            <div className="p-6 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 rounded-b-3xl">
-              <button
-                onClick={() => setIsTopicModalOpen(false)}
-                className="w-full py-4 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 font-bold text-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-              >
-                সম্পন্ন করুন
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SelectionModal
+        isOpen={isTopicModalOpen}
+        onClose={() => setIsTopicModalOpen(false)}
+        title="টপিক নির্বাচন"
+        items={topicOptions}
+        selectedItems={selectedTopics}
+        onToggle={toggleTopicSelection}
+        onSelectAll={() => setSelectedTopics([...topicOptions])}
+        onClearAll={() => setSelectedTopics([])}
+      />
 
       {/* OMR Modal (Restored & Fixed Layout) */}
       {isOmrModalOpen && (
