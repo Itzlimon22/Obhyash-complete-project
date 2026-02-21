@@ -246,8 +246,16 @@ export default function BulkUploadDialog({
             'Explanation Image',
           ]),
 
-          difficulty: findValue(row, ['difficulty', 'Difficulty']) || 'Medium',
-          examType: findValue(row, ['examType', 'Exam Type']) || 'Academic',
+          difficulty: (findValue(row, ['difficulty', 'Difficulty']) || 'Medium')
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
+            .join(','),
+          examType: (findValue(row, ['examType', 'Exam Type']) || 'Academic')
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
+            .join(','),
           institute: findValue(row, ['institute', 'Institute']),
           institutes: findValue(row, ['institute', 'Institute'])
             .split(',')

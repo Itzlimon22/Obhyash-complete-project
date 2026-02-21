@@ -17,9 +17,12 @@ import {
   CheckSquare,
   Square,
   FileUp,
+  ImageIcon,
 } from 'lucide-react';
 import { Question } from '@/lib/types';
 import { MathText } from './shared';
+import { MathRenderer } from '@/components/common/MathRenderer';
+import { ImageUploader } from '@/components/ui/image-uploader';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { hscSubjects } from '@/lib/data/hsc';
@@ -68,8 +71,16 @@ function normalizeRawRow(
   q.division = raw['division'] || raw['section'] || '';
   q.section = raw['section'] || ''; // Keep section for backward compat if needed, or leave empty if we strictly switch.
   q.explanation = raw['explanation'] || '';
-  q.difficulty = (raw['difficulty'] as 'Easy' | 'Medium' | 'Hard') || 'Medium';
-  q.examType = raw['examType'] || raw['exam_type'] || 'Academic';
+  q.difficulty = ((raw['difficulty'] || 'Medium') as string)
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join(',') as 'Easy' | 'Medium' | 'Hard' | 'Mixed';
+  q.examType = (raw['examType'] || raw['exam_type'] || 'Academic')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join(',');
 
   // Institutes & Years (comma separated)
   if (raw['institute'] || raw['institutes']) {
@@ -374,74 +385,25 @@ const EditModal: React.FC<{
 
   return (
     <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-[100] p-0 sm:p-4">
-      <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 max-w-xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col">
-        <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center">
+      <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col">
+        <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-white sticky top-0 z-10">
           <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
             প্রশ্ন সম্পাদনা
           </h3>
           <button
             onClick={onCancel}
-            className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
+            className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg text-neutral-500"
           >
             <X size={20} />
           </button>
         </div>
 
-        <div className="p-5 space-y-4 overflow-y-auto custom-scrollbar flex-1">
-          {/* Question */}
-          <div>
-            <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
-              প্রশ্ন
-            </label>
-            <textarea
-              value={data.question || ''}
-              onChange={(e) => onChange({ ...data, question: e.target.value })}
-              className="w-full p-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none"
-              rows={3}
-            />
-          </div>
-
-          {/* Options */}
-          <div>
-            <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
-              অপশনসমূহ (সঠিক উত্তরে ক্লিক করুন)
-            </label>
-            <div className="space-y-2">
-              {(data.options || []).map((opt, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      onChange({
-                        ...data,
-                        correctAnswerIndex: i,
-                        correctAnswer: data.options?.[i] || '',
-                        correctAnswerIndices: [i],
-                      })
-                    }
-                    className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center font-mono text-xs font-bold border transition-all ${
-                      data.correctAnswerIndex === i
-                        ? 'bg-emerald-500 text-white border-emerald-500'
-                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 border-neutral-200 dark:border-neutral-700 hover:border-emerald-400'
-                    }`}
-                  >
-                    {String.fromCharCode(65 + i)}
-                  </button>
-                  <input
-                    value={opt}
-                    onChange={(e) => updateOption(i, e.target.value)}
-                    className="flex-1 p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Metadata */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {/* Subject Dropdown */}
-            <div>
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+        <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1 bg-white">
+          {/* Metadata & Hierarchy */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 bg-neutral-50 rounded-xl border border-neutral-100">
+            {/* Subject */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
                 বিষয়
               </label>
               <select
@@ -454,7 +416,7 @@ const EditModal: React.FC<{
                     topic: '',
                   })
                 }
-                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
+                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
               >
                 <option value="">নির্বাচন করুন</option>
                 {availableSubjects.map((s) => (
@@ -465,9 +427,9 @@ const EditModal: React.FC<{
               </select>
             </div>
 
-            {/* Chapter Dropdown */}
-            <div>
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+            {/* Chapter */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
                 অধ্যায়
               </label>
               <select
@@ -476,7 +438,7 @@ const EditModal: React.FC<{
                   onChange({ ...data, chapter: e.target.value, topic: '' })
                 }
                 disabled={!data.subject}
-                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm disabled:opacity-50"
+                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm disabled:opacity-50"
               >
                 <option value="">নির্বাচন করুন</option>
                 {availableChapters.map((c) => (
@@ -487,16 +449,16 @@ const EditModal: React.FC<{
               </select>
             </div>
 
-            {/* Topic Dropdown */}
-            <div>
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+            {/* Topic */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
                 টপিক
               </label>
               <select
                 value={data.topic || ''}
                 onChange={(e) => onChange({ ...data, topic: e.target.value })}
                 disabled={!data.chapter}
-                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm disabled:opacity-50"
+                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm disabled:opacity-50"
               >
                 <option value="">নির্বাচন করুন</option>
                 {availableTopics.map((t) => (
@@ -507,10 +469,10 @@ const EditModal: React.FC<{
               </select>
             </div>
 
-            {/* Difficulty Dropdown */}
-            <div>
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
-                কঠিন্য
+            {/* Difficulty */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                কাঠিন্য মাত্রা
               </label>
               <select
                 value={data.difficulty || 'Medium'}
@@ -520,7 +482,7 @@ const EditModal: React.FC<{
                     difficulty: e.target.value as 'Easy' | 'Medium' | 'Hard',
                   })
                 }
-                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
+                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
               >
                 <option>Easy</option>
                 <option>Medium</option>
@@ -529,20 +491,34 @@ const EditModal: React.FC<{
             </div>
 
             {/* Stream */}
-            <div>
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
-                স্ট্রিম
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                স্ট্রিম (Stream)
               </label>
               <input
                 value={data.stream || ''}
                 onChange={(e) => onChange({ ...data, stream: e.target.value })}
-                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
+                placeholder="e.g. HSC"
+                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
+              />
+            </div>
+
+            {/* Section */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                বিভাগ (Section)
+              </label>
+              <input
+                value={data.section || data.division || ''}
+                onChange={(e) => onChange({ ...data, section: e.target.value })}
+                placeholder="e.g. Science"
+                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
               />
             </div>
 
             {/* Exam Type */}
-            <div>
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
                 পরীক্ষার ধরন
               </label>
               <input
@@ -550,59 +526,227 @@ const EditModal: React.FC<{
                 onChange={(e) =>
                   onChange({ ...data, examType: e.target.value })
                 }
-                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
-              />
-            </div>
-
-            {/* Institute */}
-            <div>
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
-                প্রতিষ্ঠান
-              </label>
-              <input
-                value={data.institute || ''}
-                onChange={(e) =>
-                  onChange({ ...data, institute: e.target.value })
-                }
-                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
+                placeholder="e.g. Medical,Varsity"
+                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
               />
             </div>
 
             {/* Year */}
-            <div>
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
                 বছর
               </label>
               <input
                 value={data.year || ''}
                 onChange={(e) => onChange({ ...data, year: e.target.value })}
-                className="w-full p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm"
+                placeholder="e.g. 2023"
+                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
+              />
+            </div>
+
+            {/* Institute */}
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
+                প্রতিষ্ঠান (Institute)
+              </label>
+              <input
+                value={data.institute || data.institutes?.join(',') || ''}
+                onChange={(e) =>
+                  onChange({ ...data, institute: e.target.value })
+                }
+                placeholder="e.g. Buet,Ruet,DMC"
+                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
               />
             </div>
           </div>
 
-          {/* Explanation */}
-          <div>
-            <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
-              ব্যাখ্যা
-            </label>
-            <textarea
-              value={data.explanation || ''}
-              onChange={(e) =>
-                onChange({ ...data, explanation: e.target.value })
-              }
-              className="w-full p-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
-              rows={3}
-            />
+          {/* Core Content */}
+          <div className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Question */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-end">
+                  <label className="text-sm font-bold text-neutral-700 block">
+                    প্রশ্ন
+                  </label>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-blue-50 text-blue-600 font-semibold border border-blue-100">
+                    LaTeX Supported ($...$)
+                  </span>
+                </div>
+                <textarea
+                  value={data.question || ''}
+                  onChange={(e) =>
+                    onChange({ ...data, question: e.target.value })
+                  }
+                  className="w-full p-3 rounded-xl border border-neutral-200 bg-neutral-50 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                  rows={4}
+                  placeholder="প্রশ্নের বিবরণ লিখুন..."
+                />
+
+                {data.question && (
+                  <div className="p-4 bg-neutral-50 border border-neutral-100 rounded-xl min-h-[60px]">
+                    <span className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold mb-2 block">
+                      প্রিভিউ
+                    </span>
+                    <MathRenderer text={data.question} />
+                  </div>
+                )}
+
+                <div className="pt-2">
+                  <label className="text-sm font-bold text-neutral-700 block mb-2">
+                    প্রশ্নের ছবি (ঐচ্ছিক)
+                  </label>
+                  <div className="inline-block">
+                    <ImageUploader
+                      folder="questions"
+                      defaultValue={data.imageUrl}
+                      onUploadComplete={(url) => {
+                        onChange({ ...data, imageUrl: url });
+                      }}
+                    />
+                  </div>
+                  {data.imageUrl && (
+                    <div className="relative mt-2 w-full h-32 border rounded-xl overflow-hidden bg-neutral-100 group">
+                      <img
+                        src={data.imageUrl}
+                        alt="Question"
+                        className="w-full h-full object-contain"
+                      />
+                      <button
+                        onClick={() =>
+                          onChange({ ...data, imageUrl: undefined })
+                        }
+                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Options */}
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-neutral-700 block mb-3">
+                  অপশনসমূহ
+                  <span className="text-xs font-normal text-neutral-500 ml-2">
+                    (সঠিক উত্তরে ক্লিক করুন)
+                  </span>
+                </label>
+                <div className="grid grid-cols-1 gap-3">
+                  {(data.options || []).map((opt, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col gap-1 p-3 rounded-xl border border-neutral-100 bg-neutral-50"
+                    >
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onChange({
+                              ...data,
+                              correctAnswerIndex: i,
+                              correctAnswer: data.options?.[i] || '',
+                              correctAnswerIndices: [i],
+                            })
+                          }
+                          className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center font-mono text-sm font-bold transition-all ${
+                            data.correctAnswerIndex === i
+                              ? 'bg-emerald-500 text-white border-emerald-500 ring-2 ring-emerald-500/20'
+                              : 'bg-white text-neutral-500 border-neutral-300 hover:border-emerald-400 border'
+                          }`}
+                        >
+                          {String.fromCharCode(65 + i)}
+                        </button>
+                        <input
+                          value={opt}
+                          onChange={(e) => updateOption(i, e.target.value)}
+                          placeholder={`Option ${String.fromCharCode(65 + i)}`}
+                          className={`flex-1 p-2 rounded-lg border text-sm transition-all outline-none ${
+                            data.correctAnswerIndex === i
+                              ? 'border-emerald-300 bg-emerald-50 focus:ring-1 focus:ring-emerald-500'
+                              : 'border-neutral-200 bg-white focus:ring-1 focus:ring-emerald-500'
+                          }`}
+                        />
+                      </div>
+
+                      {/* Option Math Preview */}
+                      {opt && (
+                        <div className="ml-10 mt-1 pb-1 text-xs text-neutral-700">
+                          <MathRenderer text={opt} />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Explanation */}
+            <div className="mt-6 space-y-2">
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-bold text-neutral-700 block">
+                  ব্যাখ্যা / সমাধান
+                </label>
+                <div className="inline-block scale-90 origin-right">
+                  <ImageUploader
+                    folder="explanations"
+                    defaultValue={data.explanationImageUrl}
+                    onUploadComplete={(url) => {
+                      onChange({ ...data, explanationImageUrl: url });
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Explanation Image Preview */}
+              {data.explanationImageUrl && (
+                <div className="relative w-full md:w-1/2 h-32 border rounded-xl overflow-hidden bg-neutral-100 group mb-3">
+                  <img
+                    src={data.explanationImageUrl}
+                    alt="Explanation"
+                    className="w-full h-full object-contain"
+                  />
+                  <button
+                    onClick={() =>
+                      onChange({ ...data, explanationImageUrl: undefined })
+                    }
+                    className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              )}
+
+              <textarea
+                value={data.explanation || ''}
+                onChange={(e) =>
+                  onChange({ ...data, explanation: e.target.value })
+                }
+                className="w-full p-3 rounded-xl border border-neutral-200 bg-neutral-50 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                rows={3}
+                placeholder="সঠিক উত্তরের ব্যাখ্যা লিখুন..."
+              />
+
+              {data.explanation && (
+                <div className="p-4 bg-neutral-50 border border-neutral-100 rounded-xl min-h-[60px]">
+                  <span className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold mb-2 block">
+                    সমাধান প্রিভিউ
+                  </span>
+                  <MathRenderer text={data.explanation} />
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="p-4 bg-neutral-50 dark:bg-neutral-950 flex gap-3 border-t border-neutral-100 dark:border-neutral-800">
+        {/* Footer Actions */}
+        <div className="p-5 bg-neutral-50 border-t border-neutral-100 flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 text-sm font-bold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors"
+            className="flex-1 py-3 text-sm font-bold text-neutral-600 hover:bg-neutral-200 rounded-xl transition-colors"
           >
-            বাতিল
+            বাতিল করুন
           </button>
           <button
             onClick={onSave}
