@@ -154,8 +154,8 @@ export const QuestionList: React.FC<QuestionListProps> = ({
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden lg:block bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
+      <div className="hidden lg:block bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-sm w-full max-w-full overflow-hidden">
+        <div className="overflow-x-auto w-full">
           <table className="w-full min-w-[1000px] text-left border-collapse">
             <thead>
               <tr className="bg-neutral-50 dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 text-xs uppercase tracking-wider text-neutral-500 dark:text-neutral-400 font-semibold">

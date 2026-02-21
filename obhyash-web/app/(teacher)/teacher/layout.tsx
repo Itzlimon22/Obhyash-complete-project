@@ -15,7 +15,7 @@ export default function TeacherLayout({
       <div className="lg:pl-72 transition-all duration-300">
         {/* Top spacer for mobile menu button */}
         <div className="h-14 lg:h-0" />
-        <main className="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto">
+        <main className="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto min-w-0 w-full overflow-x-hidden">
           {children}
         </main>
       </div>

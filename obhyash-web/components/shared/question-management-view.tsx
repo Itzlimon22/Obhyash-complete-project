@@ -119,7 +119,7 @@ export default function QuestionManagementView({
   };
 
   return (
-    <div className="space-y-6 animate-fade-in pb-20">
+    <div className="space-y-6 animate-fade-in pb-20 w-full max-w-full box-border">
       {/* List View */}
       {viewMode === 'list' && (
         <>

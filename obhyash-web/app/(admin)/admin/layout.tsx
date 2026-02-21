@@ -61,7 +61,7 @@ export default function AdminLayout({
 
         {/* 4. The Page Content */}
         <main
-          className={`flex-1 p-6 overflow-x-hidden ${isMobile ? 'pb-24' : ''}`}
+          className={`flex-1 min-w-0 p-6 overflow-x-hidden ${isMobile ? 'pb-24' : ''}`}
         >
           {children}
         </main>
