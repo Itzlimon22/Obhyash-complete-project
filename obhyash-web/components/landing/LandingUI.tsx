@@ -89,7 +89,7 @@ export const ExamDemo = () => {
   };
 
   return (
-    <div className="w-full bg-white dark:bg-neutral-900 border border-red-100 dark:border-neutral-800 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-6 shadow-2xl relative overflow-hidden group hover:border-indigo-500 dark:hover:border-indigo-900 transition-colors h-[320px] flex flex-col">
+    <div className="w-full bg-white dark:bg-black border border-red-100 dark:border-neutral-800 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-6 shadow-2xl relative overflow-hidden group hover:border-indigo-500 dark:hover:border-indigo-900 transition-colors h-[320px] flex flex-col">
       <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-600 to-rose-600"></div>
 
       {/* Header */}
@@ -272,9 +272,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
     <div className="min-h-screen bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-100 transition-colors font-sans selection:bg-rose-500/20">
       {/* Background Gradients - Adjusted for Reddish Theme */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-rose-500/10 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-[100px]"></div>
-        <div className="absolute top-[40%] left-[20%] w-[300px] h-[300px] bg-red-500/5 rounded-full blur-[80px]"></div>
+        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-rose-500/10 dark:bg-transparent rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-orange-500/10 dark:bg-transparent rounded-full blur-[100px]"></div>
+        <div className="absolute top-[40%] left-[20%] w-[300px] h-[300px] bg-red-500/5 dark:bg-transparent rounded-full blur-[80px]"></div>
       </div>
 
       {/* Navigation */}
@@ -451,9 +451,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Right Interactive Demo */}
           <div className="lg:w-1/2 w-full">
-            <div className="w-full relative bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-red-100 dark:border-neutral-800 shadow-2xl shadow-neutral-200/50 dark:shadow-black/50 overflow-hidden">
+            <div className="w-full relative bg-white dark:bg-black rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-red-100 dark:border-neutral-800 shadow-2xl shadow-neutral-200/50 dark:shadow-black/50 overflow-hidden">
               {/* Fake Browser Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-black">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-400"></div>
                   <div className="w-3 h-3 rounded-full bg-amber-400"></div>
@@ -508,7 +508,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                         </span>
                       </div>
                     </div>
-                    <div className="bg-white dark:bg-neutral-900 border-l-4 border-l-indigo-600 border-y border-r border-neutral-100 dark:border-y-neutral-800 dark:border-r-neutral-800 rounded-r-xl shadow-sm p-5">
+                    <div className="bg-white dark:bg-black border-l-4 border-l-indigo-600 border-y border-r border-neutral-100 dark:border-y-neutral-800 dark:border-r-neutral-800 rounded-r-xl shadow-sm p-5">
                       <div className="flex justify-between mb-4">
                         <span className="text-xs font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 px-2 py-0.5 rounded">
                           Question Demo
@@ -638,7 +638,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
           {/* Card 1: AI Exam */}
-          <div className="lg:col-span-3 p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-rose-200 dark:hover:border-rose-900 transition-all">
+          <div className="lg:col-span-3 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-rose-200 dark:hover:border-rose-900 transition-all">
             <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
               Available Now
             </div>
@@ -687,7 +687,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Card 2: OMR Scanner */}
-          <div className="lg:col-span-3 p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-orange-200 dark:hover:border-orange-900 transition-all">
+          <div className="lg:col-span-3 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-orange-200 dark:hover:border-orange-900 transition-all">
             <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
               Available Now
             </div>
@@ -718,7 +718,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Card 3: Analysis */}
-          <div className="lg:col-span-2 p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-indigo-200 dark:hover:border-indigo-900 transition-all">
+          <div className="lg:col-span-2 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-indigo-200 dark:hover:border-indigo-900 transition-all">
             <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
               Available Now
             </div>
@@ -748,7 +748,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Card 4: Leaderboard */}
-          <div className="lg:col-span-2 p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-amber-200 dark:hover:border-amber-900 transition-all">
+          <div className="lg:col-span-2 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-amber-200 dark:hover:border-amber-900 transition-all">
             <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
               Available Now
             </div>
@@ -778,7 +778,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Card 5: PDF Tools */}
-          <div className="lg:col-span-2 p-8 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-purple-200 dark:hover:border-purple-900 transition-all">
+          <div className="lg:col-span-2 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-purple-200 dark:hover:border-purple-900 transition-all">
             <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
               Available Now
             </div>
@@ -907,7 +907,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 bg-neutral-50 dark:bg-neutral-900/50 border-y border-red-100 dark:border-neutral-800 relative">
+      <section className="py-20 bg-neutral-50 dark:bg-black border-y border-red-100 dark:border-neutral-800 relative">
         <div className="max-w-7xl mx-auto px-4 lg:px-6 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mt-2">
@@ -923,7 +923,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             {pricingPlans.map((plan, idx) => (
               <div
                 key={idx}
-                className={`relative bg-white dark:bg-neutral-900 rounded-3xl p-8 shadow-xl transition-all hover:-tranneutral-y-2 flex flex-col ${plan.highlight ? 'border-2 border-indigo-500 z-10 scale-105' : 'border border-red-100 dark:border-neutral-800'}`}
+                className={`relative bg-white dark:bg-black rounded-3xl p-8 shadow-xl transition-all hover:-tranneutral-y-2 flex flex-col ${plan.highlight ? 'border-2 border-indigo-500 z-10 scale-105' : 'border border-red-100 dark:border-neutral-800'}`}
               >
                 {plan.highlight && (
                   <div className="absolute top-0 left-1/2 -tranneutral-x-1/2 -tranneutral-y-1/2 bg-indigo-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">
@@ -991,7 +991,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             return (
               <div
                 key={idx}
-                className={`bg-white dark:bg-neutral-900 rounded-2xl border transition-all duration-300 overflow-hidden ${isOpen ? 'border-indigo-500 shadow-md ring-1 ring-indigo-500/10' : 'border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md'}`}
+                className={`bg-white dark:bg-black rounded-2xl border transition-all duration-300 overflow-hidden ${isOpen ? 'border-indigo-500 shadow-md ring-1 ring-indigo-500/10' : 'border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md'}`}
               >
                 <button
                   onClick={() => setOpenFaq(isOpen ? null : idx)}
@@ -1038,7 +1038,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-rose-50/50 dark:bg-neutral-900/30 border-y border-red-100 dark:border-neutral-800">
+      <section className="py-20 bg-rose-50/50 dark:bg-black border-y border-red-100 dark:border-neutral-800">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-neutral-900 dark:text-white font-serif-exam">
@@ -1052,7 +1052,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             {testimonials.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-white dark:bg-neutral-900 p-8 rounded-3xl border border-red-100 dark:border-neutral-800 shadow-sm relative hover:-tranneutral-y-1 transition-transform duration-300"
+                className="bg-white dark:bg-black p-8 rounded-3xl border border-red-100 dark:border-neutral-800 shadow-sm relative hover:-tranneutral-y-1 transition-transform duration-300"
               >
                 <div className="absolute top-8 right-8 text-neutral-200 dark:text-neutral-800">
                   <svg
@@ -1171,7 +1171,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     support@zenith.edu.bd
                   </p>
                 </div>
-                <div className="bg-neutral-100 dark:bg-neutral-900 rounded-lg p-3 border border-neutral-200 dark:border-neutral-800 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                <div className="bg-neutral-100 dark:bg-black rounded-lg p-3 border border-neutral-200 dark:border-neutral-800 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
                   <strong className="block text-neutral-900 dark:text-white mb-1">
                     হেড অফিস:
                   </strong>

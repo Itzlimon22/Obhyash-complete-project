@@ -74,6 +74,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
   const [activeDemoTab, setActiveDemoTab] = useState<
     'generate' | 'omr' | 'analytics'
   >('generate');
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   // --- Interactive Demo Logic ---
   const [demoQIndex, setDemoQIndex] = useState(0);
@@ -247,9 +248,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
     <div className="min-h-screen bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-100 transition-colors font-sans selection:bg-rose-500/20">
       {/* Background Gradients */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-rose-500/10 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-[100px]"></div>
-        <div className="absolute top-[40%] left-[20%] w-[300px] h-[300px] bg-red-500/5 rounded-full blur-[80px]"></div>
+        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-rose-500/10 dark:bg-transparent rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-orange-500/10 dark:bg-transparent rounded-full blur-[100px]"></div>
+        <div className="absolute top-[40%] left-[20%] w-[300px] h-[300px] bg-red-500/5 dark:bg-transparent rounded-full blur-[80px]"></div>
       </div>
 
       {/* Navigation */}
@@ -405,9 +406,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Right Interactive Demo */}
           <div className="lg:w-1/2 w-full perspective-1000">
-            <div className="w-full relative bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-red-100 dark:border-neutral-800 shadow-2xl shadow-neutral-200/50 dark:shadow-black/50 overflow-hidden transform rotate-y-2 hover:rotate-y-0 transition-transform duration-500">
+            <div className="w-full relative bg-white dark:bg-black rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-red-100 dark:border-neutral-800 shadow-2xl shadow-neutral-200/50 dark:shadow-black/50 overflow-hidden transform rotate-y-2 hover:rotate-y-0 transition-transform duration-500">
               {/* Fake Browser Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-black/50">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-400"></div>
                   <div className="w-3 h-3 rounded-full bg-amber-400"></div>
@@ -539,7 +540,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* 2. Stats Banner */}
-      <section className="py-10 border-y border-indigo-50 dark:border-neutral-800 bg-white/50 dark:bg-black/90 backdrop-blur-sm">
+      <section className="py-10 border-y border-indigo-50 dark:border-neutral-800 bg-white/50 dark:bg-black backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-neutral-200 dark:divide-neutral-800">
             <div className="space-y-1">
@@ -602,7 +603,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
           <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-8 -mx-4 px-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:pb-0 md:mx-0 md:px-0 no-scrollbar">
             {/* Smart Analytics */}
-            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-rose-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-rose-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
               <div className="w-16 h-16 md:w-14 md:h-14 bg-rose-50 dark:bg-rose-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                 <BarChart3 className="w-8 h-8 md:w-7 md:h-7 text-rose-600" />
               </div>
@@ -616,7 +617,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* OMR Scanning */}
-            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-orange-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
               <div className="w-16 h-16 md:w-14 md:h-14 bg-orange-50 dark:bg-orange-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                 <ScanLine className="w-8 h-8 md:w-7 md:h-7 text-orange-600" />
               </div>
@@ -630,7 +631,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* AI Question Generator */}
-            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
               <div className="w-16 h-16 md:w-14 md:h-14 bg-amber-50 dark:bg-amber-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                 <Sparkles className="w-8 h-8 md:w-7 md:h-7 text-amber-600" />
               </div>
@@ -644,7 +645,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Leaderboard */}
-            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-yellow-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-yellow-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
               <div className="w-16 h-16 md:w-14 md:h-14 bg-yellow-50 dark:bg-yellow-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                 <Trophy className="w-8 h-8 md:w-7 md:h-7 text-yellow-600" />
               </div>
@@ -658,7 +659,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Exam History */}
-            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
               <div className="w-16 h-16 md:w-14 md:h-14 bg-blue-50 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                 <History className="w-8 h-8 md:w-7 md:h-7 text-blue-600" />
               </div>
@@ -672,7 +673,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             {/* Smart Adaptive System (NEW) */}
-            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-cyan-500/10 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col items-center text-center md:items-start md:text-left">
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-cyan-500/10 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col items-center text-center md:items-start md:text-left">
               <div className="absolute top-0 right-0 px-3 py-1 bg-rose-600 text-white text-[10px] font-bold rounded-bl-xl shadow-lg z-10">
                 NEW
               </div>
@@ -748,7 +749,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* 4. How It Works - Workflow */}
-      <section className="py-24 bg-neutral-50 dark:bg-black/90 relative overflow-hidden">
+      <section className="py-24 bg-neutral-50 dark:bg-black relative overflow-hidden">
         {/* Decorative blob */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl -z-10"></div>
 
@@ -811,7 +812,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       {/* Pricing Section */}
       <section
         id="pricing"
-        className="py-20 bg-neutral-50 dark:bg-black/90 border-y border-red-100 dark:border-neutral-800"
+        className="py-20 bg-neutral-50 dark:bg-black border-y border-red-100 dark:border-neutral-800"
       >
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-16">
@@ -827,7 +828,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             {pricingPlans.map((plan, i) => (
               <div
                 key={i}
-                className={`relative bg-white dark:bg-neutral-900 rounded-2xl p-8 border transition-transform hover:-tranneutral-y-2 ${plan.color} ${plan.highlight ? 'shadow-2xl shadow-indigo-500/10 scale-105 z-10' : 'shadow-lg'}`}
+                className={`relative bg-white dark:bg-black rounded-2xl p-8 border transition-transform hover:-tranneutral-y-2 ${plan.color} ${plan.highlight ? 'shadow-2xl shadow-indigo-500/10 scale-105 z-10' : 'shadow-lg'}`}
               >
                 {plan.highlight && (
                   <div className="absolute top-0 left-1/2 -tranneutral-x-1/2 -tranneutral-y-1/2 bg-indigo-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
@@ -869,7 +870,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-rose-50/50 dark:bg-black/80 border-y border-red-100 dark:border-neutral-800">
+      <section className="py-20 bg-rose-50/50 dark:bg-black border-y border-red-100 dark:border-neutral-800">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-neutral-900 dark:text-white font-serif-exam">
@@ -883,7 +884,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             {testimonials.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-white dark:bg-neutral-900 p-8 rounded-3xl border border-red-100 dark:border-neutral-800 shadow-sm relative hover:-tranneutral-y-1 transition-transform duration-300"
+                className="bg-white dark:bg-black p-8 rounded-3xl border border-red-100 dark:border-neutral-800 shadow-sm relative hover:-tranneutral-y-1 transition-transform duration-300"
               >
                 <div className="flex items-center gap-4 mb-4">
                   <div
@@ -916,21 +917,55 @@ const LandingPage: React.FC<LandingPageProps> = ({
             সচরাচর জিজ্ঞাসিত প্রশ্ন (FAQ)
           </h2>
         </div>
-        <div className="grid gap-4">
-          {faqs.map((faq, idx) => (
-            <div
-              key={idx}
-              className="w-full bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-6 border border-red-100 dark:border-neutral-800 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <h3 className="font-bold text-lg text-neutral-900 dark:text-white mb-2 flex items-start gap-3">
-                <span className="text-indigo-500 text-xl leading-none">Q.</span>
-                {faq.q}
-              </h3>
-              <p className="text-neutral-600 dark:text-neutral-400 pl-7 leading-relaxed">
-                {faq.a}
-              </p>
-            </div>
-          ))}
+        <div className="space-y-4">
+          {faqs.map((faq, idx) => {
+            const isOpen = openFaq === idx;
+            return (
+              <div
+                key={idx}
+                className={`bg-white dark:bg-black rounded-2xl border transition-all duration-300 overflow-hidden animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 shadow-sm hover:shadow-md ${isOpen ? 'border-indigo-500 shadow-md ring-1 ring-indigo-500/10' : 'border-neutral-200 dark:border-neutral-800'}`}
+              >
+                <button
+                  onClick={() => setOpenFaq(isOpen ? null : idx)}
+                  className="w-full text-left p-6 flex items-start justify-between gap-4 group"
+                >
+                  <h3 className="font-bold text-lg text-neutral-900 dark:text-white flex items-start gap-3">
+                    <span
+                      className={`text-indigo-500 text-xl leading-none transition-transform duration-300 ${isOpen ? 'scale-110' : ''}`}
+                    >
+                      Q.
+                    </span>
+                    {faq.q}
+                  </h3>
+                  <div
+                    className={`mt-1 flex-shrink-0 w-6 h-6 rounded-full border border-neutral-200 dark:border-neutral-700 flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-indigo-500 border-indigo-500 text-white rotate-180' : 'text-neutral-400 group-hover:text-indigo-500 group-hover:border-indigo-500'}`}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2.5}
+                      stroke="currentColor"
+                      className="w-3.5 h-3.5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                      />
+                    </svg>
+                  </div>
+                </button>
+                <div
+                  className={`transition-all duration-300 ease-in-out px-6 ${isOpen ? 'max-h-[500px] pb-6 opacity-100' : 'max-h-0 pb-0 opacity-0'}`}
+                >
+                  <div className="pl-7 text-neutral-600 dark:text-neutral-400 leading-relaxed border-t border-neutral-50 dark:border-neutral-800/50 pt-4">
+                    {faq.a}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
