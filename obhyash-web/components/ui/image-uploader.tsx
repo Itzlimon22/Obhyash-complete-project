@@ -20,7 +20,8 @@ export function ImageUploader({
   folder = 'misc',
   defaultValue,
   className,
-}: ImageUploaderProps) {
+  compact = false,
+}: ImageUploaderProps & { compact?: boolean }) {
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(defaultValue || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -69,21 +70,41 @@ export function ImageUploader({
           variant="outline"
           disabled={loading}
           onClick={() => fileInputRef.current?.click()}
-          className="w-full h-24 border-dashed border-2 flex flex-col gap-2"
+          className={
+            compact
+              ? 'px-3 py-1.5 h-auto text-xs flex items-center gap-1.5'
+              : 'w-full h-24 border-dashed border-2 flex flex-col gap-2'
+          }
         >
           {loading ? (
-            <Loader2 className="h-6 w-6 animate-spin" />
+            <Loader2
+              className={
+                compact ? 'h-3 w-3 animate-spin' : 'h-6 w-6 animate-spin'
+              }
+            />
           ) : (
             <>
-              <ImagePlus className="h-6 w-6 text-neutral-400" />
-              <span className="text-xs text-neutral-500">
-                Click to upload image/PDF
-              </span>
+              <ImagePlus
+                className={
+                  compact
+                    ? 'h-3.5 w-3.5 text-neutral-500'
+                    : 'h-6 w-6 text-neutral-400'
+                }
+              />
+              {compact ? (
+                <span>ছবি যুক্ত করুন</span>
+              ) : (
+                <span className="text-xs text-neutral-500">
+                  Click to upload image/PDF
+                </span>
+              )}
             </>
           )}
         </Button>
       ) : (
-        <div className="relative w-full h-40 border rounded-lg overflow-hidden group">
+        <div
+          className={`relative w-full ${compact ? 'h-20' : 'h-40'} border rounded-lg overflow-hidden group`}
+        >
           <Image
             src={preview}
             alt="Uploaded preview"

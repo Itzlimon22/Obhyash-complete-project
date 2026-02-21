@@ -310,9 +310,10 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                 <label className="text-sm font-bold text-neutral-700 block mb-2">
                   প্রশ্নের ছবি (ঐচ্ছিক)
                 </label>
-                <div className="inline-block">
+                <div className="inline-block mt-2">
                   <ImageUploader
                     folder="questions"
+                    compact
                     defaultValue={data.imageUrl}
                     onUploadComplete={(url) => {
                       setData({ ...data, imageUrl: url });
@@ -409,6 +410,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                       <div className="shrink-0 self-start mt-0.5">
                         <ImageUploader
                           folder="options"
+                          compact
                           onUploadComplete={(url) => {
                             const newOpts = [...(data.optionImages || [])];
                             while (newOpts.length <= i) newOpts.push('');
@@ -437,9 +439,10 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
               <label className="text-sm font-bold text-neutral-700 block">
                 ব্যাখ্যা / সমাধান
               </label>
-              <div className="inline-block scale-90 origin-right">
+              <div className="inline-block origin-right">
                 <ImageUploader
                   folder="explanations"
+                  compact
                   defaultValue={data.explanationImageUrl}
                   onUploadComplete={(url) => {
                     setData({ ...data, explanationImageUrl: url });

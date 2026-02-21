@@ -596,9 +596,10 @@ const EditModal: React.FC<{
                   <label className="text-sm font-bold text-neutral-700 block mb-2">
                     প্রশ্নের ছবি (ঐচ্ছিক)
                   </label>
-                  <div className="inline-block">
+                  <div className="inline-block mt-2">
                     <ImageUploader
                       folder="questions"
+                      compact
                       defaultValue={data.imageUrl}
                       onUploadComplete={(url) => {
                         onChange({ ...data, imageUrl: url });
@@ -699,6 +700,7 @@ const EditModal: React.FC<{
                         <div className="shrink-0 self-start mt-0.5">
                           <ImageUploader
                             folder="options"
+                            compact
                             onUploadComplete={(url) => {
                               const newOpts = [...(data.optionImages || [])];
                               while (newOpts.length <= i) newOpts.push('');
@@ -727,9 +729,10 @@ const EditModal: React.FC<{
                 <label className="text-sm font-bold text-neutral-700 block">
                   ব্যাখ্যা / সমাধান
                 </label>
-                <div className="inline-block scale-90 origin-right">
+                <div className="inline-block origin-right">
                   <ImageUploader
                     folder="explanations"
+                    compact
                     defaultValue={data.explanationImageUrl}
                     onUploadComplete={(url) => {
                       onChange({ ...data, explanationImageUrl: url });
@@ -961,7 +964,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           (row: Record<string, unknown>) => {
             const mapped: Record<string, string> = {};
             Object.entries(row).forEach(([k, v]) => {
-              mapped[k] = String(v ?? '');
+              mapped[k.trim().toLowerCase()] = String(v ?? '');
             });
             return mapped;
           },
@@ -971,7 +974,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         const result = Papa.parse<Record<string, string>>(text, {
           header: true,
           skipEmptyLines: true,
-          transformHeader: (h: string) => h.trim(),
+          transformHeader: (h: string) => h.trim().toLowerCase(),
         });
         if (result.errors.length > 0) {
           console.warn('CSV parse warnings:', result.errors);
@@ -989,7 +992,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         ).map((row) => {
           const mapped: Record<string, string> = {};
           Object.entries(row).forEach(([k, v]) => {
-            mapped[k.trim()] = String(v ?? '');
+            mapped[k.trim().toLowerCase()] = String(v ?? '');
           });
           return mapped;
         });
