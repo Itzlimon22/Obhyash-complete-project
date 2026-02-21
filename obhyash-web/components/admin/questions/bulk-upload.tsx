@@ -30,6 +30,9 @@ import {
   getHscSubjectList,
   getHscChapterList,
   getHscTopicList,
+  resolveSubjectName,
+  resolveChapterName,
+  resolveTopicName,
 } from '@/lib/data/hsc-helpers';
 import { checkDuplicateQuestions } from '@/services/question-service';
 
@@ -339,207 +342,236 @@ const EditModal: React.FC<{
     onChange({ ...data, options: opts });
   };
 
-  // --- Synchronous Dropdown Data from hsc.ts (Single Source of Truth) ---
-  const availableSubjects = React.useMemo(() => getHscSubjectList(), []);
+  // ── Fix: Normalize subject/chapter/topic to canonical names on mount ──
+  // This ensures the <select> value matches an actual <option> in the list.
+  React.useEffect(() => {
+    const canonicalSubject = data.subject
+      ? resolveSubjectName(data.subject)
+      : undefined;
+    const canonicalChapter =
+      canonicalSubject && data.chapter
+        ? resolveChapterName(canonicalSubject, data.chapter)
+        : undefined;
+    const canonicalTopic =
+      canonicalChapter && data.topic
+        ? resolveTopicName(canonicalChapter, data.topic)
+        : undefined;
 
+    const needsUpdate =
+      (canonicalSubject && canonicalSubject !== data.subject) ||
+      (canonicalChapter && canonicalChapter !== data.chapter) ||
+      (canonicalTopic && canonicalTopic !== data.topic);
+
+    if (needsUpdate) {
+      onChange({
+        ...data,
+        subject: canonicalSubject ?? data.subject,
+        chapter: canonicalChapter ?? data.chapter,
+        topic: canonicalTopic ?? data.topic,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const availableSubjects = React.useMemo(() => getHscSubjectList(), []);
   const availableChapters = React.useMemo(
     () => (data.subject ? getHscChapterList(data.subject) : []),
     [data.subject],
   );
-
   const availableTopics = React.useMemo(
     () => (data.chapter ? getHscTopicList(data.chapter) : []),
     [data.chapter],
   );
 
+  const fieldCls =
+    'w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-600 transition-all';
+  const labelCls =
+    'text-[10px] font-extrabold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest mb-1 block';
+
   return (
-    <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-[100] p-0 sm:p-4">
-      <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col">
-        <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-white sticky top-0 z-10">
-          <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
-            প্রশ্ন সম্পাদনা
-          </h3>
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center z-[100] p-0 sm:p-4">
+      <div className="bg-white dark:bg-neutral-900 rounded-t-3xl sm:rounded-2xl w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl border border-neutral-200/50 dark:border-neutral-800 flex flex-col animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
+        {/* Header */}
+        <div className="flex justify-between items-center px-5 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/80 sticky top-0 z-10">
+          <div>
+            <h3 className="text-base font-extrabold text-neutral-900 dark:text-white">
+              প্রশ্ন সম্পাদনা
+            </h3>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+              সঠিক তথ্য পূরণ করে সংরক্ষণ করুন
+            </p>
+          </div>
           <button
             onClick={onCancel}
-            className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg text-neutral-500"
+            className="p-2 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-xl text-neutral-500 transition-colors active:scale-95"
           >
             <X size={20} />
           </button>
         </div>
 
-        <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1 bg-white">
-          {/* Metadata & Hierarchy */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 bg-neutral-50 rounded-xl border border-neutral-100">
-            {/* Subject */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                বিষয়
-              </label>
-              <select
-                value={data.subject || ''}
-                onChange={(e) =>
-                  onChange({
-                    ...data,
-                    subject: e.target.value,
-                    chapter: '',
-                    topic: '',
-                  })
-                }
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
-              >
-                <option value="">নির্বাচন করুন</option>
-                {availableSubjects.map((s) => (
-                  <option key={s.id} value={s.name}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+        <div className="overflow-y-auto flex-1 custom-scrollbar">
+          {/* Section: Taxonomy */}
+          <div className="px-5 py-4 border-b border-neutral-100 dark:border-neutral-800">
+            <p className="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-500 uppercase tracking-widest mb-3">
+              বিষয় বিন্যাস
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {/* Subject */}
+              <div>
+                <label className={labelCls}>বিষয়</label>
+                <select
+                  value={data.subject || ''}
+                  onChange={(e) =>
+                    onChange({
+                      ...data,
+                      subject: e.target.value,
+                      chapter: '',
+                      topic: '',
+                    })
+                  }
+                  className={fieldCls}
+                >
+                  <option value="">নির্বাচন করুন</option>
+                  {availableSubjects.map((s) => (
+                    <option key={s.id} value={s.name}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            {/* Chapter */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                অধ্যায়
-              </label>
-              <select
-                value={data.chapter || ''}
-                onChange={(e) =>
-                  onChange({ ...data, chapter: e.target.value, topic: '' })
-                }
-                disabled={!data.subject}
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm disabled:opacity-50"
-              >
-                <option value="">নির্বাচন করুন</option>
-                {availableChapters.map((c) => (
-                  <option key={c.id} value={c.name}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+              {/* Chapter */}
+              <div>
+                <label className={labelCls}>অধ্যায়</label>
+                <select
+                  value={data.chapter || ''}
+                  onChange={(e) =>
+                    onChange({ ...data, chapter: e.target.value, topic: '' })
+                  }
+                  disabled={!data.subject}
+                  className={`${fieldCls} disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  <option value="">নির্বাচন করুন</option>
+                  {availableChapters.map((c) => (
+                    <option key={c.id} value={c.name}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            {/* Topic */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                টপিক
-              </label>
-              <select
-                value={data.topic || ''}
-                onChange={(e) => onChange({ ...data, topic: e.target.value })}
-                disabled={!data.chapter}
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm disabled:opacity-50"
-              >
-                <option value="">নির্বাচন করুন</option>
-                {availableTopics.map((t) => (
-                  <option key={t.id} value={t.name}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+              {/* Topic */}
+              <div>
+                <label className={labelCls}>টপিক</label>
+                <select
+                  value={data.topic || ''}
+                  onChange={(e) => onChange({ ...data, topic: e.target.value })}
+                  disabled={!data.chapter}
+                  className={`${fieldCls} disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  <option value="">নির্বাচন করুন</option>
+                  {availableTopics.map((t) => (
+                    <option key={t.id} value={t.name}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            {/* Difficulty */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                কাঠিন্য মাত্রা
-              </label>
-              <select
-                value={data.difficulty || 'Medium'}
-                onChange={(e) =>
-                  onChange({
-                    ...data,
-                    difficulty: e.target.value as 'Easy' | 'Medium' | 'Hard',
-                  })
-                }
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
-              >
-                <option>Easy</option>
-                <option>Medium</option>
-                <option>Hard</option>
-              </select>
-            </div>
-
-            {/* Stream */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                স্ট্রিম (Stream)
-              </label>
-              <input
-                value={data.stream || ''}
-                onChange={(e) => onChange({ ...data, stream: e.target.value })}
-                placeholder="e.g. HSC"
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
-              />
-            </div>
-
-            {/* Section */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                বিভাগ (Section)
-              </label>
-              <input
-                value={data.section || data.division || ''}
-                onChange={(e) => onChange({ ...data, section: e.target.value })}
-                placeholder="e.g. Science"
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
-              />
-            </div>
-
-            {/* Exam Type */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                পরীক্ষার ধরন
-              </label>
-              <input
-                value={data.examType || ''}
-                onChange={(e) =>
-                  onChange({ ...data, examType: e.target.value })
-                }
-                placeholder="e.g. Medical,Varsity"
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
-              />
-            </div>
-
-            {/* Year */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                বছর
-              </label>
-              <input
-                value={data.year || ''}
-                onChange={(e) => onChange({ ...data, year: e.target.value })}
-                placeholder="e.g. 2023"
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
-              />
-            </div>
-
-            {/* Institute */}
-            <div className="space-y-1.5 md:col-span-2">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                প্রতিষ্ঠান (Institute)
-              </label>
-              <input
-                value={data.institute || data.institutes?.join(',') || ''}
-                onChange={(e) =>
-                  onChange({ ...data, institute: e.target.value })
-                }
-                placeholder="e.g. Buet,Ruet,DMC"
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm"
-              />
+              {/* Difficulty */}
+              <div>
+                <label className={labelCls}>কাঠিন্য</label>
+                <select
+                  value={data.difficulty || 'Medium'}
+                  onChange={(e) =>
+                    onChange({
+                      ...data,
+                      difficulty: e.target.value as 'Easy' | 'Medium' | 'Hard',
+                    })
+                  }
+                  className={fieldCls}
+                >
+                  <option>Easy</option>
+                  <option>Medium</option>
+                  <option>Hard</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          {/* Core Content */}
-          <div className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+          {/* Section: Extra Metadata */}
+          <div className="px-5 py-4 border-b border-neutral-100 dark:border-neutral-800">
+            <p className="text-[10px] font-extrabold text-neutral-500 uppercase tracking-widest mb-3">
+              অতিরিক্ত তথ্য
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div>
+                <label className={labelCls}>স্ট্রিম</label>
+                <input
+                  value={data.stream || ''}
+                  onChange={(e) =>
+                    onChange({ ...data, stream: e.target.value })
+                  }
+                  placeholder="e.g. HSC"
+                  className={fieldCls}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>বিভাগ</label>
+                <input
+                  value={data.section || data.division || ''}
+                  onChange={(e) =>
+                    onChange({ ...data, section: e.target.value })
+                  }
+                  placeholder="e.g. Science"
+                  className={fieldCls}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>পরীক্ষার ধরন</label>
+                <input
+                  value={data.examType || ''}
+                  onChange={(e) =>
+                    onChange({ ...data, examType: e.target.value })
+                  }
+                  placeholder="Medical,Varsity"
+                  className={fieldCls}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>বছর</label>
+                <input
+                  value={data.year || ''}
+                  onChange={(e) => onChange({ ...data, year: e.target.value })}
+                  placeholder="e.g. 2023"
+                  className={fieldCls}
+                />
+              </div>
+              <div className="col-span-2">
+                <label className={labelCls}>প্রতিষ্ঠান</label>
+                <input
+                  value={data.institute || data.institutes?.join(',') || ''}
+                  onChange={(e) =>
+                    onChange({ ...data, institute: e.target.value })
+                  }
+                  placeholder="e.g. Buet,Ruet,DMC"
+                  className={fieldCls}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Content */}
+          <div className="px-5 py-5 space-y-5">
+            <div className="grid md:grid-cols-2 gap-5">
               {/* Question */}
               <div className="space-y-2">
-                <div className="flex justify-between items-end">
-                  <label className="text-sm font-bold text-neutral-700 block">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-bold text-neutral-800 dark:text-white">
                     প্রশ্ন
                   </label>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-blue-50 text-blue-600 font-semibold border border-blue-100">
-                    LaTeX Supported ($...$)
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-semibold border border-indigo-100 dark:border-indigo-800">
+                    LaTeX: $...$
                   </span>
                 </div>
                 <textarea
@@ -547,36 +579,32 @@ const EditModal: React.FC<{
                   onChange={(e) =>
                     onChange({ ...data, question: e.target.value })
                   }
-                  className="w-full p-3 rounded-xl border border-neutral-200 bg-neutral-50 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                  className={`${fieldCls} resize-none`}
                   rows={4}
                   placeholder="প্রশ্নের বিবরণ লিখুন..."
                 />
-
                 {data.question && (
-                  <div className="p-4 bg-neutral-50 border border-neutral-100 rounded-xl min-h-[60px]">
-                    <span className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold mb-2 block">
+                  <div className="p-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 rounded-xl">
+                    <span className="text-[9px] text-neutral-400 uppercase tracking-widest font-bold mb-1 block">
                       প্রিভিউ
                     </span>
                     <MathRenderer text={data.question} />
                   </div>
                 )}
-
-                <div className="pt-2">
-                  <label className="text-sm font-bold text-neutral-700 block mb-2">
+                <div>
+                  <label className="text-xs font-bold text-neutral-600 dark:text-neutral-400 block mb-1.5">
                     প্রশ্নের ছবি (ঐচ্ছিক)
                   </label>
-                  <div className="inline-block mt-2">
-                    <ImageUploader
-                      folder="questions"
-                      compact
-                      defaultValue={data.imageUrl}
-                      onUploadComplete={(url) => {
-                        onChange({ ...data, imageUrl: url });
-                      }}
-                    />
-                  </div>
+                  <ImageUploader
+                    folder="questions"
+                    compact
+                    defaultValue={data.imageUrl}
+                    onUploadComplete={(url) =>
+                      onChange({ ...data, imageUrl: url })
+                    }
+                  />
                   {data.imageUrl && (
-                    <div className="relative mt-2 w-full h-32 border rounded-xl overflow-hidden bg-neutral-100 group">
+                    <div className="relative mt-2 w-full h-28 border rounded-xl overflow-hidden bg-neutral-100 group">
                       <img
                         src={data.imageUrl}
                         alt="Question"
@@ -586,9 +614,9 @@ const EditModal: React.FC<{
                         onClick={() =>
                           onChange({ ...data, imageUrl: undefined })
                         }
-                        className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={13} />
                       </button>
                     </div>
                   )}
@@ -597,95 +625,62 @@ const EditModal: React.FC<{
 
               {/* Options */}
               <div className="space-y-2">
-                <label className="text-sm font-bold text-neutral-700 block mb-3">
-                  অপশনসমূহ
-                  <span className="text-xs font-normal text-neutral-500 ml-2">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-bold text-neutral-800 dark:text-white">
+                    অপশনসমূহ
+                  </label>
+                  <span className="text-[10px] text-neutral-400 font-semibold">
                     (সঠিক উত্তরে ক্লিক করুন)
                   </span>
-                </label>
-                <div className="grid grid-cols-1 gap-3">
+                </div>
+                <div className="space-y-2">
                   {(data.options || []).map((opt, i) => (
                     <div
                       key={i}
-                      className="flex flex-col gap-1 p-3 rounded-xl border border-neutral-100 bg-neutral-50"
+                      className={`flex items-center gap-2 p-2 rounded-xl border transition-all ${
+                        data.correctAnswerIndex === i
+                          ? 'border-emerald-400 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20'
+                          : 'border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800'
+                      }`}
                     >
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            onChange({
-                              ...data,
-                              correctAnswerIndex: i,
-                              correctAnswer: data.options?.[i] || '',
-                              correctAnswerIndices: [i],
-                            })
-                          }
-                          className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center font-mono text-sm font-bold transition-all ${
-                            data.correctAnswerIndex === i
-                              ? 'bg-emerald-500 text-white border-emerald-500 ring-2 ring-emerald-500/20'
-                              : 'bg-white text-neutral-500 border-neutral-300 hover:border-emerald-400 border'
-                          }`}
-                        >
-                          {String.fromCharCode(65 + i)}
-                        </button>
-
-                        <div className="flex-1 space-y-2">
-                          <input
-                            value={opt}
-                            onChange={(e) => updateOption(i, e.target.value)}
-                            placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                            className={`w-full p-2 rounded-lg border text-sm transition-all outline-none ${
-                              data.correctAnswerIndex === i
-                                ? 'border-emerald-300 bg-emerald-50 focus:ring-1 focus:ring-emerald-500'
-                                : 'border-neutral-200 bg-white focus:ring-1 focus:ring-emerald-500'
-                            }`}
-                          />
-
-                          {/* Option Image Preview if exists */}
-                          {data.optionImages?.[i] && (
-                            <div className="relative w-full h-20 rounded-lg border border-neutral-200 overflow-hidden bg-white group">
-                              <img
-                                src={data.optionImages[i]}
-                                alt="Option"
-                                className="w-full h-full object-contain"
-                              />
-                              <button
-                                onClick={() => {
-                                  const newOpts = [
-                                    ...(data.optionImages || []),
-                                  ];
-                                  newOpts[i] = '';
-                                  onChange({ ...data, optionImages: newOpts });
-                                }}
-                                className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
-                                <Trash2 size={12} />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Image Uploader Component */}
-                        <div className="shrink-0 self-start mt-0.5">
-                          <ImageUploader
-                            folder="options"
-                            compact
-                            onUploadComplete={(url) => {
-                              const newOpts = [...(data.optionImages || [])];
-                              while (newOpts.length <= i) newOpts.push('');
-                              newOpts[i] = url;
-                              onChange({ ...data, optionImages: newOpts });
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Option Math Preview */}
-                      {opt && (
-                        <div className="ml-10 mt-1 pb-1 text-xs text-neutral-700">
-                          <MathRenderer text={opt} />
-                        </div>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onChange({
+                            ...data,
+                            correctAnswerIndex: i,
+                            correctAnswer: data.options?.[i] || '',
+                            correctAnswerIndices: [i],
+                          })
+                        }
+                        className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center font-mono text-sm font-extrabold transition-all ${
+                          data.correctAnswerIndex === i
+                            ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20'
+                            : 'bg-white dark:bg-neutral-700 text-neutral-500 border border-neutral-300 dark:border-neutral-600 hover:border-emerald-400'
+                        }`}
+                      >
+                        {String.fromCharCode(65 + i)}
+                      </button>
+                      <input
+                        value={opt}
+                        onChange={(e) => updateOption(i, e.target.value)}
+                        placeholder={`Option ${String.fromCharCode(65 + i)}`}
+                        className={`flex-1 px-2.5 py-1.5 rounded-lg border text-sm transition-all outline-none ${
+                          data.correctAnswerIndex === i
+                            ? 'border-emerald-300 dark:border-emerald-700 bg-white dark:bg-emerald-900/10 focus:ring-1 focus:ring-emerald-500'
+                            : 'border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 focus:ring-1 focus:ring-emerald-500'
+                        }`}
+                      />
+                      <ImageUploader
+                        folder="options"
+                        compact
+                        onUploadComplete={(url) => {
+                          const newOpts = [...(data.optionImages || [])];
+                          while (newOpts.length <= i) newOpts.push('');
+                          newOpts[i] = url;
+                          onChange({ ...data, optionImages: newOpts });
+                        }}
+                      />
                     </div>
                   ))}
                 </div>
@@ -693,26 +688,22 @@ const EditModal: React.FC<{
             </div>
 
             {/* Explanation */}
-            <div className="mt-6 space-y-2">
+            <div className="space-y-2 border-t border-neutral-100 dark:border-neutral-800 pt-4">
               <div className="flex justify-between items-center">
-                <label className="text-sm font-bold text-neutral-700 block">
+                <label className="text-sm font-bold text-neutral-800 dark:text-white">
                   ব্যাখ্যা / সমাধান
                 </label>
-                <div className="inline-block origin-right">
-                  <ImageUploader
-                    folder="explanations"
-                    compact
-                    defaultValue={data.explanationImageUrl}
-                    onUploadComplete={(url) => {
-                      onChange({ ...data, explanationImageUrl: url });
-                    }}
-                  />
-                </div>
+                <ImageUploader
+                  folder="explanations"
+                  compact
+                  defaultValue={data.explanationImageUrl}
+                  onUploadComplete={(url) =>
+                    onChange({ ...data, explanationImageUrl: url })
+                  }
+                />
               </div>
-
-              {/* Explanation Image Preview */}
               {data.explanationImageUrl && (
-                <div className="relative w-full md:w-1/2 h-32 border rounded-xl overflow-hidden bg-neutral-100 group mb-3">
+                <div className="relative w-full md:w-1/2 h-28 border rounded-xl overflow-hidden bg-neutral-100 group">
                   <img
                     src={data.explanationImageUrl}
                     alt="Explanation"
@@ -722,26 +713,24 @@ const EditModal: React.FC<{
                     onClick={() =>
                       onChange({ ...data, explanationImageUrl: undefined })
                     }
-                    className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={13} />
                   </button>
                 </div>
               )}
-
               <textarea
                 value={data.explanation || ''}
                 onChange={(e) =>
                   onChange({ ...data, explanation: e.target.value })
                 }
-                className="w-full p-3 rounded-xl border border-neutral-200 bg-neutral-50 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                className={`${fieldCls} resize-none`}
                 rows={3}
                 placeholder="সঠিক উত্তরের ব্যাখ্যা লিখুন..."
               />
-
               {data.explanation && (
-                <div className="p-4 bg-neutral-50 border border-neutral-100 rounded-xl min-h-[60px]">
-                  <span className="text-[10px] text-neutral-400 uppercase tracking-wider font-bold mb-2 block">
+                <div className="p-3 bg-amber-50/60 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/50 rounded-xl">
+                  <span className="text-[9px] text-amber-600 uppercase tracking-widest font-bold mb-1 block">
                     সমাধান প্রিভিউ
                   </span>
                   <MathRenderer text={data.explanation} />
@@ -751,17 +740,17 @@ const EditModal: React.FC<{
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="p-5 bg-neutral-50 border-t border-neutral-100 flex gap-3">
+        {/* Footer */}
+        <div className="px-5 py-4 bg-neutral-50 dark:bg-neutral-900/80 border-t border-neutral-100 dark:border-neutral-800 flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 text-sm font-bold text-neutral-600 hover:bg-neutral-200 rounded-xl transition-colors"
+            className="flex-1 py-3 text-sm font-extrabold text-neutral-600 dark:text-neutral-400 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-all active:scale-[0.98]"
           >
-            বাতিল করুন
+            বাতিল
           </button>
           <button
             onClick={onSave}
-            className="flex-1 py-3 text-sm font-bold bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 transition-all active:scale-95"
+            className="flex-1 py-3 text-sm font-extrabold bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-700/20 hover:bg-emerald-800 border border-emerald-600 transition-all active:scale-[0.98]"
           >
             সংরক্ষণ করুন
           </button>
