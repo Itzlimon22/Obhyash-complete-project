@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Notification } from '@/lib/types';
 import NotificationItem from './NotificationItem';
 import { CheckCheck, Bell, X, Inbox } from 'lucide-react';
@@ -33,98 +34,153 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
+  /* ── Desktop dropdown (rendered inline — works fine inside relative parent) ── */
+  const desktopDropdown = (
+    <AnimatePresence>
+      <motion.div
+        key="desktop-dropdown"
+        initial={{ opacity: 0, scale: 0.96, y: -8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: -8 }}
+        transition={{ duration: 0.18 }}
+        className="hidden md:flex md:flex-col absolute top-12 right-0 w-[400px] max-h-[85vh] rounded-2xl bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 shadow-2xl z-[99] origin-top-right overflow-hidden"
+      >
+        <DropdownHeader
+          unreadCount={unreadCount}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onMarkAllAsRead={onMarkAllAsRead}
+          onClose={onClose}
+        />
+        <NotificationList
+          isLoading={isLoading}
+          displayedNotifications={displayedNotifications}
+          activeTab={activeTab}
+          onNotificationClick={onNotificationClick}
+        />
+        <DropdownFooter onViewAll={onViewAll} />
+      </motion.div>
+    </AnimatePresence>
+  );
+
+  /* ── Mobile bottom sheet (portalled to body to escape stacking context) ───── */
+  const mobileSheet =
+    typeof document !== 'undefined'
+      ? createPortal(
+          <div className="md:hidden">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-md"
+              onClick={onClose}
+            />
+
+            {/* Bottom sheet */}
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', stiffness: 400, damping: 34 }}
+              className="fixed bottom-0 left-0 right-0 z-[9999] flex flex-col max-h-[50vh] rounded-t-3xl bg-white dark:bg-neutral-950 border border-b-0 border-neutral-200 dark:border-neutral-800 shadow-2xl"
+            >
+              {/* Top accent */}
+              <div className="absolute inset-x-0 top-0 h-[1.5px] bg-emerald-700 rounded-t-3xl pointer-events-none" />
+
+              {/* Drag handle */}
+              <div className="mx-auto mt-3 mb-1 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700 flex-shrink-0" />
+
+              {/* Header */}
+              <div className="flex-shrink-0 px-5 pt-2 pb-0 border-b border-neutral-100 dark:border-neutral-800">
+                <div className="flex justify-between items-center mb-2.5">
+                  <h3 className="font-bold text-neutral-900 dark:text-white text-[15px] flex items-center gap-2">
+                    নোটিফিকেশন
+                    {unreadCount > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold leading-none min-w-[18px] text-center">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </h3>
+                  <div className="flex items-center gap-1">
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={onMarkAllAsRead}
+                        className="p-1.5 text-neutral-400 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors"
+                        aria-label="সব পঠিত"
+                      >
+                        <CheckCheck className="w-4 h-4" />
+                      </button>
+                    )}
+                    <button
+                      onClick={onClose}
+                      className="p-1.5 text-neutral-400 hover:text-neutral-700 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+                      aria-label="বন্ধ করো"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex gap-5">
+                  {(['unread', 'all'] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={cn(
+                        'pb-2 text-[13px] font-bold relative transition-colors',
+                        activeTab === tab
+                          ? 'text-neutral-900 dark:text-white'
+                          : 'text-neutral-400 dark:text-neutral-500',
+                      )}
+                    >
+                      {tab === 'unread' ? 'অপঠিত' : 'সবগুলো'}
+                      {activeTab === tab && (
+                        <motion.div
+                          layoutId="mobileNotifTab"
+                          className="absolute bottom-0 left-0 right-0 h-[2px] bg-emerald-700 rounded-full"
+                        />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* List */}
+              <NotificationList
+                isLoading={isLoading}
+                displayedNotifications={displayedNotifications}
+                activeTab={activeTab}
+                onNotificationClick={onNotificationClick}
+              />
+
+              {/* Footer */}
+              <div className="flex-shrink-0 px-4 py-3 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-950">
+                <button
+                  onClick={onViewAll}
+                  className="w-full py-3 rounded-2xl bg-emerald-900 hover:bg-emerald-950 active:scale-[0.98] text-white text-sm font-bold transition-all duration-150 shadow-md"
+                >
+                  সব নোটিফিকেশন দেখো
+                </button>
+              </div>
+            </motion.div>
+          </div>,
+          document.body,
+        )
+      : null;
+
   return (
     <>
-      {/* ── Mobile backdrop ────────────────────────────────────────── */}
-      <div
-        className="fixed inset-0 z-[98] bg-black/60 backdrop-blur-md md:hidden"
-        onClick={onClose}
-      />
-
-      <AnimatePresence>
-        {/* ── Mobile: bottom sheet ───────────────────────────────────── */}
-        <motion.div
-          key="mobile-sheet"
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '100%' }}
-          transition={{ type: 'spring', stiffness: 420, damping: 36 }}
-          className={cn(
-            'fixed bottom-0 left-0 right-0 z-[99] flex flex-col',
-            'max-h-[50vh] rounded-t-3xl',
-            'bg-white dark:bg-neutral-950',
-            'border border-b-0 border-neutral-200 dark:border-neutral-800',
-            'shadow-2xl',
-            // Hide on desktop — desktop uses its own absolutely-positioned dropdown below
-            'md:hidden',
-          )}
-        >
-          {/* Top accent line */}
-          <div className="absolute inset-x-0 top-0 h-[1.5px] bg-emerald-700 rounded-t-3xl pointer-events-none" />
-
-          {/* Drag handle */}
-          <div className="mx-auto mt-4 mb-1 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700 flex-shrink-0" />
-
-          {/* Header */}
-          <MobileHeader
-            unreadCount={unreadCount}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            onMarkAllAsRead={onMarkAllAsRead}
-            onClose={onClose}
-          />
-
-          {/* List */}
-          <NotificationList
-            isLoading={isLoading}
-            displayedNotifications={displayedNotifications}
-            activeTab={activeTab}
-            onNotificationClick={onNotificationClick}
-          />
-
-          {/* Footer */}
-          <NotificationFooter onViewAll={onViewAll} />
-        </motion.div>
-
-        {/* ── Desktop: dropdown panel ────────────────────────────────── */}
-        <motion.div
-          key="desktop-dropdown"
-          initial={{ opacity: 0, scale: 0.96, y: -8 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.96, y: -8 }}
-          transition={{ duration: 0.18 }}
-          className={cn(
-            'hidden md:flex md:flex-col',
-            'absolute top-12 right-0 w-[400px] max-h-[85vh]',
-            'rounded-2xl bg-white dark:bg-neutral-950',
-            'border border-neutral-200 dark:border-neutral-800',
-            'shadow-2xl',
-            'z-[99] origin-top-right overflow-hidden',
-          )}
-        >
-          <MobileHeader
-            unreadCount={unreadCount}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            onMarkAllAsRead={onMarkAllAsRead}
-            onClose={onClose}
-          />
-          <NotificationList
-            isLoading={isLoading}
-            displayedNotifications={displayedNotifications}
-            activeTab={activeTab}
-            onNotificationClick={onNotificationClick}
-          />
-          <NotificationFooter onViewAll={onViewAll} />
-        </motion.div>
-      </AnimatePresence>
+      {mobileSheet}
+      {desktopDropdown}
     </>
   );
 };
 
-/* ── Shared sub-components ─────────────────────────────────────────────── */
+/* ─────────────────────── Shared sub-components ─────────────────────── */
 
-function MobileHeader({
+function DropdownHeader({
   unreadCount,
   activeTab,
   setActiveTab,
@@ -138,8 +194,7 @@ function MobileHeader({
   onClose: () => void;
 }) {
   return (
-    <div className="flex-shrink-0 px-5 pt-3 pb-0 border-b border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-950 sticky top-0 z-20 rounded-t-3xl md:rounded-none">
-      {/* Title row */}
+    <div className="flex-shrink-0 px-5 pt-4 pb-0 border-b border-neutral-100 dark:border-neutral-800">
       <div className="flex justify-between items-center mb-3">
         <h3 className="font-bold text-neutral-900 dark:text-white text-base flex items-center gap-2">
           নোটিফিকেশন
@@ -149,13 +204,12 @@ function MobileHeader({
             </span>
           )}
         </h3>
-
         <div className="flex items-center gap-1">
           {unreadCount > 0 && (
             <button
               onClick={onMarkAllAsRead}
               className="p-1.5 text-neutral-400 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors"
-              title="সবগুলো পঠিত হিসেবে চিহ্নিত করো"
+              title="সব পঠিত হিসেবে চিহ্নিত করো"
             >
               <CheckCheck className="w-4 h-4" />
             </button>
@@ -170,7 +224,6 @@ function MobileHeader({
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-6">
         {(['unread', 'all'] as const).map((tab) => (
           <button
@@ -186,7 +239,7 @@ function MobileHeader({
             {tab === 'unread' ? 'অপঠিত' : 'সবগুলো'}
             {activeTab === tab && (
               <motion.div
-                layoutId="activeNotifTab"
+                layoutId="desktopNotifTab"
                 className="absolute bottom-0 left-0 right-0 h-[2px] bg-emerald-700 rounded-full"
               />
             )}
@@ -209,34 +262,34 @@ function NotificationList({
   onNotificationClick: (n: Notification) => void;
 }) {
   return (
-    <div className="flex-1 overflow-y-auto custom-scrollbar min-h-[200px]">
+    <div className="flex-1 overflow-y-auto min-h-0">
       {isLoading ? (
-        <div className="p-4 space-y-4">
-          {[...Array(4)].map((_, i) => (
+        <div className="p-4 space-y-3">
+          {[...Array(3)].map((_, i) => (
             <div key={i} className="flex gap-3 animate-pulse px-1">
-              <div className="w-10 h-10 bg-neutral-100 dark:bg-neutral-800 rounded-xl shrink-0" />
+              <div className="w-9 h-9 bg-neutral-100 dark:bg-neutral-800 rounded-xl shrink-0" />
               <div className="flex-1 space-y-2 py-1">
-                <div className="h-3.5 bg-neutral-100 dark:bg-neutral-800 rounded w-3/4" />
-                <div className="h-3 bg-neutral-100 dark:bg-neutral-800 rounded w-full" />
+                <div className="h-3 bg-neutral-100 dark:bg-neutral-800 rounded w-3/4" />
+                <div className="h-2.5 bg-neutral-100 dark:bg-neutral-800 rounded w-full" />
               </div>
             </div>
           ))}
         </div>
       ) : displayedNotifications.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-          <div className="w-16 h-16 mb-4 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center py-10 px-6 text-center">
+          <div className="w-12 h-12 mb-3 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
             {activeTab === 'unread' ? (
-              <Bell className="w-7 h-7 text-neutral-400 dark:text-neutral-500" />
+              <Bell className="w-5 h-5 text-neutral-400 dark:text-neutral-500" />
             ) : (
-              <Inbox className="w-7 h-7 text-neutral-400 dark:text-neutral-500" />
+              <Inbox className="w-5 h-5 text-neutral-400 dark:text-neutral-500" />
             )}
           </div>
-          <p className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
+          <p className="text-sm font-bold text-neutral-700 dark:text-neutral-300">
             {activeTab === 'unread'
               ? 'সবকিছু পরিষ্কার!'
               : 'কোনো নোটিফিকেশন নেই'}
           </p>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 max-w-[200px]">
+          <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
             {activeTab === 'unread'
               ? 'তোমার কোনো নতুন নোটিফিকেশন নেই।'
               : 'তোমার ইনবক্স ফাঁকা।'}
@@ -257,12 +310,12 @@ function NotificationList({
   );
 }
 
-function NotificationFooter({ onViewAll }: { onViewAll: () => void }) {
+function DropdownFooter({ onViewAll }: { onViewAll: () => void }) {
   return (
-    <div className="flex-shrink-0 p-4 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-950 sticky bottom-0 z-10">
+    <div className="flex-shrink-0 p-3 border-t border-neutral-100 dark:border-neutral-800">
       <button
         onClick={onViewAll}
-        className="w-full py-3 rounded-2xl bg-emerald-900 hover:bg-emerald-950 active:scale-[0.98] text-white text-sm font-bold transition-all duration-150 shadow-md"
+        className="w-full py-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 text-xs font-bold hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
       >
         সব নোটিফিকেশন দেখো
       </button>

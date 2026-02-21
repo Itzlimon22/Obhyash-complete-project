@@ -52,6 +52,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
 
   // Modal State
+  const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false);
   const [isChapterModalOpen, setIsChapterModalOpen] = useState(false);
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
 
@@ -367,142 +368,108 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         className="grid grid-cols-1 lg:grid-cols-3 gap-6"
       >
         {/* LEFT COLUMN - SELECTION */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Subject Selection */}
-          <div className="w-full bg-white dark:bg-neutral-900 rounded-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-5 sm:p-6 border border-neutral-200/80 dark:border-neutral-800 shadow-sm">
-            <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-4">
-              বিষয় নির্বাচন করুন
-            </label>
-
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-              {isSubjectsLoading ? (
-                <div className="col-span-full py-12 text-center text-neutral-400 text-sm animate-pulse">
-                  বিষয় লোড হচ্ছে...
-                </div>
-              ) : availableSubjects.length === 0 ? (
-                <div className="col-span-full py-12 text-center text-neutral-400 text-sm">
-                  কোনো বিষয় পাওয়া যায়নি
-                </div>
-              ) : (
-                availableSubjects.map((opt) => (
-                  <button
-                    type="button"
-                    key={opt.id}
-                    onClick={() => setSubject(opt.id)}
-                    className={cn(
-                      'p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 text-center',
-                      subject === opt.id
-                        ? 'border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 shadow-sm'
-                        : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-800/50',
-                    )}
-                  >
-                    <span className="text-2xl">{opt.icon}</span>
-                    <span
-                      className={cn(
-                        'text-xs font-semibold',
-                        subject === opt.id
-                          ? 'text-emerald-800 dark:text-emerald-300'
-                          : 'text-neutral-700 dark:text-neutral-300',
-                      )}
-                    >
-                      {opt.name || opt.label}
-                    </span>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Chapters & Topics Selection */}
-          <div
-            className={cn(
-              'bg-white dark:bg-neutral-900 rounded-2xl p-5 sm:p-6 border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-6',
-              !subject && 'opacity-70 pointer-events-none cursor-not-allowed',
-            )}
-          >
-            {/* Chapter Selection */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* ── Subject / Chapter / Topic — compact trigger rows ─── */}
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl p-5 sm:p-6 border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-4">
+            {/* Subject trigger */}
             <div>
-              <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">
-                অধ্যায় (Chapters)
+              <label className="block text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2">
+                বিষয়
               </label>
+              <button
+                type="button"
+                onClick={() => setIsSubjectModalOpen(true)}
+                className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl p-3.5 text-left hover:border-neutral-300 dark:hover:border-neutral-600 transition-all flex items-center justify-between group"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  {subject ? (
+                    <>
+                      <span className="text-xl flex-shrink-0">
+                        {availableSubjects.find((s) => s.id === subject)?.icon}
+                      </span>
+                      <span className="text-sm font-bold text-neutral-900 dark:text-white truncate">
+                        {availableSubjects.find((s) => s.id === subject)
+                          ?.name ||
+                          availableSubjects.find((s) => s.id === subject)
+                            ?.label}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-sm text-neutral-500 dark:text-neutral-400">
+                      {isSubjectsLoading
+                        ? 'লোড হচ্ছে...'
+                        : 'বিষয় নির্বাচন করো'}
+                    </span>
+                  )}
+                </div>
+                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors flex-shrink-0" />
+              </button>
+            </div>
 
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsChapterModalOpen(true)}
-                  className="flex-1 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl p-3 text-left hover:border-neutral-300 dark:hover:border-neutral-600 transition-all flex items-center justify-between group"
-                >
-                  <span className="text-sm text-neutral-700 dark:text-neutral-300 truncate">
-                    {selectedChapters.length === 0
-                      ? 'সব অধ্যায়'
-                      : selectedChapters.length === 1
-                        ? selectedChapters[0]
-                        : `${selectedChapters.length} টি নির্বাচিত`}
-                  </span>
-                  <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsChapterModalOpen(true)}
-                  className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-xl border border-neutral-200 dark:border-neutral-700 font-medium text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all"
-                >
-                  <ListFilter className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Selected Chips */}
+            {/* Chapter trigger */}
+            <div className={cn(!subject && 'opacity-50 pointer-events-none')}>
+              <label className="block text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2">
+                অধ্যায়
+              </label>
+              <button
+                type="button"
+                onClick={() => setIsChapterModalOpen(true)}
+                className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl p-3.5 text-left hover:border-neutral-300 dark:hover:border-neutral-600 transition-all flex items-center justify-between group"
+              >
+                <span className="text-sm text-neutral-700 dark:text-neutral-300 truncate">
+                  {selectedChapters.length === 0
+                    ? 'সব অধ্যায়'
+                    : selectedChapters.length === 1
+                      ? selectedChapters[0]
+                      : `${selectedChapters.length} টি নির্বাচিত`}
+                </span>
+                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors" />
+              </button>
               {selectedChapters.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {selectedChapters.slice(0, 5).map((c) => (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {selectedChapters.slice(0, 3).map((c) => (
                     <span
                       key={c}
-                      className="text-xs px-2 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg"
+                      className="text-[11px] px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-400 rounded-md font-medium"
                     >
                       {c}
                     </span>
                   ))}
-                  {selectedChapters.length > 5 && (
-                    <span className="text-xs px-2 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-500 rounded-lg">
-                      +{selectedChapters.length - 5}
+                  {selectedChapters.length > 3 && (
+                    <span className="text-[11px] px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-500 rounded-md">
+                      +{selectedChapters.length - 3}
                     </span>
                   )}
                 </div>
               )}
             </div>
 
-            {/* Topic Selection */}
-            <div className={cn(topicOptions.length === 0 && 'opacity-50')}>
-              <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">
-                টপিক (Topics)
+            {/* Topic trigger */}
+            <div
+              className={cn(
+                topicOptions.length === 0 && 'opacity-50 pointer-events-none',
+              )}
+            >
+              <label className="block text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2">
+                টপিক
               </label>
-
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    topicOptions.length > 0 && setIsTopicModalOpen(true)
-                  }
-                  disabled={topicOptions.length === 0}
-                  className="flex-1 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl p-3 text-left hover:border-neutral-300 dark:hover:border-neutral-600 transition-all flex items-center justify-between group disabled:cursor-not-allowed"
-                >
-                  <span className="text-sm text-neutral-700 dark:text-neutral-300 truncate">
-                    {topicOptions.length === 0
-                      ? 'অধ্যায় নির্বাচন করুন'
-                      : selectedTopics.length === 0
-                        ? 'সব টপিক'
-                        : `${selectedTopics.length} টি নির্বাচিত`}
-                  </span>
-                  <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors" />
-                </button>
-                <button
-                  type="button"
-                  disabled={topicOptions.length === 0}
-                  onClick={() => setIsTopicModalOpen(true)}
-                  className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-xl border border-neutral-200 dark:border-neutral-700 font-medium text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                >
-                  <ListFilter className="w-4 h-4" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  topicOptions.length > 0 && setIsTopicModalOpen(true)
+                }
+                disabled={topicOptions.length === 0}
+                className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl p-3.5 text-left hover:border-neutral-300 dark:hover:border-neutral-600 transition-all flex items-center justify-between group disabled:cursor-not-allowed"
+              >
+                <span className="text-sm text-neutral-700 dark:text-neutral-300 truncate">
+                  {topicOptions.length === 0
+                    ? 'অধ্যায় নির্বাচন করো'
+                    : selectedTopics.length === 0
+                      ? 'সব টপিক'
+                      : `${selectedTopics.length} টি নির্বাচিত`}
+                </span>
+                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors" />
+              </button>
             </div>
           </div>
         </div>
@@ -626,35 +593,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 <span>1</span>
                 <span>100</span>
               </div>
-
-              {/* Available Count Badge */}
-              {subject && (
-                <div className="mt-3 flex items-center gap-2">
-                  {isCountLoading ? (
-                    <span className="text-xs text-neutral-400 animate-pulse">
-                      গণনা হচ্ছে...
-                    </span>
-                  ) : availableCount !== null ? (
-                    <>
-                      <span
-                        className={cn(
-                          'text-xs font-bold px-2.5 py-1 rounded-lg',
-                          availableCount >= questionCount
-                            ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
-                            : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400',
-                        )}
-                      >
-                        ডাটাবেসে আছে: {availableCount} টি
-                      </span>
-                      {availableCount < questionCount && (
-                        <span className="text-[10px] text-red-600 dark:text-red-400 font-medium">
-                          ⚠ চাহিদার চেয়ে কম — {availableCount} টি পাবেন
-                        </span>
-                      )}
-                    </>
-                  ) : null}
-                </div>
-              )}
             </div>
 
             {/* Duration */}
@@ -729,6 +667,106 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           </button>
         </div>
       </form>
+
+      {/* Subject Selection Bottom Sheet */}
+      {isSubjectModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in-0 duration-300"
+          onClick={() => setIsSubjectModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-lg max-h-[50vh] sm:max-h-[85vh] flex flex-col animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 ease-out"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-[1.5px] bg-emerald-700 rounded-t-3xl z-10" />
+
+            <div className="rounded-t-3xl sm:rounded-t-3xl bg-white dark:bg-neutral-950 border border-b-0 border-neutral-200 dark:border-neutral-800 px-6 pt-5 pb-4 flex-shrink-0">
+              <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700 sm:hidden" />
+              <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
+                বিষয় নির্বাচন
+              </h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                তোমার পরীক্ষার বিষয় বেছে নাও
+              </p>
+            </div>
+
+            <div className="flex-1 overflow-y-auto bg-white dark:bg-neutral-950 border-x border-neutral-200 dark:border-neutral-800 px-4 py-3">
+              {isSubjectsLoading ? (
+                <div className="flex items-center justify-center py-12 text-neutral-400 text-sm animate-pulse">
+                  বিষয় লোড হচ্ছে...
+                </div>
+              ) : availableSubjects.length === 0 ? (
+                <div className="flex items-center justify-center py-12 text-neutral-400 text-sm">
+                  কোনো বিষয় পাওয়া যায়নি
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  {availableSubjects.map((opt) => {
+                    const isSelected = subject === opt.id;
+                    return (
+                      <div
+                        key={opt.id}
+                        onClick={() => {
+                          setSubject(opt.id);
+                          setIsSubjectModalOpen(false);
+                        }}
+                        className={cn(
+                          'flex items-center gap-3.5 p-3.5 rounded-2xl cursor-pointer transition-all duration-150',
+                          isSelected
+                            ? 'bg-emerald-50 dark:bg-emerald-950/30 ring-1 ring-emerald-700/20'
+                            : 'hover:bg-neutral-50 dark:hover:bg-neutral-900',
+                        )}
+                      >
+                        <span className="text-2xl flex-shrink-0">
+                          {opt.icon}
+                        </span>
+                        <span
+                          className={cn(
+                            'text-sm font-semibold',
+                            isSelected
+                              ? 'text-emerald-900 dark:text-emerald-300'
+                              : 'text-neutral-700 dark:text-neutral-300',
+                          )}
+                        >
+                          {opt.name || opt.label}
+                        </span>
+                        {isSelected && (
+                          <div className="ml-auto flex-shrink-0 w-5 h-5 rounded-full bg-emerald-700 flex items-center justify-center">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 20 20"
+                              fill="white"
+                              className="w-3 h-3"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-b-none sm:rounded-b-3xl bg-white dark:bg-neutral-950 border border-t-0 border-neutral-200 dark:border-neutral-800 px-6 py-4 flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsSubjectModalOpen(false)}
+                className="w-full py-3 rounded-2xl text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 font-medium text-sm transition-colors duration-150"
+              >
+                বন্ধ করো
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Chapter Selection Modal */}
       <SelectionModal
