@@ -376,6 +376,29 @@ export default function QuestionManagementView({
                   </div>
                 ))}
               </div>
+
+              {/* Explanation Section */}
+              {(previewData.explanation || previewData.explanationImageUrl) && (
+                <div className="mt-6 p-4 rounded-xl border border-blue-100 bg-blue-50/50 dark:border-blue-900/30 dark:bg-blue-900/10">
+                  <h3 className="text-sm font-bold text-blue-900 dark:text-blue-300 mb-3 block">
+                    ব্যাখ্যা / সমাধান
+                  </h3>
+                  {previewData.explanationImageUrl && (
+                    <div className="mb-4 w-full md:w-1/2 rounded-lg overflow-hidden border border-blue-100 dark:border-blue-800 bg-white dark:bg-neutral-900">
+                      <img
+                        src={previewData.explanationImageUrl}
+                        alt="Explanation"
+                        className="w-full h-auto object-contain"
+                      />
+                    </div>
+                  )}
+                  {previewData.explanation && (
+                    <div className="text-sm text-neutral-800 dark:text-neutral-200 leading-relaxed">
+                      <MathText text={previewData.explanation} />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

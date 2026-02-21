@@ -23,6 +23,7 @@ import { Question } from '@/lib/types';
 import { MathText } from './shared';
 import { MathRenderer } from '@/components/common/MathRenderer';
 import { ImageUploader } from '@/components/ui/image-uploader';
+import { Button } from '@/components/ui/button';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 
@@ -799,6 +800,67 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   const [rawJsonText, setRawJsonText] = useState('');
   const [jsonErrorMsg, setJsonErrorMsg] = useState('');
 
+  // ── Bulk Action State ──
+  const [bulkSubject, setBulkSubject] = useState('');
+  const [bulkChapter, setBulkChapter] = useState('');
+  const [bulkTopic, setBulkTopic] = useState('');
+
+  const bulkAvailableSubjects = React.useMemo(() => getHscSubjectList(), []);
+  const bulkAvailableChapters = React.useMemo(
+    () => (bulkSubject ? getHscChapterList(bulkSubject) : []),
+    [bulkSubject],
+  );
+  const bulkAvailableTopics = React.useMemo(
+    () => (bulkChapter ? getHscTopicList(bulkChapter) : []),
+    [bulkChapter],
+  );
+
+  const applyBulkAction = () => {
+    if (selectedIndices.size === 0) return;
+
+    // Resolve full names based on inputs
+    const subjectName = bulkSubject
+      ? (resolveSubjectName(bulkSubject) ?? bulkSubject)
+      : undefined;
+    const chapterName =
+      subjectName && bulkChapter
+        ? (resolveChapterName(subjectName, bulkChapter) ?? bulkChapter)
+        : undefined;
+    const topicName =
+      chapterName && bulkTopic
+        ? (resolveTopicName(chapterName, bulkTopic) ?? bulkTopic)
+        : undefined;
+
+    setParsedData((prev) =>
+      prev.map((q, i) => {
+        if (!selectedIndices.has(i)) return q;
+        const newQ = { ...q };
+        if (subjectName !== undefined) newQ.subject = subjectName;
+        // Only update chapter/topic if the new subject is set or doesn't conflict
+        if (chapterName !== undefined) newQ.chapter = chapterName;
+        if (topicName !== undefined) newQ.topic = topicName;
+
+        // Also clear invalid chapter/topic if changing subject
+        if (subjectName !== undefined && subjectName !== q.subject) {
+          if (chapterName === undefined) newQ.chapter = '';
+          if (topicName === undefined) newQ.topic = '';
+        } else if (chapterName !== undefined && chapterName !== q.chapter) {
+          if (topicName === undefined) newQ.topic = '';
+        }
+
+        return newQ;
+      }),
+    );
+
+    // Reset bulk selections after applying
+    setBulkSubject('');
+    setBulkChapter('');
+    setBulkTopic('');
+
+    // Optionally clear selection (or keep it selected)
+    // setSelectedIndices(new Set());
+  };
+
   // ── Unified processor: raw rows -> Question[] with dedup ──
   const processRawData = useCallback(
     (rows: Record<string, string>[]): Partial<Question>[] => {
@@ -1331,6 +1393,69 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           </div>
         )}
       </div>
+
+      {/* Bulk Action Bar */}
+      {selectedIndices.size > 0 && (
+        <div className="px-5 sm:px-6 py-3 bg-indigo-50/50 dark:bg-indigo-900/10 border-b border-indigo-100 dark:border-indigo-900/30 flex flex-wrap items-center gap-3">
+          <span className="text-xs font-bold text-indigo-700 dark:text-indigo-400 whitespace-nowrap">
+            বাল্ক অ্যাকশন:
+          </span>
+          <div className="flex-1 flex flex-wrap items-center gap-2">
+            <select
+              value={bulkSubject}
+              onChange={(e) => {
+                setBulkSubject(e.target.value);
+                setBulkChapter('');
+                setBulkTopic('');
+              }}
+              className="px-2.5 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 text-xs text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 outline-none focus:ring-2 focus:ring-indigo-500/30"
+            >
+              <option value="">বিষয় পরিবর্তন</option>
+              {bulkAvailableSubjects.map((s) => (
+                <option key={s.id} value={s.name}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+            <select
+              value={bulkChapter}
+              onChange={(e) => {
+                setBulkChapter(e.target.value);
+                setBulkTopic('');
+              }}
+              disabled={!bulkSubject}
+              className="px-2.5 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 text-xs text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 outline-none focus:ring-2 focus:ring-indigo-500/30 disabled:opacity-50"
+            >
+              <option value="">অধ্যায় পরিবর্তন</option>
+              {bulkAvailableChapters.map((c) => (
+                <option key={c.id} value={c.name}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            <select
+              value={bulkTopic}
+              onChange={(e) => setBulkTopic(e.target.value)}
+              disabled={!bulkChapter}
+              className="px-2.5 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 text-xs text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 outline-none focus:ring-2 focus:ring-indigo-500/30 disabled:opacity-50"
+            >
+              <option value="">টপিক পরিবর্তন</option>
+              {bulkAvailableTopics.map((t) => (
+                <option key={t.id} value={t.name}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={applyBulkAction}
+              disabled={!bulkSubject && !bulkChapter && !bulkTopic}
+              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm ml-auto sm:ml-0 whitespace-nowrap"
+            >
+              এপ্লাই করুন
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Error details */}
       {errorCount > 0 && (
