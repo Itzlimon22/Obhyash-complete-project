@@ -1259,7 +1259,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
   // ── STEP 2: Review & Import ────────────────────────────────────────
   return (
-    <div className="w-full bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-neutral-200 dark:border-neutral-800 shadow-xl max-w-5xl mx-auto overflow-hidden flex flex-col max-h-[95vh]">
+    <div className="w-full bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xl max-w-5xl mx-auto overflow-hidden flex flex-col max-h-[95vh] animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
       {/* Modals */}
       {previewQuestion && (
         <QuestionPreview
@@ -1281,47 +1281,61 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
       {/* Success overlay */}
       {importSuccess && (
-        <div className="absolute inset-0 bg-white/90 dark:bg-neutral-900/90 z-50 flex flex-col items-center justify-center gap-4">
-          <CheckCircle2 size={56} className="text-emerald-500" />
-          <p className="text-lg font-bold text-emerald-700 dark:text-emerald-400">
+        <div className="absolute inset-0 bg-white/95 dark:bg-neutral-900/95 z-50 flex flex-col items-center justify-center gap-5 backdrop-blur-sm transition-all duration-300">
+          <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center">
+            <CheckCircle2
+              size={40}
+              className="text-emerald-600 dark:text-emerald-400"
+            />
+          </div>
+          <p className="text-xl md:text-2xl font-extrabold text-emerald-800 dark:text-emerald-400">
             সফলভাবে ইমপোর্ট হয়েছে!
           </p>
         </div>
       )}
 
       {/* Header */}
-      <div className="p-4 sm:p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-white dark:bg-neutral-900 sticky top-0 z-20">
-        <div className="flex items-center gap-3">
+      <div className="p-4 sm:px-6 sm:py-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-white dark:bg-neutral-900 sticky top-0 z-20">
+        <div className="flex items-center gap-4">
           <button
             onClick={() => setStep(1)}
-            className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg"
+            className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors active:scale-95"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft
+              size={20}
+              className="text-neutral-700 dark:text-neutral-300"
+            />
           </button>
           <div>
-            <h2 className="text-base font-bold text-neutral-900 dark:text-white">
+            <h2 className="text-base md:text-lg font-extrabold text-neutral-900 dark:text-white">
               রিভিউ — {fileName}
             </h2>
-            <p className="text-[10px] text-neutral-500">
-              {parsedData.length} টি প্রশ্ন পাওয়া গেছে • {validCount} টি
-              নির্বাচিত
+            <p className="text-xs font-semibold text-neutral-500 mt-0.5">
+              {parsedData.length} টি প্রশ্ন পাওয়া গেছে •{' '}
+              <span className="text-emerald-600 dark:text-emerald-400">
+                {validCount} টি নির্বাচিত
+              </span>
             </p>
           </div>
         </div>
         <button
           onClick={onCancel}
-          className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full text-neutral-500"
+          className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl text-neutral-500 transition-colors active:scale-95"
         >
           <X size={20} />
         </button>
       </div>
 
       {/* Stats & Errors */}
-      <div className="px-5 py-3 bg-neutral-50 dark:bg-neutral-950 border-b border-neutral-100 dark:border-neutral-800 flex flex-wrap items-center gap-3 justify-between">
-        <div className="flex items-center gap-3">
+      <div className="px-5 sm:px-6 py-3 bg-neutral-50/80 dark:bg-neutral-950/80 border-b border-neutral-100 dark:border-neutral-800 flex flex-wrap items-center gap-3 justify-between shadow-sm z-10">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={isAllSelected ? clearSelection : selectAll}
-            className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:underline"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-[0.98] border ${
+              isAllSelected
+                ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                : 'bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700'
+            }`}
           >
             {isAllSelected ? <CheckSquare size={14} /> : <Square size={14} />}
             {isAllSelected ? 'সব বাদ দিন' : 'সব সিলেক্ট'}
@@ -1329,16 +1343,16 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           {selectedIndices.size > 0 && (
             <button
               onClick={removeSelected}
-              className="flex items-center gap-1.5 text-xs font-bold text-red-500 hover:underline"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-xs font-bold border border-red-100 dark:border-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all active:scale-[0.98]"
             >
-              <Trash2 size={12} />
+              <Trash2 size={13} />
               নির্বাচিত মুছুন ({selectedIndices.size})
             </button>
           )}
         </div>
         {errorCount > 0 && (
-          <div className="flex items-center gap-1.5 text-xs text-amber-600 font-bold bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg border border-amber-100 dark:border-amber-800">
-            <AlertCircle size={14} />
+          <div className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 font-extrabold bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded-lg border border-red-100 dark:border-red-900/30 shadow-sm animate-pulse-slight">
+            <AlertCircle size={14} className="animate-bounce-slight" />
             {errorCount} ত্রুটি
           </div>
         )}
@@ -1346,16 +1360,20 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
       {/* Error details */}
       {errorCount > 0 && (
-        <div className="px-5 py-3 bg-red-50/50 dark:bg-red-900/5 border-b border-red-100 dark:border-red-900/20">
-          <div className="max-h-20 overflow-y-auto space-y-1 custom-scrollbar">
+        <div className="px-5 sm:px-6 py-3 bg-red-50 dark:bg-red-950/30 border-b border-red-100 dark:border-red-900/30">
+          <div className="max-h-24 overflow-y-auto space-y-1.5 custom-scrollbar pr-2">
             {errors.map((err, i) => (
               <div
                 key={i}
-                className="text-[10px] text-red-600 flex items-start gap-2"
+                className="text-xs text-red-700 dark:text-red-400 flex items-center gap-2 bg-white/60 dark:bg-black/20 px-2.5 py-1.5 rounded-md border border-red-100/50 dark:border-red-900/20"
               >
-                <span className="shrink-0 font-bold">রো {err.row}:</span>
-                <span>
-                  {err.field} — {err.message}
+                <span className="shrink-0 font-extrabold bg-red-100 dark:bg-red-900/50 px-1.5 py-0.5 rounded text-[10px]">
+                  রো {err.row}
+                </span>
+                <span className="font-semibold text-xs text-red-800 dark:text-red-300">
+                  {err.field}{' '}
+                  <span className="text-red-400 dark:text-red-600 mx-1">—</span>{' '}
+                  {err.message}
                 </span>
               </div>
             ))}
@@ -1364,7 +1382,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
       )}
 
       {/* Question List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 custom-scrollbar bg-neutral-50/30 dark:bg-[#0a0a0a]">
         {parsedData.map((q, i) => {
           const isSelected = selectedIndices.has(i);
           const hasError = errors.some((err) => err.row === i + 1);
@@ -1372,44 +1390,44 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           return (
             <div
               key={i}
-              className={`p-4 rounded-xl border transition-all ${
+              className={`p-4 sm:p-5 rounded-2xl transition-all duration-200 relative overflow-hidden group ${
                 isSelected
-                  ? 'bg-emerald-50/50 border-emerald-200 dark:bg-emerald-900/10 dark:border-emerald-900/30'
-                  : 'bg-white border-neutral-200 dark:bg-neutral-900 dark:border-neutral-800'
-              } ${hasError ? 'ring-1 ring-amber-400/50' : ''}`}
+                  ? 'bg-emerald-50/80 dark:bg-emerald-900/10 border-2 border-emerald-500/40 shadow-[0_4px_12px_-4px_rgba(16,185,129,0.15)] dark:shadow-none'
+                  : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-neutral-300 dark:hover:border-neutral-700'
+              } ${hasError ? 'border-red-300 dark:border-red-800 ring-1 ring-red-400/20' : ''}`}
             >
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-3 sm:gap-4">
                 <input
                   type="checkbox"
                   checked={isSelected}
                   onChange={() => toggleSelection(i)}
-                  className="mt-1 rounded border-neutral-300 dark:border-neutral-700 text-emerald-600 focus:ring-emerald-500"
+                  className="mt-1 w-4.5 h-4.5 rounded border-neutral-300 dark:border-neutral-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer transition-all"
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] font-bold text-neutral-400">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                    <span className="text-xs font-extrabold text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-md">
                       #{i + 1}
                     </span>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => setPreviewQuestion(q)}
-                        className="p-1 px-2 text-[10px] font-bold text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                        className="p-1 px-2 text-[10px] md:text-xs font-bold text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 rounded-md transition-colors"
                       >
-                        <Eye size={12} className="inline mr-1" />
+                        <Eye size={14} className="inline mr-1" />
                         দেখুন
                       </button>
                       <button
                         onClick={() => handleEditQuestion(i)}
-                        className="p-1 px-2 text-[10px] font-bold text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded transition-colors"
+                        className="p-1 px-2 text-[10px] md:text-xs font-bold text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-900/20 rounded-md transition-colors"
                       >
-                        <Edit size={12} className="inline mr-1" />
+                        <Edit size={14} className="inline mr-1" />
                         সম্পাদনা
                       </button>
                       <button
                         onClick={() => removeQuestion(i)}
-                        className="p-1 px-2 text-[10px] font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                        className="p-1 px-2 text-[10px] md:text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-md transition-colors"
                       >
-                        <Trash2 size={12} className="inline mr-1" />
+                        <Trash2 size={14} className="inline mr-1" />
                         মুছুন
                       </button>
                     </div>
@@ -1503,18 +1521,18 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         )}
 
       {/* Footer */}
-      <div className="p-4 sm:p-5 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 flex flex-col sm:flex-row justify-end gap-3 sticky bottom-0">
+      <div className="p-4 sm:p-5 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-950 flex flex-col sm:flex-row justify-end gap-3 sticky bottom-0 z-20">
         <button
           onClick={() => setStep(1)}
           disabled={isProcessing}
-          className="px-6 py-3 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 font-bold hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all w-full sm:w-auto disabled:opacity-50"
+          className="px-6 py-3 rounded-xl border-2 border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 font-extrabold hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:border-neutral-300 transition-all w-full sm:w-auto active:scale-[0.98] disabled:opacity-50"
         >
           পিছে যান
         </button>
         <button
           onClick={handleImport}
           disabled={isProcessing || selectedIndices.size === 0}
-          className="px-8 py-3 rounded-xl font-bold shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-8 py-3 rounded-xl font-extrabold shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 w-full sm:w-auto bg-emerald-700 hover:bg-emerald-800 text-white shadow-emerald-700/20 border border-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isProcessing ? (
             <>
