@@ -369,7 +369,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
             <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-[1.25]">
               আপনার প্রস্তুতি হোক <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-rose-600">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-rose-600 py-2">
                 স্মার্ট ও নির্ভুল
               </span>
             </h1>
