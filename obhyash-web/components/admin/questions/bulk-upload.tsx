@@ -27,10 +27,10 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { hscSubjects } from '@/lib/data/hsc';
 import {
-  getSubjects,
-  getChapters,
-  getTopics,
-} from '@/services/metadata-service';
+  getHscSubjectList,
+  getHscChapterList,
+  getHscTopicList,
+} from '@/lib/data/hsc-helpers';
 
 // ─── Types ───────────────────────────────────────────────────────────
 interface BulkUploadProps {
@@ -52,6 +52,16 @@ function normalizeRawRow(
   rowIndex: number,
   parseErrors: ParseError[],
 ): Partial<Question> {
+  // Helper: get value by trying multiple key variants (original, lowercase, snake_case)
+  const get = (...keys: string[]): string => {
+    for (const k of keys) {
+      if (raw[k] !== undefined && raw[k] !== '') return raw[k];
+      const lower = k.toLowerCase();
+      if (raw[lower] !== undefined && raw[lower] !== '') return raw[lower];
+    }
+    return '';
+  };
+
   const q: Partial<Question> = {
     type: 'MCQ',
     status: 'Pending',
@@ -61,39 +71,47 @@ function normalizeRawRow(
   };
 
   // Map flat fields
-  q.question = raw['question'] || raw['content'] || '';
-  q.subject = raw['subject'] || '';
-  q.chapter = raw['chapter'] || '';
-  q.topic = raw['topic'] || '';
-  q.stream = raw['stream'] || '';
-  q.stream = raw['stream'] || '';
+  q.question = get('question', 'content');
+  q.subject = get('subject');
+  q.chapter = get('chapter');
+  q.topic = get('topic');
+  q.stream = get('stream');
   // Mapped 'section' from file to 'division' in DB as per requirement
-  q.division = raw['division'] || raw['section'] || '';
-  q.section = raw['section'] || ''; // Keep section for backward compat if needed, or leave empty if we strictly switch.
-  q.explanation = raw['explanation'] || '';
-  q.difficulty = ((raw['difficulty'] || 'Medium') as string)
+  q.division = get('division', 'section');
+  q.section = get('section');
+  q.explanation = get('explanation');
+  q.difficulty = (get('difficulty') || 'Medium')
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean)
     .join(',') as 'Easy' | 'Medium' | 'Hard' | 'Mixed';
-  q.examType = (raw['examType'] || raw['exam_type'] || 'Academic')
+  q.examType = (get('examType', 'examtype', 'exam_type') || 'Academic')
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean)
     .join(',');
 
+  // Image URLs from parsed data
+  q.imageUrl = get('imageUrl', 'imageurl', 'image_url') || undefined;
+  q.explanationImageUrl =
+    get(
+      'explanationImageUrl',
+      'explanationimageurl',
+      'explanation_image_url',
+    ) || undefined;
+
   // Institutes & Years (comma separated)
-  if (raw['institute'] || raw['institutes']) {
-    const val = raw['institute'] || raw['institutes'] || '';
-    q.institutes = val
+  const instituteVal = get('institute', 'institutes');
+  if (instituteVal) {
+    q.institutes = instituteVal
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
     q.institute = q.institutes[0] || '';
   }
-  if (raw['year'] || raw['years']) {
-    const val = raw['year'] || raw['years'] || '';
-    q.years = val
+  const yearVal = get('year', 'years');
+  if (yearVal) {
+    q.years = yearVal
       .split(',')
       .map((s) => parseInt(s.trim()))
       .filter((n) => !isNaN(n));
@@ -103,13 +121,14 @@ function normalizeRawRow(
   // Build options array from option1..option6
   const options: string[] = [];
   for (let i = 1; i <= 6; i++) {
-    const opt = raw[`option${i}`];
+    const opt = get(`option${i}`);
     if (opt && opt.trim()) options.push(opt.trim());
   }
   // Fallback: if no option1..N, try options array directly
-  if (options.length === 0 && raw['options']) {
+  const optionsRaw = get('options');
+  if (options.length === 0 && optionsRaw) {
     try {
-      const parsed = JSON.parse(raw['options']);
+      const parsed = JSON.parse(optionsRaw);
       if (Array.isArray(parsed)) options.push(...parsed);
     } catch {
       /* ignore */
@@ -118,7 +137,12 @@ function normalizeRawRow(
   q.options = options;
 
   // Resolve correct answer
-  const answerRef = raw['answer'] || raw['correctAnswer'] || '';
+  const answerRef = get(
+    'answer',
+    'correctAnswer',
+    'correctanswer',
+    'correct_answer',
+  );
   if (answerRef) {
     // Try "option3" style
     const optionMatch = answerRef.match(/^option(\d+)$/i);
@@ -307,81 +331,18 @@ const EditModal: React.FC<{
     onChange({ ...data, options: opts });
   };
 
-  // --- Data State for Dropdowns ---
-  const [availableSubjects, setAvailableSubjects] = React.useState<
-    { id: string; name: string }[]
-  >([]);
-  const [availableChapters, setAvailableChapters] = React.useState<
-    { id: string; name: string }[]
-  >([]);
-  const [availableTopics, setAvailableTopics] = React.useState<
-    { id: string; name: string }[]
-  >([]);
+  // --- Synchronous Dropdown Data from hsc.ts (Single Source of Truth) ---
+  const availableSubjects = React.useMemo(() => getHscSubjectList(), []);
 
-  // 1. Fetch Subjects on Mount
-  React.useEffect(() => {
-    const fetchSubjects = async () => {
-      try {
-        const subjects = await getSubjects();
-        setAvailableSubjects(
-          subjects.map((s) => ({
-            id: s.id,
-            name: (s as any).rawName || s.name,
-          })),
-        );
-      } catch (err) {
-        console.error('Failed to load subjects:', err);
-      }
-    };
-    fetchSubjects();
-  }, []);
+  const availableChapters = React.useMemo(
+    () => (data.subject ? getHscChapterList(data.subject) : []),
+    [data.subject],
+  );
 
-  // 2. Fetch Chapters when Subject changes
-  React.useEffect(() => {
-    if (!data.subject) {
-      setAvailableChapters([]);
-      setAvailableTopics([]);
-      return;
-    }
-    const fetchChapters = async () => {
-      try {
-        const matchedSubject = availableSubjects.find(
-          (s) => s.name.toLowerCase() === data.subject?.toLowerCase(),
-        );
-        const subjectId = matchedSubject ? matchedSubject.id : data.subject;
-        if (subjectId) {
-          const chapters = await getChapters(subjectId);
-          setAvailableChapters(chapters);
-        }
-      } catch (err) {
-        console.error('Failed to load chapters:', err);
-      }
-    };
-    fetchChapters();
-  }, [data.subject, availableSubjects]);
-
-  // 3. Fetch Topics when Chapter changes
-  React.useEffect(() => {
-    if (!data.chapter) {
-      setAvailableTopics([]);
-      return;
-    }
-    const fetchTopics = async () => {
-      try {
-        const matchedChapter = availableChapters.find(
-          (c) => c.name.toLowerCase() === data.chapter?.toLowerCase(),
-        );
-        const chapterId = matchedChapter ? matchedChapter.id : data.chapter;
-        if (chapterId) {
-          const topics = await getTopics(chapterId);
-          setAvailableTopics(topics.map((t) => ({ id: t.id, name: t.name })));
-        }
-      } catch (err) {
-        console.error('Failed to load topics:', err);
-      }
-    };
-    fetchTopics();
-  }, [data.chapter, availableChapters]);
+  const availableTopics = React.useMemo(
+    () => (data.chapter ? getHscTopicList(data.chapter) : []),
+    [data.chapter],
+  );
 
   return (
     <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-[100] p-0 sm:p-4">

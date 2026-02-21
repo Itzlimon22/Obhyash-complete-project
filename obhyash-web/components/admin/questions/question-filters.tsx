@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { X, Search } from 'lucide-react';
 import { QuestionFilters } from '@/services/database';
-import { getSubjects, getChapters, getTopics } from '@/services/database';
+import {
+  getHscSubjectList,
+  getHscChapterList,
+  getHscTopicList,
+} from '@/lib/data/hsc-helpers';
 
 interface FilterItem {
   id: string;
@@ -19,9 +23,6 @@ export const QuestionFiltersPanel: React.FC<QuestionFiltersProps> = ({
   onFiltersChange,
   onClear,
 }) => {
-  const [subjects, setSubjects] = useState<FilterItem[]>([]);
-  const [chapters, setChapters] = useState<FilterItem[]>([]);
-  const [topics, setTopics] = useState<FilterItem[]>([]);
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
 
   // Debounce search
@@ -33,44 +34,18 @@ export const QuestionFiltersPanel: React.FC<QuestionFiltersProps> = ({
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Load subjects on mount
-  useEffect(() => {
-    const loadSubjects = async () => {
-      const subs = await getSubjects();
-      setSubjects(subs);
-    };
-    loadSubjects();
-  }, []);
+  // --- Synchronous Dropdown Data from hsc.ts (Single Source of Truth) ---
+  const subjects: FilterItem[] = useMemo(() => getHscSubjectList(), []);
 
-  // Load chapters when subject changes
-  useEffect(() => {
-    const loadChapters = async () => {
-      if (!filters.subject) {
-        setChapters([]);
-        setTopics([]);
-        return;
-      }
+  const chapters: FilterItem[] = useMemo(
+    () => (filters.subject ? getHscChapterList(filters.subject) : []),
+    [filters.subject],
+  );
 
-      const chaps = await getChapters(filters.subject!);
-      setChapters(chaps);
-      setTopics([]);
-    };
-    loadChapters();
-  }, [filters.subject]);
-
-  // Load topics when chapter changes
-  useEffect(() => {
-    const loadTopics = async () => {
-      if (!filters.chapter) {
-        setTopics([]);
-        return;
-      }
-
-      const tops = await getTopics(filters.chapter!);
-      setTopics(tops);
-    };
-    loadTopics();
-  }, [filters.chapter]);
+  const topics: FilterItem[] = useMemo(
+    () => (filters.chapter ? getHscTopicList(filters.chapter) : []),
+    [filters.chapter],
+  );
 
   const handleSubjectChange = (value: string) => {
     onFiltersChange({
@@ -154,7 +129,7 @@ export const QuestionFiltersPanel: React.FC<QuestionFiltersProps> = ({
           >
             <option value="">সকল বিষয়</option>
             {subjects.map((sub) => (
-              <option key={sub.id} value={sub.id}>
+              <option key={sub.id} value={sub.name}>
                 {sub.name}
               </option>
             ))}
@@ -174,7 +149,7 @@ export const QuestionFiltersPanel: React.FC<QuestionFiltersProps> = ({
           >
             <option value="">সকল অধ্যায়</option>
             {chapters.map((chap) => (
-              <option key={chap.id} value={chap.id}>
+              <option key={chap.id} value={chap.name}>
                 {chap.name}
               </option>
             ))}
@@ -196,7 +171,7 @@ export const QuestionFiltersPanel: React.FC<QuestionFiltersProps> = ({
           >
             <option value="">সকল টপিক</option>
             {topics.map((topic) => (
-              <option key={topic.id} value={topic.id}>
+              <option key={topic.id} value={topic.name}>
                 {topic.name}
               </option>
             ))}

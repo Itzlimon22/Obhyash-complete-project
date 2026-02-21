@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Save, X, Trash2 } from 'lucide-react';
 import { Question } from '@/lib/types';
 import { MathRenderer } from '@/components/common/MathRenderer';
 import { ImageUploader } from '@/components/ui/image-uploader';
 import {
-  getSubjects,
-  getChapters,
-  getTopics,
-} from '@/services/metadata-service';
+  getHscSubjectList,
+  getHscChapterList,
+  getHscTopicList,
+} from '@/lib/data/hsc-helpers';
 
 interface QuestionFormProps {
   initialData: Partial<Question>;
@@ -28,81 +28,18 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
     setData({ ...data, options: opts });
   };
 
-  // --- Data State for Dropdowns ---
-  const [availableSubjects, setAvailableSubjects] = React.useState<
-    { id: string; name: string }[]
-  >([]);
-  const [availableChapters, setAvailableChapters] = React.useState<
-    { id: string; name: string }[]
-  >([]);
-  const [availableTopics, setAvailableTopics] = React.useState<
-    { id: string; name: string }[]
-  >([]);
+  // --- Synchronous Dropdown Data from hsc.ts (Single Source of Truth) ---
+  const availableSubjects = useMemo(() => getHscSubjectList(), []);
 
-  // 1. Fetch Subjects on Mount
-  React.useEffect(() => {
-    const fetchSubjects = async () => {
-      try {
-        const subjects = await getSubjects();
-        setAvailableSubjects(
-          subjects.map((s) => ({
-            id: s.id,
-            name: (s as any).rawName || s.name,
-          })),
-        );
-      } catch (err) {
-        console.error('Failed to load subjects:', err);
-      }
-    };
-    fetchSubjects();
-  }, []);
+  const availableChapters = useMemo(
+    () => (data.subject ? getHscChapterList(data.subject) : []),
+    [data.subject],
+  );
 
-  // 2. Fetch Chapters when Subject changes
-  React.useEffect(() => {
-    if (!data.subject) {
-      setAvailableChapters([]);
-      setAvailableTopics([]);
-      return;
-    }
-    const fetchChapters = async () => {
-      try {
-        const matchedSubject = availableSubjects.find(
-          (s) => s.name.toLowerCase() === data.subject?.toLowerCase(),
-        );
-        const subjectId = matchedSubject ? matchedSubject.id : data.subject;
-        if (subjectId) {
-          const chapters = await getChapters(subjectId);
-          setAvailableChapters(chapters);
-        }
-      } catch (err) {
-        console.error('Failed to load chapters:', err);
-      }
-    };
-    fetchChapters();
-  }, [data.subject, availableSubjects]);
-
-  // 3. Fetch Topics when Chapter changes
-  React.useEffect(() => {
-    if (!data.chapter) {
-      setAvailableTopics([]);
-      return;
-    }
-    const fetchTopics = async () => {
-      try {
-        const matchedChapter = availableChapters.find(
-          (c) => c.name.toLowerCase() === data.chapter?.toLowerCase(),
-        );
-        const chapterId = matchedChapter ? matchedChapter.id : data.chapter;
-        if (chapterId) {
-          const topics = await getTopics(chapterId);
-          setAvailableTopics(topics.map((t) => ({ id: t.id, name: t.name })));
-        }
-      } catch (err) {
-        console.error('Failed to load topics:', err);
-      }
-    };
-    fetchTopics();
-  }, [data.chapter, availableChapters]);
+  const availableTopics = useMemo(
+    () => (data.chapter ? getHscTopicList(data.chapter) : []),
+    [data.chapter],
+  );
 
   return (
     <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-xl max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-200">
