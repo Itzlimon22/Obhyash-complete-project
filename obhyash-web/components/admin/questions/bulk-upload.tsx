@@ -25,7 +25,7 @@ import { MathRenderer } from '@/components/common/MathRenderer';
 import { ImageUploader } from '@/components/ui/image-uploader';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
-import { hscSubjects } from '@/lib/data/hsc';
+
 import {
   getHscSubjectList,
   getHscChapterList,
@@ -256,7 +256,7 @@ const QuestionPreview: React.FC<{
             প্রশ্ন
           </label>
           <div className="text-neutral-900 dark:text-white text-[15px] leading-relaxed">
-            <MathText text={q.question || ''} />
+            <MathRenderer text={q.question || ''} />
           </div>
         </div>
 
@@ -278,7 +278,7 @@ const QuestionPreview: React.FC<{
                   <span className="font-mono text-xs font-bold mt-0.5 shrink-0 w-5">
                     {String.fromCharCode(65 + i)}.
                   </span>
-                  <MathText text={opt} />
+                  <MathRenderer text={opt} />
                   {i === q.correctAnswerIndex && (
                     <CheckCircle2
                       size={16}
@@ -297,7 +297,7 @@ const QuestionPreview: React.FC<{
               ব্যাখ্যা
             </label>
             <div className="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
-              <MathText text={q.explanation} />
+              <MathRenderer text={q.explanation} />
             </div>
           </div>
         )}
@@ -336,51 +336,41 @@ const EditModal: React.FC<{
   onSave: () => void;
   onCancel: () => void;
 }> = ({ data, onChange, onSave, onCancel }) => {
-  const updateOption = (idx: number, val: string) => {
-    const opts = [...(data.options || [])];
-    opts[idx] = val;
-    onChange({ ...data, options: opts });
+  // ── Normalize synchronously in useState initializer so dropdowns
+  //    are populated on the very first render (no useEffect delay). ──
+  const [localData, setLocalData] = React.useState<Partial<Question>>(() => {
+    const subject =
+      resolveSubjectName(data.subject || '') ?? data.subject ?? '';
+    const chapter = subject
+      ? (resolveChapterName(subject, data.chapter || '') ?? data.chapter ?? '')
+      : (data.chapter ?? '');
+    const topic = chapter
+      ? (resolveTopicName(chapter, data.topic || '') ?? data.topic ?? '')
+      : (data.topic ?? '');
+    return { ...data, subject, chapter, topic };
+  });
+
+  // Sync local changes back to parent so Save works correctly.
+  const update = (patch: Partial<Question>) => {
+    const next = { ...localData, ...patch };
+    setLocalData(next);
+    onChange(next);
   };
 
-  // ── Fix: Normalize subject/chapter/topic to canonical names on mount ──
-  // This ensures the <select> value matches an actual <option> in the list.
-  React.useEffect(() => {
-    const canonicalSubject = data.subject
-      ? resolveSubjectName(data.subject)
-      : undefined;
-    const canonicalChapter =
-      canonicalSubject && data.chapter
-        ? resolveChapterName(canonicalSubject, data.chapter)
-        : undefined;
-    const canonicalTopic =
-      canonicalChapter && data.topic
-        ? resolveTopicName(canonicalChapter, data.topic)
-        : undefined;
-
-    const needsUpdate =
-      (canonicalSubject && canonicalSubject !== data.subject) ||
-      (canonicalChapter && canonicalChapter !== data.chapter) ||
-      (canonicalTopic && canonicalTopic !== data.topic);
-
-    if (needsUpdate) {
-      onChange({
-        ...data,
-        subject: canonicalSubject ?? data.subject,
-        chapter: canonicalChapter ?? data.chapter,
-        topic: canonicalTopic ?? data.topic,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const updateOption = (idx: number, val: string) => {
+    const opts = [...(localData.options || [])];
+    opts[idx] = val;
+    update({ options: opts });
+  };
 
   const availableSubjects = React.useMemo(() => getHscSubjectList(), []);
   const availableChapters = React.useMemo(
-    () => (data.subject ? getHscChapterList(data.subject) : []),
-    [data.subject],
+    () => (localData.subject ? getHscChapterList(localData.subject) : []),
+    [localData.subject],
   );
   const availableTopics = React.useMemo(
-    () => (data.chapter ? getHscTopicList(data.chapter) : []),
-    [data.chapter],
+    () => (localData.chapter ? getHscTopicList(localData.chapter) : []),
+    [localData.chapter],
   );
 
   const fieldCls =
@@ -420,10 +410,9 @@ const EditModal: React.FC<{
               <div>
                 <label className={labelCls}>বিষয়</label>
                 <select
-                  value={data.subject || ''}
+                  value={localData.subject || ''}
                   onChange={(e) =>
-                    onChange({
-                      ...data,
+                    update({
                       subject: e.target.value,
                       chapter: '',
                       topic: '',
@@ -444,11 +433,11 @@ const EditModal: React.FC<{
               <div>
                 <label className={labelCls}>অধ্যায়</label>
                 <select
-                  value={data.chapter || ''}
+                  value={localData.chapter || ''}
                   onChange={(e) =>
-                    onChange({ ...data, chapter: e.target.value, topic: '' })
+                    update({ chapter: e.target.value, topic: '' })
                   }
-                  disabled={!data.subject}
+                  disabled={!localData.subject}
                   className={`${fieldCls} disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <option value="">নির্বাচন করুন</option>
@@ -464,9 +453,9 @@ const EditModal: React.FC<{
               <div>
                 <label className={labelCls}>টপিক</label>
                 <select
-                  value={data.topic || ''}
-                  onChange={(e) => onChange({ ...data, topic: e.target.value })}
-                  disabled={!data.chapter}
+                  value={localData.topic || ''}
+                  onChange={(e) => update({ topic: e.target.value })}
+                  disabled={!localData.chapter}
                   className={`${fieldCls} disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <option value="">নির্বাচন করুন</option>
@@ -482,10 +471,9 @@ const EditModal: React.FC<{
               <div>
                 <label className={labelCls}>কাঠিন্য</label>
                 <select
-                  value={data.difficulty || 'Medium'}
+                  value={localData.difficulty || 'Medium'}
                   onChange={(e) =>
-                    onChange({
-                      ...data,
+                    update({
                       difficulty: e.target.value as 'Easy' | 'Medium' | 'Hard',
                     })
                   }
@@ -508,10 +496,8 @@ const EditModal: React.FC<{
               <div>
                 <label className={labelCls}>স্ট্রিম</label>
                 <input
-                  value={data.stream || ''}
-                  onChange={(e) =>
-                    onChange({ ...data, stream: e.target.value })
-                  }
+                  value={localData.stream || ''}
+                  onChange={(e) => update({ stream: e.target.value })}
                   placeholder="e.g. HSC"
                   className={fieldCls}
                 />
@@ -519,10 +505,8 @@ const EditModal: React.FC<{
               <div>
                 <label className={labelCls}>বিভাগ</label>
                 <input
-                  value={data.section || data.division || ''}
-                  onChange={(e) =>
-                    onChange({ ...data, section: e.target.value })
-                  }
+                  value={localData.section || localData.division || ''}
+                  onChange={(e) => update({ section: e.target.value })}
                   placeholder="e.g. Science"
                   className={fieldCls}
                 />
@@ -530,10 +514,8 @@ const EditModal: React.FC<{
               <div>
                 <label className={labelCls}>পরীক্ষার ধরন</label>
                 <input
-                  value={data.examType || ''}
-                  onChange={(e) =>
-                    onChange({ ...data, examType: e.target.value })
-                  }
+                  value={localData.examType || ''}
+                  onChange={(e) => update({ examType: e.target.value })}
                   placeholder="Medical,Varsity"
                   className={fieldCls}
                 />
@@ -541,8 +523,8 @@ const EditModal: React.FC<{
               <div>
                 <label className={labelCls}>বছর</label>
                 <input
-                  value={data.year || ''}
-                  onChange={(e) => onChange({ ...data, year: e.target.value })}
+                  value={localData.year || ''}
+                  onChange={(e) => update({ year: e.target.value })}
                   placeholder="e.g. 2023"
                   className={fieldCls}
                 />
@@ -550,10 +532,10 @@ const EditModal: React.FC<{
               <div className="col-span-2">
                 <label className={labelCls}>প্রতিষ্ঠান</label>
                 <input
-                  value={data.institute || data.institutes?.join(',') || ''}
-                  onChange={(e) =>
-                    onChange({ ...data, institute: e.target.value })
+                  value={
+                    localData.institute || localData.institutes?.join(',') || ''
                   }
+                  onChange={(e) => update({ institute: e.target.value })}
                   placeholder="e.g. Buet,Ruet,DMC"
                   className={fieldCls}
                 />
@@ -575,20 +557,18 @@ const EditModal: React.FC<{
                   </span>
                 </div>
                 <textarea
-                  value={data.question || ''}
-                  onChange={(e) =>
-                    onChange({ ...data, question: e.target.value })
-                  }
+                  value={localData.question || ''}
+                  onChange={(e) => update({ question: e.target.value })}
                   className={`${fieldCls} resize-none`}
                   rows={4}
                   placeholder="প্রশ্নের বিবরণ লিখুন..."
                 />
-                {data.question && (
+                {localData.question && (
                   <div className="p-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 rounded-xl">
                     <span className="text-[9px] text-neutral-400 uppercase tracking-widest font-bold mb-1 block">
                       প্রিভিউ
                     </span>
-                    <MathRenderer text={data.question} />
+                    <MathRenderer text={localData.question} />
                   </div>
                 )}
                 <div>
@@ -598,22 +578,18 @@ const EditModal: React.FC<{
                   <ImageUploader
                     folder="questions"
                     compact
-                    defaultValue={data.imageUrl}
-                    onUploadComplete={(url) =>
-                      onChange({ ...data, imageUrl: url })
-                    }
+                    defaultValue={localData.imageUrl}
+                    onUploadComplete={(url) => update({ imageUrl: url })}
                   />
-                  {data.imageUrl && (
+                  {localData.imageUrl && (
                     <div className="relative mt-2 w-full h-28 border rounded-xl overflow-hidden bg-neutral-100 group">
                       <img
-                        src={data.imageUrl}
+                        src={localData.imageUrl}
                         alt="Question"
                         className="w-full h-full object-contain"
                       />
                       <button
-                        onClick={() =>
-                          onChange({ ...data, imageUrl: undefined })
-                        }
+                        onClick={() => update({ imageUrl: undefined })}
                         className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <Trash2 size={13} />
@@ -634,11 +610,11 @@ const EditModal: React.FC<{
                   </span>
                 </div>
                 <div className="space-y-2">
-                  {(data.options || []).map((opt, i) => (
+                  {(localData.options || []).map((opt, i) => (
                     <div
                       key={i}
                       className={`flex items-center gap-2 p-2 rounded-xl border transition-all ${
-                        data.correctAnswerIndex === i
+                        localData.correctAnswerIndex === i
                           ? 'border-emerald-400 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20'
                           : 'border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800'
                       }`}
@@ -646,15 +622,14 @@ const EditModal: React.FC<{
                       <button
                         type="button"
                         onClick={() =>
-                          onChange({
-                            ...data,
+                          update({
                             correctAnswerIndex: i,
-                            correctAnswer: data.options?.[i] || '',
+                            correctAnswer: localData.options?.[i] || '',
                             correctAnswerIndices: [i],
                           })
                         }
                         className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center font-mono text-sm font-extrabold transition-all ${
-                          data.correctAnswerIndex === i
+                          localData.correctAnswerIndex === i
                             ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20'
                             : 'bg-white dark:bg-neutral-700 text-neutral-500 border border-neutral-300 dark:border-neutral-600 hover:border-emerald-400'
                         }`}
@@ -666,7 +641,7 @@ const EditModal: React.FC<{
                         onChange={(e) => updateOption(i, e.target.value)}
                         placeholder={`Option ${String.fromCharCode(65 + i)}`}
                         className={`flex-1 px-2.5 py-1.5 rounded-lg border text-sm transition-all outline-none ${
-                          data.correctAnswerIndex === i
+                          localData.correctAnswerIndex === i
                             ? 'border-emerald-300 dark:border-emerald-700 bg-white dark:bg-emerald-900/10 focus:ring-1 focus:ring-emerald-500'
                             : 'border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 focus:ring-1 focus:ring-emerald-500'
                         }`}
@@ -675,10 +650,10 @@ const EditModal: React.FC<{
                         folder="options"
                         compact
                         onUploadComplete={(url) => {
-                          const newOpts = [...(data.optionImages || [])];
+                          const newOpts = [...(localData.optionImages || [])];
                           while (newOpts.length <= i) newOpts.push('');
                           newOpts[i] = url;
-                          onChange({ ...data, optionImages: newOpts });
+                          update({ optionImages: newOpts });
                         }}
                       />
                     </div>
@@ -696,23 +671,21 @@ const EditModal: React.FC<{
                 <ImageUploader
                   folder="explanations"
                   compact
-                  defaultValue={data.explanationImageUrl}
+                  defaultValue={localData.explanationImageUrl}
                   onUploadComplete={(url) =>
-                    onChange({ ...data, explanationImageUrl: url })
+                    update({ explanationImageUrl: url })
                   }
                 />
               </div>
-              {data.explanationImageUrl && (
+              {localData.explanationImageUrl && (
                 <div className="relative w-full md:w-1/2 h-28 border rounded-xl overflow-hidden bg-neutral-100 group">
                   <img
-                    src={data.explanationImageUrl}
+                    src={localData.explanationImageUrl}
                     alt="Explanation"
                     className="w-full h-full object-contain"
                   />
                   <button
-                    onClick={() =>
-                      onChange({ ...data, explanationImageUrl: undefined })
-                    }
+                    onClick={() => update({ explanationImageUrl: undefined })}
                     className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <Trash2 size={13} />
@@ -720,20 +693,18 @@ const EditModal: React.FC<{
                 </div>
               )}
               <textarea
-                value={data.explanation || ''}
-                onChange={(e) =>
-                  onChange({ ...data, explanation: e.target.value })
-                }
+                value={localData.explanation || ''}
+                onChange={(e) => update({ explanation: e.target.value })}
                 className={`${fieldCls} resize-none`}
                 rows={3}
                 placeholder="সঠিক উত্তরের ব্যাখ্যা লিখুন..."
               />
-              {data.explanation && (
+              {localData.explanation && (
                 <div className="p-3 bg-amber-50/60 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/50 rounded-xl">
                   <span className="text-[9px] text-amber-600 uppercase tracking-widest font-bold mb-1 block">
                     সমাধান প্রিভিউ
                   </span>
-                  <MathRenderer text={data.explanation} />
+                  <MathRenderer text={localData.explanation} />
                 </div>
               )}
             </div>
@@ -823,6 +794,11 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   );
   const [importSuccess, setImportSuccess] = useState(false);
 
+  // ── JSON Auto-Fix State ──
+  const [showJsonEditor, setShowJsonEditor] = useState(false);
+  const [rawJsonText, setRawJsonText] = useState('');
+  const [jsonErrorMsg, setJsonErrorMsg] = useState('');
+
   // ── Unified processor: raw rows -> Question[] with dedup ──
   const processRawData = useCallback(
     (rows: Record<string, string>[]): Partial<Question>[] => {
@@ -854,68 +830,17 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
     [],
   );
 
-  // Helper to resolve topic serials to names using local hscSubjects data
+  // Resolve subject/chapter/topic to canonical names (including serial→name for topics)
   const resolveTopicSerialsLocally = (questions: Partial<Question>[]) => {
     return questions.map((q) => {
-      let resolvedSubject = q.subject || '';
-      let resolvedChapter = q.chapter || '';
-      let resolvedTopic = q.topic || '';
-
-      if (!resolvedSubject) return q;
-
-      const subjLower = resolvedSubject.toLowerCase().trim();
-      const foundSubject = hscSubjects.find(
-        (s) =>
-          s.name.toLowerCase() === subjLower ||
-          s.name.toLowerCase().includes(subjLower) ||
-          subjLower.includes(s.name.toLowerCase()),
-      );
-
-      if (foundSubject) {
-        resolvedSubject = foundSubject.name; // Keep exact DB string format
-
-        if (resolvedChapter) {
-          const chapLower = resolvedChapter.toLowerCase().trim();
-          const foundChapter = foundSubject.chapters?.find(
-            (c) =>
-              c.name.toLowerCase() === chapLower ||
-              c.name.toLowerCase().includes(chapLower) ||
-              chapLower.includes(c.name.toLowerCase()),
-          );
-
-          if (foundChapter) {
-            resolvedChapter = foundChapter.name; // Keep exact DB string format
-
-            if (resolvedTopic) {
-              const topicRaw = resolvedTopic.trim();
-              const topicLower = topicRaw.toLowerCase();
-              const isSerial = /^\d+$/.test(topicRaw);
-
-              const foundTopic = foundChapter.topics?.find((t) => {
-                if (isSerial) {
-                  return t.serial?.toString() === topicRaw;
-                }
-                return (
-                  t.name.toLowerCase() === topicLower ||
-                  t.name.toLowerCase().includes(topicLower) ||
-                  topicLower.includes(t.name.toLowerCase())
-                );
-              });
-
-              if (foundTopic) {
-                resolvedTopic = foundTopic.name; // Keep exact DB string format
-              }
-            }
-          }
-        }
-      }
-
-      return {
-        ...q,
-        subject: resolvedSubject,
-        chapter: resolvedChapter,
-        topic: resolvedTopic,
-      };
+      const subject = resolveSubjectName(q.subject || '') ?? q.subject ?? '';
+      const chapter = subject
+        ? (resolveChapterName(subject, q.chapter || '') ?? q.chapter ?? '')
+        : (q.chapter ?? '');
+      const topic = chapter
+        ? (resolveTopicName(chapter, q.topic || '') ?? q.topic ?? '')
+        : (q.topic ?? '');
+      return { ...q, subject, chapter, topic };
     });
   };
 
@@ -950,7 +875,17 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
       if (ext === 'json') {
         const text = await file.text();
-        const data = JSON.parse(text);
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (err: any) {
+          setRawJsonText(text);
+          setJsonErrorMsg(err.message);
+          setShowJsonEditor(true);
+          setIsProcessing(false);
+          e.target.value = '';
+          return; // Stop processing further here
+        }
         rawRows = (Array.isArray(data) ? data : [data]).map(
           (row: Record<string, unknown>) => {
             const mapped: Record<string, string> = {};
@@ -1035,7 +970,57 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
     } finally {
       setIsProcessing(false);
       // Reset input so the same file can be re-uploaded
-      e.target.value = '';
+      // Only reset if we didn't open the JSON editor (which resets early)
+      if (!showJsonEditor) e.target.value = '';
+    }
+  };
+
+  // ── Manual JSON Fix Handler ────────────────────────────────────────
+  const handleJsonFix = async () => {
+    setIsProcessing(true);
+    setJsonErrorMsg('');
+    try {
+      const data = JSON.parse(rawJsonText);
+      const rawRows = (Array.isArray(data) ? data : [data]).map(
+        (row: Record<string, unknown>) => {
+          const mapped: Record<string, string> = {};
+          Object.entries(row).forEach(([k, v]) => {
+            mapped[k.trim().toLowerCase()] = String(v ?? '');
+          });
+          return mapped;
+        },
+      );
+
+      if (rawRows.length === 0)
+        throw new Error('ফাইলে কোনো ডাটা পাওয়া যায়নি।');
+      if (rawRows.length > MAX_ROW_COUNT)
+        throw new Error(`সর্বোচ্চ ${MAX_ROW_COUNT} টি সারি অনুমোদিত।`);
+
+      let questions = processRawData(rawRows);
+      questions = resolveTopicSerialsLocally(questions);
+
+      const questionTexts = questions.map((q) => q.question || '');
+      const dbDuplicates = await checkDuplicateQuestions(questionTexts);
+      if (dbDuplicates.size > 0) {
+        const dupErrors: ParseError[] = [];
+        dbDuplicates.forEach((idx) => {
+          dupErrors.push({
+            row: idx + 1,
+            field: 'question',
+            message: 'ডাটাবেসে ইতিমধ্যে বিদ্যমান — ডুপ্লিকেট',
+          });
+        });
+        setErrors((prev) => [...prev, ...dupErrors]);
+      }
+
+      setParsedData(questions);
+      setSelectedIndices(new Set(questions.map((_, i) => i)));
+      setShowJsonEditor(false); // Close editor on success
+      setStep(2);
+    } catch (err: any) {
+      setJsonErrorMsg(err.message);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -1539,6 +1524,75 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           )}
         </button>
       </div>
+
+      {/* JSON Editor Modal */}
+      {showJsonEditor && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-neutral-200 dark:border-neutral-800">
+            <div className="flex justify-between items-center px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900">
+              <div className="flex items-center gap-2 text-rose-600 dark:text-rose-500">
+                <FileJson size={20} />
+                <h3 className="font-extrabold text-sm tracking-wide">
+                  JSON ফিক্সার
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowJsonEditor(false)}
+                className="p-1.5 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg text-neutral-500 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="p-4 flex flex-col gap-3 flex-1 overflow-hidden">
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 rounded-xl text-sm flex items-start gap-2 text-red-700 dark:text-red-400">
+                <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-bold mb-1">
+                    JSON ফাইলটি পার্স করা যাচ্ছে না
+                  </p>
+                  <p className="opacity-90 leading-relaxed font-mono text-xs">
+                    {jsonErrorMsg}
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-neutral-500 font-medium">
+                নিচের টেক্সট-এ উল্লেখিত লাইনে ভুলটি (যেমন কমা বা কোলন মিসিং) ঠিক
+                করে পুনরায় চেষ্টা করুন।
+              </p>
+
+              <textarea
+                value={rawJsonText}
+                onChange={(e) => setRawJsonText(e.target.value)}
+                className="w-full flex-1 p-4 font-mono text-sm leading-relaxed rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                spellCheck={false}
+              />
+            </div>
+
+            <div className="p-4 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 flex justify-end gap-2">
+              <button
+                onClick={() => setShowJsonEditor(false)}
+                className="px-4 py-2 rounded-xl text-sm font-bold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
+                disabled={isProcessing}
+              >
+                বাতিল
+              </button>
+              <button
+                onClick={handleJsonFix}
+                disabled={isProcessing}
+                className="px-6 py-2 rounded-xl text-sm font-bold bg-emerald-600 text-white shadow-lg hover:bg-emerald-500 transition-colors flex items-center gap-2"
+              >
+                {isProcessing ? (
+                  <Loader2 className="animate-spin" size={16} />
+                ) : (
+                  <Save size={16} />
+                )}
+                সংরক্ষণ ও চেষ্টা করুন
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
