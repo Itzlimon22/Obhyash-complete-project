@@ -19,7 +19,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   onClose,
   onConfirm,
   title = 'তুমি কি নিশ্চিত?',
-  description = 'এই পদক্ষেপটি আর ফিরে পাওয়া যাবে না।',
+  description = 'এই পদক্ষেপটি আর ফিরে পাওয়া যাবে না।',
   confirmLabel = 'মুছে ফেলো',
   isLoading = false,
 }) => {
@@ -35,58 +35,51 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
     };
   }, [isOpen]);
 
-  // Only run on client (portal requirement)
   if (typeof document === 'undefined') return null;
 
   const modal = (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* ── Full-screen backdrop (rendered in <body>, covers everything) ── */}
+          {/* Backdrop */}
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[9998] backdrop-blur-md
-                       bg-white/30 dark:bg-black/50"
+            className="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-md"
             onClick={onClose}
           />
 
-          {/* ── Dialog card ── */}
-          <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 pointer-events-none">
+          {/* Sheet wrapper — bottom on mobile, centered on desktop */}
+          <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center pointer-events-none">
             <motion.div
               key="panel"
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              className="pointer-events-auto relative w-full max-w-[360px] rounded-2xl overflow-hidden
-                         bg-white dark:bg-neutral-900
-                         border border-neutral-200 dark:border-neutral-700/60
-                         shadow-2xl shadow-black/10 dark:shadow-black/50"
+              initial={{ y: 60, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 60, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+              className="pointer-events-auto relative w-full max-w-lg"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Top accent strip */}
-              <div className="h-1 w-full bg-gradient-to-r from-red-500 via-rose-500 to-red-600" />
+              {/* Top accent stripe */}
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-[1.5px] bg-red-600 rounded-t-3xl" />
 
-              <div className="px-6 pt-6 pb-6">
-                {/* Icon */}
-                <div
-                  className="mx-auto mb-4 flex items-center justify-center
-                                w-14 h-14 rounded-2xl
-                                bg-red-50 dark:bg-red-900/20
-                                border border-red-100 dark:border-red-800/30
-                                text-red-500 dark:text-red-400"
-                >
+              <div className="rounded-t-3xl sm:rounded-3xl bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 shadow-2xl px-6 pb-8 pt-5 text-center">
+                {/* Drag handle */}
+                <div className="mx-auto mb-6 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700 sm:hidden" />
+
+                {/* Icon badge */}
+                <div className="mx-auto mb-5 flex items-center justify-center w-14 h-14 rounded-2xl bg-red-600 shadow-md">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={1.8}
-                    stroke="currentColor"
+                    stroke="white"
                     className="w-7 h-7"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -96,52 +89,21 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
                   </svg>
                 </div>
 
-                {/* Title */}
-                <h3
-                  className="text-center text-[1.1rem] font-bold tracking-tight
-                               text-neutral-900 dark:text-white mb-1.5"
-                >
+                <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-1.5">
                   {title}
                 </h3>
-
-                {/* Description */}
-                <p
-                  className="text-center text-sm leading-relaxed
-                              text-neutral-500 dark:text-neutral-400 mb-6"
-                >
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed mb-6">
                   {description}
                 </p>
 
-                {/* Divider */}
-                <div className="mb-5 h-px bg-neutral-100 dark:bg-neutral-800" />
+                <div className="h-px bg-neutral-100 dark:bg-neutral-800 mb-5" />
 
-                {/* Action buttons */}
-                <div className="flex gap-3">
-                  {/* Cancel */}
-                  <button
-                    onClick={onClose}
-                    disabled={isLoading}
-                    className="flex-1 py-2.5 rounded-xl text-sm font-semibold
-                               border border-neutral-200 dark:border-neutral-700
-                               text-neutral-700 dark:text-neutral-300
-                               bg-neutral-50 dark:bg-neutral-800
-                               hover:bg-neutral-100 dark:hover:bg-neutral-700
-                               transition-colors disabled:opacity-50"
-                  >
-                    বাতিল
-                  </button>
-
-                  {/* Confirm / Delete */}
+                {/* Stacked action buttons */}
+                <div className="flex flex-col gap-2.5">
                   <button
                     onClick={onConfirm}
                     disabled={isLoading}
-                    className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white
-                               bg-gradient-to-br from-red-500 to-red-700
-                               hover:from-red-600 hover:to-red-800
-                               shadow-md shadow-red-200 dark:shadow-red-900/30
-                               hover:shadow-lg hover:shadow-red-200 dark:hover:shadow-red-900/40
-                               hover:-translate-y-px
-                               transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                    className="w-full py-3.5 rounded-2xl bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-bold text-sm transition-all duration-150 shadow-md disabled:opacity-60 flex items-center justify-center gap-2"
                   >
                     {isLoading ? (
                       <svg
@@ -172,6 +134,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
                         strokeWidth={2.2}
                         stroke="currentColor"
                         className="w-4 h-4"
+                        aria-hidden="true"
                       >
                         <path
                           strokeLinecap="round"
@@ -182,6 +145,13 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
                     )}
                     {confirmLabel}
                   </button>
+                  <button
+                    onClick={onClose}
+                    disabled={isLoading}
+                    className="w-full py-3 rounded-2xl text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 font-medium text-sm transition-colors duration-150 disabled:opacity-50"
+                  >
+                    বাতিল করো
+                  </button>
                 </div>
               </div>
             </motion.div>
@@ -191,7 +161,6 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
     </AnimatePresence>
   );
 
-  // Portal renders directly into <body> — escapes all layout stacking contexts
   return createPortal(modal, document.body);
 };
 

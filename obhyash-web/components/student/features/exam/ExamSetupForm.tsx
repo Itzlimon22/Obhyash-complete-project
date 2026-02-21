@@ -327,14 +327,14 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         <div>
           <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2 flex items-center gap-3">
             মক টেস্ট সেটআপ
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-indigo-500/10 to-rose-500/10 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 text-[10px] uppercase tracking-wider font-extrabold">
-              <Sparkles className="w-3 h-3 text-rose-500" />
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-[10px] uppercase tracking-wider font-extrabold">
+              <Sparkles className="w-3 h-3" />
               Smart AI Active
             </span>
           </h2>
           <p className="text-neutral-600 dark:text-neutral-400 text-sm flex items-center gap-2">
             আপনার প্রয়োজন অনুযায়ী পরীক্ষা কাস্টমাইজ করুন
-            <span className="sm:hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 text-[10px] font-bold">
+            <span className="sm:hidden inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 text-[10px] font-bold">
               <Sparkles className="w-3 h-3" /> AI Active
             </span>
           </p>
@@ -344,7 +344,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         <button
           type="button"
           onClick={() => setIsOmrModalOpen(true)}
-          className="w-full inline-flex items-center gap-2 px-5 py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 font-semibold text-sm hover:shadow-lg transition-all active:scale-95"
+          className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-xl font-semibold text-sm hover:shadow-lg transition-all active:scale-95"
         >
           <FileQuestion className="w-4 h-4" />
           OMR শিট ডাউনলোড
@@ -392,7 +392,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                     className={cn(
                       'p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 text-center',
                       subject === opt.id
-                        ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/30 shadow-sm'
+                        ? 'border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 shadow-sm'
                         : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-800/50',
                     )}
                   >
@@ -401,7 +401,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                       className={cn(
                         'text-xs font-semibold',
                         subject === opt.id
-                          ? 'text-rose-700 dark:text-rose-300'
+                          ? 'text-emerald-800 dark:text-emerald-300'
                           : 'text-neutral-700 dark:text-neutral-300',
                       )}
                     >
@@ -520,7 +520,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 <button
                   type="button"
                   onClick={handleSelectAllExamTypes}
-                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                  className="text-xs font-bold text-emerald-700 dark:text-emerald-500 hover:underline"
                 >
                   {examTypes.length === EXAM_TYPE_OPTIONS.length
                     ? 'সব মুছুন'
@@ -538,7 +538,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                       className={cn(
                         'p-3 rounded-xl border-2 text-left transition-all',
                         isSelected
-                          ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/30'
+                          ? 'border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30'
                           : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600',
                       )}
                     >
@@ -546,7 +546,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                         className={cn(
                           'text-xs font-semibold mb-0.5',
                           isSelected
-                            ? 'text-rose-700 dark:text-rose-300'
+                            ? 'text-emerald-800 dark:text-emerald-300'
                             : 'text-neutral-700 dark:text-neutral-300',
                         )}
                       >
@@ -573,7 +573,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   className={cn(
                     'flex-1 min-w-[60px] py-2 rounded-lg text-xs font-semibold transition-all',
                     difficulties.length === DIFFICULTY_OPTIONS.length
-                      ? 'bg-white dark:bg-neutral-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                      ? 'bg-white dark:bg-neutral-700 text-emerald-700 dark:text-emerald-400 shadow-sm'
                       : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white',
                   )}
                 >
@@ -620,7 +620,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 step="1"
                 value={questionCount}
                 onChange={(e) => setQuestionCount(parseInt(e.target.value))}
-                className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-rose-500"
+                className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-emerald-700"
               />
               <div className="flex justify-between text-xs text-neutral-500 mt-2">
                 <span>1</span>
@@ -641,13 +641,13 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                           'text-xs font-bold px-2.5 py-1 rounded-lg',
                           availableCount >= questionCount
                             ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
-                            : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',
+                            : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400',
                         )}
                       >
                         ডাটাবেসে আছে: {availableCount} টি
                       </span>
                       {availableCount < questionCount && (
-                        <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                        <span className="text-[10px] text-red-600 dark:text-red-400 font-medium">
                           ⚠ চাহিদার চেয়ে কম — {availableCount} টি পাবেন
                         </span>
                       )}
@@ -674,7 +674,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 step="1"
                 value={duration}
                 onChange={(e) => setDuration(parseInt(e.target.value))}
-                className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-rose-500"
+                className="w-full h-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-emerald-700"
               />
               <div className="flex justify-between text-xs text-neutral-500 mt-2">
                 <span>1m</span>
@@ -696,7 +696,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                     className={cn(
                       'flex-1 py-2 px-1 rounded-xl border-2 text-xs font-semibold transition-all',
                       negativeMarking === val
-                        ? 'bg-rose-50 dark:bg-rose-950/30 border-rose-500 text-rose-700 dark:text-rose-300'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-700 text-emerald-800 dark:text-emerald-300'
                         : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-600',
                     )}
                   >
@@ -767,7 +767,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h3 className="text-2xl font-extrabold text-neutral-900 dark:text-white flex items-center gap-2">
-                  <Download className="w-6 h-6 text-rose-500" />
+                  <Download className="w-6 h-6 text-neutral-700 dark:text-neutral-300" />
                   OMR ডাউনলোড
                 </h3>
                 <p className="text-sm text-neutral-500 mt-2 font-medium">
@@ -799,7 +799,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                     onChange={(e) => setOmrIsBlank(e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-12 h-7 bg-neutral-200 peer-focus:outline-none rounded-full peer dark:bg-neutral-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-rose-600 transition-colors"></div>
+                  <div className="w-12 h-7 bg-neutral-200 peer-focus:outline-none rounded-full peer dark:bg-neutral-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-700 transition-colors"></div>
                 </label>
               </div>
 
@@ -819,7 +819,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                     <select
                       value={subject || ''}
                       onChange={(e) => setSubject(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-white text-sm font-bold border-none focus:ring-2 focus:ring-rose-500/20"
+                      className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-white text-sm font-bold border-none focus:ring-2 focus:ring-emerald-700/20"
                     >
                       <option value="" disabled>
                         বিষয় নির্বাচন করুন
