@@ -386,7 +386,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
               <button
                 onClick={onGetStarted}
-                className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-rose-600 hover:from-indigo-700 hover:to-rose-700 text-white rounded-xl font-bold text-base shadow-xl shadow-indigo-500/30 transition-all hover:-tranneutral-y-1 flex items-center justify-center gap-2"
+                className="sm:w-auto w-full px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-base shadow-lg shadow-indigo-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap"
               >
                 নতুন পরীক্ষা দিন
                 <ArrowRight className="w-5 h-5" />
@@ -397,7 +397,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     .getElementById('features')
                     ?.scrollIntoView({ behavior: 'smooth' })
                 }
-                className="w-full px-8 py-4 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 font-bold text-base hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all"
+                className="sm:w-auto w-full px-8 py-4 bg-white dark:bg-black border-2 border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-900 rounded-xl font-bold text-base transition-all active:scale-95 flex items-center justify-center whitespace-nowrap"
               >
                 ফিচারগুলো দেখুন
               </button>
