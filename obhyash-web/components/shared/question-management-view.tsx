@@ -12,11 +12,16 @@ import {
   AlertCircle,
   Clock,
   Download,
+  LayoutList,
+  Table,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Question } from '@/lib/types';
 import { useQuestions } from '@/hooks/use-questions';
 import { QuestionList } from '@/components/admin/questions/question-list';
+import { QuestionTableView } from '@/components/admin/questions/question-table-view';
 import { QuestionForm } from '@/components/admin/questions/question-form';
 import { BulkUpload } from '@/components/admin/questions/bulk-upload';
 import { Pagination } from '@/components/admin/questions/pagination';
@@ -73,6 +78,8 @@ export default function QuestionManagementView({
 
   // View state management
   const [viewMode, setViewMode] = useState<'list' | 'upload' | 'edit'>('list');
+  const [displayStyle, setDisplayStyle] = useState<'card' | 'table'>('card');
+  const [tableFontSize, setTableFontSize] = useState<number>(14);
   const [editingData, setEditingData] = useState<Partial<Question>>({});
   const [previewData, setPreviewData] = useState<Question | null>(null);
   const [showExportMenu, setShowExportMenu] = useState(false);
@@ -288,6 +295,52 @@ export default function QuestionManagementView({
             onUpdateMetadata={updateSelectedMetadata}
           />
 
+          {/* View Toggles & Table Font Size */}
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-2 mt-4">
+            <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 p-1 rounded-lg">
+              <button
+                onClick={() => setDisplayStyle('card')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  displayStyle === 'card'
+                    ? 'bg-white dark:bg-neutral-900 shadow text-neutral-900 dark:text-white'
+                    : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200'
+                }`}
+              >
+                <LayoutList size={16} /> কার্ড ভিউ
+              </button>
+              <button
+                onClick={() => setDisplayStyle('table')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  displayStyle === 'table'
+                    ? 'bg-white dark:bg-neutral-900 shadow text-neutral-900 dark:text-white'
+                    : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200'
+                }`}
+              >
+                <Table size={16} /> টেবিল ভিউ
+              </button>
+            </div>
+
+            {displayStyle === 'table' && (
+              <div className="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-xl shadow-inner border border-neutral-200 dark:border-neutral-700">
+                <span className="text-xs font-bold text-neutral-500 px-2 uppercase tracking-wider">
+                  ফন্ট সাইজ: {tableFontSize}px
+                </span>
+                <button
+                  onClick={() => setTableFontSize((f) => Math.max(10, f - 1))}
+                  className="p-1.5 hover:bg-white dark:hover:bg-neutral-700 rounded-md text-neutral-600 dark:text-neutral-300 shadow-sm border border-transparent hover:border-neutral-200 dark:hover:border-neutral-600 transition-all active:scale-95"
+                >
+                  <ZoomOut size={16} />
+                </button>
+                <button
+                  onClick={() => setTableFontSize((f) => Math.min(24, f + 1))}
+                  className="p-1.5 hover:bg-white dark:hover:bg-neutral-700 rounded-md text-neutral-600 dark:text-neutral-300 shadow-sm border border-transparent hover:border-neutral-200 dark:hover:border-neutral-600 transition-all active:scale-95"
+                >
+                  <ZoomIn size={16} />
+                </button>
+              </div>
+            )}
+          </div>
+
           {/* Questions Table */}
           {isLoading ? (
             <div className="w-full py-20 flex justify-center bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-neutral-200 dark:border-neutral-800">
@@ -295,15 +348,27 @@ export default function QuestionManagementView({
             </div>
           ) : (
             <>
-              <QuestionList
-                questions={questions}
-                selectedQuestions={selectedQuestions}
-                onEdit={handleEdit}
-                onDelete={deleteQuestion}
-                onPreview={setPreviewData}
-                onStatusChange={updateStatus}
-                onToggleSelection={toggleSelection}
-              />
+              {displayStyle === 'card' ? (
+                <QuestionList
+                  questions={questions}
+                  selectedQuestions={selectedQuestions}
+                  onEdit={handleEdit}
+                  onDelete={deleteQuestion}
+                  onPreview={setPreviewData}
+                  onStatusChange={updateStatus}
+                  onToggleSelection={toggleSelection}
+                />
+              ) : (
+                <QuestionTableView
+                  questions={questions}
+                  selectedQuestions={selectedQuestions}
+                  onEdit={handleEdit}
+                  onDelete={deleteQuestion}
+                  onToggleSelection={toggleSelection}
+                  fontSize={tableFontSize}
+                  saveQuestion={saveQuestion}
+                />
+              )}
 
               {/* Pagination */}
               {totalPages > 1 && (
