@@ -80,22 +80,33 @@ const EditableRow = ({
     if (typeof localQ.correctAnswerIndex === 'number') {
       return String.fromCharCode(65 + localQ.correctAnswerIndex);
     }
+    if (
+      Array.isArray(localQ.correctAnswerIndices) &&
+      localQ.correctAnswerIndices.length > 0
+    ) {
+      return String.fromCharCode(65 + localQ.correctAnswerIndices[0]);
+    }
     // Fallback if correctAnswer is present but index is missing
     if (localQ.correctAnswer && localQ.options) {
-      const idx = localQ.options.findIndex((o) => o === localQ.correctAnswer);
+      const idx = localQ.options.findIndex(
+        (o) => o?.trim() === localQ.correctAnswer?.trim(),
+      );
       if (idx !== -1) return String.fromCharCode(65 + idx);
     }
     return '';
   };
 
-  const canonicalSubject = localQ.subject
-    ? resolveSubjectName(localQ.subject) || localQ.subject
+  const cleanSubject = (localQ.subject || '').trim();
+  const canonicalSubject = cleanSubject
+    ? resolveSubjectName(cleanSubject) || cleanSubject
     : '';
-  const canonicalChapter = localQ.chapter
-    ? resolveChapterName(canonicalSubject, localQ.chapter) || localQ.chapter
+  const cleanChapter = (localQ.chapter || '').trim();
+  const canonicalChapter = cleanChapter
+    ? resolveChapterName(canonicalSubject, cleanChapter) || cleanChapter
     : '';
-  const canonicalTopic = localQ.topic
-    ? resolveTopicName(canonicalChapter, localQ.topic) || localQ.topic
+  const cleanTopic = (localQ.topic || '').trim();
+  const canonicalTopic = cleanTopic
+    ? resolveTopicName(canonicalChapter, cleanTopic) || cleanTopic
     : '';
 
   const availableSubjects = getHscSubjectList();
@@ -143,13 +154,18 @@ const EditableRow = ({
 
       {[0, 1, 2, 3].map((i) => (
         <td key={i} className={`${tdClass} min-w-[200px]`}>
-          <input
-            value={localQ.options?.[i] || ''}
-            onChange={(e) => updateOption(i, e.target.value)}
-            onBlur={handleBlur}
-            className={inputClass}
-            placeholder={`Option ${String.fromCharCode(65 + i)}`}
-          />
+          <div className="relative group w-full h-full min-h-[36px]">
+            <input
+              value={localQ.options?.[i] || ''}
+              onChange={(e) => updateOption(i, e.target.value)}
+              onBlur={handleBlur}
+              className={`${inputClass} absolute inset-0 opacity-0 focus:opacity-100 z-10 w-full h-full bg-white dark:bg-neutral-800 border focus:border-emerald-500 rounded px-2`}
+              placeholder={`Option ${String.fromCharCode(65 + i)}`}
+            />
+            <div className="absolute inset-0 pointer-events-none flex items-center px-2 py-1 overflow-hidden group-focus-within:opacity-0">
+              <MathRenderer text={localQ.options?.[i] || ''} />
+            </div>
+          </div>
         </td>
       ))}
 
@@ -200,12 +216,26 @@ const EditableRow = ({
       </td>
 
       <td className={`${tdClass} min-w-[120px]`}>
-        <input
+        <select
           value={localQ.examType || ''}
-          onChange={(e) => updateField('examType', e.target.value)}
-          onBlur={handleBlur}
-          className={inputClass}
-        />
+          onChange={(e) => {
+            updateField('examType', e.target.value);
+            const newQ = { ...localQ, examType: e.target.value };
+            setLocalQ(newQ);
+            onSave(newQ);
+          }}
+          className={`${inputClass} min-w-[100px]`}
+        >
+          <option value="">Select</option>
+          {localQ.examType &&
+            !['Academic', 'Medical', 'Engineering', 'Varsity'].includes(
+              localQ.examType,
+            ) && <option value={localQ.examType}>{localQ.examType}</option>}
+          <option value="Academic">Academic</option>
+          <option value="Medical">Medical</option>
+          <option value="Engineering">Engineering</option>
+          <option value="Varsity">Varsity</option>
+        </select>
       </td>
 
       <td className={`${tdClass} min-w-[100px]`}>
@@ -317,6 +347,24 @@ const EditableRow = ({
         </select>
       </td>
 
+      <td className={`${tdClass} min-w-[120px]`}>
+        <select
+          value={localQ.status || 'Pending'}
+          onChange={(e) => {
+            updateField('status', e.target.value);
+            const newQ = { ...localQ, status: e.target.value as any };
+            setLocalQ(newQ);
+            onSave(newQ);
+          }}
+          className={`${inputClass} ${localQ.status === 'Approved' ? 'text-emerald-600' : localQ.status === 'Rejected' ? 'text-red-600' : 'text-amber-600'}`}
+        >
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+          <option value="Draft">Draft</option>
+        </select>
+      </td>
+
       <td className={`${tdClass} text-center align-middle whitespace-nowrap`}>
         <div className="flex items-center justify-center gap-1 px-1">
           <button
@@ -389,6 +437,7 @@ export const QuestionTableView: React.FC<QuestionTableViewProps> = ({
             <th className={thClass}>Chapter</th>
             <th className={thClass}>Topic</th>
             <th className={thClass}>Diff</th>
+            <th className={thClass}>Status</th>
             <th className={`${thClass} text-center`}>Actions</th>
           </tr>
         </thead>
@@ -408,7 +457,7 @@ export const QuestionTableView: React.FC<QuestionTableViewProps> = ({
           {questions.length === 0 && (
             <tr>
               <td
-                colSpan={18}
+                colSpan={19}
                 className="p-8 text-center text-neutral-500 border border-neutral-300"
               >
                 No questions found.

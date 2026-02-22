@@ -68,9 +68,10 @@ function normalizeRawRow(
   // Helper: get value by trying multiple key variants (original, lowercase, snake_case)
   const get = (...keys: string[]): string => {
     for (const k of keys) {
-      if (raw[k] !== undefined && raw[k] !== '') return raw[k];
+      if (raw[k] !== undefined && raw[k] !== '') return String(raw[k]).trim();
       const lower = k.toLowerCase();
-      if (raw[lower] !== undefined && raw[lower] !== '') return raw[lower];
+      if (raw[lower] !== undefined && raw[lower] !== '')
+        return String(raw[lower]).trim();
     }
     return '';
   };
