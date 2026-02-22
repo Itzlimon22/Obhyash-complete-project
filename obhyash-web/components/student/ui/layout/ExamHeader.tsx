@@ -110,7 +110,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
               <button
                 onClick={onDownloadQuestionPaper}
                 className="p-2 rounded-full bg-neutral-50 dark:bg-neutral-800 text-neutral-500 hover:text-indigo-600 dark:hover:text-indigo-400 border border-neutral-200 dark:border-neutral-700 transition-colors hidden sm:flex"
-                title="প্রশ্নপত্র ডাউনলোড করুন"
+                title="প্রশ্নপত্র ডাউনলোড করো"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

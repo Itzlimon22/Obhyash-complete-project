@@ -130,7 +130,7 @@ const ResultView: React.FC<ResultViewProps> = ({
       return { title: 'ভালো প্রচেষ্টা', text: 'আপনি সঠিক পথে আছেন।' };
     return {
       title: 'আরও ভালো করতে হবে',
-      text: 'বিষয়টি পুনরায় পড়ে আবার চেষ্টা করুন।',
+      text: 'বিষয়টি পুনরায় পড়ে আবার চেষ্টা করো।',
     };
   };
 
@@ -178,7 +178,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                 onClick={onChallengeEvaluation}
                 className="px-4 py-2 bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 text-sm font-bold rounded hover:bg-amber-100 dark:hover:bg-neutral-700 transition-colors whitespace-nowrap"
               >
-                পুনরায় যাচাই করুন
+                পুনরায় যাচাই করো
               </button>
             </div>
           )}
@@ -549,7 +549,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                   d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
                 />
               </svg>
-              নতুন পরীক্ষা শুরু করুন
+              নতুন পরীক্ষা শুরু করো
             </>
           )}
         </button>

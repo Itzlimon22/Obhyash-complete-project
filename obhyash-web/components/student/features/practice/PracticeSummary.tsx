@@ -38,8 +38,8 @@ export const PracticeSummary: React.FC<PracticeSummaryProps> = ({
     percentage >= 80
       ? 'দারুণ! অনুশীলন চমৎকার হয়েছে।'
       : percentage >= 50
-        ? 'ভালো প্রচেষ্টা! আরও একটু অনুশীলন করুন।'
-        : 'চিন্তা নেই, আবার চেষ্টা করুন।';
+        ? 'ভালো প্রচেষ্টা! আরও একটু অনুশীলন করো।'
+        : 'চিন্তা নেই, আবার চেষ্টা করো।';
 
   const containerVariants = {
     hidden: { opacity: 0 },

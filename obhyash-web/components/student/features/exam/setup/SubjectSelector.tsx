@@ -93,7 +93,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
           >
             {selectedSubjectData
               ? selectedSubjectData.name
-              : 'বিষয় নির্বাচন করুন...'}
+              : 'বিষয় নির্বাচন করো...'}
           </span>
         </div>
         <ChevronDown

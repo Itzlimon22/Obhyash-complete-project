@@ -166,7 +166,7 @@ const UserForm = ({
                 <label
                   className={`px-4 py-2 bg-white dark:bg-obsidian-900 border border-paper-200 dark:border-obsidian-700 rounded-lg text-xs font-medium cursor-pointer hover:bg-gray-50 dark:hover:bg-obsidian-800 transition-colors shadow-sm flex items-center gap-2 w-fit ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}
                 >
-                  {isUploading ? 'আপলোড হচ্ছে...' : 'ছবি পরিবর্তন করুন'}
+                  {isUploading ? 'আপলোড হচ্ছে...' : 'ছবি পরিবর্তন করো'}
                   <input
                     type="file"
                     className="hidden"
@@ -241,7 +241,7 @@ const UserForm = ({
                     setFormData({ ...formData, address: e.target.value })
                   }
                   className="w-full px-4 py-2.5 rounded-lg bg-paper-50 dark:bg-obsidian-950 border border-paper-200 dark:border-obsidian-800 text-sm focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none dark:text-white transition-all resize-none min-h-[80px]"
-                  placeholder="সম্পূর্ণ ঠিকানা লিখুন..."
+                  placeholder="সম্পূর্ণ ঠিকানা লেখো..."
                 />
               </InputGroup>
             </div>
@@ -503,7 +503,7 @@ export const UserDrawer: React.FC<UserDrawerProps> = ({
                 {user ? user.name : 'নতুন ইউজার'}
               </h2>
               <span className="text-xs text-gray-500">
-                {user ? 'প্রোফাইল এডিট করুন' : 'নতুন একাউন্ট তৈরি'}
+                {user ? 'প্রোফাইল এডিট করো' : 'নতুন একাউন্ট তৈরি'}
               </span>
             </div>
           </div>

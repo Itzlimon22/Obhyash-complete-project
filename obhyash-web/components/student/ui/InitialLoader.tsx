@@ -42,7 +42,7 @@ const InitialLoader: React.FC = () => {
 
         {/* Bengali Tagline */}
         <p className="text-sm font-bold text-black/60 dark:text-white/60 tracking-wide uppercase">
-          অভ্যাস • শিখুন • জয় করুন
+          অভ্যাস • শেখো • জয় করো
         </p>
 
         {/* Loading Bar */}

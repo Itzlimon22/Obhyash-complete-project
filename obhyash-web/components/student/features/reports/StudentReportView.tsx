@@ -196,7 +196,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                         onClick={(e) => e.stopPropagation()}
                         className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-neutral-50 hover:bg-neutral-100 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 text-xs font-bold rounded-xl border border-neutral-200 dark:border-neutral-700 transition-all active:scale-[0.98]"
                       >
-                        <Eye size={14} /> প্রশ্ন দেখুন
+                        <Eye size={14} /> প্রশ্ন দেখো
                       </button>
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl bg-white dark:bg-neutral-900 border-none shadow-2xl rounded-2xl">
@@ -258,7 +258,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                               />
                               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                                 <span className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-white text-xs font-bold border border-white/30 flex items-center gap-2">
-                                  <ExternalLink size={14} /> দেখুন
+                                  <ExternalLink size={14} /> দেখো
                                 </span>
                               </div>
                             </a>
@@ -305,7 +305,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                     হচ্ছে...
                   </>
                 ) : (
-                  'আরো দেখুন'
+                  'আরও দেখো'
                 )}
               </button>
             </div>

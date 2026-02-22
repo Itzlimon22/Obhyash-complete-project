@@ -202,7 +202,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
         'বেসিক এনালাইসিস',
         'লিমিটেড প্রশ্ন ব্যাংক',
       ],
-      cta: 'বিনামূল্যে শুরু করুন',
+      cta: 'বিনামূল্যে শুরু করো',
       color: 'border-neutral-200 dark:border-neutral-800',
       buttonColor:
         'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700',
@@ -218,7 +218,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
         'অ্যাডভান্সড এনালাইসিস',
         'বিজ্ঞাপনমুক্ত অভিজ্ঞতা',
       ],
-      cta: 'সাবস্ক্রাইব করুন',
+      cta: 'সাবস্ক্রাইব করো',
       highlight: true,
       color: 'border-indigo-500 ring-2 ring-indigo-500/20',
       buttonColor:
@@ -248,7 +248,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     },
     {
       q: 'OMR স্ক্যান ফিচারটি কিভাবে কাজ করে?',
-      a: 'বাসায় বসে সাধারণ কাগজে পরীক্ষা দিন এবং আমাদের অ্যাপের ক্যামেরা দিয়ে ওএমআর শিটটির ছবি তুলুন। আমাদের অত্যাধুনিক AI ২০ সেকেন্ডের মধ্যে আপনার খাতা মূল্যায়ন করে নির্ভুল স্কোর এবং সঠিক উত্তরের ব্যাখ্যা দেখাবে। এটি কোচিং সেন্টারের ওএমআর রিডারের মতোই কার্যকর।',
+      a: 'বাসায় বসে সাধারণ কাগজে পরীক্ষা দাও এবং আমাদের অ্যাপের ক্যামেরা দিয়ে ওএমআর শিটটির ছবি তোলো। আমাদের অত্যাধুনিক AI ২০ সেকেন্ডের মধ্যে আপনার খাতা মূল্যায়ন করে নির্ভুল স্কোর এবং সঠিক উত্তরের ব্যাখ্যা দেখাবে। এটি কোচিং সেন্টারের ওএমআর রিডারের মতোই কার্যকর।',
     },
     {
       q: 'AI ব্যাখ্যা এবং সমাধান কতটা নির্ভুল?',
@@ -382,7 +382,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <span className="text-indigo-600 dark:text-indigo-400">
                 OMR Upload
               </span>{' '}
-              এবং নিজের অগ্রগতি যাচাই করুন এক নিমিষেই। একাডেমিক এবং অ্যাডমিশন
+              এবং নিজের অগ্রগতি যাচাই করো এক নিমিষেই। একাডেমিক এবং অ্যাডমিশন
               প্রস্তুতির সেরা সঙ্গী।
             </p>
 
@@ -391,7 +391,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 onClick={onGetStarted}
                 className="sm:w-auto w-full px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-base shadow-lg shadow-indigo-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap"
               >
-                নতুন পরীক্ষা দিন
+                নতুন পরীক্ষা দাও
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -413,7 +413,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 }
                 className="sm:w-auto w-full px-8 py-4 bg-white dark:bg-black border-2 border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-900 rounded-xl font-bold text-base transition-all active:scale-95 flex items-center justify-center whitespace-nowrap"
               >
-                ফিচারগুলো দেখুন
+                ফিচারগুলো দেখো
               </button>
             </div>
 
@@ -664,7 +664,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed mb-6 text-sm">
               Gemini 2.5 এর শক্তিতে তৈরি করুন আপনার প্রয়োজন অনুযায়ী প্রশ্নপত্র।
               বিষয়, অধ্যায়, টপিক এবং কঠিনতার লেভেল সেট করে আনলিমিটেড মক টেস্ট
-              দিন। সাথে থাকছে প্রতিটি প্রশ্নের বিস্তারিত ব্যাখ্যা।
+              দাও। সাথে থাকছে প্রতিটি প্রশ্নের বিস্তারিত ব্যাখ্যা।
             </p>
             <ul className="grid grid-cols-2 gap-2 text-xs md:text-sm text-neutral-500 font-medium">
               <li className="flex items-center gap-2">
@@ -742,7 +742,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               স্মার্ট এনালাইসিস
             </h3>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-              সাবজেক্ট ভিত্তিক দুর্বলতা চিহ্নিত করুন। গ্রাফ এবং চার্টের মাধ্যমে
+              সাবজেক্ট ভিত্তিক দুর্বলতা চিহ্নিত করো। গ্রাফ এবং চার্টের মাধ্যমে
               নিজের অগ্রগতি ট্র্যাক করুন এবং সময়ের সঠিক ব্যবহার শিখুন।
             </p>
           </div>
@@ -773,7 +773,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </h3>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
               প্রতিটি সঠিক উত্তরে অর্জন করুন XP পয়েন্ট। লেভেল আনলক করুন এবং সারা
-              দেশের শিক্ষার্থীদের সাথে প্রতিযোগিতায় নিজেকে যাচাই করুন।
+              দেশের শিক্ষার্থীদের সাথে প্রতিযোগিতায় নিজেকে যাচাই করো।
             </p>
           </div>
 
@@ -802,7 +802,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               PDF ও অফলাইন টুলস
             </h3>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-              প্রশ্নপত্র এবং OMR শিট PDF আকারে ডাউনলোড করে প্রিন্ট করুন। অফলাইনে
+              প্রশ্নপত্র এবং OMR শিট PDF আকারে ডাউনলোড করে প্রিন্ট করো। অফলাইনে
               পরীক্ষা দেওয়ার পূর্ণ স্বাধীনতা।
             </p>
           </div>
@@ -911,7 +911,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto px-4 lg:px-6 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mt-2">
-              আপনার পছন্দের প্ল্যানটি বেছে নিন
+              আপনার পছন্দের প্ল্যানটি বেছে নাও
             </h2>
             <p className="text-neutral-600 dark:text-neutral-400 mt-4 max-w-2xl mx-auto">
               আমাদের সাশ্রয়ী সাবস্ক্রিপশন প্ল্যানগুলোর মাধ্যমে আপনার প্রস্তুতিকে

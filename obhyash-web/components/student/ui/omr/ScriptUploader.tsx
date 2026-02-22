@@ -30,7 +30,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
     }
 
     if (!['image/jpeg', 'image/png', 'image/jpg'].includes(selectedFile.type)) {
-      alert('শুধুমাত্র JPG বা PNG ফরম্যাটের ছবি আপলোড করুন।');
+      alert('শুধুমাত্র JPG বা PNG ফরম্যাটের ছবি আপলোড করো।');
       return;
     }
 
@@ -72,7 +72,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
         reader.readAsDataURL(file);
       } catch (error) {
         console.error('Upload failed', error);
-        alert('আপলোড ব্যর্থ হয়েছে। আবার চেষ্টা করুন।');
+        alert('আপলোড ব্যর্থ হয়েছে। আবার চেষ্টা করো।');
         setIsUploading(false);
       }
     }
@@ -185,7 +185,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
                       d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
                     />
                   </svg>
-                  <span className="text-sm font-bold">পরিবর্তন করুন</span>
+                  <span className="text-sm font-bold">পরিবর্তন করো</span>
                 </div>
               )}
               {isUploading && (
@@ -232,7 +232,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
                 </svg>
               </div>
               <span className="text-emerald-600 dark:text-emerald-400 font-bold text-lg">
-                ছবি নির্বাচন করুন
+                ছবি নির্বাচন করো
               </span>
               <span className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">
                 অথবা ড্র্যাগ করে আনুন
@@ -254,7 +254,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
             disabled={!file || isUploading}
             className="px-6 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-bold transition-colors shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            {isUploading ? 'আপলোড হচ্ছে...' : 'আপলোড করুন'}
+            {isUploading ? 'আপলোড হচ্ছে...' : 'আপলোড করো'}
           </button>
         </div>
       </div>

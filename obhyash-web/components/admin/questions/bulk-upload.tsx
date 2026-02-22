@@ -57,6 +57,34 @@ interface ParseError {
   message: string;
 }
 
+// ─── JSON Error Helper ───────────────────────────────────────────────
+function getHelpfulJsonError(rawText: string, error: any): string {
+  const baseMessage = error instanceof Error ? error.message : String(error);
+  let helpfulMessage = baseMessage;
+
+  const posMatch = baseMessage.match(/position (\d+)/);
+  if (posMatch) {
+    const pos = parseInt(posMatch[1]);
+    const snippet = rawText.substring(
+      Math.max(0, pos - 30),
+      Math.min(rawText.length, pos + 30),
+    );
+    helpfulMessage += `\nসমস্যাটি এই অংশের আশেপাশে:\n"...${snippet}..."`;
+
+    if (snippet.includes(',}') || snippet.includes(']')) {
+      helpfulMessage += '\nটিপস: ব্র্যাকেটের আগে অতিরিক্ত কমা (,) থাকতে পারে।';
+    } else if (snippet.includes("'")) {
+      helpfulMessage +=
+        '\nটিপস: JSON এর প্রপার্টি এবং ভ্যালু ডাবল কোট (") দিয়ে লিখতে হয়, সিঙ্গেল কোট (\') নয়।';
+    }
+  } else if (baseMessage.includes('Unexpected end')) {
+    helpfulMessage +=
+      '\nটিপস: শেষে কোনো ব্র্যাকেট } বা ] বন্ধ করতে ভুলে গেছেন হতে পারে।';
+  }
+
+  return helpfulMessage;
+}
+
 // ─── Unified Data Normalizer ─────────────────────────────────────────
 // Converts flat format (option1, option2, answer:"option3") into
 // the Question schema the database expects.
@@ -439,7 +467,7 @@ const EditModal: React.FC<{
                   }
                   className={fieldCls}
                 >
-                  <option value="">নির্বাচন করুন</option>
+                  <option value="">নির্বাচন করো</option>
                   {availableSubjects.map((s) => (
                     <option key={s.id} value={s.name}>
                       {s.name}
@@ -580,7 +608,7 @@ const EditModal: React.FC<{
                   onChange={(e) => update({ question: e.target.value })}
                   className={`${fieldCls} resize-none`}
                   rows={4}
-                  placeholder="প্রশ্নের বিবরণ লিখুন..."
+                  placeholder="প্রশ্নের বিবরণ লেখো..."
                 />
                 {localData.question && (
                   <div className="p-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 rounded-xl">
@@ -716,7 +744,7 @@ const EditModal: React.FC<{
                 onChange={(e) => update({ explanation: e.target.value })}
                 className={`${fieldCls} resize-none`}
                 rows={3}
-                placeholder="সঠিক উত্তরের ব্যাখ্যা লিখুন..."
+                placeholder="সঠিক উত্তরের ব্যাখ্যা লেখো..."
               />
               {localData.explanation && (
                 <div className="p-3 bg-amber-50/60 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/50 rounded-xl">
@@ -961,7 +989,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           data = JSON.parse(text);
         } catch (err: any) {
           setRawJsonText(text);
-          setJsonErrorMsg(err.message);
+          setJsonErrorMsg(getHelpfulJsonError(text, err));
           setShowJsonEditor(true);
           setIsProcessing(false);
           e.target.value = '';
@@ -1005,7 +1033,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         });
       } else {
         throw new Error(
-          'অসমর্থিত ফাইল ফরম্যাট। JSON, CSV, অথবা XLSX ব্যবহার করুন।',
+          'অসমর্থিত ফাইল ফরম্যাট। JSON, CSV, অথবা XLSX ব্যবহার করো।',
         );
       }
 
@@ -1015,7 +1043,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
       if (rawRows.length > MAX_ROW_COUNT) {
         throw new Error(
-          `ফাইলে ${rawRows.length} টি সারি আছে — সর্বোচ্চ ${MAX_ROW_COUNT} টি অনুমোদিত। ফাইল ভাগ করে আপলোড করুন।`,
+          `ফাইলে ${rawRows.length} টি সারি আছে — সর্বোচ্চ ${MAX_ROW_COUNT} টি অনুমোদিত। ফাইল ভাগ করে আপলোড করো।`,
         );
       }
 
@@ -1099,7 +1127,11 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
       setShowJsonEditor(false); // Close editor on success
       setStep(2);
     } catch (err: any) {
-      setJsonErrorMsg(err.message);
+      if (err instanceof SyntaxError) {
+        setJsonErrorMsg(getHelpfulJsonError(rawJsonText, err));
+      } else {
+        setJsonErrorMsg(err.message || 'অজানা ত্রুটি');
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -1118,7 +1150,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         data = JSON.parse(directJsonText);
       } catch (err: any) {
         setRawJsonText(directJsonText);
-        setJsonErrorMsg(err.message);
+        setJsonErrorMsg(getHelpfulJsonError(directJsonText, err));
         setShowJsonEditor(true);
         setIsProcessing(false);
         return;
@@ -1254,7 +1286,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         setTimeout(() => onCancel(), 2000);
       }
     } catch {
-      alert('ইমপোর্ট করতে ব্যর্থ। আবার চেষ্টা করুন।');
+      alert('ইমপোর্ট করতে ব্যর্থ। আবার চেষ্টা করো।');
     } finally {
       setIsProcessing(false);
     }
@@ -1393,7 +1425,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                     প্রসেস হচ্ছে...
                   </span>
                 ) : (
-                  'টেক্সট পার্স করুন'
+                  'ফাইল আপলোড করো'
                 )}
               </button>
             </div>
@@ -1484,7 +1516,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
             }`}
           >
             {isAllSelected ? <CheckSquare size={14} /> : <Square size={14} />}
-            {isAllSelected ? 'সব বাদ দিন' : 'সব সিলেক্ট'}
+            {isAllSelected ? 'সব বাদ দাও' : 'সব সিলেক্ট'}
           </button>
           {selectedIndices.size > 0 && (
             <button
@@ -1623,7 +1655,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                         className="p-1 px-2 text-[10px] md:text-xs font-bold text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 rounded-md transition-colors"
                       >
                         <Eye size={14} className="inline mr-1" />
-                        দেখুন
+                        দেখো
                       </button>
                       <button
                         onClick={() => handleEditQuestion(i)}
@@ -1801,7 +1833,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
               </div>
               <p className="text-xs text-neutral-500 font-medium">
                 নিচের টেক্সট-এ উল্লেখিত লাইনে ভুলটি (যেমন কমা বা কোলন মিসিং) ঠিক
-                করে পুনরায় চেষ্টা করুন।
+                করে পুনরায় চেষ্টা করো।
               </p>
 
               <textarea
@@ -1830,7 +1862,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                 ) : (
                   <Save size={16} />
                 )}
-                সংরক্ষণ ও চেষ্টা করুন
+                সংরক্ষণ ও চেষ্টা করো
               </button>
             </div>
           </DialogContent>

@@ -176,7 +176,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
                   <textarea
                     value={adminComment}
                     onChange={(e) => setAdminComment(e.target.value)}
-                    placeholder="শিক্ষার্থীকে কোনো বার্তা দিতে চাইলে এখানে লিখুন..."
+                    placeholder="শিক্ষার্থীকে কোনো বার্তা দিতে চাইলে এখানে লেখো..."
                     className="w-full h-20 p-3 rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-sm focus:outline-none focus:border-emerald-700 text-black dark:text-white placeholder:text-black/30 dark:placeholder:text-white/30 transition-colors"
                   />
                 </div>
@@ -200,7 +200,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
                     ) : (
                       <>
                         <Check size={18} />
-                        গ্রহণ করুন ও পুরস্কার দিন
+                        গ্রহণ করো ও পুরস্কার দাও
                       </>
                     )}
                   </button>

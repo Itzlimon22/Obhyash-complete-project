@@ -53,7 +53,7 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
         >
           <Plus className="w-3.5 h-3.5" />
-          যুক্ত করুন
+          যুক্ত করো
         </button>
       </div>
 
@@ -67,7 +67,7 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
             কোনো মেথড নেই
           </p>
           <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-[180px]">
-            bKash বা Nagad যুক্ত করুন সহজ পেমেন্টের জন্য।
+            bKash বা Nagad যুক্ত করো সহজ পেমেন্টের জন্য।
           </p>
         </div>
       ) : (

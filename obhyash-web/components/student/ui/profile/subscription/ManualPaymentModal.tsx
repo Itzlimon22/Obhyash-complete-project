@@ -5,6 +5,7 @@ import {
   PaymentSubmission,
 } from '@/lib/types';
 import { ArrowLeft, Clock, Info, Headphones } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ManualPaymentModalProps {
   isOpen: boolean;
@@ -34,22 +35,20 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!senderNumber || !trxId) {
-      alert('অনুগ্রহ করে সব তথ্য পূরণ করুন');
+    if (!senderNumber.trim() || !trxId.trim()) {
+      toast.error('অনুগ্রহ করে সব তথ্য পূরণ করো');
       return;
     }
 
     const phoneRegex = /^01\d{9}$/;
     if (!phoneRegex.test(senderNumber)) {
-      alert('সঠিক মোবাইল নম্বর দিন (১১ ডিজিট, শুরু হতে হবে ০১ দিয়ে)');
+      toast.error('সঠিক মোবাইল নম্বর দিন (১১ ডিজিট, শুরু হতে হবে ০১ দিয়ে)');
       return;
     }
 
-    const trxIdRegex = /^[A-Z0-9]{10}$/;
+    const trxIdRegex = /^[A-Z0-9]{5,20}$/; // Relaxed slightly from 10 but kept safe
     if (!trxIdRegex.test(trxId.toUpperCase())) {
-      alert(
-        'সঠিক ট্রানজেকশন আইডি দিন (১০ ডিজিটের বড় হাতের অক্ষর ও সংখ্যার সমন্বয়)',
-      );
+      toast.error('সঠিক ট্রানজেকশন আইডি দিন');
       return;
     }
 
@@ -66,7 +65,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    alert('নম্বর কপি করা হয়েছে!');
+    toast.success('নম্বর কপি করা হয়েছে!');
   };
 
   const renderTabs = () => (
@@ -146,7 +145,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
 
               <div className="w-full bg-white dark:bg-black border-2 border-dashed border-emerald-200 dark:border-emerald-900 rounded-xl p-5 text-center">
                 <h4 className="text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-3">
-                  অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করুন
+                  অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করো
                 </h4>
                 <div
                   className="bg-neutral-100 dark:bg-neutral-800 p-3 rounded-lg mb-3 flex items-center justify-between group cursor-pointer"
@@ -175,11 +174,11 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 </div>
                 <ul className="text-xs text-neutral-500 dark:text-neutral-400 text-left space-y-1.5 list-disc pl-4">
                   <li>
-                    উপরের নম্বরে <strong>Send Money</strong> করুন।
+                    উপরের নম্বরে <strong>Send Money</strong> করো।
                   </li>
-                  <li>Reference হিসেবে আপনার মোবাইল নম্বর দিন।</li>
+                  <li>Reference হিসেবে আপনার মোবাইল নম্বর দাও।</li>
                   <li>
-                    নিচের ফর্মে আপনার পেমেন্ট মেথড, মোবাইল নম্বর এবং TrxID দিন।
+                    নিচের ফর্মে আপনার পেমেন্ট মেথড, মোবাইল নম্বর এবং TrxID দাও।
                   </li>
                 </ul>
               </div>
@@ -295,28 +294,28 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 {
                   icon: '📞',
                   title: 'সরাসরি কথা বলুন',
-                  sub: 'কল করতে ক্লিক করুন',
+                  sub: 'কল করতে ক্লিক করো',
                   color: 'bg-blue-50 text-blue-600',
                   link: 'tel:+8801946855793',
                 },
                 {
                   icon: '💬',
                   title: 'লাইভ চ্যাট (Messenger)',
-                  sub: 'এখানে ক্লিক করুন',
+                  sub: 'এখানে ক্লিক করো',
                   color: 'bg-purple-50 text-purple-600',
                   link: 'https://m.me/obhyash',
                 },
                 {
                   icon: '📱',
                   title: 'লাইভ চ্যাট (WhatsApp)',
-                  sub: 'এখানে ক্লিক করুন',
+                  sub: 'এখানে ক্লিক করো',
                   color: 'bg-emerald-50 text-emerald-600',
                   link: 'https://wa.me/8801946855793',
                 },
                 {
                   icon: '✉️',
                   title: 'সাপোর্টে ইমেইল',
-                  sub: 'এখানে ক্লিক করুন',
+                  sub: 'এখানে ক্লিক করো',
                   color: 'bg-amber-50 text-amber-600',
                   link: 'mailto:support@obhyash.com',
                 },
@@ -356,7 +355,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
               {[
                 {
                   q: 'কিভাবে পেমেন্ট করবেন?',
-                  a: '১. আপনার বিকাশ/নগদ অ্যাপে যান। ২. সেন্ড মানি অপশনে যান। ৩. আমাদের নম্বর দিন। ৪. রেফারেন্সে আপনার নম্বর দিন। ৫. পেমেন্ট শেষে TrxID ফর্ম এ জমা দিন।',
+                  a: '১. আপনার বিকাশ/নগদ অ্যাপে যাও। ২. সেন্ড মানি অপশনে যাও। ৩. আমাদের নম্বর দাও। ৪. রেফারেন্সে আপনার নম্বর দাও। ৫. পেমেন্ট শেষে TrxID ফর্ম এ জমা দাও।',
                 },
                 {
                   q: 'পেমেন্ট করার কতক্ষণ পর একাউন্ট আপগ্রেড হবে?',
@@ -364,11 +363,11 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 },
                 {
                   q: 'ট্রানজেকশন আইডি (TrxID) খুঁজে না পেলে কী করব?',
-                  a: 'আপনার পেমেন্ট অ্যাপের স্টেটমেন্ট অথবা মেসেজ অপশন চেক করুন। তবুও না পেলে আমাদের সাপোর্টে যোগাযোগ করুন।',
+                  a: 'আপনার পেমেন্ট অ্যাপের স্টেটমেন্ট অথবা মেসেজ অপশন চেক করো। তবুও না পেলে আমাদের সাপোর্টে যোগাযোগ করো।',
                 },
                 {
                   q: 'ভুল নম্বরে টাকা পাঠালে কী হবে?',
-                  a: 'ভুল নম্বরে টাকা পাঠালে আমরা দায়ী থাকবো না। দয়া করে নম্বরটি দুইবার যাচাই করুন।',
+                  a: 'ভুল নম্বরে টাকা পাঠালে আমরা দায়ী থাকবো না। দয়া করে নম্বরটি দুইবার যাচাই করো।',
                 },
                 {
                   q: 'প্রিমিয়াম প্যাকেজে কী কী থাকছে?',

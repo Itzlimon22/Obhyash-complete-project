@@ -30,7 +30,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
     }
 
     if (!['image/jpeg', 'image/png', 'image/jpg'].includes(selectedFile.type)) {
-      alert('শুধুমাত্র JPG বা PNG ফরম্যাটের ছবি আপলোড করুন।');
+      alert('শুধুমাত্র JPG বা PNG ফরম্যাটের ছবি আপলোড করো।');
       return;
     }
 
@@ -72,7 +72,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
         reader.readAsDataURL(file);
       } catch (error) {
         console.error('Upload failed', error);
-        alert('আপলোড ব্যর্থ হয়েছে। আবার চেষ্টা করুন।');
+        alert('আপলোড ব্যর্থ হয়েছে। আবার চেষ্টা করো।');
         setIsUploading(false);
       }
     }
@@ -232,7 +232,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
                 </svg>
               </div>
               <span className="text-indigo-600 dark:text-indigo-400 font-bold text-lg">
-                ছবি নির্বাচন করুন
+                ছবি নির্বাচন করো
               </span>
               <span className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">
                 অথবা ড্র্যাগ করে আনুন
@@ -254,7 +254,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
             disabled={!file || isUploading}
             className="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold transition-colors shadow-lg shadow-indigo-200 dark:shadow-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            {isUploading ? 'আপলোড হচ্ছে...' : 'আপলোড করুন'}
+            {isUploading ? 'আপলোড হচ্ছে...' : 'আপলোড করো'}
           </button>
         </div>
       </div>

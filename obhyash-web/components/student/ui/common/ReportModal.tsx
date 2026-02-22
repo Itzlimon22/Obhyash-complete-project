@@ -68,6 +68,10 @@ const ReportModal: React.FC<ReportModalProps> = ({
 
   const handleSubmit = async () => {
     if (!selectedType) return;
+    if (comment.length > 500) {
+      toast.error('মন্তব্য ৫০০ অক্ষরের মধ্যে হতে হবে');
+      return;
+    }
     setIsSubmitting(true);
     try {
       await submitReport({
@@ -87,7 +91,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
       onClose();
     } catch (error) {
       console.error(error);
-      toast.error('রিপোর্ট জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+      toast.error('রিপোর্ট জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করো।');
     } finally {
       setIsSubmitting(false);
     }
@@ -172,7 +176,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value.slice(0, 500))}
-                placeholder="সমস্যার বিস্তারিত এখানে লিখুন..."
+                placeholder="সমস্যার বিস্তারিত এখানে লেখো..."
                 className="w-full h-24 p-4 rounded-xl border-2 border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-black dark:text-white placeholder:text-black/30 dark:placeholder:text-white/30 focus:outline-none focus:border-red-500/50 transition-all resize-none text-sm leading-relaxed"
               />
             </div>
@@ -239,10 +243,10 @@ const ReportModal: React.FC<ReportModalProps> = ({
                 {isSubmitting ? (
                   <>
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    অপেক্ষা করুন...
+                    অপেক্ষা করো...
                   </>
                 ) : (
-                  'রিপোর্ট জমা দিন'
+                  'রিপোর্ট জমা দাও'
                 )}
               </button>
             </div>

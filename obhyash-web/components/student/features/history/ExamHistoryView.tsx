@@ -820,7 +820,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                         onClick={() => setVisibleCount((p) => p + 9)}
                         className="px-6 py-2.5 bg-neutral-200 dark:bg-neutral-800 rounded-xl font-bold text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-neutral-700 transition-colors"
                       >
-                        আরও দেখুন
+                        আরও দেখো
                       </button>
                     </div>
                   )}

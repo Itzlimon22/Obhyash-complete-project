@@ -207,7 +207,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               লিডারবোর্ড
             </h3>
             <button className="text-xs font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1 group-hover:underline">
-              সব দেখুন
+              সব দেখো
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"

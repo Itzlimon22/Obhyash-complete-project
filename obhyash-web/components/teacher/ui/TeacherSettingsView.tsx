@@ -165,7 +165,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
       <div className="bg-gradient-to-r from-emerald-900 to-emerald-800 rounded-2xl p-6 text-white shadow-lg shadow-emerald-900/10 mb-8">
         <h1 className="text-2xl font-bold mb-2">সেটিংস</h1>
         <p className="text-emerald-100 text-sm">
-          আপনার ব্যক্তিগত এবং পেশাগত তথ্য এখানে আপডেট করুন।
+          আপনার ব্যক্তিগত এবং পেশাগত তথ্য এখানে আপডেট করো।
         </p>
       </div>
 
@@ -186,7 +186,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
               htmlFor="avatar-upload"
               className="flex items-center gap-2 text-sm font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 cursor-pointer transition-colors"
             >
-              {uploading ? 'Uploading...' : 'ছবি পরিবর্তন করুন'}
+              {uploading ? 'Uploading...' : 'ছবি পরিবর্তন করো'}
               <Camera className="w-4 h-4" />
             </label>
           </div>
@@ -241,7 +241,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
                 value={formData.name}
                 onChange={handleChange}
                 className={inputClass}
-                placeholder="আপনার পূর্ণ নাম লিখুন"
+                placeholder="আপনার পূর্ণ নাম লেখো"
               />
             </div>
 
@@ -293,7 +293,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
                   onChange={handleChange}
                   className={selectClass}
                 >
-                  <option value="">নির্বাচন করুন</option>
+                  <option value="">নির্বাচন করো</option>
                   <option value="Male">পুরুষ (Male)</option>
                   <option value="Female">মহিলা (Female)</option>
                 </select>
@@ -321,7 +321,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
               onChange={handleChange}
               rows={4}
               className={inputClass}
-              placeholder="আপনার সম্পর্কে কিছু লিখুন..."
+              placeholder="আপনার সম্পর্কে কিছু লেখো..."
             />
           </div>
         </div>
@@ -341,7 +341,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
               value={formData.institute}
               onChange={handleChange}
               className={inputClass}
-              placeholder="আপনার শিক্ষা প্রতিষ্ঠানের নাম লিখুন..."
+              placeholder="আপনার শিক্ষা প্রতিষ্ঠানের নাম লেখো..."
             />
           </div>
         </div>
@@ -379,14 +379,14 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
                 />
               </div>
               <div className={inputGroupClass}>
-                <label className={labelClass}>পাসওয়ার্ড নিশ্চিত করুন</label>
+                <label className={labelClass}>পাসওয়ার্ড নিশ্চিত করো</label>
                 <input
                   type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className={inputClass}
-                  placeholder="পুনরায় পাসওয়ার্ড লিখুন"
+                  placeholder="পুনরায় পাসওয়ার্ড লেখো"
                 />
               </div>
             </div>
@@ -400,7 +400,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
           onClick={handleSubmit}
           className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full shadow-lg hover:shadow-red-600/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
         >
-          সেভ করুন
+          সেভ করো
         </button>
       </div>
     </div>

@@ -141,7 +141,7 @@ export default function StudentRoot({
       } else if (!success) {
         // This usually falls into AppState.ERROR, but engine might throw specifically
         toast.error(
-          'দুঃখিত, কোনো প্রশ্ন পাওয়া যায়নি। অন্য টপিক নির্বাচন করুন।',
+          'দুঃখিত, কোনো প্রশ্ন পাওয়া যায়নি। অন্য টপিক নির্বাচন করো।',
           {
             description: 'No questions found for the selected criteria.',
           },
@@ -155,8 +155,8 @@ export default function StudentRoot({
 
       toast.error(
         isNoQuestions
-          ? 'দুঃখিত, কোনো প্রশ্ন পাওয়া যায়নি। অন্য টপিক নির্বাচন করুন।'
-          : 'পরীক্ষা শুরু করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।',
+          ? 'দুঃখিত, কোনো প্রশ্ন পাওয়া যায়নি। অন্য টপিক নির্বাচন করো।'
+          : 'পরীক্ষা শুরু করতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
         {
           description: e.message || 'Unknown error starting exam',
         },

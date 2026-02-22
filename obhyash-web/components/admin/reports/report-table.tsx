@@ -118,7 +118,7 @@ export const ReportTable: React.FC<ReportTableProps> = ({
 
                 <button className="flex items-center gap-1.5 px-3 py-1.5 bg-black dark:bg-white text-white dark:text-black rounded-lg text-xs font-black uppercase tracking-widest hover:bg-red-600 dark:hover:bg-red-500 dark:hover:text-white transition-colors">
                   <Eye size={12} />
-                  দেখুন
+                  দেখো
                 </button>
               </div>
             </div>

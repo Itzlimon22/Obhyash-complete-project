@@ -65,7 +65,7 @@ export default function AboutUsView() {
         <div className="space-y-4">
           <div className="lg:sticky lg:top-8 space-y-2">
             <h3 className="text-sm font-black text-neutral-400 dark:text-neutral-600 px-4 uppercase tracking-widest hidden lg:block">
-              সেকশন নির্বাচন করুন
+              সেকশন নির্বাচন করো
             </h3>
 
             {/* Desktop Sidebar */}

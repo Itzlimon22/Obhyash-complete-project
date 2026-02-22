@@ -124,7 +124,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
                 }
             `}
         >
-          {isCurrent ? 'বর্তমান প্ল্যান' : 'বেছে নিন'}
+          {isCurrent ? 'বর্তমান প্ল্যান' : 'বেছে নাও'}
         </button>
       </div>
     </div>

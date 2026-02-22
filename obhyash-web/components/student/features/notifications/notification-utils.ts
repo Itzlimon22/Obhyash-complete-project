@@ -15,12 +15,12 @@ import { NotificationType } from '@/lib/types';
 export const FUNNY_EMPTY_STATES = [
   // --- Motivation & Study ---
   {
-    message: 'সব ফাঁকা! পড়াশোনা শুরু করে দিন 🚀',
+    message: 'সব ফাঁকা! পড়াশোনা শুরু করে দাও 🚀',
     subtext: 'এখানে মশা মাছিও নেই, একদম পরিষ্কার! 🦟',
     icon: '🧹',
   },
   {
-    message: 'বইয়ের পাতায় মন দিন 📖',
+    message: 'বইয়ের পাতায় মন দাও 📖',
     subtext: 'নোটিফিকেশন তো আসবেই, কিন্তু পড়াটা বেশি জরুরি।',
     icon: '🤓',
   },
@@ -35,7 +35,7 @@ export const FUNNY_EMPTY_STATES = [
     icon: '📚',
   },
   {
-    message: 'স্বপ্ন দেখুন বড় কিছু করার ✨',
+    message: 'স্বপ্ন দেখো বড় কিছু করার ✨',
     subtext: 'নোটিফিকেশনের অপেক্ষা না করে স্বপ্নের পেছনে ছুটুন।',
     icon: '🌠',
   },
@@ -48,12 +48,12 @@ export const FUNNY_EMPTY_STATES = [
   },
   {
     message: 'ব্রেক টাইম! ☕',
-    subtext: 'নোটিফিকেশন চেক না করে এক কাপ চা খেয়ে নিন।',
+    subtext: 'নোটিফিকেশন চেক না করে এক কাপ চা খেয়ে নাও।',
     icon: '🍪',
   },
   {
     message: 'আপনার ইনবক্স এখন ঘুমাচ্ছে 😴',
-    subtext: 'বিরক্ত করবেন না, রেস্ট নিতে দিন!',
+    subtext: 'বিরক্ত করো না, রেস্ট নিতে দাও!',
     icon: '💤',
   },
   {
@@ -85,7 +85,7 @@ export const FUNNY_EMPTY_STATES = [
   },
   {
     message: 'স্বাগতম নতুন শুরুতে! 🌱',
-    subtext: 'পুরানো সব মুছে ফেলে নতুন করে শুরু করুন।',
+    subtext: 'পুরানো সব মুছে ফেলে নতুন করে শুরু করো।',
     icon: '✨',
   },
   {
@@ -144,7 +144,7 @@ export const FUNNY_EMPTY_STATES = [
   },
   {
     message: 'এরর ৪০৪: নটিফিকেশন নট ফাউন্ড 🚫',
-    subtext: 'খুঁজে পাওয়া যাচ্ছে না, পরে চেষ্টা করুন!',
+    subtext: 'খুঁজে পাওয়া যাচ্ছে না, পরে চেষ্টা করো!',
     icon: '📟',
   },
   {
@@ -170,7 +170,7 @@ export const FUNNY_EMPTY_STATES = [
     icon: '🥇',
   },
   {
-    message: 'নিজেকে সময় দিন 🕰️',
+    message: 'নিজেকে সময় দাও 🕰️',
     subtext: 'অন্যের আপডেটের চেয়ে নিজের উন্নতি বেশি দামী।',
     icon: '💎',
   },

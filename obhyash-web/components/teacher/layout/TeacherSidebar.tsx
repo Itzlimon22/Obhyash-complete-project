@@ -171,7 +171,7 @@ export default function TeacherSidebar() {
             <div className="px-3 pt-5 pb-2">
               <Link
                 href="/teacher/question-management"
-                title="প্রশ্ন আপলোড করুন"
+                title="প্রশ্ন আপলোড করো"
                 className="flex items-center justify-center w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl shadow-lg shadow-emerald-500/25 hover:scale-[1.05] active:scale-[0.95] transition-all"
               >
                 <Upload size={18} />

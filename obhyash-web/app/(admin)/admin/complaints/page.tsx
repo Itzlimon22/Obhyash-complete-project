@@ -29,56 +29,67 @@ export default function AdminComplaintsPage() {
   const [statusFilter, setStatusFilter] = useState<ComplaintStatus | 'All'>(
     'All',
   );
+
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [totalComplaints, setTotalComplaints] = useState(0);
+  const pageSize = 20;
+
   const [selectedComplaint, setSelectedComplaint] =
     useState<AppComplaint | null>(null);
 
   useEffect(() => {
-    fetchComplaints();
-  }, []);
+    // Reset page to 1 when search or filter changes
+    setPage(1);
+  }, [searchQuery, statusFilter]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchComplaints();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [page, statusFilter, searchQuery]);
 
   const fetchComplaints = async (showToast = false) => {
     if (showToast) setIsRefreshing(true);
     const supabase = createClient();
 
     try {
-      // 1. Fetch Complaints from DB
-      const { data: complaintsData, error: complaintsError } = await supabase
+      let query = supabase
         .from('app_complaints')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*, user:users!inner(name, email)', { count: 'exact' });
+
+      if (statusFilter !== 'All') {
+        query = query.eq('status', statusFilter);
+      }
+
+      if (searchQuery) {
+        query = query.ilike('description', `%${searchQuery}%`);
+      }
+
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+
+      const {
+        data: complaintsData,
+        error: complaintsError,
+        count,
+      } = await query.order('created_at', { ascending: false }).range(from, to);
 
       if (complaintsError) throw complaintsError;
 
-      // 2. Fetch user details for each complaint
-      const userIds = [
-        ...new Set((complaintsData || []).map((c) => c.user_id)),
-      ];
-      let usersMap: Record<string, { name: string; email: string }> = {};
-
-      if (userIds.length > 0) {
-        const { data: usersData } = await supabase
-          .from('users')
-          .select('id, name, email')
-          .in('id', userIds);
-
-        if (usersData) {
-          usersMap = usersData.reduce(
-            (acc, user) => {
-              acc[user.id] = { name: user.name, email: user.email };
-              return acc;
-            },
-            {} as Record<string, { name: string; email: string }>,
-          );
-        }
-      }
-
       // 3. Combine complaints with user info
-      const complaintsWithUsers = (complaintsData || []).map((c) => ({
+      const mappedComplaints = (complaintsData || []).map((c: any) => ({
         ...c,
-        user: usersMap[c.user_id] || { name: 'Unknown', email: '' },
+        user:
+          c.user && !Array.isArray(c.user)
+            ? c.user
+            : { name: 'Unknown', email: '' },
       }));
 
-      setComplaints(complaintsWithUsers);
+      setComplaints(mappedComplaints);
+      if (count !== null) setTotalComplaints(count);
+
       if (showToast) toast.success('Complaints list updated');
     } catch (error) {
       console.error('Failed to fetch complaints:', error);
@@ -88,14 +99,6 @@ export default function AdminComplaintsPage() {
       setIsRefreshing(false);
     }
   };
-
-  const filteredComplaints = complaints.filter((c) => {
-    const matchesSearch =
-      (c.user?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'All' || c.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
 
   const getStatusColor = (status: ComplaintStatus) => {
     switch (status) {
@@ -127,12 +130,7 @@ export default function AdminComplaintsPage() {
     }
   };
 
-  // Stats
-  const stats = {
-    total: complaints.length,
-    pending: complaints.filter((c) => c.status === 'Pending').length,
-    resolved: complaints.filter((c) => c.status === 'Resolved').length,
-  };
+  // Stats (total across all pages, pending/resolved only for current page for purely visual cues, or omit if inaccurate)
 
   return (
     <div className="min-h-screen bg-white dark:bg-black p-4 lg:p-8 text-neutral-900 dark:text-neutral-100">
@@ -159,21 +157,11 @@ export default function AdminComplaintsPage() {
                   <p className="text-[8px] text-amber-600/70 font-black uppercase tracking-tight">
                     Pending
                   </p>
-                  <p className="text-sm font-black text-amber-600 dark:text-amber-400 leading-none">
-                    {stats.pending}
-                  </p>
-                </div>
-              </div>
-              <div className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-800 rounded-xl flex items-center gap-2">
-                <div className="p-1 px-1.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-lg">
-                  <CheckCircle2 size={12} />
-                </div>
-                <div>
                   <p className="text-[8px] text-emerald-600/70 font-black uppercase tracking-tight">
-                    Solved
+                    Page
                   </p>
                   <p className="text-sm font-black text-emerald-600 dark:text-emerald-400 leading-none">
-                    {stats.resolved}
+                    {page}
                   </p>
                 </div>
               </div>
@@ -233,9 +221,10 @@ export default function AdminComplaintsPage() {
           <p className="text-[10px] md:text-xs font-black text-neutral-400 uppercase tracking-widest">
             Showing{' '}
             <span className="text-neutral-900 dark:text-white">
-              {filteredComplaints.length}
+              {complaints.length > 0 ? (page - 1) * pageSize + 1 : 0}-
+              {Math.min(page * pageSize, totalComplaints)}
             </span>{' '}
-            of {complaints.length} complaints
+            of {totalComplaints} complaints
           </p>
         </div>
 
@@ -245,7 +234,7 @@ export default function AdminComplaintsPage() {
             <Loader2 size={40} className="animate-spin text-rose-600" />
             <p className="font-bold">Loading complaints...</p>
           </div>
-        ) : filteredComplaints.length === 0 ? (
+        ) : complaints.length === 0 ? (
           <div className="h-[400px] bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl flex flex-col items-center justify-center text-center p-8 space-y-4 shadow-sm">
             <div className="w-20 h-20 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center">
               <AlertCircle size={40} className="text-neutral-400" />
@@ -285,7 +274,7 @@ export default function AdminComplaintsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-                  {filteredComplaints.map((c) => {
+                  {complaints.map((c) => {
                     const SIcon = getStatusIcon(c.status);
                     return (
                       <tr
@@ -341,8 +330,8 @@ export default function AdminComplaintsPage() {
             </div>
 
             {/* Mobile Card View (2 Column Grid) */}
-            <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-3 pb-20">
-              {filteredComplaints.map((c) => {
+            <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-3 pb-6">
+              {complaints.map((c) => {
                 const SIcon = getStatusIcon(c.status);
                 return (
                   <Card
@@ -385,6 +374,50 @@ export default function AdminComplaintsPage() {
                   </Card>
                 );
               })}
+            </div>
+            {/* Pagination Controls */}
+            <div className="flex items-center justify-between pt-6 border-t border-neutral-200 dark:border-neutral-800 mt-6 lg:mt-8 pb-10">
+              <p className="text-[10px] md:text-sm text-neutral-600 dark:text-neutral-400">
+                Showing{' '}
+                <span className="font-bold text-neutral-900 dark:text-white">
+                  {complaints.length > 0 ? (page - 1) * pageSize + 1 : 0}
+                </span>{' '}
+                to{' '}
+                <span className="font-bold text-neutral-900 dark:text-white">
+                  {Math.min(page * pageSize, totalComplaints)}
+                </span>{' '}
+                of{' '}
+                <span className="font-bold text-neutral-900 dark:text-white">
+                  {totalComplaints}
+                </span>{' '}
+                complaints
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1 || isLoading}
+                  className="px-3 py-1.5 text-xs md:text-sm font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg disabled:opacity-50 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                >
+                  Previous
+                </button>
+                <span className="text-xs md:text-sm text-neutral-600 dark:text-neutral-400 font-medium px-2 py-1.5 hidden sm:inline-block">
+                  Page {page} of{' '}
+                  {Math.max(1, Math.ceil(totalComplaints / pageSize))}
+                </span>
+                <button
+                  onClick={() =>
+                    setPage((p) =>
+                      Math.min(Math.ceil(totalComplaints / pageSize), p + 1),
+                    )
+                  }
+                  disabled={
+                    page >= Math.ceil(totalComplaints / pageSize) || isLoading
+                  }
+                  className="px-3 py-1.5 text-xs md:text-sm font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg disabled:opacity-50 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </div>
         )}

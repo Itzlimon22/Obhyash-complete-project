@@ -127,7 +127,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
         'বেসিক এনালাইসিস',
         'লিমিটেড প্রশ্ন ব্যাংক',
       ],
-      cta: 'বিনামূল্যে শুরু করুন',
+      cta: 'বিনামূল্যে শুরু করো',
       color: 'border-neutral-200 dark:border-neutral-800',
       buttonColor:
         'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700',
@@ -186,7 +186,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                       ? '/৩ মাস'
                       : plan.billingCycle,
               features: plan.features,
-              cta: isFree ? 'বিনামূল্যে শুরু করুন' : 'সাবস্ক্রাইব করুন',
+              cta: isFree ? 'বিনামূল্যে শুরু করো' : 'সাবস্ক্রাইব করো',
               highlight: plan.isPopular,
               color: color,
               buttonColor: buttonColor,
@@ -379,7 +379,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <span className="font-bold text-indigo-600 dark:text-indigo-400">
                 Adaptive AI
               </span>{' '}
-              এর সাহায্যে নিজের দুর্বলতা কাটিয়ে উঠুন। আনলিমিটেড প্রশ্ন, OMR
+              এর সাহায্যে নিজের দুর্বলতা কাটিয়ে ওঠো। আনলিমিটেড প্রশ্ন, OMR
               Upload এবং স্মার্ট এনালাইসিস—সবই এক অ্যাপে।
             </p>
 
@@ -388,7 +388,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 onClick={onGetStarted}
                 className="sm:w-auto w-full px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-base shadow-lg shadow-indigo-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap"
               >
-                নতুন পরীক্ষা দিন
+                নতুন পরীক্ষা দাও
                 <ArrowRight className="w-5 h-5" />
               </button>
               <button
@@ -399,7 +399,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 }
                 className="sm:w-auto w-full px-8 py-4 bg-white dark:bg-black border-2 border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-900 rounded-xl font-bold text-base transition-all active:scale-95 flex items-center justify-center whitespace-nowrap"
               >
-                ফিচারগুলো দেখুন
+                ফিচারগুলো দেখো
               </button>
             </div>
           </div>
@@ -586,7 +586,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             কেন আমরা সেরা?
           </span>
           <h2 className="text-3xl lg:text-4xl font-extrabold text-neutral-900 dark:text-white mt-2">
-            আপনার প্রস্তুতিকে দিন <br className="hidden md:block" />
+            আপনার প্রস্তুতিকে দাও <br className="hidden md:block" />
             <span className="relative whitespace-nowrap">
               <span className="relative z-10">নতুন মাত্রা</span>
               <span className="absolute bottom-1 left-0 w-full h-3 bg-rose-100 dark:bg-rose-900/50 -z-0 rounded-full"></span>
@@ -611,8 +611,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 স্মার্ট এনালাইসিস
               </h3>
               <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                প্রতিটি পরীক্ষার পর দেখুন আপনার সবল ও দুর্বল দিকগুলো। গ্রাফ এবং
-                চার্টের মাধ্যমে নিজের অগ্রগতি নিজেই যাচাই করুন।
+                প্রতিটি পরীক্ষার পর দেখো আপনার সবল ও দুর্বল দিকগুলো। গ্রাফ এবং
+                চার্টের মাধ্যমে নিজের অগ্রগতি নিজেই যাচাই করো।
               </p>
             </div>
 
@@ -667,7 +667,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 এক্সাম হিস্ট্রি
               </h3>
               <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                আপনার পুরনো সব এক্সাম এবং ভুলগুলোর বিস্তারিত সমাধান দেখুন যেকোনো
+                আপনার পুরনো সব এক্সাম এবং ভুলগুলোর বিস্তারিত সমাধান দেখো যেকোনো
                 সময়।
               </p>
             </div>
@@ -759,7 +759,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               কিভাবে শুরু করবেন?
             </h2>
             <p className="text-neutral-600 dark:text-neutral-400 mt-4 max-w-2xl mx-auto">
-              খুব সহজেই মাত্র ৩টি ধাপে নিজেকে যাচাই করুন
+              খুব সহজেই মাত্র ৩টি ধাপে নিজেকে যাচাই করো
             </p>
           </div>
 
@@ -776,7 +776,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 অ্যাকাউন্ট খুলুন
               </h3>
               <p className="text-neutral-500 text-sm max-w-xs px-4">
-                গুগল বা ইমেইল দিয়ে মাত্র ১০ সেকেন্ডে ফ্রি রেজিস্ট্রেশন করুন।
+                গুগল বা ইমেইল দিয়ে মাত্র ১০ সেকেন্ডে ফ্রি রেজিস্ট্রেশন করো।
               </p>
             </div>
 
@@ -786,10 +786,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <span className="text-3xl font-bold text-rose-600">২</span>
               </div>
               <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
-                পরীক্ষা দিন
+                পরীক্ষা দাও
               </h3>
               <p className="text-neutral-500 text-sm max-w-xs px-4">
-                অ্যাপে বা খাতায় পরীক্ষা দিয়ে সাথে সাথেই উত্তরপত্র আপলোড করুন।
+                অ্যাপে বা খাতায় পরীক্ষা দিয়ে সাথে সাথেই উত্তরপত্র আপলোড করো।
               </p>
             </div>
 
@@ -799,10 +799,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <span className="text-3xl font-bold text-emerald-600">৩</span>
               </div>
               <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
-                ফলাফল দেখুন
+                ফলাফল দেখো
               </h3>
               <p className="text-neutral-500 text-sm max-w-xs px-4">
-                AI জেনারেটেড রিপোর্ট দেখে নিজের দুর্বলতাগুলো কাটিয়ে উঠুন।
+                AI জেনারেটেড রিপোর্ট দেখে নিজের দুর্বলতাগুলো কাটিয়ে ওঠো।
               </p>
             </div>
           </div>
@@ -817,7 +817,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mb-4">
-              আপনার পছন্দের প্ল্যানটি বেছে নিন
+              আপনার পছন্দের প্ল্যানটি বেছে নাও
             </h2>
             <p className="text-neutral-600 dark:text-neutral-400">
               সাশ্রয়ী সাবস্ক্রিপশন প্ল্যান।

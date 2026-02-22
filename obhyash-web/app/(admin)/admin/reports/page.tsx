@@ -20,6 +20,13 @@ export default function AdminReportsPage() {
   const [filterStatus, setFilterStatus] = useState<
     'All' | 'Pending' | 'Resolved' | 'Ignored'
   >('Pending');
+
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [totalReports, setTotalReports] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const pageSize = 20;
+
   const [selectedReport, setSelectedReport] = useState<any | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
@@ -27,8 +34,14 @@ export default function AdminReportsPage() {
     setLoading(true);
     try {
       const status = filterStatus === 'All' ? undefined : filterStatus;
-      const data = await getReports(status);
+      const { reports: data, count } = await getReports(
+        status,
+        page,
+        pageSize,
+        searchQuery,
+      );
       setReports(data || []);
+      setTotalReports(count || 0);
     } catch (error) {
       console.error('Error fetching reports:', error);
       toast.error('রিপোর্ট লোড করতে সমস্যা হয়েছে।');
@@ -38,8 +51,15 @@ export default function AdminReportsPage() {
   };
 
   useEffect(() => {
-    fetchReports();
-  }, [filterStatus]);
+    setPage(1);
+  }, [filterStatus, searchQuery]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchReports();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [filterStatus, page, searchQuery]);
 
   const handleViewDetails = (report: any) => {
     setSelectedReport(report);
@@ -59,8 +79,10 @@ export default function AdminReportsPage() {
     }
   };
 
+  // Current Page Stats
   const stats = {
-    total: reports.length,
+    total:
+      filterStatus === 'All' && !searchQuery ? totalReports : reports.length,
     pending: reports.filter((r) => r.status === 'Pending').length,
     resolved: reports.filter((r) => r.status === 'Resolved').length,
     ignored: reports.filter((r) => r.status === 'Ignored').length,
@@ -161,7 +183,7 @@ export default function AdminReportsPage() {
           ))}
         </div>
 
-        {/* Search - Placeholder for now */}
+        {/* Search */}
         <div className="relative w-full sm:w-64">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
@@ -169,7 +191,9 @@ export default function AdminReportsPage() {
           />
           <input
             type="text"
-            placeholder="আইডি বা নাম দিয়ে খুঁজুন..."
+            placeholder="আইডি, কারণ বা নাম দিয়ে খুঁজুন..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 dark:focus:ring-white"
           />
         </div>
@@ -251,6 +275,53 @@ export default function AdminReportsPage() {
                 ))}
               </tbody>
             </table>
+
+            {/* Pagination Controls */}
+            {totalReports > 0 && (
+              <div className="flex items-center justify-between p-4 border-t border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/30">
+                <p className="text-sm font-medium text-neutral-500">
+                  Showing{' '}
+                  <span className="font-bold text-neutral-900 dark:text-white">
+                    {reports.length > 0 ? (page - 1) * pageSize + 1 : 0}
+                  </span>{' '}
+                  to{' '}
+                  <span className="font-bold text-neutral-900 dark:text-white">
+                    {Math.min(page * pageSize, totalReports)}
+                  </span>{' '}
+                  of{' '}
+                  <span className="font-bold text-neutral-900 dark:text-white">
+                    {totalReports}
+                  </span>{' '}
+                  reports
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1 || loading}
+                    className="px-3 py-1.5 text-xs font-bold bg-white dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg border border-neutral-200 dark:border-neutral-600 disabled:opacity-50 hover:bg-neutral-50 dark:hover:bg-neutral-600 transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-xs text-neutral-600 dark:text-neutral-400 font-bold px-2 py-1.5 hidden sm:inline-block">
+                    Page {page} of{' '}
+                    {Math.max(1, Math.ceil(totalReports / pageSize))}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setPage((p) =>
+                        Math.min(Math.ceil(totalReports / pageSize), p + 1),
+                      )
+                    }
+                    disabled={
+                      page >= Math.ceil(totalReports / pageSize) || loading
+                    }
+                    className="px-3 py-1.5 text-xs font-bold bg-white dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg border border-neutral-200 dark:border-neutral-600 disabled:opacity-50 hover:bg-neutral-50 dark:hover:bg-neutral-600 transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

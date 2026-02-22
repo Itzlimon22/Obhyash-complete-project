@@ -74,9 +74,7 @@ export default function SocialLoginButton({
         </svg>
       )}
       <span>
-        {mode === 'signup'
-          ? 'Google দিয়ে সাইন আপ করুন'
-          : 'Google দিয়ে লগইন করুন'}
+        {mode === 'signup' ? 'Google দিয়ে সাইন আপ করো' : 'Google দিয়ে লগইন করো'}
       </span>
     </button>
   );

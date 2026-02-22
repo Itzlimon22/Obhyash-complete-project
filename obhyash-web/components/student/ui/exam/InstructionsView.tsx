@@ -53,8 +53,8 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
               নির্দেশাবলী (Instructions)
             </h1>
             <p className="text-neutral-400 text-base md:text-lg max-w-2xl">
-              পরীক্ষা শুরু করার আগে নিচের তথ্যগুলো যাচাই করুন এবং নিয়মাবলী
-              মনোযোগ দিয়ে পড়ুন।
+              পরীক্ষা শুরু করার আগে নিচের তথ্যগুলো যাচাই করো এবং নিয়মাবলী মনোযোগ
+              দিয়ে পড়ো।
             </p>
           </div>
         </div>

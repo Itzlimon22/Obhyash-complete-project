@@ -30,7 +30,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
 
     // Check file type
     if (!['image/jpeg', 'image/png', 'image/jpg'].includes(selectedFile.type)) {
-      alert('শুধুমাত্র JPG বা PNG ফরম্যাটের ছবি আপলোড করুন।');
+      alert('শুধুমাত্র JPG বা PNG ফরম্যাটের ছবি আপলোড করো।');
       return;
     }
 
@@ -167,7 +167,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
                     d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
                   />
                 </svg>
-                <span className="text-sm font-bold">পরিবর্তন করুন</span>
+                <span className="text-sm font-bold">পরিবর্তন করো</span>
               </div>
               <div className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-2 py-1 rounded">
                 {file?.size ? (file.size / 1024 / 1024).toFixed(2) : 0} MB
@@ -192,7 +192,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
                 </svg>
               </div>
               <span className="text-emerald-600 dark:text-emerald-400 font-bold text-lg">
-                ছবি নির্বাচন করুন
+                ছবি নির্বাচন করো
               </span>
               <span className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">
                 অথবা ড্র্যাগ করে আনুন
@@ -230,7 +230,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
                 d="m4.5 12.75 6 6 9-13.5"
               />
             </svg>
-            আপলোড করুন
+            আপলোড করো
           </button>
         </div>
       </div>

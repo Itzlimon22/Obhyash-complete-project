@@ -54,22 +54,35 @@ export const submitReport = async (data: SubmitReportData) => {
 
 export const getReports = async (
   statusFilter?: ReportStatus,
-): Promise<Report[]> => {
+  page: number = 1,
+  pageSize: number = 20,
+  searchQuery: string = '',
+): Promise<{ reports: Report[]; count: number }> => {
   try {
-    let query = supabase
-      .from('reports')
-      .select('*')
-      .order('created_at', { ascending: false });
+    let query = supabase.from('reports').select('*', { count: 'exact' });
 
     if (statusFilter) {
       query = query.eq('status', statusFilter);
     }
 
-    const { data, error } = await query;
+    if (searchQuery) {
+      // Allows searching by reporter id or reporting reason
+      query = query.or(
+        `reporter_id.ilike.%${searchQuery}%,reason.ilike.%${searchQuery}%,reporter_name.ilike.%${searchQuery}%`,
+      );
+    }
+
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    const { data, count, error } = await query
+      .order('created_at', { ascending: false })
+      .range(from, to);
+
     if (error) throw error;
 
     const reports = data || [];
-    if (reports.length === 0) return [];
+    if (reports.length === 0) return { reports: [], count: count || 0 };
 
     // Manually fetch questions to avoid Foreign Key relation errors
     const questionIds = Array.from(
@@ -88,17 +101,19 @@ export const getReports = async (
         const questionMap = new Map(questionsData.map((q) => [q.id, q]));
 
         // Map questions back to reports
-        return reports.map((report) => ({
+        const mappedReports = reports.map((report) => ({
           ...report,
           question: questionMap.get(report.question_id) || null,
         })) as unknown as Report[];
+
+        return { reports: mappedReports, count: count || 0 };
       }
     }
 
-    return reports as unknown as Report[];
+    return { reports: reports as unknown as Report[], count: count || 0 };
   } catch (error) {
     console.error('Get Reports Error:', error);
-    return [];
+    return { reports: [], count: 0 };
   }
 };
 

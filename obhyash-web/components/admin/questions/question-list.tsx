@@ -250,7 +250,7 @@ export const QuestionList: React.FC<QuestionListProps> = ({
                           onPreview(q);
                         }}
                         className="p-1.5 text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-md transition-colors"
-                        title="প্রিভিউ দেখুন"
+                        title="প্রিভিউ দেখো"
                       >
                         <Eye size={16} />
                       </button>
@@ -272,14 +272,14 @@ export const QuestionList: React.FC<QuestionListProps> = ({
                           onEdit(q);
                         }}
                         className="p-1.5 text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-md transition-colors"
-                        title="এডিট করুন"
+                        title="এডিট করো"
                       >
                         <Edit2 size={16} />
                       </button>
                       <button
                         onClick={(e) => handleDeleteClick(e, q.id)}
                         className="p-1.5 text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-md transition-colors"
-                        title="ডিলিট করুন"
+                        title="ডিলিট করো"
                       >
                         <Trash2 size={16} />
                       </button>

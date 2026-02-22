@@ -502,7 +502,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                         {weakChapters[0]?.name}
                       </span>{' '}
                       অধ্যায়ে দুর্বলতা রয়েছে। মূল বইয়ের কনসেপ্টগুলো আবার ঝালিয়ে
-                      নিন এবং বেশি করে প্র্যাকটিস করুন।
+                      নাও এবং বেশি করে প্র্যাকটিস করো।
                     </p>
                   </div>
                 </div>

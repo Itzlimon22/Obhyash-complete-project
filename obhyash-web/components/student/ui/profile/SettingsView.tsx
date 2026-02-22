@@ -165,14 +165,14 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (formData.email && !emailRegex.test(formData.email)) {
-      toast.error('সঠিক ইমেইল ঠিকানা দিন!');
+      toast.error('সঠিক ইমেইল ঠিকানা দাও!');
       return false;
     }
 
     // Phone validation: exactly 11 digits, starts with 01
     const phoneRegex = /^01\d{9}$/;
     if (formData.phone && !phoneRegex.test(formData.phone)) {
-      toast.error('সঠিক 11 ডিজিটের ফোন নম্বর দিন');
+      toast.error('সঠিক 11 ডিজিটের ফোন নম্বর দাও');
       return false;
     }
 

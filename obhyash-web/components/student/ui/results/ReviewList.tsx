@@ -105,7 +105,7 @@ const ReviewList: React.FC<ReviewListProps> = ({
                 <button
                   onClick={() => openReportModal(q.id)}
                   className="p-2.5 rounded-full text-neutral-400 dark:text-neutral-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-                  title="রিপোর্ট করুন"
+                  title="রিপোর্ট করো"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -128,7 +128,7 @@ const ReviewList: React.FC<ReviewListProps> = ({
                         transition-all duration-200 p-2.5 rounded-full 
                         ${isBookmarked ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-500 dark:text-amber-400' : 'text-neutral-400 dark:text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-600 dark:hover:text-neutral-300'}
                       `}
-                  title={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করুন'}
+                  title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
                 >
                   {isBookmarked ? (
                     <svg

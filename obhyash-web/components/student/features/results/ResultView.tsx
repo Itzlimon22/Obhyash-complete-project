@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Question, UserAnswers, ExamResult } from '@/lib/types';
+import { toast } from 'sonner';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import ResultStats from '@/components/student/ui/results/ResultStats';
 import ReviewList from './ReviewList';
@@ -67,7 +68,7 @@ const ResultView: React.FC<ResultViewProps> = ({
       console.log(
         `Report submitted for Q${reportingQuestionId}: ${reportReason}`,
       );
-      alert('রিপোর্ট সফলভাবে জমা দেওয়া হয়েছে!');
+      toast.success('রিপোর্ট সফলভাবে জমা দেওয়া হয়েছে!');
       closeReportModal();
     }
   };

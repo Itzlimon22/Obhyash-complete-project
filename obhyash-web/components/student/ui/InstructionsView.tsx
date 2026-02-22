@@ -127,7 +127,7 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
                     টাইমার শুরু
                   </h4>
                   <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-                    "পরীক্ষা শুরু করুন" বাটনে ক্লিক করার সাথে সাথে টাইমার গণনা
+                    "পরীক্ষা শুরু করো" বাটনে ক্লিক করার সাথে সাথে টাইমার গণনা
                     শুরু হবে।
                   </p>
                 </div>
@@ -172,7 +172,7 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
                     সমাপ্তি
                   </h4>
                   <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-                    উত্তর দেওয়া শেষে "জমা দিন" ক্লিক করুন। সময় শেষ হলে অটোমেটিক
+                    উত্তর দেওয়া শেষে "জমা দাও" ক্লিক করো। সময় শেষ হলে অটোমেটিক
                     জমা হবে।
                   </p>
                 </div>
@@ -193,7 +193,7 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
               className="w-full sm:w-auto flex-1 px-8 py-4 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold transition-all shadow-lg shadow-emerald-500/20 text-sm active:scale-[0.98] hover:-translate-y-0.5 flex items-center justify-center gap-2"
             >
               <Play className="w-5 h-5 fill-current" />
-              সব প্রস্তুতি শেষ। শুরু করুন
+              সব প্রস্তুতি শেষ। শুরু করো
             </button>
           </div>
         </div>

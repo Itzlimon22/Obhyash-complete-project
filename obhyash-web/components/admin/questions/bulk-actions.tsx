@@ -89,7 +89,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
                 onClick={onSelectAll}
                 className="text-[10px] sm:text-xs font-medium text-rose-600 dark:text-rose-400 hover:underline"
               >
-                সব নির্বাচন করুন ({totalCount})
+                সব নির্বাচন করো ({totalCount})
               </button>
             )}
             <button
@@ -154,7 +154,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
                   {!selectedSubjectForChapter ? (
                     <>
                       <div className="px-3 py-2 text-[10px] font-bold text-neutral-400 uppercase tracking-wider bg-neutral-50 dark:bg-neutral-800 sticky top-0">
-                        প্রথমে বিষয় নির্বাচন করুন
+                        প্রথমে বিষয় নির্বাচন করো
                       </div>
                       {subjects.map((s) => (
                         <button

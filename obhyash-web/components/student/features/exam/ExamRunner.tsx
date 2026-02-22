@@ -5,6 +5,8 @@ import ExamHeader from '@/components/student/ui/ExamHeader';
 import QuestionCard from '@/components/student/ui/exam/QuestionCard';
 import ExamDetailsCard from '@/components/student/ui/exam/ExamDetailsCard';
 
+import { toast } from 'sonner';
+
 // Common Modals (Moved to student/ui/common)
 import ConfirmationModal from '@/components/student/ui/common/ConfirmationModal';
 import TimeoutModal from '@/components/student/ui/common/TimeoutModal';
@@ -156,7 +158,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
 
   const handleReportSubmit = (data: Record<string, unknown>) => {
     console.log('Report:', data);
-    alert('রিপোর্ট জমা নেওয়া হয়েছে। ধন্যবাদ!');
+    toast.success('রিপোর্ট জমা নেওয়া হয়েছে। ধন্যবাদ!');
   };
 
   if (!examDetails) return null;

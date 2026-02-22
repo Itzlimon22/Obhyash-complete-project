@@ -132,11 +132,15 @@ export const ComplaintView: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedType) {
-      toast.error('অনুগ্রহ করে অভিযোগের ধরণ নির্বাচন করুন');
+      toast.error('অনুগ্রহ করে অভিযোগের ধরণ নির্বাচন করো');
       return;
     }
     if (description.length < 10) {
-      toast.error('অনুগ্রহ করে বিস্তারিত লিখুন (কমপক্ষে ১০ অক্ষর)');
+      toast.error('অনুগ্রহ করে বিস্তারিত লেখো (কমপক্ষে ১০ অক্ষর)');
+      return;
+    }
+    if (description.length > 1000) {
+      toast.error('অভিযোগ সর্বোচ্চ ১০০০ অক্ষরের মধ্যে হতে হবে');
       return;
     }
 
@@ -149,7 +153,7 @@ export const ComplaintView: React.FC = () => {
       } else {
         // If result.success is false, it's an application-level error returned by the service
         toast.error(
-          result.error || 'কিছু ভুল হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+          result.error || 'কিছু ভুল হয়েছে। অনুগ্রহ করে আবার চেষ্টা করো।',
         );
       }
     } catch (error) {
@@ -198,7 +202,7 @@ export const ComplaintView: React.FC = () => {
               }}
               className="flex-1 py-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition-colors"
             >
-              আমার অভিযোগ দেখুন
+              আমার অভিযোগ দেখো
             </button>
           </div>
         </div>
@@ -268,7 +272,7 @@ export const ComplaintView: React.FC = () => {
                 {/* Category Selection */}
                 <div className="space-y-5">
                   <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
-                    ১. অভিযোগের ধরণ নির্বাচন করুন
+                    ১. অভিযোগের ধরণ নির্বাচন করো
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {COMPLAINT_TYPES.map((type) => {
@@ -331,14 +335,14 @@ export const ComplaintView: React.FC = () => {
                 {/* Description Input */}
                 <div className="space-y-5">
                   <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
-                    ২. বিস্তারিত লিখুন
+                    ২. বিস্তারিত লেখো
                   </h3>
                   <div className="relative group">
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-rose-500 to-indigo-600 rounded-3xl opacity-0 group-focus-within:opacity-20 transition duration-500 blur-lg"></div>
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      placeholder="আপনার সমস্যা বা পরামর্শ সম্পর্কে বিস্তারিত লিখুন..."
+                      placeholder="আপনার সমস্যা বা পরামর্শ সম্পর্কে বিস্তারিত লেখো..."
                       className="relative w-full min-h-[200px] p-6 rounded-2xl border-2 border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-base leading-relaxed focus:outline-none focus:border-rose-500 dark:focus:border-rose-500 transition-all resize-none shadow-sm placeholder:text-neutral-400"
                     />
                   </div>
@@ -359,7 +363,7 @@ export const ComplaintView: React.FC = () => {
                         </>
                       ) : (
                         <>
-                          <span>জমা দিন</span>
+                          <span>জমা দাও</span>
                           <Send
                             size={18}
                             className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"

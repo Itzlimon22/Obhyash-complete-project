@@ -304,7 +304,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   const handleStartExam = async () => {
     if (!subject) {
-      toast.error('অনুগ্রহ করে একটি বিষয় নির্বাচন করুন');
+      toast.error('অনুগ্রহ করে একটি বিষয় নির্বাচন করো');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -363,7 +363,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             </>
           ) : (
             <>
-              <span className="text-xl">পরীক্ষা শুরু করুন</span>
+              <span className="text-xl">পরীক্ষা শুরু করো</span>
               <Sparkles
                 size={22}
                 className="group-hover:rotate-12 transition-transform"
@@ -389,7 +389,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             </span>
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-neutral-900 dark:text-white tracking-tight">
-            পরীক্ষা সেটআপ করুন
+            পরীক্ষা সেটআপ করো
           </h1>
         </div>
 
@@ -468,7 +468,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   handleTopicSelectionChange('topics', names)
                 }
                 disabled={selectedChapters.length === 0}
-                emptyLabel="আগে অধ্যায় নির্বাচন করুন"
+                emptyLabel="আগে অধ্যায় নির্বাচন করো"
               />
             </div>
 
@@ -515,7 +515,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                     )}
                     {availableCount === 0 && (
                       <span className="text-[10px] text-red-600 dark:text-red-400 font-medium">
-                        ⚠ কোনো প্রশ্ন নেই — অন্য ফিল্টার ব্যবহার করুন
+                        ⚠ কোনো প্রশ্ন নেই — অন্য ফিল্টার ব্যবহার করো
                       </span>
                     )}
                   </>

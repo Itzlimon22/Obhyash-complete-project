@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 
 interface AddPaymentMethodModalProps {
   isOpen: boolean;
@@ -22,8 +23,8 @@ const AddPaymentMethodModal: React.FC<AddPaymentMethodModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (number.length < 11) {
-      alert('সঠিক নম্বর দিন');
+    if (number.length < 11 || number.length > 15) {
+      toast.error('সঠিক নম্বর দাও');
       return;
     }
     onSubmit(type, number);
@@ -31,8 +32,8 @@ const AddPaymentMethodModal: React.FC<AddPaymentMethodModalProps> = ({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-neutral-900/60 backdrop-blur-sm animate-fade-in">
-        <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 w-full max-w-sm shadow-2xl overflow-hidden transform transition-all duration-300 border border-neutral-100 dark:border-neutral-800">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all duration-300 animate-in fade-in">
+        <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 w-full max-w-sm shadow-2xl overflow-hidden transform transition-all duration-300 border border-neutral-100 dark:border-neutral-800">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
@@ -126,7 +127,7 @@ const AddPaymentMethodModal: React.FC<AddPaymentMethodModalProps> = ({
                     যুক্ত হচ্ছে...
                   </>
                 ) : (
-                  'যুক্ত করুন'
+                  'যুক্ত করো'
                 )}
               </button>
             </form>

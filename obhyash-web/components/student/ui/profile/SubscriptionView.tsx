@@ -13,6 +13,7 @@ import BillingHistory from './subscription/BillingHistory';
 import PaymentMethods from './subscription/PaymentMethods';
 import AddPaymentMethodModal from './subscription/AddPaymentMethodModal';
 import ManualPaymentModal from './subscription/ManualPaymentModal';
+import { toast } from 'sonner';
 import {
   getSubscriptionPlans,
   getUserInvoices,
@@ -128,7 +129,7 @@ const SubscriptionView: React.FC = () => {
     trxId: string;
   }) => {
     if (!currentUser || !selectedPlan) {
-      alert('User or Plan details missing.');
+      toast.error('User or Plan details missing.');
       return;
     }
 
@@ -149,7 +150,7 @@ const SubscriptionView: React.FC = () => {
     try {
       const success = await submitManualPayment(submission);
       if (success) {
-        alert(
+        toast.success(
           `আপনার পেমেন্ট তথ্য জমা নেওয়া হয়েছে। যাচাই করার পর ${selectedPlan?.name} প্ল্যানটি চালু হবে।`,
         );
         setIsPaymentModalOpen(false);
@@ -158,7 +159,7 @@ const SubscriptionView: React.FC = () => {
         throw new Error('Submission failed');
       }
     } catch {
-      alert('ত্রুটি হয়েছে। আবার চেষ্টা করুন।');
+      toast.error('ত্রুটি হয়েছে। আবার চেষ্টা করো।');
     }
   };
 
@@ -176,7 +177,7 @@ const SubscriptionView: React.FC = () => {
       setPaymentMethods((prev) => [...prev, newMethod]);
       setIsAddMethodOpen(false);
     } catch {
-      alert('মেথড যুক্ত করা যায়নি।');
+      toast.error('মেথড যুক্ত করা যায়নি।');
     } finally {
       setIsAddingMethod(false);
     }
@@ -189,7 +190,7 @@ const SubscriptionView: React.FC = () => {
         setPaymentMethods((prev) => prev.filter((m) => m.id !== id));
       } catch (error) {
         console.error('Failed to delete method', error);
-        alert('মুছে ফেলা সম্ভব হয়নি।');
+        toast.error('মুছে ফেলা সম্ভব হয়নি।');
       }
     }
   };
@@ -198,7 +199,7 @@ const SubscriptionView: React.FC = () => {
     if (currentUser) {
       printInvoice(invoice, currentUser);
     } else {
-      alert('ব্যবহারকারীর তথ্য লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...');
+      toast.info('ব্যবহারকারীর তথ্য লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করো...');
     }
   };
 
@@ -295,7 +296,7 @@ const SubscriptionView: React.FC = () => {
       <div id="pricing-plans" className="scroll-mt-24">
         <div className="text-center mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-2">
-            আপনার প্ল্যান বেছে নিন
+            আপনার প্ল্যান বেছে নাও
           </h2>
         </div>
 

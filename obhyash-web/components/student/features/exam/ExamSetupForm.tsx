@@ -255,14 +255,12 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       availableSubjects.find((s) => s.id === subject)?.name || subject;
 
     if (!subject) {
-      setValidationError('অনুগ্রহ করে একটি বিষয় নির্বাচন করুন।');
+      setValidationError('অনুগ্রহ করে একটি বিষয় নির্বাচন করো।');
       return;
     }
 
     if (examTypes.length === 0) {
-      setValidationError(
-        'অনুগ্রহ করে কমপক্ষে একটি পরীক্ষার ধরণ নির্বাচন করুন।',
-      );
+      setValidationError('অনুগ্রহ করে কমপক্ষে একটি পরীক্ষার ধরণ নির্বাচন করো।');
       return;
     }
 
@@ -478,7 +476,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 >
                   {examTypes.length === EXAM_TYPE_OPTIONS.length
                     ? 'সব মুছুন'
-                    : 'সব নির্বাচন করুন'}
+                    : 'সব নির্বাচন করো'}
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -857,7 +855,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                       className="w-full px-4 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-white text-sm font-bold border-none focus:ring-2 focus:ring-emerald-700/20"
                     >
                       <option value="" disabled>
-                        বিষয় নির্বাচন করুন
+                        বিষয় নির্বাচন করো
                       </option>
                       {availableSubjects.map((s) => (
                         <option key={s.id} value={s.id}>
@@ -897,7 +895,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                     >
                       <span className="truncate">
                         {topicOptions.length === 0
-                          ? 'অধ্যায় নির্বাচন করুন'
+                          ? 'অধ্যায় নির্বাচন করো'
                           : selectedTopics.length === 0
                             ? 'সব টপিক'
                             : `${selectedTopics.length} টি নির্বাচিত`}

@@ -44,6 +44,23 @@ export default function EditProfileModal({
     e.preventDefault();
     if (!currentUser) return;
 
+    if (!formData.name.trim() || formData.name.length > 50) {
+      toast.error('নাম ৫০ অক্ষরের মধ্যে হতে হবে');
+      return;
+    }
+    if (formData.phone && formData.phone.length > 15) {
+      toast.error('ফোন নম্বর 11 অক্ষরের মধ্যে হতে হবে');
+      return;
+    }
+    if (formData.address && formData.address.length > 150) {
+      toast.error('ঠিকানা ১৫০ অক্ষরের মধ্যে হতে হবে');
+      return;
+    }
+    if (formData.bio && formData.bio.length > 300) {
+      toast.error('বায়ো ৩০০ অক্ষরের মধ্যে হতে হবে');
+      return;
+    }
+
     setLoading(true);
     try {
       const updatedUser: UserProfile = {
@@ -111,7 +128,7 @@ export default function EditProfileModal({
                   setFormData({ ...formData, name: e.target.value })
                 }
                 className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 outline-none text-neutral-900 dark:text-white font-black text-sm transition-all"
-                placeholder="আপনার নাম লিখুন"
+                placeholder="আপনার নাম লেখো"
                 required
               />
             </div>
@@ -173,7 +190,7 @@ export default function EditProfileModal({
               }
               rows={3}
               className="w-full px-5 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 outline-none text-neutral-900 dark:text-white font-medium text-sm transition-all resize-none"
-              placeholder="আপনার সম্পর্কে কিছু লিখুন"
+              placeholder="আপনার সম্পর্কে কিছু লেখো"
             />
           </div>
 

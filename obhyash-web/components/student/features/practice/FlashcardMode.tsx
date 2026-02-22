@@ -388,7 +388,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                 }`}
               >
                 {currentIndex + 1 >= total
-                  ? 'ফলাফল দেখুন →'
+                  ? 'ফলাফল দেখো →'
                   : 'পরবর্তী প্রশ্ন →'}
               </button>
             </div>

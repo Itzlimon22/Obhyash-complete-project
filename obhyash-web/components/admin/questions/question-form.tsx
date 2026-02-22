@@ -12,6 +12,7 @@ import {
 } from '@/lib/data/hsc-helpers';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { RichTextEditor } from '@/components/admin/questions/rich-text-editor';
+import { toast } from 'sonner';
 
 interface QuestionFormProps {
   initialData: Partial<Question>;
@@ -55,6 +56,42 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
     [currentChapterName],
   );
 
+  const handleSave = () => {
+    // ── Input Validation (Crash Prevention) ──
+    if (!data.subject?.trim()) {
+      toast.error('দয়া করে একটি বিষয় নির্বাচন করো');
+      return;
+    }
+    if (!data.chapter?.trim()) {
+      toast.error('দয়া করে একটি অধ্যায় নির্বাচন করো');
+      return;
+    }
+    if (!data.question?.trim() && !data.imageUrl) {
+      toast.error('প্রশ্নের বিবরণ বা ছবি খালি রাখা যাবে না');
+      return;
+    }
+
+    const opts = data.options || ['', '', '', ''];
+    const optImgs = data.optionImages || [];
+    for (let i = 0; i < opts.length; i++) {
+      if (!opts[i]?.trim() && !optImgs[i]) {
+        toast.error(`অপশন ${String.fromCharCode(65 + i)} খালি রাখা যাবে না`);
+        return;
+      }
+    }
+
+    if (
+      data.correctAnswerIndex === undefined ||
+      data.correctAnswerIndex === null ||
+      data.correctAnswerIndex < 0
+    ) {
+      toast.error('সঠিক উত্তর নির্বাচন করো');
+      return;
+    }
+
+    onSave(data);
+  };
+
   return (
     <Dialog
       open={true}
@@ -68,7 +105,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
       >
         <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-white dark:bg-neutral-900 sticky top-0 z-10 shrink-0">
           <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
-            {data.id ? 'প্রশ্ন সম্পাদনা' : 'নতুন প্রশ্ন তৈরি করুন'}
+            {data.id ? 'প্রশ্ন সম্পাদনা' : 'নতুন প্রশ্ন তৈরি করো'}
           </h3>
           <button
             onClick={onCancel}
@@ -98,7 +135,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                 }
                 className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
               >
-                <option value="">নির্বাচন করুন</option>
+                <option value="">নির্বাচন করো</option>
                 {availableSubjects.map((s) => (
                   <option key={s.id} value={s.name}>
                     {s.name}
@@ -254,7 +291,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                 <RichTextEditor
                   value={data.question || ''}
                   onChange={(val) => setData({ ...data, question: val })}
-                  placeholder="প্রশ্নের বিবরণ লিখুন (LaTeX and formatting supported)..."
+                  placeholder="প্রশ্নের বিবরণ লেখো (LaTeX and formatting supported)..."
                 />
 
                 {data.question && (
@@ -434,7 +471,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
               <RichTextEditor
                 value={data.explanation || ''}
                 onChange={(val) => setData({ ...data, explanation: val })}
-                placeholder="সঠিক উত্তরের ব্যাখ্যা লিখুন (LaTeX and formatting supported)..."
+                placeholder="সঠিক উত্তরের ব্যাখ্যা লেখো (LaTeX and formatting supported)..."
               />
 
               {data.explanation && (
@@ -458,7 +495,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
             বাতিল করুন
           </button>
           <button
-            onClick={() => onSave(data)}
+            onClick={handleSave}
             className="px-6 py-2.5 text-sm font-bold bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center gap-2"
           >
             <Save size={16} /> সংরক্ষণ করুন
