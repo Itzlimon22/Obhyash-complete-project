@@ -187,7 +187,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
 
       {/* Key Stats Grid */}
       <StatsGrid
-        examsTaken={user.examsTaken}
+        examsTaken={evaluatedExams.length}
         avgScore={avgScore}
         xp={user.xp}
         streak={user.streakCount || 0}
