@@ -58,7 +58,7 @@ const ResultStats: React.FC<ResultStatsProps> = ({
                 fill="transparent"
                 strokeDasharray={283}
                 strokeDashoffset={283 - (283 * percentage) / 100}
-                className={`transition-all duration-1000 ease-out ${percentage >= 70 ? 'text-emerald-500' : percentage >= 40 ? 'text-amber-500' : 'text-red-500'}`}
+                className={`transition-all duration-1000 ease-out ${percentage >= 70 ? 'text-emerald-500' : percentage >= 40 ? 'text-red-500' : 'text-red-500'}`}
                 strokeLinecap="round"
               />
             </svg>
@@ -75,7 +75,7 @@ const ResultStats: React.FC<ResultStatsProps> = ({
 
         {/* Points */}
         <div className="bg-white dark:bg-neutral-900 p-3 md:p-5 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
-          <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center mb-2 text-rose-600 dark:text-rose-400">
+          <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center mb-2 text-red-600 dark:text-red-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

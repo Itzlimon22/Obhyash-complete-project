@@ -238,39 +238,39 @@ export default function QuestionManagementView({
               </div>
             </div>
 
-            <div className="bg-white dark:bg-neutral-900 rounded-[1.25rem] border border-amber-200/50 dark:border-amber-900/30 p-3.5 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
+            <div className="bg-white dark:bg-neutral-900 rounded-[1.25rem] border border-red-200/50 dark:border-red-900/30 p-3.5 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] md:text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-[0.1em] opacity-80">
+                  <p className="text-[10px] md:text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-[0.1em] opacity-80">
                     Pending
                   </p>
-                  <p className="text-xl md:text-3xl font-bold text-amber-700 dark:text-amber-400 mt-0.5 md:mt-2">
+                  <p className="text-xl md:text-3xl font-bold text-red-700 dark:text-red-400 mt-0.5 md:mt-2">
                     {stats.pending}
                   </p>
                 </div>
-                <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
                   <Clock
                     size={18}
-                    className="text-amber-600 dark:text-amber-400"
+                    className="text-red-600 dark:text-red-400"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-neutral-900 rounded-[1.25rem] border border-rose-200/50 dark:border-rose-900/30 p-3.5 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
+            <div className="bg-white dark:bg-neutral-900 rounded-[1.25rem] border border-red-200/50 dark:border-red-900/30 p-3.5 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] md:text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-[0.1em] opacity-80">
+                  <p className="text-[10px] md:text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-[0.1em] opacity-80">
                     Rejected
                   </p>
-                  <p className="text-xl md:text-3xl font-bold text-rose-700 dark:text-rose-400 mt-0.5 md:mt-2">
+                  <p className="text-xl md:text-3xl font-bold text-red-700 dark:text-red-400 mt-0.5 md:mt-2">
                     {stats.rejected}
                   </p>
                 </div>
-                <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
+                <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
                   <AlertCircle
                     size={18}
-                    className="text-rose-600 dark:text-rose-400"
+                    className="text-red-600 dark:text-red-400"
                   />
                 </div>
               </div>
@@ -344,7 +344,7 @@ export default function QuestionManagementView({
           {/* Questions Table */}
           {isLoading ? (
             <div className="w-full py-20 flex justify-center bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-neutral-200 dark:border-neutral-800">
-              <Loader2 className="animate-spin text-rose-600" size={32} />
+              <Loader2 className="animate-spin text-red-600" size={32} />
             </div>
           ) : (
             <>
@@ -467,12 +467,12 @@ export default function QuestionManagementView({
 
               {/* Explanation Section */}
               {(previewData.explanation || previewData.explanationImageUrl) && (
-                <div className="mt-6 p-4 rounded-xl border border-blue-100 bg-blue-50/50 dark:border-blue-900/30 dark:bg-blue-900/10">
-                  <h3 className="text-sm font-bold text-blue-900 dark:text-blue-300 mb-3 block">
+                <div className="mt-6 p-4 rounded-xl border border-emerald-100 bg-emerald-50/50 dark:border-emerald-900/30 dark:bg-emerald-900/10">
+                  <h3 className="text-sm font-bold text-emerald-900 dark:text-emerald-300 mb-3 block">
                     ব্যাখ্যা / সমাধান
                   </h3>
                   {previewData.explanationImageUrl && (
-                    <div className="mb-4 w-full md:w-1/2 rounded-lg overflow-hidden border border-blue-100 dark:border-blue-800 bg-white dark:bg-neutral-900">
+                    <div className="mb-4 w-full md:w-1/2 rounded-lg overflow-hidden border border-emerald-100 dark:border-emerald-800 bg-white dark:bg-neutral-900">
                       <img
                         src={previewData.explanationImageUrl}
                         alt="Explanation"

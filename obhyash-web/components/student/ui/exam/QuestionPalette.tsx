@@ -19,7 +19,7 @@ const QuestionPalette: React.FC<QuestionPaletteProps> = ({
     const isFlagged = flaggedQuestions.has(id);
 
     if (isFlagged)
-      return 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-700 ring-1 ring-amber-300 dark:ring-amber-700';
+      return 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400 border-red-300 dark:border-red-700 ring-1 ring-red-300 dark:ring-red-700';
     if (isAnswered)
       return 'bg-emerald-600 text-white border-emerald-600 shadow-sm';
     return 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-emerald-300 dark:hover:border-emerald-600';
@@ -61,7 +61,7 @@ const QuestionPalette: React.FC<QuestionPaletteProps> = ({
           Answered
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-amber-400"></div> Review
+          <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div> Review
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-2.5 h-2.5 rounded-full border border-neutral-400 bg-white dark:bg-neutral-800"></div>{' '}

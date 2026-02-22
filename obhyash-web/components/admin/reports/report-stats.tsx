@@ -9,15 +9,15 @@ export const ReportStats = ({
   highSeverity: number;
 }) => (
   <div className="flex gap-2 md:gap-3">
-    <div className="px-3 py-1.5 bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-800 rounded-xl flex items-center gap-2.5">
-      <div className="p-1 px-1.5 bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 rounded-lg">
+    <div className="px-3 py-1.5 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-800 rounded-xl flex items-center gap-2.5">
+      <div className="p-1 px-1.5 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-lg">
         <AlertOctagon size={14} />
       </div>
       <div>
-        <p className="text-[9px] text-rose-600/70 font-black uppercase tracking-tight">
+        <p className="text-[9px] text-red-600/70 font-black uppercase tracking-tight">
           High
         </p>
-        <p className="text-sm md:text-lg font-black text-rose-700 dark:text-rose-400 leading-none">
+        <p className="text-sm md:text-lg font-black text-red-700 dark:text-red-400 leading-none">
           {highSeverity}
         </p>
       </div>

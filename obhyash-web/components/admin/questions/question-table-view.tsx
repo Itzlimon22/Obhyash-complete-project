@@ -356,7 +356,7 @@ const EditableRow = ({
             setLocalQ(newQ);
             onSave(newQ);
           }}
-          className={`${inputClass} ${localQ.status === 'Approved' ? 'text-emerald-600' : localQ.status === 'Rejected' ? 'text-red-600' : 'text-amber-600'}`}
+          className={`${inputClass} ${localQ.status === 'Approved' ? 'text-emerald-600' : localQ.status === 'Rejected' ? 'text-red-600' : 'text-red-600'}`}
         >
           <option value="Pending">Pending</option>
           <option value="Approved">Approved</option>
@@ -369,7 +369,7 @@ const EditableRow = ({
         <div className="flex items-center justify-center gap-1 px-1">
           <button
             onClick={onEdit}
-            className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md"
+            className="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-md"
             title="Form Edit"
           >
             <Edit size={14} />
@@ -512,8 +512,8 @@ export const QuestionTableView: React.FC<QuestionTableViewProps> = ({
             </div>
 
             {(previewQ?.explanation || previewQ?.explanationImageUrl) && (
-              <div className="bg-blue-50 dark:bg-blue-900/10 p-5 rounded-xl mt-4 border border-blue-100 dark:border-blue-800">
-                <h4 className="font-bold mb-3 text-blue-900 dark:text-blue-300">
+              <div className="bg-emerald-50 dark:bg-emerald-900/10 p-5 rounded-xl mt-4 border border-emerald-100 dark:border-emerald-800">
+                <h4 className="font-bold mb-3 text-emerald-900 dark:text-emerald-300">
                   Explanation
                 </h4>
                 {previewQ.explanationImageUrl && (

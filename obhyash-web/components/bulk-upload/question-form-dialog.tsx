@@ -237,7 +237,7 @@ export function QuestionFormDialog({
             <div className="space-y-2">
               <Label className="flex justify-between items-end">
                 <span>Question Text</span>
-                <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded">
                   LaTeX supported ($...$)
                 </span>
               </Label>
@@ -456,7 +456,7 @@ export function QuestionFormDialog({
           </Button>
           <Button
             onClick={handleUpdate}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-emerald-600 hover:bg-emerald-700"
           >
             Save Question
           </Button>

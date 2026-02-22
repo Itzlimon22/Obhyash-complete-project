@@ -164,7 +164,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
 
           <div className="flex gap-4 md:gap-8 w-full md:w-auto justify-around md:justify-end">
             <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-amber-400 mb-1">
+              <div className="flex items-center justify-center gap-1 text-red-400 mb-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -184,7 +184,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
               <div className="text-xs text-neutral-500 font-medium">পয়েন্ট</div>
             </div>
             <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-indigo-500 mb-1">
+              <div className="flex items-center justify-center gap-1 text-emerald-500 mb-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -206,7 +206,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
               </div>
             </div>
             <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-rose-500 mb-1">
+              <div className="flex items-center justify-center gap-1 text-red-500 mb-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -293,7 +293,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
                   <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
                     {user.name.split(' ')[0]} - {data[data.length - 1].opponent}
                   </span>

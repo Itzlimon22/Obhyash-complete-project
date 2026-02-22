@@ -70,7 +70,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6">
-        <div className="w-10 h-10 border-4 border-neutral-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+        <div className="w-10 h-10 border-4 border-neutral-200 border-t-emerald-600 rounded-full animate-spin mb-4"></div>
         <p className="text-neutral-500 dark:text-neutral-400 font-medium">
           এনালাইসিস তৈরি হচ্ছে...
         </p>
@@ -111,7 +111,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
             onChange={(e) =>
               setTimeFilter(e.target.value as 'all' | 'month' | 'week')
             }
-            className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 text-sm font-bold rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-sm cursor-pointer"
+            className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 text-sm font-bold rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-emerald-500/20 shadow-sm cursor-pointer"
           >
             <option value="all">সব সময় (All Time)</option>
             <option value="month">এই মাস (This Month)</option>
@@ -140,7 +140,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
           onChange={(e) =>
             setTimeFilter(e.target.value as 'all' | 'month' | 'week')
           }
-          className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 text-sm font-bold rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-sm cursor-pointer hover:border-neutral-300 dark:hover:border-neutral-700 transition-colors w-full sm:w-auto"
+          className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 text-sm font-bold rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500/20 shadow-sm cursor-pointer hover:border-neutral-300 dark:hover:border-neutral-700 transition-colors w-full sm:w-auto"
         >
           <option value="all">সব সময় (All Time)</option>
           <option value="month">এই মাস (This Month)</option>
@@ -162,7 +162,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
           <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
             গড় স্কোর
           </p>
-          <p className="text-2xl md:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400">
+          <p className="text-2xl md:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
             {analytics.avgScore}%
           </p>
         </div>
@@ -178,7 +178,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
           <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
             মোট সময়
           </p>
-          <p className="text-xl md:text-2xl font-extrabold text-amber-600 dark:text-amber-400">
+          <p className="text-xl md:text-2xl font-extrabold text-red-600 dark:text-red-400">
             {formatTime(analytics.totalTime)}
           </p>
         </div>
@@ -191,7 +191,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
             <h3 className="font-bold text-lg text-neutral-800 dark:text-white">
               ফলাফলের গ্রাফ
             </h3>
-            <div className="text-xs font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 px-2 py-1 rounded">
+            <div className="text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded">
               Score %
             </div>
           </div>

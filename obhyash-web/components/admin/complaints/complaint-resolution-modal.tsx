@@ -83,7 +83,7 @@ export function ComplaintResolutionModal({
           {/* Header */}
           <div className="px-5 py-3 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-white dark:bg-black sticky top-0 z-10">
             <div className="flex items-center gap-2.5">
-              <div className="p-1.5 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-lg">
+              <div className="p-1.5 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg">
                 <AlertTriangle size={18} />
               </div>
               <div>
@@ -114,7 +114,7 @@ export function ComplaintResolutionModal({
                   Reporter
                 </span>
                 <div className="flex items-center gap-2 font-black text-xs text-neutral-900 dark:text-white truncate">
-                  <div className="w-5 h-5 rounded-md bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center text-[10px] font-black uppercase">
+                  <div className="w-5 h-5 rounded-md bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 flex items-center justify-center text-[10px] font-black uppercase">
                     {(complaint.user?.name || 'U').charAt(0)}
                   </div>
                   {complaint.user?.name || 'Unknown'}
@@ -125,7 +125,7 @@ export function ComplaintResolutionModal({
                   Created
                 </span>
                 <div className="flex items-center gap-2 font-black text-xs text-neutral-900 dark:text-white">
-                  <Calendar size={12} className="text-rose-500" />
+                  <Calendar size={12} className="text-red-500" />
                   {new Date(complaint.created_at).toLocaleDateString()}
                 </div>
               </div>
@@ -136,7 +136,7 @@ export function ComplaintResolutionModal({
               <h4 className="text-[10px] font-black text-neutral-400 uppercase tracking-widest flex items-center gap-2 opacity-70 ml-1">
                 <MessageSquare size={12} /> Student Narration
               </h4>
-              <div className="p-4 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/40 text-neutral-800 dark:text-neutral-200 text-[13px] leading-relaxed italic">
+              <div className="p-4 rounded-2xl bg-red-50/50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/40 text-neutral-800 dark:text-neutral-200 text-[13px] leading-relaxed italic">
                 &ldquo;{complaint.description}&rdquo;
               </div>
             </div>
@@ -150,7 +150,7 @@ export function ComplaintResolutionModal({
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 placeholder="Ex: We resolved the issue. Please check again..."
-                className="min-h-[140px] rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none dark:text-white transition-all text-sm font-medium p-4 resize-none"
+                className="min-h-[140px] rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none dark:text-white transition-all text-sm font-medium p-4 resize-none"
               />
               <p className="text-[9px] text-neutral-400 font-bold px-1 flex items-center gap-1">
                 <Clock size={10} /> User will receive a push notification with
@@ -163,7 +163,7 @@ export function ComplaintResolutionModal({
           <div className="p-4 sm:p-5 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 flex flex-col sm:flex-row justify-between items-center gap-3 sticky bottom-0 z-10">
             <button
               onClick={() => handleAction('Dismissed')}
-              className="w-full sm:w-auto px-4 py-2 text-[11px] text-rose-500 bg-rose-50/50 dark:bg-rose-500/5 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-all flex items-center justify-center gap-1.5 font-black uppercase tracking-tight"
+              className="w-full sm:w-auto px-4 py-2 text-[11px] text-red-500 bg-red-50/50 dark:bg-red-500/5 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all flex items-center justify-center gap-1.5 font-black uppercase tracking-tight"
             >
               <Trash2 size={12} /> Dismiss Issue
             </button>
@@ -178,7 +178,7 @@ export function ComplaintResolutionModal({
               <button
                 onClick={() => handleAction('Resolved')}
                 disabled={isSaving}
-                className="flex-[2] sm:flex-none px-8 py-3 bg-rose-600 hover:bg-rose-500 text-white text-xs font-black rounded-xl shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50 uppercase tracking-tight"
+                className="flex-[2] sm:flex-none px-8 py-3 bg-red-600 hover:bg-red-500 text-white text-xs font-black rounded-xl shadow-lg shadow-red-500/20 flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50 uppercase tracking-tight"
               >
                 {isSaving ? (
                   <Loader2 className="animate-spin" size={14} />

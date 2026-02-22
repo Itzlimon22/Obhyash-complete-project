@@ -62,7 +62,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
     switch (status) {
       case 'Pending':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-900/10 dark:text-amber-500 dark:border-amber-800/30">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-600 border border-red-100 dark:bg-red-900/10 dark:text-red-500 dark:border-red-800/30">
             <Clock size={12} /> অপেক্ষমান
           </span>
         );
@@ -74,7 +74,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
         );
       case 'Ignored':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-600 border border-rose-100 dark:bg-rose-900/10 dark:text-rose-500 dark:border-rose-800/30">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-600 border border-red-100 dark:bg-red-900/10 dark:text-red-500 dark:border-red-800/30">
             <XCircle size={12} /> বাতিল
           </span>
         );
@@ -110,11 +110,11 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
           </div>
         </div>
         {question.explanation && (
-          <div className="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30">
-            <h4 className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1.5">
+          <div className="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
+            <h4 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1.5">
               ব্যাখ্যা
             </h4>
-            <p className="text-sm text-blue-800 dark:text-blue-200 leading-relaxed">
+            <p className="text-sm text-emerald-800 dark:text-emerald-200 leading-relaxed">
               {question.explanation}
             </p>
           </div>
@@ -160,7 +160,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                 onClick={() => toggleExpand(report.id)}
               >
                 <div className="flex items-start gap-4 flex-1">
-                  <div className="mt-1 p-3 bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-100 dark:border-neutral-700 shadow-sm text-neutral-500 group-hover:text-rose-500 transition-colors">
+                  <div className="mt-1 p-3 bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-100 dark:border-neutral-700 shadow-sm text-neutral-500 group-hover:text-red-500 transition-colors">
                     <AlertTriangle size={24} />
                   </div>
                   <div className="space-y-1">
@@ -202,7 +202,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                     <DialogContent className="max-w-2xl bg-white dark:bg-neutral-900 border-none shadow-2xl rounded-2xl">
                       <DialogHeader>
                         <DialogTitle className="text-xl font-bold flex items-center gap-2 font-serif-exam">
-                          <Eye className="text-rose-500" /> প্রশ্ন বিস্তারিত
+                          <Eye className="text-red-500" /> প্রশ্ন বিস্তারিত
                         </DialogTitle>
                       </DialogHeader>
                       <div className="mt-2">
@@ -230,7 +230,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                     <div className="grid md:grid-cols-2 gap-8">
                       <div className="space-y-5">
                         <div className="bg-white dark:bg-neutral-900 p-4 rounded-xl border border-neutral-100 dark:border-neutral-700 shadow-sm">
-                          <h4 className="text-[10px] uppercase tracking-widest font-black text-rose-500 mb-3 flex items-center gap-2">
+                          <h4 className="text-[10px] uppercase tracking-widest font-black text-red-500 mb-3 flex items-center gap-2">
                             আপনার মন্তব্য
                           </h4>
                           <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed italic">

@@ -113,7 +113,7 @@ export default function AdminRoot({
       {/* Simple Admin Header or use AdminDashboard's internal header */}
       <div className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-6 py-3 flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">
+          <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold">
             A
           </div>
           <h1 className="font-bold text-neutral-800 dark:text-white">

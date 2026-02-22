@@ -57,7 +57,7 @@ const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({
   return (
     <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-5 md:p-8 mb-8 shadow-sm relative overflow-hidden">
       {/* Decorative top gradient line */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-indigo-500 opacity-80" />
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-emerald-500 to-emerald-500 opacity-80" />
 
       <div className="mb-6 pb-4 border-b border-neutral-100 dark:border-neutral-800/60 flex items-center gap-3">
         <div className="p-2.5 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl">
@@ -82,16 +82,16 @@ const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({
           icon={Layers}
           label="পরীক্ষার ধরন (Exam Type)"
           value={details.examType || 'সাধারণ পরীক্ষা'}
-          iconBgClass="bg-blue-50 dark:bg-blue-900/20"
-          iconColorClass="text-blue-600 dark:text-blue-400"
+          iconBgClass="bg-emerald-50 dark:bg-emerald-900/20"
+          iconColorClass="text-emerald-600 dark:text-emerald-400"
         />
 
         <DetailIconItem
           icon={Clock}
           label="সময় (Duration)"
           value={`${details.durationMinutes || 0} মিনিট`}
-          iconBgClass="bg-amber-50 dark:bg-amber-900/20"
-          iconColorClass="text-amber-600 dark:text-amber-400"
+          iconBgClass="bg-red-50 dark:bg-red-900/20"
+          iconColorClass="text-red-600 dark:text-red-400"
         />
 
         <DetailIconItem
@@ -120,8 +120,8 @@ const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({
                   {details.chapters}
                 </span>
               }
-              iconBgClass="bg-indigo-50 dark:bg-indigo-900/20"
-              iconColorClass="text-indigo-600 dark:text-indigo-400"
+              iconBgClass="bg-emerald-50 dark:bg-emerald-900/20"
+              iconColorClass="text-emerald-600 dark:text-emerald-400"
             />
           </div>
         )}
@@ -136,8 +136,8 @@ const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({
                   {details.topics}
                 </span>
               }
-              iconBgClass="bg-purple-50 dark:bg-purple-900/20"
-              iconColorClass="text-purple-600 dark:text-purple-400"
+              iconBgClass="bg-emerald-50 dark:bg-emerald-900/20"
+              iconColorClass="text-emerald-600 dark:text-emerald-400"
             />
           </div>
         )}

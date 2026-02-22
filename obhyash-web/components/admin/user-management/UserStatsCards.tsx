@@ -23,8 +23,8 @@ const UserStatsCards: React.FC<UserStatsCardsProps> = ({
       label: 'Total Users',
       value: stats.total,
       icon: User,
-      gradient: 'from-rose-500 to-red-500',
-      bg: 'bg-rose-50 dark:bg-rose-500/10',
+      gradient: 'from-red-500 to-red-500',
+      bg: 'bg-red-50 dark:bg-red-500/10',
       onClick: () => onStatClick?.('total'),
     },
     {
@@ -32,7 +32,7 @@ const UserStatsCards: React.FC<UserStatsCardsProps> = ({
       label: 'Active Users',
       value: stats.active,
       icon: UserCheck,
-      gradient: 'from-emerald-500 to-teal-500',
+      gradient: 'from-emerald-500 to-emerald-500',
       bg: 'bg-emerald-50 dark:bg-emerald-500/10',
       onClick: () => onStatClick?.('active'),
     },
@@ -41,8 +41,8 @@ const UserStatsCards: React.FC<UserStatsCardsProps> = ({
       label: 'Students',
       value: stats.students,
       icon: BookOpen,
-      gradient: 'from-rose-500 to-rose-400',
-      bg: 'bg-rose-50 dark:bg-rose-500/10',
+      gradient: 'from-red-500 to-red-400',
+      bg: 'bg-red-50 dark:bg-red-500/10',
       onClick: () => onStatClick?.('students'),
     },
     {
@@ -50,8 +50,8 @@ const UserStatsCards: React.FC<UserStatsCardsProps> = ({
       label: 'Premium Users',
       value: stats.premium,
       icon: Crown,
-      gradient: 'from-amber-500 to-orange-500',
-      bg: 'bg-amber-50 dark:bg-amber-500/10',
+      gradient: 'from-red-500 to-red-500',
+      bg: 'bg-red-50 dark:bg-red-500/10',
       onClick: () => onStatClick?.('premium'),
     },
   ];
@@ -62,7 +62,7 @@ const UserStatsCards: React.FC<UserStatsCardsProps> = ({
         <button
           key={i}
           onClick={stat.onClick}
-          className="bg-white dark:bg-neutral-900 p-3 md:p-6 rounded-2xl md:rounded-[1.75rem] border border-neutral-200/60 dark:border-neutral-800/60 shadow-sm hover:shadow-md transition-all group text-left w-full outline-none focus:ring-2 focus:ring-rose-500/20"
+          className="bg-white dark:bg-neutral-900 p-3 md:p-6 rounded-2xl md:rounded-[1.75rem] border border-neutral-200/60 dark:border-neutral-800/60 shadow-sm hover:shadow-md transition-all group text-left w-full outline-none focus:ring-2 focus:ring-red-500/20"
         >
           <div className="flex items-center justify-between mb-2 md:mb-4">
             <div

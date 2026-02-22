@@ -53,7 +53,7 @@ export default function EmailTemplateSelector({
       <select
         value={selectedId}
         onChange={handleChange}
-        className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm text-neutral-700 dark:text-neutral-300 outline-none focus:ring-2 focus:ring-violet-500"
+        className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm text-neutral-700 dark:text-neutral-300 outline-none focus:ring-2 focus:ring-emerald-500"
       >
         <option value="">Select a template to auto-fill...</option>
         {EMAIL_TEMPLATES.map((t) => (

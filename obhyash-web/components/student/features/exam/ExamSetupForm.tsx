@@ -911,7 +911,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   <label className="block text-xs font-bold text-neutral-500 uppercase">
                     প্রশ্নের সংখ্যা
                   </label>
-                  <span className="font-mono font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 px-3 py-1 rounded-lg text-sm border border-rose-100 dark:border-rose-900/30">
+                  <span className="font-mono font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded-lg text-sm border border-red-100 dark:border-red-900/30">
                     {omrCount}
                   </span>
                 </div>
@@ -922,7 +922,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   step="10"
                   value={omrCount}
                   onChange={(e) => setOmrCount(parseInt(e.target.value))}
-                  className="w-full h-2 bg-neutral-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-rose-600"
+                  className="w-full h-2 bg-neutral-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-red-600"
                 />
                 <div className="flex justify-between text-[10px] text-neutral-400 mt-2 font-bold px-1">
                   <span>10</span>

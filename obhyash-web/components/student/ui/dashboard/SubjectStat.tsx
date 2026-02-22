@@ -28,18 +28,18 @@ const SubjectItem: React.FC<{ subject: SubjectData; onClick?: () => void }> = ({
         className="p-4 flex items-center justify-between cursor-pointer bg-white dark:bg-neutral-900 transition-colors select-none group"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <h4 className="font-bold text-neutral-800 dark:text-neutral-200 text-base group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+        <h4 className="font-bold text-neutral-800 dark:text-neutral-200 text-base group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
           {subject.name}
         </h4>
 
         <div className="flex items-center gap-3">
           <span
-            className={`text-sm font-bold ${accuracy >= 80 ? 'text-emerald-600' : accuracy >= 50 ? 'text-amber-500' : 'text-neutral-500'}`}
+            className={`text-sm font-bold ${accuracy >= 80 ? 'text-emerald-600' : accuracy >= 50 ? 'text-red-500' : 'text-neutral-500'}`}
           >
             {accuracy}%
           </span>
           <button
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-neutral-50 dark:bg-neutral-800 text-neutral-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-600 transition-colors"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-neutral-50 dark:bg-neutral-800 text-neutral-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-colors"
             aria-label="Toggle details"
           >
             <svg
@@ -77,7 +77,7 @@ const SubjectItem: React.FC<{ subject: SubjectData; onClick?: () => void }> = ({
                 <span>{subject.wrong} ভুল</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm shadow-amber-200 dark:shadow-none"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-red-400 shadow-sm shadow-red-200 dark:shadow-none"></div>
                 <span>{subject.skipped} স্কিপড</span>
               </div>
             </div>
@@ -106,7 +106,7 @@ const SubjectItem: React.FC<{ subject: SubjectData; onClick?: () => void }> = ({
                     e.stopPropagation();
                     onClick();
                   }}
-                  className="text-xs font-bold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 flex items-center gap-1.5 transition-colors bg-rose-50 dark:bg-rose-900/10 px-3 py-1.5 rounded-lg border border-rose-100 dark:border-rose-800"
+                  className="text-xs font-bold text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 flex items-center gap-1.5 transition-colors bg-red-50 dark:bg-red-900/10 px-3 py-1.5 rounded-lg border border-red-100 dark:border-red-800"
                 >
                   বিস্তারিত রিপোর্ট দেখো
                   <svg

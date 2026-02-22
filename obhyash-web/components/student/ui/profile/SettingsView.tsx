@@ -324,7 +324,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
                   onSave?.({ avatarUrl: undefined });
                   toast.success('ছবি সরিয়ে নেওয়া হয়েছে।');
                 }}
-                className="mt-4 flex items-center gap-1.5 text-xs font-bold text-rose-500 hover:text-rose-600 transition-colors"
+                className="mt-4 flex items-center gap-1.5 text-xs font-bold text-red-500 hover:text-red-600 transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 ছবি সরিয়ে ফেলো
@@ -352,7 +352,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
             <label className={labelClass}>
               ফোন নম্বর
               {user.phone && (
-                <span className="text-xs text-rose-500 ml-2">
+                <span className="text-xs text-red-500 ml-2">
                   (পরিবর্তনযোগ্য নয়)
                 </span>
               )}

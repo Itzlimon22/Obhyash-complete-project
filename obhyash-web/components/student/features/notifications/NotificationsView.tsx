@@ -146,7 +146,7 @@ const NotificationsView: React.FC = () => {
                       >
                         {/* Unread Indicator Dot */}
                         {!notif.is_read && (
-                          <div className="absolute top-5 right-5 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                          <div className="absolute top-5 right-5 w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                         )}
 
                         <div className="flex gap-5">
@@ -182,7 +182,7 @@ const NotificationsView: React.FC = () => {
                               <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-200">
                                 <button
                                   onClick={(e) => handleDelete(notif.id, e)}
-                                  className="p-2 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-neutral-400 hover:text-rose-500 rounded-xl transition-colors"
+                                  className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-neutral-400 hover:text-red-500 rounded-xl transition-colors"
                                   title="মুছে ফেলুন"
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -204,7 +204,7 @@ const NotificationsView: React.FC = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center justify-center py-24 text-center px-4"
             >
-              <div className="w-32 h-32 bg-gradient-to-tr from-violet-100 to-fuchsia-50 dark:from-neutral-800 dark:to-neutral-900 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-fuchsia-100 dark:shadow-none animate-float">
+              <div className="w-32 h-32 bg-gradient-to-tr from-emerald-100 to-red-50 dark:from-neutral-800 dark:to-neutral-900 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-red-100 dark:shadow-none animate-float">
                 <span className="text-6xl filter drop-shadow-lg">
                   {emptyState.icon}
                 </span>

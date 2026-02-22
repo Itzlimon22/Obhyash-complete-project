@@ -115,11 +115,11 @@ export default function TeacherSidebar() {
           <div className="h-16 flex items-center justify-between px-4 border-b border-neutral-100 dark:border-neutral-800">
             {!isCollapsed && (
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                   <GraduationCap size={18} className="text-white" />
                 </div>
                 <div>
-                  <span className="text-base font-black bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
+                  <span className="text-base font-black bg-gradient-to-r from-emerald-600 to-emerald-500 bg-clip-text text-transparent">
                     Obhyash
                   </span>
                   <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest block -mt-0.5">
@@ -129,7 +129,7 @@ export default function TeacherSidebar() {
               </div>
             )}
             {isCollapsed && (
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 mx-auto">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 mx-auto">
                 <GraduationCap size={18} className="text-white" />
               </div>
             )}
@@ -160,7 +160,7 @@ export default function TeacherSidebar() {
               <Link
                 href="/teacher/question-management"
                 onClick={() => setIsMobileOpen(false)}
-                className="flex items-center justify-center gap-2.5 w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                className="flex items-center justify-center gap-2.5 w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-emerald-600 hover:from-emerald-700 hover:to-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 <Upload size={16} />
                 প্রশ্ন আপলোড করুন
@@ -172,7 +172,7 @@ export default function TeacherSidebar() {
               <Link
                 href="/teacher/question-management"
                 title="প্রশ্ন আপলোড করো"
-                className="flex items-center justify-center w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl shadow-lg shadow-emerald-500/25 hover:scale-[1.05] active:scale-[0.95] transition-all"
+                className="flex items-center justify-center w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/25 hover:scale-[1.05] active:scale-[0.95] transition-all"
               >
                 <Upload size={18} />
               </Link>
@@ -239,7 +239,7 @@ export default function TeacherSidebar() {
             {!isCollapsed ? (
               <div className="p-4">
                 <div className="flex items-center gap-3 mb-3 p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">
                     {userInitial}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -265,7 +265,7 @@ export default function TeacherSidebar() {
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all"
                   >
                     <LogOut size={14} />
                     লগ আউট
@@ -275,14 +275,14 @@ export default function TeacherSidebar() {
             ) : (
               <div className="p-3 space-y-1.5">
                 <div
-                  className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-sm mx-auto shadow-md"
+                  className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-bold text-sm mx-auto shadow-md"
                   title={userName}
                 >
                   {userInitial}
                 </div>
                 <button
                   onClick={handleSignOut}
-                  className="w-full flex items-center justify-center p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all"
+                  className="w-full flex items-center justify-center p-2 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all"
                   title="লগ আউট"
                 >
                   <LogOut size={16} />

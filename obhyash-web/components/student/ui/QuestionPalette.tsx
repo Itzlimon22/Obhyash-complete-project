@@ -25,7 +25,7 @@ const QuestionPalette: React.FC<QuestionPaletteProps> = ({
     const isFlagged = flaggedQuestions.has(id);
 
     if (isFlagged)
-      return 'bg-amber-400 text-white border-amber-500 ring-2 ring-amber-100 dark:ring-amber-900/50';
+      return 'bg-red-400 text-white border-red-500 ring-2 ring-red-100 dark:ring-red-900/50';
     if (isAnswered) return 'bg-emerald-500 text-white border-emerald-600';
     return 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-600 hover:border-emerald-400 dark:hover:border-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-700';
   };
@@ -67,7 +67,7 @@ const QuestionPalette: React.FC<QuestionPaletteProps> = ({
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <div className="w-5 h-5 rounded bg-amber-400 border border-amber-500"></div>
+          <div className="w-5 h-5 rounded bg-red-400 border border-red-500"></div>
           <span className="text-sm text-slate-700 dark:text-slate-300">
             রিভিউয়ের জন্য মার্ক করা
           </span>

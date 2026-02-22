@@ -66,14 +66,14 @@ const AddPaymentMethodModal: React.FC<AddPaymentMethodModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setType('bkash')}
-                  className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${type === 'bkash' ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20 text-pink-700 dark:text-pink-400' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500'}`}
+                  className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${type === 'bkash' ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500'}`}
                 >
                   <span className="font-bold">bKash</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setType('nagad')}
-                  className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${type === 'nagad' ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500'}`}
+                  className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${type === 'nagad' ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500'}`}
                 >
                   <span className="font-bold">Nagad</span>
                 </button>
@@ -89,7 +89,7 @@ const AddPaymentMethodModal: React.FC<AddPaymentMethodModalProps> = ({
                 value={number}
                 onChange={(e) => setNumber(e.target.value)}
                 placeholder="017xxxxxxxx"
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 font-mono"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 font-mono"
                 required
               />
             </div>
@@ -97,7 +97,7 @@ const AddPaymentMethodModal: React.FC<AddPaymentMethodModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
             >
               {isLoading ? (
                 <>

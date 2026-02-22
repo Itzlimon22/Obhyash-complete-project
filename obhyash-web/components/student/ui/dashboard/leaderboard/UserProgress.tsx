@@ -32,7 +32,7 @@ const UserProgress: React.FC<UserProgressProps> = ({
     <div className="mb-6 md:mb-8 bg-white dark:bg-neutral-900 rounded-2xl p-4 md:p-6 shadow-sm border border-neutral-200 dark:border-neutral-800 relative overflow-hidden">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 relative z-10">
         <div className="flex items-center gap-3 md:gap-4 w-full sm:w-auto">
-          <div className="flex flex-col items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800 shrink-0">
+          <div className="flex flex-col items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-100 dark:border-emerald-800 shrink-0">
             <span className="text-[9px] md:text-[10px] uppercase opacity-70">
               Rank
             </span>
@@ -41,7 +41,7 @@ const UserProgress: React.FC<UserProgressProps> = ({
           <div className="flex-1">
             <h3 className="font-bold text-neutral-900 dark:text-white text-sm md:text-lg">
               আপনি বর্তমানে{' '}
-              <span className="text-indigo-600 dark:text-indigo-400">
+              <span className="text-emerald-600 dark:text-emerald-400">
                 {currentUserLevelInfo?.label.split(' ')[0]}
               </span>{' '}
               লেভেলে আছেন
@@ -49,7 +49,7 @@ const UserProgress: React.FC<UserProgressProps> = ({
             {nextLevel ? (
               <p className="text-xs md:text-sm text-neutral-500 dark:text-neutral-400">
                 পরবর্তী লেভেলে যেতে আর{' '}
-                <span className="font-bold text-amber-500">{xpNeeded} XP</span>{' '}
+                <span className="font-bold text-red-500">{xpNeeded} XP</span>{' '}
                 প্রয়োজন
               </p>
             ) : (
@@ -70,7 +70,7 @@ const UserProgress: React.FC<UserProgressProps> = ({
           {nextLevel && (
             <div className="w-full h-2 md:h-2.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-1000"
+                className="h-full bg-gradient-to-r from-emerald-500 to-emerald-500 transition-all duration-1000"
                 style={{ width: `${progressPercent}%` }}
               ></div>
             </div>

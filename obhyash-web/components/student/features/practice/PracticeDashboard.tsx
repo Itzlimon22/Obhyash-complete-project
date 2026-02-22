@@ -305,7 +305,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
           }
         : count === 2
           ? {
-              bg: 'bg-amber-900/50 text-amber-400 border-amber-800/50',
+              bg: 'bg-red-900/50 text-red-400 border-red-800/50',
               label: `${count}× ভুল`,
             }
           : {
@@ -327,13 +327,13 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       {/* ── Stats bar ── */}
       <div className="grid grid-cols-3 gap-3 md:gap-4">
         {[
-          { label: 'মোট ভুল', value: mistakes.length, color: 'text-rose-500' },
+          { label: 'মোট ভুল', value: mistakes.length, color: 'text-red-500' },
           {
             label: 'বুকমার্ক',
             value: globalBookmarks.length,
             color: 'text-emerald-500',
           },
-          { label: 'রিভিউ বাকি', value: dueCount, color: 'text-indigo-400' },
+          { label: 'রিভিউ বাকি', value: dueCount, color: 'text-emerald-400' },
         ].map(({ label, value, color }) => (
           <div
             key={label}
@@ -382,8 +382,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                 onClick={() => setSubjectFilter(code)}
                 className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
                   subjectFilter === code
-                    ? 'bg-rose-600 text-white border-rose-600 shadow'
-                    : 'bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-rose-400'
+                    ? 'bg-red-600 text-white border-red-600 shadow'
+                    : 'bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-red-400'
                 }`}
               >
                 {label}
@@ -396,7 +396,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-sm min-h-[400px] flex flex-col">
         {isLoadingBookmarks && activeTab === 'bookmarks' ? (
           <div className="flex-1 flex items-center justify-center p-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600" />
           </div>
         ) : currentList.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
@@ -428,7 +428,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
             </p>
             <button
               onClick={onNavigateToMock}
-              className="px-6 py-2 bg-rose-600 text-white rounded-lg text-sm font-bold shadow hover:bg-rose-700 transition-colors"
+              className="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-bold shadow hover:bg-red-700 transition-colors"
             >
               নতুন পরীক্ষা দাও
             </button>
@@ -445,7 +445,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                     currentList.length > 0
                   }
                   onChange={toggleSelectAll}
-                  className="w-5 h-5 rounded border-neutral-300 text-rose-600 focus:ring-rose-500"
+                  className="w-5 h-5 rounded border-neutral-300 text-red-600 focus:ring-red-500"
                 />
                 <span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
                   {currentSelection.size} নির্বাচিত
@@ -457,7 +457,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                   title="এলোমেলো করো"
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold border transition-all ${
                     shuffle
-                      ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-indigo-300 dark:border-indigo-700'
+                      ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700'
                       : 'bg-white dark:bg-neutral-800 text-neutral-500 border-neutral-200 dark:border-neutral-700 hover:border-neutral-400'
                   }`}
                 >
@@ -503,8 +503,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                     onClick={() => toggleSelection(question.id)}
                     className={`group relative bg-white dark:bg-neutral-900 border rounded-xl p-4 transition-all cursor-pointer ${
                       isSelected
-                        ? 'border-rose-500 dark:border-rose-500 ring-1 ring-rose-500'
-                        : 'border-neutral-200 dark:border-neutral-800 hover:border-rose-300 dark:hover:border-rose-700'
+                        ? 'border-red-500 dark:border-red-500 ring-1 ring-red-500'
+                        : 'border-neutral-200 dark:border-neutral-800 hover:border-red-300 dark:hover:border-red-700'
                     }`}
                   >
                     <div className="flex items-start gap-4">
@@ -513,7 +513,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                         <div
                           className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
                             isSelected
-                              ? 'bg-rose-600 border-rose-600'
+                              ? 'bg-red-600 border-red-600'
                               : 'border-neutral-300 dark:border-neutral-600'
                           }`}
                         >
@@ -547,7 +547,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                             <FrequencyBadge count={freq} />
                           )}
                           {due && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-900/30 text-indigo-400 border border-indigo-800/30">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-900/30 text-emerald-400 border border-emerald-800/30">
                               📅 রিভিউ বাকি
                             </span>
                           )}

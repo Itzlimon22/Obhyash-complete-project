@@ -112,13 +112,13 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
                             relative flex flex-col items-center p-3 md:p-4 rounded-2xl border-2 transition-all min-w-[105px] md:min-w-[130px] overflow-hidden
                             ${
                               isSelected
-                                ? `border-transparent ring-2 ring-offset-2 ring-rose-500 dark:ring-offset-neutral-950 shadow-lg scale-105`
+                                ? `border-transparent ring-2 ring-offset-2 ring-red-500 dark:ring-offset-neutral-950 shadow-lg scale-105`
                                 : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700'
                             }
                         `}
             >
               {isUserLevel && (
-                <div className="absolute top-2 right-2 w-2 h-2 md:w-2.5 md:h-2.5 bg-rose-500 rounded-full animate-pulse shadow-sm"></div>
+                <div className="absolute top-2 right-2 w-2 h-2 md:w-2.5 md:h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm"></div>
               )}
               {isSelected && (
                 <div

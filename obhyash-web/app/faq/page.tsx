@@ -69,12 +69,12 @@ export default function FAQPage() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans selection:bg-rose-500/20 text-slate-900 dark:text-slate-100">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans selection:bg-red-500/20 text-slate-900 dark:text-slate-100">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full backdrop-blur-lg bg-white/70 dark:bg-black/70 border-b border-rose-100 dark:border-slate-800">
+      <header className="sticky top-0 z-50 w-full backdrop-blur-lg bg-white/70 dark:bg-black/70 border-b border-red-100 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-rose-600 to-red-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-rose-500/20 group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-red-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-red-500/20 group-hover:scale-105 transition-transform">
               <Flame className="w-5 h-5" />
             </div>
             <span className="text-xl font-bold text-slate-900 dark:text-white font-serif-exam">
@@ -83,7 +83,7 @@ export default function FAQPage() {
           </Link>
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+            className="flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             হোম-এ ফিরে যান
@@ -92,10 +92,10 @@ export default function FAQPage() {
       </header>
 
       {/* Hero with Search */}
-      <section className="relative py-20 bg-white dark:bg-slate-900 border-b border-rose-100 dark:border-slate-800">
+      <section className="relative py-20 bg-white dark:bg-slate-900 border-b border-red-100 dark:border-slate-800">
         <div className="absolute inset-0 bg-[radial-gradient(#e11d48_1px,transparent_1px)] [background-size:16px_16px] opacity-[0.03] dark:opacity-[0.1]" />
         <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
-          <div className="inline-flex items-center justify-center p-3 mb-6 bg-rose-100 dark:bg-rose-900/30 text-rose-600 rounded-2xl">
+          <div className="inline-flex items-center justify-center p-3 mb-6 bg-red-100 dark:bg-red-900/30 text-red-600 rounded-2xl">
             <MessageCircle className="w-8 h-8" />
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-6">
@@ -110,7 +110,7 @@ export default function FAQPage() {
               placeholder="আপনার প্রশ্ন লিখুন... (যেমন: পেমেন্ট, লগইন)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 rounded-xl border border-rose-100 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl shadow-rose-500/5 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all text-slate-900 dark:text-white"
+              className="w-full pl-12 pr-4 py-4 rounded-xl border border-red-100 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl shadow-red-500/5 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-slate-900 dark:text-white"
             />
           </div>
         </div>
@@ -144,7 +144,7 @@ export default function FAQPage() {
                   key={idx}
                   className={`group rounded-2xl border transition-all duration-300 overflow-hidden ${
                     openIndex === idx
-                      ? 'bg-white dark:bg-slate-900 border-rose-200 dark:border-rose-900/50 shadow-lg shadow-rose-500/5'
+                      ? 'bg-white dark:bg-slate-900 border-red-200 dark:border-red-900/50 shadow-lg shadow-red-500/5'
                       : 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-900'
                   }`}
                 >
@@ -155,14 +155,14 @@ export default function FAQPage() {
                     <span
                       className={`font-bold text-lg ${
                         openIndex === idx
-                          ? 'text-rose-600 dark:text-rose-400'
+                          ? 'text-red-600 dark:text-red-400'
                           : 'text-slate-900 dark:text-slate-200'
                       }`}
                     >
                       {faq.question}
                     </span>
                     {openIndex === idx ? (
-                      <ChevronUp className="w-5 h-5 text-rose-600" />
+                      <ChevronUp className="w-5 h-5 text-red-600" />
                     ) : (
                       <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-slate-600" />
                     )}
@@ -189,16 +189,16 @@ export default function FAQPage() {
             )}
           </div>
 
-          <div className="mt-16 bg-gradient-to-r from-rose-600 to-red-600 rounded-3xl p-8 md:p-12 text-center text-white shadow-2xl shadow-rose-500/30 relative overflow-hidden">
+          <div className="mt-16 bg-gradient-to-r from-red-600 to-red-600 rounded-3xl p-8 md:p-12 text-center text-white shadow-2xl shadow-red-500/30 relative overflow-hidden">
             <div className="relative z-10">
               <h3 className="text-2xl font-bold mb-4">আরও প্রশ্ন আছে?</h3>
-              <p className="mb-6 text-rose-100 max-w-lg mx-auto">
+              <p className="mb-6 text-red-100 max-w-lg mx-auto">
                 আপনার প্রশ্নের উত্তর এখানে না পেলে আমাদের সাপোর্ট টিমের সাথে
                 সরাসরি কথা বলুন।
               </p>
               <a
                 href="mailto:support@obhyash.com"
-                className="inline-flex px-6 py-3 bg-white text-rose-600 rounded-xl font-bold hover:bg-rose-50 transition-colors"
+                className="inline-flex px-6 py-3 bg-white text-red-600 rounded-xl font-bold hover:bg-red-50 transition-colors"
               >
                 আমাদের মেইল করুন
               </a>
@@ -211,7 +211,7 @@ export default function FAQPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-slate-900 py-8 border-t border-rose-100 dark:border-slate-800 text-center text-sm text-slate-500">
+      <footer className="bg-white dark:bg-slate-900 py-8 border-t border-red-100 dark:border-slate-800 text-center text-sm text-slate-500">
         © {new Date().getFullYear()} Obhyash Platform. All rights reserved.
       </footer>
     </div>

@@ -233,10 +233,10 @@ export default function ExamDebugPage() {
                       <div
                         key={c}
                         onClick={() => toggleChapter(c)}
-                        className={`cursor-pointer px-2 py-1 rounded flex items-center gap-2 ${selectedChapters.includes(c) ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-200'}`}
+                        className={`cursor-pointer px-2 py-1 rounded flex items-center gap-2 ${selectedChapters.includes(c) ? 'bg-emerald-100 text-emerald-700' : 'hover:bg-gray-200'}`}
                       >
                         <div
-                          className={`w-3 h-3 rounded border ${selectedChapters.includes(c) ? 'bg-blue-600 border-blue-600' : 'border-gray-400'}`}
+                          className={`w-3 h-3 rounded border ${selectedChapters.includes(c) ? 'bg-emerald-600 border-emerald-600' : 'border-gray-400'}`}
                         ></div>
                         {c}
                       </div>
@@ -326,7 +326,7 @@ export default function ExamDebugPage() {
             <button
               onClick={handleTestFetch}
               disabled={isFetching || loading}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full bg-emerald-600 text-white py-3 rounded-lg font-medium hover:bg-emerald-700 transition flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isFetching ? (
                 'Fetching...'

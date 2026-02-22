@@ -200,7 +200,7 @@ export default function TeacherBulkUploadPage() {
             </button>
             <button
               onClick={() => downloadTemplate('JSON')}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg"
             >
               <Download className="w-4 h-4" /> JSON Template
             </button>
@@ -216,7 +216,7 @@ export default function TeacherBulkUploadPage() {
             }}
             onDragLeave={() => setIsDragOver(false)}
             onDrop={handleDrop}
-            className={`border-2 border-dashed rounded-xl p-12 text-center transition ${isDragOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-neutral-300 dark:border-neutral-700'}`}
+            className={`border-2 border-dashed rounded-xl p-12 text-center transition ${isDragOver ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' : 'border-neutral-300 dark:border-neutral-700'}`}
           >
             <Upload className="w-12 h-12 mx-auto mb-4 text-neutral-400" />
             <p className="text-neutral-600 dark:text-neutral-400 mb-4">
@@ -233,7 +233,7 @@ export default function TeacherBulkUploadPage() {
             />
             <label
               htmlFor="file-upload"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg cursor-pointer"
             >
               {isUploading ? (
                 <>
@@ -260,10 +260,10 @@ export default function TeacherBulkUploadPage() {
               Validation Results
             </h2>
             <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <FileText className="w-8 h-8 text-blue-600" />
+              <div className="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                <FileText className="w-8 h-8 text-emerald-600" />
                 <div>
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-2xl font-bold text-emerald-600">
                     {previewQuestions.length}
                   </p>
                   <p className="text-sm text-neutral-600">Total</p>

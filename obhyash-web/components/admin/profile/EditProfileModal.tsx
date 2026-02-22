@@ -92,7 +92,7 @@ export default function EditProfileModal({
       <div className="bg-white dark:bg-neutral-900 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl w-full max-w-lg border-x border-t sm:border border-neutral-200 dark:border-neutral-800 animate-in slide-in-from-bottom-10 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 overflow-hidden">
         <div className="flex items-center justify-between p-6 sm:p-8 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/20">
           <div className="flex items-center gap-3">
-            <span className="p-2 bg-rose-600 text-white rounded-xl shadow-lg shadow-rose-500/20">
+            <span className="p-2 bg-red-600 text-white rounded-xl shadow-lg shadow-red-500/20">
               <User size={20} />
             </span>
             <h2 className="text-xl font-black text-neutral-900 dark:text-white tracking-tight">
@@ -118,7 +118,7 @@ export default function EditProfileModal({
             </label>
             <div className="relative group">
               <User
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-rose-500 transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-red-500 transition-colors"
                 size={18}
               />
               <input
@@ -127,7 +127,7 @@ export default function EditProfileModal({
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 outline-none text-neutral-900 dark:text-white font-black text-sm transition-all"
+                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-red-500/10 focus:border-red-500 outline-none text-neutral-900 dark:text-white font-black text-sm transition-all"
                 placeholder="আপনার নাম লেখো"
                 required
               />
@@ -141,7 +141,7 @@ export default function EditProfileModal({
             </label>
             <div className="relative group">
               <Phone
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-rose-500 transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-red-500 transition-colors"
                 size={18}
               />
               <input
@@ -150,7 +150,7 @@ export default function EditProfileModal({
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
-                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 outline-none text-neutral-900 dark:text-white font-black text-sm transition-all"
+                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-red-500/10 focus:border-red-500 outline-none text-neutral-900 dark:text-white font-black text-sm transition-all"
                 placeholder="০১XXXXXXXXX"
               />
             </div>
@@ -163,7 +163,7 @@ export default function EditProfileModal({
             </label>
             <div className="relative group">
               <MapPin
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-rose-500 transition-colors"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 group-focus-within:text-red-500 transition-colors"
                 size={18}
               />
               <input
@@ -172,7 +172,7 @@ export default function EditProfileModal({
                 onChange={(e) =>
                   setFormData({ ...formData, address: e.target.value })
                 }
-                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 outline-none text-neutral-900 dark:text-white font-black text-sm transition-all"
+                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-red-500/10 focus:border-red-500 outline-none text-neutral-900 dark:text-white font-black text-sm transition-all"
                 placeholder="আপনার বর্তমান অবস্থান"
               />
             </div>
@@ -189,7 +189,7 @@ export default function EditProfileModal({
                 setFormData({ ...formData, bio: e.target.value })
               }
               rows={3}
-              className="w-full px-5 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 outline-none text-neutral-900 dark:text-white font-medium text-sm transition-all resize-none"
+              className="w-full px-5 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 focus:ring-4 focus:ring-red-500/10 focus:border-red-500 outline-none text-neutral-900 dark:text-white font-medium text-sm transition-all resize-none"
               placeholder="আপনার সম্পর্কে কিছু লেখো"
             />
           </div>
@@ -198,7 +198,7 @@ export default function EditProfileModal({
             <button
               type="submit"
               disabled={loading}
-              className="w-full order-first sm:order-last px-8 py-4 bg-rose-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-rose-700 shadow-xl shadow-rose-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-70 active:scale-95"
+              className="w-full order-first sm:order-last px-8 py-4 bg-red-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-red-700 shadow-xl shadow-red-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-70 active:scale-95"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

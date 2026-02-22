@@ -29,13 +29,13 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
       <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-violet-600 p-6 rounded-t-2xl flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-gradient-to-r from-emerald-600 to-emerald-600 p-6 rounded-t-2xl flex items-center justify-between z-10">
           <div>
             <h2 className="text-2xl font-bold text-white flex items-center gap-2">
               <User className="w-6 h-6" />
               User Details
             </h2>
-            <p className="text-blue-100 text-sm mt-1">
+            <p className="text-emerald-100 text-sm mt-1">
               Full profile information
             </p>
           </div>
@@ -51,7 +51,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
         <div className="p-6 space-y-8">
           {/* Header Profile */}
           <div className="flex items-center gap-6">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center text-white font-bold text-3xl shadow-lg">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-500 flex items-center justify-center text-white font-bold text-3xl shadow-lg">
               {user.name?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div>
@@ -137,8 +137,8 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
                   <span
                     className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                       user.subscription?.plan === 'Pro'
-                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                        : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                        ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                        : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                     }`}
                   >
                     {user.subscription?.plan}

@@ -67,7 +67,7 @@ export default function QuestionCard({
         border border-neutral-200/80 dark:border-neutral-800 shadow-sm hover:shadow-md
         ${
           isFlagged
-            ? 'ring-2 ring-amber-400/50'
+            ? 'ring-2 ring-red-400/50'
             : isAnswered
               ? 'ring-1 ring-emerald-500/30'
               : ''
@@ -84,7 +84,7 @@ export default function QuestionCard({
               : `Question ${question.id}`}
           </span>
           {isFlagged && (
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
               Marked
             </span>
           )}
@@ -126,7 +126,7 @@ export default function QuestionCard({
               {tags.map((tag, i) => (
                 <span
                   key={i}
-                  className="px-3 py-1 bg-[#8be8e5] dark:bg-cyan-900/40 text-cyan-900 dark:text-cyan-300 text-xs font-extrabold rounded-full whitespace-nowrap"
+                  className="px-3 py-1 bg-[#8be8e5] dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-300 text-xs font-extrabold rounded-full whitespace-nowrap"
                 >
                   {tag}
                 </span>
@@ -154,7 +154,7 @@ export default function QuestionCard({
               disabled={!onToggleBookmark}
               className={`p-1.5 rounded-full transition-colors ${
                 isBookmarked
-                  ? 'bg-pink-50 dark:bg-pink-900/20'
+                  ? 'bg-red-50 dark:bg-red-900/20'
                   : 'hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-300'
               } ${!onToggleBookmark ? 'opacity-30 cursor-default' : ''}`}
               title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
@@ -239,10 +239,10 @@ export default function QuestionCard({
               textClass = 'text-emerald-900 dark:text-emerald-100 font-bold';
             } else if (isSelected) {
               bgClass =
-                'bg-blue-100/60 dark:bg-blue-900/30 ring-1 ring-blue-400 dark:ring-blue-500 inset-0';
-              iconClass = 'bg-blue-500 text-white border-none';
+                'bg-emerald-100/60 dark:bg-emerald-900/30 ring-1 ring-emerald-400 dark:ring-emerald-500 inset-0';
+              iconClass = 'bg-emerald-500 text-white border-none';
               iconText = '✓';
-              textClass = 'text-blue-900 dark:text-blue-100 font-bold';
+              textClass = 'text-emerald-900 dark:text-emerald-100 font-bold';
             }
 
             return (

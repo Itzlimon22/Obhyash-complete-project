@@ -19,15 +19,15 @@ const PricingCard: React.FC<PricingCardProps> = ({
     if (plan.colorTheme === 'emerald')
       return 'border-emerald-500 ring-1 ring-emerald-500/20 shadow-emerald-500/10';
     if (plan.colorTheme === 'indigo')
-      return 'border-indigo-500 ring-1 ring-indigo-500/20 shadow-indigo-500/10';
+      return 'border-emerald-500 ring-1 ring-emerald-500/20 shadow-emerald-500/10';
     return 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600';
   };
 
   const getHeaderBg = () => {
     if (plan.colorTheme === 'emerald')
-      return 'bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20';
+      return 'bg-gradient-to-br from-emerald-50 to-emerald-50 dark:from-emerald-900/20 dark:to-emerald-900/20';
     if (plan.colorTheme === 'indigo')
-      return 'bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20';
+      return 'bg-gradient-to-br from-emerald-50 to-emerald-50 dark:from-emerald-900/20 dark:to-emerald-900/20';
     return 'bg-slate-50 dark:bg-slate-800/50';
   };
 
@@ -35,7 +35,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
     if (plan.colorTheme === 'emerald')
       return 'text-emerald-700 dark:text-emerald-400';
     if (plan.colorTheme === 'indigo')
-      return 'text-indigo-700 dark:text-indigo-400';
+      return 'text-emerald-700 dark:text-emerald-400';
     return 'text-slate-600 dark:text-slate-400';
   };
 
@@ -51,7 +51,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
       `}
     >
       {plan.isPopular && (
-        <div className="absolute top-0 right-0 bg-gradient-to-bl from-emerald-500 to-teal-500 text-white text-[9px] font-bold uppercase px-3 py-1 rounded-bl-xl shadow-sm z-10">
+        <div className="absolute top-0 right-0 bg-gradient-to-bl from-emerald-500 to-emerald-500 text-white text-[9px] font-bold uppercase px-3 py-1 rounded-bl-xl shadow-sm z-10">
           Best Value
         </div>
       )}
@@ -120,7 +120,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
                 ${
                   isCurrent
                     ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-default border border-slate-200 dark:border-slate-700'
-                    : `text-white shadow-md shadow-${plan.colorTheme}-500/20 ${plan.colorTheme === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' : plan.colorTheme === 'indigo' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-slate-800 hover:bg-slate-900 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200'}`
+                    : `text-white shadow-md shadow-${plan.colorTheme}-500/20 ${plan.colorTheme === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' : plan.colorTheme === 'indigo' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-800 hover:bg-slate-900 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200'}`
                 }
             `}
         >

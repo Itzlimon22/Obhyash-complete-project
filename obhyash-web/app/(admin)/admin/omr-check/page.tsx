@@ -244,7 +244,7 @@ export default function OmrCheckPage() {
       <div className="max-w-6xl mx-auto space-y-4 sm:space-y-8">
         <div className="flex flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="bg-rose-600 text-white p-2 rounded-2xl shadow-lg shadow-rose-500/20">
+            <span className="bg-red-600 text-white p-2 rounded-2xl shadow-lg shadow-red-500/20">
               <Activity size={24} />
             </span>
             <h1 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
@@ -253,7 +253,7 @@ export default function OmrCheckPage() {
           </div>
           <button
             onClick={fetchSubmissions}
-            className="p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-500 hover:text-rose-600 transition-all shadow-sm active:scale-95"
+            className="p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-500 hover:text-red-600 transition-all shadow-sm active:scale-95"
             title="Refresh"
           >
             <svg
@@ -281,8 +281,8 @@ export default function OmrCheckPage() {
               val: scriptSubmissions.filter(
                 (s) => s.status !== 'evaluated' && s.status !== 'rejected',
               ).length,
-              color: 'text-amber-500',
-              bg: 'bg-amber-50 dark:bg-amber-500/10',
+              color: 'text-red-500',
+              bg: 'bg-red-50 dark:bg-red-500/10',
             },
             {
               label: 'মূল্যায়িত',
@@ -295,14 +295,14 @@ export default function OmrCheckPage() {
               label: 'বাতিল',
               val: scriptSubmissions.filter((s) => s.status === 'rejected')
                 .length,
-              color: 'text-rose-500',
-              bg: 'bg-rose-50 dark:bg-rose-500/10',
+              color: 'text-red-500',
+              bg: 'bg-red-50 dark:bg-red-500/10',
             },
             {
               label: 'মোট',
               val: scriptSubmissions.length,
-              color: 'text-indigo-500',
-              bg: 'bg-indigo-50 dark:bg-indigo-500/10',
+              color: 'text-emerald-500',
+              bg: 'bg-emerald-50 dark:bg-emerald-500/10',
             },
           ].map((stat, i) => (
             <div
@@ -326,7 +326,7 @@ export default function OmrCheckPage() {
             {isLoading ? (
               <div className="col-span-full bg-white dark:bg-neutral-900 rounded-[2rem] p-12 border border-neutral-200 dark:border-neutral-800 text-center">
                 <Loader2
-                  className="animate-spin mx-auto text-rose-500 mb-2"
+                  className="animate-spin mx-auto text-red-500 mb-2"
                   size={32}
                 />
                 <p className="text-neutral-500 dark:text-neutral-400 font-bold text-sm">
@@ -360,12 +360,12 @@ export default function OmrCheckPage() {
                       </span>
                     )}
                     {item.status === 'rejected' && (
-                      <span className="px-2.5 py-1 rounded-xl text-[10px] font-black bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 uppercase tracking-widest border border-rose-100 dark:border-rose-500/20">
+                      <span className="px-2.5 py-1 rounded-xl text-[10px] font-black bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 uppercase tracking-widest border border-red-100 dark:border-red-500/20">
                         REJECTED
                       </span>
                     )}
                     {(item.status === 'pending' || !item.status) && (
-                      <span className="px-2.5 py-1 rounded-xl text-[10px] font-black bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 uppercase tracking-widest border border-amber-100 dark:border-amber-500/20 animate-pulse">
+                      <span className="px-2.5 py-1 rounded-xl text-[10px] font-black bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 uppercase tracking-widest border border-red-100 dark:border-red-500/20 animate-pulse">
                         PENDING
                       </span>
                     )}
@@ -393,7 +393,7 @@ export default function OmrCheckPage() {
                   <div className="flex items-center justify-between pt-2">
                     <button
                       onClick={() => setViewingScript(item)}
-                      className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold text-xs hover:bg-rose-50 dark:hover:bg-rose-950/20 px-3 py-2 rounded-xl transition-colors"
+                      className="flex items-center gap-2 text-red-600 dark:text-red-400 font-bold text-xs hover:bg-red-50 dark:hover:bg-red-950/20 px-3 py-2 rounded-xl transition-colors"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -415,7 +415,7 @@ export default function OmrCheckPage() {
                     <div className="flex-1 text-right">
                       {item.status === 'evaluated' ? (
                         <div className="flex flex-col items-end">
-                          <span className="font-black text-rose-600 dark:text-rose-500 text-2xl leading-none">
+                          <span className="font-black text-red-600 dark:text-red-500 text-2xl leading-none">
                             {item.score?.toFixed(1) || 0}
                           </span>
                           <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest mt-1">
@@ -423,14 +423,14 @@ export default function OmrCheckPage() {
                           </span>
                         </div>
                       ) : item.status === 'rejected' ? (
-                        <span className="text-[10px] text-rose-500 font-bold italic truncate max-w-[120px] inline-block">
+                        <span className="text-[10px] text-red-500 font-bold italic truncate max-w-[120px] inline-block">
                           {item.rejectionReason || 'বাতিল করা হয়েছে'}
                         </span>
                       ) : (
                         <button
                           onClick={() => handleEvaluate(item)}
                           disabled={processingId === item.id}
-                          className="bg-rose-600 hover:bg-rose-700 text-white px-5 py-2.5 rounded-2xl text-xs font-black shadow-lg shadow-rose-500/20 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2"
+                          className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-2xl text-xs font-black shadow-lg shadow-red-500/20 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2"
                         >
                           {processingId === item.id ? (
                             <Loader2 className="animate-spin" size={16} />
@@ -467,7 +467,7 @@ export default function OmrCheckPage() {
                       <td colSpan={6} className="text-center py-24">
                         <div className="flex flex-col items-center justify-center gap-3">
                           <Loader2
-                            className="animate-spin text-rose-500"
+                            className="animate-spin text-red-500"
                             size={32}
                           />
                           <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
@@ -503,7 +503,7 @@ export default function OmrCheckPage() {
                           <div className="font-black text-neutral-900 dark:text-neutral-200">
                             {item.subject}
                           </div>
-                          <div className="text-[9px] text-rose-600 dark:text-rose-400 font-black bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-lg w-fit mt-1.5 uppercase tracking-widest border border-rose-100 dark:border-rose-500/20">
+                          <div className="text-[9px] text-red-600 dark:text-red-400 font-black bg-red-50 dark:bg-red-500/10 px-2 py-0.5 rounded-lg w-fit mt-1.5 uppercase tracking-widest border border-red-100 dark:border-red-500/20">
                             {item.examType || 'General'}
                           </div>
                         </td>
@@ -513,7 +513,7 @@ export default function OmrCheckPage() {
                         <td className="px-8 py-6">
                           <button
                             onClick={() => setViewingScript(item)}
-                            className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-black text-xs hover:bg-rose-50 dark:hover:bg-rose-500/10 px-3 py-2 rounded-xl transition-all active:scale-95 border border-transparent hover:border-rose-100 dark:hover:border-rose-500/20"
+                            className="flex items-center gap-2 text-red-600 dark:text-red-400 font-black text-xs hover:bg-red-50 dark:hover:bg-red-500/10 px-3 py-2 rounded-xl transition-all active:scale-95 border border-transparent hover:border-red-100 dark:hover:border-red-500/20"
                           >
                             <svg
                               className="w-5 h-5"
@@ -538,12 +538,12 @@ export default function OmrCheckPage() {
                             </span>
                           )}
                           {item.status === 'rejected' && (
-                            <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-black bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 uppercase tracking-widest border border-rose-100 dark:border-rose-500/20">
+                            <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-black bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 uppercase tracking-widest border border-red-100 dark:border-red-500/20">
                               Rejected
                             </span>
                           )}
                           {(item.status === 'pending' || !item.status) && (
-                            <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-black bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 uppercase tracking-widest border border-amber-100 dark:border-amber-500/20">
+                            <span className="inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-black bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 uppercase tracking-widest border border-red-100 dark:border-red-500/20">
                               Pending
                             </span>
                           )}
@@ -551,7 +551,7 @@ export default function OmrCheckPage() {
                         <td className="px-8 py-6 text-right">
                           {item.status === 'evaluated' ? (
                             <div className="flex flex-col items-end">
-                              <span className="font-black text-2xl text-rose-600 dark:text-rose-500 leading-none">
+                              <span className="font-black text-2xl text-red-600 dark:text-red-500 leading-none">
                                 {item.score?.toFixed(2) || 0}
                               </span>
                               <span className="text-[9px] text-neutral-400 font-black uppercase tracking-[0.2em] mt-1.5">
@@ -560,7 +560,7 @@ export default function OmrCheckPage() {
                             </div>
                           ) : item.status === 'rejected' ? (
                             <span
-                              className="text-xs text-rose-500 font-bold italic opacity-80"
+                              className="text-xs text-red-500 font-bold italic opacity-80"
                               title={item.rejectionReason}
                             >
                               {item.rejectionReason || 'Rejected'}
@@ -569,7 +569,7 @@ export default function OmrCheckPage() {
                             <button
                               onClick={() => handleEvaluate(item)}
                               disabled={processingId === item.id}
-                              className="bg-rose-600 hover:bg-rose-700 text-white px-6 py-3 rounded-2xl text-xs font-black shadow-lg shadow-rose-500/20 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2 ml-auto"
+                              className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl text-xs font-black shadow-lg shadow-red-500/20 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-2 ml-auto"
                             >
                               {processingId === item.id ? (
                                 <Loader2 className="animate-spin w-4 h-4" />
@@ -610,7 +610,7 @@ export default function OmrCheckPage() {
                     setViewingScript(null);
                     setShowRejectInput(false);
                   }}
-                  className="p-3 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-500 hover:text-rose-600 transition-all active:scale-95"
+                  className="p-3 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-500 hover:text-red-600 transition-all active:scale-95"
                 >
                   <svg
                     className="w-5 h-5"
@@ -649,7 +649,7 @@ export default function OmrCheckPage() {
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="যেমন: ছবি অস্পষ্ট, ভুল ফরম্যাট..."
-                      className="w-full p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white mb-4 focus:ring-2 focus:ring-rose-500/20 outline-none text-sm min-h-[100px] resize-none"
+                      className="w-full p-4 border border-neutral-200 dark:border-neutral-800 rounded-2xl bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white mb-4 focus:ring-2 focus:ring-red-500/20 outline-none text-sm min-h-[100px] resize-none"
                       autoFocus
                     />
                     <div className="flex gap-4">
@@ -678,7 +678,7 @@ export default function OmrCheckPage() {
                         viewingScript.status === 'evaluated' ||
                         viewingScript.status === 'rejected'
                       }
-                      className="flex-1 py-3.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 disabled:opacity-30 active:scale-95"
+                      className="flex-1 py-3.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 disabled:opacity-30 active:scale-95"
                     >
                       স্ক্রিপ্ট বাতিল করুন
                     </button>
@@ -688,7 +688,7 @@ export default function OmrCheckPage() {
                         viewingScript.status === 'evaluated' ||
                         viewingScript.status === 'rejected'
                       }
-                      className="flex-[2] py-4 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-rose-500/30 active:scale-95 disabled:opacity-30 flex items-center justify-center gap-2"
+                      className="flex-[2] py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-red-500/30 active:scale-95 disabled:opacity-30 flex items-center justify-center gap-2"
                     >
                       {processingId === viewingScript.id ? (
                         <Loader2 className="animate-spin w-5 h-5" />

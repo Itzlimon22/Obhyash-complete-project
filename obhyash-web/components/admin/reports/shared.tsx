@@ -4,10 +4,10 @@ import { ReportStatus } from '@/lib/types';
 
 export const SeverityBadge: React.FC<{ severity: string }> = ({ severity }) => {
   const styles: Record<string, string> = {
-    Low: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
+    Low: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400',
     Medium:
-      'bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400',
-    High: 'bg-rose-100 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400',
+      'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
+    High: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
   };
   return (
     <span
@@ -23,7 +23,7 @@ export const ReportStatusBadge: React.FC<{ status: ReportStatus }> = ({
 }) => {
   const styles: Record<ReportStatus, string> = {
     Pending:
-      'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border-amber-200 dark:border-amber-500/20',
+      'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400 border-red-200 dark:border-red-500/20',
     Resolved:
       'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20',
     Ignored:

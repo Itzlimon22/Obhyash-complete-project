@@ -242,7 +242,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               {/* Streak Icon */}
               <motion.button
                 whileTap={{ scale: 0.9 }}
-                className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 bg-orange-50 dark:bg-orange-900/10 rounded-full border border-orange-100 dark:border-orange-900/20 group cursor-pointer transition-all hover:border-orange-200 hover:bg-orange-100/50 dark:hover:bg-orange-900/20 shadow-sm"
+                className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 bg-red-50 dark:bg-red-900/10 rounded-full border border-red-100 dark:border-red-900/20 group cursor-pointer transition-all hover:border-red-200 hover:bg-red-100/50 dark:hover:bg-red-900/20 shadow-sm"
                 title="Daily Streak"
                 onClick={() => {
                   // Optional: Add logic here if needed (e.g. show streak details)
@@ -268,7 +268,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     fill="currentColor"
-                    className="w-5 h-5 md:w-5 md:h-5 text-orange-500 transition-transform"
+                    className="w-5 h-5 md:w-5 md:h-5 text-red-500 transition-transform"
                   >
                     <path
                       fillRule="evenodd"
@@ -277,7 +277,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                     />
                   </motion.svg>
                 </div>
-                <span className="text-xs md:text-sm font-bold text-orange-600 dark:text-orange-400 tabular-nums">
+                <span className="text-xs md:text-sm font-bold text-red-600 dark:text-red-400 tabular-nums">
                   {user?.streakCount || 0}
                 </span>
               </motion.button>

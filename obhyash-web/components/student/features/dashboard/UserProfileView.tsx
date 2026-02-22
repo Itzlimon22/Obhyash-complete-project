@@ -178,7 +178,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
 
           <div className="flex gap-4 md:gap-8 w-full md:w-auto justify-around md:justify-end">
             <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-amber-400 mb-1">
+              <div className="flex items-center justify-center gap-1 text-red-400 mb-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -200,7 +200,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
               </div>
             </div>
             <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-indigo-500 mb-1">
+              <div className="flex items-center justify-center gap-1 text-emerald-500 mb-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -222,7 +222,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
               </div>
             </div>
             <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-rose-500 mb-1">
+              <div className="flex items-center justify-center gap-1 text-red-500 mb-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -319,7 +319,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
                     <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
                       {user.name?.split(' ')[0]} — {opponentXp.toLocaleString()}{' '}
                       XP
@@ -354,7 +354,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
                     </div>
                     <div className="h-3 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-700"
+                        className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-700"
                         style={{
                           width: `${Math.min(100, (opponentXp / Math.max(myXp, opponentXp, 1)) * 100)}%`,
                         }}
@@ -378,7 +378,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
                       </div>
                       <div className="w-px bg-neutral-200 dark:bg-neutral-700" />
                       <div>
-                        <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                        <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                           {user.examsTaken || 0}
                         </div>
                         <div className="text-[10px] text-neutral-400">
@@ -400,7 +400,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
                       </div>
                       <div className="w-px bg-neutral-200 dark:bg-neutral-700" />
                       <div>
-                        <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                        <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                           {user.streakCount || 0}
                         </div>
                         <div className="text-[10px] text-neutral-400">
@@ -425,7 +425,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
                       </div>
                       <div className="w-px bg-neutral-200 dark:bg-neutral-700" />
                       <div>
-                        <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                        <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                           {analytics?.avgScore
                             ? Math.round(analytics.avgScore)
                             : 0}
@@ -453,7 +453,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
                       </div>
                       <div className="w-px bg-neutral-200 dark:bg-neutral-700" />
                       <div>
-                        <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                        <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                           {analytics?.avgAccuracy
                             ? Math.round(analytics.avgAccuracy)
                             : 0}

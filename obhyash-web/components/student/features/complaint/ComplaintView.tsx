@@ -29,8 +29,8 @@ const COMPLAINT_TYPES = [
     label: 'কারিগরি সমস্যা',
     subLabel: 'Technical Issue',
     icon: Zap,
-    color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-    borderColor: 'group-hover:border-blue-500',
+    color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
+    borderColor: 'group-hover:border-emerald-500',
     description: 'অ্যাপ ক্র্যাশ, লোডিং সমস্যা বা এরর',
   },
   {
@@ -39,8 +39,8 @@ const COMPLAINT_TYPES = [
     subLabel: 'UX / Design',
     icon: Smile,
     color:
-      'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
-    borderColor: 'group-hover:border-purple-500',
+      'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
+    borderColor: 'group-hover:border-emerald-500',
     description: 'ইন্টারফেস বা ব্যবহারের সুবিধা নিয়ে পরামর্শ',
   },
   {
@@ -48,8 +48,8 @@ const COMPLAINT_TYPES = [
     label: 'বাগ রিপোর্ট',
     subLabel: 'Bug Report',
     icon: Bug,
-    color: 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400',
-    borderColor: 'group-hover:border-rose-500',
+    color: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+    borderColor: 'group-hover:border-red-500',
     description: 'কোনো ফিচার ঠিকমতো কাজ করছে না',
   },
   {
@@ -58,8 +58,8 @@ const COMPLAINT_TYPES = [
     subLabel: 'Feature Request',
     icon: AlertCircle,
     color:
-      'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
-    borderColor: 'group-hover:border-amber-500',
+      'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+    borderColor: 'group-hover:border-red-500',
     description: 'নতুন কোনো সুবিধা বা ফিচার চান?',
   },
 ];
@@ -71,12 +71,12 @@ const STATUS_CONFIG: Record<
   Pending: {
     label: 'অপেক্ষমাণ',
     icon: Clock,
-    color: 'text-amber-500 bg-amber-100 dark:bg-amber-900/20',
+    color: 'text-red-500 bg-red-100 dark:bg-red-900/20',
   },
   'In Progress': {
     label: 'প্রক্রিয়াধীন',
     icon: RefreshCcw,
-    color: 'text-blue-500 bg-blue-100 dark:bg-blue-900/20',
+    color: 'text-emerald-500 bg-emerald-100 dark:bg-emerald-900/20',
   },
   Resolved: {
     label: 'সমাধান হয়েছে',
@@ -175,7 +175,7 @@ export const ComplaintView: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center min-h-[60vh] animate-in fade-in zoom-in duration-500">
         <div className="w-full max-w-md space-y-8 bg-white dark:bg-neutral-900 p-8 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 to-teal-500" />
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 to-emerald-500" />
           <div className="relative mx-auto w-24 h-24 bg-emerald-100 dark:bg-emerald-900/20 rounded-full flex items-center justify-center">
             <CheckCircle2 size={48} className="text-emerald-500" />
             <div className="absolute inset-0 bg-emerald-400 opacity-20 rounded-full animate-ping"></div>
@@ -200,7 +200,7 @@ export const ComplaintView: React.FC = () => {
                 handleReset();
                 setActiveTab('my');
               }}
-              className="flex-1 py-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition-colors"
+              className="flex-1 py-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition-colors"
             >
               আমার অভিযোগ দেখো
             </button>
@@ -220,7 +220,7 @@ export const ComplaintView: React.FC = () => {
           className={cn(
             'flex items-center gap-2 px-6 py-3 rounded-lg font-bold text-sm transition-all',
             activeTab === 'new'
-              ? 'bg-white dark:bg-neutral-900 text-rose-600 shadow-md'
+              ? 'bg-white dark:bg-neutral-900 text-red-600 shadow-md'
               : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300',
           )}
         >
@@ -232,7 +232,7 @@ export const ComplaintView: React.FC = () => {
           className={cn(
             'flex items-center gap-2 px-6 py-3 rounded-lg font-bold text-sm transition-all',
             activeTab === 'my'
-              ? 'bg-white dark:bg-neutral-900 text-rose-600 shadow-md'
+              ? 'bg-white dark:bg-neutral-900 text-red-600 shadow-md'
               : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300',
           )}
         >
@@ -245,7 +245,7 @@ export const ComplaintView: React.FC = () => {
       {activeTab === 'new' ? (
         <>
           {/* Header Section */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 to-violet-700 p-8 md:p-12 text-white shadow-2xl shadow-indigo-500/20">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 to-emerald-700 p-8 md:p-12 text-white shadow-2xl shadow-emerald-500/20">
             <div className="absolute top-0 right-0 p-12 opacity-10 transform rotate-12 pointer-events-none">
               <MessageSquare size={200} />
             </div>
@@ -256,9 +256,9 @@ export const ComplaintView: React.FC = () => {
               </div>
               <h1 className="text-3xl md:text-5xl font-black leading-tight">
                 কিছু বলতে চান? <br />
-                <span className="text-indigo-200">আমরা শুনছি।</span>
+                <span className="text-emerald-200">আমরা শুনছি।</span>
               </h1>
-              <p className="text-indigo-100 text-lg md:text-xl font-medium leading-relaxed max-w-lg">
+              <p className="text-emerald-100 text-lg md:text-xl font-medium leading-relaxed max-w-lg">
                 &apos;অভ্যাস&apos; প্ল্যাটফর্মকে আরও উন্নত করতে আপনার মতামত বা
                 অভিযোগ আমাদের জানান।
               </p>
@@ -285,7 +285,7 @@ export const ComplaintView: React.FC = () => {
                           className={cn(
                             'group relative p-5 rounded-2xl text-left transition-all duration-300 border-2',
                             isSelected
-                              ? 'border-rose-500 bg-white dark:bg-neutral-800 shadow-xl shadow-rose-500/10 scale-[1.02]'
+                              ? 'border-red-500 bg-white dark:bg-neutral-800 shadow-xl shadow-red-500/10 scale-[1.02]'
                               : 'border-transparent bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 shadow-sm hover:shadow-md',
                           )}
                         >
@@ -303,7 +303,7 @@ export const ComplaintView: React.FC = () => {
                                 className={cn(
                                   'font-bold text-base transition-colors',
                                   isSelected
-                                    ? 'text-rose-600'
+                                    ? 'text-red-600'
                                     : 'text-neutral-900 dark:text-white',
                                 )}
                               >
@@ -318,7 +318,7 @@ export const ComplaintView: React.FC = () => {
                             </div>
                           </div>
                           {isSelected && (
-                            <div className="absolute top-4 right-4 text-rose-500 animate-in zoom-in">
+                            <div className="absolute top-4 right-4 text-red-500 animate-in zoom-in">
                               <CheckCircle2
                                 size={20}
                                 fill="currentColor"
@@ -338,12 +338,12 @@ export const ComplaintView: React.FC = () => {
                     ২. বিস্তারিত লেখো
                   </h3>
                   <div className="relative group">
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-rose-500 to-indigo-600 rounded-3xl opacity-0 group-focus-within:opacity-20 transition duration-500 blur-lg"></div>
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-emerald-600 rounded-3xl opacity-0 group-focus-within:opacity-20 transition duration-500 blur-lg"></div>
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       placeholder="আপনার সমস্যা বা পরামর্শ সম্পর্কে বিস্তারিত লেখো..."
-                      className="relative w-full min-h-[200px] p-6 rounded-2xl border-2 border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-base leading-relaxed focus:outline-none focus:border-rose-500 dark:focus:border-rose-500 transition-all resize-none shadow-sm placeholder:text-neutral-400"
+                      className="relative w-full min-h-[200px] p-6 rounded-2xl border-2 border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-base leading-relaxed focus:outline-none focus:border-red-500 dark:focus:border-red-500 transition-all resize-none shadow-sm placeholder:text-neutral-400"
                     />
                   </div>
                 </div>
@@ -353,7 +353,7 @@ export const ComplaintView: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="group relative w-full sm:w-auto overflow-hidden bg-neutral-900 dark:bg-rose-600 text-white font-bold py-4 px-10 rounded-xl shadow-xl shadow-neutral-900/10 hover:shadow-neutral-900/20 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="group relative w-full sm:w-auto overflow-hidden bg-neutral-900 dark:bg-red-600 text-white font-bold py-4 px-10 rounded-xl shadow-xl shadow-neutral-900/10 hover:shadow-neutral-900/20 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     <div className="relative z-10 flex items-center justify-center gap-3">
                       {isLoading ? (
@@ -381,16 +381,16 @@ export const ComplaintView: React.FC = () => {
 
             {/* Sidebar Info */}
             <div className="lg:col-span-4 space-y-6">
-              <div className="bg-rose-50 dark:bg-rose-900/10 rounded-3xl p-6 border border-rose-100 dark:border-rose-800/20">
-                <h4 className="font-bold text-rose-700 dark:text-rose-400 mb-4 flex items-center gap-2">
+              <div className="bg-red-50 dark:bg-red-900/10 rounded-3xl p-6 border border-red-100 dark:border-red-800/20">
+                <h4 className="font-bold text-red-700 dark:text-red-400 mb-4 flex items-center gap-2">
                   <AlertCircle size={18} />
                   জরুরী প্রয়োজনে
                 </h4>
-                <p className="text-sm text-rose-600/80 dark:text-rose-400/80 leading-relaxed mb-4">
+                <p className="text-sm text-red-600/80 dark:text-red-400/80 leading-relaxed mb-4">
                   আপনার যদি একাউন্ট সম্পর্কিত কোনো জটিল সমস্যা থাকে অথবা পেমেন্ট
                   সংক্রান্ত কোনো বিষয় থাকে, তবে সরাসরি আমাদের মেইল করতে পারেন।
                 </p>
-                <div className="flex items-center gap-2 text-sm font-bold text-neutral-900 dark:text-white bg-white dark:bg-neutral-800 p-3 rounded-xl border border-rose-100 dark:border-neutral-700">
+                <div className="flex items-center gap-2 text-sm font-bold text-neutral-900 dark:text-white bg-white dark:bg-neutral-800 p-3 rounded-xl border border-red-100 dark:border-neutral-700">
                   ✉️ support@obhyash.com
                 </div>
               </div>
@@ -418,7 +418,7 @@ export const ComplaintView: React.FC = () => {
 
           {isLoadingComplaints ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="animate-spin text-rose-500" size={40} />
+              <Loader2 className="animate-spin text-red-500" size={40} />
             </div>
           ) : myComplaints.length === 0 ? (
             <div className="text-center py-20 bg-neutral-50 dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800">
@@ -434,7 +434,7 @@ export const ComplaintView: React.FC = () => {
               </p>
               <button
                 onClick={() => setActiveTab('new')}
-                className="mt-6 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl transition-colors"
+                className="mt-6 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-colors"
               >
                 নতুন অভিযোগ করুন
               </button>

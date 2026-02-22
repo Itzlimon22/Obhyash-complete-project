@@ -346,7 +346,7 @@ export default function NewQuestionPage() {
   };
 
   const selectClassName =
-    'w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent';
+    'w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
@@ -433,7 +433,7 @@ export default function NewQuestionPage() {
                 </label>
                 <button
                   onClick={addOption}
-                  className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+                  className="flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700"
                 >
                   <Plus className="w-4 h-4" /> Add Option
                 </button>
@@ -674,7 +674,7 @@ export default function NewQuestionPage() {
                 <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-6">
                   {/* Question Number */}
                   <div className="flex items-center gap-3 mb-4">
-                    <span className="w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-full text-sm font-bold">
+                    <span className="w-8 h-8 flex items-center justify-center bg-emerald-600 text-white rounded-full text-sm font-bold">
                       1
                     </span>
                     <span className="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded">
@@ -726,11 +726,11 @@ export default function NewQuestionPage() {
 
                   {/* Explanation */}
                   {formData.explanation && (
-                    <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+                    <div className="mt-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                      <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200 mb-2">
                         Explanation
                       </p>
-                      <p className="text-sm text-blue-700 dark:text-blue-300 whitespace-pre-wrap">
+                      <p className="text-sm text-emerald-700 dark:text-emerald-300 whitespace-pre-wrap">
                         {formData.explanation}
                       </p>
                     </div>

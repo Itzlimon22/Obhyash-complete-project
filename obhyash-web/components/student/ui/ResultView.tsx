@@ -165,18 +165,18 @@ const ResultView: React.FC<ResultViewProps> = ({
         {submissionType === 'script' &&
           onChallengeEvaluation &&
           !isHistoryMode && (
-            <div className="mt-6 max-w-xl mx-auto bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="mt-6 max-w-xl mx-auto bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-left">
-                <h4 className="font-bold text-amber-800 dark:text-amber-200 text-sm">
+                <h4 className="font-bold text-red-800 dark:text-red-200 text-sm">
                   OMR মূল্যায়ন নিয়ে সন্তুষ্ট নন?
                 </h4>
-                <p className="text-xs text-amber-700 dark:text-amber-300">
+                <p className="text-xs text-red-700 dark:text-red-300">
                   যান্ত্রিক ত্রুটির কারণে ফলাফল ভুল হতে পারে।
                 </p>
               </div>
               <button
                 onClick={onChallengeEvaluation}
-                className="px-4 py-2 bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 text-sm font-bold rounded hover:bg-amber-100 dark:hover:bg-neutral-700 transition-colors whitespace-nowrap"
+                className="px-4 py-2 bg-white dark:bg-neutral-800 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 text-sm font-bold rounded hover:bg-red-100 dark:hover:bg-neutral-700 transition-colors whitespace-nowrap"
               >
                 পুনরায় যাচাই করো
               </button>
@@ -257,7 +257,7 @@ const ResultView: React.FC<ResultViewProps> = ({
             viewBox="0 0 24 24"
             strokeWidth={2.5}
             stroke="currentColor"
-            className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500"
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500"
           >
             <path
               strokeLinecap="round"
@@ -274,7 +274,7 @@ const ResultView: React.FC<ResultViewProps> = ({
             viewBox="0 0 24 24"
             strokeWidth={2.5}
             stroke="currentColor"
-            className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-500"
+            className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500"
           >
             <path
               strokeLinecap="round"
@@ -310,7 +310,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                 fill="transparent"
                 strokeDasharray={283}
                 strokeDashoffset={283 - (283 * percentage) / 100}
-                className={`transition-all duration-1000 ease-out ${percentage >= 70 ? 'text-emerald-500' : percentage >= 40 ? 'text-amber-500' : 'text-red-500'}`}
+                className={`transition-all duration-1000 ease-out ${percentage >= 70 ? 'text-emerald-500' : percentage >= 40 ? 'text-red-500' : 'text-red-500'}`}
                 strokeLinecap="round"
               />
             </svg>
@@ -327,7 +327,7 @@ const ResultView: React.FC<ResultViewProps> = ({
 
         {/* Points */}
         <div className="bg-white dark:bg-neutral-900 p-3 sm:p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
-          <div className="w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center mb-2 sm:mb-4 text-rose-600 dark:text-rose-400">
+          <div className="w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center mb-2 sm:mb-4 text-red-600 dark:text-red-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

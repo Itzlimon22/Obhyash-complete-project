@@ -69,14 +69,14 @@ const AddPaymentMethodModal: React.FC<AddPaymentMethodModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setType('bkash')}
-                    className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${type === 'bkash' ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20 text-pink-700 dark:text-pink-400' : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-500'}`}
+                    className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${type === 'bkash' ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400' : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-500'}`}
                   >
                     <span className="font-bold">bKash</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setType('nagad')}
-                    className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${type === 'nagad' ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400' : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-500'}`}
+                    className={`p-3 rounded-xl border-2 flex items-center justify-center gap-2 transition-all ${type === 'nagad' ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400' : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-500'}`}
                   >
                     <span className="font-bold">Nagad</span>
                   </button>

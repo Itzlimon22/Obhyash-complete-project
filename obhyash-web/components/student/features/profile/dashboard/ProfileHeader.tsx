@@ -57,7 +57,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEdit }) => {
           <div
             className={`
               w-32 h-32 rounded-full overflow-hidden border-4 border-neutral-50 dark:border-neutral-800 shadow-lg relative
-              ${!avatarPreview ? user.avatarColor || 'bg-indigo-500' : ''}
+              ${!avatarPreview ? user.avatarColor || 'bg-emerald-500' : ''}
               flex items-center justify-center
            `}
           >
@@ -106,7 +106,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEdit }) => {
           <button
             onClick={triggerFileInput}
             disabled={isUploading}
-            className="absolute bottom-1 right-1 p-2 bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 rounded-full shadow-md border border-neutral-200 dark:border-neutral-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors z-10"
+            className="absolute bottom-1 right-1 p-2 bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 rounded-full shadow-md border border-neutral-200 dark:border-neutral-700 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors z-10"
             title="Change Profile Picture"
           >
             <svg
@@ -129,7 +129,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEdit }) => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                className="w-6 h-6 text-indigo-500"
+                className="w-6 h-6 text-emerald-500"
               >
                 <path
                   fillRule="evenodd"
@@ -153,7 +153,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onEdit }) => {
               </span>
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/10 rounded-lg border border-amber-100 dark:border-amber-800/30 text-amber-700 dark:text-amber-500">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-800/30 text-red-700 dark:text-red-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"

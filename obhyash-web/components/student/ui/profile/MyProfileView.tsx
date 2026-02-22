@@ -152,12 +152,12 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
 
       {/* Level Progress Bar */}
       <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-sm relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-32 sm:w-48 h-32 sm:h-48 bg-rose-500/5 rounded-full -mr-16 sm:-mr-24 -mt-16 sm:-mt-24 group-hover:scale-110 transition-transform duration-700" />
+        <div className="absolute top-0 right-0 w-32 sm:w-48 h-32 sm:h-48 bg-red-500/5 rounded-full -mr-16 sm:-mr-24 -mt-16 sm:-mt-24 group-hover:scale-110 transition-transform duration-700" />
 
         <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-3 sm:gap-0 mb-4 sm:mb-6 relative z-10">
           <div>
             <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-2">
-              <span className="px-3 py-1 sm:px-4 sm:py-1.5 bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 text-sm sm:text-base font-black rounded-lg uppercase tracking-wider">
+              <span className="px-3 py-1 sm:px-4 sm:py-1.5 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 text-sm sm:text-base font-black rounded-lg uppercase tracking-wider">
                 {getRankName(user.xp || 0)}
               </span>
               <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-neutral-800 dark:text-white">
@@ -166,7 +166,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
             </div>
           </div>
           <div className="text-left sm:text-right">
-            <span className="text-3xl sm:text-4xl md:text-5xl font-black text-rose-600 dark:text-rose-400">
+            <span className="text-3xl sm:text-4xl md:text-5xl font-black text-red-600 dark:text-red-400">
               {Math.floor((user.xp % 1000) / 10)}%
             </span>
           </div>
@@ -174,7 +174,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
 
         <div className="h-3 sm:h-4 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden relative border border-neutral-200/50 dark:border-neutral-700/50">
           <div
-            className="h-full bg-gradient-to-r from-rose-500 via-red-500 to-rose-600 transition-all duration-1000 ease-out relative"
+            className="h-full bg-gradient-to-r from-red-500 via-red-500 to-red-600 transition-all duration-1000 ease-out relative"
             style={{ width: `${(user.xp % 1000) / 10}%` }}
           >
             <div className="absolute inset-0 bg-[length:20px_20px] bg-[linear-gradient(45deg,rgba(255,255,255,0.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.15)_75%,transparent_75%,transparent)] animate-[shimmer_2s_linear_infinite]" />
@@ -220,7 +220,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
                 >
                   <div className="flex items-center gap-5">
                     <div
-                      className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-sm ${exam.score / exam.totalMarks >= 0.8 ? 'bg-emerald-500' : exam.score / exam.totalMarks >= 0.5 ? 'bg-amber-500' : 'bg-red-500'}`}
+                      className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-sm ${exam.score / exam.totalMarks >= 0.8 ? 'bg-emerald-500' : exam.score / exam.totalMarks >= 0.5 ? 'bg-red-500' : 'bg-red-500'}`}
                     >
                       {Math.round((exam.score / exam.totalMarks) * 100)}%
                     </div>

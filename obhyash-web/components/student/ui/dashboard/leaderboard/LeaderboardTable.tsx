@@ -16,9 +16,9 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   isLoading = false,
 }) => {
   const getRankStyle = (index: number) => {
-    if (index === 0) return 'text-amber-500'; // Gold
+    if (index === 0) return 'text-red-500'; // Gold
     if (index === 1) return 'text-neutral-400'; // Silver
-    if (index === 2) return 'text-orange-700'; // Bronze
+    if (index === 2) return 'text-red-700'; // Bronze
     return 'text-neutral-500 dark:text-neutral-400';
   };
 
@@ -113,7 +113,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                     key={user.id}
                     className={`
                                         transition-colors group
-                                        ${isMe ? 'bg-indigo-50/60 dark:bg-indigo-900/10' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/30'}
+                                        ${isMe ? 'bg-emerald-50/60 dark:bg-emerald-900/10' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/30'}
                                     `}
                   >
                     <td className="px-3 py-3 md:px-6 md:py-5 text-center">
@@ -129,17 +129,17 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                         onClick={() => onUserClick && onUserClick(user)}
                       >
                         <div
-                          className={`w-8 h-8 md:w-12 md:h-12 shrink-0 rounded-full ${user.avatarColor} flex items-center justify-center text-white font-bold text-xs md:text-lg shadow-sm ring-2 ${isMe ? 'ring-indigo-200 dark:ring-indigo-800' : 'ring-transparent'}`}
+                          className={`w-8 h-8 md:w-12 md:h-12 shrink-0 rounded-full ${user.avatarColor} flex items-center justify-center text-white font-bold text-xs md:text-lg shadow-sm ring-2 ${isMe ? 'ring-emerald-200 dark:ring-emerald-800' : 'ring-transparent'}`}
                         >
                           {user.name.charAt(0)}
                         </div>
                         <div className="min-w-0 flex-1">
                           <div
-                            className={`font-bold text-sm md:text-lg truncate ${isMe ? 'text-indigo-700 dark:text-indigo-300' : 'text-neutral-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors'}`}
+                            className={`font-bold text-sm md:text-lg truncate ${isMe ? 'text-emerald-700 dark:text-emerald-300' : 'text-neutral-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors'}`}
                           >
                             {user.name}
                             {isMe && (
-                              <span className="ml-2 text-[8px] md:text-[10px] px-1.5 py-0.5 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 rounded-full font-bold uppercase tracking-wide align-middle">
+                              <span className="ml-2 text-[8px] md:text-[10px] px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-300 rounded-full font-bold uppercase tracking-wide align-middle">
                                 You
                               </span>
                             )}
@@ -151,7 +151,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                       </div>
                     </td>
                     <td className="px-3 py-3 md:px-6 md:py-5 text-right whitespace-nowrap">
-                      <div className="font-mono font-bold text-indigo-600 dark:text-indigo-400 text-sm md:text-xl">
+                      <div className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm md:text-xl">
                         {user.xp.toLocaleString()}
                       </div>
                     </td>

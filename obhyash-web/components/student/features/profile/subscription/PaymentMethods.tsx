@@ -15,7 +15,7 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({ methods, onAddMethod, o
             <h3 className="text-lg font-bold text-slate-800 dark:text-white">পেমেন্ট মেথড</h3>
             <button 
                 onClick={onAddMethod}
-                className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                className="text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -32,8 +32,8 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({ methods, onAddMethod, o
                     <div key={method.id} className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30">
                         <div className="flex items-center gap-4">
                             <div className="w-10 h-10 rounded-lg bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 shadow-sm">
-                                {method.type === 'bkash' && <span className="font-bold text-pink-600 text-xs">bKash</span>}
-                                {method.type === 'nagad' && <span className="font-bold text-orange-600 text-xs">Nagad</span>}
+                                {method.type === 'bkash' && <span className="font-bold text-red-600 text-xs">bKash</span>}
+                                {method.type === 'nagad' && <span className="font-bold text-red-600 text-xs">Nagad</span>}
                                 {method.type === 'card' && (
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-slate-600 dark:text-slate-300">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />

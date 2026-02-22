@@ -35,19 +35,19 @@ const SubjectsProgressSection: React.FC<SubjectsProgressSectionProps> = ({
   // Get color based on accuracy
   const getAccuracyColor = (accuracy: number) => {
     if (accuracy >= 80) return 'bg-emerald-500';
-    if (accuracy >= 50) return 'bg-amber-500';
+    if (accuracy >= 50) return 'bg-red-500';
     return 'bg-red-500';
   };
 
   const getAccuracyBgColor = (accuracy: number) => {
     if (accuracy >= 80) return 'bg-emerald-100 dark:bg-emerald-900/20';
-    if (accuracy >= 50) return 'bg-amber-100 dark:bg-amber-900/20';
+    if (accuracy >= 50) return 'bg-red-100 dark:bg-red-900/20';
     return 'bg-red-100 dark:bg-red-900/20';
   };
 
   const getAccuracyTextColor = (accuracy: number) => {
     if (accuracy >= 80) return 'text-emerald-600 dark:text-emerald-400';
-    if (accuracy >= 50) return 'text-amber-600 dark:text-amber-400';
+    if (accuracy >= 50) return 'text-red-600 dark:text-red-400';
     return 'text-red-600 dark:text-red-400';
   };
 

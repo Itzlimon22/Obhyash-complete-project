@@ -72,9 +72,9 @@ const Dashboard: React.FC<DashboardProps> = ({
           {/* Mock Exam Card */}
           <button
             onClick={onMockExamClick}
-            className="col-span-1 bg-white dark:bg-neutral-900 p-4 rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 flex flex-col justify-center items-center gap-3 hover:border-rose-100 dark:hover:border-rose-900 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
+            className="col-span-1 bg-white dark:bg-neutral-900 p-4 rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 flex flex-col justify-center items-center gap-3 hover:border-red-100 dark:hover:border-red-900 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-all text-center h-full group active:scale-[0.98] duration-200"
           >
-            <div className="w-10 h-10 bg-rose-50 dark:bg-rose-900/20 rounded-xl flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 bg-red-50 dark:bg-red-900/20 rounded-xl flex items-center justify-center text-red-600 dark:text-red-400 group-hover:scale-105 transition-transform">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -126,8 +126,8 @@ const Dashboard: React.FC<DashboardProps> = ({
           </button>
 
           {/* Question Bank */}
-          <div className="col-span-1 bg-white dark:bg-neutral-900 p-4 rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 flex flex-col justify-center items-center gap-3 hover:border-orange-100 dark:hover:border-orange-900 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-all text-center h-full group cursor-pointer active:scale-[0.98] duration-200">
-            <div className="w-10 h-10 bg-orange-50 dark:bg-orange-900/20 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mb-1">
+          <div className="col-span-1 bg-white dark:bg-neutral-900 p-4 rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 flex flex-col justify-center items-center gap-3 hover:border-red-100 dark:hover:border-red-900 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-all text-center h-full group cursor-pointer active:scale-[0.98] duration-200">
+            <div className="w-10 h-10 bg-red-50 dark:bg-red-900/20 rounded-xl flex items-center justify-center text-red-600 dark:text-red-400 mb-1">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -151,8 +151,8 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
 
           {/* Rapid Practice */}
-          <div className="col-span-1 bg-white dark:bg-neutral-900 p-4 rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 flex flex-col justify-center items-center gap-3 hover:border-amber-100 dark:hover:border-amber-900 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-all text-center h-full group cursor-pointer active:scale-[0.98] duration-200">
-            <div className="w-10 h-10 bg-amber-50 dark:bg-amber-900/20 rounded-xl flex items-center justify-center text-amber-600 dark:text-amber-400 mb-1">
+          <div className="col-span-1 bg-white dark:bg-neutral-900 p-4 rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 flex flex-col justify-center items-center gap-3 hover:border-red-100 dark:hover:border-red-900 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-all text-center h-full group cursor-pointer active:scale-[0.98] duration-200">
+            <div className="w-10 h-10 bg-red-50 dark:bg-red-900/20 rounded-xl flex items-center justify-center text-red-600 dark:text-red-400 mb-1">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -185,12 +185,12 @@ const Dashboard: React.FC<DashboardProps> = ({
         {/* Leaderboard Preview Card - Now in Right Sidebar */}
         <div
           onClick={onLeaderboardClick}
-          className="relative bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden group cursor-pointer hover:border-rose-200 dark:hover:border-rose-900 transition-colors active:scale-[0.99] duration-200"
+          className="relative bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden group cursor-pointer hover:border-red-200 dark:hover:border-red-900 transition-colors active:scale-[0.99] duration-200"
         >
           {/* Header */}
           <div className="flex justify-between items-center mb-5 relative z-10">
             <h3 className="text-lg font-bold text-neutral-800 dark:text-white flex items-center gap-2">
-              <span className="p-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 rounded-lg">
+              <span className="p-1.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-500 rounded-lg">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -206,7 +206,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               </span>
               লিডারবোর্ড
             </h3>
-            <button className="text-xs font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1 group-hover:underline">
+            <button className="text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-1 group-hover:underline">
               সব দেখো
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -225,12 +225,12 @@ const Dashboard: React.FC<DashboardProps> = ({
 
           {/* Rank Info Grid */}
           <div className="flex items-center gap-4 mb-4 relative z-10">
-            <div className="flex-1 bg-rose-50 dark:bg-rose-900/10 rounded-xl p-3 border border-rose-100 dark:border-rose-800/30">
+            <div className="flex-1 bg-red-50 dark:bg-red-900/10 rounded-xl p-3 border border-red-100 dark:border-red-800/30">
               <span className="text-[10px] text-neutral-500 dark:text-neutral-400 font-bold uppercase tracking-wider block mb-1">
                 আপনার র‍্যাংক
               </span>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-bold text-rose-700 dark:text-rose-400">
+                <span className="text-2xl font-bold text-red-700 dark:text-red-400">
                   #{userRank}
                 </span>
                 <span className="text-xs font-medium text-neutral-500">
@@ -238,7 +238,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </span>
               </div>
             </div>
-            <div className="flex-1 bg-amber-50 dark:bg-amber-900/10 rounded-xl p-3 border border-amber-100 dark:border-amber-800/30">
+            <div className="flex-1 bg-red-50 dark:bg-red-900/10 rounded-xl p-3 border border-red-100 dark:border-red-800/30">
               <span className="text-[10px] text-neutral-500 dark:text-neutral-400 font-bold uppercase tracking-wider block mb-1">
                 শীর্ষ স্থান
               </span>
@@ -273,7 +273,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           )}
 
           {/* Background decoration */}
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-rose-50 dark:bg-rose-900/10 rounded-full blur-3xl -z-0 pointer-events-none"></div>
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-red-50 dark:bg-red-900/10 rounded-full blur-3xl -z-0 pointer-events-none"></div>
         </div>
       </div>
     </div>

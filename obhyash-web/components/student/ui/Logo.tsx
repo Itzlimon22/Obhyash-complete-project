@@ -22,7 +22,7 @@ const Logo: React.FC<LogoProps> = ({
 
   const textColor =
     colorMode === 'print' ? 'black' : colorMode === 'dark' ? 'white' : 'black';
-  const accentColor = colorMode === 'print' ? 'black' : '#9f1239'; // deep red (rose-900)
+  const accentColor = colorMode === 'print' ? 'black' : '#9f1239'; // deep red (red-900)
 
   return (
     <div className={`inline-flex items-center gap-2 ${className}`}>

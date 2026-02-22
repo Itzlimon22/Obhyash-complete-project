@@ -66,9 +66,9 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
             </div>
 
             {/* Duration */}
-            <div className="bg-neutral-50 dark:bg-neutral-950 p-5 rounded-3xl border border-neutral-200 dark:border-neutral-800 hover:border-orange-300 dark:hover:border-orange-700 transition-colors group">
+            <div className="bg-neutral-50 dark:bg-neutral-950 p-5 rounded-3xl border border-neutral-200 dark:border-neutral-800 hover:border-red-300 dark:hover:border-red-700 transition-colors group">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-xl text-orange-600 dark:text-orange-400 group-hover:scale-110 transition-transform">
+                <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-xl text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform">
                   <Clock className="w-5 h-5" />
                 </div>
                 <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
@@ -81,9 +81,9 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
             </div>
 
             {/* Questions */}
-            <div className="bg-neutral-50 dark:bg-neutral-950 p-5 rounded-3xl border border-neutral-200 dark:border-neutral-800 hover:border-rose-300 dark:hover:border-rose-700 transition-colors group">
+            <div className="bg-neutral-50 dark:bg-neutral-950 p-5 rounded-3xl border border-neutral-200 dark:border-neutral-800 hover:border-red-300 dark:hover:border-red-700 transition-colors group">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-rose-100 dark:bg-rose-900/30 rounded-xl text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform">
+                <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-xl text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform">
                   <HelpCircle className="w-5 h-5" />
                 </div>
                 <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
@@ -134,7 +134,7 @@ const InstructionsView: React.FC<InstructionsViewProps> = ({
               </div>
 
               <div className="flex gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800">
-                <div className="bg-white dark:bg-neutral-900 p-2.5 rounded-xl shadow-sm h-fit text-orange-500">
+                <div className="bg-white dark:bg-neutral-900 p-2.5 rounded-xl shadow-sm h-fit text-red-500">
                   <Bookmark className="w-5 h-5" />
                 </div>
                 <div>

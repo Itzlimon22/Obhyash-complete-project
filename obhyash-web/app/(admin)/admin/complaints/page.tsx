@@ -103,9 +103,9 @@ export default function AdminComplaintsPage() {
   const getStatusColor = (status: ComplaintStatus) => {
     switch (status) {
       case 'Pending':
-        return 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400';
+        return 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400';
       case 'In Progress':
-        return 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400';
+        return 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400';
       case 'Resolved':
         return 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400';
       case 'Dismissed':
@@ -139,7 +139,7 @@ export default function AdminComplaintsPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="space-y-0.5">
             <h1 className="text-xl md:text-3xl font-black text-neutral-900 dark:text-white flex items-center gap-2.5 tracking-tight">
-              <AlertTriangle className="text-rose-600" size={24} />
+              <AlertTriangle className="text-red-600" size={24} />
               Complaints
             </h1>
             <p className="text-neutral-500 dark:text-neutral-400 text-[11px] md:text-sm font-medium">
@@ -149,12 +149,12 @@ export default function AdminComplaintsPage() {
 
           <div className="flex items-center gap-2 self-end md:self-auto">
             <div className="flex items-center gap-2.5 mr-1">
-              <div className="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-800 rounded-xl flex items-center gap-2">
-                <div className="p-1 px-1.5 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-lg">
+              <div className="px-3 py-1.5 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-800 rounded-xl flex items-center gap-2">
+                <div className="p-1 px-1.5 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-lg">
                   <AlertCircle size={12} />
                 </div>
                 <div>
-                  <p className="text-[8px] text-amber-600/70 font-black uppercase tracking-tight">
+                  <p className="text-[8px] text-red-600/70 font-black uppercase tracking-tight">
                     Pending
                   </p>
                   <p className="text-[8px] text-emerald-600/70 font-black uppercase tracking-tight">
@@ -193,7 +193,7 @@ export default function AdminComplaintsPage() {
               placeholder="Search by student or problem..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all text-xs md:text-sm font-bold"
+              className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none transition-all text-xs md:text-sm font-bold"
             />
           </div>
           <div className="relative">
@@ -206,7 +206,7 @@ export default function AdminComplaintsPage() {
               onChange={(e) =>
                 setStatusFilter(e.target.value as ComplaintStatus | 'All')
               }
-              className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none appearance-none transition-all text-xs md:text-sm font-bold cursor-pointer"
+              className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none appearance-none transition-all text-xs md:text-sm font-bold cursor-pointer"
             >
               <option value="All">All Statuses</option>
               <option value="Pending">Pending</option>
@@ -231,7 +231,7 @@ export default function AdminComplaintsPage() {
         {/* Complaints Listing */}
         {isLoading ? (
           <div className="h-[400px] flex flex-col items-center justify-center gap-4 text-neutral-500">
-            <Loader2 size={40} className="animate-spin text-rose-600" />
+            <Loader2 size={40} className="animate-spin text-red-600" />
             <p className="font-bold">Loading complaints...</p>
           </div>
         ) : complaints.length === 0 ? (
@@ -317,7 +317,7 @@ export default function AdminComplaintsPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => setSelectedComplaint(c)}
-                            className="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl font-bold"
+                            className="text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl font-bold"
                           >
                             Review <ChevronRight size={14} className="ml-1" />
                           </Button>
@@ -365,7 +365,7 @@ export default function AdminComplaintsPage() {
                         <span className="text-[9px] text-neutral-400 font-black uppercase tracking-tighter">
                           {new Date(c.created_at).toLocaleDateString()}
                         </span>
-                        <div className="flex items-center gap-1 text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-tight cursor-pointer">
+                        <div className="flex items-center gap-1 text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-tight cursor-pointer">
                           <span>Review</span>
                           <ChevronRight size={12} />
                         </div>

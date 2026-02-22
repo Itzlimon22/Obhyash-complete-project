@@ -158,7 +158,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <>
         {/* Active Strip */}
         {isActive && (
-          <div className="absolute left-0 top-2 bottom-2 w-1.5 bg-rose-600 rounded-r-full shadow-lg shadow-rose-500/40" />
+          <div className="absolute left-0 top-2 bottom-2 w-1.5 bg-red-600 rounded-r-full shadow-lg shadow-red-500/40" />
         )}
 
         {/* Icon */}
@@ -167,8 +167,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           strokeWidth={isActive ? 3 : 2}
           className={`
             flex-shrink-0 transition-all duration-300
-            ${isActive ? 'text-rose-600 dark:text-rose-400 scale-110' : 'text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white'}
-            ${item.id === 'logout' ? 'text-rose-500 group-hover:text-rose-600' : ''}
+            ${isActive ? 'text-red-600 dark:text-red-400 scale-110' : 'text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white'}
+            ${item.id === 'logout' ? 'text-red-500 group-hover:text-red-600' : ''}
           `}
         />
 
@@ -178,7 +178,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             ml-4 text-sm font-black whitespace-nowrap overflow-hidden transition-all duration-300 tracking-tight
             ${showLabel ? 'opacity-100 max-w-full' : 'opacity-0 max-w-0 hidden'}
             ${isActive ? 'text-neutral-900 dark:text-white' : 'text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white'}
-            ${item.id === 'logout' ? 'text-rose-600 dark:text-rose-400' : ''}
+            ${item.id === 'logout' ? 'text-red-600 dark:text-red-400' : ''}
           `}
         >
           {item.label}
@@ -193,7 +193,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   text-[10px] font-black px-2.5 py-1 rounded-full mr-2 shadow-sm
                   ${
                     isActive
-                      ? 'bg-rose-600 text-white'
+                      ? 'bg-red-600 text-white'
                       : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'
                   }
                 `}
@@ -205,7 +205,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <ChevronRight
                 size={18}
                 strokeWidth={3}
-                className={`text-neutral-400 transition-transform duration-300 ${isExpanded ? 'rotate-90 text-rose-600' : ''}`}
+                className={`text-neutral-400 transition-transform duration-300 ${isExpanded ? 'rotate-90 text-red-600' : ''}`}
               />
             )}
           </div>
@@ -217,11 +217,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       group flex items-center w-full px-4 py-2 sm:py-3 rounded-2xl transition-all duration-300 border border-transparent mx-auto relative
       ${
         isActive
-          ? 'bg-rose-50 text-rose-700 dark:bg-rose-500/10'
+          ? 'bg-red-50 text-red-700 dark:bg-red-500/10'
           : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-white'
       }
       ${!isOpen && !isMobile && 'justify-center px-0'}
-      ${item.id === 'logout' ? 'mt-4 bg-rose-50/50 dark:bg-rose-950/20 active:scale-95' : 'active:scale-[0.98]'}
+      ${item.id === 'logout' ? 'mt-4 bg-red-50/50 dark:bg-red-950/20 active:scale-95' : 'active:scale-[0.98]'}
     `;
 
     if (item.id === 'logout') {
@@ -261,13 +261,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="ml-10 mt-1 space-y-1 border-l-2 border-neutral-100 dark:border-neutral-800 pl-4 py-1">
               <Link
                 href={`${item.href}/create`}
-                className="block w-full text-left px-3 py-2 text-xs font-black text-neutral-500 hover:text-rose-600 dark:text-neutral-500 dark:hover:text-rose-400 transition-colors rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+                className="block w-full text-left px-3 py-2 text-xs font-black text-neutral-500 hover:text-red-600 dark:text-neutral-500 dark:hover:text-red-400 transition-colors rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
               >
                 নতুন যুক্ত করুন
               </Link>
               <Link
                 href={`${item.href}/archive`}
-                className="block w-full text-left px-3 py-2 text-xs font-black text-neutral-500 hover:text-rose-600 dark:text-neutral-500 dark:hover:text-rose-400 transition-colors rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+                className="block w-full text-left px-3 py-2 text-xs font-black text-neutral-500 hover:text-red-600 dark:text-neutral-500 dark:hover:text-red-400 transition-colors rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
               >
                 আর্কাইভ
               </Link>
@@ -296,7 +296,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div
           className={`flex items-center gap-3 transition-all ${!isOpen && !isMobile && 'justify-center w-full'}`}
         >
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-rose-600 to-rose-700 flex items-center justify-center flex-shrink-0 shadow-xl shadow-rose-500/30 ring-2 ring-white/20">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center flex-shrink-0 shadow-xl shadow-red-500/30 ring-2 ring-white/20">
             <Command size={22} strokeWidth={3} className="text-white" />
           </div>
           <span
@@ -309,7 +309,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {isMobile && (
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 text-neutral-400 hover:text-rose-600 dark:text-neutral-500 dark:hover:text-white transition-all bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-800 active:scale-90"
+            className="p-2 text-neutral-400 hover:text-red-600 dark:text-neutral-500 dark:hover:text-white transition-all bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-800 active:scale-90"
           >
             <X size={20} strokeWidth={3} />
           </button>
@@ -347,7 +347,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {!isMobile && (
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="absolute -right-4 top-24 bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400 p-2 rounded-2xl shadow-xl hover:text-rose-600 dark:hover:text-white transition-all z-50 hover:scale-110 group active:scale-90"
+          className="absolute -right-4 top-24 bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400 p-2 rounded-2xl shadow-xl hover:text-red-600 dark:hover:text-white transition-all z-50 hover:scale-110 group active:scale-90"
           aria-label="Toggle Sidebar"
         >
           <ChevronsLeft

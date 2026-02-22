@@ -236,11 +236,11 @@ const Dashboard: React.FC<DashboardProps> = ({
 
         <button
           onClick={onLeaderboardClick}
-          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-purple-50/80 dark:from-neutral-900 dark:to-purple-950/20 p-4 md:p-5 rounded-2xl shadow-[0_2px_12px_-2px_rgba(126,34,206,0.06)] dark:shadow-none border border-purple-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2.5 md:gap-3 hover:border-purple-300 dark:hover:border-purple-900/50 transition-all text-center h-full group active:scale-[0.97] duration-200"
+          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-emerald-50/80 dark:from-neutral-900 dark:to-emerald-950/20 p-4 md:p-5 rounded-2xl shadow-[0_2px_12px_-2px_rgba(126,34,206,0.06)] dark:shadow-none border border-emerald-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2.5 md:gap-3 hover:border-emerald-300 dark:hover:border-emerald-900/50 transition-all text-center h-full group active:scale-[0.97] duration-200"
         >
-          <div className="absolute top-0 right-0 w-14 h-14 md:w-20 md:h-20 bg-gradient-to-br from-purple-100/20 to-transparent dark:from-purple-900/10 rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+          <div className="absolute top-0 right-0 w-14 h-14 md:w-20 md:h-20 bg-gradient-to-br from-emerald-100/20 to-transparent dark:from-emerald-900/10 rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
 
-          <div className="w-11 h-11 md:w-13 md:h-13 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-purple-100 dark:border-neutral-700 flex items-center justify-center text-purple-700 dark:text-purple-400 group-hover:scale-105 transition-transform relative z-10">
+          <div className="w-11 h-11 md:w-13 md:h-13 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-emerald-100 dark:border-neutral-700 flex items-center justify-center text-emerald-700 dark:text-emerald-400 group-hover:scale-105 transition-transform relative z-10">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -257,7 +257,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             </svg>
           </div>
           <div className="relative z-10">
-            <h3 className="font-extrabold text-[13px] md:text-base text-neutral-800 dark:text-neutral-200 leading-tight group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors">
+            <h3 className="font-extrabold text-[13px] md:text-base text-neutral-800 dark:text-neutral-200 leading-tight group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
               লিডারবোর্ড
             </h3>
           </div>
@@ -302,14 +302,14 @@ const Dashboard: React.FC<DashboardProps> = ({
       <div className="lg:col-span-1 h-full">
         <div
           onClick={onLeaderboardClick}
-          className="relative bg-white dark:bg-neutral-900 rounded-3xl p-5 md:p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden group cursor-pointer hover:border-purple-200 dark:hover:border-purple-900/50 transition-all active:scale-[0.99] duration-200 h-full"
+          className="relative bg-white dark:bg-neutral-900 rounded-3xl p-5 md:p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden group cursor-pointer hover:border-emerald-200 dark:hover:border-emerald-900/50 transition-all active:scale-[0.99] duration-200 h-full"
         >
           {/* Subtle Background Pattern */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-50 to-transparent dark:from-purple-900/10 dark:to-transparent rounded-bl-full -mr-4 -mt-4 opacity-50"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-50 to-transparent dark:from-emerald-900/10 dark:to-transparent rounded-bl-full -mr-4 -mt-4 opacity-50"></div>
 
           <div className="flex justify-between items-center mb-4 relative z-10">
             <h3 className="text-base font-bold text-neutral-800 dark:text-white flex items-center gap-2">
-              <span className="p-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-lg">
+              <span className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -325,7 +325,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               </span>
               লিডারবোর্ড
             </h3>
-            <button className="text-xs font-bold text-purple-700 dark:text-purple-400 flex items-center gap-1 group-hover:gap-1.5 transition-all bg-purple-50 dark:bg-purple-900/20 px-2.5 py-1 rounded-full">
+            <button className="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1 group-hover:gap-1.5 transition-all bg-emerald-50 dark:bg-emerald-900/20 px-2.5 py-1 rounded-full">
               সব দেখো
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -352,8 +352,8 @@ const Dashboard: React.FC<DashboardProps> = ({
             </div>
 
             {/* Topper Row */}
-            <div className="grid grid-cols-[2rem_2rem_1fr] gap-2.5 items-center px-3 py-2.5 rounded-xl bg-gradient-to-r from-purple-50 to-purple-50/30 dark:from-purple-900/20 dark:to-purple-900/5 border border-purple-100/60 dark:border-purple-800/30">
-              <span className="text-sm font-black text-purple-700 dark:text-purple-400">
+            <div className="grid grid-cols-[2rem_2rem_1fr] gap-2.5 items-center px-3 py-2.5 rounded-xl bg-gradient-to-r from-emerald-50 to-emerald-50/30 dark:from-emerald-900/20 dark:to-emerald-900/5 border border-emerald-100/60 dark:border-emerald-800/30">
+              <span className="text-sm font-black text-emerald-700 dark:text-emerald-400">
                 🥇
               </span>
               {topUser ? (
@@ -361,7 +361,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <UserAvatar
                     user={topUser as unknown as UserProfile}
                     size="sm"
-                    className="w-7 h-7 text-[11px] shadow-sm ring-2 ring-purple-200 dark:ring-purple-800"
+                    className="w-7 h-7 text-[11px] shadow-sm ring-2 ring-emerald-200 dark:ring-emerald-800"
                   />
                   <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200 truncate">
                     {topUser.name?.split(' ').slice(0, 2).join(' ')}
@@ -398,7 +398,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             {/* XP Gap Indicator */}
             {xpDiff > 0 && (
               <div className="flex items-center gap-1.5 text-[11px] text-neutral-500 dark:text-neutral-400 px-3 pt-1">
-                <div className="w-1 h-1 rounded-full bg-purple-400 animate-pulse"></div>
+                <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></div>
                 শীর্ষে পৌঁছাতে আরও{' '}
                 <span className="font-bold text-neutral-700 dark:text-neutral-300">
                   {xpDiff.toLocaleString()} XP

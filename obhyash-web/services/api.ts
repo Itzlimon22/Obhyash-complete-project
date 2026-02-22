@@ -257,8 +257,8 @@ export const api = {
           value: questionCount || 0,
           icon: FileQuestion,
           trend: { value: 4, isPositive: true },
-          colorClass: 'text-rose-500',
-          bgClass: 'bg-rose-500/10',
+          colorClass: 'text-red-500',
+          bgClass: 'bg-red-500/10',
         },
         {
           id: 'pending-reports',
@@ -266,8 +266,8 @@ export const api = {
           value: reportCount || 0,
           icon: Flag,
           trend: { value: 2, isPositive: false },
-          colorClass: 'text-amber-500',
-          bgClass: 'bg-amber-500/10',
+          colorClass: 'text-red-500',
+          bgClass: 'bg-red-500/10',
         },
       ];
     },

@@ -25,13 +25,13 @@ const PricingCard: React.FC<PricingCardProps> = ({
       className={cn(
         'relative rounded-3xl p-1', // Border container
         isBestValue
-          ? 'bg-gradient-to-b from-rose-500 via-red-500 to-rose-700 shadow-2xl shadow-rose-500/20'
+          ? 'bg-gradient-to-b from-red-500 via-red-500 to-red-700 shadow-2xl shadow-red-500/20'
           : 'bg-neutral-200 dark:bg-neutral-800',
         'flex flex-col h-full transition-transform hover:-translate-y-1 duration-300',
       )}
     >
       {isBestValue && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-rose-600 to-red-600 text-white text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg z-20 whitespace-nowrap">
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-red-600 to-red-600 text-white text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg z-20 whitespace-nowrap">
           সেরা অফার 🔥
         </div>
       )}
@@ -40,8 +40,8 @@ const PricingCard: React.FC<PricingCardProps> = ({
         {/* Background blobs */}
         {isBestValue && (
           <>
-            <div className="absolute top-0 right-0 w-32 sm:w-40 h-32 sm:h-40 bg-rose-500/5 rounded-full blur-3xl -translate-y-10 translate-x-10" />
-            <div className="absolute bottom-0 left-0 w-32 sm:w-40 h-32 sm:h-40 bg-rose-500/5 rounded-full blur-3xl translate-y-10 -translate-x-10" />
+            <div className="absolute top-0 right-0 w-32 sm:w-40 h-32 sm:h-40 bg-red-500/5 rounded-full blur-3xl -translate-y-10 translate-x-10" />
+            <div className="absolute bottom-0 left-0 w-32 sm:w-40 h-32 sm:h-40 bg-red-500/5 rounded-full blur-3xl translate-y-10 -translate-x-10" />
           </>
         )}
 
@@ -50,7 +50,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
             className={cn(
               'w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 text-xl sm:text-2xl shadow-sm',
               isBestValue
-                ? 'bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-rose-500/20'
+                ? 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-red-500/20'
                 : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400',
             )}
           >
@@ -95,7 +95,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
                   className={cn(
                     'w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center shrink-0',
                     isBestValue
-                      ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400'
+                      ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
                       : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400',
                   )}
                 >

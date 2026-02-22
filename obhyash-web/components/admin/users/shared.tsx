@@ -10,7 +10,7 @@ export const StatusBadge: React.FC<{ status: UserStatus }> = ({ status }) => {
     Inactive:
       'bg-gray-100 text-gray-600 dark:bg-gray-500/10 dark:text-gray-400 border-gray-200 dark:border-gray-500/20',
     Suspended:
-      'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 border-rose-200 dark:border-rose-500/20',
+      'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400 border-red-200 dark:border-red-500/20',
   };
 
   return (
@@ -18,7 +18,7 @@ export const StatusBadge: React.FC<{ status: UserStatus }> = ({ status }) => {
       className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${styles[status] || styles.Inactive}`}
     >
       <span
-        className={`w-1.5 h-1.5 rounded-full mr-1.5 ${status === 'Active' ? 'bg-emerald-500' : status === 'Suspended' ? 'bg-rose-500' : 'bg-gray-400'}`}
+        className={`w-1.5 h-1.5 rounded-full mr-1.5 ${status === 'Active' ? 'bg-emerald-500' : status === 'Suspended' ? 'bg-red-500' : 'bg-gray-400'}`}
       ></span>
       {status}
     </span>
@@ -28,8 +28,8 @@ export const StatusBadge: React.FC<{ status: UserStatus }> = ({ status }) => {
 // --- Role Badge (রোল ব্যাজ) ---
 export const RoleBadge: React.FC<{ role: UserRole }> = ({ role }) => {
   const icons = {
-    Admin: <Shield size={12} className="mr-1.5 text-indigo-500" />,
-    Teacher: <GraduationCap size={12} className="mr-1.5 text-amber-500" />,
+    Admin: <Shield size={12} className="mr-1.5 text-emerald-500" />,
+    Teacher: <GraduationCap size={12} className="mr-1.5 text-red-500" />,
     Student: <UserIcon size={12} className="mr-1.5 text-brand-500" />,
   };
 

@@ -503,13 +503,13 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                         'text-xs font-bold px-2.5 py-1 rounded-lg',
                         availableCount >= questionCount
                           ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
-                          : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400',
+                          : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400',
                       )}
                     >
                       ডাটাবেসে আছে: {availableCount} টি
                     </span>
                     {availableCount < questionCount && availableCount > 0 && (
-                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                      <span className="text-[10px] text-red-600 dark:text-red-400 font-medium">
                         ⚠ চাহিদার চেয়ে কম — {availableCount} টি পাবেন
                       </span>
                     )}

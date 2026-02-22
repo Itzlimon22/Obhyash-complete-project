@@ -16,12 +16,12 @@ export default function PrivacyPage() {
   const content = POLICY_CONTENT.privacy;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans selection:bg-rose-500/20 text-slate-900 dark:text-slate-100">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans selection:bg-red-500/20 text-slate-900 dark:text-slate-100">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full backdrop-blur-lg bg-white/70 dark:bg-black/70 border-b border-rose-100 dark:border-slate-800">
+      <header className="sticky top-0 z-50 w-full backdrop-blur-lg bg-white/70 dark:bg-black/70 border-b border-red-100 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-lg flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-lg flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
               <Flame className="w-5 h-5" />
             </div>
             <span className="text-xl font-bold text-slate-900 dark:text-white font-serif-exam">
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
           </Link>
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            className="flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             হোম-এ ফিরে যান
@@ -39,10 +39,10 @@ export default function PrivacyPage() {
       </header>
 
       {/* Hero */}
-      <section className="relative py-20 bg-white dark:bg-slate-900 border-b border-rose-100 dark:border-slate-800">
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-50/50 to-transparent dark:from-indigo-900/10 pointer-events-none" />
+      <section className="relative py-20 bg-white dark:bg-slate-900 border-b border-red-100 dark:border-slate-800">
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/50 to-transparent dark:from-emerald-900/10 pointer-events-none" />
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <div className="inline-flex items-center justify-center p-3 mb-6 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-2xl">
+          <div className="inline-flex items-center justify-center p-3 mb-6 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-2xl">
             <ShieldCheck className="w-8 h-8" />
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-6">
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
           {content.sections.map((section: Section, idx) => (
             <div key={idx} className="space-y-4">
               <h2 className="text-2xl font-bold flex items-center gap-3 text-slate-900 dark:text-white">
-                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 text-sm font-bold">
+                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 text-sm font-bold">
                   {section.id || idx + 1}
                 </span>
                 {section.title}
@@ -78,7 +78,7 @@ export default function PrivacyPage() {
                   </p>
                 )}
                 {section.warning && (
-                  <p className="mt-4 font-semibold text-rose-600">
+                  <p className="mt-4 font-semibold text-red-600">
                     ⚠️ {section.warning}
                   </p>
                 )}
@@ -93,7 +93,7 @@ export default function PrivacyPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-slate-900 py-8 border-t border-rose-100 dark:border-slate-800 text-center text-sm text-slate-500">
+      <footer className="bg-white dark:bg-slate-900 py-8 border-t border-red-100 dark:border-slate-800 text-center text-sm text-slate-500">
         © {new Date().getFullYear()} Obhyash Platform. All rights reserved.
       </footer>
     </div>

@@ -206,7 +206,7 @@ const SubscriptionView: React.FC = () => {
   const isFreeUser = currentPlanId === 'free' || !currentPlanId;
 
   const TRUST_BADGES = [
-    { icon: Headphones, label: '২৪/৭ সাপোর্ট', color: 'text-rose-500' },
+    { icon: Headphones, label: '২৪/৭ সাপোর্ট', color: 'text-red-500' },
     { icon: Clock, label: 'তাৎক্ষণিক অ্যাক্সেস', color: 'text-emerald-500' },
   ];
 

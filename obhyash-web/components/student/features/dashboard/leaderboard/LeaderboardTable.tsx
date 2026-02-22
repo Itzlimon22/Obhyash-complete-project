@@ -17,9 +17,9 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   isLoading = false,
 }) => {
   const getRankStyle = (index: number) => {
-    if (index === 0) return 'text-amber-500';
+    if (index === 0) return 'text-red-500';
     if (index === 1) return 'text-neutral-400';
-    if (index === 2) return 'text-orange-700';
+    if (index === 2) return 'text-red-700';
     return 'text-neutral-500 dark:text-neutral-400';
   };
 
@@ -113,7 +113,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                     key={user.id}
                     className={`
                                         transition-colors group
-                                        ${isMe ? 'bg-rose-50/60 dark:bg-rose-900/10' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/30'}
+                                        ${isMe ? 'bg-red-50/60 dark:bg-red-900/10' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/30'}
                                     `}
                   >
                     <td className="px-3 py-3 md:px-6 md:py-5 text-center">
@@ -131,15 +131,15 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                         <UserAvatar
                           user={user}
                           size="lg"
-                          className={`ring-2 ${isMe ? 'ring-rose-200 dark:ring-rose-800' : 'ring-transparent'}`}
+                          className={`ring-2 ${isMe ? 'ring-red-200 dark:ring-red-800' : 'ring-transparent'}`}
                         />
                         <div className="min-w-0 flex-1">
                           <div
-                            className={`font-bold text-sm md:text-lg truncate ${isMe ? 'text-rose-700 dark:text-rose-300' : 'text-neutral-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors'}`}
+                            className={`font-bold text-sm md:text-lg truncate ${isMe ? 'text-red-700 dark:text-red-300' : 'text-neutral-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors'}`}
                           >
                             {user.name}
                             {isMe && (
-                              <span className="ml-2 text-[8px] md:text-[10px] px-1.5 py-0.5 bg-rose-100 dark:bg-rose-900 text-rose-600 dark:text-rose-300 rounded-full font-bold uppercase tracking-wide align-middle">
+                              <span className="ml-2 text-[8px] md:text-[10px] px-1.5 py-0.5 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 rounded-full font-bold uppercase tracking-wide align-middle">
                                 You
                               </span>
                             )}

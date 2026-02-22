@@ -798,7 +798,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                         />
                       </svg>
                     </div>
-                    <p className="text-xs text-amber-800 dark:text-amber-400 font-medium">
+                    <p className="text-xs text-red-800 dark:text-red-400 font-medium">
                       এখানে তুমি ভুল করা প্রশ্নগুলো আবার প্র্যাকটিস করতে পারবে।
                     </p>
                   </div>
@@ -834,7 +834,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
             <div className="animate-fade-in space-y-6">
               {displayedBookmarks.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-neutral-900 rounded-3xl border border-dashed border-neutral-200 dark:border-neutral-800">
-                  <div className="w-16 h-16 bg-amber-50 dark:bg-amber-900/20 rounded-full flex items-center justify-center mb-4 text-amber-500">
+                  <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4 text-red-500">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"

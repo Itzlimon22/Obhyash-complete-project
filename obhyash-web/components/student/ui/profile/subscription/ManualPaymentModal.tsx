@@ -212,7 +212,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                       >
                         <div className="flex items-center gap-3">
                           <div
-                            className={`w-8 h-8 rounded-lg flex items-center justify-center text-white text-[10px] font-black ${method.type === 'bkash' ? 'bg-pink-500' : method.type === 'nagad' ? 'bg-orange-500' : 'bg-neutral-500'}`}
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center text-white text-[10px] font-black ${method.type === 'bkash' ? 'bg-red-500' : method.type === 'nagad' ? 'bg-red-500' : 'bg-neutral-500'}`}
                           >
                             {method.type === 'bkash'
                               ? 'bK'
@@ -295,14 +295,14 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                   icon: '📞',
                   title: 'সরাসরি কথা বলুন',
                   sub: 'কল করতে ক্লিক করো',
-                  color: 'bg-blue-50 text-blue-600',
+                  color: 'bg-emerald-50 text-emerald-600',
                   link: 'tel:+8801946855793',
                 },
                 {
                   icon: '💬',
                   title: 'লাইভ চ্যাট (Messenger)',
                   sub: 'এখানে ক্লিক করো',
-                  color: 'bg-purple-50 text-purple-600',
+                  color: 'bg-emerald-50 text-emerald-600',
                   link: 'https://m.me/obhyash',
                 },
                 {
@@ -316,7 +316,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                   icon: '✉️',
                   title: 'সাপোর্টে ইমেইল',
                   sub: 'এখানে ক্লিক করো',
-                  color: 'bg-amber-50 text-amber-600',
+                  color: 'bg-red-50 text-red-600',
                   link: 'mailto:support@obhyash.com',
                 },
               ].map((item, idx) => (

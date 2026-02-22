@@ -323,18 +323,18 @@ export default function TeacherDashboard() {
 
         <Link
           href="/teacher/questions/bulk-upload"
-          className="group relative overflow-hidden bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-violet-500/50 hover:shadow-lg hover:shadow-violet-500/5 transition-all"
+          className="group relative overflow-hidden bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/5 transition-all"
         >
-          <div className="w-12 h-12 rounded-xl bg-violet-50 dark:bg-violet-900/20 flex items-center justify-center mb-4 text-violet-600 dark:text-violet-400 group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-4 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
             <Upload size={24} />
           </div>
-          <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-100 mb-1 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+          <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-100 mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
             বাল্ক আপলোড
           </h3>
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
             একসাথে অনেক প্রশ্ন আপলোড করুন (CSV/JSON)
           </p>
-          <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/5 rounded-bl-full -mr-4 -mt-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none" />
+          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full -mr-4 -mt-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none" />
         </Link>
 
         <Link
@@ -363,15 +363,15 @@ export default function TeacherDashboard() {
           </h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="flex gap-3 p-4 rounded-xl bg-amber-50/60 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/30">
-            <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+          <div className="flex gap-3 p-4 rounded-xl bg-red-50/60 dark:bg-red-900/10 border border-red-100 dark:border-red-800/30">
+            <div className="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 flex items-center justify-center flex-shrink-0 mt-0.5">
               <Target size={16} />
             </div>
             <div>
-              <p className="text-sm font-bold text-amber-800 dark:text-amber-400 mb-0.5">
+              <p className="text-sm font-bold text-red-800 dark:text-red-400 mb-0.5">
                 সঠিক অধ্যায় নির্বাচন করুন
               </p>
-              <p className="text-xs text-amber-700/80 dark:text-amber-400/70 leading-relaxed">
+              <p className="text-xs text-red-700/80 dark:text-red-400/70 leading-relaxed">
                 প্রশ্ন আপলোড করার সময় সঠিক বিষয়, অধ্যায় এবং টপিক নির্বাচন
                 করুন যাতে শিক্ষার্থীরা সহজে খুঁজে পায়।
               </p>

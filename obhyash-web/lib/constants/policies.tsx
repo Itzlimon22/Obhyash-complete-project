@@ -92,7 +92,7 @@ export const POLICY_CONTENT = {
     sections: [
       {
         title: 'সাধারণ রিফান্ড নিয়ম',
-        icon: <AlertCircle className="w-5 h-5 text-rose-600" />,
+        icon: <AlertCircle className="w-5 h-5 text-red-600" />,
         content:
           'যেহেতু এটি একটি ডিজিটাল সেবা, তাই সাধারণত কোনো সাবস্ক্রিপশন ক্রয় করার পর তার জন্য কোনো রিফান্ড প্রদান করা হয় না। তবে বিশেষ কারিগরি ত্রুটির ক্ষেত্রে আমরা এটি বিবেচনা করি।',
       },

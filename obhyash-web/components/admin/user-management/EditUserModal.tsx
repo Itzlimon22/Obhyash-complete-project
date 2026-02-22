@@ -72,13 +72,13 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
       <div className="bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-2xl border border-neutral-200 dark:border-neutral-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-violet-600 p-6 rounded-t-2xl flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-gradient-to-r from-emerald-600 to-emerald-600 p-6 rounded-t-2xl flex items-center justify-between z-10">
           <div>
             <h2 className="text-2xl font-bold text-white flex items-center gap-2">
               <Edit className="w-6 h-6" />
               Edit User
             </h2>
-            <p className="text-blue-100 text-sm mt-1">
+            <p className="text-emerald-100 text-sm mt-1">
               Update user information and settings
             </p>
           </div>
@@ -95,7 +95,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
           {/* Personal Information */}
           <div>
             <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
-              <User className="w-5 h-5 text-blue-600" />
+              <User className="w-5 h-5 text-emerald-600" />
               Personal Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -111,7 +111,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
                   />
                 </div>
               </div>
@@ -127,7 +127,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
                   />
                 </div>
               </div>
@@ -143,7 +143,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                     onChange={(e) =>
                       setFormData({ ...formData, phone: e.target.value })
                     }
-                    className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
                   />
                 </div>
               </div>
@@ -155,7 +155,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
           {/* Role & Status */}
           <div>
             <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
-              <Shield className="w-5 h-5 text-purple-600" />
+              <Shield className="w-5 h-5 text-emerald-600" />
               Role & Permissions
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -170,7 +170,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                     onChange={(e) =>
                       setFormData({ ...formData, role: e.target.value as 'Student' | 'Teacher' | 'Admin' })
                     }
-                    className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
+                    className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none appearance-none"
                   >
                     <option value="Student">Student</option>
                     <option value="Teacher">Teacher</option>
@@ -192,7 +192,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                         status: e.target.value as 'Active' | 'Inactive' | 'Suspended',
                       })
                     }
-                    className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
+                    className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none appearance-none"
                   >
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
@@ -208,7 +208,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
           {/* Academic Info */}
           <div>
             <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-orange-600" />
+              <BookOpen className="w-5 h-5 text-red-600" />
               Academic Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -222,7 +222,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, institute: e.target.value })
                   }
-                  className="w-full px-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
                 />
               </div>
               <div>
@@ -235,7 +235,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                   onChange={(e) =>
                     setFormData({ ...formData, division: e.target.value })
                   }
-                  className="w-full px-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
                 />
               </div>
               <div>
@@ -250,7 +250,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
                     onChange={(e) =>
                       setFormData({ ...formData, batch: e.target.value })
                     }
-                    className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full pl-10 pr-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"
                   />
                 </div>
               </div>
@@ -268,7 +268,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+            className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-600 hover:from-emerald-700 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
           >
             Save Changes
           </button>

@@ -77,9 +77,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex flex-col h-full relative">
           {/* Header */}
           <div
-            className={`h-20 flex items-center px-6 border-b border-rose-50 dark:border-neutral-800 transition-all ${collapsed ? 'justify-center px-2' : ''}`}
+            className={`h-20 flex items-center px-6 border-b border-red-50 dark:border-neutral-800 transition-all ${collapsed ? 'justify-center px-2' : ''}`}
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-rose-500/20 shrink-0">
+            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-red-500/20 shrink-0">
               <Sparkles className="w-5 h-5" />
             </div>
             {!collapsed && (
@@ -144,7 +144,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div
               className={`
               bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-3 
-              transition-all duration-300 group hover:border-rose-200 dark:hover:border-neutral-700 hover:shadow-sm
+              transition-all duration-300 group hover:border-red-200 dark:hover:border-neutral-700 hover:shadow-sm
               ${collapsed ? 'items-center justify-center flex flex-col gap-2' : ''}
             `}
             >
@@ -152,7 +152,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 className={`flex items-center gap-3 cursor-pointer ${collapsed ? 'flex-col' : ''}`}
                 onClick={() => handleLinkClick('profile')}
               >
-                <div className="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-900/20 text-orange-600 flex items-center justify-center font-bold text-lg shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/20 text-red-600 flex items-center justify-center font-bold text-lg shrink-0">
                   {user?.name?.[0] || 'U'}
                 </div>
 
@@ -200,7 +200,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
               <button
                 onClick={toggleTheme}
-                className="text-neutral-400 hover:text-indigo-600 transition-colors"
+                className="text-neutral-400 hover:text-emerald-600 transition-colors"
                 title="Toggle Theme"
               >
                 {isDarkMode ? (

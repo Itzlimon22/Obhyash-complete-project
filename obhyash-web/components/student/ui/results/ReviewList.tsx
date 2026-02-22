@@ -126,7 +126,7 @@ const ReviewList: React.FC<ReviewListProps> = ({
                   onClick={() => toggleBookmark(q.id)}
                   className={`
                         transition-all duration-200 p-2.5 rounded-full 
-                        ${isBookmarked ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-500 dark:text-amber-400' : 'text-neutral-400 dark:text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-600 dark:hover:text-neutral-300'}
+                        ${isBookmarked ? 'bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400' : 'text-neutral-400 dark:text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-neutral-600 dark:hover:text-neutral-300'}
                       `}
                   title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
                 >

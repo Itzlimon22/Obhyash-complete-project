@@ -56,7 +56,7 @@ export default function TestUploadPage() {
 
         <button
           onClick={handleUpload}
-          className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition disabled:opacity-50"
+          className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition disabled:opacity-50"
           disabled={status === 'Uploading...'}
         >
           {status === 'Uploading...' ? 'Uploading...' : 'Upload Test Question'}

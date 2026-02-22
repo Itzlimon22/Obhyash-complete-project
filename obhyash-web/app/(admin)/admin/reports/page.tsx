@@ -69,7 +69,7 @@ export default function AdminReportsPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Pending':
-        return 'bg-amber-100 text-amber-700 border-amber-200';
+        return 'bg-red-100 text-red-700 border-red-200';
       case 'Resolved':
         return 'bg-emerald-100 text-emerald-700 border-emerald-200';
       case 'Ignored':
@@ -119,7 +119,7 @@ export default function AdminReportsPage() {
             <span className="text-neutral-500 text-sm font-bold">
               মোট রিপোর্ট
             </span>
-            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+            <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
               <Filter size={16} />
             </div>
           </div>
@@ -132,11 +132,11 @@ export default function AdminReportsPage() {
             <span className="text-neutral-500 text-sm font-bold">
               অপেক্ষমান
             </span>
-            <div className="p-1.5 bg-amber-50 text-amber-600 rounded-lg">
+            <div className="p-1.5 bg-red-50 text-red-600 rounded-lg">
               <Clock size={16} />
             </div>
           </div>
-          <div className="text-2xl font-bold text-amber-600">
+          <div className="text-2xl font-bold text-red-600">
             {stats.pending}
           </div>
         </div>
@@ -255,7 +255,7 @@ export default function AdminReportsPage() {
                         {report.reason}
                       </span>
                       {report.image_url && (
-                        <span className="ml-2 inline-flex items-center text-[10px] bg-blue-50 text-blue-600 px-1.5 rounded border border-blue-100">
+                        <span className="ml-2 inline-flex items-center text-[10px] bg-emerald-50 text-emerald-600 px-1.5 rounded border border-emerald-100">
                           IMG
                         </span>
                       )}

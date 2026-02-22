@@ -109,12 +109,12 @@ export default function BulkEmailModal({
         <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-              <Mail className="w-5 h-5 text-violet-500" />
+              <Mail className="w-5 h-5 text-emerald-500" />
               Send Bulk Email
             </h2>
             <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
               Sending to{' '}
-              <span className="font-bold text-violet-600 dark:text-violet-400">
+              <span className="font-bold text-emerald-600 dark:text-emerald-400">
                 {selectedCount}
               </span>{' '}
               selected users
@@ -145,7 +145,7 @@ export default function BulkEmailModal({
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="e.g. Important Announcement"
-              className="w-full px-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-900 dark:text-white focus:ring-2 focus:ring-violet-500 outline-none transition-all"
+              className="w-full px-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
             />
           </div>
 
@@ -158,13 +158,13 @@ export default function BulkEmailModal({
               onChange={(e) => setBody(e.target.value)}
               rows={6}
               placeholder="Type your message here..."
-              className="w-full px-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-900 dark:text-white focus:ring-2 focus:ring-violet-500 outline-none transition-all resize-none"
+              className="w-full px-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all resize-none"
             />
           </div>
 
-          <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/10 rounded-lg">
-            <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5" />
-            <p className="text-xs text-amber-700 dark:text-amber-300">
+          <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/10 rounded-lg">
+            <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5" />
+            <p className="text-xs text-red-700 dark:text-red-300">
               Emails will be queued for sending. Large batches may take some
               time to process completely.
             </p>
@@ -181,7 +181,7 @@ export default function BulkEmailModal({
           <button
             onClick={handleSend}
             disabled={sending || !subject || !body}
-            className="flex items-center gap-2 px-6 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-all shadow-lg shadow-violet-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {sending ? (
               <>

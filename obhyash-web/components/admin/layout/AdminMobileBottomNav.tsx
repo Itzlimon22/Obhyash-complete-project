@@ -70,7 +70,7 @@ const AdminMobileBottomNav: React.FC<AdminMobileBottomNavProps> = ({
                 {isActive && (
                   <motion.div
                     layoutId="activeTabCircle"
-                    className="absolute inset-0 bg-rose-600 rounded-2xl -m-2.5 shadow-lg shadow-rose-500/30"
+                    className="absolute inset-0 bg-red-600 rounded-2xl -m-2.5 shadow-lg shadow-red-500/30"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
@@ -104,7 +104,7 @@ const AdminMobileBottomNav: React.FC<AdminMobileBottomNavProps> = ({
               className={cn(
                 'text-[9px] font-black tracking-tight transition-colors duration-300 truncate w-full text-center relative z-10 uppercase',
                 isActive
-                  ? 'text-rose-600 dark:text-rose-400 mt-0.5'
+                  ? 'text-red-600 dark:text-red-400 mt-0.5'
                   : 'text-neutral-500 dark:text-neutral-500',
               )}
             >
@@ -118,7 +118,7 @@ const AdminMobileBottomNav: React.FC<AdminMobileBottomNavProps> = ({
         onClick={onMenuClick}
         className="flex flex-col items-center justify-center gap-1 group flex-1 min-w-0 py-2 h-full"
       >
-        <div className="flex items-center justify-center p-3 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:text-rose-600 transition-all duration-300 relative shadow-inner">
+        <div className="flex items-center justify-center p-3 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:text-red-600 transition-all duration-300 relative shadow-inner">
           <Menu size={22} strokeWidth={3} className="relative z-10" />
         </div>
         <span className="text-[9px] font-black tracking-tight text-neutral-500 uppercase mt-0.5">

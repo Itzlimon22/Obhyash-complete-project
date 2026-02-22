@@ -28,7 +28,7 @@ const COMPLAINT_TYPES = [
     id: 'Technical' as ComplaintType,
     label: 'Technical Issue',
     icon: Zap,
-    color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+    color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
     description: 'Bugs, crashes, or loading problems',
   },
   {
@@ -36,14 +36,14 @@ const COMPLAINT_TYPES = [
     label: 'User Experience',
     icon: Smile,
     color:
-      'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+      'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
     description: 'Interface suggestions or frustrations',
   },
   {
     id: 'Bug' as ComplaintType,
     label: 'Hidden Bug',
     icon: Bug,
-    color: 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400',
+    color: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
     description: "Something isn't working correctly",
   },
   {
@@ -51,7 +51,7 @@ const COMPLAINT_TYPES = [
     label: 'New Idea',
     icon: AlertCircle,
     color:
-      'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
+      'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
     description: "A feature you'd love to see",
   },
 ];
@@ -144,7 +144,7 @@ export default function ComplaintPage() {
               variant="ghost"
               size="sm"
               onClick={() => router.back()}
-              className="group -ml-3 text-neutral-500 hover:text-rose-600"
+              className="group -ml-3 text-neutral-500 hover:text-red-600"
             >
               <ArrowLeft
                 size={18}
@@ -153,15 +153,15 @@ export default function ComplaintPage() {
               Back
             </Button>
             <h1 className="text-3xl md:text-5xl font-black text-neutral-900 dark:text-white leading-tight">
-              Something <span className="text-rose-600">Bugging</span> You? 🐛
+              Something <span className="text-red-600">Bugging</span> You? 🐛
             </h1>
             <p className="text-neutral-500 dark:text-neutral-400 text-lg">
               Tell us what{"'"}s wrong or how we can make Obhyash better for you!
             </p>
           </div>
           <div className="hidden sm:block">
-            <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/20 rounded-2xl flex items-center justify-center rotate-6 animate-pulse">
-              <MessageSquare size={32} className="text-rose-600" />
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-2xl flex items-center justify-center rotate-6 animate-pulse">
+              <MessageSquare size={32} className="text-red-600" />
             </div>
           </div>
         </div>
@@ -178,8 +178,8 @@ export default function ComplaintPage() {
                   key={type.id}
                   className={`cursor-pointer transition-all duration-300 border-2 ${
                     selectedType === type.id
-                      ? 'border-rose-500 bg-rose-50/50 dark:bg-rose-500/5 shadow-xl shadow-rose-500/10 scale-105'
-                      : 'border-neutral-200 dark:border-neutral-800 hover:border-rose-300 dark:hover:border-rose-900/30'
+                      ? 'border-red-500 bg-red-50/50 dark:bg-red-500/5 shadow-xl shadow-red-500/10 scale-105'
+                      : 'border-neutral-200 dark:border-neutral-800 hover:border-red-300 dark:hover:border-red-900/30'
                   }`}
                   onClick={() => setSelectedType(type.id)}
                 >
@@ -212,9 +212,9 @@ export default function ComplaintPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Be as detailed as possible... (e.g., 'The OMR scan button didn't react on my phone' or 'I think the font size is too small on the results page')"
-                className="min-h-[200px] p-6 rounded-3xl border-2 border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-lg focus:ring-rose-500 focus:border-rose-500 resize-none transition-all shadow-sm"
+                className="min-h-[200px] p-6 rounded-3xl border-2 border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-lg focus:ring-red-500 focus:border-red-500 resize-none transition-all shadow-sm"
               />
-              <div className="absolute top-4 right-4 text-neutral-300 group-focus-within:text-rose-400 transition-colors pointer-events-none">
+              <div className="absolute top-4 right-4 text-neutral-300 group-focus-within:text-red-400 transition-colors pointer-events-none">
                 <Settings
                   className="animate-[spin_4s_linear_infinite]"
                   size={24}
@@ -227,7 +227,7 @@ export default function ComplaintPage() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="group relative h-16 px-12 rounded-full bg-rose-600 hover:bg-rose-700 text-xl font-black text-white shadow-2xl shadow-rose-500/30 active:scale-95 transition-all w-full sm:w-auto"
+              className="group relative h-16 px-12 rounded-full bg-red-600 hover:bg-red-700 text-xl font-black text-white shadow-2xl shadow-red-500/30 active:scale-95 transition-all w-full sm:w-auto"
             >
               {isLoading ? (
                 <Loader2 className="animate-spin mr-2" />

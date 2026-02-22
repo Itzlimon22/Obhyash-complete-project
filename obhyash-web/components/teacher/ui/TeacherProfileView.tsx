@@ -91,7 +91,7 @@ export default function TeacherProfileView({
       {/* ── Profile Hero ── */}
       <div className="relative overflow-hidden bg-gradient-to-br from-emerald-800 to-emerald-950 rounded-2xl p-6 md:p-8 text-white shadow-lg shadow-emerald-900/10">
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-red-500 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-400 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4" />
         </div>
 
@@ -103,7 +103,7 @@ export default function TeacherProfileView({
               showBorder
               className="ring-4 ring-emerald-500/30"
             />
-            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-rose-500 border-2 border-emerald-900 flex items-center justify-center shadow-lg">
+            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-red-500 border-2 border-emerald-900 flex items-center justify-center shadow-lg">
               <Shield size={12} className="text-white" />
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function TeacherProfileView({
 
           <Link
             href="/teacher/settings"
-            className="flex items-center gap-2 px-4 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-rose-500/20 active:scale-95 transition-all flex-shrink-0"
+            className="flex items-center gap-2 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-red-500/20 active:scale-95 transition-all flex-shrink-0"
           >
             <Edit3 size={14} />
             এডিট প্রোফাইল
@@ -165,9 +165,9 @@ export default function TeacherProfileView({
               অনুমোদিত
             </p>
           </div>
-          <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/5 transition-all">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center mb-2">
-              <Clock size={18} className="text-amber-600 dark:text-amber-400" />
+          <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5 transition-all">
+            <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center mb-2">
+              <Clock size={18} className="text-red-600 dark:text-red-400" />
             </div>
             <p className="text-2xl font-black text-neutral-900 dark:text-white">
               {stats.pending}
@@ -176,11 +176,11 @@ export default function TeacherProfileView({
               অপেক্ষমান
             </p>
           </div>
-          <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-rose-500/30 hover:shadow-lg hover:shadow-rose-500/5 transition-all">
-            <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center mb-2">
+          <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5 transition-all">
+            <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center mb-2">
               <AlertCircle
                 size={18}
-                className="text-rose-600 dark:text-rose-400"
+                className="text-red-600 dark:text-red-400"
               />
             </div>
             <p className="text-2xl font-black text-neutral-900 dark:text-white">
@@ -195,30 +195,30 @@ export default function TeacherProfileView({
 
       {/* ── Earnings Summary ── */}
       {stats && stats.approved > 0 && (
-        <div className="relative overflow-hidden bg-gradient-to-br from-rose-600 to-rose-700 rounded-2xl p-6 text-white shadow-lg shadow-rose-600/20">
+        <div className="relative overflow-hidden bg-gradient-to-br from-red-600 to-red-700 rounded-2xl p-6 text-white shadow-lg shadow-red-600/20">
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-4 right-4">
               <Award size={100} strokeWidth={1} />
             </div>
           </div>
           <div className="relative z-10">
-            <p className="text-[10px] font-black text-rose-200 uppercase tracking-widest mb-1">
+            <p className="text-[10px] font-black text-red-200 uppercase tracking-widest mb-1">
               আনুমানিক আয়
             </p>
             <h2 className="text-3xl md:text-4xl font-black mb-1 tabular-nums">
               ৳{estimatedEarnings.toLocaleString('bn-BD')}
             </h2>
-            <p className="text-rose-100 text-sm">
+            <p className="text-red-100 text-sm">
               {stats.approved}টি অনুমোদিত প্রশ্ন × ৳১০ = মোট আয়
             </p>
             <div className="mt-4 flex items-center gap-4 text-xs">
               <div>
-                <p className="text-rose-200 font-bold">অনুমোদনের হার</p>
+                <p className="text-red-200 font-bold">অনুমোদনের হার</p>
                 <p className="text-lg font-black">{approvalRate}%</p>
               </div>
               <div className="w-px h-8 bg-white/20" />
               <div>
-                <p className="text-rose-200 font-bold">প্রতি প্রশ্ন</p>
+                <p className="text-red-200 font-bold">প্রতি প্রশ্ন</p>
                 <p className="text-lg font-black">৳১০</p>
               </div>
             </div>

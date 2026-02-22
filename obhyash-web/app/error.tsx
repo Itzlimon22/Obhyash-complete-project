@@ -19,7 +19,7 @@ export default function GlobalError({
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center animate-in fade-in zoom-in duration-300">
-      <div className="w-24 h-24 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-full flex items-center justify-center mb-6 shadow-sm border border-rose-100 dark:border-rose-900/50">
+      <div className="w-24 h-24 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-full flex items-center justify-center mb-6 shadow-sm border border-red-100 dark:border-red-900/50">
         <AlertOctagon size={48} />
       </div>
       <h2 className="text-2xl font-black text-neutral-900 dark:text-white mb-3">
@@ -34,7 +34,7 @@ export default function GlobalError({
         <Button
           onClick={() => reset()}
           size="lg"
-          className="w-full sm:w-auto px-8 rounded-xl font-bold flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/20 transition-all active:scale-95"
+          className="w-full sm:w-auto px-8 rounded-xl font-bold flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/20 transition-all active:scale-95"
         >
           <RefreshCw size={18} />
           আবার চেষ্টা করুন
@@ -51,11 +51,11 @@ export default function GlobalError({
       {/* Dev-only error stack trace mapping */}
       {process.env.NODE_ENV === 'development' && (
         <div className="mt-12 w-full max-w-3xl bg-neutral-950 dark:bg-black rounded-2xl p-6 text-left overflow-auto border border-neutral-800 shadow-2xl">
-          <p className="text-rose-400 font-mono text-sm mb-3 font-bold flex items-center gap-2">
+          <p className="text-red-400 font-mono text-sm mb-3 font-bold flex items-center gap-2">
             <AlertOctagon size={16} /> Error Details (Dev Only):
           </p>
           <pre className="text-neutral-300 font-mono text-xs whitespace-pre-wrap leading-relaxed">
-            <span className="text-rose-300 font-bold">{error.name}: </span>
+            <span className="text-red-300 font-bold">{error.name}: </span>
             {error.message}
             {'\n\n'}
             <span className="opacity-70">{error.stack}</span>

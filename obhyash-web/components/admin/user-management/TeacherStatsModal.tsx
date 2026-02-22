@@ -69,7 +69,7 @@ export default function TeacherStatsModal({
         <div className="p-6">
           {isLoading ? (
             <div className="flex justify-center py-10">
-              <Loader2 className="animate-spin text-rose-600" size={32} />
+              <Loader2 className="animate-spin text-red-600" size={32} />
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4">
@@ -83,7 +83,7 @@ export default function TeacherStatsModal({
                   </p>
                 </div>
                 <div className="w-full p-3 bg-white dark:bg-neutral-800 rounded-t-2xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 shadow-sm">
-                  <FileText className="text-blue-500" size={24} />
+                  <FileText className="text-emerald-500" size={24} />
                 </div>
               </div>
 
@@ -99,28 +99,28 @@ export default function TeacherStatsModal({
                 </p>
               </div>
 
-              <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-xl border border-amber-100 dark:border-amber-900/20">
+              <div className="bg-red-50 dark:bg-red-900/10 p-4 rounded-xl border border-red-100 dark:border-red-900/20">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase">
+                  <p className="text-xs font-bold text-red-600 dark:text-red-400 uppercase">
                     Pending
                   </p>
-                  <Clock size={16} className="text-amber-500" />
+                  <Clock size={16} className="text-red-500" />
                 </div>
-                <p className="text-2xl font-bold text-amber-700 dark:text-amber-400">
+                <p className="text-2xl font-bold text-red-700 dark:text-red-400">
                   {stats?.pending || 0}
                 </p>
               </div>
 
-              <div className="col-span-2 bg-rose-50 dark:bg-rose-900/10 p-4 rounded-xl border border-rose-100 dark:border-rose-900/20 flex items-center justify-between">
+              <div className="col-span-2 bg-red-50 dark:bg-red-900/10 p-4 rounded-xl border border-red-100 dark:border-red-900/20 flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase">
+                  <p className="text-xs font-bold text-red-600 dark:text-red-400 uppercase">
                     Rejected
                   </p>
-                  <p className="text-2xl font-bold text-rose-700 dark:text-rose-400">
+                  <p className="text-2xl font-bold text-red-700 dark:text-red-400">
                     {stats?.rejected || 0}
                   </p>
                 </div>
-                <AlertCircle size={24} className="text-rose-500" />
+                <AlertCircle size={24} className="text-red-500" />
               </div>
             </div>
           )}

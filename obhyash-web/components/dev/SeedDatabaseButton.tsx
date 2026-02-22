@@ -100,7 +100,7 @@ export default function SeedDatabaseButton() {
           onClick={handleSeed}
           disabled={loading}
           variant="outline"
-          className="border-blue-200 hover:bg-blue-50 text-blue-700"
+          className="border-emerald-200 hover:bg-emerald-50 text-emerald-700"
         >
           {loading ? (
             <Loader2 className="animate-spin mr-2 h-4 w-4" />

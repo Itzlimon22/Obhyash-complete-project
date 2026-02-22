@@ -51,7 +51,7 @@ export default function DebugPage() {
           {JSON.stringify(user, null, 2)}
         </pre>
         {user && (
-          <div className="mt-4 p-2 bg-yellow-100">
+          <div className="mt-4 p-2 bg-red-100">
             <div>
               <strong>Division Sent to getSubjects:</strong>{' '}
               {JSON.stringify(user.division)}

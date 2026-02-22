@@ -188,31 +188,31 @@ export const getNotificationStyle = (type: NotificationType | string) => {
     case 'exam_result':
       return {
         icon: BookOpen,
-        color: 'text-blue-600 dark:text-blue-400',
-        bg: 'bg-blue-100 dark:bg-blue-900/30',
-        border: 'border-blue-200 dark:border-blue-800',
+        color: 'text-emerald-600 dark:text-emerald-400',
+        bg: 'bg-emerald-100 dark:bg-emerald-900/30',
+        border: 'border-emerald-200 dark:border-emerald-800',
       };
     case 'achievement':
     case 'level_up':
       return {
         icon: Trophy,
-        color: 'text-amber-600 dark:text-amber-400',
-        bg: 'bg-amber-100 dark:bg-amber-900/30',
-        border: 'border-amber-200 dark:border-amber-800',
+        color: 'text-red-600 dark:text-red-400',
+        bg: 'bg-red-100 dark:bg-red-900/30',
+        border: 'border-red-200 dark:border-red-800',
       };
     case 'announcement':
       return {
         icon: Bell,
-        color: 'text-purple-600 dark:text-purple-400',
-        bg: 'bg-purple-100 dark:bg-purple-900/30',
-        border: 'border-purple-200 dark:border-purple-800',
+        color: 'text-emerald-600 dark:text-emerald-400',
+        bg: 'bg-emerald-100 dark:bg-emerald-900/30',
+        border: 'border-emerald-200 dark:border-emerald-800',
       };
     case 'warning':
       return {
         icon: AlertTriangle,
-        color: 'text-orange-600 dark:text-orange-400',
-        bg: 'bg-orange-100 dark:bg-orange-900/30',
-        border: 'border-orange-200 dark:border-orange-800',
+        color: 'text-red-600 dark:text-red-400',
+        bg: 'bg-red-100 dark:bg-red-900/30',
+        border: 'border-red-200 dark:border-red-800',
       };
     case 'success':
       return {

@@ -439,7 +439,7 @@ const UserForm = ({
                   <StyledInput type="password" placeholder="••••••••" />
                 </InputGroup>
               </div>
-              <p className="text-[10px] text-amber-500 mt-2">
+              <p className="text-[10px] text-red-500 mt-2">
                 * Note: As an Admin, use the &quot;Reset Password&quot; email
                 trigger in production.
               </p>

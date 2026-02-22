@@ -471,8 +471,8 @@ export default function BulkUploadDialog({
               className="border-4 border-dashed h-full rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-neutral-50 transition-colors border-neutral-200"
             >
               <input {...getInputProps()} />
-              <div className="bg-blue-100 p-4 rounded-full mb-4">
-                <Upload className="w-10 h-10 text-blue-600" />
+              <div className="bg-emerald-100 p-4 rounded-full mb-4">
+                <Upload className="w-10 h-10 text-emerald-600" />
               </div>
               <p className="font-semibold text-neutral-700">
                 Click or drag Excel or JSON file here
@@ -481,9 +481,9 @@ export default function BulkUploadDialog({
           ) : (
             <div className="h-full flex flex-col gap-4">
               {isAiReviewing && (
-                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
                   <div className="flex justify-between text-xs mb-2">
-                    <span className="font-medium text-blue-700">
+                    <span className="font-medium text-emerald-700">
                       AI Fact-Checking...
                     </span>
                     <span>{Math.round(aiProgress)}%</span>
@@ -558,7 +558,7 @@ export default function BulkUploadDialog({
                             variant="ghost"
                             size="icon"
                             onClick={() => setEditingQuestion({ q, i })}
-                            className="text-blue-600"
+                            className="text-emerald-600"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -619,12 +619,12 @@ export default function BulkUploadDialog({
                   onClick={handleAiReview}
                   disabled={isAiReviewing || uploading}
                 >
-                  <Wand2 className="mr-2 h-4 w-4 text-purple-600" /> AI Review
+                  <Wand2 className="mr-2 h-4 w-4 text-emerald-600" /> AI Review
                 </Button>
                 <Button
                   onClick={handleUpload}
                   disabled={uploading || isAiReviewing}
-                  className="bg-blue-600 hover:bg-blue-700 shadow-md"
+                  className="bg-emerald-600 hover:bg-emerald-700 shadow-md"
                 >
                   {uploading ? (
                     <Loader2 className="animate-spin mr-2 h-4 w-4" />

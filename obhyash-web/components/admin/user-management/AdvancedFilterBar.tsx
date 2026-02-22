@@ -91,7 +91,7 @@ export default function AdvancedFilterBar({
                   lastActiveRange: e.target.value as 'all' | '7days' | '30days' | 'inactive',
                 }))
               }
-              className="w-full p-2.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full p-2.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
             >
               <option value="all">Any Time</option>
               <option value="7days">Active Last 7 Days</option>
@@ -111,7 +111,7 @@ export default function AdvancedFilterBar({
                   subscriptionStatus: e.target.value as 'all' | 'Active' | 'Past Due' | 'Expired',
                 }))
               }
-              className="w-full p-2.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full p-2.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
             >
               <option value="all">All Statuses</option>
               <option value="Active">Active</option>
@@ -137,7 +137,7 @@ export default function AdvancedFilterBar({
                 }))
               }
               placeholder="Min"
-              className="w-full p-2.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm focus:ring-2 focus:ring-emerald-500"
             />
             <span className="text-neutral-400">-</span>
             <input
@@ -150,7 +150,7 @@ export default function AdvancedFilterBar({
                 }))
               }
               placeholder="Max"
-              className="w-full p-2.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm focus:ring-2 focus:ring-emerald-500"
             />
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function AdvancedFilterBar({
                   type="checkbox"
                   checked={filters.institutes.includes(inst)}
                   onChange={() => toggleSelection('institutes', inst)}
-                  className="rounded border-neutral-300 text-blue-600"
+                  className="rounded border-neutral-300 text-emerald-600"
                 />
                 <span className="text-sm text-neutral-700 dark:text-neutral-300 truncate">
                   {inst}
@@ -195,7 +195,7 @@ export default function AdvancedFilterBar({
                   type="checkbox"
                   checked={filters.batches.includes(batch)}
                   onChange={() => toggleSelection('batches', batch)}
-                  className="rounded border-neutral-300 text-blue-600"
+                  className="rounded border-neutral-300 text-emerald-600"
                 />
                 <span className="text-sm text-neutral-700 dark:text-neutral-300 truncate">
                   {batch}
@@ -215,7 +215,7 @@ export default function AdvancedFilterBar({
         </button>
         <button
           onClick={handleApply}
-          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors"
+          className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors"
         >
           Apply Advanced Filters
         </button>

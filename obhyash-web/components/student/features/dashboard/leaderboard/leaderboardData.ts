@@ -16,7 +16,7 @@ export const LEVELS: {
     label: 'লিজেন্ড (Legend)',
     minXP: 5000,
     maxXP: 100000,
-    color: 'from-rose-700 to-rose-950',
+    color: 'from-red-700 to-red-950',
     icon: null,
   },
   {
@@ -24,7 +24,7 @@ export const LEVELS: {
     label: 'টাইটান (Titan)',
     minXP: 3500,
     maxXP: 4999,
-    color: 'from-amber-500 to-orange-600',
+    color: 'from-red-500 to-red-600',
     icon: null,
   },
   {
@@ -32,7 +32,7 @@ export const LEVELS: {
     label: 'ওয়ারিয়র (Warrior)',
     minXP: 2000,
     maxXP: 3499,
-    color: 'from-rose-500 to-red-600',
+    color: 'from-red-500 to-red-600',
     icon: null,
   },
   {
@@ -40,7 +40,7 @@ export const LEVELS: {
     label: 'স্কাউট (Scout)',
     minXP: 800,
     maxXP: 1999,
-    color: 'from-emerald-500 to-teal-500',
+    color: 'from-emerald-500 to-emerald-500',
     icon: null,
   },
   {
@@ -66,7 +66,7 @@ export const MOCK_USERS: UserProfile[] = [
     xp: 5820,
     level: 'Legend',
     examsTaken: 95,
-    avatarColor: 'bg-rose-500',
+    avatarColor: 'bg-red-500',
   },
   {
     id: '2',
@@ -75,7 +75,7 @@ export const MOCK_USERS: UserProfile[] = [
     xp: 5150,
     level: 'Legend',
     examsTaken: 82,
-    avatarColor: 'bg-rose-400',
+    avatarColor: 'bg-red-400',
   },
   {
     id: '3',
@@ -84,7 +84,7 @@ export const MOCK_USERS: UserProfile[] = [
     xp: 4890,
     level: 'Titan',
     examsTaken: 75,
-    avatarColor: 'bg-orange-500',
+    avatarColor: 'bg-red-500',
   },
   {
     id: '4',
@@ -93,7 +93,7 @@ export const MOCK_USERS: UserProfile[] = [
     xp: 4200,
     level: 'Titan',
     examsTaken: 68,
-    avatarColor: 'bg-amber-500',
+    avatarColor: 'bg-red-500',
   },
   {
     id: 'me',
@@ -112,7 +112,7 @@ export const MOCK_USERS: UserProfile[] = [
     xp: 2600,
     level: 'Warrior',
     examsTaken: 38,
-    avatarColor: 'bg-rose-500',
+    avatarColor: 'bg-red-500',
   },
   {
     id: '6',
@@ -130,7 +130,7 @@ export const MOCK_USERS: UserProfile[] = [
     xp: 1800,
     level: 'Scout',
     examsTaken: 25,
-    avatarColor: 'bg-teal-500',
+    avatarColor: 'bg-emerald-500',
   },
   {
     id: '8',

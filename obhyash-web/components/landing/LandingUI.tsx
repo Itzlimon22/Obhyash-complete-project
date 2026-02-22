@@ -89,13 +89,13 @@ export const ExamDemo = () => {
   };
 
   return (
-    <div className="w-full bg-white dark:bg-black border border-red-100 dark:border-neutral-800 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-6 shadow-2xl relative overflow-hidden group hover:border-indigo-500 dark:hover:border-indigo-900 transition-colors h-[320px] flex flex-col">
-      <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-600 to-rose-600"></div>
+    <div className="w-full bg-white dark:bg-black border border-red-100 dark:border-neutral-800 rounded-t-2xl sm:rounded-2xl rounded-b-none sm:rounded-b-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-6 shadow-2xl relative overflow-hidden group hover:border-emerald-500 dark:hover:border-emerald-900 transition-colors h-[320px] flex flex-col">
+      <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-600 to-red-600"></div>
 
       {/* Header */}
       <div className="flex justify-between items-center mb-6 border-b border-red-50 dark:border-neutral-800 pb-4">
         <span className="font-bold text-neutral-800 dark:text-white flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></span>
+          <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
           পদার্থবিজ্ঞান ১ম পত্র
         </span>
         <span className="px-3 py-1 bg-red-50 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 text-xs font-mono font-bold rounded-lg border border-red-100 dark:border-neutral-700">
@@ -119,7 +119,7 @@ export const ExamDemo = () => {
                             px-4 py-3 rounded-xl border flex items-center justify-center transition-all duration-300
                             ${
                               selectedOpt === i
-                                ? 'bg-red-50 dark:bg-rose-900/20 border-rose-600 text-rose-700 dark:text-rose-300 shadow-sm transform scale-[1.02]'
+                                ? 'bg-red-50 dark:bg-red-900/20 border-red-600 text-red-700 dark:text-red-300 shadow-sm transform scale-[1.02]'
                                 : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400'
                             }
                         `}
@@ -132,7 +132,7 @@ export const ExamDemo = () => {
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
-                  className="w-5 h-5 text-rose-600 ml-auto"
+                  className="w-5 h-5 text-red-600 ml-auto"
                 >
                   <path
                     fillRule="evenodd"
@@ -180,14 +180,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
       role: 'HSC পরীক্ষার্থী (Science)',
       text: 'Obhyash-এর AI জেনারেটেড প্রশ্নগুলো বইয়ের টপিক অনুযায়ী হয়, যা আমার রিভিশনের জন্য খুব উপকারে এসেছে। এক্সপ্ল্যানেশনগুলোও খুব স্পষ্ট।',
       initial: 'T',
-      color: 'bg-rose-500',
+      color: 'bg-red-500',
     },
     {
       name: 'রাফসান জামান',
       role: 'বিশ্ববিদ্যালয় ভর্তি পরীক্ষার্থী',
       text: 'Analytics ড্যাশবোর্ড দেখে আমি বুঝতে পেরেছি ফিজিক্সের কোন চ্যাপ্টারে আমার দুর্বলতা আছে। এখন সেই অনুযায়ী প্রস্তুতি নিচ্ছি।',
       initial: 'R',
-      color: 'bg-indigo-500',
+      color: 'bg-emerald-500',
     },
   ];
 
@@ -220,9 +220,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
       ],
       cta: 'সাবস্ক্রাইব করো',
       highlight: true,
-      color: 'border-indigo-500 ring-2 ring-indigo-500/20',
+      color: 'border-emerald-500 ring-2 ring-emerald-500/20',
       buttonColor:
-        'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/30',
+        'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-500/30',
     },
     {
       title: 'ত্রৈমাসিক (Quarterly)',
@@ -235,9 +235,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
         'নতুন ফিচারে আর্লি এক্সেস',
       ],
       cta: 'ব্যান্ডেল কিনুন',
-      color: 'border-rose-500',
+      color: 'border-red-500',
       buttonColor:
-        'bg-gradient-to-r from-rose-600 to-orange-600 text-white hover:from-rose-700 hover:to-orange-700 shadow-lg shadow-rose-500/30',
+        'bg-gradient-to-r from-red-600 to-red-600 text-white hover:from-red-700 hover:to-red-700 shadow-lg shadow-red-500/30',
     },
   ];
 
@@ -269,11 +269,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-100 transition-colors font-sans selection:bg-rose-500/20">
+    <div className="min-h-screen bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-100 transition-colors font-sans selection:bg-red-500/20">
       {/* Background Gradients - Adjusted for Reddish Theme */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-rose-500/10 dark:bg-transparent rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-orange-500/10 dark:bg-transparent rounded-full blur-[100px]"></div>
+        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-red-500/10 dark:bg-transparent rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-red-500/10 dark:bg-transparent rounded-full blur-[100px]"></div>
         <div className="absolute top-[40%] left-[20%] w-[300px] h-[300px] bg-red-500/5 dark:bg-transparent rounded-full blur-[80px]"></div>
       </div>
 
@@ -284,7 +284,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             className="flex items-center gap-2 cursor-pointer"
             onClick={onGetStarted}
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-rose-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-rose-500/20">
+            <div className="w-8 h-8 bg-gradient-to-br from-emerald-600 to-red-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-red-500/20">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -304,7 +304,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <span className="text-[10px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.15em] leading-none mb-0.5 font-sans">
                 OBHYASH
               </span>
-              <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-500 font-serif-exam leading-none pb-1">
+              <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-500 font-serif-exam leading-none pb-1">
                 অভ্যাস
               </span>
             </div>
@@ -349,7 +349,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </button>
             <button
               onClick={onGetStarted}
-              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-sm transition-all shadow-lg shadow-indigo-500/20"
+              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-sm transition-all shadow-lg shadow-emerald-500/20"
             >
               শুরু করুন
             </button>
@@ -362,24 +362,24 @@ const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto px-4 lg:px-6 flex flex-col lg:flex-row items-center gap-16">
           {/* Left Content */}
           <div className="lg:w-1/2 text-center lg:text-left space-y-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100/50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/50 text-indigo-700 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100/50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
               এক সাবস্ক্রিপশনেই সব ফিচার
             </div>
 
             <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight text-neutral-900 dark:text-white leading-[1.25]">
               আপনার প্রস্তুতি হোক <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-rose-600 py-2">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-red-600 py-2">
                 স্মার্ট ও নির্ভুল
               </span>
             </h1>
 
             <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
               আনলিমিটেড প্রশ্নে ইচ্ছেমতো পরীক্ষা,{' '}
-              <span className="text-indigo-600 dark:text-indigo-400">
+              <span className="text-emerald-600 dark:text-emerald-400">
                 OMR Upload
               </span>{' '}
               এবং নিজের অগ্রগতি যাচাই করো এক নিমিষেই। একাডেমিক এবং অ্যাডমিশন
@@ -389,7 +389,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
               <button
                 onClick={onGetStarted}
-                className="sm:w-auto w-full px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-base shadow-lg shadow-indigo-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap"
+                className="sm:w-auto w-full px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-base shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap"
               >
                 নতুন পরীক্ষা দাও
                 <svg
@@ -456,25 +456,25 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-black">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-amber-400"></div>
+                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
                   <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
                 </div>
                 <div className="flex bg-neutral-800 rounded-lg p-1 text-[10px] font-bold">
                   <button
                     onClick={() => setActiveDemoTab('generate')}
-                    className={`px-3 py-1 rounded-md transition-all ${activeDemoTab === 'generate' ? 'bg-white dark:bg-neutral-700 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-neutral-500'}`}
+                    className={`px-3 py-1 rounded-md transition-all ${activeDemoTab === 'generate' ? 'bg-white dark:bg-neutral-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-neutral-500'}`}
                   >
                     কাস্টম এক্সাম
                   </button>
                   <button
                     onClick={() => setActiveDemoTab('omr')}
-                    className={`px-3 py-1 rounded-md transition-all ${activeDemoTab === 'omr' ? 'bg-white dark:bg-neutral-700 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-neutral-500'}`}
+                    className={`px-3 py-1 rounded-md transition-all ${activeDemoTab === 'omr' ? 'bg-white dark:bg-neutral-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-neutral-500'}`}
                   >
                     OMR যাচাই
                   </button>
                   <button
                     onClick={() => setActiveDemoTab('analytics')}
-                    className={`px-3 py-1 rounded-md transition-all ${activeDemoTab === 'analytics' ? 'bg-white dark:bg-neutral-700 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-neutral-500'}`}
+                    className={`px-3 py-1 rounded-md transition-all ${activeDemoTab === 'analytics' ? 'bg-white dark:bg-neutral-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-neutral-500'}`}
                   >
                     এনালাইসিস
                   </button>
@@ -508,9 +508,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
                         </span>
                       </div>
                     </div>
-                    <div className="bg-white dark:bg-black border-l-4 border-l-indigo-600 border-y border-r border-neutral-100 dark:border-y-neutral-800 dark:border-r-neutral-800 rounded-r-xl shadow-sm p-5">
+                    <div className="bg-white dark:bg-black border-l-4 border-l-emerald-600 border-y border-r border-neutral-100 dark:border-y-neutral-800 dark:border-r-neutral-800 rounded-r-xl shadow-sm p-5">
                       <div className="flex justify-between mb-4">
-                        <span className="text-xs font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 px-2 py-0.5 rounded">
+                        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded">
                           Question Demo
                         </span>
                         <span className="text-xs font-bold text-neutral-400">
@@ -524,7 +524,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                         {demoQuestion.options.map((opt, i) => (
                           <div
                             key={i}
-                            className={`p-2.5 rounded border text-sm font-medium ${i === 1 ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300' : 'border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400'}`}
+                            className={`p-2.5 rounded border text-sm font-medium ${i === 1 ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300' : 'border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400'}`}
                           >
                             <LatexText text={opt} />
                           </div>
@@ -547,9 +547,9 @@ const LandingPage: React.FC<LandingPageProps> = ({
                           <div className="w-4 h-4 bg-neutral-200 rounded-full"></div>
                         </div>
                       ))}
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-rose-500 shadow-[0_0_15px_rgba(200,16,46,0.8)] animate-[scan_2s_ease-in-out_infinite]"></div>
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-red-500 shadow-[0_0_15px_rgba(200,16,46,0.8)] animate-[scan_2s_ease-in-out_infinite]"></div>
                     </div>
-                    <div className="mt-6 flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold">
+                    <div className="mt-6 flex items-center gap-2 text-red-600 dark:text-red-400 font-bold">
                       <svg
                         className="animate-spin h-4 w-4"
                         xmlns="http://www.w3.org/2000/svg"
@@ -577,8 +577,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 {activeDemoTab === 'analytics' && (
                   <div className="animate-fade-in pt-4">
                     <div className="flex gap-4 mb-6">
-                      <div className="flex-1 bg-indigo-50 dark:bg-indigo-900/10 p-3 rounded-xl border border-indigo-100 dark:border-indigo-900/30">
-                        <div className="text-xs text-indigo-600 dark:text-indigo-400 font-bold uppercase">
+                      <div className="flex-1 bg-emerald-50 dark:bg-emerald-900/10 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
+                        <div className="text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase">
                           গড় স্কোর
                         </div>
                         <div className="text-2xl font-bold text-neutral-900 dark:text-white">
@@ -601,7 +601,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                           className="w-full bg-neutral-100 dark:bg-neutral-800 rounded-t-lg relative group"
                         >
                           <div
-                            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-indigo-600 to-rose-500 rounded-t-lg transition-all duration-1000 group-hover:opacity-90"
+                            className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-emerald-600 to-red-500 rounded-t-lg transition-all duration-1000 group-hover:opacity-90"
                             style={{ height: `${h}%` }}
                           ></div>
                         </div>
@@ -638,11 +638,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
           {/* Card 1: AI Exam */}
-          <div className="lg:col-span-3 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-rose-200 dark:hover:border-rose-900 transition-all">
+          <div className="lg:col-span-3 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-red-200 dark:hover:border-red-900 transition-all">
             <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
               Available Now
             </div>
-            <div className="w-12 h-12 bg-rose-100 dark:bg-rose-900/20 rounded-2xl flex items-center justify-center mb-6 text-rose-600 dark:text-rose-400">
+            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 text-red-600 dark:text-red-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -668,30 +668,30 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </p>
             <ul className="grid grid-cols-2 gap-2 text-xs md:text-sm text-neutral-500 font-medium">
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
                 LaTeX সাপোর্ট
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
                 নেগেটিভ মার্কিং
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
                 টাইমার কন্ট্রোল
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
                 ইনস্ট্যান্ট রেজাল্ট
               </li>
             </ul>
           </div>
 
           {/* Card 2: OMR Scanner */}
-          <div className="lg:col-span-3 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-orange-200 dark:hover:border-orange-900 transition-all">
+          <div className="lg:col-span-3 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-red-200 dark:hover:border-red-900 transition-all">
             <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
               Available Now
             </div>
-            <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/20 rounded-2xl flex items-center justify-center mb-6 text-orange-600 dark:text-orange-400">
+            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 text-red-600 dark:text-red-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -718,11 +718,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Card 3: Analysis */}
-          <div className="lg:col-span-2 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-indigo-200 dark:hover:border-indigo-900 transition-all">
+          <div className="lg:col-span-2 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-emerald-200 dark:hover:border-emerald-900 transition-all">
             <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
               Available Now
             </div>
-            <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/20 rounded-2xl flex items-center justify-center mb-6 text-indigo-600 dark:text-indigo-400">
+            <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center mb-6 text-emerald-600 dark:text-emerald-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -748,11 +748,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Card 4: Leaderboard */}
-          <div className="lg:col-span-2 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-amber-200 dark:hover:border-amber-900 transition-all">
+          <div className="lg:col-span-2 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-red-200 dark:hover:border-red-900 transition-all">
             <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
               Available Now
             </div>
-            <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/20 rounded-2xl flex items-center justify-center mb-6 text-amber-600 dark:text-amber-400">
+            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 text-red-600 dark:text-red-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -778,11 +778,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Card 5: PDF Tools */}
-          <div className="lg:col-span-2 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-purple-200 dark:hover:border-purple-900 transition-all">
+          <div className="lg:col-span-2 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-emerald-200 dark:hover:border-emerald-900 transition-all">
             <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
               Available Now
             </div>
-            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-2xl flex items-center justify-center mb-6 text-purple-600 dark:text-purple-400">
+            <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center mb-6 text-emerald-600 dark:text-emerald-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -834,7 +834,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
             <div className="space-y-3">
-              <div className="flex items-center gap-3 text-rose-400 font-bold text-lg">
+              <div className="flex items-center gap-3 text-red-400 font-bold text-lg">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -857,7 +857,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </p>
             </div>
             <div className="space-y-3">
-              <div className="flex items-center gap-3 text-amber-400 font-bold text-lg">
+              <div className="flex items-center gap-3 text-red-400 font-bold text-lg">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -923,10 +923,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
             {pricingPlans.map((plan, idx) => (
               <div
                 key={idx}
-                className={`relative bg-white dark:bg-black rounded-3xl p-8 shadow-xl transition-all hover:-tranneutral-y-2 flex flex-col ${plan.highlight ? 'border-2 border-indigo-500 z-10 scale-105' : 'border border-red-100 dark:border-neutral-800'}`}
+                className={`relative bg-white dark:bg-black rounded-3xl p-8 shadow-xl transition-all hover:-tranneutral-y-2 flex flex-col ${plan.highlight ? 'border-2 border-emerald-500 z-10 scale-105' : 'border border-red-100 dark:border-neutral-800'}`}
               >
                 {plan.highlight && (
-                  <div className="absolute top-0 left-1/2 -tranneutral-x-1/2 -tranneutral-y-1/2 bg-indigo-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">
+                  <div className="absolute top-0 left-1/2 -tranneutral-x-1/2 -tranneutral-y-1/2 bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">
                     Most Popular
                   </div>
                 )}
@@ -950,7 +950,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                       className="flex items-start gap-3 text-sm text-neutral-700 dark:text-neutral-300"
                     >
                       <svg
-                        className={`w-5 h-5 shrink-0 ${plan.highlight ? 'text-indigo-500' : 'text-emerald-500'}`}
+                        className={`w-5 h-5 shrink-0 ${plan.highlight ? 'text-emerald-500' : 'text-emerald-500'}`}
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -991,7 +991,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             return (
               <div
                 key={idx}
-                className={`bg-white dark:bg-black rounded-2xl border transition-all duration-300 overflow-hidden ${isOpen ? 'border-indigo-500 shadow-md ring-1 ring-indigo-500/10' : 'border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md'}`}
+                className={`bg-white dark:bg-black rounded-2xl border transition-all duration-300 overflow-hidden ${isOpen ? 'border-emerald-500 shadow-md ring-1 ring-emerald-500/10' : 'border-neutral-200 dark:border-neutral-800 shadow-sm hover:shadow-md'}`}
               >
                 <button
                   onClick={() => setOpenFaq(isOpen ? null : idx)}
@@ -999,14 +999,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 >
                   <h3 className="font-bold text-lg text-neutral-900 dark:text-white flex items-start gap-3">
                     <span
-                      className={`text-indigo-500 text-xl leading-none transition-transform duration-300 ${isOpen ? 'scale-110' : ''}`}
+                      className={`text-emerald-500 text-xl leading-none transition-transform duration-300 ${isOpen ? 'scale-110' : ''}`}
                     >
                       Q.
                     </span>
                     {faq.q}
                   </h3>
                   <div
-                    className={`mt-1 flex-shrink-0 w-6 h-6 rounded-full border border-neutral-200 dark:border-neutral-700 flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-indigo-500 border-indigo-500 text-white rotate-180' : 'text-neutral-400 group-hover:text-indigo-500 group-hover:border-indigo-500'}`}
+                    className={`mt-1 flex-shrink-0 w-6 h-6 rounded-full border border-neutral-200 dark:border-neutral-700 flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-emerald-500 border-emerald-500 text-white rotate-180' : 'text-neutral-400 group-hover:text-emerald-500 group-hover:border-emerald-500'}`}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -1038,7 +1038,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-rose-50/50 dark:bg-black border-y border-red-100 dark:border-neutral-800">
+      <section className="py-20 bg-red-50/50 dark:bg-black border-y border-red-100 dark:border-neutral-800">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-neutral-900 dark:text-white font-serif-exam">
@@ -1065,7 +1065,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     <path d="M14.017 21L14.017 18C14.017 16.054 15.192 15.189 16.53 14.253C17.18 13.798 18.067 13.178 18.067 12.063C18.067 10.948 16.594 10.793 16.037 10.793C15.48 10.793 13.567 10.948 13.567 12.063V12.793H10.567V5.793H17.067C19.828 5.793 22.067 8.032 22.067 10.793V12.063C22.067 15.373 19.333 17.287 18.067 18.173C17.23 18.759 16.325 19.393 16.325 21H14.017ZM5.017 21L5.017 18C5.017 16.054 6.192 15.189 7.53 14.253C8.18 13.798 9.067 13.178 9.067 12.063C9.067 10.948 7.594 10.793 7.037 10.793C6.48 10.793 4.567 10.948 4.567 12.063V12.793H1.567V5.793H8.067C10.828 5.793 13.067 8.032 13.067 10.793V12.063C13.067 15.373 10.333 17.287 9.067 18.173C8.23 18.759 7.325 19.393 7.325 21H5.017Z"></path>
                   </svg>
                 </div>
-                <div className="flex gap-1 text-amber-400 mb-6">
+                <div className="flex gap-1 text-red-400 mb-6">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <svg
                       key={i}
@@ -1112,7 +1112,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
             <div className="space-y-6">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-rose-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-600 to-red-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -1132,7 +1132,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   <span className="text-[10px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.15em] leading-none mb-0.5 font-sans">
                     OBHYASH
                   </span>
-                  <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-500 font-serif-exam leading-none pb-1">
+                  <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-500 font-serif-exam leading-none pb-1">
                     অভ্যাস
                   </span>
                 </div>
@@ -1144,7 +1144,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                       <a
                         key={social}
                         href="#"
-                        className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 transition-colors"
+                        className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500 dark:text-neutral-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 transition-colors"
                       >
                         <span className="sr-only">{social}</span>
                         <svg
@@ -1164,10 +1164,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   )}
                 </div>
                 <div className="space-y-2 text-sm text-neutral-600 dark:text-neutral-400">
-                  <p className="flex items-center gap-2 hover:text-rose-600 transition-colors cursor-pointer">
+                  <p className="flex items-center gap-2 hover:text-red-600 transition-colors cursor-pointer">
                     +880 1712 345678
                   </p>
-                  <p className="flex items-center gap-2 hover:text-rose-600 transition-colors cursor-pointer">
+                  <p className="flex items-center gap-2 hover:text-red-600 transition-colors cursor-pointer">
                     support@zenith.edu.bd
                   </p>
                 </div>
@@ -1189,7 +1189,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <a
                     href="#"
-                    className="hover:text-rose-600 transition-colors flex items-center gap-2"
+                    className="hover:text-red-600 transition-colors flex items-center gap-2"
                   >
                     মক এক্সাম (Mock Exam)
                   </a>
@@ -1197,7 +1197,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <a
                     href="#"
-                    className="hover:text-rose-600 transition-colors flex items-center gap-2"
+                    className="hover:text-red-600 transition-colors flex items-center gap-2"
                   >
                     প্রশ্ন ব্যাংক (Question Bank)
                   </a>
@@ -1205,7 +1205,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <a
                     href="#"
-                    className="hover:text-rose-600 transition-colors flex items-center gap-2"
+                    className="hover:text-red-600 transition-colors flex items-center gap-2"
                   >
                     OMR গ্রেডিং (OMR Grading)
                   </a>
@@ -1213,7 +1213,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <a
                     href="#"
-                    className="hover:text-rose-600 transition-colors flex items-center gap-2"
+                    className="hover:text-red-600 transition-colors flex items-center gap-2"
                   >
                     লিডারবোর্ড (Leaderboard)
                   </a>
@@ -1221,7 +1221,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <a
                     href="#"
-                    className="hover:text-rose-600 transition-colors flex items-center gap-2"
+                    className="hover:text-red-600 transition-colors flex items-center gap-2"
                   >
                     পারফরম্যান্স এনালাইসিস
                   </a>
@@ -1234,27 +1234,27 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </h3>
               <ul className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400 font-medium">
                 <li>
-                  <a href="#" className="hover:text-rose-600 transition-colors">
+                  <a href="#" className="hover:text-red-600 transition-colors">
                     ইঞ্জিনিয়ারিং ভর্তি প্রস্তুতি
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-rose-600 transition-colors">
+                  <a href="#" className="hover:text-red-600 transition-colors">
                     মেডিকেল ভর্তি প্রস্তুতি
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-rose-600 transition-colors">
+                  <a href="#" className="hover:text-red-600 transition-colors">
                     বিশ্ববিদ্যালয় &apos;ক ইউনিট
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-rose-600 transition-colors">
+                  <a href="#" className="hover:text-red-600 transition-colors">
                     HSC বিজ্ঞান বিভাগ
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-rose-600 transition-colors">
+                  <a href="#" className="hover:text-red-600 transition-colors">
                     HSC মানবিক ও ব্যবসায় শিক্ষা
                   </a>
                 </li>
@@ -1266,27 +1266,27 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </h3>
               <ul className="space-y-4 text-sm text-neutral-600 dark:text-neutral-400 font-medium">
                 <li>
-                  <a href="#" className="hover:text-rose-600 transition-colors">
+                  <a href="#" className="hover:text-red-600 transition-colors">
                     আমাদের সম্পর্কে (About Us)
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-rose-600 transition-colors">
+                  <a href="#" className="hover:text-red-600 transition-colors">
                     ক্যারিয়ার
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-rose-600 transition-colors">
+                  <a href="#" className="hover:text-red-600 transition-colors">
                     টার্মস এন্ড কন্ডিশন
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-rose-600 transition-colors">
+                  <a href="#" className="hover:text-red-600 transition-colors">
                     প্রাইভেসি পলিসি
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-rose-600 transition-colors">
+                  <a href="#" className="hover:text-red-600 transition-colors">
                     রিফান্ড পলিসি
                   </a>
                 </li>
@@ -1299,10 +1299,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
               rights reserved.
             </p>
             <div className="flex gap-6">
-              <a href="#" className="hover:text-rose-600 transition-colors">
+              <a href="#" className="hover:text-red-600 transition-colors">
                 সাপোর্ট সেন্টার
               </a>
-              <a href="#" className="hover:text-rose-600 transition-colors">
+              <a href="#" className="hover:text-red-600 transition-colors">
                 কমিউনিটি
               </a>
             </div>

@@ -100,7 +100,7 @@ export function UserNav() {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => router.push('/complaint')}
-            className="cursor-pointer hover:bg-white/10 focus:bg-white/10 rounded-md text-amber-400 font-medium"
+            className="cursor-pointer hover:bg-white/10 focus:bg-white/10 rounded-md text-red-400 font-medium"
           >
             <AlertTriangle className="mr-2 h-4 w-4" />
             <span>Report an Issue</span>

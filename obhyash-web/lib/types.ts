@@ -336,7 +336,7 @@ export interface PlanStat {
   id: string;
   label: string; // e.g., "Free Plan", "Pro Plan"
   value: number; // e.g., 1050 users
-  percentage: number; // e.g., 45% of total users      // e.g., "bg-blue-500" for the progress bar
+  percentage: number; // e.g., 45% of total users      // e.g., "bg-emerald-500" for the progress bar
   name: string; // Matches "Free Tier", "Pro Plan"
   count: number; // Matches 854, 320
   total: number; // Used for calculating the progress bar width

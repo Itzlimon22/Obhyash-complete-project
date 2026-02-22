@@ -150,7 +150,7 @@ export default function OmrDashboard({ initialData }: OmrDashboardProps) {
         <StatCard
           label="Pending"
           value={scriptSubmissions.filter((s) => s.status === 'pending').length}
-          color="text-amber-500"
+          color="text-red-500"
         />
         <StatCard
           label="Evaluated"
@@ -169,7 +169,7 @@ export default function OmrDashboard({ initialData }: OmrDashboardProps) {
         <StatCard
           label="Total"
           value={scriptSubmissions.length}
-          color="text-indigo-500"
+          color="text-emerald-500"
         />
       </div>
 
@@ -219,7 +219,7 @@ export default function OmrDashboard({ initialData }: OmrDashboardProps) {
                         setViewingScript(item);
                         setShowRejectInput(false);
                       }}
-                      className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline flex items-center gap-1 ml-auto"
+                      className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1 ml-auto"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -368,7 +368,7 @@ export default function OmrDashboard({ initialData }: OmrDashboardProps) {
                       viewingScript.status !== 'pending' ||
                       processingId === viewingScript.id
                     }
-                    className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold disabled:opacity-50 flex items-center gap-2 shadow-lg hover:shadow-indigo-500/30 transition-all"
+                    className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold disabled:opacity-50 flex items-center gap-2 shadow-lg hover:shadow-emerald-500/30 transition-all"
                   >
                     {processingId === viewingScript.id ? (
                       <>
@@ -448,7 +448,7 @@ function StatCard({
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     pending:
-      'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+      'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800',
     evaluated:
       'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
     rejected:

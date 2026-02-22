@@ -25,7 +25,7 @@ const SubjectItem: React.FC<{
 
   return (
     <div
-      className={`bg-white dark:bg-neutral-800/50 rounded-2xl border transition-all duration-300 shadow-sm ${isOpen ? 'border-rose-200 dark:border-rose-900 shadow-md ring-1 ring-rose-100 dark:ring-rose-900/50' : 'border-neutral-200 dark:border-neutral-700 hover:shadow-md'}`}
+      className={`bg-white dark:bg-neutral-800/50 rounded-2xl border transition-all duration-300 shadow-sm ${isOpen ? 'border-red-200 dark:border-red-900 shadow-md ring-1 ring-red-100 dark:ring-red-900/50' : 'border-neutral-200 dark:border-neutral-700 hover:shadow-md'}`}
     >
       <div
         className="p-4 flex items-center justify-between cursor-pointer select-none group"
@@ -33,10 +33,10 @@ const SubjectItem: React.FC<{
       >
         <div className="flex items-center gap-3">
           <div
-            className={`w-1.5 h-8 rounded-full transition-colors ${isOpen ? 'bg-rose-500' : 'bg-neutral-200 dark:bg-neutral-700 group-hover:bg-rose-400'}`}
+            className={`w-1.5 h-8 rounded-full transition-colors ${isOpen ? 'bg-red-500' : 'bg-neutral-200 dark:bg-neutral-700 group-hover:bg-red-400'}`}
           ></div>
           <h4
-            className={`font-bold text-base transition-colors ${isOpen ? 'text-rose-600 dark:text-rose-400' : 'text-neutral-800 dark:text-neutral-200 group-hover:text-rose-600 dark:group-hover:text-rose-400'}`}
+            className={`font-bold text-base transition-colors ${isOpen ? 'text-red-600 dark:text-red-400' : 'text-neutral-800 dark:text-neutral-200 group-hover:text-red-600 dark:group-hover:text-red-400'}`}
           >
             {subject.name}
           </h4>
@@ -44,12 +44,12 @@ const SubjectItem: React.FC<{
 
         <div className="flex items-center gap-3">
           <div
-            className={`px-2.5 py-1 rounded-lg text-xs font-black ${accuracy >= 80 ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400' : accuracy >= 50 ? 'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400' : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'}`}
+            className={`px-2.5 py-1 rounded-lg text-xs font-black ${accuracy >= 80 ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400' : accuracy >= 50 ? 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400' : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'}`}
           >
             {accuracy}%
           </div>
           <button
-            className={`flex items-center justify-center w-8 h-8 rounded-full transition-all ${isOpen ? 'bg-rose-50 text-rose-600 rotate-180 dark:bg-rose-900/20 dark:text-rose-400' : 'bg-neutral-50 text-neutral-500 dark:bg-neutral-800  group-hover:bg-rose-50 group-hover:text-rose-600 dark:group-hover:bg-rose-900/20'}`}
+            className={`flex items-center justify-center w-8 h-8 rounded-full transition-all ${isOpen ? 'bg-red-50 text-red-600 rotate-180 dark:bg-red-900/20 dark:text-red-400' : 'bg-neutral-50 text-neutral-500 dark:bg-neutral-800  group-hover:bg-red-50 group-hover:text-red-600 dark:group-hover:bg-red-900/20'}`}
             aria-label="Toggle details"
           >
             <svg
@@ -88,7 +88,7 @@ const SubjectItem: React.FC<{
                 <span className="block text-[10px] text-neutral-400 dark:text-neutral-500 font-bold uppercase tracking-wider">
                   ভুল
                 </span>
-                <span className="text-lg font-black text-rose-500 dark:text-rose-400 leading-tight">
+                <span className="text-lg font-black text-red-500 dark:text-red-400 leading-tight">
                   {subject.wrong}
                 </span>
               </div>
@@ -96,7 +96,7 @@ const SubjectItem: React.FC<{
                 <span className="block text-[10px] text-neutral-400 dark:text-neutral-500 font-bold uppercase tracking-wider">
                   স্কিপড
                 </span>
-                <span className="text-lg font-black text-amber-500 dark:text-amber-400 leading-tight">
+                <span className="text-lg font-black text-red-500 dark:text-red-400 leading-tight">
                   {subject.skipped}
                 </span>
               </div>
@@ -113,7 +113,7 @@ const SubjectItem: React.FC<{
                 style={{
                   width: `${(subject.wrong / Math.max(subject.total, 1)) * 100}%`,
                 }}
-                className="h-full bg-gradient-to-r from-rose-400 to-rose-600 shadow-sm relative z-10"
+                className="h-full bg-gradient-to-r from-red-400 to-red-600 shadow-sm relative z-10"
               ></div>
             </div>
 

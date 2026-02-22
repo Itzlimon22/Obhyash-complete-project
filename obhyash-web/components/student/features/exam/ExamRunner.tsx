@@ -267,7 +267,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                 <button
                   onClick={handleSubmitRequest}
                   disabled={!selectedScript}
-                  className="flex-1 sm:flex-none px-8 py-3 bg-indigo-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/30 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+                  className="flex-1 sm:flex-none px-8 py-3 bg-emerald-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
                 >
                   স্ক্রিপ্ট জমা দাও
                 </button>
@@ -275,7 +275,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
             ) : (
               <button
                 onClick={handleSubmitRequest}
-                className="w-full sm:w-auto min-w-[200px] bg-rose-600 hover:bg-rose-700 text-white font-bold text-base py-3 px-8 rounded-xl shadow-lg shadow-rose-500/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full sm:w-auto min-w-[200px] bg-red-600 hover:bg-red-700 text-white font-bold text-base py-3 px-8 rounded-xl shadow-lg shadow-red-500/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -315,7 +315,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
         />
         {/* Using direct modal rendering or portal would be better, but keeping inline for simplicity with existing architecture */}
         {appState === AppState.GRACE_PERIOD && (
-          <div className="fixed bottom-20 right-4 z-50 bg-amber-100 dark:bg-amber-900 border border-amber-300 text-amber-800 dark:text-amber-200 px-4 py-2 rounded-lg shadow-lg animate-bounce">
+          <div className="fixed bottom-20 right-4 z-50 bg-red-100 dark:bg-red-900 border border-red-300 text-red-800 dark:text-red-200 px-4 py-2 rounded-lg shadow-lg animate-bounce">
             সময় শেষ! তাড়াতাড়ি জমা দাও।
           </div>
         )}

@@ -19,14 +19,14 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
   const getMethodIcon = (type: string) => {
     if (type === 'bkash') {
       return (
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center text-white text-[10px] font-black shadow-sm">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white text-[10px] font-black shadow-sm">
           bK
         </div>
       );
     }
     if (type === 'nagad') {
       return (
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-[10px] font-black shadow-sm">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white text-[10px] font-black shadow-sm">
           N
         </div>
       );

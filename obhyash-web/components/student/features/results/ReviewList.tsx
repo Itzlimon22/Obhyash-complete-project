@@ -271,13 +271,13 @@ const ReviewList: React.FC<ReviewListProps> = ({
 
               {/* Redesigned Explanation Section */}
               <div className="mt-6 md:mt-8 pt-6 border-t border-neutral-100 dark:border-neutral-800">
-                <div className="bg-neutral-50 dark:bg-neutral-800/40 rounded-lg p-4 md:p-5 border-l-4 border-indigo-500 shadow-sm">
+                <div className="bg-neutral-50 dark:bg-neutral-800/40 rounded-lg p-4 md:p-5 border-l-4 border-emerald-500 shadow-sm">
                   <div className="mb-3">
                     <span className="text-sm font-bold text-neutral-500 dark:text-neutral-400 block mb-1">
                       সঠিক উত্তর
                     </span>
-                    <div className="text-indigo-700 dark:text-indigo-300 font-bold text-base md:text-lg flex items-center gap-3">
-                      <span className="flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-sm md:text-base">
+                    <div className="text-emerald-700 dark:text-emerald-300 font-bold text-base md:text-lg flex items-center gap-3">
+                      <span className="flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 text-sm md:text-base">
                         {correctOptionLabel}
                       </span>
                       {typeof q.correctAnswerIndex === 'number' && (

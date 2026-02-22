@@ -53,7 +53,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
 
   const getTimerStyles = () => {
     if (isGracePeriod) {
-      return 'text-white bg-amber-500 border-amber-600 animate-pulse shadow-lg shadow-amber-500/30';
+      return 'text-white bg-red-500 border-red-600 animate-pulse shadow-lg shadow-red-500/30';
     }
     if (timeLeft < 60) {
       return 'text-white bg-red-600 border-red-700 animate-[pulse_0.5s_ease-in-out_infinite] shadow-lg shadow-red-500/50 scale-105 transition-all';

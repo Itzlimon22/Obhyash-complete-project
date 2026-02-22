@@ -115,7 +115,7 @@ export default function ActivityLogModal({
         <div className="p-6 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-              <Activity className="w-5 h-5 text-blue-500" />
+              <Activity className="w-5 h-5 text-emerald-500" />
               Activity Log
             </h2>
             <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
@@ -140,7 +140,7 @@ export default function ActivityLogModal({
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-t-2xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full pl-9 pr-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-t-2xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none"
             >
               <option value="all">All Activities</option>
               <option value="LOGIN">Login</option>
@@ -173,17 +173,17 @@ export default function ActivityLogModal({
               {filteredActivities.map((activity) => (
                 <div
                   key={activity.id}
-                  className="flex gap-4 p-4 rounded-xl bg-white dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800/50 hover:border-blue-200 dark:hover:border-blue-800 transition-colors"
+                  className="flex gap-4 p-4 rounded-xl bg-white dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800/50 hover:border-emerald-200 dark:hover:border-emerald-800 transition-colors"
                 >
                   <div
                     className={`mt-1 w-2 h-2 rounded-full shrink-0 ${
                       activity.activity_type === 'LOGIN'
                         ? 'bg-emerald-500'
                         : activity.activity_type === 'SUBSCRIPTION'
-                          ? 'bg-amber-500'
+                          ? 'bg-red-500'
                           : activity.activity_type === 'EXAM'
-                            ? 'bg-violet-500'
-                            : 'bg-blue-500'
+                            ? 'bg-emerald-500'
+                            : 'bg-emerald-500'
                     }`}
                   />
                   <div className="flex-1 min-w-0">

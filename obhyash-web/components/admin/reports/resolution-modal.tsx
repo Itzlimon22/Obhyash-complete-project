@@ -62,7 +62,7 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
         {/* Header */}
         <div className="px-5 py-3 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-white dark:bg-black sticky top-0 z-10">
           <div className="flex items-center gap-2.5">
-            <div className="p-1.5 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-lg">
+            <div className="p-1.5 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg">
               <AlertOctagon size={18} />
             </div>
             <div>
@@ -91,8 +91,8 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
             <div className="space-y-4">
               <div className="w-full bg-white dark:bg-black p-4 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-neutral-100 dark:border-neutral-800 shadow-sm">
                 <div className="flex items-center gap-1.5 mb-1.5">
-                  <Flag size={12} className="text-rose-600" />
-                  <span className="text-xs font-black text-rose-600 dark:text-rose-400 uppercase tracking-tight">
+                  <Flag size={12} className="text-red-600" />
+                  <span className="text-xs font-black text-red-600 dark:text-red-400 uppercase tracking-tight">
                     {report.reason}
                   </span>
                 </div>
@@ -105,7 +105,7 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
                   Reporter
                 </p>
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center text-[10px] font-black uppercase shadow-inner">
+                  <div className="w-6 h-6 rounded-lg bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 flex items-center justify-center text-[10px] font-black uppercase shadow-inner">
                     {(report.reporter_name || 'G').charAt(0)}
                   </div>
                   <span className="text-[13px] font-bold text-neutral-900 dark:text-white">
@@ -125,12 +125,12 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
               {!editMode ? (
                 <button
                   onClick={() => setEditMode(true)}
-                  className="text-[11px] font-black text-rose-600 hover:text-rose-700 flex items-center gap-1 uppercase tracking-tight"
+                  className="text-[11px] font-black text-red-600 hover:text-red-700 flex items-center gap-1 uppercase tracking-tight"
                 >
                   <ArrowRight size={12} /> Edit Mode
                 </button>
               ) : (
-                <span className="text-[11px] font-black text-amber-600 flex items-center gap-1 uppercase tracking-tight animate-pulse">
+                <span className="text-[11px] font-black text-red-600 flex items-center gap-1 uppercase tracking-tight animate-pulse">
                   <AlertTriangle size={12} /> Editing...
                 </span>
               )}
@@ -150,7 +150,7 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
                         question: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-sm focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none dark:text-white transition-all font-medium"
+                    className="w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none dark:text-white transition-all font-medium"
                     placeholder="Type LaTeX or plain text..."
                   />
                 ) : (
@@ -174,7 +174,7 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
                       explanation: e.target.value,
                     })
                   }
-                  className={`w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-sm focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none dark:text-white transition-all font-medium ${!editMode && 'opacity-50 grayscale select-none'}`}
+                  className={`w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-sm focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none dark:text-white transition-all font-medium ${!editMode && 'opacity-50 grayscale select-none'}`}
                   readOnly={!editMode}
                   placeholder="Explain why this change was made..."
                 />
@@ -191,7 +191,7 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
                 if (confirm('Are you sure you want to delete this report?'))
                   handleAction('delete');
               }}
-              className="w-full sm:w-auto px-4 py-2 text-[11px] text-rose-500 bg-rose-50/50 dark:bg-rose-500/5 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl transition-all flex items-center justify-center gap-1.5 font-black uppercase tracking-tight"
+              className="w-full sm:w-auto px-4 py-2 text-[11px] text-red-500 bg-red-50/50 dark:bg-red-500/5 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all flex items-center justify-center gap-1.5 font-black uppercase tracking-tight"
             >
               <Trash2 size={12} /> Delete Report
             </button>
@@ -205,7 +205,7 @@ export const ResolutionModal: React.FC<ResolutionModalProps> = ({
               <button
                 onClick={() => handleAction('fix')}
                 disabled={isSaving}
-                className="flex-[2] sm:flex-none px-8 py-3 bg-rose-600 hover:bg-rose-500 text-white text-xs font-black rounded-xl shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50 uppercase tracking-tight"
+                className="flex-[2] sm:flex-none px-8 py-3 bg-red-600 hover:bg-red-500 text-white text-xs font-black rounded-xl shadow-lg shadow-red-500/20 flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50 uppercase tracking-tight"
               >
                 {isSaving ? (
                   <Loader2 className="animate-spin" size={14} />

@@ -13,7 +13,7 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ invoices, onDownload })
   const getStatusBadge = (status: Invoice['status']) => {
       switch(status) {
           case 'paid': return <span className="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded text-xs font-bold capitalize">Paid</span>;
-          case 'pending': return <span className="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded text-xs font-bold capitalize">Pending</span>;
+          case 'pending': return <span className="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded text-xs font-bold capitalize">Pending</span>;
           case 'failed': return <span className="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded text-xs font-bold capitalize">Failed</span>;
       }
   };
@@ -23,7 +23,7 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ invoices, onDownload })
         <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
             <h3 className="text-lg font-bold text-slate-800 dark:text-white">বিলিং ইতিহাস</h3>
             {/* SUPABASE: This could trigger a PDF export of all invoices */}
-            <button className="text-sm text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
+            <button className="text-sm text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
                 সব ডাউনলোড করুন
             </button>
         </div>
@@ -57,7 +57,7 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ invoices, onDownload })
                                 <td className="px-6 py-4 text-right">
                                     <button 
                                         onClick={() => onDownload(inv)}
-                                        className="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                                        className="text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                                         title="ডাউনলোড"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 ml-auto">

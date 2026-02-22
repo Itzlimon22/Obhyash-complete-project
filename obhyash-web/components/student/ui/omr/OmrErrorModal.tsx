@@ -67,12 +67,12 @@ const OmrErrorModal: React.FC<OmrErrorModalProps> = ({
           </div>
 
           {/* ── Hint banner ────────────────────────────────────────── */}
-          <div className="flex items-start gap-2.5 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 px-4 py-3 mb-6">
+          <div className="flex items-start gap-2.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700/40 px-4 py-3 mb-6">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
               fill="currentColor"
-              className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-500"
+              className="w-4 h-4 flex-shrink-0 mt-0.5 text-red-500"
               aria-hidden="true"
             >
               <path
@@ -81,7 +81,7 @@ const OmrErrorModal: React.FC<OmrErrorModalProps> = ({
                 clipRule="evenodd"
               />
             </svg>
-            <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
+            <p className="text-xs text-red-700 dark:text-red-300 leading-relaxed">
               আবার চেষ্টা করো অথবা উত্তরপত্রটি সরাসরি পরীক্ষকের কাছে পাঠাও।
             </p>
           </div>

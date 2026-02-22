@@ -65,12 +65,12 @@ const StreakCalendar: React.FC<StreakCalendarProps> = ({
         </h3>
 
         {/* Streak Badge */}
-        <div className="flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-orange-50 dark:bg-orange-900/20 rounded-full border border-orange-100 dark:border-orange-900/30 shadow-sm shadow-orange-500/5 w-fit">
+        <div className="flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 py-1.5 sm:py-2 bg-red-50 dark:bg-red-900/20 rounded-full border border-red-100 dark:border-red-900/30 shadow-sm shadow-red-500/5 w-fit">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500"
+            className="w-4 h-4 sm:w-5 sm:h-5 text-red-500"
           >
             <path
               fillRule="evenodd"
@@ -78,7 +78,7 @@ const StreakCalendar: React.FC<StreakCalendarProps> = ({
               clipRule="evenodd"
             />
           </svg>
-          <span className="text-sm sm:text-base font-black text-orange-600 dark:text-orange-400">
+          <span className="text-sm sm:text-base font-black text-red-600 dark:text-red-400">
             {streakCount} দিন স্ট্রিক
           </span>
         </div>

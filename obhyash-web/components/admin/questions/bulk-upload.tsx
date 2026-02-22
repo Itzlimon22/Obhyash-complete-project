@@ -335,7 +335,7 @@ const QuestionPreview: React.FC<{
             <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1.5 block">
               ব্যাখ্যা
             </label>
-            <div className="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
+            <div className="p-4 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-xl text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
               <MathRenderer text={q.explanation} />
             </div>
           </div>
@@ -599,7 +599,7 @@ const EditModal: React.FC<{
                   <label className="text-sm font-bold text-neutral-800 dark:text-white">
                     প্রশ্ন
                   </label>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 font-semibold border border-indigo-100 dark:border-indigo-800">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-100 dark:border-emerald-800">
                     LaTeX: $...$
                   </span>
                 </div>
@@ -747,8 +747,8 @@ const EditModal: React.FC<{
                 placeholder="সঠিক উত্তরের ব্যাখ্যা লেখো..."
               />
               {localData.explanation && (
-                <div className="p-3 bg-amber-50/60 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/50 rounded-xl">
-                  <span className="text-[9px] text-amber-600 uppercase tracking-widest font-bold mb-1 block">
+                <div className="p-3 bg-red-50/60 dark:bg-red-900/10 border border-red-100 dark:border-red-800/50 rounded-xl">
+                  <span className="text-[9px] text-red-600 uppercase tracking-widest font-bold mb-1 block">
                     সমাধান প্রিভিউ
                   </span>
                   <MathRenderer text={localData.explanation} />
@@ -1333,7 +1333,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                   fmt: 'json' as const,
                   icon: FileJson,
                   label: 'JSON',
-                  color: 'bg-amber-50 dark:bg-amber-900/20 text-amber-600',
+                  color: 'bg-red-50 dark:bg-red-900/20 text-red-600',
                 },
                 {
                   fmt: 'csv' as const,
@@ -1346,7 +1346,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                   fmt: 'xlsx' as const,
                   icon: FileSpreadsheet,
                   label: 'Excel',
-                  color: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600',
+                  color: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600',
                 },
               ].map((t) => (
                 <button
@@ -1538,8 +1538,8 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
       {/* Bulk Action Bar */}
       {selectedIndices.size > 0 && (
-        <div className="px-5 sm:px-6 py-3 bg-indigo-50/50 dark:bg-indigo-900/10 border-b border-indigo-100 dark:border-indigo-900/30 flex flex-wrap items-center gap-3">
-          <span className="text-xs font-bold text-indigo-700 dark:text-indigo-400 whitespace-nowrap">
+        <div className="px-5 sm:px-6 py-3 bg-emerald-50/50 dark:bg-emerald-900/10 border-b border-emerald-100 dark:border-emerald-900/30 flex flex-wrap items-center gap-3">
+          <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
             বাল্ক অ্যাকশন:
           </span>
           <div className="flex-1 flex flex-wrap items-center gap-2">
@@ -1550,7 +1550,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                 setBulkChapter('');
                 setBulkTopic('');
               }}
-              className="px-2.5 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 text-xs text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 outline-none focus:ring-2 focus:ring-indigo-500/30"
+              className="px-2.5 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 text-xs text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 outline-none focus:ring-2 focus:ring-emerald-500/30"
             >
               <option value="">বিষয় পরিবর্তন</option>
               {bulkAvailableSubjects.map((s) => (
@@ -1566,7 +1566,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                 setBulkTopic('');
               }}
               disabled={!bulkSubject}
-              className="px-2.5 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 text-xs text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 outline-none focus:ring-2 focus:ring-indigo-500/30 disabled:opacity-50"
+              className="px-2.5 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 text-xs text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-50"
             >
               <option value="">অধ্যায় পরিবর্তন</option>
               {bulkAvailableChapters.map((c) => (
@@ -1579,7 +1579,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
               value={bulkTopic}
               onChange={(e) => setBulkTopic(e.target.value)}
               disabled={!bulkChapter}
-              className="px-2.5 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 text-xs text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 outline-none focus:ring-2 focus:ring-indigo-500/30 disabled:opacity-50"
+              className="px-2.5 py-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 text-xs text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-800 outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-50"
             >
               <option value="">টপিক পরিবর্তন</option>
               {bulkAvailableTopics.map((t) => (
@@ -1591,7 +1591,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
             <button
               onClick={applyBulkAction}
               disabled={!bulkSubject && !bulkChapter && !bulkTopic}
-              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm ml-auto sm:ml-0 whitespace-nowrap"
+              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm ml-auto sm:ml-0 whitespace-nowrap"
             >
               এপ্লাই করুন
             </button>
@@ -1652,14 +1652,14 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                     <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => setPreviewQuestion(q)}
-                        className="p-1 px-2 text-[10px] md:text-xs font-bold text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 rounded-md transition-colors"
+                        className="p-1 px-2 text-[10px] md:text-xs font-bold text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20 rounded-md transition-colors"
                       >
                         <Eye size={14} className="inline mr-1" />
                         দেখো
                       </button>
                       <button
                         onClick={() => handleEditQuestion(i)}
-                        className="p-1 px-2 text-[10px] md:text-xs font-bold text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-900/20 rounded-md transition-colors"
+                        className="p-1 px-2 text-[10px] md:text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-md transition-colors"
                       >
                         <Edit size={14} className="inline mr-1" />
                         সম্পাদনা
@@ -1681,12 +1681,12 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                       {q.subject || '—'}
                     </span>
                     {q.chapter && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold truncate max-w-[180px]">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-bold truncate max-w-[180px]">
                         📖 {q.chapter}
                       </span>
                     )}
                     {q.topic && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 font-bold truncate max-w-[180px]">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-bold truncate max-w-[180px]">
                         🏷️ {q.topic}
                       </span>
                     )}
@@ -1702,7 +1702,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                             ? 'bg-green-50 text-green-600'
                             : q.difficulty === 'Hard'
                               ? 'bg-red-50 text-red-600'
-                              : 'bg-amber-50 text-amber-600'
+                              : 'bg-red-50 text-red-600'
                         }`}
                       >
                         {q.difficulty}
@@ -1805,7 +1805,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
             showCloseButton={false}
           >
             <div className="flex justify-between items-center px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 shrink-0">
-              <div className="flex items-center gap-2 text-rose-600 dark:text-rose-500">
+              <div className="flex items-center gap-2 text-red-600 dark:text-red-500">
                 <FileJson size={20} />
                 <h3 className="font-extrabold text-sm tracking-wide">
                   JSON ফিক্সার

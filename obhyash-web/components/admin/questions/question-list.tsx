@@ -92,7 +92,7 @@ export const QuestionList: React.FC<QuestionListProps> = ({
             onClick={() => onPreview(q)}
             className={`relative p-4 rounded-2xl border transition-all active:scale-95 ${
               selectedQuestions.has(q.id)
-                ? 'bg-rose-50 border-rose-200 dark:bg-rose-900/20 dark:border-rose-800'
+                ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800'
                 : 'bg-white border-neutral-200 dark:bg-neutral-900 dark:border-neutral-800'
             } shadow-sm cursor-pointer`}
           >
@@ -105,7 +105,7 @@ export const QuestionList: React.FC<QuestionListProps> = ({
                   e.stopPropagation();
                   onToggleSelection(q.id);
                 }}
-                className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-red-600 focus:ring-red-500 cursor-pointer"
               />
             </div>
 
@@ -136,13 +136,13 @@ export const QuestionList: React.FC<QuestionListProps> = ({
                       e.stopPropagation();
                       onEdit(q);
                     }}
-                    className="p-1.5 text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors"
+                    className="p-1.5 text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                   >
                     <Edit2 size={15} />
                   </button>
                   <button
                     onClick={(e) => handleDeleteClick(e, q.id)}
-                    className="p-1.5 text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors"
+                    className="p-1.5 text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                   >
                     <Trash2 size={15} />
                   </button>
@@ -173,7 +173,7 @@ export const QuestionList: React.FC<QuestionListProps> = ({
                         }
                       });
                     }}
-                    className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                    className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-red-600 focus:ring-red-500 cursor-pointer"
                   />
                 </th>
                 <th className="px-6 py-4">প্রশ্ন (Question)</th>
@@ -190,7 +190,7 @@ export const QuestionList: React.FC<QuestionListProps> = ({
                   key={q.id}
                   className={`group hover:bg-neutral-50 dark:hover:bg-neutral-950/50 transition-colors ${
                     selectedQuestions.has(q.id)
-                      ? 'bg-rose-50/50 dark:bg-rose-900/10'
+                      ? 'bg-red-50/50 dark:bg-red-900/10'
                       : ''
                   }`}
                 >
@@ -199,7 +199,7 @@ export const QuestionList: React.FC<QuestionListProps> = ({
                       type="checkbox"
                       checked={selectedQuestions.has(q.id)}
                       onChange={() => onToggleSelection(q.id)}
-                      className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-rose-600 focus:ring-rose-500 cursor-pointer"
+                      className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-red-600 focus:ring-red-500 cursor-pointer"
                     />
                   </td>
                   <td className="px-6 py-4 max-w-sm">
@@ -226,7 +226,7 @@ export const QuestionList: React.FC<QuestionListProps> = ({
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1 text-xs text-neutral-500">
                       <div className="flex items-center gap-1.5">
-                        <div className="w-5 h-5 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-700 dark:text-rose-300 font-bold">
+                        <div className="w-5 h-5 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-700 dark:text-red-300 font-bold">
                           {(q.author || 'S').charAt(0)}
                         </div>
                         {q.author || 'System'}
@@ -249,7 +249,7 @@ export const QuestionList: React.FC<QuestionListProps> = ({
                           e.stopPropagation();
                           onPreview(q);
                         }}
-                        className="p-1.5 text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-md transition-colors"
+                        className="p-1.5 text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
                         title="প্রিভিউ দেখো"
                       >
                         <Eye size={16} />
@@ -271,14 +271,14 @@ export const QuestionList: React.FC<QuestionListProps> = ({
                           e.stopPropagation();
                           onEdit(q);
                         }}
-                        className="p-1.5 text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-md transition-colors"
+                        className="p-1.5 text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
                         title="এডিট করো"
                       >
                         <Edit2 size={16} />
                       </button>
                       <button
                         onClick={(e) => handleDeleteClick(e, q.id)}
-                        className="p-1.5 text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-md transition-colors"
+                        className="p-1.5 text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
                         title="ডিলিট করো"
                       >
                         <Trash2 size={16} />
@@ -298,7 +298,7 @@ export const QuestionList: React.FC<QuestionListProps> = ({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-rose-600">
+            <DialogTitle className="flex items-center gap-2 text-red-600">
               <AlertTriangle className="h-5 w-5" />
               প্রশ্ন মুছে ফেলুন
             </DialogTitle>

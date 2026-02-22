@@ -249,7 +249,7 @@ export default function UserManagementPage() {
                 onClick={() => setViewStyle('card')}
                 className={`p-1.5 rounded-lg transition-colors ${
                   viewStyle === 'card'
-                    ? 'bg-white dark:bg-neutral-700 shadow-sm text-blue-600 dark:text-blue-400'
+                    ? 'bg-white dark:bg-neutral-700 shadow-sm text-emerald-600 dark:text-emerald-400'
                     : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
                 }`}
                 title="Card View"
@@ -260,7 +260,7 @@ export default function UserManagementPage() {
                 onClick={() => setViewStyle('table')}
                 className={`p-1.5 rounded-lg transition-colors ${
                   viewStyle === 'table'
-                    ? 'bg-white dark:bg-neutral-700 shadow-sm text-blue-600 dark:text-blue-400'
+                    ? 'bg-white dark:bg-neutral-700 shadow-sm text-emerald-600 dark:text-emerald-400'
                     : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
                 }`}
                 title="Table View"
@@ -309,15 +309,15 @@ export default function UserManagementPage() {
 
         {/* Bulk Actions Toolbar */}
         {selectedUsers.size > 0 && (
-          <div className="p-3 md:p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="p-3 md:p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div className="flex items-center justify-between md:justify-start gap-3">
-                <p className="text-xs md:text-sm font-bold text-rose-900 dark:text-rose-100">
+                <p className="text-xs md:text-sm font-bold text-red-900 dark:text-red-100">
                   {selectedUsers.size} user(s) selected
                 </p>
                 <button
                   onClick={() => setSelectedUsers(new Set())}
-                  className="text-xs text-rose-600 dark:text-rose-400 font-bold hover:underline"
+                  className="text-xs text-red-600 dark:text-red-400 font-bold hover:underline"
                 >
                   Clear
                 </button>
@@ -333,7 +333,7 @@ export default function UserManagementPage() {
                 </button>
                 <button
                   onClick={() => activeBulkAction('deactivate')}
-                  className="flex-1 md:flex-none px-3 py-2 bg-amber-600 hover:bg-amber-500 text-white text-[11px] md:text-sm font-bold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="flex-1 md:flex-none px-3 py-2 bg-red-600 hover:bg-red-500 text-white text-[11px] md:text-sm font-bold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
                   <Clock className="w-3.5 h-3.5" />
                   Deactivate
@@ -342,7 +342,7 @@ export default function UserManagementPage() {
                 <div className="relative group">
                   <button
                     onClick={() => setShowBulkActions(!showBulkActions)}
-                    className="flex-1 md:flex-none px-3 py-2 bg-rose-600 hover:bg-rose-500 text-white text-[11px] md:text-sm font-bold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                    className="flex-1 md:flex-none px-3 py-2 bg-red-600 hover:bg-red-500 text-white text-[11px] md:text-sm font-bold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                   >
                     <Crown className="w-3.5 h-3.5" />
                     Sub
@@ -375,14 +375,14 @@ export default function UserManagementPage() {
 
                 <button
                   onClick={() => activeBulkAction('delete')}
-                  className="flex-1 md:flex-none px-3 py-2 bg-rose-600 hover:bg-rose-500 text-white text-[11px] md:text-sm font-bold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="flex-1 md:flex-none px-3 py-2 bg-red-600 hover:bg-red-500 text-white text-[11px] md:text-sm font-bold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   Delete
                 </button>
                 <button
                   onClick={() => setShowBulkEmailModal(true)}
-                  className="flex-1 md:flex-none px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] md:text-sm font-bold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="flex-1 md:flex-none px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] md:text-sm font-bold rounded-lg transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                 >
                   <Mail className="w-3.5 h-3.5" />
                   Email

@@ -79,7 +79,7 @@ export default function NotificationManagementPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-6">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white tracking-tight flex items-center gap-2">
-            <Bell className="text-rose-600 shrink-0" size={24} />
+            <Bell className="text-red-600 shrink-0" size={24} />
             নোটিফিকেশন সেন্টার
           </h1>
         </div>
@@ -90,7 +90,7 @@ export default function NotificationManagementPage() {
         <div className="lg:col-span-8">
           <div className="bg-white dark:bg-neutral-900 rounded-2xl md:rounded-[2.5rem] border border-neutral-200 dark:border-neutral-800 shadow-sm p-4 md:p-8">
             <h2 className="text-lg font-bold text-neutral-900 dark:text-white mb-4 md:mb-6 flex items-center gap-2">
-              <Send size={20} className="text-rose-600" />
+              <Send size={20} className="text-red-600" />
               নতুন নোটিফিকেশন পাঠান
             </h2>
 
@@ -107,7 +107,7 @@ export default function NotificationManagementPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, title: e.target.value })
                     }
-                    className="w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none transition-all text-sm"
+                    className="w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
                     placeholder="নোটিফিকেশনের শিরোনাম দিন"
                   />
                 </div>
@@ -123,7 +123,7 @@ export default function NotificationManagementPage() {
                         type: e.target.value as NotificationType,
                       })
                     }
-                    className="w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none transition-all text-sm cursor-pointer"
+                    className="w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm cursor-pointer"
                   >
                     <option value="announcement">Announcement</option>
                     <option value="system">System</option>
@@ -145,7 +145,7 @@ export default function NotificationManagementPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, message: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:ring-2 focus:ring-rose-500 outline-none transition-all resize-none text-sm leading-relaxed"
+                  className="w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none transition-all resize-none text-sm leading-relaxed"
                   placeholder="বিস্তারিত বার্তাটি এখানে লিখুন..."
                 />
               </div>
@@ -165,7 +165,7 @@ export default function NotificationManagementPage() {
                         }
                         className={`flex-1 py-2 text-xs font-bold rounded-xl capitalize transition-all active:scale-95 ${
                           formData.priority === p
-                            ? 'bg-white dark:bg-neutral-800 text-rose-600 shadow-sm border border-neutral-200 dark:border-neutral-700'
+                            ? 'bg-white dark:bg-neutral-800 text-red-600 shadow-sm border border-neutral-200 dark:border-neutral-700'
                             : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
                         }`}
                       >
@@ -186,7 +186,7 @@ export default function NotificationManagementPage() {
                       }
                       className={`flex-1 py-2.5 px-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 ${
                         formData.target === 'all'
-                          ? 'border-rose-500 bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 shadow-sm'
+                          ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 shadow-sm'
                           : 'border-neutral-200 dark:border-neutral-800 text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-800'
                       }`}
                     >
@@ -200,7 +200,7 @@ export default function NotificationManagementPage() {
                       }
                       className={`flex-1 py-2.5 px-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 ${
                         formData.target === 'specific'
-                          ? 'border-rose-500 bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 shadow-sm'
+                          ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 shadow-sm'
                           : 'border-neutral-200 dark:border-neutral-800 text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-800'
                       }`}
                     >
@@ -220,7 +220,7 @@ export default function NotificationManagementPage() {
                             specificUserId: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white text-xs focus:ring-2 focus:ring-rose-500 outline-none transition-all"
+                        className="w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white text-xs focus:ring-2 focus:ring-red-500 outline-none transition-all"
                       />
                     </div>
                   )}
@@ -231,7 +231,7 @@ export default function NotificationManagementPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full sm:w-auto px-8 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-bold shadow-lg shadow-rose-500/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-bold shadow-lg shadow-red-500/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isLoading ? (
                     <>
@@ -251,14 +251,14 @@ export default function NotificationManagementPage() {
 
         {/* Instructions / Info Panel */}
         <div className="lg:col-span-4 space-y-4 md:space-y-6">
-          <div className="bg-rose-50 dark:bg-rose-900/10 rounded-2xl md:rounded-[2rem] p-5 md:p-6 border border-rose-100 dark:border-rose-900/30">
-            <h3 className="font-bold text-rose-800 dark:text-rose-300 mb-4 flex items-center gap-2">
+          <div className="bg-red-50 dark:bg-red-900/10 rounded-2xl md:rounded-[2rem] p-5 md:p-6 border border-red-100 dark:border-red-900/30">
+            <h3 className="font-bold text-red-800 dark:text-red-300 mb-4 flex items-center gap-2">
               <Info size={20} />
               টিপস
             </h3>
-            <ul className="space-y-4 text-xs sm:text-sm text-rose-700 dark:text-rose-400 font-medium">
+            <ul className="space-y-4 text-xs sm:text-sm text-red-700 dark:text-red-400 font-medium">
               <li className="flex gap-3">
-                <div className="shrink-0 w-5 h-5 rounded-full bg-rose-200 dark:bg-rose-800 flex items-center justify-center text-[10px] text-rose-700 dark:text-rose-300 font-bold">
+                <div className="shrink-0 w-5 h-5 rounded-full bg-red-200 dark:bg-red-800 flex items-center justify-center text-[10px] text-red-700 dark:text-red-300 font-bold">
                   1
                 </div>
                 <span>
@@ -267,7 +267,7 @@ export default function NotificationManagementPage() {
                 </span>
               </li>
               <li className="flex gap-3">
-                <div className="shrink-0 w-5 h-5 rounded-full bg-rose-200 dark:bg-rose-800 flex items-center justify-center text-[10px] text-rose-700 dark:text-rose-300 font-bold">
+                <div className="shrink-0 w-5 h-5 rounded-full bg-red-200 dark:bg-red-800 flex items-center justify-center text-[10px] text-red-700 dark:text-red-300 font-bold">
                   2
                 </div>
                 <span>
@@ -276,7 +276,7 @@ export default function NotificationManagementPage() {
                 </span>
               </li>
               <li className="flex gap-3">
-                <div className="shrink-0 w-5 h-5 rounded-full bg-rose-200 dark:bg-rose-800 flex items-center justify-center text-[10px] text-rose-700 dark:text-rose-300 font-bold">
+                <div className="shrink-0 w-5 h-5 rounded-full bg-red-200 dark:bg-red-800 flex items-center justify-center text-[10px] text-red-700 dark:text-red-300 font-bold">
                   3
                 </div>
                 <span>

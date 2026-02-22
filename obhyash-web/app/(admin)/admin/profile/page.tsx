@@ -59,7 +59,7 @@ export default function AdminProfilePage() {
       {/* 1. Profile Banner & Header Card */}
       <div className="relative rounded-[2.5rem] overflow-hidden bg-white dark:bg-neutral-900 shadow-xl border border-neutral-200 dark:border-neutral-800">
         {/* Banner Image */}
-        <div className="h-32 sm:h-48 bg-gradient-to-r from-rose-600 to-rose-400 relative">
+        <div className="h-32 sm:h-48 bg-gradient-to-r from-red-600 to-red-400 relative">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
           <div className="absolute top-4 right-4">
             <button className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white p-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2">
@@ -82,14 +82,14 @@ export default function AdminProfilePage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-900 dark:to-rose-800 flex items-center justify-center text-5xl font-black text-rose-600 dark:text-rose-400">
+                  <div className="w-full h-full bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900 dark:to-red-800 flex items-center justify-center text-5xl font-black text-red-600 dark:text-red-400">
                     {user?.name?.[0]?.toUpperCase() || 'A'}
                   </div>
                 )}
               </div>
               <button
                 onClick={() => setIsEditModalOpen(true)}
-                className="absolute -bottom-1 -right-1 bg-white dark:bg-neutral-800 text-rose-600 p-2.5 rounded-2xl shadow-xl hover:bg-rose-50 dark:hover:bg-rose-900/50 transition-all border border-neutral-100 dark:border-neutral-700 active:scale-90"
+                className="absolute -bottom-1 -right-1 bg-white dark:bg-neutral-800 text-red-600 p-2.5 rounded-2xl shadow-xl hover:bg-red-50 dark:hover:bg-red-900/50 transition-all border border-neutral-100 dark:border-neutral-700 active:scale-90"
               >
                 <Edit2 size={16} strokeWidth={3} />
               </button>
@@ -103,7 +103,7 @@ export default function AdminProfilePage() {
                     {user?.name || 'অ্যাডমিন ইউজার'}
                   </h1>
                   <div className="flex items-center justify-center sm:justify-start gap-2">
-                    <span className="px-3 py-1 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 text-[10px] font-black uppercase tracking-[0.2em] border border-rose-100 dark:border-rose-500/20">
+                    <span className="px-3 py-1 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-[10px] font-black uppercase tracking-[0.2em] border border-red-100 dark:border-red-500/20">
                       {user?.role === 'Admin'
                         ? 'সুপার অ্যাডমিন'
                         : 'অ্যাডমিনিস্ট্রেটর'}
@@ -120,7 +120,7 @@ export default function AdminProfilePage() {
                   </button>
                   <button
                     onClick={() => setIsEditModalOpen(true)}
-                    className="flex-1 sm:flex-none px-6 py-3.5 bg-rose-600 text-white rounded-2xl hover:bg-rose-700 shadow-xl shadow-rose-500/30 transition-all font-black text-xs uppercase tracking-widest active:scale-95"
+                    className="flex-1 sm:flex-none px-6 py-3.5 bg-red-600 text-white rounded-2xl hover:bg-red-700 shadow-xl shadow-red-500/30 transition-all font-black text-xs uppercase tracking-widest active:scale-95"
                   >
                     প্রোফাইল এডিট
                   </button>
@@ -136,15 +136,15 @@ export default function AdminProfilePage() {
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-white dark:bg-neutral-900 rounded-[2rem] p-6 sm:p-8 shadow-sm border border-neutral-200 dark:border-neutral-800">
             <h3 className="text-lg font-black text-neutral-900 dark:text-white mb-8 flex items-center gap-3">
-              <span className="p-2 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-xl">
+              <span className="p-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl">
                 <User size={20} />
               </span>
               আমার সম্পর্কে
             </h3>
 
             <div className="grid grid-cols-1 gap-4">
-              <div className="flex items-center gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 transition-all hover:border-blue-100 dark:hover:border-blue-900/30 group">
-                <div className="p-2.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl transition-transform group-hover:scale-110">
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 transition-all hover:border-emerald-100 dark:hover:border-emerald-900/30 group">
+                <div className="p-2.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl transition-transform group-hover:scale-110">
                   <Mail size={18} />
                 </div>
                 <div>
@@ -171,8 +171,8 @@ export default function AdminProfilePage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 transition-all hover:border-indigo-100 dark:hover:border-indigo-900/30 group">
-                <div className="p-2.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl transition-transform group-hover:scale-110">
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 transition-all hover:border-emerald-100 dark:hover:border-emerald-900/30 group">
+                <div className="p-2.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl transition-transform group-hover:scale-110">
                   <MapPin size={18} />
                 </div>
                 <div>
@@ -185,8 +185,8 @@ export default function AdminProfilePage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 transition-all hover:border-purple-100 dark:hover:border-purple-900/30 group">
-                <div className="p-2.5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-xl transition-transform group-hover:scale-110">
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 transition-all hover:border-emerald-100 dark:hover:border-emerald-900/30 group">
+                <div className="p-2.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl transition-transform group-hover:scale-110">
                   <Calendar size={18} />
                 </div>
                 <div>
@@ -222,7 +222,7 @@ export default function AdminProfilePage() {
           {/* Quick Stats Row */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             <div className="bg-white dark:bg-neutral-900 p-6 rounded-[2rem] shadow-sm border border-neutral-100 dark:border-neutral-800 transition-all hover:shadow-md group">
-              <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center transition-transform group-hover:scale-110">
+              <div className="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center transition-transform group-hover:scale-110">
                 <Activity size={24} />
               </div>
               <div className="mt-6">
@@ -235,7 +235,7 @@ export default function AdminProfilePage() {
               </div>
             </div>
             <div className="bg-white dark:bg-neutral-900 p-6 rounded-[2rem] shadow-sm border border-neutral-100 dark:border-neutral-800 transition-all hover:shadow-md group">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center transition-transform group-hover:scale-110">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-transform group-hover:scale-110">
                 <BookOpen size={24} />
               </div>
               <div className="mt-6">
@@ -266,14 +266,14 @@ export default function AdminProfilePage() {
           <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] shadow-sm border border-neutral-200 dark:border-neutral-800 flex-1 overflow-hidden">
             <div className="p-6 sm:p-8 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center transition-all bg-neutral-50/50 dark:bg-neutral-800/20">
               <div className="flex items-center gap-3">
-                <span className="p-2 bg-rose-600 text-white rounded-xl shadow-lg shadow-rose-500/20">
+                <span className="p-2 bg-red-600 text-white rounded-xl shadow-lg shadow-red-500/20">
                   <Clock size={20} />
                 </span>
                 <h3 className="text-lg font-black text-neutral-900 dark:text-white tracking-tight">
                   সাম্প্রতিক অ্যাক্টিভিটি
                 </h3>
               </div>
-              <button className="text-[10px] font-black text-rose-600 uppercase tracking-[0.2em] hover:text-rose-700">
+              <button className="text-[10px] font-black text-red-600 uppercase tracking-[0.2em] hover:text-red-700">
                 সব দেখুন
               </button>
             </div>
@@ -304,8 +304,8 @@ export default function AdminProfilePage() {
                     <span
                       className={`absolute -left-[40px] top-0 w-5 h-5 rounded-full border-4 border-white dark:border-neutral-900 shadow-xl transition-transform group-hover:scale-125
                               ${item.type === 'payment' ? 'bg-emerald-500' : ''}
-                              ${item.type === 'system' ? 'bg-indigo-500' : ''}
-                              ${item.type === 'report' ? 'bg-amber-500' : ''}
+                              ${item.type === 'system' ? 'bg-emerald-500' : ''}
+                              ${item.type === 'report' ? 'bg-red-500' : ''}
                            `}
                     ></span>
                     <div className="space-y-1.5 transition-all group-hover:translate-x-2">

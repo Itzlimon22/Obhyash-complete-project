@@ -59,7 +59,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
         <div className="md:col-span-2 space-y-6">
           <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 border border-neutral-200 dark:border-neutral-800 shadow-xl shadow-neutral-200/50 dark:shadow-none">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center">
                 <FileQuestion size={24} />
               </div>
               <div>
@@ -75,12 +75,12 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
             <div className="space-y-6">
               <div className="space-y-4">
                 <InstructionItem
-                  icon={<Clock className="text-blue-500" />}
+                  icon={<Clock className="text-emerald-500" />}
                   title="সময় ব্যবস্থাপনা (Time Management)"
                   desc={`এই পরীক্ষার জন্য মোট সময় ${config.durationMinutes} মিনিট। সময় শেষ হলে পরীক্ষা স্বয়ংক্রিয়ভাবে জমা হয়ে যাবে।`}
                 />
                 <InstructionItem
-                  icon={<AlertTriangle className="text-amber-500" />}
+                  icon={<AlertTriangle className="text-red-500" />}
                   title="নেগেটিভ মার্কিং (Negative Marking)"
                   desc={
                     config.negativeMarking > 0
@@ -136,7 +136,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
             <button
               onClick={handleStart}
               disabled={isLoading}
-              className="w-full group relative overflow-hidden bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-rose-500/30 hover:shadow-rose-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+              className="w-full group relative overflow-hidden bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
             >
               <div className="relative z-10 flex items-center justify-center gap-2">
                 {isLoading ? (
@@ -199,7 +199,7 @@ const SummaryRow = ({
       className={cn(
         'font-bold text-sm',
         isNegative
-          ? 'text-rose-500'
+          ? 'text-red-500'
           : 'text-neutral-900 dark:text-white truncate max-w-[150px]',
       )}
     >

@@ -171,7 +171,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
           <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
             মোট সময়
           </p>
-          <p className="text-xl md:text-2xl font-extrabold text-amber-600 dark:text-amber-400">
+          <p className="text-xl md:text-2xl font-extrabold text-red-600 dark:text-red-400">
             {formatTime(analytics.totalTime)}
           </p>
         </div>

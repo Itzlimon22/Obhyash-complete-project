@@ -74,7 +74,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-neutral-100 dark:bg-black px-4 font-sans">
       <div className="w-full max-w-md bg-white dark:bg-neutral-950 rounded-[2rem] shadow-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 relative z-10 animate-in fade-in zoom-in duration-300">
         {/* Header Decor */}
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 via-red-500 to-rose-500" />
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 via-red-500 to-red-500" />
 
         {/* Background Glow */}
         <div className="absolute -top-20 -right-20 w-40 h-40 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />

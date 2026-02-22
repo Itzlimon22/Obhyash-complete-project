@@ -168,8 +168,8 @@ export default function DashboardPage() {
           title: 'Total Users',
           value: dashStats.totalUsers,
           icon: Users,
-          colorClass: 'text-rose-600 dark:text-rose-400',
-          bgClass: 'bg-rose-50 dark:bg-rose-950/30',
+          colorClass: 'text-red-600 dark:text-red-400',
+          bgClass: 'bg-red-50 dark:bg-red-950/30',
           trend: { value: userGrowth, isPositive: true },
         },
         {
@@ -185,8 +185,8 @@ export default function DashboardPage() {
           title: 'Total Questions',
           value: dashStats.totalQuestions,
           icon: FileQuestion,
-          colorClass: 'text-rose-600 dark:text-rose-400',
-          bgClass: 'bg-rose-50 dark:bg-rose-950/30',
+          colorClass: 'text-red-600 dark:text-red-400',
+          bgClass: 'bg-red-50 dark:bg-red-950/30',
         },
         {
           id: 'exams',
@@ -202,8 +202,8 @@ export default function DashboardPage() {
           title: 'Pending Reports',
           value: dashStats.pendingReports,
           icon: AlertCircle,
-          colorClass: 'text-amber-600 dark:text-amber-400',
-          bgClass: 'bg-amber-50 dark:bg-amber-950/30',
+          colorClass: 'text-red-600 dark:text-red-400',
+          bgClass: 'bg-red-50 dark:bg-red-950/30',
         },
       ];
 
@@ -317,7 +317,7 @@ export default function DashboardPage() {
               <RefreshCw
                 size={14}
                 className={
-                  isRefreshing ? 'animate-spin text-rose-500' : 'text-rose-500'
+                  isRefreshing ? 'animate-spin text-red-500' : 'text-red-500'
                 }
               />
               <span>{isRefreshing ? '...' : 'Refresh'}</span>
@@ -328,13 +328,13 @@ export default function DashboardPage() {
             >
               <Download
                 size={14}
-                className="text-indigo-500 group-hover:-translate-y-0.5 transition-transform"
+                className="text-emerald-500 group-hover:-translate-y-0.5 transition-transform"
               />
               <span>Export</span>
             </button>
             <button
               onClick={() => handleNavigate('question-management')}
-              className="group shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-[11px] md:text-xs font-bold rounded-xl shadow-lg shadow-rose-500/20 transition-all active:scale-95"
+              className="group shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-[11px] md:text-xs font-bold rounded-xl shadow-lg shadow-red-500/20 transition-all active:scale-95"
             >
               <Upload
                 size={14}
@@ -366,8 +366,8 @@ export default function DashboardPage() {
           <div className="lg:col-span-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-bold text-neutral-900 dark:text-white text-lg flex items-center gap-2">
-                <div className="p-2 bg-rose-50 dark:bg-rose-950/30 rounded-lg">
-                  <Clock className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                <div className="p-2 bg-red-50 dark:bg-red-950/30 rounded-lg">
+                  <Clock className="w-5 h-5 text-red-600 dark:text-red-400" />
                 </div>
                 Recent Activity
               </h3>
@@ -402,16 +402,16 @@ export default function DashboardPage() {
                     <div
                       className={`p-3 rounded-2xl shrink-0 ${
                         activity.type === 'user'
-                          ? 'bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                          ? 'bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400'
                           : activity.type === 'exam'
                             ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                            : 'bg-amber-100 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                            : 'bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400'
                       }`}
                     >
                       {getActivityIcon(activity.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-neutral-900 dark:text-neutral-100 truncate group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                      <p className="text-sm font-bold text-neutral-900 dark:text-neutral-100 truncate group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                         {activity.message}
                       </p>
                       <p className="text-[11px] text-neutral-500 dark:text-neutral-500 mt-0.5">
@@ -436,17 +436,17 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 gap-2 md:gap-3">
               <button
                 onClick={() => handleNavigate('question-management')}
-                className="w-full text-left p-3.5 md:p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-rose-50 dark:hover:bg-rose-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-rose-300 dark:hover:border-rose-500/50 transition-all flex items-center justify-between group shadow-sm active:scale-95"
+                className="w-full text-left p-3.5 md:p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-red-50 dark:hover:bg-red-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-red-300 dark:hover:border-red-500/50 transition-all flex items-center justify-between group shadow-sm active:scale-95"
               >
                 <div className="flex-1 min-w-0 mr-3">
-                  <span className="block text-[13px] md:text-sm font-bold text-neutral-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                  <span className="block text-[13px] md:text-sm font-bold text-neutral-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                     Questions
                   </span>
                   <span className="block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5">
                     Add/Edit bank
                   </span>
                 </div>
-                <div className="p-2 md:p-2.5 bg-rose-50 dark:bg-rose-500/10 rounded-xl text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform w-fit shrink-0">
+                <div className="p-2 md:p-2.5 bg-red-50 dark:bg-red-500/10 rounded-xl text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform w-fit shrink-0">
                   <FileQuestion
                     size={16}
                     className="md:w-[18px] md:h-[18px]"
@@ -457,17 +457,17 @@ export default function DashboardPage() {
 
               <button
                 onClick={() => handleNavigate('user-management')}
-                className="w-full text-left p-3.5 md:p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-rose-50 dark:hover:bg-rose-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-rose-300 dark:hover:border-rose-500/50 transition-all flex items-center justify-between group shadow-sm active:scale-95"
+                className="w-full text-left p-3.5 md:p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-red-50 dark:hover:bg-red-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-red-300 dark:hover:border-red-500/50 transition-all flex items-center justify-between group shadow-sm active:scale-95"
               >
                 <div className="flex-1 min-w-0 mr-3">
-                  <span className="block text-[13px] md:text-sm font-bold text-neutral-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                  <span className="block text-[13px] md:text-sm font-bold text-neutral-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                     Users
                   </span>
                   <span className="block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5">
                     Manage accounts
                   </span>
                 </div>
-                <div className="p-2 md:p-2.5 bg-rose-50 dark:bg-rose-500/10 rounded-xl text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform w-fit shrink-0">
+                <div className="p-2 md:p-2.5 bg-red-50 dark:bg-red-500/10 rounded-xl text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform w-fit shrink-0">
                   <Users
                     size={16}
                     className="md:w-[18px] md:h-[18px]"
@@ -478,17 +478,17 @@ export default function DashboardPage() {
 
               <button
                 onClick={() => handleNavigate('reports')}
-                className="w-full text-left p-3.5 md:p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-amber-50 dark:hover:bg-amber-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-amber-300 dark:hover:border-amber-500/50 transition-all flex items-center justify-between group shadow-sm active:scale-95"
+                className="w-full text-left p-3.5 md:p-4 rounded-2xl bg-white dark:bg-neutral-900 hover:bg-red-50 dark:hover:bg-red-500/5 border border-neutral-200 dark:border-neutral-800 hover:border-red-300 dark:hover:border-red-500/50 transition-all flex items-center justify-between group shadow-sm active:scale-95"
               >
                 <div className="flex-1 min-w-0 mr-3">
-                  <span className="block text-[13px] md:text-sm font-bold text-neutral-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  <span className="block text-[13px] md:text-sm font-bold text-neutral-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                     Reports
                   </span>
                   <span className="block text-[10px] text-neutral-500 dark:text-neutral-500 mt-0.5 truncate">
                     {dashboardStats?.pendingReports || 0} pending
                   </span>
                 </div>
-                <div className="p-2 md:p-2.5 bg-amber-50 dark:bg-amber-500/10 rounded-xl text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform w-fit shrink-0">
+                <div className="p-2 md:p-2.5 bg-red-50 dark:bg-red-500/10 rounded-xl text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform w-fit shrink-0">
                   <Flag
                     size={16}
                     className="md:w-[18px] md:h-[18px]"

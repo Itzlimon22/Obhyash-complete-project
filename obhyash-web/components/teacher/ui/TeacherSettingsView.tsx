@@ -184,7 +184,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
             />
             <label
               htmlFor="avatar-upload"
-              className="flex items-center gap-2 text-sm font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 cursor-pointer transition-colors"
+              className="flex items-center gap-2 text-sm font-bold text-red-600 dark:text-red-400 hover:text-red-700 cursor-pointer transition-colors"
             >
               {uploading ? 'Uploading...' : 'ছবি পরিবর্তন করো'}
               <Camera className="w-4 h-4" />
@@ -224,7 +224,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
                   onSave?.({ avatarUrl: undefined });
                   toast.success('ছবি সরিয়ে নেওয়া হয়েছে।');
                 }}
-                className="mt-4 flex items-center gap-1.5 text-xs font-bold text-rose-500 hover:text-rose-600 transition-colors"
+                className="mt-4 flex items-center gap-1.5 text-xs font-bold text-red-500 hover:text-red-600 transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 ছবি সরিয়ে ফেলুন

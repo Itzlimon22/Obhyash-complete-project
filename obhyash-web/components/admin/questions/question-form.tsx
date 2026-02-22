@@ -284,7 +284,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                   <label className="text-sm font-bold text-neutral-700 block">
                     প্রশ্ন
                   </label>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-blue-50 text-blue-600 font-semibold border border-blue-100">
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 font-semibold border border-emerald-100">
                     LaTeX Supported ($...$)
                   </span>
                 </div>

@@ -54,7 +54,7 @@ export const StatCard: React.FC<{ data: StatData }> = ({ data }) => {
             className={`flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full ${
               data.trend.isPositive
                 ? 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-500/10'
-                : 'text-rose-600 bg-rose-50 dark:text-rose-400 dark:bg-rose-500/10'
+                : 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-500/10'
             }`}
           >
             {data.trend.isPositive ? (
@@ -200,16 +200,16 @@ export const DatabaseToolsSection: React.FC = () => {
           ))}
         </div>
 
-        <div className="mt-6 p-4 rounded-xl bg-amber-50/50 dark:bg-yellow-500/5 border border-amber-100 dark:border-yellow-500/10">
+        <div className="mt-6 p-4 rounded-xl bg-red-50/50 dark:bg-red-500/5 border border-red-100 dark:border-red-500/10">
           <div className="flex gap-4 items-start">
-            <div className="text-amber-600 dark:text-yellow-600 mt-0.5 p-1.5 bg-amber-100 dark:bg-yellow-500/10 rounded-md">
+            <div className="text-red-600 dark:text-red-600 mt-0.5 p-1.5 bg-red-100 dark:bg-red-500/10 rounded-md">
               <Database size={16} />
             </div>
             <div>
-              <h6 className="text-sm font-semibold text-amber-900 dark:text-yellow-500">
+              <h6 className="text-sm font-semibold text-red-900 dark:text-red-500">
                 Scheduled Maintenance
               </h6>
-              <p className="text-sm text-amber-700 dark:text-gray-400 mt-1 leading-relaxed">
+              <p className="text-sm text-red-700 dark:text-gray-400 mt-1 leading-relaxed">
                 Database maintenance is scheduled for{' '}
                 <span className="font-semibold">Sunday at 02:00 AM UTC</span>.
                 Write operations may be paused for ~15 mins.

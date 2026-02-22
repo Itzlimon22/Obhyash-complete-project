@@ -26,7 +26,7 @@ export default function GlobalError({
     <html lang="en" className={`${anekBangla.variable} ${inter.variable}`}>
       <body className="antialiased bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 font-sans flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center justify-center p-6 text-center w-full max-w-lg">
-          <div className="w-24 h-24 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-full flex items-center justify-center mb-6 shadow-sm border border-rose-100 dark:border-rose-900/50">
+          <div className="w-24 h-24 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-full flex items-center justify-center mb-6 shadow-sm border border-red-100 dark:border-red-900/50">
             <AlertOctagon size={48} />
           </div>
           <h2 className="text-2xl font-black mb-3">ক্রিটিক্যাল সিস্টেম এরর!</h2>
@@ -36,7 +36,7 @@ export default function GlobalError({
           </p>
           <button
             onClick={() => reset()}
-            className="w-full sm:w-auto px-8 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 mx-auto"
+            className="w-full sm:w-auto px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 mx-auto"
           >
             <RefreshCw size={18} />
             পেজ রিলোড করুন

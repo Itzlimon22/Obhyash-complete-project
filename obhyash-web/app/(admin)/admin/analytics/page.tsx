@@ -250,7 +250,7 @@ export default function AnalyticsPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-0.5">
             <h1 className="text-xl md:text-3xl font-black text-neutral-900 dark:text-white flex items-center gap-2.5 tracking-tight">
-              <Sparkles className="text-violet-600" size={24} />
+              <Sparkles className="text-emerald-600" size={24} />
               Analytics
             </h1>
             <p className="text-neutral-500 dark:text-neutral-400 text-[11px] md:text-sm font-medium">
@@ -315,27 +315,27 @@ export default function AnalyticsPage() {
               label: 'Avg Score',
               value: `${examStats.averageScore.toFixed(1)}%`,
               icon: Target,
-              color: 'text-violet-600',
-              bgColor: 'bg-violet-50/50 dark:bg-violet-500/5',
-              borderColor: 'border-violet-100 dark:border-violet-500/10',
+              color: 'text-emerald-600',
+              bgColor: 'bg-emerald-50/50 dark:bg-emerald-500/5',
+              borderColor: 'border-emerald-100 dark:border-emerald-500/10',
               change: '+5.2%',
             },
             {
               label: 'Active',
               value: activeUsers,
               icon: Users,
-              color: 'text-blue-600',
-              bgColor: 'bg-blue-50/50 dark:bg-blue-500/5',
-              borderColor: 'border-blue-100 dark:border-blue-500/10',
+              color: 'text-emerald-600',
+              bgColor: 'bg-emerald-50/50 dark:bg-emerald-500/5',
+              borderColor: 'border-emerald-100 dark:border-emerald-500/10',
               change: totalUsers,
             },
             {
               label: 'Bank',
               value: examStats.totalQuestions,
               icon: FileQuestion,
-              color: 'text-rose-600',
-              bgColor: 'bg-rose-50/50 dark:bg-rose-500/5',
-              borderColor: 'border-rose-100 dark:border-rose-500/10',
+              color: 'text-red-600',
+              bgColor: 'bg-red-50/50 dark:bg-red-500/5',
+              borderColor: 'border-red-100 dark:border-red-500/10',
               change: 'Qns',
             },
           ].map((stat, i) => (
@@ -372,12 +372,12 @@ export default function AnalyticsPage() {
             <div className="flex justify-between items-center mb-5">
               <div>
                 <h3 className="text-xs md:text-sm font-black text-neutral-900 dark:text-white uppercase tracking-widest flex items-center gap-2 opacity-80">
-                  <TrendingUp className="text-rose-500" size={16} /> User
+                  <TrendingUp className="text-red-500" size={16} /> User
                   Acquisition
                 </h3>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
                 <span className="text-[10px] font-black text-neutral-400 uppercase tracking-tight">
                   Total Users
                 </span>
@@ -481,7 +481,7 @@ export default function AnalyticsPage() {
           {/* Top Performers Section */}
           <div className="bg-neutral-50 dark:bg-neutral-900 p-4 md:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
             <h3 className="text-xs md:text-sm font-black text-neutral-900 dark:text-white mb-5 flex items-center gap-2 uppercase tracking-widest opacity-80">
-              <Award className="text-amber-500" size={16} /> Leaderboard
+              <Award className="text-red-500" size={16} /> Leaderboard
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2.5">
@@ -508,11 +508,11 @@ export default function AnalyticsPage() {
                     <div
                       className={`w-9 h-9 rounded-lg flex items-center justify-center font-black text-xs shadow-sm ${
                         index === 0
-                          ? 'bg-amber-100 text-amber-600'
+                          ? 'bg-red-100 text-red-600'
                           : index === 1
                             ? 'bg-neutral-100 text-neutral-500'
                             : index === 2
-                              ? 'bg-orange-100 text-orange-600'
+                              ? 'bg-red-100 text-red-600'
                               : 'bg-neutral-50 text-neutral-400'
                       }`}
                     >
@@ -523,7 +523,7 @@ export default function AnalyticsPage() {
                         {performer.name}
                       </p>
                       <div className="flex items-center gap-1.5 text-[9px] font-bold text-neutral-400 uppercase tracking-tighter">
-                        <CheckCircle size={10} className="text-rose-500" />
+                        <CheckCircle size={10} className="text-red-500" />
                         {performer.examsCompleted} EXAMS
                       </div>
                     </div>
@@ -537,7 +537,7 @@ export default function AnalyticsPage() {
         {/* Subject Performance */}
         <div className="bg-neutral-50 dark:bg-neutral-900 p-4 md:p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
           <h3 className="text-xs md:text-sm font-black text-neutral-900 dark:text-white mb-5 flex items-center gap-2 uppercase tracking-widest opacity-80">
-            <BookOpen className="text-rose-500" size={16} /> Subject Metrics
+            <BookOpen className="text-red-500" size={16} /> Subject Metrics
           </h3>
 
           {isLoading ? (
@@ -561,11 +561,11 @@ export default function AnalyticsPage() {
               {subjectPerformance.map((subject, index) => (
                 <div
                   key={index}
-                  className="group p-3.5 bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800 shadow-sm hover:border-rose-200 dark:hover:border-rose-900 transition-all active:scale-[0.98]"
+                  className="group p-3.5 bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800 shadow-sm hover:border-red-200 dark:hover:border-red-900 transition-all active:scale-[0.98]"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 rounded-lg bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center text-rose-600 font-black text-sm shadow-inner group-hover:scale-110 transition-transform">
+                      <div className="w-10 h-10 rounded-lg bg-red-50 dark:bg-red-500/10 flex items-center justify-center text-red-600 font-black text-sm shadow-inner group-hover:scale-110 transition-transform">
                         {subject.subject.charAt(0)}
                       </div>
                       <div>
@@ -578,7 +578,7 @@ export default function AnalyticsPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-black text-rose-600 dark:text-rose-400 tracking-tighter">
+                      <p className="text-sm font-black text-red-600 dark:text-red-400 tracking-tighter">
                         {subject.averageScore.toFixed(1)}%
                       </p>
                     </div>
@@ -587,7 +587,7 @@ export default function AnalyticsPage() {
                   <div className="space-y-1.5">
                     <div className="h-2 bg-neutral-100 dark:bg-neutral-900 rounded-full overflow-hidden border border-neutral-50 dark:border-neutral-800">
                       <div
-                        className="h-full bg-rose-500 rounded-full transition-all duration-700"
+                        className="h-full bg-red-500 rounded-full transition-all duration-700"
                         style={{
                           width: `${Math.min(subject.averageScore, 100)}%`,
                         }}

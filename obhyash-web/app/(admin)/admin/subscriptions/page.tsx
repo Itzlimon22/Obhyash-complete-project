@@ -520,10 +520,10 @@ export default function SubscriptionsPage() {
       case 'Active':
         return 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10';
       case 'Pending':
-        return 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10';
+        return 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10';
       case 'Rejected':
       case 'Expired':
-        return 'text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10';
+        return 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10';
       default:
         return 'text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800';
     }
@@ -559,7 +559,7 @@ export default function SubscriptionsPage() {
     return (
       <div className="min-h-screen bg-white dark:bg-neutral-950 flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="w-12 h-12 animate-spin text-rose-600 dark:text-rose-400 mx-auto mb-4" />
+          <RefreshCw className="w-12 h-12 animate-spin text-red-600 dark:text-red-400 mx-auto mb-4" />
           <p className="text-neutral-600 dark:text-neutral-400 font-medium">
             Loading subscription data...
           </p>
@@ -599,7 +599,7 @@ export default function SubscriptionsPage() {
                   onClick={() => setViewStyle('card')}
                   className={`p-1.5 rounded-lg transition-colors ${
                     viewStyle === 'card'
-                      ? 'bg-white dark:bg-neutral-700 shadow-sm text-rose-600 dark:text-rose-400'
+                      ? 'bg-white dark:bg-neutral-700 shadow-sm text-red-600 dark:text-red-400'
                       : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
                   }`}
                   title="Card View"
@@ -610,7 +610,7 @@ export default function SubscriptionsPage() {
                   onClick={() => setViewStyle('table')}
                   className={`p-1.5 rounded-lg transition-colors ${
                     viewStyle === 'table'
-                      ? 'bg-white dark:bg-neutral-700 shadow-sm text-rose-600 dark:text-rose-400'
+                      ? 'bg-white dark:bg-neutral-700 shadow-sm text-red-600 dark:text-red-400'
                       : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
                   }`}
                   title="Table View"
@@ -638,7 +638,7 @@ export default function SubscriptionsPage() {
                   });
                   setShowPlanModal(true);
                 }}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg shadow-rose-500/20 transition-all active:scale-95"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg shadow-red-500/20 transition-all active:scale-95"
               >
                 <Plus size={16} />
                 <span>নতুন প্লান</span>
@@ -654,31 +654,31 @@ export default function SubscriptionsPage() {
               label: 'মোট আয়',
               value: `৳${stats.totalRevenue.toLocaleString()}`,
               icon: DollarSign,
-              gradient: 'from-rose-500 to-red-500',
-              bg: 'bg-rose-50 dark:bg-rose-500/10',
-              textColor: 'text-rose-600 dark:text-rose-400',
+              gradient: 'from-red-500 to-red-500',
+              bg: 'bg-red-50 dark:bg-red-500/10',
+              textColor: 'text-red-600 dark:text-red-400',
             },
             {
               label: 'পেন্ডিং রিকোয়েস্ট',
               value: stats.pendingRequests,
               icon: Clock,
-              gradient: 'from-amber-500 to-orange-500',
-              bg: 'bg-amber-50 dark:bg-amber-500/10',
-              textColor: 'text-amber-600 dark:text-amber-400',
+              gradient: 'from-red-500 to-red-500',
+              bg: 'bg-red-50 dark:bg-red-500/10',
+              textColor: 'text-red-600 dark:text-red-400',
             },
             {
               label: 'এক্টিভ ইউজার',
               value: stats.activeSubscriptions,
               icon: Users,
-              gradient: 'from-rose-500 to-red-500',
-              bg: 'bg-rose-50 dark:bg-rose-500/10',
-              textColor: 'text-rose-600 dark:text-rose-400',
+              gradient: 'from-red-500 to-red-500',
+              bg: 'bg-red-50 dark:bg-red-500/10',
+              textColor: 'text-red-600 dark:text-red-400',
             },
             {
               label: 'অ্যাপ্রুভাল রেট',
               value: `${stats.approvalRate}%`,
               icon: TrendingUp,
-              gradient: 'from-emerald-500 to-teal-500',
+              gradient: 'from-emerald-500 to-emerald-500',
               bg: 'bg-emerald-50 dark:bg-emerald-500/10',
               textColor: 'text-emerald-600 dark:text-emerald-400',
             },
@@ -718,7 +718,7 @@ export default function SubscriptionsPage() {
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
               className={`flex items-center gap-2 px-4 sm:px-6 py-3 text-[13px] sm:text-sm font-bold border-b-2 transition-colors shrink-0 whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'border-rose-600 text-rose-600 dark:text-rose-400'
+                  ? 'border-red-600 text-red-600 dark:text-red-400'
                   : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'
               }`}
             >
@@ -744,7 +744,7 @@ export default function SubscriptionsPage() {
                       setSearchQuery(e.target.value);
                       setReqPage(1);
                     }}
-                    className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-rose-500 transition-all text-sm"
+                    className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm"
                   />
                 </div>
 
@@ -759,7 +759,7 @@ export default function SubscriptionsPage() {
                         }}
                         className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
                           statusFilter === status
-                            ? 'bg-rose-600 text-white shadow-md'
+                            ? 'bg-red-600 text-white shadow-md'
                             : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
                         }`}
                       >
@@ -783,7 +783,7 @@ export default function SubscriptionsPage() {
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-600 font-bold text-sm">
+                        <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 font-bold text-sm">
                           {request.user?.name?.charAt(0) || '?'}
                         </div>
                         <div>
@@ -817,7 +817,7 @@ export default function SubscriptionsPage() {
                         <p className="text-[10px] text-neutral-400 font-bold uppercase">
                           টাকা
                         </p>
-                        <p className="text-[13px] font-bold text-rose-600 dark:text-rose-400">
+                        <p className="text-[13px] font-bold text-red-600 dark:text-red-400">
                           ৳{request.amount.toLocaleString()}
                         </p>
                       </div>
@@ -843,7 +843,7 @@ export default function SubscriptionsPage() {
                               setSelectedProof(request.payment_proof_url);
                               setShowProofModal(true);
                             }}
-                            className="p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg transition-colors border border-blue-100 dark:border-blue-900/30"
+                            className="p-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-lg transition-colors border border-emerald-100 dark:border-emerald-900/30"
                           >
                             <Eye size={16} />
                           </button>
@@ -866,7 +866,7 @@ export default function SubscriptionsPage() {
                                 setReviewAction('reject');
                                 setShowReviewModal(true);
                               }}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-rose-500/20"
+                              className="flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-red-500/20"
                             >
                               <X size={14} /> Reject
                             </button>
@@ -1019,10 +1019,10 @@ export default function SubscriptionsPage() {
                                         setReviewAction('reject');
                                         setShowReviewModal(true);
                                       }}
-                                      className="p-2 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors"
+                                      className="p-2 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
                                       title="Reject"
                                     >
-                                      <X className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                                      <X className="w-4 h-4 text-red-600 dark:text-red-400" />
                                     </button>
                                   </>
                                 )}
@@ -1062,7 +1062,7 @@ export default function SubscriptionsPage() {
                     >
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 font-bold text-sm">
+                          <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 font-bold text-sm">
                             <Crown size={18} />
                           </div>
                           <div>
@@ -1096,7 +1096,7 @@ export default function SubscriptionsPage() {
                           <span className="text-neutral-500">
                             Exp: {new Date(sub.expires_at).toLocaleDateString()}
                           </span>
-                          <span className="text-rose-600 font-bold">
+                          <span className="text-red-600 font-bold">
                             ৳{sub.plan?.price || 0}
                           </span>
                         </div>
@@ -1108,7 +1108,7 @@ export default function SubscriptionsPage() {
                             setExtendingSubscription(sub);
                             setShowExtendModal(true);
                           }}
-                          className="w-full py-2 bg-rose-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-rose-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                          className="w-full py-2 bg-red-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-red-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
                         >
                           <RefreshCw size={14} /> মেয়াদ বাড়ান
                         </button>
@@ -1174,7 +1174,7 @@ export default function SubscriptionsPage() {
                             </td>
                             <td className="px-6 py-4">
                               <p className="text-sm font-medium text-neutral-900 dark:text-white flex items-center gap-2">
-                                <Crown className="w-4 h-4 text-amber-500" />
+                                <Crown className="w-4 h-4 text-red-500" />
                                 {sub.plan?.display_name || 'Unknown Plan'}
                               </p>
                             </td>
@@ -1208,7 +1208,7 @@ export default function SubscriptionsPage() {
                                   setExtendingSubscription(sub);
                                   setShowExtendModal(true);
                                 }}
-                                className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                                className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-medium rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
                               >
                                 Extend
                               </button>
@@ -1333,7 +1333,7 @@ export default function SubscriptionsPage() {
                   </button>
                   <button
                     onClick={() => handleDeletePlan(plan.id)}
-                    className="py-3 px-4 bg-rose-50 dark:bg-rose-900/10 hover:bg-rose-100 dark:hover:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-xl transition-all active:scale-95 flex items-center justify-center"
+                    className="py-3 px-4 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl transition-all active:scale-95 flex items-center justify-center"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -1349,7 +1349,7 @@ export default function SubscriptionsPage() {
             <div className="bg-white dark:bg-neutral-900 rounded-[2rem] shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-2xl w-full overflow-hidden">
               <div className="p-4 sm:p-6 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between bg-white dark:bg-neutral-900">
                 <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                  <ImageIcon size={20} className="text-rose-600" />
+                  <ImageIcon size={20} className="text-red-600" />
                   পেমেন্ট প্রুফ (Proof)
                 </h3>
                 <button
@@ -1390,8 +1390,8 @@ export default function SubscriptionsPage() {
               <div
                 className={`p-6 ${
                   reviewAction === 'approve'
-                    ? 'bg-gradient-to-br from-emerald-600 to-teal-700'
-                    : 'bg-gradient-to-br from-rose-600 to-red-700'
+                    ? 'bg-gradient-to-br from-emerald-600 to-emerald-700'
+                    : 'bg-gradient-to-br from-red-600 to-red-700'
                 }`}
               >
                 <div className="flex justify-between items-start mb-2">
@@ -1432,7 +1432,7 @@ export default function SubscriptionsPage() {
                   </div>
                   <div className="flex justify-between text-xs sm:text-sm">
                     <span className="text-neutral-500">টাকার পরিমাণ:</span>
-                    <span className="font-bold text-rose-600 dark:text-rose-400">
+                    <span className="font-bold text-red-600 dark:text-red-400">
                       ৳{reviewingRequest.amount.toLocaleString()}
                     </span>
                   </div>
@@ -1448,7 +1448,7 @@ export default function SubscriptionsPage() {
                   <label className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">
                     অ্যাডমিন নোট (ঐচ্ছিক)
                     {reviewAction === 'reject' && (
-                      <span className="text-rose-600 ml-1">*</span>
+                      <span className="text-red-600 ml-1">*</span>
                     )}
                   </label>
                   <textarea
@@ -1460,7 +1460,7 @@ export default function SubscriptionsPage() {
                         : 'রিজেক্ট করার কারণ অবশ্যই লিখুন...'
                     }
                     rows={3}
-                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-rose-500 transition-all resize-none text-sm"
+                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all resize-none text-sm"
                   />
                 </div>
               </div>
@@ -1482,7 +1482,7 @@ export default function SubscriptionsPage() {
                   className={`flex-1 px-6 py-3 font-bold rounded-2xl shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
                     reviewAction === 'approve'
                       ? 'bg-emerald-600 text-white shadow-emerald-500/20'
-                      : 'bg-rose-600 text-white shadow-rose-500/20'
+                      : 'bg-red-600 text-white shadow-red-500/20'
                   }`}
                 >
                   {reviewAction === 'approve'
@@ -1498,14 +1498,14 @@ export default function SubscriptionsPage() {
         {showPlanModal && (
           <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
             <div className="bg-white dark:bg-neutral-900 rounded-[2.5rem] shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-              <div className="p-6 bg-gradient-to-br from-blue-600 to-indigo-700">
+              <div className="p-6 bg-gradient-to-br from-emerald-600 to-emerald-700">
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
                       <CreditCard className="w-6 h-6" />
                       {editingPlan.id ? 'প্লান এডিট করুন' : 'নতুন প্লান তৈরি'}
                     </h3>
-                    <p className="text-blue-100 text-xs sm:text-sm mt-1">
+                    <p className="text-emerald-100 text-xs sm:text-sm mt-1">
                       সাবস্ক্রিপশন প্লানের সকল তথ্য এখানে প্রদান করুন
                     </p>
                   </div>
@@ -1539,7 +1539,7 @@ export default function SubscriptionsPage() {
                       }
                       disabled={!!editingPlan.id}
                       placeholder="premium_monthly"
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:opacity-50 text-sm"
+                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all disabled:opacity-50 text-sm"
                     />
                   </div>
 
@@ -1557,7 +1557,7 @@ export default function SubscriptionsPage() {
                         })
                       }
                       placeholder="Premium Monthly"
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
+                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm"
                     />
                   </div>
 
@@ -1575,7 +1575,7 @@ export default function SubscriptionsPage() {
                         })
                       }
                       placeholder="299"
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm font-bold"
+                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm font-bold"
                     />
                   </div>
 
@@ -1593,7 +1593,7 @@ export default function SubscriptionsPage() {
                         })
                       }
                       placeholder="30"
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
+                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm"
                     />
                   </div>
                 </div>
@@ -1614,7 +1614,7 @@ export default function SubscriptionsPage() {
                     }
                     placeholder="অনিমিত এক্সাম&#10;সকল চ্যাপ্টার এক্সেস&#10;বিস্তারিত এনালাইটিক্স"
                     rows={5}
-                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none text-sm leading-relaxed"
+                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all resize-none text-sm leading-relaxed"
                   />
                 </div>
 
@@ -1631,13 +1631,13 @@ export default function SubscriptionsPage() {
                           color_theme: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
+                      className="w-full px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm"
                     >
                       <option value="border-neutral-200">Gray (Default)</option>
-                      <option value="border-blue-500">Blue (Premium)</option>
-                      <option value="border-rose-500">Rose (Popular)</option>
+                      <option value="border-emerald-500">Blue (Premium)</option>
+                      <option value="border-red-500">Rose (Popular)</option>
                       <option value="border-emerald-500">Green (Growth)</option>
-                      <option value="border-amber-500">Amber (Gold)</option>
+                      <option value="border-red-500">Amber (Gold)</option>
                     </select>
                   </div>
 
@@ -1653,10 +1653,10 @@ export default function SubscriptionsPage() {
                               is_active: e.target.checked,
                             })
                           }
-                          className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-700 text-blue-600 focus:ring-0"
+                          className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-700 text-emerald-600 focus:ring-0"
                         />
                       </div>
-                      <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300 group-hover:text-blue-600 transition-colors">
+                      <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300 group-hover:text-emerald-600 transition-colors">
                         প্লানটি এক্টিভ রাখুন
                       </span>
                     </label>
@@ -1671,9 +1671,9 @@ export default function SubscriptionsPage() {
                             is_popular: e.target.checked,
                           })
                         }
-                        className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-700 text-amber-500 focus:ring-0"
+                        className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-700 text-red-500 focus:ring-0"
                       />
-                      <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300 group-hover:text-amber-500 transition-colors">
+                      <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300 group-hover:text-red-500 transition-colors">
                         জনপ্রিয় (Highlighed) হিসেবে দেখান
                       </span>
                     </label>
@@ -1697,7 +1697,7 @@ export default function SubscriptionsPage() {
                 </button>
                 <button
                   onClick={handleCreatePlan}
-                  className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/20 transition-all active:scale-95"
+                  className="flex-1 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
                 >
                   {editingPlan.id ? 'আপডেট করুন' : 'তৈরি করুন'}
                 </button>
@@ -1710,7 +1710,7 @@ export default function SubscriptionsPage() {
         {showExtendModal && extendingSubscription && (
           <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
             <div className="bg-white dark:bg-neutral-900 rounded-[2rem] shadow-2xl border border-neutral-200 dark:border-neutral-800 max-w-sm w-full overflow-hidden">
-              <div className="p-6 bg-gradient-to-br from-rose-600 to-red-700">
+              <div className="p-6 bg-gradient-to-br from-red-600 to-red-700">
                 <h3 className="text-xl font-bold text-white mb-1">
                   মেয়াদ বাড়িয়ে দিন
                 </h3>
@@ -1751,7 +1751,7 @@ export default function SubscriptionsPage() {
                         onClick={() => setExtensionDays(days)}
                         className={`py-2 text-xs font-bold rounded-xl border transition-all ${
                           extensionDays === days
-                            ? 'bg-rose-600 border-rose-600 text-white shadow-lg shadow-rose-500/20'
+                            ? 'bg-red-600 border-red-600 text-white shadow-lg shadow-red-500/20'
                             : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-500'
                         }`}
                       >
@@ -1770,7 +1770,7 @@ export default function SubscriptionsPage() {
                       onChange={(e) =>
                         setExtensionDays(parseInt(e.target.value) || 0)
                       }
-                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-rose-600 dark:text-rose-400 font-bold focus:outline-none focus:ring-2 focus:ring-rose-500"
+                      className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-red-600 dark:text-red-400 font-bold focus:outline-none focus:ring-2 focus:ring-red-500"
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-neutral-400 uppercase">
                       Days
@@ -1791,7 +1791,7 @@ export default function SubscriptionsPage() {
                 </button>
                 <button
                   onClick={handleExtendSubscription}
-                  className="flex-1 py-3 bg-rose-600 text-white font-bold rounded-2xl shadow-lg shadow-rose-500/20 transition-all active:scale-95"
+                  className="flex-1 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg shadow-red-500/20 transition-all active:scale-95"
                 >
                   নিশ্চিত করুন
                 </button>

@@ -106,7 +106,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       <div className="flex items-center gap-4 flex-1">
         {/* Mobile Branding (Left-aligned) */}
         <div className="lg:hidden flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-rose-600 to-rose-700 flex items-center justify-center shadow-lg shadow-rose-500/20">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center shadow-lg shadow-red-500/20">
             <span className="text-white text-xs font-black">O</span>
           </div>
           <span className="font-black text-sm text-neutral-900 dark:text-white uppercase tracking-tight">
@@ -120,14 +120,14 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
         {/* Search Bar - Optimized for visibility */}
         <div className="relative hidden sm:block group ml-auto md:ml-4 lg:ml-0">
           <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-600 group-focus-within:text-rose-500 transition-colors"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-600 group-focus-within:text-red-500 transition-colors"
             size={16}
             strokeWidth={3}
           />
           <input
             type="text"
             placeholder="সার্চ করুন..."
-            className="bg-neutral-100 dark:bg-neutral-900 border border-transparent dark:border-neutral-800 text-neutral-900 dark:text-neutral-200 text-xs font-black rounded-2xl pl-11 pr-4 py-2.5 w-32 md:w-56 outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500/50 transition-all placeholder:text-neutral-400"
+            className="bg-neutral-100 dark:bg-neutral-900 border border-transparent dark:border-neutral-800 text-neutral-900 dark:text-neutral-200 text-xs font-black rounded-2xl pl-11 pr-4 py-2.5 w-32 md:w-56 outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500/50 transition-all placeholder:text-neutral-400"
           />
         </div>
       </div>

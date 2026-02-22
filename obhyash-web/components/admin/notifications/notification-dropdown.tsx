@@ -114,17 +114,17 @@ export const NotificationDropdown = () => {
       case 'achievement':
         return <CheckCircle size={16} className="text-emerald-500" />;
       case 'warning':
-        return <AlertTriangle size={16} className="text-amber-500" />;
+        return <AlertTriangle size={16} className="text-red-500" />;
       case 'error':
-        return <X size={16} className="text-rose-500" />;
+        return <X size={16} className="text-red-500" />;
       case 'exam_result':
         return <CheckCircle size={16} className="text-brand-500" />;
       case 'announcement':
-        return <Info size={16} className="text-purple-500" />;
+        return <Info size={16} className="text-emerald-500" />;
       case 'system':
       case 'info':
       default:
-        return <Info size={16} className="text-blue-500" />;
+        return <Info size={16} className="text-emerald-500" />;
     }
   };
 
@@ -148,7 +148,7 @@ export const NotificationDropdown = () => {
       >
         <Bell size={20} />
         {unreadCount > 0 && (
-          <span className="absolute top-2 right-2.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-paper-50 dark:border-obsidian-950 animate-pulse"></span>
+          <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-paper-50 dark:border-obsidian-950 animate-pulse"></span>
         )}
       </button>
 
@@ -226,11 +226,11 @@ export const NotificationDropdown = () => {
                           notification.type === 'success' &&
                             'bg-emerald-100 dark:bg-emerald-900/20',
                           notification.type === 'warning' &&
-                            'bg-amber-100 dark:bg-amber-900/20',
+                            'bg-red-100 dark:bg-red-900/20',
                           notification.type === 'error' &&
-                            'bg-rose-100 dark:bg-rose-900/20',
+                            'bg-red-100 dark:bg-red-900/20',
                           notification.type === 'info' &&
-                            'bg-blue-100 dark:bg-blue-900/20',
+                            'bg-emerald-100 dark:bg-emerald-900/20',
                         )}
                       >
                         {getIcon(notification.type)}

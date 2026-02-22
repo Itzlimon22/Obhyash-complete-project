@@ -70,13 +70,13 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
   };
 
   return (
-    <div className="bg-rose-50 dark:bg-rose-900/10 border border-rose-200 dark:border-rose-900/30 rounded-2xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in duration-200">
+    <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-2xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in duration-200">
       {/* Selection Info */}
       <div className="flex items-center gap-3 w-full sm:w-auto">
-        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
+        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">
           <CheckCircle2
             size={18}
-            className="text-rose-600 dark:text-rose-400"
+            className="text-red-600 dark:text-red-400"
           />
         </div>
         <div>
@@ -87,7 +87,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
             {selectedCount < totalCount && (
               <button
                 onClick={onSelectAll}
-                className="text-[10px] sm:text-xs font-medium text-rose-600 dark:text-rose-400 hover:underline"
+                className="text-[10px] sm:text-xs font-medium text-red-600 dark:text-red-400 hover:underline"
               >
                 সব নির্বাচন করো ({totalCount})
               </button>
@@ -114,7 +114,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
                   setShowSubjectPicker(!showSubjectPicker);
                   setShowChapterPicker(false);
                 }}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors flex items-center gap-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors flex items-center gap-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800"
               >
                 <FileEdit size={14} />
                 <span className="hidden xs:inline">বিষয়</span>
@@ -142,7 +142,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
                   setShowChapterPicker(!showChapterPicker);
                   setShowSubjectPicker(false);
                 }}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors flex items-center gap-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors flex items-center gap-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800"
               >
                 <FileEdit size={14} />
                 <span className="hidden xs:inline">অধ্যায়</span>
@@ -170,7 +170,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
                     <>
                       <button
                         onClick={() => setSelectedSubjectForChapter('')}
-                        className="w-full text-left px-3 py-2 text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 sticky top-0"
+                        className="w-full text-left px-3 py-2 text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 sticky top-0"
                       >
                         ← {selectedSubjectForChapter}
                       </button>
@@ -203,7 +203,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
           </button>
           <button
             onClick={() => onUpdateStatus('Rejected')}
-            className="flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-medium text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors flex items-center justify-center gap-1.5"
+            className="flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-medium text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-1.5"
             title="Reject Selected"
           >
             <XCircle size={14} className="sm:inline" />
@@ -214,7 +214,7 @@ export const BulkActions: React.FC<BulkActionsProps> = ({
         {/* Delete */}
         <button
           onClick={handleDelete}
-          className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-medium shadow-lg shadow-rose-500/20 transition-all active:scale-95 flex items-center gap-2 shrink-0"
+          className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-medium shadow-lg shadow-red-500/20 transition-all active:scale-95 flex items-center gap-2 shrink-0"
         >
           <Trash2 size={16} />
           <span className="hidden xs:inline">মুছে ফেলুন</span>

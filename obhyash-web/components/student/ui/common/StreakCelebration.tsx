@@ -46,9 +46,9 @@ const StreakCelebration: React.FC<StreakCelebrationProps> = ({
             className="w-full max-w-sm bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 text-center shadow-2xl relative overflow-hidden border border-neutral-100 dark:border-neutral-800"
           >
             {/* Background elements */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 via-rose-500 to-amber-500" />
-            <div className="absolute -top-24 -right-24 w-48 h-48 bg-orange-100 dark:bg-orange-900/20 rounded-full blur-3xl" />
-            <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-rose-100 dark:bg-rose-900/20 rounded-full blur-3xl" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-400 via-red-500 to-red-500" />
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-red-100 dark:bg-red-900/20 rounded-full blur-3xl" />
+            <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-red-100 dark:bg-red-900/20 rounded-full blur-3xl" />
 
             {/* Fire Icon with Pulse */}
             <div className="relative mb-6 inline-block">
@@ -58,13 +58,13 @@ const StreakCelebration: React.FC<StreakCelebrationProps> = ({
                   opacity: [0.5, 1, 0.5],
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="absolute inset-0 bg-orange-500/20 rounded-full blur-xl"
+                className="absolute inset-0 bg-red-500/20 rounded-full blur-xl"
               />
               <motion.div
                 initial={{ rotate: -20, scale: 0 }}
                 animate={{ rotate: 0, scale: 1 }}
                 transition={{ delay: 0.2, type: 'spring' }}
-                className="relative w-24 h-24 bg-orange-500 text-white rounded-3xl flex items-center justify-center shadow-lg shadow-orange-500/30"
+                className="relative w-24 h-24 bg-red-500 text-white rounded-3xl flex items-center justify-center shadow-lg shadow-red-500/30"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -109,7 +109,7 @@ const StreakCelebration: React.FC<StreakCelebrationProps> = ({
                   <span className="text-[10px] text-neutral-400 font-black uppercase tracking-widest">
                     Bonus
                   </span>
-                  <div className="flex items-center gap-1 text-amber-600 dark:text-amber-500 font-black">
+                  <div className="flex items-center gap-1 text-red-600 dark:text-red-500 font-black">
                     <Zap size={14} fill="currentColor" />
                     <span>Streak</span>
                   </div>
@@ -123,7 +123,7 @@ const StreakCelebration: React.FC<StreakCelebrationProps> = ({
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
               onClick={() => setIsVisible(false)}
-              className="mt-8 w-full py-4 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-2xl transition-all shadow-lg active:scale-95"
+              className="mt-8 w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black rounded-2xl transition-all shadow-lg active:scale-95"
             >
               ধন্যবাদ!
             </motion.button>

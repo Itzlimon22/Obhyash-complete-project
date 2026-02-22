@@ -112,20 +112,20 @@ export default function ManageSubscriptionModal({
 
         <div className="p-6 space-y-5">
           {/* Current Info */}
-          <div className="flex gap-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-900/50">
+          <div className="flex gap-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-900/50">
             <div className="flex-1">
-              <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold uppercase">
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase">
                 Current Plan
               </p>
-              <p className="font-bold text-blue-900 dark:text-blue-100">
+              <p className="font-bold text-emerald-900 dark:text-emerald-100">
                 {user.subscription?.plan || 'Free'}
               </p>
             </div>
             <div className="flex-1 text-right">
-              <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold uppercase">
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase">
                 Expiry
               </p>
-              <p className="font-mono text-sm text-blue-900 dark:text-blue-100">
+              <p className="font-mono text-sm text-emerald-900 dark:text-emerald-100">
                 {user.subscription?.expiry
                   ? new Date(user.subscription.expiry).toLocaleDateString()
                   : 'N/A'}
@@ -141,7 +141,7 @@ export default function ManageSubscriptionModal({
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none"
             >
               <option value="Active">Active</option>
               <option value="Paused">Paused</option>
@@ -177,7 +177,7 @@ export default function ManageSubscriptionModal({
                 onChange={(e) =>
                   setExtensionDays(parseInt(e.target.value) || 0)
                 }
-                className="w-full flex-1 px-3 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-t-2xl sm:rounded-md rounded-b-none sm:rounded-b-md animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 text-sm outline-none focus:border-blue-500"
+                className="w-full flex-1 px-3 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-t-2xl sm:rounded-md rounded-b-none sm:rounded-b-md animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 text-sm outline-none focus:border-emerald-500"
               />
             </div>
           </div>
@@ -202,7 +202,7 @@ export default function ManageSubscriptionModal({
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Why are you changing this?"
-              className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none h-20 resize-none"
+              className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm text-neutral-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none h-20 resize-none"
             />
           </div>
         </div>
@@ -217,7 +217,7 @@ export default function ManageSubscriptionModal({
           <button
             onClick={handleSubmit}
             disabled={isLoading}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isLoading ? 'Updating...' : 'Save Changes'}
           </button>

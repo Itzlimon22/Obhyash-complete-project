@@ -86,7 +86,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
           <div className="flex items-center justify-between p-5 border-b border-neutral-100 dark:border-neutral-800">
             <div>
               <h3 className="text-lg font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-                <Settings className="w-5 h-5 text-indigo-600" />
+                <Settings className="w-5 h-5 text-emerald-600" />
                 OMR Configuration
               </h3>
               <p className="text-xs text-neutral-500 dark:text-neutral-400">
@@ -108,7 +108,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
               className={cn(
                 'flex items-center justify-between p-4 rounded-xl border-2 transition-all cursor-pointer',
                 isBlank
-                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10'
+                  ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10'
                   : 'border-neutral-200 dark:border-neutral-800 hover:border-neutral-300',
               )}
             >
@@ -124,7 +124,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
                 className={cn(
                   'w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors',
                   isBlank
-                    ? 'bg-indigo-600 border-indigo-600'
+                    ? 'bg-emerald-600 border-emerald-600'
                     : 'border-neutral-300 dark:border-neutral-600',
                 )}
               >
@@ -149,7 +149,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
                   <select
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border-transparent focus:bg-white dark:focus:bg-neutral-900 border focus:border-indigo-500 focus:ring-0 transition-all font-medium appearance-none"
+                    className="w-full px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border-transparent focus:bg-white dark:focus:bg-neutral-900 border focus:border-emerald-500 focus:ring-0 transition-all font-medium appearance-none"
                   >
                     <option value="" disabled>
                       Select a Subject
@@ -166,7 +166,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     placeholder="e.g. Physics"
-                    className="w-full px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border-transparent focus:bg-white dark:focus:bg-neutral-900 border focus:border-indigo-500 focus:ring-0 transition-all font-medium"
+                    className="w-full px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border-transparent focus:bg-white dark:focus:bg-neutral-900 border focus:border-emerald-500 focus:ring-0 transition-all font-medium"
                   />
                 )}
               </div>
@@ -181,7 +181,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
                     value={chapter}
                     onChange={(e) => setChapter(e.target.value)}
                     placeholder="Optional"
-                    className="w-full px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border-transparent focus:bg-white dark:focus:bg-neutral-900 border focus:border-indigo-500 focus:ring-0 transition-all font-medium text-sm"
+                    className="w-full px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border-transparent focus:bg-white dark:focus:bg-neutral-900 border focus:border-emerald-500 focus:ring-0 transition-all font-medium text-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -193,7 +193,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
                     placeholder="Optional"
-                    className="w-full px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border-transparent focus:bg-white dark:focus:bg-neutral-900 border focus:border-indigo-500 focus:ring-0 transition-all font-medium text-sm"
+                    className="w-full px-4 py-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border-transparent focus:bg-white dark:focus:bg-neutral-900 border focus:border-emerald-500 focus:ring-0 transition-all font-medium text-sm"
                   />
                 </div>
               </div>
@@ -205,7 +205,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
                 <label className="text-xs font-bold text-neutral-500 uppercase">
                   Questions Count
                 </label>
-                <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded-md">
+                <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-md">
                   {count} Q
                 </span>
               </div>
@@ -216,7 +216,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
                 step="5"
                 value={count}
                 onChange={(e) => setCount(parseInt(e.target.value))}
-                className="w-full h-2 bg-neutral-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                className="w-full h-2 bg-neutral-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-emerald-600"
               />
               <div className="flex justify-between text-[10px] text-neutral-400 font-medium px-1">
                 <span>10</span>
@@ -230,7 +230,7 @@ export const OmrConfigModal: React.FC<OmrConfigModalProps> = ({
           <div className="p-5 border-t border-neutral-100 dark:border-neutral-800 pb-safe bg-white dark:bg-neutral-900 md:rounded-b-3xl">
             <button
               onClick={handleGenerate}
-              className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
               <Download size={18} />
               Generate PDF

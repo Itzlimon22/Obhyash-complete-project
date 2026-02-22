@@ -232,7 +232,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 className={`
                         w-full flex items-center ${isCollapsed ? 'justify-center p-1' : 'gap-3 p-2.5'} rounded-xl 
                         bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700
-                        hover:border-rose-300 dark:hover:border-rose-700 transition-all duration-300 shadow-sm group
+                        hover:border-red-300 dark:hover:border-red-700 transition-all duration-300 shadow-sm group
                     `}
                 title={isCollapsed ? 'Profile' : undefined}
               >
@@ -258,7 +258,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
-                    className="w-4 h-4 text-neutral-400 group-hover:text-rose-500 transition-colors"
+                    className="w-4 h-4 text-neutral-400 group-hover:text-red-500 transition-colors"
                   >
                     <path
                       fillRule="evenodd"
@@ -315,7 +315,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               {/* Logout Button */}
               <button
                 onClick={onLogout}
-                className="p-2 rounded-lg text-neutral-500 hover:bg-white dark:hover:bg-neutral-800 hover:text-rose-600 transition-all"
+                className="p-2 rounded-lg text-neutral-500 hover:bg-white dark:hover:bg-neutral-800 hover:text-red-600 transition-all"
                 title="Logout"
               >
                 <svg
@@ -337,7 +337,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               {/* Collapse Toggle (Desktop Only) */}
               <button
                 onClick={toggleCollapse}
-                className="hidden lg:flex p-2 rounded-lg text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 hover:text-rose-600 transition-all"
+                className="hidden lg:flex p-2 rounded-lg text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 hover:text-red-600 transition-all"
                 title={isCollapsed ? 'Expand' : 'Collapse'}
               >
                 <svg

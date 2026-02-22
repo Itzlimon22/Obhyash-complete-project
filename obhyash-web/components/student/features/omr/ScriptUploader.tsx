@@ -108,8 +108,8 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
         </div>
 
         {/* Guidelines Box */}
-        <div className="mb-5 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg p-4">
-          <h4 className="text-sm font-bold text-blue-800 dark:text-blue-200 mb-2 flex items-center gap-2">
+        <div className="mb-5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 rounded-lg p-4">
+          <h4 className="text-sm font-bold text-emerald-800 dark:text-emerald-200 mb-2 flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
@@ -124,7 +124,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
             </svg>
             নির্ভুল ফলাফলের জন্য নির্দেশনা
           </h4>
-          <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1.5 list-disc pl-4">
+          <ul className="text-xs text-emerald-700 dark:text-emerald-300 space-y-1.5 list-disc pl-4">
             <li>
               ফাইলের আকার অবশ্যই <strong>৫ মেগাবাইটের (5MB)</strong> কম হতে হবে।
             </li>
@@ -141,8 +141,8 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
             flex-1 border-2 border-dashed rounded-xl flex flex-col items-center justify-center p-6 transition-all cursor-pointer min-h-[200px] mb-4
             ${
               previewUrl
-                ? 'border-indigo-300 bg-indigo-50 dark:border-indigo-700 dark:bg-indigo-900/10'
-                : 'border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/50 hover:border-indigo-400 dark:hover:border-indigo-500'
+                ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-900/10'
+                : 'border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/50 hover:border-emerald-400 dark:hover:border-emerald-500'
             }
           `}
           onDragOver={(e) => e.preventDefault()}
@@ -191,7 +191,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
               {isUploading && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <svg
-                    className="animate-spin h-8 w-8 text-indigo-600"
+                    className="animate-spin h-8 w-8 text-emerald-600"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -215,7 +215,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
             </div>
           ) : (
             <>
-              <div className="w-14 h-14 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-3">
+              <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-3">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -231,7 +231,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
                   />
                 </svg>
               </div>
-              <span className="text-indigo-600 dark:text-indigo-400 font-bold text-lg">
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold text-lg">
                 ছবি নির্বাচন করো
               </span>
               <span className="text-neutral-500 dark:text-neutral-400 text-sm mt-1">
@@ -252,7 +252,7 @@ const ScriptUploader: React.FC<ScriptUploaderProps> = ({
           <button
             onClick={handleConfirm}
             disabled={!file || isUploading}
-            className="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold transition-colors shadow-lg shadow-indigo-200 dark:shadow-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-bold transition-colors shadow-lg shadow-emerald-200 dark:shadow-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isUploading ? 'আপলোড হচ্ছে...' : 'আপলোড করো'}
           </button>

@@ -58,7 +58,7 @@ export function ReviewTable({ data, onEdit, onDelete }: ReviewTableProps) {
               {/* Subject/Chapter Column */}
               <TableCell className="p-4">
                 <div className="flex flex-col gap-1">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 w-fit">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 w-fit">
                     {q.subject}
                   </span>
                   <span className="text-xs text-gray-500 italic truncate max-w-[150px]">
@@ -85,7 +85,7 @@ export function ReviewTable({ data, onEdit, onDelete }: ReviewTableProps) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
                     onClick={() => onEdit(q, i)}
                     title="Edit Question"
                   >

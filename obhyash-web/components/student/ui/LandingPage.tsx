@@ -265,7 +265,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
           <div className="relative w-full max-w-xl mx-auto lg:max-w-none flex justify-center">
             {/* Illustration Placeholder or Hero Image */}
-            <div className="relative z-10 w-full aspect-square max-w-[500px] bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 rounded-3xl border border-white/20 backdrop-blur-sm p-8 flex items-center justify-center">
+            <div className="relative z-10 w-full aspect-square max-w-[500px] bg-gradient-to-tr from-emerald-500/20 to-emerald-500/20 rounded-3xl border border-white/20 backdrop-blur-sm p-8 flex items-center justify-center">
               <div className="text-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -334,7 +334,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 role: 'Medical Aspirant',
                 quote:
                   'The OMR scanning feature is a game changer. I can practice offline and get results instantly.',
-                bg: 'bg-orange-50 dark:bg-orange-900/10 text-orange-600',
+                bg: 'bg-red-50 dark:bg-red-900/10 text-red-600',
               },
               {
                 name: 'Farhana Rimi',
@@ -348,14 +348,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 role: 'University Student',
                 quote:
                   'The custom exam builder allowed me to focus exactly on my weak chapters. Highly recommended!',
-                bg: 'bg-blue-50 dark:bg-blue-900/10 text-blue-600',
+                bg: 'bg-emerald-50 dark:bg-emerald-900/10 text-emerald-600',
               },
             ].map((item, idx) => (
               <div
                 key={idx}
                 className="p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-left"
               >
-                <div className="flex gap-1 text-amber-400 mb-4">
+                <div className="flex gap-1 text-red-400 mb-4">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <svg
                       key={i}
@@ -415,7 +415,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <a
                     href="#"
-                    className="hover:text-indigo-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     Question Bank
                   </a>
@@ -423,7 +423,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <a
                     href="#"
-                    className="hover:text-indigo-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     Mock Tests
                   </a>
@@ -431,7 +431,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <a
                     href="#"
-                    className="hover:text-indigo-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     OMR Grading
                   </a>
@@ -444,7 +444,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <a
                     href="#"
-                    className="hover:text-indigo-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     Help Center
                   </a>
@@ -452,7 +452,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <a
                     href="#"
-                    className="hover:text-indigo-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     Privacy Policy
                   </a>
@@ -460,7 +460,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <li>
                   <a
                     href="#"
-                    className="hover:text-indigo-400 transition-colors"
+                    className="hover:text-emerald-400 transition-colors"
                   >
                     Contact Us
                   </a>

@@ -108,7 +108,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
                     {report.question.question}
                   </p>
                 ) : (
-                  <p className="text-amber-500 text-sm font-bold">
+                  <p className="text-red-500 text-sm font-bold">
                     প্রশ্নটি লোড করা যাচ্ছে না।
                   </p>
                 )}

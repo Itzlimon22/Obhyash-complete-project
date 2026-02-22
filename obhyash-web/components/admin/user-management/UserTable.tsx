@@ -67,7 +67,7 @@ const UserTable: React.FC<UserTableProps> = ({
       case 'Inactive':
         return 'text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800';
       case 'Suspended':
-        return 'text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10';
+        return 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10';
       default:
         return 'text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800';
     }
@@ -76,11 +76,11 @@ const UserTable: React.FC<UserTableProps> = ({
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'Admin':
-        return 'text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10';
+        return 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10';
       case 'Teacher':
         return 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10';
       case 'Student':
-        return 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10';
+        return 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10';
       default:
         return 'text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800';
     }
@@ -89,7 +89,7 @@ const UserTable: React.FC<UserTableProps> = ({
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden py-24 flex flex-col items-center justify-center">
-        <RefreshCw className="w-12 h-12 animate-spin text-blue-600 dark:text-blue-400 mb-4" />
+        <RefreshCw className="w-12 h-12 animate-spin text-emerald-600 dark:text-emerald-400 mb-4" />
         <p className="text-neutral-600 dark:text-neutral-400 font-medium">
           Loading users...
         </p>
@@ -129,9 +129,9 @@ const UserTable: React.FC<UserTableProps> = ({
                     type="checkbox"
                     checked={selectedUsers.has(user.id)}
                     onChange={() => onSelectUser(user.id)}
-                    className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-600 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer shrink-0"
+                    className="w-5 h-5 rounded border-neutral-300 dark:border-neutral-600 text-emerald-600 focus:ring-2 focus:ring-emerald-500 cursor-pointer shrink-0"
                   />
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
                     {user.name?.charAt(0).toUpperCase() || 'U'}
                   </div>
                   <div className="min-w-0">
@@ -211,7 +211,7 @@ const UserTable: React.FC<UserTableProps> = ({
                             onDeleteUser(user.id);
                             setShowActionMenu(null);
                           }}
-                          className="w-full px-4 py-2.5 text-left text-sm hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center gap-3 text-rose-600 dark:text-rose-400 transition-colors"
+                          className="w-full px-4 py-2.5 text-left text-sm hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center gap-3 text-red-600 dark:text-red-400 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                           Delete User
@@ -285,7 +285,7 @@ const UserTable: React.FC<UserTableProps> = ({
                         selectedUsers.size === users.length && users.length > 0
                       }
                       onChange={onSelectAll}
-                      className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                      className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-emerald-600 focus:ring-2 focus:ring-emerald-500 cursor-pointer"
                     />
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
@@ -325,12 +325,12 @@ const UserTable: React.FC<UserTableProps> = ({
                         type="checkbox"
                         checked={selectedUsers.has(user.id)}
                         onChange={() => onSelectUser(user.id)}
-                        className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                        className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-emerald-600 focus:ring-2 focus:ring-emerald-500 cursor-pointer"
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center text-white font-semibold text-sm shadow-md">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-500 flex items-center justify-center text-white font-semibold text-sm shadow-md">
                           {user.name?.charAt(0).toUpperCase() || 'U'}
                         </div>
                         <div className="text-left">
@@ -339,7 +339,7 @@ const UserTable: React.FC<UserTableProps> = ({
                           </p>
                           <p className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
                             {user.subscription?.plan === 'Pro' && (
-                              <Crown className="w-3 h-3 text-amber-500" />
+                              <Crown className="w-3 h-3 text-red-500" />
                             )}
                             {user.subscription?.plan || 'Free'} Plan
                           </p>
@@ -497,7 +497,7 @@ const UserTable: React.FC<UserTableProps> = ({
                                       onUpdateSubscription(user.id, 'Premium');
                                       setShowActionMenu(null);
                                     }}
-                                    className="flex-1 px-2 py-1.5 text-xs bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-400 rounded-lg transition-colors font-medium text-center"
+                                    className="flex-1 px-2 py-1.5 text-xs bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 rounded-lg transition-colors font-medium text-center"
                                   >
                                     Premium
                                   </button>
@@ -506,7 +506,7 @@ const UserTable: React.FC<UserTableProps> = ({
                                       onManageSubscription(user);
                                       setShowActionMenu(null);
                                     }}
-                                    className="px-2 py-1.5 text-xs bg-violet-100 dark:bg-violet-900/30 hover:bg-violet-200 dark:hover:bg-violet-900/50 text-violet-700 dark:text-violet-400 rounded-lg transition-colors font-medium flex items-center justify-center"
+                                    className="px-2 py-1.5 text-xs bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 rounded-lg transition-colors font-medium flex items-center justify-center"
                                     title="Manage Subscription"
                                   >
                                     <Settings size={14} />
@@ -569,7 +569,7 @@ const UserTable: React.FC<UserTableProps> = ({
                                   onDeleteUser(user.id);
                                   setShowActionMenu(null);
                                 }}
-                                className="w-full px-4 py-2.5 text-left text-sm hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center gap-3 text-rose-600 dark:text-rose-400 transition-colors"
+                                className="w-full px-4 py-2.5 text-left text-sm hover:bg-red-50 dark:hover:bg-red-950/30 flex items-center gap-3 text-red-600 dark:text-red-400 transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
                                 Delete User

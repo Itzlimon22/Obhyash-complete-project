@@ -46,7 +46,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
 
   const getTimerStyles = () => {
     if (isGracePeriod)
-      return 'text-amber-700 bg-amber-100 border-amber-300 animate-pulse font-extrabold shadow-md shadow-amber-500/20';
+      return 'text-red-700 bg-red-100 border-red-300 animate-pulse font-extrabold shadow-md shadow-red-500/20';
     // Critical time (< 60s): Strong Red, Pulse, Shadow
     if (timeLeft < 60)
       return 'text-red-700 bg-red-100 border-red-300 animate-[pulse_0.8s_ease-in-out_infinite] font-extrabold shadow-lg shadow-red-500/30 scale-105 origin-right';
@@ -109,7 +109,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
             {onDownloadQuestionPaper && (
               <button
                 onClick={onDownloadQuestionPaper}
-                className="p-2 rounded-full bg-neutral-50 dark:bg-neutral-800 text-neutral-500 hover:text-indigo-600 dark:hover:text-indigo-400 border border-neutral-200 dark:border-neutral-700 transition-colors hidden sm:flex"
+                className="p-2 rounded-full bg-neutral-50 dark:bg-neutral-800 text-neutral-500 hover:text-emerald-600 dark:hover:text-emerald-400 border border-neutral-200 dark:border-neutral-700 transition-colors hidden sm:flex"
                 title="প্রশ্নপত্র ডাউনলোড করো"
               >
                 <svg
@@ -137,7 +137,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
               <button
                 onClick={onToggleOmr}
                 disabled={isGracePeriod}
-                className={`relative w-7 h-4 md:w-8 md:h-4 rounded-full transition-colors ${isOmrMode ? 'bg-rose-600' : 'bg-neutral-300 dark:bg-neutral-600'}`}
+                className={`relative w-7 h-4 md:w-8 md:h-4 rounded-full transition-colors ${isOmrMode ? 'bg-red-600' : 'bg-neutral-300 dark:bg-neutral-600'}`}
               >
                 <span
                   className={`absolute top-0.5 left-0.5 bg-white w-3 h-3 rounded-full shadow-sm transition-transform ${isOmrMode ? 'tranneutral-x-3.5 md:tranneutral-x-4' : 'tranneutral-x-0'}`}
@@ -193,7 +193,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
         {/* Progress Bar */}
         <div className="h-1 w-full bg-neutral-100 dark:bg-neutral-800">
           <div
-            className="h-full bg-rose-600 transition-all duration-500 ease-out"
+            className="h-full bg-red-600 transition-all duration-500 ease-out"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
