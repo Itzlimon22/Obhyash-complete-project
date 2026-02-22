@@ -132,7 +132,7 @@ const EditableRow = ({
       </td>
 
       <td
-        className={`${tdClass} cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 min-w-[200px] max-w-[400px] resize-x overflow-auto`}
+        className={`${tdClass} cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 min-w-[300px] max-w-[500px] resize-x overflow-auto`}
         onClick={() => onPreviewQuestion(localQ)}
         title="Click to view full question/math"
       >
@@ -142,7 +142,7 @@ const EditableRow = ({
       </td>
 
       {[0, 1, 2, 3].map((i) => (
-        <td key={i} className={`${tdClass} min-w-[120px]`}>
+        <td key={i} className={`${tdClass} min-w-[200px]`}>
           <input
             value={localQ.options?.[i] || ''}
             onChange={(e) => updateOption(i, e.target.value)}
@@ -178,7 +178,7 @@ const EditableRow = ({
         </select>
       </td>
 
-      <td className={tdClass}>
+      <td className={`${tdClass} min-w-[100px]`}>
         <input
           value={localQ.stream || ''}
           onChange={(e) => updateField('stream', e.target.value)}
@@ -187,7 +187,7 @@ const EditableRow = ({
         />
       </td>
 
-      <td className={tdClass}>
+      <td className={`${tdClass} min-w-[100px]`}>
         <input
           value={localQ.division || localQ.section || ''}
           onChange={(e) => {
@@ -199,7 +199,7 @@ const EditableRow = ({
         />
       </td>
 
-      <td className={tdClass}>
+      <td className={`${tdClass} min-w-[120px]`}>
         <input
           value={localQ.examType || ''}
           onChange={(e) => updateField('examType', e.target.value)}
@@ -208,7 +208,7 @@ const EditableRow = ({
         />
       </td>
 
-      <td className={tdClass}>
+      <td className={`${tdClass} min-w-[100px]`}>
         <input
           value={localQ.year || ''}
           onChange={(e) => updateField('year', e.target.value)}
@@ -217,7 +217,7 @@ const EditableRow = ({
         />
       </td>
 
-      <td className={tdClass}>
+      <td className={`${tdClass} min-w-[160px]`}>
         <input
           value={localQ.institute || ''}
           onChange={(e) => updateField('institute', e.target.value)}
@@ -226,7 +226,7 @@ const EditableRow = ({
         />
       </td>
 
-      <td className={tdClass}>
+      <td className={`${tdClass} min-w-[160px]`}>
         <select
           value={canonicalSubject}
           onChange={(e) => {
@@ -255,7 +255,7 @@ const EditableRow = ({
         </select>
       </td>
 
-      <td className={tdClass}>
+      <td className={`${tdClass} min-w-[160px]`}>
         <select
           value={canonicalChapter}
           onChange={(e) => {
@@ -278,7 +278,7 @@ const EditableRow = ({
         </select>
       </td>
 
-      <td className={tdClass}>
+      <td className={`${tdClass} min-w-[160px]`}>
         <select
           value={canonicalTopic}
           onChange={(e) => {
@@ -299,7 +299,7 @@ const EditableRow = ({
         </select>
       </td>
 
-      <td className={tdClass}>
+      <td className={`${tdClass} min-w-[120px]`}>
         <select
           value={localQ.difficulty || ''}
           onChange={(e) => {
@@ -357,7 +357,7 @@ export const QuestionTableView: React.FC<QuestionTableViewProps> = ({
   return (
     <div className="w-full bg-white dark:bg-[#0a0a0a] border border-neutral-300 dark:border-neutral-700 overflow-x-auto max-h-[70vh] custom-scrollbar shadow-sm rounded-xl">
       <table
-        className="w-full border-collapse border border-neutral-300 dark:border-neutral-600 text-neutral-900 dark:text-neutral-100"
+        className="w-full min-w-max border-collapse border border-neutral-300 dark:border-neutral-600 text-neutral-900 dark:text-neutral-100"
         style={{ fontSize: `${fontSize}px` }}
       >
         <thead>
