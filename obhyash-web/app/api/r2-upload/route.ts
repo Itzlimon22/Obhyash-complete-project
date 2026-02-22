@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     const r2Domain =
       process.env.NEXT_PUBLIC_R2_DOMAIN ||
-      'pub-0ddd6e91e0dd3380b972941c39a5729f.r2.dev';
+      'pub-6560195307b14ca49f6f183b13bfa841.r2.dev';
 
     return NextResponse.json({
       uploadUrl: signedUrl,
