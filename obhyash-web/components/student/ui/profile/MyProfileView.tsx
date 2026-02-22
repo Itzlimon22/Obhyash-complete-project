@@ -34,7 +34,9 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
   const isLoading = !propHistory && hookData.isLoading;
 
   // -- Data Processing --
-  const evaluatedExams = history.filter((h) => h.status === 'evaluated');
+  const evaluatedExams = history.filter(
+    (h) => !h.status || h.status === 'evaluated',
+  );
   const avgScore =
     evaluatedExams.length > 0
       ? Math.round(
