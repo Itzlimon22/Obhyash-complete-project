@@ -22,6 +22,8 @@ import {
   Edit,
   Trash2,
   Image as ImageIcon,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
@@ -88,6 +90,18 @@ export default function SubscriptionsPage() {
     'All' | 'Pending' | 'Approved' | 'Rejected'
   >('All');
 
+  // Pagination State
+  const [reqPage, setReqPage] = useState(1);
+  const [reqTotal, setReqTotal] = useState(0);
+  const [subPage, setSubPage] = useState(1);
+  const [subTotal, setSubTotal] = useState(0);
+  const pageSize = 20;
+
+  // View Style
+  const [viewStyle, setViewStyle] = useState<'table' | 'card' | 'responsive'>(
+    'responsive',
+  );
+
   // Modals
   const [showProofModal, setShowProofModal] = useState(false);
   const [selectedProof, setSelectedProof] = useState<string | null>(null);
@@ -115,7 +129,7 @@ export default function SubscriptionsPage() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [reqPage, subPage, statusFilter, searchQuery]); // Re-fetch when pagination or filters change
 
   const fetchData = async (showToast = false) => {
     if (showToast) setIsRefreshing(true);
@@ -123,33 +137,60 @@ export default function SubscriptionsPage() {
     const supabase = createClient();
 
     try {
-      // Fetch payment requests with user data
-      const { data: requestsData, error: requestsError } = await supabase
+      // 1. Payment Requests Query
+      let reqQuery = supabase
         .from('payment_requests')
         .select(
-          `
-          *,
-          user:users!payment_requests_user_id_fkey(name, email, phone)
-        `,
-        )
-        .order('requested_at', { ascending: false });
+          `*, user:users!payment_requests_user_id_fkey(name, email, phone)`,
+          { count: 'exact' },
+        );
+
+      if (statusFilter !== 'All') {
+        reqQuery = reqQuery.eq('status', statusFilter);
+      }
+
+      // Note: Full text search across joined tables is complex in simple Supabase client.
+      // We will rely on simple local filtering for `searchQuery` if we don't implement an RPC,
+      // OR we can implement server-side search for transaction_id.
+      if (searchQuery) {
+        reqQuery = reqQuery.ilike('transaction_id', `%${searchQuery}%`);
+      }
+
+      const reqFrom = (reqPage - 1) * pageSize;
+      const reqTo = reqFrom + pageSize - 1;
+
+      const {
+        data: requestsData,
+        error: requestsError,
+        count: reqCount,
+      } = await reqQuery
+        .order('requested_at', { ascending: false })
+        .range(reqFrom, reqTo);
 
       if (requestsError) {
         console.error('Payment requests error:', requestsError);
         throw requestsError;
       }
 
-      // Fetch subscription history with user and plan data
-      const { data: subsData, error: subsError } = await supabase
+      // 2. Subscriptions Query
+      let subQuery = supabase
         .from('subscription_history')
-        .select(
-          `
-          *,
-          user:users(name, email),
-          plan:subscription_plans(*)
-        `,
-        )
-        .order('created_at', { ascending: false });
+        .select(`*, user:users(name, email), plan:subscription_plans(*)`, {
+          count: 'exact',
+        });
+
+      // Note: To search by user name/email server-side requires more complex joins/RPC.
+      // For now we just paginate the history based on creation date.
+      const subFrom = (subPage - 1) * pageSize;
+      const subTo = subFrom + pageSize - 1;
+
+      const {
+        data: subsData,
+        error: subsError,
+        count: subCount,
+      } = await subQuery
+        .order('created_at', { ascending: false })
+        .range(subFrom, subTo);
 
       if (subsError) {
         console.error('Subscription history error:', subsError);
@@ -168,7 +209,11 @@ export default function SubscriptionsPage() {
       }
 
       setPaymentRequests(requestsData || []);
+      if (reqCount !== null) setReqTotal(reqCount);
+
       setSubscriptions(subsData || []);
+      if (subCount !== null) setSubTotal(subCount);
+
       setPlans(plansData || []);
 
       if (showToast) {
@@ -501,14 +546,13 @@ export default function SubscriptionsPage() {
         : 0,
   };
 
+  // We still explicitly filter for the front-end string matching just in case (e.g. name matching which we didn't send to server)
   const filteredRequests = paymentRequests.filter((request) => {
     const matchesSearch =
       request.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       request.user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       request.transaction_id?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter =
-      statusFilter === 'All' || request.status === statusFilter;
-    return matchesSearch && matchesFilter;
+    return matchesSearch;
   });
 
   if (isLoading) {
@@ -547,6 +591,34 @@ export default function SubscriptionsPage() {
               />
               <span>{isRefreshing ? 'লোডিং...' : 'রিফ্রেশ'}</span>
             </button>
+
+            {/* View Toggles for Requests and Subscriptions */}
+            {(activeTab === 'requests' || activeTab === 'subscriptions') && (
+              <div className="hidden md:flex bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl">
+                <button
+                  onClick={() => setViewStyle('card')}
+                  className={`p-1.5 rounded-lg transition-colors ${
+                    viewStyle === 'card'
+                      ? 'bg-white dark:bg-neutral-700 shadow-sm text-rose-600 dark:text-rose-400'
+                      : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+                  }`}
+                  title="Card View"
+                >
+                  <LayoutGrid size={18} />
+                </button>
+                <button
+                  onClick={() => setViewStyle('table')}
+                  className={`p-1.5 rounded-lg transition-colors ${
+                    viewStyle === 'table'
+                      ? 'bg-white dark:bg-neutral-700 shadow-sm text-rose-600 dark:text-rose-400'
+                      : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+                  }`}
+                  title="Table View"
+                >
+                  <List size={18} />
+                </button>
+              </div>
+            )}
 
             <button
               onClick={handleExport}
@@ -666,9 +738,12 @@ export default function SubscriptionsPage() {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
                   <input
                     type="text"
-                    placeholder="নাম, ইমেইল বা ট্রানজেকশন আইডি দিয়ে খুঁজুন..."
+                    placeholder="ট্রানজেকশন আইডি দিয়ে খুঁজুন..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setReqPage(1);
+                    }}
                     className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-rose-500 transition-all text-sm"
                   />
                 </div>
@@ -678,7 +753,10 @@ export default function SubscriptionsPage() {
                     (status) => (
                       <button
                         key={status}
-                        onClick={() => setStatusFilter(status)}
+                        onClick={() => {
+                          setStatusFilter(status);
+                          setReqPage(1); // Reset page on filter change
+                        }}
                         className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
                           statusFilter === status
                             ? 'bg-rose-600 text-white shadow-md'
@@ -693,437 +771,500 @@ export default function SubscriptionsPage() {
               </div>
             </div>
 
-            {/* Mobile Card List (Visible on mobile only) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:hidden gap-3">
-              {filteredRequests.map((request) => (
-                <div
-                  key={request.id}
-                  className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-600 font-bold text-sm">
-                        {request.user?.name?.charAt(0) || '?'}
+            {/* Mobile Card List */}
+            {(viewStyle === 'responsive' || viewStyle === 'card') && (
+              <div
+                className={`grid grid-cols-1 md:grid-cols-2 gap-3 ${viewStyle === 'responsive' ? 'lg:hidden' : ''}`}
+              >
+                {filteredRequests.map((request) => (
+                  <div
+                    key={request.id}
+                    className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-600 font-bold text-sm">
+                          {request.user?.name?.charAt(0) || '?'}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-neutral-900 dark:text-white line-clamp-1">
+                            {request.user?.name || 'Unknown'}
+                          </p>
+                          <p className="text-[10px] text-neutral-500 dark:text-neutral-400 line-clamp-1">
+                            {request.user?.email || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusColor(
+                          request.status,
+                        )}`}
+                      >
+                        {request.status}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 py-3 border-y border-neutral-100 dark:border-neutral-800">
+                      <div>
+                        <p className="text-[10px] text-neutral-400 font-bold uppercase">
+                          প্যাক
+                        </p>
+                        <p className="text-[13px] font-bold text-neutral-800 dark:text-neutral-200">
+                          {request.plan_name}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-neutral-900 dark:text-white line-clamp-1">
-                          {request.user?.name || 'Unknown'}
+                        <p className="text-[10px] text-neutral-400 font-bold uppercase">
+                          টাকা
                         </p>
-                        <p className="text-[10px] text-neutral-500 dark:text-neutral-400 line-clamp-1">
-                          {request.user?.email || 'N/A'}
+                        <p className="text-[13px] font-bold text-rose-600 dark:text-rose-400">
+                          ৳{request.amount.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-[10px] text-neutral-400 font-bold uppercase">
+                          Transaction ID
+                        </p>
+                        <p className="text-[11px] font-mono text-neutral-600 dark:text-neutral-400 truncate">
+                          {request.transaction_id || 'N/A'}
                         </p>
                       </div>
                     </div>
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusColor(
-                        request.status,
-                      )}`}
-                    >
-                      {request.status}
-                    </span>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-3 py-3 border-y border-neutral-100 dark:border-neutral-800">
-                    <div>
-                      <p className="text-[10px] text-neutral-400 font-bold uppercase">
-                        প্যাক
-                      </p>
-                      <p className="text-[13px] font-bold text-neutral-800 dark:text-neutral-200">
-                        {request.plan_name}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-neutral-400 font-bold uppercase">
-                        টাকা
-                      </p>
-                      <p className="text-[13px] font-bold text-rose-600 dark:text-rose-400">
-                        ৳{request.amount.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-[10px] text-neutral-400 font-bold uppercase">
-                        Transaction ID
-                      </p>
-                      <p className="text-[11px] font-mono text-neutral-600 dark:text-neutral-400 truncate">
-                        {request.transaction_id || 'N/A'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-2 pt-1">
-                    <div className="flex items-center gap-1.5 text-[10px] text-neutral-500">
-                      <Calendar size={12} />
-                      {new Date(request.requested_at).toLocaleDateString()}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {request.payment_proof_url && (
-                        <button
-                          onClick={() => {
-                            setSelectedProof(request.payment_proof_url);
-                            setShowProofModal(true);
-                          }}
-                          className="p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg transition-colors border border-blue-100 dark:border-blue-900/30"
-                        >
-                          <Eye size={16} />
-                        </button>
-                      )}
-                      {request.status === 'Pending' && (
-                        <>
+                    <div className="flex items-center justify-between gap-2 pt-1">
+                      <div className="flex items-center gap-1.5 text-[10px] text-neutral-500">
+                        <Calendar size={12} />
+                        {new Date(request.requested_at).toLocaleDateString()}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {request.payment_proof_url && (
                           <button
                             onClick={() => {
-                              setReviewingRequest(request);
-                              setReviewAction('approve');
-                              setShowReviewModal(true);
+                              setSelectedProof(request.payment_proof_url);
+                              setShowProofModal(true);
                             }}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-emerald-500/20"
+                            className="p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg transition-colors border border-blue-100 dark:border-blue-900/30"
                           >
-                            <Check size={14} /> Approve
+                            <Eye size={16} />
                           </button>
-                          <button
-                            onClick={() => {
-                              setReviewingRequest(request);
-                              setReviewAction('reject');
-                              setShowReviewModal(true);
-                            }}
-                            className="flex items-center gap-1 px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-rose-500/20"
-                          >
-                            <X size={14} /> Reject
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Requests Table (Hidden on mobile) */}
-            <div className="hidden lg:block bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
-              {filteredRequests.length === 0 ? (
-                <div className="py-24 flex flex-col items-center justify-center">
-                  <FileText className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
-                  <p className="text-neutral-600 dark:text-neutral-400 font-medium mb-2">
-                    কোন রিকোয়েস্ট পাওয়া যায়নি
-                  </p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800">
-                      <tr>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          User
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          Plan
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          Amount
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          Method
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          Transaction ID
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
-                      {filteredRequests.map((request) => (
-                        <tr
-                          key={request.id}
-                          className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
-                        >
-                          <td className="px-6 py-4">
-                            <div>
-                              <p className="text-sm font-semibold text-neutral-900 dark:text-white">
-                                {request.user?.name || 'Unknown'}
-                              </p>
-                              <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                                {request.user?.email || 'N/A'}
-                              </p>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-sm font-medium text-neutral-900 dark:text-white">
-                              {request.plan_name}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-sm font-bold text-neutral-900 dark:text-white">
-                              ৳{request.amount.toLocaleString()}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                              {request.payment_method}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-xs font-mono text-neutral-600 dark:text-neutral-400">
-                              {request.transaction_id || 'N/A'}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span
-                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusColor(
-                                request.status,
-                              )}`}
+                        )}
+                        {request.status === 'Pending' && (
+                          <>
+                            <button
+                              onClick={() => {
+                                setReviewingRequest(request);
+                                setReviewAction('approve');
+                                setShowReviewModal(true);
+                              }}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-emerald-500/20"
                             >
-                              {request.status === 'Approved' && (
-                                <CheckCircle className="w-3.5 h-3.5" />
-                              )}
-                              {request.status === 'Pending' && (
-                                <Clock className="w-3.5 h-3.5" />
-                              )}
-                              {request.status === 'Rejected' && (
-                                <XCircle className="w-3.5 h-3.5" />
-                              )}
-                              {request.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-400">
-                              <Calendar className="w-3.5 h-3.5" />
-                              {new Date(
-                                request.requested_at,
-                              ).toLocaleDateString()}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center justify-end gap-2">
-                              {request.payment_proof_url && (
-                                <button
-                                  onClick={() => {
-                                    setSelectedProof(request.payment_proof_url);
-                                    setShowProofModal(true);
-                                  }}
-                                  className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
-                                  title="View Proof"
-                                >
-                                  <Eye className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
-                                </button>
-                              )}
-                              {request.status === 'Pending' && (
-                                <>
-                                  <button
-                                    onClick={() => {
-                                      setReviewingRequest(request);
-                                      setReviewAction('approve');
-                                      setShowReviewModal(true);
-                                    }}
-                                    className="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors"
-                                    title="Approve"
-                                  >
-                                    <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      setReviewingRequest(request);
-                                      setReviewAction('reject');
-                                      setShowReviewModal(true);
-                                    }}
-                                    className="p-2 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors"
-                                    title="Reject"
-                                  >
-                                    <X className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-                                  </button>
-                                </>
-                              )}
-                            </div>
-                          </td>
+                              <Check size={14} /> Approve
+                            </button>
+                            <button
+                              onClick={() => {
+                                setReviewingRequest(request);
+                                setReviewAction('reject');
+                                setShowReviewModal(true);
+                              }}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-rose-500/20"
+                            >
+                              <X size={14} /> Reject
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Requests Table */}
+            {(viewStyle === 'responsive' || viewStyle === 'table') && (
+              <div
+                className={`bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden ${viewStyle === 'responsive' ? 'hidden lg:block' : ''}`}
+              >
+                {filteredRequests.length === 0 ? (
+                  <div className="py-24 flex flex-col items-center justify-center">
+                    <FileText className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
+                    <p className="text-neutral-600 dark:text-neutral-400 font-medium mb-2">
+                      কোন রিকোয়েস্ট পাওয়া যায়নি
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800">
+                        <tr>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            User
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Plan
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Amount
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Method
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Transaction ID
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Date
+                          </th>
+                          <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Actions
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
+                      </thead>
+                      <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
+                        {filteredRequests.map((request) => (
+                          <tr
+                            key={request.id}
+                            className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+                          >
+                            <td className="px-6 py-4">
+                              <div>
+                                <p className="text-sm font-semibold text-neutral-900 dark:text-white">
+                                  {request.user?.name || 'Unknown'}
+                                </p>
+                                <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                  {request.user?.email || 'N/A'}
+                                </p>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="text-sm font-medium text-neutral-900 dark:text-white">
+                                {request.plan_name}
+                              </p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="text-sm font-bold text-neutral-900 dark:text-white">
+                                ৳{request.amount.toLocaleString()}
+                              </p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                                {request.payment_method}
+                              </p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="text-xs font-mono text-neutral-600 dark:text-neutral-400">
+                                {request.transaction_id || 'N/A'}
+                              </p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span
+                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusColor(
+                                  request.status,
+                                )}`}
+                              >
+                                {request.status === 'Approved' && (
+                                  <CheckCircle className="w-3.5 h-3.5" />
+                                )}
+                                {request.status === 'Pending' && (
+                                  <Clock className="w-3.5 h-3.5" />
+                                )}
+                                {request.status === 'Rejected' && (
+                                  <XCircle className="w-3.5 h-3.5" />
+                                )}
+                                {request.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-400">
+                                <Calendar className="w-3.5 h-3.5" />
+                                {new Date(
+                                  request.requested_at,
+                                ).toLocaleDateString()}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center justify-end gap-2">
+                                {request.payment_proof_url && (
+                                  <button
+                                    onClick={() => {
+                                      setSelectedProof(
+                                        request.payment_proof_url,
+                                      );
+                                      setShowProofModal(true);
+                                    }}
+                                    className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+                                    title="View Proof"
+                                  >
+                                    <Eye className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
+                                  </button>
+                                )}
+                                {request.status === 'Pending' && (
+                                  <>
+                                    <button
+                                      onClick={() => {
+                                        setReviewingRequest(request);
+                                        setReviewAction('approve');
+                                        setShowReviewModal(true);
+                                      }}
+                                      className="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors"
+                                      title="Approve"
+                                    >
+                                      <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        setReviewingRequest(request);
+                                        setReviewAction('reject');
+                                        setShowReviewModal(true);
+                                      }}
+                                      className="p-2 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors"
+                                      title="Reject"
+                                    >
+                                      <X className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
         {/* Active Subscriptions Tab */}
         {activeTab === 'subscriptions' && (
           <div className="space-y-4">
-            {/* Mobile Card List (Visible on mobile only) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:hidden gap-3">
-              {subscriptions.length === 0 ? (
-                <div className="py-24 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center">
-                  <Crown className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
-                  <p className="text-neutral-600 dark:text-neutral-400 font-medium">
-                    কোন এক্টিভ ইউজার নেই
-                  </p>
-                </div>
-              ) : (
-                subscriptions.map((sub) => (
-                  <div
-                    key={sub.id}
-                    className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 font-bold text-sm">
-                          <Crown size={18} />
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-neutral-900 dark:text-white line-clamp-1">
-                            {sub.user?.name || 'Unknown'}
-                          </p>
-                          <p className="text-[10px] text-neutral-500 dark:text-neutral-400 line-clamp-1">
-                            {sub.user?.email || 'N/A'}
-                          </p>
-                        </div>
-                      </div>
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusColor(
-                          sub.is_active ? 'Active' : 'Expired',
-                        )}`}
-                      >
-                        {sub.is_active ? 'Active' : 'Expired'}
-                      </span>
-                    </div>
-
-                    <div className="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800">
-                      <div className="flex justify-between items-center mb-1">
-                        <p className="text-[10px] text-neutral-400 font-bold uppercase">
-                          প্যাক
-                        </p>
-                        <p className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
-                          {sub.plan?.display_name || 'Unknown'}
-                        </p>
-                      </div>
-                      <div className="flex justify-between items-center text-[11px]">
-                        <span className="text-neutral-500">
-                          Exp: {new Date(sub.expires_at).toLocaleDateString()}
-                        </span>
-                        <span className="text-rose-600 font-bold">
-                          ৳{sub.plan?.price || 0}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-end pt-1">
-                      <button
-                        onClick={() => {
-                          setExtendingSubscription(sub);
-                          setShowExtendModal(true);
-                        }}
-                        className="w-full py-2 bg-rose-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-rose-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
-                      >
-                        <RefreshCw size={14} /> মেয়াদ বাড়ান
-                      </button>
-                    </div>
+            {/* Mobile Card List */}
+            {(viewStyle === 'responsive' || viewStyle === 'card') && (
+              <div
+                className={`grid grid-cols-1 md:grid-cols-2 gap-3 ${viewStyle === 'responsive' ? 'lg:hidden' : ''}`}
+              >
+                {subscriptions.length === 0 ? (
+                  <div className="py-24 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center">
+                    <Crown className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
+                    <p className="text-neutral-600 dark:text-neutral-400 font-medium">
+                      কোন এক্টিভ ইউজার নেই
+                    </p>
                   </div>
-                ))
-              )}
-            </div>
-
-            {/* Subscriptions Table (Hidden on mobile) */}
-            <div className="hidden lg:block bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden">
-              {subscriptions.length === 0 ? (
-                <div className="py-24 flex flex-col items-center justify-center">
-                  <Crown className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
-                  <p className="text-neutral-600 dark:text-neutral-400 font-medium">
-                    কোন এক্টিভ ইউজার পাওয়া যায়নি
-                  </p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800">
-                      <tr>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          User
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          Plan
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          Started
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          Expires
-                        </th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
-                          Action
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
-                      {subscriptions.map((sub) => (
-                        <tr
-                          key={sub.id}
-                          className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+                ) : (
+                  subscriptions.map((sub) => (
+                    <div
+                      key={sub.id}
+                      className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm space-y-4"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 font-bold text-sm">
+                            <Crown size={18} />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-neutral-900 dark:text-white line-clamp-1">
+                              {sub.user?.name || 'Unknown'}
+                            </p>
+                            <p className="text-[10px] text-neutral-500 dark:text-neutral-400 line-clamp-1">
+                              {sub.user?.email || 'N/A'}
+                            </p>
+                          </div>
+                        </div>
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusColor(
+                            sub.is_active ? 'Active' : 'Expired',
+                          )}`}
                         >
-                          <td className="px-6 py-4">
-                            <div>
-                              <p className="text-sm font-semibold text-neutral-900 dark:text-white">
-                                {sub.user?.name || 'Unknown'}
-                              </p>
-                              <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                                {sub.user?.email || 'N/A'}
-                              </p>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-sm font-medium text-neutral-900 dark:text-white flex items-center gap-2">
-                              <Crown className="w-4 h-4 text-amber-500" />
-                              {sub.plan?.display_name || 'Unknown Plan'}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                              {new Date(sub.started_at).toLocaleDateString()}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                              {new Date(sub.expires_at).toLocaleDateString()}
-                            </p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span
-                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusColor(
-                                sub.is_active ? 'Active' : 'Expired',
-                              )}`}
-                            >
-                              {sub.is_active ? (
-                                <CheckCircle className="w-3.5 h-3.5" />
-                              ) : (
-                                <XCircle className="w-3.5 h-3.5" />
-                              )}
-                              {sub.is_active ? 'Active' : 'Expired'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-right">
-                            <button
-                              onClick={() => {
-                                setExtendingSubscription(sub);
-                                setShowExtendModal(true);
-                              }}
-                              className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
-                            >
-                              Extend
-                            </button>
-                          </td>
+                          {sub.is_active ? 'Active' : 'Expired'}
+                        </span>
+                      </div>
+
+                      <div className="bg-neutral-50 dark:bg-neutral-950 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800">
+                        <div className="flex justify-between items-center mb-1">
+                          <p className="text-[10px] text-neutral-400 font-bold uppercase">
+                            প্যাক
+                          </p>
+                          <p className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                            {sub.plan?.display_name || 'Unknown'}
+                          </p>
+                        </div>
+                        <div className="flex justify-between items-center text-[11px]">
+                          <span className="text-neutral-500">
+                            Exp: {new Date(sub.expires_at).toLocaleDateString()}
+                          </span>
+                          <span className="text-rose-600 font-bold">
+                            ৳{sub.plan?.price || 0}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end pt-1">
+                        <button
+                          onClick={() => {
+                            setExtendingSubscription(sub);
+                            setShowExtendModal(true);
+                          }}
+                          className="w-full py-2 bg-rose-600 text-white rounded-lg text-xs font-bold shadow-lg shadow-rose-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                        >
+                          <RefreshCw size={14} /> মেয়াদ বাড়ান
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* Subscriptions Table */}
+            {(viewStyle === 'responsive' || viewStyle === 'table') && (
+              <div
+                className={`bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden ${viewStyle === 'responsive' ? 'hidden lg:block' : ''}`}
+              >
+                {subscriptions.length === 0 ? (
+                  <div className="py-24 flex flex-col items-center justify-center">
+                    <Crown className="w-16 h-16 text-neutral-300 dark:text-neutral-700 mb-4" />
+                    <p className="text-neutral-600 dark:text-neutral-400 font-medium">
+                      কোন এক্টিভ ইউজার পাওয়া যায়নি
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800">
+                        <tr>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            User
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Plan
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Started
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Expires
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-600 dark:text-neutral-400 uppercase tracking-wider">
+                            Action
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                      </thead>
+                      <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
+                        {subscriptions.map((sub) => (
+                          <tr
+                            key={sub.id}
+                            className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+                          >
+                            <td className="px-6 py-4">
+                              <div>
+                                <p className="text-sm font-semibold text-neutral-900 dark:text-white">
+                                  {sub.user?.name || 'Unknown'}
+                                </p>
+                                <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                  {sub.user?.email || 'N/A'}
+                                </p>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="text-sm font-medium text-neutral-900 dark:text-white flex items-center gap-2">
+                                <Crown className="w-4 h-4 text-amber-500" />
+                                {sub.plan?.display_name || 'Unknown Plan'}
+                              </p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                                {new Date(sub.started_at).toLocaleDateString()}
+                              </p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                                {new Date(sub.expires_at).toLocaleDateString()}
+                              </p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span
+                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusColor(
+                                  sub.is_active ? 'Active' : 'Expired',
+                                )}`}
+                              >
+                                {sub.is_active ? (
+                                  <CheckCircle className="w-3.5 h-3.5" />
+                                ) : (
+                                  <XCircle className="w-3.5 h-3.5" />
+                                )}
+                                {sub.is_active ? 'Active' : 'Expired'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <button
+                                onClick={() => {
+                                  setExtendingSubscription(sub);
+                                  setShowExtendModal(true);
+                                }}
+                                className="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+                              >
+                                Extend
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Pagination Controls for Subscriptions */}
+            <div className="flex items-center justify-between pt-4 border-t border-neutral-200 dark:border-neutral-800">
+              <p className="text-[10px] md:text-sm text-neutral-600 dark:text-neutral-400">
+                Showing{' '}
+                <span className="font-bold text-neutral-900 dark:text-white">
+                  {subscriptions.length > 0 ? (subPage - 1) * pageSize + 1 : 0}
+                </span>{' '}
+                to{' '}
+                <span className="font-bold text-neutral-900 dark:text-white">
+                  {Math.min(subPage * pageSize, subTotal)}
+                </span>{' '}
+                of{' '}
+                <span className="font-bold text-neutral-900 dark:text-white">
+                  {subTotal}
+                </span>{' '}
+                subscriptions
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setSubPage((p) => Math.max(1, p - 1))}
+                  disabled={subPage === 1 || isLoading}
+                  className="px-3 py-1.5 text-xs md:text-sm font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg disabled:opacity-50 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                >
+                  Previous
+                </button>
+                <span className="text-xs md:text-sm text-neutral-600 dark:text-neutral-400 font-medium px-2 py-1.5">
+                  Page {subPage} of{' '}
+                  {Math.max(1, Math.ceil(subTotal / pageSize))}
+                </span>
+                <button
+                  onClick={() =>
+                    setSubPage((p) =>
+                      Math.min(Math.ceil(subTotal / pageSize), p + 1),
+                    )
+                  }
+                  disabled={
+                    subPage >= Math.ceil(subTotal / pageSize) || isLoading
+                  }
+                  className="px-3 py-1.5 text-xs md:text-sm font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg disabled:opacity-50 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </div>
         )}

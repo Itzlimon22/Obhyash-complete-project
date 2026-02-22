@@ -26,6 +26,11 @@ export function useUserManagement() {
   /** Loading state for manual refresh */
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalUsers, setTotalUsers] = useState(0);
+
   /** Search query string (name, email, phone) */
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -49,15 +54,17 @@ export function useUserManagement() {
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    // Reset to page 1 when filters change (except when explicitly changing page)
+    setPage(1);
     fetchUsers();
-  }, []);
+  }, [searchQuery, roleFilter, statusFilter, advancedFilters, pageSize]);
 
   useEffect(() => {
-    filterUsers();
-  }, [searchQuery, roleFilter, statusFilter, users, advancedFilters]);
+    fetchUsers();
+  }, [page]);
 
   /**
-   * Fetches the latest list of users from Supabase.
+   * Fetches the latest list of users from Supabase with server-side pagination and filtering.
    * Maps the raw database response to the global User type.
    *
    * @param showToast - Whether to show a success toast on completion.
@@ -66,10 +73,45 @@ export function useUserManagement() {
     if (showToast) setIsRefreshing(true);
     const supabase = createClient();
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false });
+      let query = supabase.from('users').select('*', { count: 'exact' });
+
+      // Apply Server-Side Filters
+      if (searchQuery) {
+        // Simple search across name, email, phone
+        query = query.or(
+          `name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%,phone.ilike.%${searchQuery}%`,
+        );
+      }
+
+      if (roleFilter !== 'all') {
+        query = query.eq('role', roleFilter);
+      }
+
+      if (statusFilter !== 'all') {
+        query = query.eq('status', statusFilter);
+      }
+
+      // Advanced Filters (Partial translation to server-side)
+      if (advancedFilters.minExams > 0) {
+        query = query.gte('exams_taken', advancedFilters.minExams);
+      }
+      if (advancedFilters.maxExams < 10000) {
+        query = query.lte('exams_taken', advancedFilters.maxExams);
+      }
+      if (advancedFilters.institutes.length > 0) {
+        query = query.in('institute', advancedFilters.institutes);
+      }
+      if (advancedFilters.batches.length > 0) {
+        query = query.in('batch', advancedFilters.batches);
+      }
+
+      // Pagination
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+
+      const { data, error, count } = await query
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
       if (error) throw error;
 
@@ -141,6 +183,38 @@ export function useUserManagement() {
       }));
 
       setUsers(mappedUsers);
+
+      // Client-side filtering pass for complex JSON criteria like subscriptions and dates
+      // which are harder to query directly if 'subscription' is JSONB
+      let clientFiltered = [...mappedUsers];
+
+      if (advancedFilters.lastActiveRange !== 'all') {
+        const now = new Date();
+        clientFiltered = clientFiltered.filter((user) => {
+          const userDate = new Date(user.lastActive);
+          const diffDays =
+            (now.getTime() - userDate.getTime()) / (1000 * 3600 * 24);
+
+          if (advancedFilters.lastActiveRange === '7days') return diffDays <= 7;
+          if (advancedFilters.lastActiveRange === '30days')
+            return diffDays <= 30;
+          if (advancedFilters.lastActiveRange === 'inactive')
+            return diffDays > 30;
+          return true;
+        });
+      }
+
+      if (advancedFilters.subscriptionStatus !== 'all') {
+        clientFiltered = clientFiltered.filter((u) =>
+          advancedFilters.subscriptionStatus === 'Expired'
+            ? u.subscription?.status !== 'Active'
+            : u.subscription?.status === advancedFilters.subscriptionStatus,
+        );
+      }
+
+      setFilteredUsers(clientFiltered);
+      if (count !== null) setTotalUsers(count);
+
       if (showToast) toast.success('Users refreshed successfully');
     } catch (error) {
       console.error('Failed to fetch users:', error);
@@ -149,73 +223,6 @@ export function useUserManagement() {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  };
-
-  const filterUsers = () => {
-    let filtered = [...users];
-
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (user) =>
-          user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.phone?.includes(searchQuery),
-      );
-    }
-
-    if (roleFilter !== 'all') {
-      filtered = filtered.filter((user) => user.role === roleFilter);
-    }
-
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter((user) => user.status === statusFilter);
-    }
-
-    // Advanced Filters Logic
-    if (advancedFilters.lastActiveRange !== 'all') {
-      const now = new Date();
-      filtered = filtered.filter((user) => {
-        const userDate = new Date(user.lastActive);
-        const diffDays =
-          (now.getTime() - userDate.getTime()) / (1000 * 3600 * 24);
-
-        if (advancedFilters.lastActiveRange === '7days') return diffDays <= 7;
-        if (advancedFilters.lastActiveRange === '30days') return diffDays <= 30;
-        if (advancedFilters.lastActiveRange === 'inactive')
-          return diffDays > 30;
-        return true;
-      });
-    }
-
-    if (advancedFilters.minExams > 0 || advancedFilters.maxExams < 10000) {
-      filtered = filtered.filter(
-        (u) =>
-          u.enrolledExams >= advancedFilters.minExams &&
-          u.enrolledExams <= advancedFilters.maxExams,
-      );
-    }
-
-    if (advancedFilters.subscriptionStatus !== 'all') {
-      filtered = filtered.filter((u) =>
-        advancedFilters.subscriptionStatus === 'Expired'
-          ? u.subscription?.status !== 'Active'
-          : u.subscription?.status === advancedFilters.subscriptionStatus,
-      );
-    }
-
-    if (advancedFilters.institutes.length > 0) {
-      filtered = filtered.filter(
-        (u) => u.institute && advancedFilters.institutes.includes(u.institute),
-      );
-    }
-
-    if (advancedFilters.batches.length > 0) {
-      filtered = filtered.filter(
-        (u) => u.batch && advancedFilters.batches.includes(u.batch),
-      );
-    }
-
-    setFilteredUsers(filtered);
   };
 
   // Helper: Log Activity
@@ -438,5 +445,13 @@ export function useUserManagement() {
 
     // Bulk Actions
     activeBulkAction,
+
+    // Pagination
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    totalUsers,
+    totalPages: Math.ceil(totalUsers / pageSize),
   };
 }

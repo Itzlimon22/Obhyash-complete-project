@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { User } from '@/lib/types';
+import { LayoutGrid, List } from 'lucide-react';
 
 // Hook
 import { useUserManagement } from '@/hooks/use-user-management';
@@ -60,7 +61,20 @@ export default function UserManagementPage() {
 
     // Bulk Actions
     activeBulkAction,
+
+    // Pagination
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    totalUsers,
+    totalPages,
   } = useUserManagement();
+
+  // View Style
+  const [viewStyle, setViewStyle] = useState<'table' | 'card' | 'responsive'>(
+    'responsive',
+  );
 
   // Local Modal State
   const [showEditModal, setShowEditModal] = useState(false);
@@ -230,6 +244,31 @@ export default function UserManagementPage() {
               <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
             </button>
 
+            <div className="hidden md:flex bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl">
+              <button
+                onClick={() => setViewStyle('card')}
+                className={`p-1.5 rounded-lg transition-colors ${
+                  viewStyle === 'card'
+                    ? 'bg-white dark:bg-neutral-700 shadow-sm text-blue-600 dark:text-blue-400'
+                    : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+                }`}
+                title="Card View"
+              >
+                <LayoutGrid size={18} />
+              </button>
+              <button
+                onClick={() => setViewStyle('table')}
+                className={`p-1.5 rounded-lg transition-colors ${
+                  viewStyle === 'table'
+                    ? 'bg-white dark:bg-neutral-700 shadow-sm text-blue-600 dark:text-blue-400'
+                    : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+                }`}
+                title="Table View"
+              >
+                <List size={18} />
+              </button>
+            </div>
+
             <button
               onClick={handleExport}
               className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-medium rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-[0.98]"
@@ -353,18 +392,42 @@ export default function UserManagementPage() {
           </div>
         )}
 
-        <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800">
+        <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
           <p className="text-[10px] md:text-sm text-neutral-600 dark:text-neutral-400">
             Showing{' '}
             <span className="font-bold text-neutral-900 dark:text-white">
-              {filteredUsers.length}
+              {users.length > 0 ? (page - 1) * pageSize + 1 : 0}
+            </span>{' '}
+            to{' '}
+            <span className="font-bold text-neutral-900 dark:text-white">
+              {Math.min(page * pageSize, totalUsers)}
             </span>{' '}
             of{' '}
             <span className="font-bold text-neutral-900 dark:text-white">
-              {users.length}
+              {totalUsers}
             </span>{' '}
             users
           </p>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1 || isLoading}
+              className="px-3 py-1.5 text-xs md:text-sm font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg disabled:opacity-50 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+            >
+              Previous
+            </button>
+            <span className="text-xs md:text-sm text-neutral-600 dark:text-neutral-400 font-medium px-2">
+              Page {page} of {Math.max(1, totalPages)}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages || isLoading}
+              className="px-3 py-1.5 text-xs md:text-sm font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg disabled:opacity-50 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+            >
+              Next
+            </button>
+          </div>
         </div>
 
         {/* Table */}
@@ -385,6 +448,7 @@ export default function UserManagementPage() {
           onUpdateStatus={handleUpdateStatus}
           onDeleteUser={handleDeleteUser}
           onViewStats={onManageTeacherStats} // Passed handler
+          viewStyle={viewStyle}
         />
 
         {/* Modals */}
