@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Question } from '@/lib/types';
 import LatexText from '../common/LatexText';
 import { toBengaliNumeral } from '@/lib/utils';
@@ -41,6 +41,23 @@ export default function QuestionCard({
   onToggleBookmark,
 }: QuestionCardProps) {
   const isAnswered = selectedOptionIndex !== undefined;
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const tags: string[] = [];
+  const len = Math.max(
+    question.institutes?.length || 0,
+    question.years?.length || 0,
+  );
+  for (let i = 0; i < len; i++) {
+    const inst = question.institutes?.[i] || '';
+    const yr = question.years?.[i] || '';
+    const combined = `${inst} ${yr}`.trim();
+    if (combined) tags.push(combined);
+  }
+  if (tags.length === 0 && (question.institute || question.year)) {
+    tags.push(`${question.institute || ''} ${question.year || ''}`.trim());
+  }
+  const tagsString = tags.join(', ');
 
   return (
     <div
@@ -93,73 +110,98 @@ export default function QuestionCard({
           <span className="text-xs font-bold text-neutral-400 dark:text-neutral-500 mr-2">
             {question.points} Marks
           </span>
-
-          {/* Report Button */}
-          <button
-            onClick={onReport}
-            className="p-2 rounded-full transition-colors text-red-400 hover:text-red-600 dark:text-red-500/50 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-            title="Report Issue"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-              />
-            </svg>
-          </button>
-
-          {/* Bookmark Button */}
-          <motion.button
-            whileTap={{ scale: 0.8 }}
-            whileHover={{ scale: 1.1 }}
-            animate={{
-              scale: isBookmarked ? 1.1 : 1,
-              color: isBookmarked ? '#10b981' : '#d4d4d4',
-            }}
-            onClick={onToggleBookmark}
-            disabled={!onToggleBookmark}
-            className={`p-2 rounded-full transition-colors ${
-              isBookmarked
-                ? 'bg-emerald-50 dark:bg-emerald-900/20'
-                : 'hover:text-neutral-500 dark:text-neutral-600 dark:hover:text-neutral-400'
-            } ${!onToggleBookmark ? 'opacity-30 cursor-default' : ''}`}
-            title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill={isFlagged ? 'currentColor' : 'none'}
-              stroke="currentColor"
-              strokeWidth={2}
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 11.186 0Z"
-              />
-            </svg>
-          </motion.button>
         </div>
       </div>
 
       <div className="px-5 pb-5">
         {/* Question Text */}
-        <h3 className="text-neutral-900 dark:text-neutral-100 font-serif-exam text-lg md:text-xl leading-relaxed mb-6">
+        <h3 className="text-neutral-900 dark:text-neutral-100 font-serif-exam text-lg md:text-xl leading-relaxed mb-4">
           <LatexText text={question.question} />
         </h3>
 
+        {/* Extras Row (Institute/Year + Action Icons) */}
+        <div className="flex items-center justify-end mb-4 relative">
+          {tags.length > 0 && (
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center gap-2 max-w-[60%] flex-wrap overflow-hidden">
+              {tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="px-3 py-1 bg-[#8be8e5] dark:bg-cyan-900/40 text-cyan-900 dark:text-cyan-300 text-xs font-extrabold rounded-full whitespace-nowrap"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 shrink-0 bg-neutral-100 dark:bg-neutral-800 rounded-full px-1 py-1">
+            {/* Read/Mark tag (Visual matching from uploaded image) */}
+            {isFlagged && (
+              <span className="px-3 py-1 text-xs font-bold text-neutral-600 dark:text-neutral-300">
+                দাগানো
+              </span>
+            )}
+
+            {/* Bookmark Button */}
+            <motion.button
+              whileTap={{ scale: 0.8 }}
+              whileHover={{ scale: 1.1 }}
+              animate={{
+                scale: isBookmarked ? 1.1 : 1,
+                color: isBookmarked ? '#db2777' : '#9ca3af', // Pink-red for active bookmark like the image
+              }}
+              onClick={onToggleBookmark}
+              disabled={!onToggleBookmark}
+              className={`p-1.5 rounded-full transition-colors ${
+                isBookmarked
+                  ? 'bg-pink-50 dark:bg-pink-900/20'
+                  : 'hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-300'
+              } ${!onToggleBookmark ? 'opacity-30 cursor-default' : ''}`}
+              title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill={isBookmarked ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth={2}
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 11.186 0Z"
+                />
+              </svg>
+            </motion.button>
+
+            {/* Report Button */}
+            <button
+              onClick={onReport}
+              className="p-1.5 rounded-full transition-colors text-neutral-400 hover:text-red-500 dark:text-neutral-500 dark:hover:text-red-400"
+              title="Report Issue"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
         {/* Options Grid */}
         <div
-          className={`grid grid-cols-1 md:grid-cols-2 gap-3 relative ${readOnly || isOmrMode ? 'pointer-events-none' : ''}`}
+          className={`grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 relative ${readOnly || isOmrMode ? 'pointer-events-none' : ''}`}
         >
           {question.options.map((option, idx) => {
             const isSelected = selectedOptionIndex === idx;
@@ -167,48 +209,49 @@ export default function QuestionCard({
             const banglaIndex = BANGLA_INDICES[idx] || (idx + 1).toString();
 
             // Logic for Feedback Color
-            let borderClass = 'border-transparent';
             let bgClass =
-              'bg-neutral-50 dark:bg-neutral-800/40 hover:bg-neutral-100 dark:hover:bg-neutral-800';
+              'bg-[#f4f4f4] hover:bg-[#ebebeb] dark:bg-neutral-800 dark:hover:bg-neutral-700';
             let iconText = banglaIndex;
-            let iconBorder = 'border-neutral-300 dark:border-neutral-600';
+            let iconClass =
+              'border-2 border-neutral-400 text-neutral-600 dark:border-neutral-500 dark:text-neutral-400';
+            let textClass = 'text-neutral-800 dark:text-neutral-200';
 
             if (showFeedback) {
               if (isCorrect) {
-                bgClass = 'bg-emerald-50 dark:bg-emerald-900/20';
-                borderClass = 'border-emerald-500 dark:border-emerald-500';
-                iconBorder = 'border-emerald-600 bg-emerald-600 text-white';
+                bgClass = 'bg-emerald-100/60 dark:bg-emerald-900/30';
+                iconClass = 'bg-emerald-500 text-white border-none';
                 iconText = '✓';
+                textClass = 'text-emerald-900 dark:text-emerald-100 font-bold';
               } else if (isSelected) {
-                bgClass = 'bg-red-50 dark:bg-red-900/20';
-                borderClass = 'border-red-500 dark:border-red-500';
-                iconBorder = 'border-red-600 bg-red-600 text-white';
+                bgClass = 'bg-red-100/60 dark:bg-red-900/30';
+                iconClass = 'bg-red-500 text-white border-none';
                 iconText = '✕';
+                textClass = 'text-red-900 dark:text-red-100 font-bold';
               } else {
-                // Non-selected wrong options fade out slightly
-                bgClass = 'bg-neutral-50 dark:bg-neutral-800/40 opacity-70';
+                // Non-selected wrong options
+                bgClass = 'bg-[#f4f4f4] dark:bg-neutral-800 opacity-60';
               }
             } else if (showAnswer && isCorrect) {
               // Show correct answer in Review/Practice mode without user selection
-              bgClass = 'bg-emerald-50 dark:bg-emerald-900/10';
-              borderClass = 'border-emerald-400 dark:border-emerald-500/50';
-              iconBorder = 'border-emerald-500 text-emerald-600';
+              bgClass = 'bg-emerald-100/60 dark:bg-emerald-900/30';
+              iconClass = 'bg-emerald-500 text-white border-none';
               iconText = '✓';
+              textClass = 'text-emerald-900 dark:text-emerald-100 font-bold';
             } else if (isSelected) {
-              bgClass = 'bg-emerald-50 dark:bg-emerald-900/20';
-              borderClass =
-                'border-emerald-500 dark:border-emerald-500 shadow-sm';
-              iconBorder = 'border-emerald-600 bg-emerald-600 text-white';
+              bgClass =
+                'bg-blue-100/60 dark:bg-blue-900/30 ring-1 ring-blue-400 dark:ring-blue-500 inset-0';
+              iconClass = 'bg-blue-500 text-white border-none';
               iconText = '✓';
+              textClass = 'text-blue-900 dark:text-blue-100 font-bold';
             }
 
             return (
               <label
                 key={idx}
                 className={`
-                  group relative flex items-start gap-3.5 p-3.5 sm:p-4 rounded-xl transition-all duration-200 border h-full
+                  group relative flex items-center gap-3.5 px-4 py-3 sm:py-3.5 rounded-2xl transition-all duration-200 h-full
                   ${isOmrMode || readOnly ? 'cursor-default' : 'cursor-pointer'}
-                  ${bgClass} ${borderClass}
+                  ${bgClass}
                 `}
               >
                 <input
@@ -227,18 +270,14 @@ export default function QuestionCard({
 
                 {/* Custom Radio Circle */}
                 <div
-                  className={`
-                  mt-0.5 w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all shrink-0
-                  ${iconBorder}
-                  ${!isSelected && !showFeedback ? 'group-hover:border-neutral-400' : ''}
-                `}
+                  className={` w-7 h-7 rounded-full flex items-center justify-center transition-all shrink-0 ${iconClass} `}
                 >
                   <span className="text-xs font-bold">{iconText}</span>
                 </div>
 
                 {/* Option Text */}
                 <div
-                  className={`text-base font-medium leading-relaxed select-none ${isSelected || (showFeedback && isCorrect) ? 'text-neutral-900 dark:text-neutral-100' : 'text-neutral-700 dark:text-neutral-300'}`}
+                  className={`text-base font-medium leading-[1.6] select-none ${textClass}`}
                 >
                   <LatexText text={option} />
                 </div>
@@ -250,25 +289,73 @@ export default function QuestionCard({
         {/* Explanation Section (Only for Review) */}
         {showFeedback && question.explanation && (
           <div className="mt-6 pt-4 border-t border-neutral-100 dark:border-neutral-800 animate-fade-in">
-            <div className="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800/30">
-              <h4 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="w-full flex items-center justify-between px-5 py-3.5 bg-emerald-800 dark:bg-emerald-900 text-white rounded-xl shadow-sm hover:bg-emerald-700 dark:hover:bg-emerald-800 transition-all active:scale-[0.99]"
+            >
+              <div className="flex items-center gap-2.5">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                  <path
-                    fillRule="evenodd"
-                    d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z"
-                    clipRule="evenodd"
-                  />
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                 </svg>
-                ব্যাখ্যা (Explanation)
-              </h4>
-              <div className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif-exam">
-                <LatexText text={question.explanation} />
+                <span className="font-bold text-sm tracking-wider">
+                  ব্যাখ্যা (Explanation)
+                </span>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+
+            <div
+              className={`grid transition-all duration-300 ease-in-out ${
+                isExpanded
+                  ? 'grid-rows-[1fr] opacity-100 mt-3'
+                  : 'grid-rows-[0fr] opacity-0 mt-0'
+              }`}
+            >
+              <div className="overflow-hidden">
+                <div className="p-5 md:p-6 bg-[#F8FAF9] dark:bg-emerald-950/20 border-l-4 border-emerald-800 dark:border-emerald-600 rounded-r-2xl shadow-sm relative">
+                  {/* Decorative faint icon in background */}
+                  <div className="absolute top-4 right-4 opacity-5 dark:opacity-10 pointer-events-none text-emerald-900 dark:text-emerald-500">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="60"
+                      height="60"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                  </div>
+                  <div className="text-[15px] md:text-base text-neutral-800 dark:text-neutral-200 leading-[1.8] font-serif-exam relative z-10">
+                    <LatexText text={question.explanation} />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
