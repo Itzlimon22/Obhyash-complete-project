@@ -365,6 +365,12 @@ export default function QuestionManagementView({
                   onEdit={handleEdit}
                   onDelete={deleteQuestion}
                   onToggleSelection={toggleSelection}
+                  onSelectAll={() =>
+                    questions.length > 0 &&
+                    selectedQuestions.size === questions.length
+                      ? clearSelection()
+                      : selectAll()
+                  }
                   fontSize={tableFontSize}
                   saveQuestion={saveQuestion}
                 />

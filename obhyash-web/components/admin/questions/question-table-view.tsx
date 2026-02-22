@@ -6,8 +6,11 @@ import {
   getHscSubjectList,
   getHscChapterList,
   getHscTopicList,
+  resolveSubjectName,
+  resolveChapterName,
+  resolveTopicName,
 } from '@/lib/data/hsc-helpers';
-import { Trash2, Edit } from 'lucide-react';
+import { Trash2, Edit, Copy } from 'lucide-react';
 
 interface QuestionTableViewProps {
   questions: Question[];
@@ -15,6 +18,7 @@ interface QuestionTableViewProps {
   onEdit: (q: Question) => void;
   onDelete: (id: string) => void;
   onToggleSelection: (id: string) => void;
+  onSelectAll: () => void;
   fontSize: number;
   saveQuestion: (q: Partial<Question>) => Promise<boolean>;
 }
@@ -76,19 +80,36 @@ const EditableRow = ({
     if (typeof localQ.correctAnswerIndex === 'number') {
       return String.fromCharCode(65 + localQ.correctAnswerIndex);
     }
+    // Fallback if correctAnswer is present but index is missing
+    if (localQ.correctAnswer && localQ.options) {
+      const idx = localQ.options.findIndex((o) => o === localQ.correctAnswer);
+      if (idx !== -1) return String.fromCharCode(65 + idx);
+    }
     return '';
   };
 
+  const canonicalSubject = localQ.subject
+    ? resolveSubjectName(localQ.subject) || localQ.subject
+    : '';
+  const canonicalChapter = localQ.chapter
+    ? resolveChapterName(canonicalSubject, localQ.chapter) || localQ.chapter
+    : '';
+  const canonicalTopic = localQ.topic
+    ? resolveTopicName(canonicalChapter, localQ.topic) || localQ.topic
+    : '';
+
   const availableSubjects = getHscSubjectList();
-  const availableChapters = localQ.subject
-    ? getHscChapterList(localQ.subject)
+  const availableChapters = canonicalSubject
+    ? getHscChapterList(canonicalSubject)
     : [];
-  const availableTopics = localQ.chapter ? getHscTopicList(localQ.chapter) : [];
+  const availableTopics = canonicalChapter
+    ? getHscTopicList(canonicalChapter)
+    : [];
 
   const tdClass =
-    'border border-neutral-300 dark:border-neutral-600 p-1 align-top';
+    'border border-neutral-300 dark:border-neutral-600 p-1 align-top relative';
   const inputClass =
-    'w-full h-full bg-transparent border-none outline-none focus:ring-1 focus:ring-emerald-500 rounded px-1';
+    'w-full min-w-[80px] h-full bg-transparent border-none outline-none focus:ring-1 focus:ring-emerald-500 rounded px-1';
 
   return (
     <tr className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
@@ -100,12 +121,18 @@ const EditableRow = ({
           className="cursor-pointer"
         />
       </td>
-      <td className={`${tdClass} text-center font-mono align-middle`}>
-        {localQ.id}
+      <td className={`${tdClass} text-center align-middle`}>
+        <button
+          onClick={() => navigator.clipboard.writeText(localQ.id!)}
+          className="p-1.5 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md text-neutral-500 transition-colors"
+          title="Copy ID"
+        >
+          <Copy size={16} />
+        </button>
       </td>
 
       <td
-        className={`${tdClass} cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 min-w-[200px] max-w-[300px]`}
+        className={`${tdClass} cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 min-w-[200px] max-w-[400px] resize-x overflow-auto`}
         onClick={() => onPreviewQuestion(localQ)}
         title="Click to view full question/math"
       >
@@ -201,7 +228,7 @@ const EditableRow = ({
 
       <td className={tdClass}>
         <select
-          value={localQ.subject || ''}
+          value={canonicalSubject}
           onChange={(e) => {
             updateField('subject', e.target.value);
             updateField('chapter', '');
@@ -217,7 +244,7 @@ const EditableRow = ({
             setLocalQ(newQ);
             onSave(newQ);
           }}
-          className={`${inputClass} max-w-[120px]`}
+          className={`${inputClass} min-w-[100px]`}
         >
           <option value="">Select</option>
           {availableSubjects.map((s) => (
@@ -230,7 +257,7 @@ const EditableRow = ({
 
       <td className={tdClass}>
         <select
-          value={localQ.chapter || ''}
+          value={canonicalChapter}
           onChange={(e) => {
             updateField('chapter', e.target.value);
             updateField('topic', '');
@@ -239,8 +266,8 @@ const EditableRow = ({
             setLocalQ(newQ);
             onSave(newQ);
           }}
-          disabled={!localQ.subject}
-          className={`${inputClass} max-w-[120px] disabled:opacity-50`}
+          disabled={!canonicalSubject}
+          className={`${inputClass} min-w-[100px] disabled:opacity-50`}
         >
           <option value="">Select</option>
           {availableChapters.map((c) => (
@@ -253,15 +280,15 @@ const EditableRow = ({
 
       <td className={tdClass}>
         <select
-          value={localQ.topic || ''}
+          value={canonicalTopic}
           onChange={(e) => {
             updateField('topic', e.target.value);
             const newQ = { ...localQ, topic: e.target.value };
             setLocalQ(newQ);
             onSave(newQ);
           }}
-          disabled={!localQ.chapter}
-          className={`${inputClass} max-w-[120px] disabled:opacity-50`}
+          disabled={!canonicalChapter}
+          className={`${inputClass} min-w-[100px] disabled:opacity-50`}
         >
           <option value="">Select</option>
           {availableTopics.map((t) => (
@@ -318,6 +345,7 @@ export const QuestionTableView: React.FC<QuestionTableViewProps> = ({
   onEdit,
   onDelete,
   onToggleSelection,
+  onSelectAll,
   fontSize,
   saveQuestion,
 }) => {
@@ -334,7 +362,17 @@ export const QuestionTableView: React.FC<QuestionTableViewProps> = ({
       >
         <thead>
           <tr>
-            <th className={`${thClass} text-center w-10`}>☑</th>
+            <th className={`${thClass} text-center w-10`}>
+              <input
+                type="checkbox"
+                checked={
+                  questions.length > 0 &&
+                  selectedQuestions.size === questions.length
+                }
+                onChange={onSelectAll}
+                className="cursor-pointer"
+              />
+            </th>
             <th className={thClass}>ID</th>
             <th className={thClass}>Question / Text</th>
             <th className={thClass}>Opt A</th>
