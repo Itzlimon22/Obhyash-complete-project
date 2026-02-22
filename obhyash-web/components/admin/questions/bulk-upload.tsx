@@ -816,6 +816,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   const [showJsonEditor, setShowJsonEditor] = useState(false);
   const [rawJsonText, setRawJsonText] = useState('');
   const [jsonErrorMsg, setJsonErrorMsg] = useState('');
+  const [directJsonText, setDirectJsonText] = useState('');
 
   // ── Bulk Action State ──
   const [bulkSubject, setBulkSubject] = useState('');
@@ -1103,6 +1104,68 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
     }
   };
 
+  // ── JSON Text Submit Handler ───────────────────────────────────────
+  const handleJsonTextSubmit = async () => {
+    if (!directJsonText.trim()) return;
+    setIsProcessing(true);
+    setErrors([]);
+    setImportSuccess(false);
+
+    try {
+      let data;
+      try {
+        data = JSON.parse(directJsonText);
+      } catch (err: any) {
+        setRawJsonText(directJsonText);
+        setJsonErrorMsg(err.message);
+        setShowJsonEditor(true);
+        setIsProcessing(false);
+        return;
+      }
+
+      const rawRows = (Array.isArray(data) ? data : [data]).map(
+        (row: Record<string, unknown>) => {
+          const mapped: Record<string, string> = {};
+          Object.entries(row).forEach(([k, v]) => {
+            mapped[k.trim().toLowerCase()] = String(v ?? '');
+          });
+          return mapped;
+        },
+      );
+
+      if (rawRows.length === 0)
+        throw new Error('টেক্সটে কোনো ডাটা পাওয়া যায়নি।');
+      if (rawRows.length > MAX_ROW_COUNT)
+        throw new Error(`সর্বোচ্চ ${MAX_ROW_COUNT} টি সারি অনুমোদিত।`);
+
+      let questions = processRawData(rawRows);
+      questions = resolveTopicSerialsLocally(questions);
+
+      const questionTexts = questions.map((q) => q.question || '');
+      const dbDuplicates = await checkDuplicateQuestions(questionTexts);
+      if (dbDuplicates.size > 0) {
+        const dupErrors: ParseError[] = [];
+        dbDuplicates.forEach((idx) => {
+          dupErrors.push({
+            row: idx + 1,
+            field: 'question',
+            message: 'ডাটাবেসে ইতিমধ্যে বিদ্যমান — ডুপ্লিকেট',
+          });
+        });
+        setErrors((prev) => [...prev, ...dupErrors]);
+      }
+
+      setFileName('Pasted JSON text');
+      setParsedData(questions);
+      setSelectedIndices(new Set(questions.map((_, i) => i)));
+      setStep(2);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'JSON পার্স করতে ব্যর্থ।');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   // ── Download Templates ─────────────────────────────────────────────
   const downloadTemplate = (format: 'json' | 'csv' | 'xlsx') => {
     if (format === 'json') {
@@ -1276,14 +1339,15 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           </div>
 
           {/* Upload Area */}
-          <label className="relative border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-2xl p-10 text-center hover:border-emerald-500 bg-neutral-50/50 dark:bg-neutral-950/50 cursor-pointer block group transition-all">
-            <input
-              type="file"
-              onChange={handleFile}
-              className="hidden"
-              accept=".csv,.json,.xlsx,.xls"
-            />
-            <div className="flex flex-col items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left: Dropzone */}
+            <label className="relative border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-2xl p-8 text-center hover:border-emerald-500 bg-neutral-50/50 dark:bg-neutral-950/50 cursor-pointer flex flex-col items-center justify-center transition-all h-64 group">
+              <input
+                type="file"
+                onChange={handleFile}
+                className="hidden"
+                accept=".csv,.json,.xlsx,.xls"
+              />
               <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-transform">
                 <FileUp size={28} />
               </div>
@@ -1303,8 +1367,36 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                   'ফাইল আপলোড করুন'
                 )}
               </div>
+            </label>
+
+            {/* Right: Json Code Paste */}
+            <div className="relative border border-neutral-200 dark:border-neutral-700 rounded-2xl p-4 flex flex-col focus-within:border-emerald-500 bg-white dark:bg-neutral-950 transition-all h-64">
+              <div className="flex items-center gap-2 mb-2 text-neutral-700 dark:text-neutral-300">
+                <FileJson size={18} className="text-emerald-600" />
+                <h3 className="text-sm font-bold">JSON টেক্সট পেস্ট করুন</h3>
+              </div>
+              <textarea
+                value={directJsonText}
+                onChange={(e) => setDirectJsonText(e.target.value)}
+                placeholder='[ { "question": "..." } ]'
+                className="flex-1 w-full bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 text-xs font-mono text-neutral-800 dark:text-neutral-300 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/50 mb-3"
+              />
+              <button
+                onClick={handleJsonTextSubmit}
+                disabled={isProcessing || !directJsonText.trim()}
+                className="w-full py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 rounded-xl font-bold text-sm shadow-md transition-all disabled:opacity-50 flex items-center justify-center"
+              >
+                {isProcessing ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 size={16} className="animate-spin" />
+                    প্রসেস হচ্ছে...
+                  </span>
+                ) : (
+                  'টেক্সট পার্স করুন'
+                )}
+              </button>
             </div>
-          </label>
+          </div>
         </div>
       </div>
     );

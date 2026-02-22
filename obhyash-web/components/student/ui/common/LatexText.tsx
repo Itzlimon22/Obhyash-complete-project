@@ -1,6 +1,10 @@
-
 import React, { useMemo } from 'react';
-import katex from 'katex';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import remarkGfm from 'remark-gfm';
+import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
+import 'katex/dist/katex.min.css';
 
 interface LatexTextProps {
   text: string;
@@ -8,41 +12,24 @@ interface LatexTextProps {
 }
 
 /**
- * A component that safely parses mixed text and LaTeX equations.
- * It looks for LaTeX content enclosed in '$' delimiters (e.g. $E=mc^2$) 
- * and renders it using KaTeX.
+ * A component that safely parses Markdown, HTML, and LaTeX equations.
+ * It renders formatted text like tables, lists, and math using remark and rehype plugins.
  */
 const LatexText: React.FC<LatexTextProps> = ({ text, className = '' }) => {
-  const renderedContent = useMemo(() => {
-    if (!text) return null;
+  const content = useMemo(() => text || '', [text]);
 
-    // Split text by regex looking for content between $ delimiters.
-    // The capturing parentheses in split() keeps the delimiters in the result array.
-    const parts = text.split(/(\$[^$]+\$)/g);
-
-    return parts.map((part, index) => {
-      // Check if this part is a LaTeX segment
-      if (part.startsWith('$') && part.endsWith('$')) {
-        // Remove the surrounding '$'
-        const math = part.slice(1, -1);
-        try {
-          // Render to HTML string using KaTeX
-          const html = katex.renderToString(math, {
-            throwOnError: false, // Don't crash on bad LaTeX syntax
-            displayMode: false,  // Inline mode
-          });
-          return <span key={index} dangerouslySetInnerHTML={{ __html: html }} />;
-        } catch {
-          // Fallback to raw text if rendering fails
-          return <span key={index}>{part}</span>;
-        }
-      }
-      // Return regular text as is
-      return <span key={index}>{part}</span>;
-    });
-  }, [text]);
-
-  return <span className={className}>{renderedContent}</span>;
+  return (
+    <div
+      className={`prose dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 ${className}`}
+    >
+      <ReactMarkdown
+        remarkPlugins={[remarkMath, remarkGfm]}
+        rehypePlugins={[rehypeKatex, rehypeRaw]}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
 };
 
 export default LatexText;

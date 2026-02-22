@@ -78,7 +78,11 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     },
     onUpdate: ({ editor }) => {
       try {
-        const markdown = (editor.storage as unknown as { markdown: { getMarkdown: () => string } }).markdown.getMarkdown();
+        const markdown = (
+          editor.storage as unknown as {
+            markdown: { getMarkdown: () => string };
+          }
+        ).markdown.getMarkdown();
         onChange(markdown);
       } catch (e) {
         console.warn('Markdown serialization failed, falling back to text', e);
@@ -88,7 +92,15 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   });
 
   useEffect(() => {
-    if (editor && value !== (editor.storage as unknown as { markdown: { getMarkdown: () => string } }).markdown.getMarkdown()) {
+    if (
+      editor &&
+      value !==
+        (
+          editor.storage as unknown as {
+            markdown: { getMarkdown: () => string };
+          }
+        ).markdown.getMarkdown()
+    ) {
       if (value === '' && editor.getText() !== '') {
         editor.commands.setContent('');
       }
@@ -103,7 +115,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (block) {
       editor.chain().focus().insertContent('$$\n\n$$').run();
     } else {
-      editor.chain().focus().insertContent('$$ $$').run();
+      editor.chain().focus().insertContent('$ $').run();
     }
   };
 

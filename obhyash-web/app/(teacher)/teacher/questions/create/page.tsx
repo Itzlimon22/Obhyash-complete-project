@@ -22,6 +22,7 @@ import {
 } from '@/services/database';
 import { Question } from '@/lib/types';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { RichTextEditor } from '@/components/admin/questions/rich-text-editor';
 
 type QuestionFormData = {
   question: string;
@@ -386,12 +387,10 @@ export default function TeacherCreateQuestionPage() {
             <label className="block text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-2">
               প্রশ্ন (Question) *
             </label>
-            <textarea
+            <RichTextEditor
               value={formData.question}
-              onChange={(e) => handleChange('question', e.target.value)}
-              placeholder="আপনার প্রশ্নটি এখানে লিখুন..."
-              rows={4}
-              className={inputClassName}
+              onChange={(val) => handleChange('question', val)}
+              placeholder="আপনার প্রশ্নটি এখানে লিখুন (supports LaTeX and formatting)..."
             />
           </div>
 
@@ -426,13 +425,13 @@ export default function TeacherCreateQuestionPage() {
                   >
                     <CheckCircle className="w-5 h-5" />
                   </button>
-                  <input
-                    type="text"
-                    value={option}
-                    onChange={(e) => handleOptionChange(idx, e.target.value)}
-                    placeholder={`অপশন ${String.fromCharCode(65 + idx)}`}
-                    className={inputClassName}
-                  />
+                  <div className="flex-1 w-full relative">
+                    <RichTextEditor
+                      value={option}
+                      onChange={(val) => handleOptionChange(idx, val)}
+                      placeholder={`অপশন ${String.fromCharCode(65 + idx)}`}
+                    />
+                  </div>
                   {formData.options.length > 2 && (
                     <button
                       onClick={() => removeOption(idx)}
@@ -566,12 +565,10 @@ export default function TeacherCreateQuestionPage() {
             <label className="block text-sm font-bold text-neutral-700 dark:text-neutral-300 mb-2">
               ব্যাখ্যা (Explanation) - অপশনাল
             </label>
-            <textarea
+            <RichTextEditor
               value={formData.explanation}
-              onChange={(e) => handleChange('explanation', e.target.value)}
-              placeholder="সঠিক উত্তরের ব্যাখ্যা লিখুন..."
-              rows={4}
-              className={inputClassName}
+              onChange={(val) => handleChange('explanation', val)}
+              placeholder="সঠিক উত্তরের ব্যাখ্যা লিখুন (supports LaTeX and formatting)..."
             />
           </div>
         </div>

@@ -22,6 +22,7 @@ import {
   getExamTypes,
 } from '@/services/database';
 import { Question } from '@/lib/types';
+import { RichTextEditor } from '@/components/admin/questions/rich-text-editor';
 
 type QuestionFormData = {
   question: string;
@@ -417,12 +418,10 @@ export default function NewQuestionPage() {
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Question *
               </label>
-              <textarea
+              <RichTextEditor
                 value={formData.question}
-                onChange={(e) => handleChange('question', e.target.value)}
-                placeholder="Enter your question (supports LaTeX and Bangla)"
-                rows={4}
-                className="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onChange={(val) => handleChange('question', val)}
+                placeholder="Enter your question (supports LaTeX and formatting)..."
               />
             </div>
 
@@ -448,13 +447,13 @@ export default function NewQuestionPage() {
                     >
                       <CheckCircle className="w-4 h-4" />
                     </button>
-                    <input
-                      type="text"
-                      value={option}
-                      onChange={(e) => handleOptionChange(idx, e.target.value)}
-                      placeholder={`Option ${idx + 1}`}
-                      className="flex-1 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700"
-                    />
+                    <div className="flex-1 w-full relative">
+                      <RichTextEditor
+                        value={option}
+                        onChange={(val) => handleOptionChange(idx, val)}
+                        placeholder={`Option ${idx + 1}`}
+                      />
+                    </div>
                     {formData.options.length > 2 && (
                       <button
                         onClick={() => removeOption(idx)}
@@ -477,12 +476,10 @@ export default function NewQuestionPage() {
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Explanation (Optional)
               </label>
-              <textarea
+              <RichTextEditor
                 value={formData.explanation}
-                onChange={(e) => handleChange('explanation', e.target.value)}
-                placeholder="Enter explanation (supports LaTeX and Bangla)"
-                rows={4}
-                className="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700"
+                onChange={(val) => handleChange('explanation', val)}
+                placeholder="Enter explanation (supports LaTeX and formatting)..."
               />
             </div>
 

@@ -11,6 +11,7 @@ import {
   findHscChapter,
 } from '@/lib/data/hsc-helpers';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { RichTextEditor } from '@/components/admin/questions/rich-text-editor';
 
 interface QuestionFormProps {
   initialData: Partial<Question>;
@@ -250,14 +251,10 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                     LaTeX Supported ($...$)
                   </span>
                 </div>
-                <textarea
+                <RichTextEditor
                   value={data.question || ''}
-                  onChange={(e) =>
-                    setData({ ...data, question: e.target.value })
-                  }
-                  className="w-full p-3 rounded-xl border border-neutral-200 bg-neutral-50 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
-                  rows={4}
-                  placeholder="প্রশ্নের বিবরণ লিখুন..."
+                  onChange={(val) => setData({ ...data, question: val })}
+                  placeholder="প্রশ্নের বিবরণ লিখুন (LaTeX and formatting supported)..."
                 />
 
                 {data.question && (
@@ -338,16 +335,13 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                         </button>
 
                         <div className="flex-1 space-y-2">
-                          <input
-                            value={opt}
-                            onChange={(e) => updateOption(i, e.target.value)}
-                            placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                            className={`w-full p-2 rounded-lg border text-sm transition-all outline-none ${
-                              data.correctAnswerIndex === i
-                                ? 'border-emerald-300 bg-emerald-50 focus:ring-1 focus:ring-emerald-500'
-                                : 'border-neutral-200 bg-white focus:ring-1 focus:ring-emerald-500'
-                            }`}
-                          />
+                          <div className="flex-1 w-full relative">
+                            <RichTextEditor
+                              value={opt}
+                              onChange={(val) => updateOption(i, val)}
+                              placeholder={`Option ${String.fromCharCode(65 + i)}`}
+                            />
+                          </div>
 
                           {/* Option Image Preview if exists */}
                           {data.optionImages?.[i] && (
@@ -437,14 +431,10 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                 </div>
               )}
 
-              <textarea
+              <RichTextEditor
                 value={data.explanation || ''}
-                onChange={(e) =>
-                  setData({ ...data, explanation: e.target.value })
-                }
-                className="w-full p-3 rounded-xl border border-neutral-200 bg-neutral-50 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
-                rows={3}
-                placeholder="সঠিক উত্তরের ব্যাখ্যা লিখুন..."
+                onChange={(val) => setData({ ...data, explanation: val })}
+                placeholder="সঠিক উত্তরের ব্যাখ্যা লিখুন (LaTeX and formatting supported)..."
               />
 
               {data.explanation && (
