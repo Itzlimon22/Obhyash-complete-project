@@ -244,7 +244,7 @@ export default function StudentRoot({
         // 2. Fetch History (always, regardless of streak)
         const { getExamHistory } = await import('@/services/database');
         const dbHistory = await getExamHistory();
-        if (dbHistory && dbHistory.length > 0 && isMounted) {
+        if (dbHistory && isMounted) {
           setExamHistory(dbHistory);
         }
       } catch (err) {

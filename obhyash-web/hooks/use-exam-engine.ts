@@ -70,7 +70,7 @@ export const useExamEngine = () => {
         // Dynamic import to avoid circular dependency issues if any
         const { getExamHistory } = await import('@/services/database');
         const dbHistory = await getExamHistory();
-        if (dbHistory && dbHistory.length > 0) {
+        if (dbHistory) {
           setExamHistory(dbHistory);
           // Update local storage to match cloud
           localStorage.setItem(
