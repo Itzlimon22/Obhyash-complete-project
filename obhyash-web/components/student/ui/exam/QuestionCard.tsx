@@ -65,17 +65,17 @@ export default function QuestionCard({
         transition-all duration-200
         border
         ${isFlagged
-          ? 'border-orange-300 dark:border-orange-700/60 shadow-orange-100/60 dark:shadow-none shadow-md'
-          : 'border-neutral-200 dark:border-neutral-700/60 shadow-sm'
+          ? 'border-orange-300 dark:border-orange-700/60'
+          : 'border-neutral-200 dark:border-neutral-700/60'
         }
+        shadow-sm
         ${isOmrMode ? 'opacity-90' : ''}
       `}
     >
-      {/* ── Question Body ── */}
       <div className="px-4 pt-4 pb-3 md:px-5 md:pt-5">
 
-        {/* Question Text */}
-        <p className="
+        {/* ── Question number + text inline ── */}
+        <div className="
           font-serif-exam text-[15px] md:text-base
           text-neutral-900 dark:text-neutral-100
           leading-[1.75] mb-3
@@ -86,59 +86,37 @@ export default function QuestionCard({
             </span>
           )}
           <LatexText text={question.question} />
-        </p>
+        </div>
 
-        {/* ── Meta Row ── */}
-        <div className="flex items-center justify-between gap-2 mb-3">
+        {/* ── Meta Row: tags LEFT · bookmark + report RIGHT ── */}
+        <div className="flex items-center justify-between gap-2 mb-3 min-h-[24px]">
 
-          {/* Tags */}
+          {/* Institute / Year tags */}
           <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-            {tags.map((tag, i) => (
-              <span
-                key={i}
-                className="
-                  inline-flex items-center
-                  text-[10px] md:text-[11px] font-bold
-                  px-2 py-[3px] rounded-md
-                  bg-teal-50 text-teal-700
-                  dark:bg-teal-900/30 dark:text-teal-400
-                  border border-teal-100 dark:border-teal-800/60
-                  tracking-wide
-                "
-              >
-                {tag}
-              </span>
-            ))}
+            {tags.length > 0 ? (
+              tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="
+                    inline-flex items-center
+                    text-[10px] md:text-[11px] font-bold
+                    px-2 py-[3px] rounded-md
+                    bg-teal-50 text-teal-700
+                    dark:bg-teal-900/30 dark:text-teal-400
+                    border border-teal-100 dark:border-teal-800/60
+                    tracking-wide whitespace-nowrap
+                  "
+                >
+                  {tag}
+                </span>
+              ))
+            ) : (
+              <span /> /* spacer so flex justify-between still works */
+            )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2 shrink-0">
-
-            {/* দাগানো */}
-            <button
-              onClick={onToggleFlag}
-              className={`
-                inline-flex items-center gap-1
-                text-[11px] font-semibold
-                px-2.5 py-[3px] rounded-md
-                border transition-all duration-150
-                ${isFlagged
-                  ? 'bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-900/25 dark:text-orange-400 dark:border-orange-700/50'
-                  : 'bg-neutral-100 text-neutral-500 border-neutral-200 hover:bg-orange-50 hover:text-orange-500 hover:border-orange-200 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700 dark:hover:bg-orange-900/20 dark:hover:text-orange-400'
-                }
-              `}
-            >
-              {isFlagged ? (
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
-                  <path d="M3 3h18v13l-9 5-9-5V3z" />
-                </svg>
-              ) : (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-3 h-3">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h18v13l-9 5-9-5V3z" />
-                </svg>
-              )}
-              দাগানো
-            </button>
+          {/* Bookmark + Report */}
+          <div className="flex items-center gap-1.5 shrink-0">
 
             {/* Bookmark */}
             <motion.button
@@ -163,11 +141,13 @@ export default function QuestionCard({
                 fill={isBookmarked ? 'currentColor' : 'none'}
                 stroke="currentColor"
                 strokeWidth={2}
-                className={`w-4 h-4 transition-colors duration-150 ${
-                  isBookmarked
+                className={`
+                  w-4 h-4 transition-colors duration-150
+                  ${isBookmarked
                     ? 'text-emerald-600 dark:text-emerald-400'
                     : 'text-neutral-400 dark:text-neutral-500'
-                }`}
+                  }
+                `}
               >
                 <path
                   strokeLinecap="round"
@@ -223,14 +203,12 @@ export default function QuestionCard({
 
             let badgeText = banglaIndex;
 
-            /* Badge styles */
             let badgeClass = `
               border-2 border-neutral-300 text-neutral-500
               dark:border-neutral-600 dark:text-neutral-400
               bg-white dark:bg-transparent
             `;
 
-            /* Option row styles */
             let rowClass = `
               bg-neutral-50 border border-neutral-200
               dark:bg-neutral-800/50 dark:border-neutral-700/50
@@ -238,7 +216,6 @@ export default function QuestionCard({
               dark:hover:bg-neutral-800 dark:hover:border-neutral-600
             `;
 
-            /* Text styles */
             let textClass = 'text-neutral-800 dark:text-neutral-200';
 
             if (showFeedback) {
@@ -276,7 +253,7 @@ export default function QuestionCard({
                 className={`
                   flex items-center gap-3
                   px-3 py-2.5 rounded-xl
-                  transition-all duration-150 cursor-pointer
+                  transition-all duration-150
                   ${isOmrMode || readOnly ? 'cursor-default' : 'cursor-pointer'}
                   ${rowClass}
                 `}
@@ -322,7 +299,7 @@ export default function QuestionCard({
         </div>
       </div>
 
-      {/* ── Explanation (review/feedback only) ── */}
+      {/* ── Explanation ── */}
       {showFeedback && question.explanation && (
         <div className="
           border-t border-neutral-100 dark:border-neutral-800
@@ -342,7 +319,7 @@ export default function QuestionCard({
             <div className="flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="17" height="17"
+                width="16" height="16"
                 viewBox="0 0 24 24"
                 fill="none" stroke="currentColor"
                 strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
@@ -350,7 +327,9 @@ export default function QuestionCard({
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
               </svg>
-              <span className="text-sm font-bold">ব্যাখ্যা দেখুন</span>
+              <span className="text-sm font-bold tracking-wide">
+                ব্যাখ্যা দেখুন
+              </span>
             </div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -362,7 +341,6 @@ export default function QuestionCard({
             </svg>
           </button>
 
-          {/* Collapsible body */}
           <div
             className={`
               grid transition-all duration-300 ease-in-out
@@ -373,7 +351,7 @@ export default function QuestionCard({
           >
             <div className="overflow-hidden">
               <div className="
-                mt-0 p-4 md:p-5 rounded-xl
+                p-4 md:p-5 rounded-xl
                 bg-neutral-50 dark:bg-neutral-800/50
                 border border-neutral-200 dark:border-neutral-700/60
                 border-l-4 border-l-emerald-500 dark:border-l-emerald-500
