@@ -74,11 +74,17 @@ export default function QuestionCard({
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2 mb-1">
           {serialNumber && (
-            <span className="font-serif-exam text-base md:text-lg text-neutral-900 dark:text-neutral-100 font-bold">
+            <span
+              className="font-serif-exam text-base md:text-lg text-neutral-900 dark:text-neutral-100"
+              style={{ lineHeight: 'inherit' }}
+            >
               {toBengaliNumeral(serialNumber)}.
             </span>
           )}
-          <span className="font-serif-exam text-base md:text-lg text-neutral-900 dark:text-neutral-100">
+          <span
+            className="font-serif-exam text-base md:text-lg text-neutral-900 dark:text-neutral-100"
+            style={{ lineHeight: 'inherit' }}
+          >
             <LatexText text={question.question} />
           </span>
         </div>
