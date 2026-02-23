@@ -40,7 +40,6 @@ export default function QuestionCard({
   const isAnswered = selectedOptionIndex !== undefined;
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Build tags
   const tags: string[] = [];
   const len = Math.max(
     question.institutes?.length || 0,
@@ -61,15 +60,11 @@ export default function QuestionCard({
       id={`question-${question.id}`}
       className={`
         bg-white dark:bg-neutral-900
-        rounded-xl mb-4 scroll-mt-24 transition-all duration-300
+        rounded-xl mb-4 scroll-mt-24
         border border-neutral-200/80 dark:border-neutral-800
-        shadow-sm hover:shadow-md
+        shadow-sm hover:shadow-md transition-all duration-200
         px-3 py-3 md:px-5 md:py-4
-        ${isFlagged
-          ? 'ring-2 ring-orange-400/50'
-          : isAnswered
-          ? 'ring-1 ring-emerald-500/30'
-          : ''}
+        ${isFlagged ? 'ring-2 ring-orange-300/50' : isAnswered ? 'ring-1 ring-emerald-400/30' : ''}
         ${isOmrMode ? 'opacity-90' : ''}
       `}
     >
@@ -79,10 +74,9 @@ export default function QuestionCard({
         <LatexText text={question.question} />
       </p>
 
-      {/* ── Single meta row: tags LEFT · দাগানো + bookmark + report RIGHT ── */}
+      {/* ── Meta Row ── */}
       <div className="flex items-center justify-between gap-2 mb-3 min-h-[26px]">
-
-        {/* Institute / Year tags — teal rounded-full pills */}
+        {/* Institute / Year tags */}
         <div className="flex items-center gap-1.5 flex-wrap">
           {tags.map((tag, i) => (
             <span
@@ -90,8 +84,8 @@ export default function QuestionCard({
               className="
                 inline-flex items-center text-[11px] md:text-xs font-semibold
                 px-2.5 py-0.5 rounded-full
-                bg-cyan-500/10 text-cyan-700
-                dark:bg-cyan-500/20 dark:text-cyan-300
+                bg-teal-500/10 text-teal-700
+                dark:bg-teal-500/20 dark:text-teal-300
               "
             >
               {tag}
@@ -101,7 +95,6 @@ export default function QuestionCard({
 
         {/* Action buttons */}
         <div className="flex items-center gap-1.5 shrink-0">
-
           {/* দাগানো pill */}
           <button
             onClick={onToggleFlag}
@@ -118,10 +111,10 @@ export default function QuestionCard({
             দাগানো
           </button>
 
-          {/* Bookmark — deep green fill when active */}
+          {/* Bookmark */}
           <motion.button
-            whileTap={{ scale: 0.82 }}
-            whileHover={{ scale: 1.12 }}
+            whileTap={{ scale: 0.85 }}
+            whileHover={{ scale: 1.1 }}
             onClick={onToggleBookmark}
             disabled={!onToggleBookmark}
             className={`
@@ -140,7 +133,7 @@ export default function QuestionCard({
               className={`
                 w-[18px] h-[18px] md:w-5 md:h-5 transition-colors duration-200
                 ${isBookmarked
-                  ? 'text-emerald-600 dark:text-emerald-500'
+                  ? 'text-emerald-700 dark:text-emerald-500'
                   : 'text-neutral-400 dark:text-neutral-500 hover:text-emerald-500 dark:hover:text-emerald-400'}
               `}
             >
@@ -152,7 +145,7 @@ export default function QuestionCard({
             </svg>
           </motion.button>
 
-          {/* Report — exclamation circle */}
+          {/* Report */}
           <button
             onClick={onReport}
             className="
@@ -182,7 +175,7 @@ export default function QuestionCard({
         </div>
       </div>
 
-      {/* ── Options Grid ── */}
+      {/* ── Options ── */}
       <div
         className={`
           grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-2.5
@@ -195,16 +188,9 @@ export default function QuestionCard({
           const banglaIndex = BANGLA_INDICES[idx] || (idx + 1).toString();
 
           let iconText = banglaIndex;
-
-          // Circle indicator styles
           let iconClass =
-            'border-2 border-neutral-300 text-neutral-500 ' +
-            'dark:border-neutral-600 dark:text-neutral-400';
-
-          // Option text styles
+            'border-2 border-neutral-300 text-neutral-500 dark:border-neutral-600 dark:text-neutral-400';
           let textClass = 'text-neutral-800 dark:text-neutral-200';
-
-          // Option container styles
           let containerClass =
             'bg-neutral-50 border border-neutral-200 ' +
             'hover:bg-neutral-100 hover:border-neutral-300 ' +
@@ -269,7 +255,6 @@ export default function QuestionCard({
                 className="sr-only"
               />
 
-              {/* Circle with Bangla letter / tick / cross */}
               <div
                 className={`
                   w-7 h-7 rounded-full flex items-center justify-center
@@ -280,13 +265,7 @@ export default function QuestionCard({
                 <span className="text-xs font-bold leading-none">{iconText}</span>
               </div>
 
-              {/* Option text */}
-              <div
-                className={`
-                  text-base font-medium leading-[1.6] select-none
-                  ${textClass}
-                `}
-              >
+              <div className={`text-base font-medium leading-[1.6] select-none ${textClass}`}>
                 <LatexText text={option} />
               </div>
             </label>
@@ -346,7 +325,6 @@ export default function QuestionCard({
                 bg-[#F8FAF9] dark:bg-emerald-950/20
                 border-l-4 border-emerald-800 dark:border-emerald-600
               ">
-                {/* Faint background icon */}
                 <div className="
                   absolute top-4 right-4 pointer-events-none
                   opacity-5 dark:opacity-10
