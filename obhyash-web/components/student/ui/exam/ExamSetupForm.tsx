@@ -497,8 +497,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                     গণনা হচ্ছে...
                   </span>
                 ) : availableCount !== null ? (
-                  {/* Removed database count and warning texts as requested */}
-                  </>
+                  null
                 ) : null}
               </div>
             )}
