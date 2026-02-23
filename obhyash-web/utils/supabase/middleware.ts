@@ -65,14 +65,17 @@ export async function updateSession(request: NextRequest) {
     if (isAuthRoute) {
       const { data: profile } = await supabase
         .from('users')
-        .select('role')
+        .select('role, status')
         .eq('id', user.id)
         .single();
 
       const role = profile?.role || 'Student';
+      const status = profile?.status || 'Active';
       const url = request.nextUrl.clone();
 
-      if (role.toLowerCase() === 'admin') {
+      if (status === 'Inactive' || status === 'Suspended') {
+        url.pathname = '/deactivated';
+      } else if (role.toLowerCase() === 'admin') {
         url.pathname = '/admin/dashboard';
       } else if (role.toLowerCase() === 'teacher') {
         url.pathname = '/teacher/dashboard';
@@ -91,11 +94,23 @@ export async function updateSession(request: NextRequest) {
     if (isAdminRoute || isStudentRoute || isTeacherRoute) {
       const { data: profile } = await supabase
         .from('users')
-        .select('role')
+        .select('role, status')
         .eq('id', user.id)
         .single();
 
       const role = profile?.role || 'Student';
+      const status = profile?.status || 'Active';
+
+      // ENFORCE STATUS CHECK
+      if (status === 'Inactive' || status === 'Suspended') {
+        const redirectResponse = NextResponse.redirect(
+          new URL('/deactivated', request.url),
+        );
+        response.cookies.getAll().forEach((cookie) => {
+          redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
+        });
+        return redirectResponse;
+      }
 
       if (isAdminRoute && role.toLowerCase() !== 'admin') {
         const redirectResponse = NextResponse.redirect(
