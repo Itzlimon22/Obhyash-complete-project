@@ -91,21 +91,28 @@ export const NotificationDropdown = () => {
     });
   }, []);
 
-  const loadNotifications = useCallback(
-    async (signal?: AbortSignal) => {
-      setLoading(true);
+  const loadNotifications = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [notifications, unreadCount] = await Promise.all([
+        getNotifications(),
+        getUnreadNotificationCount(),
+      ]);
+      setNotifications(notifications);
+      setUnreadCount(unreadCount);
+    } catch (error) {
+      console.error('Failed to load notifications', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
     updatePosition();
-    const controller = new AbortController();
-    loadNotifications(controller.signal);
-    const interval = setInterval(
-      () => loadNotifications(controller.signal),
-      30000,
-    );
+    loadNotifications();
+    const interval = setInterval(() => loadNotifications(), 30000);
     return () => {
-      controller.abort();
       clearInterval(interval);
     };
   }, [isOpen, loadNotifications, updatePosition]);
