@@ -94,27 +94,6 @@ export const NotificationDropdown = () => {
   const loadNotifications = useCallback(
     async (signal?: AbortSignal) => {
       setLoading(true);
-      <div
-        ref={dropdownRef}
-        style={{
-          position: 'absolute',
-          top: dropdownPosition.top,
-          right: dropdownPosition.right,
-          width: '24rem', // md:w-96
-          zIndex: 9999,
-          willChange: 'transform',
-          transform: 'translateZ(0)',
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none',
-        }}
-        className="
-          bg-white dark:bg-obsidian-900
-          rounded-xl shadow-2xl
-          border border-gray-100 dark:border-obsidian-800
-          overflow-hidden
-          animate-in fade-in zoom-in-95 duration-200
-        "
-      >
 
   useEffect(() => {
     if (!isOpen) return;
