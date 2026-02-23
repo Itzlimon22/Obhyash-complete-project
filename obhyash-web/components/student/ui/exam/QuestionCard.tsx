@@ -10,7 +10,7 @@ interface QuestionCardProps {
   selectedOptionIndex: number | undefined;
   isFlagged: boolean;
   onSelectOption: (optionIndex: number) => void;
-  onToggleFlag: () => void;
+  onToggleFlag: () => void; // (kept for compatibility; UI button removed)
   onReport: () => void;
   isOmrMode?: boolean;
   showFeedback?: boolean;
@@ -28,7 +28,6 @@ export default function QuestionCard({
   selectedOptionIndex,
   isFlagged,
   onSelectOption,
-  onToggleFlag,
   onReport,
   isOmrMode = false,
   showFeedback = false,
@@ -40,18 +39,20 @@ export default function QuestionCard({
   const isAnswered = selectedOptionIndex !== undefined;
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Build tags
+  // Build institute/year tags
   const tags: string[] = [];
   const len = Math.max(
     question.institutes?.length || 0,
     question.years?.length || 0,
   );
+
   for (let i = 0; i < len; i++) {
     const inst = question.institutes?.[i] || '';
     const yr = question.years?.[i] || '';
     const combined = `${inst} ${yr}`.trim();
     if (combined) tags.push(combined);
   }
+
   if (tags.length === 0 && (question.institute || question.year)) {
     tags.push(`${question.institute || ''} ${question.year || ''}`.trim());
   }
@@ -60,282 +61,257 @@ export default function QuestionCard({
     <div
       id={`question-${question.id}`}
       className={`
-        bg-white dark:bg-[#1c1c1e]
-        rounded-2xl mb-3 scroll-mt-24
-        transition-all duration-200
-        border
-        ${isFlagged
-          ? 'border-orange-300 dark:border-orange-700/60'
-          : 'border-neutral-200 dark:border-neutral-700/60'
-        }
-        shadow-sm
+        bg-white dark:bg-neutral-900
+        rounded-xl mb-4 scroll-mt-24
+        border border-neutral-200/80 dark:border-neutral-800
+        shadow-sm hover:shadow-md transition-all duration-200
+        px-3 py-3 md:px-5 md:py-4
+        ${isFlagged ? 'ring-2 ring-orange-300/50' : isAnswered ? 'ring-1 ring-emerald-400/30' : ''}
         ${isOmrMode ? 'opacity-90' : ''}
       `}
     >
-      <div className="px-4 pt-4 pb-3 md:px-5 md:pt-5">
-
-        {/* ── Question number + text inline ── */}
-        <div className="
-          font-serif-exam text-[15px] md:text-base
-          text-neutral-900 dark:text-neutral-100
-          leading-[1.75] mb-3
-        ">
-          {serialNumber && (
-            <span className="font-bold text-neutral-500 dark:text-neutral-400 mr-1">
+      {/* ── Header: (Q no + question start) LEFT · actions RIGHT ── */}
+      <div className="flex items-start justify-between gap-3">
+        {/* Number + question (forced same line via flex) */}
+        <div className="flex items-start gap-2 min-w-0">
+          {serialNumber !== undefined && (
+            <span className="shrink-0 mt-[2px] text-sm md:text-base font-bold text-neutral-500 dark:text-neutral-400">
               {toBengaliNumeral(serialNumber)}.
             </span>
           )}
-          <LatexText text={question.question} />
-        </div>
 
-        {/* ── Meta Row: tags LEFT · bookmark + report RIGHT ── */}
-        <div className="flex items-center justify-between gap-2 mb-3 min-h-[24px]">
-
-          {/* Institute / Year tags */}
-          <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-            {tags.length > 0 ? (
-              tags.map((tag, i) => (
-                <span
-                  key={i}
-                  className="
-                    inline-flex items-center
-                    text-[10px] md:text-[11px] font-bold
-                    px-2 py-[3px] rounded-md
-                    bg-teal-50 text-teal-700
-                    dark:bg-teal-900/30 dark:text-teal-400
-                    border border-teal-100 dark:border-teal-800/60
-                    tracking-wide whitespace-nowrap
-                  "
-                >
-                  {tag}
-                </span>
-              ))
-            ) : (
-              <span /> /* spacer so flex justify-between still works */
-            )}
-          </div>
-
-          {/* Bookmark + Report */}
-          <div className="flex items-center gap-1.5 shrink-0">
-
-            {/* Bookmark */}
-            <motion.button
-              whileTap={{ scale: 0.80 }}
-              whileHover={{ scale: 1.15 }}
-              onClick={onToggleBookmark}
-              disabled={!onToggleBookmark}
-              className={`
-                w-7 h-7 rounded-lg flex items-center justify-center
-                transition-colors duration-150
-                ${!onToggleBookmark ? 'opacity-30 cursor-default' : 'cursor-pointer'}
-                ${isBookmarked
-                  ? 'bg-emerald-50 dark:bg-emerald-900/30'
-                  : 'bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'
-                }
-              `}
-              title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill={isBookmarked ? 'currentColor' : 'none'}
-                stroke="currentColor"
-                strokeWidth={2}
-                className={`
-                  w-4 h-4 transition-colors duration-150
-                  ${isBookmarked
-                    ? 'text-emerald-600 dark:text-emerald-400'
-                    : 'text-neutral-400 dark:text-neutral-500'
-                  }
-                `}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 11.186 0Z"
-                />
-              </svg>
-            </motion.button>
-
-            {/* Report */}
-            <button
-              onClick={onReport}
-              className="
-                w-7 h-7 rounded-lg flex items-center justify-center
-                bg-neutral-100 dark:bg-neutral-800
-                hover:bg-red-50 dark:hover:bg-red-900/20
-                text-neutral-400 dark:text-neutral-500
-                hover:text-red-500 dark:hover:text-red-400
-                transition-colors duration-150
-              "
-              title="Report Issue"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-4 h-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-                />
-              </svg>
-            </button>
-
+          <div className="min-w-0 font-serif-exam text-base md:text-lg text-neutral-900 dark:text-neutral-100 leading-[1.7]">
+            <LatexText text={question.question} />
           </div>
         </div>
 
-        {/* ── Options Grid ── */}
-        <div
-          className={`
-            grid grid-cols-1 md:grid-cols-2 gap-2
-            ${readOnly || isOmrMode ? 'pointer-events-none' : ''}
-          `}
-        >
-          {question.options.map((option, idx) => {
-            const isSelected = selectedOptionIndex === idx;
-            const isCorrect = idx === question.correctAnswerIndex;
-            const banglaIndex = BANGLA_INDICES[idx] || (idx + 1).toString();
+        {/* Actions */}
+        <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
+          {/* Bookmark (deep green fill when active) */}
+          <motion.button
+            whileTap={{ scale: 0.86 }}
+            whileHover={{ scale: 1.06 }}
+            onClick={onToggleBookmark}
+            disabled={!onToggleBookmark}
+            title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
+            className={`
+              rounded-lg p-1.5 transition-colors
+              ${!onToggleBookmark ? 'opacity-30 cursor-default' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'}
+              ${isBookmarked ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/25 dark:text-emerald-400' : 'text-neutral-400 dark:text-neutral-500'}
+            `}
+            style={{ border: 'none' }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill={isBookmarked ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              strokeWidth={2}
+              className="w-[18px] h-[18px] md:w-5 md:h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 11.186 0Z"
+              />
+            </svg>
+          </motion.button>
 
-            let badgeText = banglaIndex;
-
-            let badgeClass = `
-              border-2 border-neutral-300 text-neutral-500
-              dark:border-neutral-600 dark:text-neutral-400
-              bg-white dark:bg-transparent
-            `;
-
-            let rowClass = `
-              bg-neutral-50 border border-neutral-200
-              dark:bg-neutral-800/50 dark:border-neutral-700/50
-              hover:bg-neutral-100 hover:border-neutral-300
-              dark:hover:bg-neutral-800 dark:hover:border-neutral-600
-            `;
-
-            let textClass = 'text-neutral-800 dark:text-neutral-200';
-
-            if (showFeedback) {
-              if (isCorrect) {
-                badgeText = '✓';
-                badgeClass = 'bg-emerald-500 border-emerald-500 text-white';
-                rowClass = 'bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-700/50';
-                textClass = 'text-emerald-800 dark:text-emerald-200 font-semibold';
-              } else if (isSelected) {
-                badgeText = '✕';
-                badgeClass = 'bg-red-500 border-red-500 text-white';
-                rowClass = 'bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-700/50';
-                textClass = 'text-red-800 dark:text-red-200 font-semibold';
-              } else {
-                rowClass = `
-                  bg-neutral-50 border border-neutral-200 opacity-50
-                  dark:bg-neutral-800/30 dark:border-neutral-700/30
-                `;
-              }
-            } else if (showAnswer && isCorrect) {
-              badgeText = '✓';
-              badgeClass = 'bg-emerald-500 border-emerald-500 text-white';
-              rowClass = 'bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-700/50';
-              textClass = 'text-emerald-800 dark:text-emerald-200 font-semibold';
-            } else if (isSelected) {
-              badgeText = '✓';
-              badgeClass = 'bg-emerald-500 border-emerald-500 text-white';
-              rowClass = 'bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-700/50';
-              textClass = 'text-emerald-800 dark:text-emerald-200 font-semibold';
-            }
-
-            return (
-              <label
-                key={idx}
-                className={`
-                  flex items-center gap-3
-                  px-3 py-2.5 rounded-xl
-                  transition-all duration-150
-                  ${isOmrMode || readOnly ? 'cursor-default' : 'cursor-pointer'}
-                  ${rowClass}
-                `}
-              >
-                <input
-                  type="radio"
-                  name={`question-${question.id}`}
-                  checked={isSelected}
-                  onChange={() =>
-                    !isAnswered && !isOmrMode && !readOnly && onSelectOption(idx)
-                  }
-                  disabled={isAnswered || isOmrMode || readOnly}
-                  className="sr-only"
-                />
-
-                {/* Letter Badge */}
-                <div
-                  className={`
-                    w-[26px] h-[26px] rounded-full shrink-0
-                    flex items-center justify-center
-                    transition-all duration-150
-                    ${badgeClass}
-                  `}
-                >
-                  <span className="text-[11px] font-bold leading-none">
-                    {badgeText}
-                  </span>
-                </div>
-
-                {/* Option Text */}
-                <span
-                  className={`
-                    text-[14px] md:text-[15px] font-medium
-                    leading-[1.55] select-none flex-1
-                    ${textClass}
-                  `}
-                >
-                  <LatexText text={option} />
-                </span>
-              </label>
-            );
-          })}
+          {/* Report */}
+          <button
+            onClick={onReport}
+            title="Report Issue"
+            className="
+              rounded-lg p-1.5 transition-colors
+              text-neutral-400 hover:text-red-500 hover:bg-neutral-100
+              dark:text-neutral-500 dark:hover:text-red-400 dark:hover:bg-neutral-800
+            "
+            style={{ border: 'none', background: 'none' }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-[18px] h-[18px] md:w-5 md:h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+              />
+            </svg>
+          </button>
         </div>
       </div>
 
-      {/* ── Explanation ── */}
+      {/* ── Institutes + Years ── */}
+      {tags.length > 0 && (
+        <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+          {tags.map((tag, i) => (
+            <span
+              key={i}
+              className="
+                inline-flex items-center
+                text-[11px] md:text-xs font-semibold
+                px-2 py-0.5 rounded-md
+                bg-emerald-50 text-emerald-700 border border-emerald-100/80
+                dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-700/30
+              "
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* ── Options ── */}
+      <div
+        className={`
+          mt-3 grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-2.5
+          ${readOnly || isOmrMode ? 'pointer-events-none' : ''}
+        `}
+      >
+        {question.options.map((option, idx) => {
+          const isSelected = selectedOptionIndex === idx;
+          const isCorrect = idx === question.correctAnswerIndex;
+          const banglaIndex = BANGLA_INDICES[idx] || (idx + 1).toString();
+
+          let iconText = banglaIndex;
+
+          // Circle styles
+          let iconClass =
+            'border-2 border-neutral-300 text-neutral-500 ' +
+            'dark:border-neutral-600 dark:text-neutral-400';
+
+          // Text styles
+          let textClass = 'text-neutral-800 dark:text-neutral-200';
+
+          // Container styles (Chorcha-ish: subtle, clean)
+          let containerClass =
+            'bg-white border border-neutral-200/80 ' +
+            'hover:bg-neutral-50 hover:border-neutral-300/80 ' +
+            'dark:bg-neutral-900/40 dark:border-neutral-700/60 ' +
+            'dark:hover:bg-neutral-800/60 dark:hover:border-neutral-600/60';
+
+          if (showFeedback) {
+            if (isCorrect) {
+              iconClass = 'bg-emerald-500 text-white border-none';
+              iconText = '✓';
+              textClass = 'text-emerald-900 dark:text-emerald-100 font-semibold';
+              containerClass =
+                'bg-emerald-50 border border-emerald-200 ' +
+                'dark:bg-emerald-900/20 dark:border-emerald-700/50';
+            } else if (isSelected) {
+              iconClass = 'bg-red-500 text-white border-none';
+              iconText = '✕';
+              textClass = 'text-red-900 dark:text-red-100 font-semibold';
+              containerClass =
+                'bg-red-50 border border-red-200 ' +
+                'dark:bg-red-900/20 dark:border-red-700/50';
+            } else {
+              containerClass =
+                'bg-white border border-neutral-200/80 opacity-55 ' +
+                'dark:bg-neutral-900/30 dark:border-neutral-700/40';
+            }
+          } else if (showAnswer && isCorrect) {
+            iconClass = 'bg-emerald-500 text-white border-none';
+            iconText = '✓';
+            textClass = 'text-emerald-900 dark:text-emerald-100 font-semibold';
+            containerClass =
+              'bg-emerald-50 border border-emerald-200 ' +
+              'dark:bg-emerald-900/20 dark:border-emerald-700/50';
+          } else if (isSelected) {
+            iconClass = 'bg-emerald-500 text-white border-none';
+            iconText = '✓';
+            textClass = 'text-emerald-900 dark:text-emerald-100 font-semibold';
+            containerClass =
+              'bg-emerald-50 border border-emerald-200 ' +
+              'dark:bg-emerald-900/20 dark:border-emerald-700/50';
+          }
+
+          return (
+            <label
+              key={idx}
+              className={`
+                group relative flex items-center gap-3
+                px-3 py-2.5 rounded-xl
+                transition-all duration-200 h-full
+                ${isOmrMode || readOnly ? 'cursor-default' : 'cursor-pointer'}
+                ${containerClass}
+              `}
+            >
+              <input
+                type="radio"
+                name={`question-${question.id}`}
+                checked={isSelected}
+                onChange={() =>
+                  !isAnswered && !isOmrMode && !readOnly && onSelectOption(idx)
+                }
+                disabled={isAnswered || isOmrMode || readOnly}
+                className="sr-only"
+              />
+
+              <div
+                className={`
+                  w-7 h-7 rounded-full flex items-center justify-center
+                  transition-all duration-200 shrink-0
+                  ${iconClass}
+                `}
+              >
+                <span className="text-xs font-bold leading-none">{iconText}</span>
+              </div>
+
+              <div className={`text-base font-medium leading-[1.6] select-none ${textClass}`}>
+                <LatexText text={option} />
+              </div>
+            </label>
+          );
+        })}
+      </div>
+
+      {/* ── Explanation (review/feedback only) ── */}
       {showFeedback && question.explanation && (
-        <div className="
-          border-t border-neutral-100 dark:border-neutral-800
-          px-4 pb-4 md:px-5 md:pb-5 pt-3
-        ">
+        <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800 animate-fade-in">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="
               w-full flex items-center justify-between
-              px-4 py-2.5 rounded-xl
-              bg-emerald-600 hover:bg-emerald-700
-              dark:bg-emerald-700 dark:hover:bg-emerald-600
-              text-white transition-all duration-150
-              active:scale-[0.99]
+              px-4 py-2.5 rounded-xl shadow-sm
+              bg-emerald-800 dark:bg-emerald-900 text-white
+              hover:bg-emerald-700 dark:hover:bg-emerald-800
+              transition-all active:scale-[0.99]
             "
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="16" height="16"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
-                fill="none" stroke="currentColor"
-                strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
               </svg>
-              <span className="text-sm font-bold tracking-wide">
-                ব্যাখ্যা দেখুন
+              <span className="font-bold text-sm tracking-wider">
+                ব্যাখ্যা (Explanation)
               </span>
             </div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-              className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
             >
               <path d="m6 9 6 6 6-6" />
             </svg>
@@ -344,25 +320,37 @@ export default function QuestionCard({
           <div
             className={`
               grid transition-all duration-300 ease-in-out
-              ${isExpanded
-                ? 'grid-rows-[1fr] opacity-100 mt-2'
-                : 'grid-rows-[0fr] opacity-0'}
+              ${isExpanded ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 mt-0'}
             `}
           >
             <div className="overflow-hidden">
-              <div className="
-                p-4 md:p-5 rounded-xl
-                bg-neutral-50 dark:bg-neutral-800/50
-                border border-neutral-200 dark:border-neutral-700/60
-                border-l-4 border-l-emerald-500 dark:border-l-emerald-500
-              ">
-                <p className="
-                  text-[14px] md:text-[15px] leading-[1.85]
-                  text-neutral-700 dark:text-neutral-300
-                  font-serif-exam
-                ">
+              <div
+                className="
+                  p-4 md:p-5 relative rounded-r-xl shadow-sm
+                  bg-[#F8FAF9] dark:bg-emerald-950/20
+                  border-l-4 border-emerald-800 dark:border-emerald-600
+                "
+              >
+                <div className="absolute top-4 right-4 opacity-5 dark:opacity-10 pointer-events-none text-emerald-900 dark:text-emerald-500">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="60"
+                    height="60"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                  </svg>
+                </div>
+
+                <div className="text-[15px] md:text-base text-neutral-800 dark:text-neutral-200 leading-[1.8] font-serif-exam relative z-10">
                   <LatexText text={question.explanation} />
-                </p>
+                </div>
               </div>
             </div>
           </div>
