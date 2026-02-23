@@ -73,18 +73,11 @@ export default function QuestionCard({
       {/* Header / Meta + Question Row */}
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2 mb-1">
-          {serialNumber && (
-            <span
-              className="font-serif-exam text-base md:text-lg text-neutral-900 dark:text-neutral-100"
-              style={{ lineHeight: 'inherit' }}
-            >
-              {toBengaliNumeral(serialNumber)}.
-            </span>
-          )}
           <span
             className="font-serif-exam text-base md:text-lg text-neutral-900 dark:text-neutral-100"
             style={{ lineHeight: 'inherit' }}
           >
+            {serialNumber ? `${toBengaliNumeral(serialNumber)}. ` : ''}
             <LatexText text={question.question} />
           </span>
         </div>
@@ -107,7 +100,7 @@ export default function QuestionCard({
               whileHover={{ scale: 1.1 }}
               animate={{
                 scale: isBookmarked ? 1.1 : 1,
-                color: isBookmarked ? '#db2777' : '#9ca3af',
+                color: isBookmarked ? '#059669' : '#9ca3af', // Deep green for active bookmark
               }}
               onClick={onToggleBookmark}
               disabled={!onToggleBookmark}
@@ -165,8 +158,7 @@ export default function QuestionCard({
           const banglaIndex = BANGLA_INDICES[idx] || (idx + 1).toString();
 
           // Logic for Feedback Color
-          let bgClass =
-            'bg-[#f4f4f4] hover:bg-[#ebebeb] dark:bg-neutral-800 dark:hover:bg-neutral-700';
+          const bgClass = '';
           let iconText = banglaIndex;
           let iconClass =
             'border-2 border-neutral-400 text-neutral-600 dark:border-neutral-500 dark:text-neutral-400';
@@ -174,28 +166,24 @@ export default function QuestionCard({
 
           if (showFeedback) {
             if (isCorrect) {
-              bgClass = 'bg-emerald-100/60 dark:bg-emerald-900/30';
               iconClass = 'bg-emerald-500 text-white border-none';
               iconText = '✓';
               textClass = 'text-emerald-900 dark:text-emerald-100 font-bold';
             } else if (isSelected) {
-              bgClass = 'bg-red-100/60 dark:bg-red-900/30';
               iconClass = 'bg-red-500 text-white border-none';
               iconText = '✕';
               textClass = 'text-red-900 dark:text-red-100 font-bold';
             } else {
               // Non-selected wrong options
-              bgClass = 'bg-[#f4f4f4] dark:bg-neutral-800 opacity-60';
+              iconClass =
+                'border-2 border-neutral-400 text-neutral-600 dark:border-neutral-500 dark:text-neutral-400 opacity-60';
             }
           } else if (showAnswer && isCorrect) {
             // Show correct answer in Review/Practice mode without user selection
-            bgClass = 'bg-emerald-100/60 dark:bg-emerald-900/30';
             iconClass = 'bg-emerald-500 text-white border-none';
             iconText = '✓';
             textClass = 'text-emerald-900 dark:text-emerald-100 font-bold';
           } else if (isSelected) {
-            bgClass =
-              'bg-emerald-100/60 dark:bg-emerald-900/30 ring-1 ring-emerald-400 dark:ring-emerald-500 inset-0';
             iconClass = 'bg-emerald-500 text-white border-none';
             iconText = '✓';
             textClass = 'text-emerald-900 dark:text-emerald-100 font-bold';
