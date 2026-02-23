@@ -89,7 +89,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({
         notifRef.current &&
         !notifRef.current.contains(event.target as Node)
       ) {
-        setIsNotifOpen(false);
+        // On mobile, the dropdown uses a portal and its own backdrop.
+        // We only trigger outside-click close on desktop where it's a relative dropdown.
+        if (window.innerWidth >= 768) {
+          setIsNotifOpen(false);
+        }
       }
     };
     document.addEventListener('mousedown', handleClickOutside);

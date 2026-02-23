@@ -79,11 +79,12 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
             {/* Bottom sheet */}
             <motion.div
-              initial={{ y: '100%' }}
+              initial={{ y: '100% ' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 34 }}
-              className="fixed bottom-0 left-0 right-0 z-[9999] flex flex-col max-h-[50vh] rounded-t-3xl bg-white dark:bg-neutral-950 border border-b-0 border-neutral-200 dark:border-neutral-800 shadow-2xl"
+              onClick={(e) => e.stopPropagation()} // Prevent click through to backdrop or parent
+              className="fixed bottom-0 left-0 right-0 z-[9999] flex flex-col max-h-[85vh] rounded-t-3xl bg-white dark:bg-neutral-950 border border-b-0 border-neutral-200 dark:border-neutral-800 shadow-2xl"
             >
               {/* Top accent */}
               <div className="absolute inset-x-0 top-0 h-[1.5px] bg-emerald-700 rounded-t-3xl pointer-events-none" />

@@ -39,9 +39,14 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
     isValidating,
     isLoading,
   } = useSWRInfinite(
-    (index) =>
-      user?.id ? ['user_reports', user.id, index + 1, pageSize] : null,
-    ([, userId, page]) => getUserReports(userId, page, pageSize),
+    (index) => {
+      if (!user?.id) return null;
+      return ['user_reports', user.id, index + 1, pageSize];
+    },
+    async ([, userId, page]) => {
+      if (!userId) return [];
+      return getUserReports(userId as string, page as number, pageSize);
+    },
     {
       revalidateOnFocus: false,
       persistSize: true,

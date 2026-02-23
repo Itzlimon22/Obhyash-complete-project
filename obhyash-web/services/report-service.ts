@@ -161,6 +161,7 @@ export const getUserReports = async (
   page: number = 1,
   pageSize: number = 10,
 ): Promise<Report[]> => {
+  if (!userId) return [];
   try {
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
