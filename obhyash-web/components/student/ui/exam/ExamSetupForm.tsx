@@ -497,27 +497,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                     গণনা হচ্ছে...
                   </span>
                 ) : availableCount !== null ? (
-                  <>
-                    <span
-                      className={cn(
-                        'text-xs font-bold px-2.5 py-1 rounded-lg',
-                        availableCount >= questionCount
-                          ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
-                          : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400',
-                      )}
-                    >
-                      ডাটাবেসে আছে: {availableCount} টি
-                    </span>
-                    {availableCount < questionCount && availableCount > 0 && (
-                      <span className="text-[10px] text-red-600 dark:text-red-400 font-medium">
-                        ⚠ চাহিদার চেয়ে কম — {availableCount} টি পাবেন
-                      </span>
-                    )}
-                    {availableCount === 0 && (
-                      <span className="text-[10px] text-red-600 dark:text-red-400 font-medium">
-                        ⚠ কোনো প্রশ্ন নেই — অন্য ফিল্টার ব্যবহার করো
-                      </span>
-                    )}
+                  {/* Removed database count and warning texts as requested */}
                   </>
                 ) : null}
               </div>
