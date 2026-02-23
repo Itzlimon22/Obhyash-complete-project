@@ -2,14 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import {
-  Bell,
-  Check,
-  X,
-  Info,
-  AlertTriangle,
-  CheckCircle,
-} from 'lucide-react';
+import { Bell, Check, X, Info, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Notification, NotificationType } from '@/lib/types';
 import {
@@ -79,7 +72,10 @@ export const NotificationDropdown = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
+  const [dropdownPosition, setDropdownPosition] = useState({
+    top: 0,
+    right: 0,
+  });
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -148,7 +144,8 @@ export const NotificationDropdown = () => {
       if (
         dropdownRef.current?.contains(target) ||
         buttonRef.current?.contains(target)
-      ) return;
+      )
+        return;
       setIsOpen(false);
     };
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -221,141 +218,157 @@ export const NotificationDropdown = () => {
 
   // ── Portal panel — rendered at document.body, escapes all stacking contexts
   const panel = isOpen ? (
-    <div
-      ref={dropdownRef}
-      style={{
-        position: 'absolute',
-        top: dropdownPosition.top,
-        right: dropdownPosition.right,
-        width: '24rem',         // md:w-96
-        zIndex: 9999,
-      }}
-      className="
-        bg-white dark:bg-obsidian-900
-        rounded-xl shadow-2xl
-        border border-gray-100 dark:border-obsidian-800
-        overflow-hidden
-        animate-in fade-in zoom-in-95 duration-200
-      "
-    >
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-100 dark:border-obsidian-800 flex items-center justify-between">
-        <h3 className="font-semibold text-gray-900 dark:text-white">
-          Notifications
-        </h3>
-        {unreadCount > 0 && (
-          <button
-            onClick={handleMarkAllAsRead}
-            className="text-xs text-brand-600 dark:text-brand-400 hover:underline"
-          >
-            Mark all read
-          </button>
-        )}
-      </div>
+    <>
+      {/* Backdrop Blur (only background, not dropdown) */}
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 9998,
+          pointerEvents: 'auto',
+          background: 'rgba(255,255,255,0.2)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+        }}
+        aria-hidden="true"
+      />
+      <div
+        ref={dropdownRef}
+        style={{
+          position: 'absolute',
+          top: dropdownPosition.top,
+          right: dropdownPosition.right,
+          width: '24rem', // md:w-96
+          zIndex: 9999,
+        }}
+        className="
+          bg-white dark:bg-obsidian-900
+          rounded-xl shadow-2xl
+          border border-gray-100 dark:border-obsidian-800
+          overflow-hidden
+          animate-in fade-in zoom-in-95 duration-200
+        "
+      >
+        {/* Header */}
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-obsidian-800 flex items-center justify-between">
+          <h3 className="font-semibold text-gray-900 dark:text-white">
+            Notifications
+          </h3>
+          {unreadCount > 0 && (
+            <button
+              onClick={handleMarkAllAsRead}
+              className="text-xs text-brand-600 dark:text-brand-400 hover:underline"
+            >
+              Mark all read
+            </button>
+          )}
+        </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-gray-100 dark:border-obsidian-800">
-        {(['all', 'unread'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={cn(
-              'flex-1 py-2 text-sm font-medium transition-colors capitalize',
-              activeTab === tab
-                ? 'text-brand-600 border-b-2 border-brand-600 bg-brand-50/50 dark:bg-brand-900/10'
-                : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200',
-            )}
-          >
-            {tab === 'unread'
-              ? `Unread${unreadCount > 0 ? ` (${unreadCount})` : ''}`
-              : 'All'}
-          </button>
-        ))}
-      </div>
+        {/* Tabs */}
+        <div className="flex border-b border-gray-100 dark:border-obsidian-800">
+          {(['all', 'unread'] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={cn(
+                'flex-1 py-2 text-sm font-medium transition-colors capitalize',
+                activeTab === tab
+                  ? 'text-brand-600 border-b-2 border-brand-600 bg-brand-50/50 dark:bg-brand-900/10'
+                  : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200',
+              )}
+            >
+              {tab === 'unread'
+                ? `Unread${unreadCount > 0 ? ` (${unreadCount})` : ''}`
+                : 'All'}
+            </button>
+          ))}
+        </div>
 
-      {/* List */}
-      <div className="max-h-[400px] overflow-y-auto">
-        {loading ? (
-          <div className="py-8 text-center text-gray-500 text-sm">
-            Loading...
-          </div>
-        ) : notifications.length === 0 ? (
-          <div className="py-12 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
-            <Bell size={32} className="mb-2 opacity-20" />
-            <p className="text-sm">No notifications</p>
-          </div>
-        ) : (
-          <ul className="divide-y divide-gray-100 dark:divide-obsidian-800">
-            {notifications.map((notification) => (
-              <li key={notification.id} className="relative group">
-                <button
-                  onClick={() => handleNotificationClick(notification)}
-                  className={cn(
-                    'w-full text-left p-4 pr-8 hover:bg-gray-50 dark:hover:bg-obsidian-800 transition-colors',
-                    !notification.is_read
-                      ? 'bg-brand-50/30 dark:bg-brand-900/5'
-                      : '',
-                  )}
-                >
-                  <div className="flex gap-3">
-                    <div
-                      className={cn(
-                        'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
-                        getIconBg(notification.type),
-                      )}
-                    >
-                      {getIcon(notification.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <p
-                          className={cn(
-                            'text-sm font-medium truncate',
-                            notification.is_read
-                              ? 'text-gray-700 dark:text-gray-300'
-                              : 'text-gray-900 dark:text-white',
-                          )}
-                        >
-                          {notification.title}
-                        </p>
-                        <span className="text-[10px] text-gray-400 whitespace-nowrap shrink-0">
-                          {formatTime(
-                            notification.created_at ?? new Date().toISOString(),
-                          )}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
-                        {notification.message}
-                      </p>
-                    </div>
-                  </div>
-                </button>
-
-                {!notification.is_read && (
+        {/* List */}
+        <div className="max-h-[400px] overflow-y-auto">
+          {loading ? (
+            <div className="py-8 text-center text-gray-500 text-sm">
+              Loading...
+            </div>
+          ) : notifications.length === 0 ? (
+            <div className="py-12 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+              <Bell size={32} className="mb-2 opacity-20" />
+              <p className="text-sm">No notifications</p>
+            </div>
+          ) : (
+            <ul className="divide-y divide-gray-100 dark:divide-obsidian-800">
+              {notifications.map((notification) => (
+                <li key={notification.id} className="relative group">
                   <button
-                    onClick={(e) => handleMarkAsRead(e, notification.id)}
-                    aria-label="Mark as read"
-                    className="absolute bottom-2 right-2 p-1 text-gray-400 hover:text-brand-600 opacity-0 group-hover:opacity-100 transition-all rounded-full hover:bg-gray-100 dark:hover:bg-obsidian-700"
+                    onClick={() => handleNotificationClick(notification)}
+                    className={cn(
+                      'w-full text-left p-4 pr-8 hover:bg-gray-50 dark:hover:bg-obsidian-800 transition-colors',
+                      !notification.is_read
+                        ? 'bg-brand-50/30 dark:bg-brand-900/5'
+                        : '',
+                    )}
                   >
-                    <Check size={14} />
+                    <div className="flex gap-3">
+                      <div
+                        className={cn(
+                          'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
+                          getIconBg(notification.type),
+                        )}
+                      >
+                        {getIcon(notification.type)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <p
+                            className={cn(
+                              'text-sm font-medium truncate',
+                              notification.is_read
+                                ? 'text-gray-700 dark:text-gray-300'
+                                : 'text-gray-900 dark:text-white',
+                            )}
+                          >
+                            {notification.title}
+                          </p>
+                          <span className="text-[10px] text-gray-400 whitespace-nowrap shrink-0">
+                            {formatTime(
+                              notification.created_at ??
+                                new Date().toISOString(),
+                            )}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">
+                          {notification.message}
+                        </p>
+                      </div>
+                    </div>
                   </button>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
 
-      <div className="p-2 border-t border-gray-100 dark:border-obsidian-800 bg-gray-50/50 dark:bg-obsidian-900/50 text-center">
-        <Link
-          href="/admin/notifications"
-          onClick={() => setIsOpen(false)}
-          className="text-xs font-medium text-gray-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
-        >
-          View All History
-        </Link>
+                  {!notification.is_read && (
+                    <button
+                      onClick={(e) => handleMarkAsRead(e, notification.id)}
+                      aria-label="Mark as read"
+                      className="absolute bottom-2 right-2 p-1 text-gray-400 hover:text-brand-600 opacity-0 group-hover:opacity-100 transition-all rounded-full hover:bg-gray-100 dark:hover:bg-obsidian-700"
+                    >
+                      <Check size={14} />
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="p-2 border-t border-gray-100 dark:border-obsidian-800 bg-gray-50/50 dark:bg-obsidian-900/50 text-center">
+          <Link
+            href="/admin/notifications"
+            onClick={() => setIsOpen(false)}
+            className="text-xs font-medium text-gray-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+          >
+            View All History
+          </Link>
+        </div>
       </div>
-    </div>
+    </>
   ) : null;
 
   return (
@@ -375,8 +388,7 @@ export const NotificationDropdown = () => {
       </button>
 
       {/* ← portal renders at <body> level, outside all stacking contexts */}
-      {typeof window !== 'undefined' &&
-        createPortal(panel, document.body)}
+      {typeof window !== 'undefined' && createPortal(panel, document.body)}
     </div>
   );
 };
