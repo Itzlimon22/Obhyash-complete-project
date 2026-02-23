@@ -7,6 +7,13 @@ import NotificationItem from './NotificationItem';
 import { CheckCheck, Bell, X, Inbox } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Dialog,
+  DialogContent,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface NotificationDropdownProps {
   notifications: Notification[];
@@ -63,113 +70,98 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     </AnimatePresence>
   );
 
-  /* ── Mobile bottom sheet (portalled to body to escape stacking context) ───── */
-  const mobileSheet =
-    typeof document !== 'undefined'
-      ? createPortal(
-          <div className="md:hidden">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-md"
-              onClick={onClose}
-            />
+  /* ── Mobile bottom sheet (using Radix Dialog) ───── */
+  const mobileSheet = (
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogPortal>
+        <DialogOverlay className="z-[99] md:hidden" />
+        <DialogContent
+          showCloseButton={false}
+          className="md:hidden z-[100] p-0 sm:max-h-[85vh] flex flex-col gap-0 border-b-0"
+        >
+          {/* Top accent */}
+          <div className="absolute inset-x-0 top-0 h-[1.5px] bg-emerald-700 rounded-t-3xl pointer-events-none" />
 
-            {/* Bottom sheet */}
-            <motion.div
-              initial={{ y: '100% ' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', stiffness: 400, damping: 34 }}
-              onClick={(e) => e.stopPropagation()} // Prevent click through to backdrop or parent
-              className="fixed bottom-0 left-0 right-0 z-[9999] flex flex-col max-h-[85vh] rounded-t-3xl bg-white dark:bg-neutral-950 border border-b-0 border-neutral-200 dark:border-neutral-800 shadow-2xl"
-            >
-              {/* Top accent */}
-              <div className="absolute inset-x-0 top-0 h-[1.5px] bg-emerald-700 rounded-t-3xl pointer-events-none" />
+          {/* Drag handle */}
+          <div className="mx-auto mt-3 mb-1 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700 flex-shrink-0" />
 
-              {/* Drag handle */}
-              <div className="mx-auto mt-3 mb-1 h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700 flex-shrink-0" />
-
-              {/* Header */}
-              <div className="flex-shrink-0 px-5 pt-2 pb-0 border-b border-neutral-100 dark:border-neutral-800">
-                <div className="flex justify-between items-center mb-2.5">
-                  <h3 className="font-bold text-neutral-900 dark:text-white text-[15px] flex items-center gap-2">
-                    নোটিফিকেশন
-                    {unreadCount > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold leading-none min-w-[18px] text-center">
-                        {unreadCount}
-                      </span>
-                    )}
-                  </h3>
-                  <div className="flex items-center gap-1">
-                    {unreadCount > 0 && (
-                      <button
-                        onClick={onMarkAllAsRead}
-                        className="p-1.5 text-neutral-400 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors"
-                        aria-label="সব পঠিত"
-                      >
-                        <CheckCheck className="w-4 h-4" />
-                      </button>
-                    )}
-                    <button
-                      onClick={onClose}
-                      className="p-1.5 text-neutral-400 hover:text-neutral-700 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
-                      aria-label="বন্ধ করো"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Tabs */}
-                <div className="flex gap-5">
-                  {(['unread', 'all'] as const).map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveTab(tab)}
-                      className={cn(
-                        'pb-2 text-[13px] font-bold relative transition-colors',
-                        activeTab === tab
-                          ? 'text-neutral-900 dark:text-white'
-                          : 'text-neutral-400 dark:text-neutral-500',
-                      )}
-                    >
-                      {tab === 'unread' ? 'অপঠিত' : 'সবগুলো'}
-                      {activeTab === tab && (
-                        <motion.div
-                          layoutId="mobileNotifTab"
-                          className="absolute bottom-0 left-0 right-0 h-[2px] bg-emerald-700 rounded-full"
-                        />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* List */}
-              <NotificationList
-                isLoading={isLoading}
-                displayedNotifications={displayedNotifications}
-                activeTab={activeTab}
-                onNotificationClick={onNotificationClick}
-              />
-
-              {/* Footer */}
-              <div className="flex-shrink-0 px-4 py-3 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-950">
+          {/* Header */}
+          <div className="flex-shrink-0 px-5 pt-2 pb-0 border-b border-neutral-100 dark:border-neutral-800">
+            <div className="flex justify-between items-center mb-2.5">
+              <DialogTitle className="font-bold text-neutral-900 dark:text-white text-[15px] flex items-center gap-2">
+                নোটিফিকেশন
+                {unreadCount > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold leading-none min-w-[18px] text-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </DialogTitle>
+              <div className="flex items-center gap-1">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={onMarkAllAsRead}
+                    className="p-1.5 text-neutral-400 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors"
+                    aria-label="সব পঠিত"
+                  >
+                    <CheckCheck className="w-4 h-4" />
+                  </button>
+                )}
                 <button
-                  onClick={onViewAll}
-                  className="w-full py-3 rounded-2xl bg-emerald-900 hover:bg-emerald-950 active:scale-[0.98] text-white text-sm font-bold transition-all duration-150 shadow-md"
+                  onClick={onClose}
+                  className="p-1.5 text-neutral-400 hover:text-neutral-700 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+                  aria-label="বন্ধ করো"
                 >
-                  সব নোটিফিকেশন দেখো
+                  <X className="w-4 h-4" />
                 </button>
               </div>
-            </motion.div>
-          </div>,
-          document.body,
-        )
-      : null;
+            </div>
+
+            {/* Tabs */}
+            <div className="flex gap-5">
+              {(['unread', 'all'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={cn(
+                    'pb-2 text-[13px] font-bold relative transition-colors cursor-pointer',
+                    activeTab === tab
+                      ? 'text-neutral-900 dark:text-white'
+                      : 'text-neutral-400 dark:text-neutral-500',
+                  )}
+                >
+                  {tab === 'unread' ? 'অপঠিত' : 'সবগুলো'}
+                  {activeTab === tab && (
+                    <motion.div
+                      layoutId="mobileNotifTab"
+                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-emerald-700 rounded-full"
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* List */}
+          <NotificationList
+            isLoading={isLoading}
+            displayedNotifications={displayedNotifications}
+            activeTab={activeTab}
+            onNotificationClick={onNotificationClick}
+          />
+
+          {/* Footer */}
+          <div className="flex-shrink-0 px-4 py-4 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-950 rounded-b-3xl">
+            <button
+              onClick={onViewAll}
+              className="w-full py-3 rounded-2xl bg-emerald-900 hover:bg-emerald-950 active:scale-[0.98] text-white text-sm font-bold transition-all duration-150 shadow-md cursor-pointer"
+            >
+              সব নোটিফিকেশন দেখো
+            </button>
+          </div>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
+  );
 
   return (
     <>

@@ -49,113 +49,51 @@ const DetailIconItem = ({
   </div>
 );
 
+
 const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({
   details,
   totalQuestions,
   negativeMarking = 0.25,
 }) => {
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-5 md:p-8 mb-8 shadow-sm relative overflow-hidden">
-      {/* Decorative top gradient line */}
+    <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 md:p-6 mb-6 shadow-sm relative overflow-hidden max-w-xl mx-auto">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-emerald-500 to-emerald-500 opacity-80" />
-
-      <div className="mb-6 pb-4 border-b border-neutral-100 dark:border-neutral-800/60 flex items-center gap-3">
-        <div className="p-2.5 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl">
-          <BookOpen
-            className="text-emerald-600 dark:text-emerald-400"
-            size={24}
-          />
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2 items-center">
+        {/* Subject */}
+        <div className="flex items-center gap-2 py-2">
+          <BookOpen className="text-emerald-600 dark:text-emerald-400 w-5 h-5" />
+          <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">বিষয়</span>
         </div>
-        <div>
-          <h2 className="text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest mb-1">
-            বিষয় (Subject)
-          </h2>
-          <h3 className="text-xl md:text-2xl font-extrabold text-neutral-900 dark:text-white leading-tight">
-            {details.subjectLabel || getSubjectDisplayName(details.subject)}
-          </h3>
+        <div className="text-sm font-bold text-neutral-900 dark:text-white truncate py-2">
+          {details.subjectLabel || getSubjectDisplayName(details.subject)}
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-x-12 md:gap-y-8">
-        {/* Basic Info */}
-        <DetailIconItem
-          icon={Layers}
-          label="পরীক্ষার ধরন (Exam Type)"
-          value={details.examType || 'সাধারণ পরীক্ষা'}
-          iconBgClass="bg-emerald-50 dark:bg-emerald-900/20"
-          iconColorClass="text-emerald-600 dark:text-emerald-400"
-        />
+        {/* Time */}
+        <div className="flex items-center gap-2 py-2">
+          <Clock className="text-red-600 dark:text-red-400 w-5 h-5" />
+          <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">সময়</span>
+        </div>
+        <div className="text-sm font-bold text-neutral-900 dark:text-white py-2">
+          {details.durationMinutes || 0} মিনিট
+        </div>
 
-        <DetailIconItem
-          icon={Clock}
-          label="সময় (Duration)"
-          value={`${details.durationMinutes || 0} মিনিট`}
-          iconBgClass="bg-red-50 dark:bg-red-900/20"
-          iconColorClass="text-red-600 dark:text-red-400"
-        />
+        {/* Total Questions */}
+        <div className="flex items-center gap-2 py-2">
+          <Target className="text-emerald-600 dark:text-emerald-400 w-5 h-5" />
+          <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">মোট প্রশ্ন</span>
+        </div>
+        <div className="text-sm font-bold text-neutral-900 dark:text-white py-2">
+          {totalQuestions} টি
+        </div>
 
-        <DetailIconItem
-          icon={Target}
-          label="প্রশ্ন ও নম্বর (Questions & Marks)"
-          value={
-            <div className="flex flex-col">
-              <span>{totalQuestions} টি প্রশ্ন</span>
-              <span className="text-sm font-semibold text-neutral-500">
-                মোট {details.totalMarks || totalQuestions} নম্বর
-              </span>
-            </div>
-          }
-          iconBgClass="bg-emerald-50 dark:bg-emerald-900/20"
-          iconColorClass="text-emerald-600 dark:text-emerald-400"
-        />
-
-        {/* Syllabus / Optional Content */}
-        {details.chapters && (
-          <div className="sm:col-span-2 lg:col-span-1">
-            <DetailIconItem
-              icon={BookMarked}
-              label="অধ্যায় (Chapters)"
-              value={
-                <span className="line-clamp-2" title={details.chapters}>
-                  {details.chapters}
-                </span>
-              }
-              iconBgClass="bg-emerald-50 dark:bg-emerald-900/20"
-              iconColorClass="text-emerald-600 dark:text-emerald-400"
-            />
-          </div>
-        )}
-
-        {details.topics && (
-          <div className="sm:col-span-2 lg:col-span-2">
-            <DetailIconItem
-              icon={ListTodo}
-              label="টপিক (Topics)"
-              value={
-                <span className="line-clamp-2" title={details.topics}>
-                  {details.topics}
-                </span>
-              }
-              iconBgClass="bg-emerald-50 dark:bg-emerald-900/20"
-              iconColorClass="text-emerald-600 dark:text-emerald-400"
-            />
-          </div>
-        )}
-
-        {/* Penalty */}
-        {negativeMarking > 0 && (
-          <div className="sm:col-span-2 lg:col-span-3 mt-2">
-            <div className="inline-flex items-center gap-2 px-3 py-2 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-lg text-red-700 dark:text-red-400">
-              <AlertCircle size={16} />
-              <span className="text-sm font-bold">
-                নেগেটিভ মার্কিং (Negative Marking):
-              </span>
-              <span className="text-sm font-semibold">
-                -{negativeMarking} প্রতি ভুলে
-              </span>
-            </div>
-          </div>
-        )}
+        {/* Negative Marking */}
+        <div className="flex items-center gap-2 py-2">
+          <AlertCircle className="text-red-600 dark:text-red-400 w-5 h-5" />
+          <span className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">নেগেটিভ মার্ক</span>
+        </div>
+        <div className="text-sm font-bold text-neutral-900 dark:text-white py-2">
+          {negativeMarking > 0 ? `-${negativeMarking} প্রতি ভুলে` : 'প্রযোজ্য নয়'}
+        </div>
       </div>
     </div>
   );
