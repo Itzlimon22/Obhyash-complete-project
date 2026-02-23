@@ -47,7 +47,12 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       <motion.div
         key="desktop-dropdown"
         initial={{ opacity: 0, scale: 0.96, y: -8 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
+        animate={{
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          transitionEnd: { transform: 'none' },
+        }}
         exit={{ opacity: 0, scale: 0.96, y: -8 }}
         transition={{ duration: 0.18 }}
         className="hidden md:flex md:flex-col absolute top-12 right-0 w-[400px] max-h-[85vh] rounded-2xl bg-white dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 shadow-2xl z-[99] origin-top-right overflow-hidden"
