@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Gift } from 'lucide-react';
+import { Gift, Edit2, Check, X } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 interface ReferralInfo {
   referral?: { code: string } | null;
@@ -30,12 +31,33 @@ export default function ReferralPage() {
       .catch(() => setLoading(false));
   }, []);
 
-  const generateCode = async () => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [customCodeInput, setCustomCodeInput] = useState('');
+
+  const generateCode = async (customCode?: string) => {
     setGenerating(true);
-    const res = await fetch('/api/referral/create', { method: 'POST' });
-    const json = await res.json();
-    setData((prev) => ({ ...prev, referral: json.referral }));
-    setGenerating(false);
+    try {
+      const res = await fetch('/api/referral/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: customCode ? JSON.stringify({ customCode }) : undefined,
+      });
+      const json = await res.json();
+
+      if (!res.ok) {
+        throw new Error(json.error || 'Failed to update code');
+      }
+
+      setData((prev) => ({ ...prev, referral: json.referral }));
+      if (customCode) {
+        toast.success('কাস্টম কোড সফলভাবে সেট করা হয়েছে!');
+        setIsEditing(false);
+      }
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setGenerating(false);
+    }
   };
 
   return (
@@ -55,21 +77,62 @@ export default function ReferralPage() {
           </div>
           {data.referral?.code ? (
             <div className="flex items-center gap-2">
-              <code className="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded">
-                {data.referral.code}
-              </code>
-              <button
-                onClick={() =>
-                  navigator.clipboard.writeText(data.referral!.code)
-                }
-                className="text-sm text-emerald-600 dark:text-emerald-400 underline"
-              >
-                কপি করুন
-              </button>
+              {isEditing ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={customCodeInput}
+                    onChange={(e) =>
+                      setCustomCodeInput(e.target.value.toUpperCase())
+                    }
+                    className="px-2 py-1 text-sm border rounded dark:bg-neutral-800 dark:border-neutral-700 outline-none w-32"
+                    placeholder="CUSTOM_123"
+                  />
+                  <button
+                    onClick={() => generateCode(customCodeInput)}
+                    disabled={generating || !customCodeInput}
+                    className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded"
+                    title="সেভ করুন"
+                  >
+                    <Check size={16} />
+                  </button>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <code className="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 rounded">
+                    {data.referral.code}
+                  </code>
+                  <button
+                    onClick={() => {
+                      setCustomCodeInput(data.referral!.code);
+                      setIsEditing(true);
+                    }}
+                    className="p-1 text-neutral-500 hover:text-emerald-600 transition"
+                    title="কাস্টম কোড"
+                  >
+                    <Edit2 size={14} />
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(data.referral!.code);
+                      toast.success('কোড কপি করা হয়েছে!');
+                    }}
+                    className="text-sm text-emerald-600 dark:text-emerald-400 underline ml-2"
+                  >
+                    কপি করুন
+                  </button>
+                </>
+              )}
             </div>
           ) : (
             <button
-              onClick={generateCode}
+              onClick={() => generateCode()}
               disabled={generating}
               className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition"
             >
@@ -112,7 +175,7 @@ export default function ReferralPage() {
                     {new Date(h.redeemed_at).toLocaleDateString('bn-BD')}
                   </td>
                   <td className="px-2 py-1 text-sm">
-                    {h.redeemed_by.name || h.redeemed_by.email}
+                    {h.redeemed_by?.name || h.redeemed_by?.email || 'অজানা'}
                   </td>
                 </tr>
               ))}

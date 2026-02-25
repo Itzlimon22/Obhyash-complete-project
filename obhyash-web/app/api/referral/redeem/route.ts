@@ -68,44 +68,35 @@ export const POST = async (req: Request) => {
     );
   }
 
-  // Helper: extend subscription by 1 month
-  const extendSubscription = async (userId: string) => {
-    const { data: profile } = await supabaseAdmin
-      .from('users')
-      .select('subscription')
-      .eq('id', userId)
-      .single();
-    const sub = profile?.subscription || {};
-    const currentExpiry = sub.expiry ? new Date(sub.expiry) : new Date();
-    if (currentExpiry < new Date()) currentExpiry.setTime(new Date().getTime());
-    currentExpiry.setMonth(currentExpiry.getMonth() + 1);
-    await supabaseAdmin
-      .from('users')
-      .update({
-        subscription: {
-          ...sub,
-          plan: 'Premium',
-          status: 'Active',
-          expiry: currentExpiry.toISOString(),
-        },
-      })
-      .eq('id', userId);
-  };
+  // Check monthly limit (max 10 redemptions per owner per month)
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+  startOfMonth.setHours(0, 0, 0, 0);
 
-  // Extend both users
-  await extendSubscription(targetUserId!);
-  await extendSubscription(referral.owner_id);
+  const { count: monthlyRedemptions } = await supabaseAdmin
+    .from('referral_history')
+    .select('id', { count: 'exact', head: true })
+    .eq('referral_id', referral.id)
+    .gte('redeemed_at', startOfMonth.toISOString());
 
-  // Record history
+  if (monthlyRedemptions && monthlyRedemptions >= 10) {
+    return NextResponse.json(
+      { error: 'This referral code has reached its monthly limit.' },
+      { status: 400 },
+    );
+  }
+
+  // Record history as Pending
   await supabaseAdmin.from('referral_history').insert({
     referral_id: referral.id,
     redeemed_by: targetUserId,
     redeemed_at: new Date().toISOString(),
-    reward_given: true,
+    admin_status: 'Pending',
+    reward_given: false,
   });
 
   return NextResponse.json({
     success: true,
-    message: '১ মাসের প্রিমিয়াম যোগ করা হয়েছে!',
+    message: 'রেফারেল কোড গৃহীত হয়েছে! অ্যাডমিন এপ্রুভালের পর বোনাস পাবেন।',
   });
 };

@@ -8,6 +8,8 @@ import {
   Gift,
   ArrowRightLeft,
   Calendar,
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -15,6 +17,7 @@ interface ReferralHistory {
   id: string;
   redeemed_at: string;
   reward_given: boolean;
+  admin_status: string;
   redeemed_by_user?: {
     id: string;
     name: string;
@@ -64,6 +67,27 @@ export default function AdminReferralsPage() {
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
+    }
+  };
+
+  const handleAction = async (
+    historyId: string,
+    action: 'approve' | 'reject',
+  ) => {
+    try {
+      const res = await fetch('/api/admin/referrals/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ historyId, action }),
+      });
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(data.error || `Failed to ${action} referral`);
+
+      toast.success(data.message);
+      fetchData(); // Refresh UI
+    } catch (err: any) {
+      toast.error(err.message);
     }
   };
 
@@ -244,13 +268,30 @@ export default function AdminReferralsPage() {
                       </td>
 
                       <td className="px-6 py-4">
-                        {item.reward_given ? (
+                        {item.admin_status === 'Pending' ? (
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleAction(item.id, 'approve')}
+                              className="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-colors"
+                              title="Approve Bonus"
+                            >
+                              <CheckCircle size={18} />
+                            </button>
+                            <button
+                              onClick={() => handleAction(item.id, 'reject')}
+                              className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                              title="Reject Bonus"
+                            >
+                              <XCircle size={18} />
+                            </button>
+                          </div>
+                        ) : item.admin_status === 'Approved' ? (
                           <span className="inline-flex py-1 px-3 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold ring-1 ring-emerald-600/20 dark:ring-emerald-500/30">
-                            সফল (1 মাস প্রিমিয়াম)
+                            অনুমোদিত
                           </span>
                         ) : (
-                          <span className="inline-flex py-1 px-3 rounded-full bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 text-xs font-bold ring-1 ring-red-600/20 dark:ring-red-500/30">
-                            ব্যর্থ
+                          <span className="inline-flex py-1 px-3 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 text-xs font-bold ring-1 ring-neutral-200 dark:ring-neutral-700">
+                            বাতিল
                           </span>
                         )}
                       </td>
