@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 export const POST = async (req: Request) => {
   const supabase = await createClient();
+  const supabaseAdmin = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -65,7 +70,7 @@ export const POST = async (req: Request) => {
 
   // Helper: extend subscription by 1 month
   const extendSubscription = async (userId: string) => {
-    const { data: profile } = await supabase
+    const { data: profile } = await supabaseAdmin
       .from('users')
       .select('subscription')
       .eq('id', userId)
@@ -74,7 +79,7 @@ export const POST = async (req: Request) => {
     const currentExpiry = sub.expiry ? new Date(sub.expiry) : new Date();
     if (currentExpiry < new Date()) currentExpiry.setTime(new Date().getTime());
     currentExpiry.setMonth(currentExpiry.getMonth() + 1);
-    await supabase
+    await supabaseAdmin
       .from('users')
       .update({
         subscription: {
@@ -92,7 +97,7 @@ export const POST = async (req: Request) => {
   await extendSubscription(referral.owner_id);
 
   // Record history
-  await supabase.from('referral_history').insert({
+  await supabaseAdmin.from('referral_history').insert({
     referral_id: referral.id,
     redeemed_by: targetUserId,
     redeemed_at: new Date().toISOString(),
