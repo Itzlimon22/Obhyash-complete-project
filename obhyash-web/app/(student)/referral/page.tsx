@@ -14,6 +14,7 @@ import {
   Edit2,
   Check,
   X,
+  Link as LinkIcon,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -307,22 +308,30 @@ export default function ReferralPage() {
               )}
 
               {/* action buttons */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 <motion.button
                   whileTap={{ scale: 0.96 }}
                   onClick={copyCode}
                   className="flex items-center justify-center gap-2 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
                 >
                   <Copy className="w-4 h-4" />
-                  কোড কপি
+                  কোড
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.96 }}
                   onClick={copyLink}
                   className="flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-900 hover:bg-emerald-950 text-white font-bold text-sm transition-colors shadow-md"
                 >
+                  <LinkIcon className="w-4 h-4" />
+                  লিংক
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.96 }}
+                  onClick={shareCode}
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm transition-colors shadow-md col-span-2 sm:col-span-1"
+                >
                   <Share2 className="w-4 h-4" />
-                  লিংক কপি
+                  শেয়ার করো
                 </motion.button>
               </div>
             </div>
