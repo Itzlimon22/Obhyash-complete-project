@@ -546,17 +546,6 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                           {freq !== undefined && activeTab === 'mistakes' && (
                             <FrequencyBadge count={freq} />
                           )}
-                          {due && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-900/30 text-emerald-400 border border-emerald-800/30">
-                              📅 রিভিউ বাকি
-                            </span>
-                          )}
-                          {activeTab === 'mistakes' &&
-                            bookmarkedIds.has(question.id) && (
-                              <span className="text-emerald-500 text-sm">
-                                🔖
-                              </span>
-                            )}
                         </div>
 
                         {/* Question text */}
