@@ -11,6 +11,9 @@ import {
   Share2,
   Loader2,
   ChevronLeft,
+  Edit2,
+  Check,
+  X,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -24,6 +27,7 @@ interface ReferralInfo {
   history: Array<{
     id: string;
     redeemed_at: string;
+    admin_status: 'Pending' | 'Approved' | 'Rejected';
     redeemed_by: { email: string; name: string };
   }>;
 }
@@ -41,6 +45,8 @@ export default function ReferralPage() {
   const [copied, setCopied] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [isEditing, setIsEditing] = useState(false);
+  const [customCodeInput, setCustomCodeInput] = useState('');
 
   /* ─── Initialise ─── */
   useEffect(() => {
@@ -89,22 +95,37 @@ export default function ReferralPage() {
   };
 
   /* ─── Generate code ─── */
-  const generateCode = async () => {
+  const generateCode = async (customCode?: string) => {
     setGenerating(true);
     try {
-      const res = await fetch('/api/referral/create', { method: 'POST' });
+      const res = await fetch('/api/referral/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: customCode ? JSON.stringify({ customCode }) : undefined,
+      });
       const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'কোড তৈরি করা সম্ভব হয়নি');
+
       if (json.referral) {
         setData((prev) => ({ ...prev, referral: json.referral }));
-        toast.success('রেফারেল কোড তৈরি হয়েছে!');
-      } else {
-        toast.error(json.error || 'কোড তৈরি করা সম্ভব হয়নি');
+        toast.success(
+          customCode ? 'কাস্টম কোড সেট করা হয়েছে!' : 'রেফারেল কোড তৈরি হয়েছে!',
+        );
+        setIsEditing(false);
       }
-    } catch {
-      toast.error('নেটওয়ার্ক সমস্যা। আবার চেষ্টা করুন।');
+    } catch (err: any) {
+      toast.error(err.message || 'নেটওয়ার্ক সমস্যা। আবার চেষ্টা করুন।');
     } finally {
       setGenerating(false);
     }
+  };
+
+  /* ─── Copy Link ─── */
+  const copyLink = () => {
+    if (!data.referral?.code) return;
+    const link = `${window.location.origin}/signup?ref=${data.referral.code}`;
+    navigator.clipboard.writeText(link);
+    toast.success('রেফারেল লিংক কপি হয়েছে!');
   };
 
   /* ─── Copy code ─── */
@@ -218,70 +239,143 @@ export default function ReferralPage() {
           {loading ? (
             <div className="h-14 bg-neutral-100 dark:bg-neutral-800 rounded-2xl animate-pulse" />
           ) : data.referral?.code ? (
-            <div className="space-y-3">
-              {/* code display */}
-              <div className="flex items-center gap-3 p-4 bg-neutral-50 dark:bg-neutral-950 rounded-2xl border border-neutral-200 dark:border-neutral-800">
-                <code className="flex-1 text-2xl font-black tracking-[0.25em] text-neutral-900 dark:text-white text-center">
-                  {data.referral.code}
-                </code>
-                <motion.button
-                  whileTap={{ scale: 0.92 }}
-                  onClick={copyCode}
-                  className={`p-2.5 rounded-xl font-bold transition-colors ${
-                    copied
-                      ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
-                      : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                  }`}
-                >
-                  {copied ? (
-                    <CheckCheck className="w-4 h-4" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                </motion.button>
-              </div>
+            <div className="space-y-4">
+              {/* code display or editor */}
+              {isEditing ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={customCodeInput}
+                    onChange={(e) =>
+                      setCustomCodeInput(
+                        e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''),
+                      )
+                    }
+                    className="flex-1 px-4 py-3 text-lg font-bold border rounded-2xl dark:bg-neutral-950 dark:border-neutral-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                    placeholder="কাস্টম কোড লিখুন"
+                    maxLength={20}
+                  />
+                  <button
+                    onClick={() => generateCode(customCodeInput)}
+                    disabled={generating || customCodeInput.length < 4}
+                    className="p-3 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-700 transition disabled:opacity-50"
+                  >
+                    {generating ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <CheckCheck className="w-5 h-5" />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="p-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 rounded-2xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 p-4 bg-neutral-50 dark:bg-neutral-950 rounded-2xl border border-neutral-200 dark:border-neutral-800 group/code">
+                  <code className="flex-1 text-2xl font-black tracking-[0.25em] text-neutral-900 dark:text-white text-center">
+                    {data.referral.code}
+                  </code>
+                  <button
+                    onClick={() => {
+                      setCustomCodeInput(data.referral!.code);
+                      setIsEditing(true);
+                    }}
+                    className="p-2 text-neutral-400 hover:text-emerald-600 transition opacity-0 group-hover/code:opacity-100"
+                    title="কোড এডিট করুন"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+                  <motion.button
+                    whileTap={{ scale: 0.92 }}
+                    onClick={copyCode}
+                    className={`p-2.5 rounded-xl font-bold transition-colors ${
+                      copied
+                        ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
+                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                    }`}
+                  >
+                    {copied ? (
+                      <CheckCheck className="w-4 h-4" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </motion.button>
+                </div>
+              )}
 
               {/* action buttons */}
               <div className="grid grid-cols-2 gap-3">
                 <motion.button
                   whileTap={{ scale: 0.96 }}
                   onClick={copyCode}
-                  className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
                 >
                   <Copy className="w-4 h-4" />
-                  কোড কপি করো
+                  কোড কপি
                 </motion.button>
                 <motion.button
                   whileTap={{ scale: 0.96 }}
-                  onClick={shareCode}
-                  className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-900 hover:bg-emerald-950 text-white font-bold text-sm transition-colors shadow-md"
+                  onClick={copyLink}
+                  className="flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-900 hover:bg-emerald-950 text-white font-bold text-sm transition-colors shadow-md"
                 >
                   <Share2 className="w-4 h-4" />
-                  শেয়ার করো
+                  লিংক কপি
                 </motion.button>
               </div>
             </div>
           ) : (
-            <div className="text-center py-4">
-              <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-4">
-                তোমার এখনও কোনো রেফারেল কোড নেই। নিচের বাটন থেকে একটি তৈরি করো।
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  value={customCodeInput}
+                  onChange={(e) =>
+                    setCustomCodeInput(
+                      e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''),
+                    )
+                  }
+                  className="flex-1 px-4 py-3 border rounded-2xl dark:bg-neutral-950 dark:border-neutral-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold"
+                  placeholder="নিজের কোড লিখুন (ঐচ্ছিক)"
+                  maxLength={20}
+                />
+                <div className="flex gap-2">
+                  <motion.button
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => {
+                      if (customCodeInput && customCodeInput.length < 4) {
+                        toast.error('কোড কমপক্ষে ৪ অক্ষরের হতে হবে');
+                        return;
+                      }
+                      generateCode(customCodeInput || undefined);
+                    }}
+                    disabled={generating}
+                    className="flex-1 sm:flex-none px-6 py-3 rounded-2xl bg-emerald-900 hover:bg-emerald-950 text-white font-black text-sm shadow-lg shadow-emerald-900/10 disabled:opacity-60 transition-all"
+                  >
+                    {generating ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      'সেভ করুন'
+                    )}
+                  </motion.button>
+                  {!customCodeInput && (
+                    <motion.button
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => generateCode()}
+                      disabled={generating}
+                      className="px-4 py-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-2xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition font-bold text-xs"
+                    >
+                      অটো
+                    </motion.button>
+                  )}
+                </div>
+              </div>
+              <p className="text-center text-xs text-neutral-500 dark:text-neutral-400">
+                আপনি নিজের পছন্দমতো কোড দিতে পারেন অথবা 'অটো' বাটনে ক্লিক করতে
+                পারেন।
               </p>
-              <motion.button
-                whileTap={{ scale: 0.96 }}
-                onClick={generateCode}
-                disabled={generating}
-                className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-2xl bg-emerald-900 hover:bg-emerald-950 text-white font-black text-sm shadow-lg shadow-emerald-900/30 disabled:opacity-60 transition-all"
-              >
-                {generating ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" /> তৈরি হচ্ছে...
-                  </>
-                ) : (
-                  <>
-                    <Gift className="w-4 h-4" /> কোড তৈরি করো
-                  </>
-                )}
-              </motion.button>
             </div>
           )}
         </div>
@@ -375,17 +469,37 @@ export default function ReferralPage() {
                     <p className="font-bold text-sm text-neutral-900 dark:text-white truncate">
                       {h.redeemed_by.name || h.redeemed_by.email}
                     </p>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                      {new Date(h.redeemed_at).toLocaleDateString('bn-BD', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                        {new Date(h.redeemed_at).toLocaleDateString('bn-BD', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </p>
+                      <span className="text-[10px] text-neutral-300">•</span>
+                      <span
+                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                          h.admin_status === 'Approved'
+                            ? 'bg-emerald-100/50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400'
+                            : h.admin_status === 'Rejected'
+                              ? 'bg-red-100/50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                              : 'bg-amber-100/50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
+                        }`}
+                      >
+                        {h.admin_status === 'Approved'
+                          ? 'সফল'
+                          : h.admin_status === 'Rejected'
+                            ? 'বাতিল'
+                            : 'পেন্ডিং'}
+                      </span>
+                    </div>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 shrink-0">
-                    +১ মাস
-                  </span>
+                  {h.admin_status === 'Approved' && (
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 shrink-0">
+                      +১ মাস
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

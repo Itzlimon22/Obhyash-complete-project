@@ -25,7 +25,7 @@ export const GET = async () => {
   // Get redemption history
   const { data: history } = await supabase
     .from('referral_history')
-    .select('id, redeemed_at, redeemed_by')
+    .select('id, redeemed_at, redeemed_by, admin_status')
     .eq('referral_id', referral.id)
     .order('redeemed_at', { ascending: false });
 
