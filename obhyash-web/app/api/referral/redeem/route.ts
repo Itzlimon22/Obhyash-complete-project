@@ -33,7 +33,7 @@ export const POST = async (req: Request) => {
   }
 
   // Look up referral
-  const { data: referral, error: refErr } = await supabase
+  const { data: referral, error: refErr } = await supabaseAdmin
     .from('referrals')
     .select('*')
     .eq('code', code.trim().toUpperCase())
@@ -54,7 +54,7 @@ export const POST = async (req: Request) => {
   }
 
   // Check if already redeemed by this targetUser
-  const { data: existing } = await supabase
+  const { data: existing } = await supabaseAdmin
     .from('referral_history')
     .select('id')
     .eq('referral_id', referral.id)

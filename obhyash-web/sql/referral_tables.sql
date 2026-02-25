@@ -22,6 +22,7 @@ create table if not exists public.referral_history (
   referral_id  uuid not null references public.referrals(id) on delete cascade,
   redeemed_by  uuid not null references public.users(id) on delete cascade,
   redeemed_at  timestamptz not null default now(),
+  admin_status text not null default 'Pending', -- 'Pending', 'Approved', 'Rejected'
   reward_given boolean not null default false,
 
   -- Prevent the same user redeeming the same code twice

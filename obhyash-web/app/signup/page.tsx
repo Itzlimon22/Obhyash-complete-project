@@ -221,7 +221,7 @@ function SignupForm() {
             if (json.error) {
               toast.error(json.error);
             } else {
-              toast.success('রেফারেল বোনাস যোগ করা হয়েছে!');
+              toast.success(json.message || 'রেফারেল কোড গৃহীত হয়েছে!');
             }
           } catch (e) {
             console.error('Failed to redeem referral code', e);

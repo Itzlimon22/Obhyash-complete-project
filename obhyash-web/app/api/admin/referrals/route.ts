@@ -35,6 +35,7 @@ export const GET = async () => {
       id,
       redeemed_at,
       reward_given,
+      admin_status,
       redeemed_by_user:users!referral_history_redeemed_by_fkey(id, name, email),
       referral:referrals(
         id,
