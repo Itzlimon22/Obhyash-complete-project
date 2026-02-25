@@ -28,35 +28,14 @@ export const POST = async (req: Request) => {
     // Ignore cases where body is empty
   }
 
-  if (customCode) {
-    // Verify admin status
-    const { data: profile } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single();
+  // Fetch user profile to check admin status
+  const { data: profile } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .single();
 
-    if (profile?.role !== 'Admin') {
-      return NextResponse.json(
-        { error: 'Only admins can create custom referral codes' },
-        { status: 403 },
-      );
-    }
-
-    // Check if custom code already exists
-    const { data: conflict } = await supabase
-      .from('referrals')
-      .select('id')
-      .eq('code', customCode)
-      .single();
-
-    if (conflict) {
-      return NextResponse.json(
-        { error: 'This custom code is already taken' },
-        { status: 400 },
-      );
-    }
-  }
+  const isAdmin = profile?.role === 'Admin';
 
   // Check if user already has a code
   const { data: existing } = await supabase
@@ -66,7 +45,16 @@ export const POST = async (req: Request) => {
     .single();
 
   if (existing) {
-    if (customCode) {
+    if (customCode && customCode !== existing.code) {
+      if (!isAdmin) {
+        return NextResponse.json(
+          {
+            error:
+              'You have already set your referral code and cannot change it.',
+          },
+          { status: 403 },
+        );
+      }
       // Update existing code to custom code
       const { data: updated, error: updateErr } = await supabase
         .from('referrals')
@@ -80,6 +68,22 @@ export const POST = async (req: Request) => {
       return NextResponse.json({ referral: updated });
     }
     return NextResponse.json({ referral: existing });
+  }
+
+  // If no code exists, verify custom code uniqueness if provided
+  if (customCode) {
+    const { data: conflict } = await supabase
+      .from('referrals')
+      .select('id')
+      .eq('code', customCode)
+      .single();
+
+    if (conflict) {
+      return NextResponse.json(
+        { error: 'This custom code is already taken' },
+        { status: 400 },
+      );
+    }
   }
 
   // Generate a unique code if custom is not provided

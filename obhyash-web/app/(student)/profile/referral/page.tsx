@@ -131,13 +131,41 @@ export default function ReferralPage() {
               )}
             </div>
           ) : (
-            <button
-              onClick={() => generateCode()}
-              disabled={generating}
-              className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition"
-            >
-              কোড তৈরি করুন
-            </button>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={customCodeInput}
+                onChange={(e) =>
+                  setCustomCodeInput(
+                    e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''),
+                  )
+                }
+                className="px-3 py-2 text-sm border rounded dark:bg-neutral-800 dark:border-neutral-700 outline-none w-40"
+                placeholder="নিজের কোড দিন"
+                maxLength={20}
+              />
+              <button
+                onClick={() => {
+                  if (customCodeInput.length < 4) {
+                    toast.error('কোড কমপক্ষে ৪ অক্ষরের হতে হবে');
+                    return;
+                  }
+                  generateCode(customCodeInput);
+                }}
+                disabled={generating || customCodeInput.length < 4}
+                className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition disabled:opacity-50"
+              >
+                সেভ করুন
+              </button>
+              <button
+                onClick={() => generateCode()}
+                disabled={generating}
+                className="px-4 py-2 bg-neutral-200 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200 rounded hover:bg-neutral-300 dark:hover:bg-neutral-700 transition disabled:opacity-50"
+                title="অটো জেনারেট করুন"
+              >
+                অটো
+              </button>
+            </div>
           )}
         </div>
       </div>
