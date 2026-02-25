@@ -195,13 +195,16 @@ export default function SignupPage() {
           toast.error(getErrorMessage(profileError));
         }
 
-        // Handle referral code redemption if auto-confirmed (we have session)
-        if (data.session && formData.referralCode) {
+        // Handle referral code redemption
+        if (formData.referralCode) {
           try {
             const res = await fetch('/api/referral/redeem', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ code: formData.referralCode }),
+              body: JSON.stringify({
+                code: formData.referralCode,
+                newUserId: data.user.id,
+              }),
             });
             const json = await res.json();
             if (json.error) {

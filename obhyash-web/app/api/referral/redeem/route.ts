@@ -7,11 +7,19 @@ export const POST = async (req: Request) => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  const { code, newUserId } = await req.json();
+
+  let targetUserId = user?.id;
+
+  // If no active session, but newUserId is provided (e.g., during signup), use it
+  if (!targetUserId && newUserId) {
+    targetUserId = newUserId;
+  }
+
+  if (!targetUserId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { code } = await req.json();
   if (!code) {
     return NextResponse.json(
       { error: 'Missing referral code' },
@@ -33,19 +41,19 @@ export const POST = async (req: Request) => {
     );
   }
 
-  if (referral.owner_id === user.id) {
+  if (referral.owner_id === targetUserId) {
     return NextResponse.json(
       { error: 'You cannot use your own referral code' },
       { status: 400 },
     );
   }
 
-  // Check if already redeemed by this user
+  // Check if already redeemed by this targetUser
   const { data: existing } = await supabase
     .from('referral_history')
     .select('id')
     .eq('referral_id', referral.id)
-    .eq('redeemed_by', user.id)
+    .eq('redeemed_by', targetUserId)
     .single();
 
   if (existing) {
@@ -80,13 +88,13 @@ export const POST = async (req: Request) => {
   };
 
   // Extend both users
-  await extendSubscription(user.id);
+  await extendSubscription(targetUserId!);
   await extendSubscription(referral.owner_id);
 
   // Record history
   await supabase.from('referral_history').insert({
     referral_id: referral.id,
-    redeemed_by: user.id,
+    redeemed_by: targetUserId,
     redeemed_at: new Date().toISOString(),
     reward_given: true,
   });
