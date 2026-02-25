@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 export const GET = async () => {
   const supabase = await createClient();
+  const supabaseAdmin = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
 
   // 1. Verify Authentication & Role
   const {
@@ -26,9 +31,9 @@ export const GET = async () => {
   // 2. Fetch all referrals history across the platform
   // Join with referral code and the users table for both referrer and redeemer
   // Because of RLS, make sure the Service Role or similar is used if Admin role doesn't override it.
-  // We've provided a separate SQL script to grant Admin users SELECT access to these tables.
-
-  const { data: history, error: historyErr } = await supabase
+  // We use the service role key to bypass the RLS policies which were rolled back
+  // Admin requires full view of all data.
+  const { data: history, error: historyErr } = await supabaseAdmin
     .from('referral_history')
     .select(
       `

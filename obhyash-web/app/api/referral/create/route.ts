@@ -71,7 +71,7 @@ export const POST = async (req: Request) => {
         user_id: user.id,
         title: 'রেফারেল কোড আপডেট!',
         message: `আপনার রেফারেল কোড পরিবর্তন করা হয়েছে। আপনার নতুন কোড: ${customCode}`,
-        type: 'info',
+        type: 'system',
         is_read: false,
       });
 
@@ -125,7 +125,7 @@ export const POST = async (req: Request) => {
     user_id: user.id,
     title: 'রেফারেল কোড তৈরি!',
     message: `আপনার রেফারেল কোড সফলভাবে তৈরি হয়েছে: ${code}`,
-    type: 'success',
+    type: 'system',
     is_read: false,
   });
 

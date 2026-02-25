@@ -87,21 +87,46 @@ export const POST = async (req: Request) => {
   }
 
   // Record history as Pending
-  await supabaseAdmin.from('referral_history').insert({
-    referral_id: referral.id,
-    redeemed_by: targetUserId,
-    redeemed_at: new Date().toISOString(),
-    admin_status: 'Pending',
-    reward_given: false,
-  });
+  const { error: insertErr } = await supabaseAdmin
+    .from('referral_history')
+    .insert({
+      referral_id: referral.id,
+      redeemed_by: targetUserId,
+      redeemed_at: new Date().toISOString(),
+      admin_status: 'Pending',
+      reward_given: false,
+    });
+
+  if (insertErr) {
+    console.error('Insert History Error:', insertErr);
+    return NextResponse.json(
+      { error: 'Failed to record referral: ' + insertErr.message },
+      { status: 500 },
+    );
+  }
 
   // Notify the referrer that someone used their code
-  await supabaseAdmin.from('notifications').insert({
+  const { error: notifErr } = await supabaseAdmin.from('notifications').insert({
     user_id: referral.owner_id,
     title: 'নতুন রেফারেল!',
     message:
       'আপনার রেফারেল কোড ব্যবহার করে একজন নতুন ইউজার যুক্ত হয়েছে। অ্যাডমিন রিভিউ করার পর আপনি ১ মাসের ফ্রি প্রিমিয়াম পাবেন।',
-    type: 'info',
+    type: 'system',
+    is_read: false,
+  });
+
+  if (notifErr) {
+    console.error('Insert Notification Error:', notifErr);
+    // Even if notification fails, the referral succeeded, so we don't throw 500, but log it.
+  }
+
+  // Notify the new user that they successfully used a code
+  await supabaseAdmin.from('notifications').insert({
+    user_id: targetUserId,
+    title: 'রেফারেল কোড গৃহীত!',
+    message:
+      'আপনি সফলভাবে একটি রেফারেল কোড ব্যবহার করে সাইনআপ করেছেন। অ্যাডমিন এপ্রুভালের পর আপনি ১ মাসের ফ্রি প্রিমিয়াম পাবেন।',
+    type: 'system',
     is_read: false,
   });
 

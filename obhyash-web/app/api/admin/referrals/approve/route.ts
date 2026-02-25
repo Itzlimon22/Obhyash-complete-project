@@ -67,7 +67,7 @@ export const POST = async (req: Request) => {
       user_id: (history.referral as any).owner_id,
       title: 'রেফারেল বাতিল!',
       message: 'আপনার একটি রেফারেল অ্যাডমিন কর্তৃক বাতিল করা হয়েছে।',
-      type: 'warning',
+      type: 'system',
       is_read: false,
     });
 
@@ -77,7 +77,7 @@ export const POST = async (req: Request) => {
       title: 'রেফারেল বাতিল!',
       message:
         'দুঃখিত, আপনার রেফারেল বোনাস রিকোয়েস্টটি অ্যাডমিন কর্তৃক বাতিল করা হয়েছে।',
-      type: 'error',
+      type: 'system',
       is_read: false,
     });
 
@@ -125,7 +125,7 @@ export const POST = async (req: Request) => {
     title: 'রেফারেল সফল!',
     message:
       'আপনার রেফারেল কোড ব্যবহার করে একজন নতুন ইউজার যুক্ত হয়েছে। আপনি ১ মাসের ফ্রি প্রিমিয়াম পেয়েছেন!',
-    type: 'success',
+    type: 'system',
     is_read: false,
   });
 
@@ -135,7 +135,7 @@ export const POST = async (req: Request) => {
     title: 'রেফারেল বোনাস!',
     message:
       'রেফারেল কোড ব্যবহারের জন্য আপনার অ্যাকাউন্টে ১ মাসের ফ্রি প্রিমিয়াম যোগ করা হয়েছে।',
-    type: 'success',
+    type: 'system',
     is_read: false,
   });
 
