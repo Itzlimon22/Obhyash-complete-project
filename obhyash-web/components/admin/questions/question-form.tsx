@@ -13,6 +13,7 @@ import {
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { RichTextEditor } from '@/components/admin/questions/rich-text-editor';
 import { toast } from 'sonner';
+import { standardizeInstituteName } from '@/lib/data/institute-helpers';
 
 interface QuestionFormProps {
   initialData: Partial<Question>;
@@ -87,6 +88,18 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
     ) {
       toast.error('সঠিক উত্তর নির্বাচন করো');
       return;
+    }
+
+    // Standardize institutes
+    const rawInstitute = data.institute || data.institutes?.join(',') || '';
+    if (rawInstitute) {
+      const unifiedInstitutes = rawInstitute
+        .split(',')
+        .map((s) => standardizeInstituteName(s))
+        .filter(Boolean);
+
+      data.institutes = unifiedInstitutes;
+      data.institute = unifiedInstitutes[0] || '';
     }
 
     onSave(data);

@@ -37,6 +37,7 @@ import {
   resolveTopicName,
 } from '@/lib/data/hsc-helpers';
 import { checkDuplicateQuestions } from '@/services/question-service';
+import { standardizeInstituteName } from '@/lib/data/institute-helpers';
 
 // ─── Types ───────────────────────────────────────────────────────────
 interface BulkUploadProps {
@@ -147,7 +148,7 @@ function normalizeRawRow(
   if (instituteVal) {
     q.institutes = instituteVal
       .split(',')
-      .map((s) => s.trim())
+      .map((s) => standardizeInstituteName(s))
       .filter(Boolean);
     q.institute = q.institutes[0] || '';
   }
@@ -1346,7 +1347,8 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                   fmt: 'xlsx' as const,
                   icon: FileSpreadsheet,
                   label: 'Excel',
-                  color: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600',
+                  color:
+                    'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600',
                 },
               ].map((t) => (
                 <button
