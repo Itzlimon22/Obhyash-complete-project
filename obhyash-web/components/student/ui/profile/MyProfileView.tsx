@@ -150,7 +150,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
             এডিট করো
           </button>
           <Link
-            href="/profile/referral"
+            href="/referral"
             className="flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 rounded-xl font-bold text-base sm:text-lg hover:bg-red-100 dark:hover:bg-red-900/40 transition-all active:scale-95 shadow-sm w-fit"
           >
             <Gift className="w-5 h-5" />
