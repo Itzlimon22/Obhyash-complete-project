@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Question } from '@/lib/types';
 import LatexText from '../common/LatexText';
 import { toBengaliNumeral } from '@/lib/utils';
@@ -37,7 +37,6 @@ export default function QuestionCard({
   onToggleBookmark,
 }: QuestionCardProps) {
   const isAnswered = selectedOptionIndex !== undefined;
-  const [isExpanded, setIsExpanded] = useState(false);
 
   // Build institute/year tags
   const tags: string[] = [];
@@ -70,12 +69,11 @@ export default function QuestionCard({
         ${isOmrMode ? 'opacity-90' : ''}
       `}
     >
-      {/* ── Header: (Q no + question start) LEFT · actions RIGHT ── */}
-      <div className="flex items-start justify-between gap-3">
-        {/* Number + question (forced same line via flex) */}
+      {/* ── Header: Question + Content ── */}
+      <div className="flex flex-col gap-3">
         <div className="flex items-start gap-2 min-w-0">
           {serialNumber !== undefined && (
-            <span className="shrink-0 mt-[2px] text-sm md:text-base font-bold text-neutral-500 dark:text-neutral-400">
+            <span className="shrink-0 mt-[2px] text-base font-bold text-neutral-800 dark:text-neutral-200">
               {toBengaliNumeral(serialNumber)}.
             </span>
           )}
@@ -85,86 +83,91 @@ export default function QuestionCard({
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
-          {/* Bookmark (deep green fill when active) */}
-          <motion.button
-            whileTap={{ scale: 0.86 }}
-            whileHover={{ scale: 1.06 }}
-            onClick={onToggleBookmark}
-            disabled={!onToggleBookmark}
-            title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
-            className={`
-              rounded-lg p-1.5 transition-colors
-              ${!onToggleBookmark ? 'opacity-30 cursor-default' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'}
-              ${isBookmarked ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/25 dark:text-emerald-400' : 'text-neutral-400 dark:text-neutral-500'}
-            `}
-            style={{ border: 'none' }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill={isBookmarked ? 'currentColor' : 'none'}
-              stroke="currentColor"
-              strokeWidth={2}
-              className="w-[18px] h-[18px] md:w-5 md:h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 11.186 0Z"
-              />
-            </svg>
-          </motion.button>
+        {/* ── Meta & Actions Row (Right-Aligned) ── */}
+        <div className="flex justify-end items-center gap-3">
+          {/* Tags */}
+          {tags.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="
+                    inline-flex items-center
+                    text-[11px] md:text-xs font-semibold
+                    px-3 py-1 rounded-full
+                    bg-cyan-100/50 text-cyan-800
+                    dark:bg-cyan-900/30 dark:text-cyan-300
+                  "
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
 
-          {/* Report */}
-          <button
-            onClick={onReport}
-            title="Report Issue"
-            className="
-              rounded-lg p-1.5 transition-colors
-              text-neutral-400 hover:text-red-500 hover:bg-neutral-100
-              dark:text-neutral-500 dark:hover:text-red-400 dark:hover:bg-neutral-800
-            "
-            style={{ border: 'none', background: 'none' }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-[18px] h-[18px] md:w-5 md:h-5"
+          {/* Actions */}
+          <div className="flex items-center gap-1 shrink-0">
+            {/* Bookmark */}
+            <motion.button
+              whileTap={{ scale: 0.86 }}
+              whileHover={{ scale: 1.06 }}
+              onClick={onToggleBookmark}
+              disabled={!onToggleBookmark}
+              title={isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো'}
+              className={`
+                rounded-full px-3 py-1 inline-flex items-center gap-1.5 transition-colors
+                ${!onToggleBookmark ? 'opacity-30 cursor-default' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'}
+                ${isBookmarked ? 'bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200' : 'bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200'}
+              `}
+              style={{ border: 'none' }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-              />
-            </svg>
-          </button>
+              <span className="text-xs font-bold">
+                {isBookmarked ? 'বুকমার্ক করা' : 'বুকমার্ক'}
+              </span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill={isBookmarked ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth={2}
+                className="w-3.5 h-3.5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 11.186 0Z"
+                />
+              </svg>
+            </motion.button>
+
+            {/* Report */}
+            <button
+              onClick={onReport}
+              title="Report Issue"
+              className="
+                rounded-full p-1.5 transition-colors text-red-500
+                hover:bg-red-50 dark:hover:bg-red-900/20
+              "
+              style={{ border: 'none', background: 'none' }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-[18px] h-[18px]"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
-
-      {/* ── Institutes + Years ── */}
-      {tags.length > 0 && (
-        <div className="mt-2 flex items-center gap-1.5 flex-wrap">
-          {tags.map((tag, i) => (
-            <span
-              key={i}
-              className="
-                inline-flex items-center
-                text-[11px] md:text-xs font-semibold
-                px-2 py-0.5 rounded-md
-                bg-emerald-50 text-emerald-700 border border-emerald-100/80
-                dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-700/30
-              "
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
 
       {/* ── Options ── */}
       <div
@@ -182,61 +185,59 @@ export default function QuestionCard({
 
           // Circle styles
           let iconClass =
-            'border-2 border-neutral-300 text-neutral-500 ' +
-            'dark:border-neutral-600 dark:text-neutral-400';
+            'border-[1.5px] border-neutral-600 text-neutral-600 ' +
+            'dark:border-neutral-500 dark:text-neutral-400';
 
           // Text styles
-          let textClass = 'text-neutral-800 dark:text-neutral-200';
+          let textClass = 'text-neutral-900 dark:text-neutral-200';
 
-          // Container styles (Chorcha-ish: subtle, clean)
+          // Container styles (chorcha.net: heavily rounded, gray/off-white background, no explicit heavy borders)
           let containerClass =
-            'bg-white border border-neutral-200/80 ' +
-            'hover:bg-neutral-50 hover:border-neutral-300/80 ' +
-            'dark:bg-neutral-900/40 dark:border-neutral-700/60 ' +
-            'dark:hover:bg-neutral-800/60 dark:hover:border-neutral-600/60';
+            'bg-[#f0f0f0] border-transparent ' +
+            'hover:bg-[#e8e8e8] ' +
+            'dark:bg-[#1f1f1f] ' +
+            'dark:hover:bg-[#2a2a2a]';
 
           if (showFeedback) {
             if (isCorrect) {
-              iconClass = 'bg-emerald-500 text-white border-none';
+              containerClass =
+                'bg-neutral-200/80 dark:bg-neutral-800 border-transparent';
+              iconClass =
+                'border-emerald-500 bg-emerald-500 text-white font-bold';
+              textClass = 'text-neutral-900 dark:text-white font-semibold';
               iconText = '✓';
-              textClass = 'text-emerald-900 dark:text-emerald-100 font-semibold';
-              containerClass =
-                'bg-emerald-50 border border-emerald-200 ' +
-                'dark:bg-emerald-900/20 dark:border-emerald-700/50';
             } else if (isSelected) {
-              iconClass = 'bg-red-500 text-white border-none';
-              iconText = '✕';
-              textClass = 'text-red-900 dark:text-red-100 font-semibold';
               containerClass =
-                'bg-red-50 border border-red-200 ' +
-                'dark:bg-red-900/20 dark:border-red-700/50';
+                'bg-neutral-200/80 dark:bg-neutral-800 border-transparent';
+              iconClass = 'border-red-500 bg-red-500 text-white font-bold';
+              textClass = 'text-neutral-900 dark:text-white font-semibold';
+              iconText = '✕';
             } else {
               containerClass =
-                'bg-white border border-neutral-200/80 opacity-55 ' +
-                'dark:bg-neutral-900/30 dark:border-neutral-700/40';
+                'bg-[#f0f0f0] border-transparent opacity-60 ' +
+                'dark:bg-[#1f1f1f]';
             }
           } else if (showAnswer && isCorrect) {
-            iconClass = 'bg-emerald-500 text-white border-none';
-            iconText = '✓';
-            textClass = 'text-emerald-900 dark:text-emerald-100 font-semibold';
             containerClass =
-              'bg-emerald-50 border border-emerald-200 ' +
-              'dark:bg-emerald-900/20 dark:border-emerald-700/50';
+              'bg-neutral-200/80 dark:bg-neutral-800 border-transparent';
+            iconClass =
+              'border-emerald-500 bg-emerald-500 text-white font-bold';
+            textClass = 'text-neutral-900 dark:text-white font-semibold';
+            iconText = '✓';
           } else if (isSelected) {
-            iconClass = 'bg-emerald-500 text-white border-none';
-            iconText = '✓';
-            textClass = 'text-emerald-900 dark:text-emerald-100 font-semibold';
             containerClass =
-              'bg-emerald-50 border border-emerald-200 ' +
-              'dark:bg-emerald-900/20 dark:border-emerald-700/50';
+              'bg-neutral-200/80 dark:bg-neutral-800 border-transparent';
+            iconClass =
+              'border-neutral-800 bg-neutral-800 text-white dark:border-neutral-300 dark:bg-neutral-300 dark:text-neutral-900 font-bold';
+            textClass = 'text-neutral-900 dark:text-white font-semibold';
           }
 
           return (
             <label
               key={idx}
               className={`
-                group relative flex items-center gap-3
-                px-3 py-2.5 rounded-xl
+                group relative flex items-center gap-4
+                px-5 py-3.5 rounded-3xl md:rounded-full border
                 transition-all duration-200 h-full
                 ${isOmrMode || readOnly ? 'cursor-default' : 'cursor-pointer'}
                 ${containerClass}
@@ -255,15 +256,19 @@ export default function QuestionCard({
 
               <div
                 className={`
-                  w-7 h-7 rounded-full flex items-center justify-center
+                  w-6 h-6 rounded-full flex items-center justify-center
                   transition-all duration-200 shrink-0
                   ${iconClass}
                 `}
               >
-                <span className="text-xs font-bold leading-none">{iconText}</span>
+                <span className="text-[11px] font-bold leading-none translate-y-px">
+                  {iconText}
+                </span>
               </div>
 
-              <div className={`text-base font-medium leading-[1.6] select-none ${textClass}`}>
+              <div
+                className={`text-base font-medium leading-[1.6] select-none ${textClass}`}
+              >
                 <LatexText text={option} />
               </div>
             </label>
@@ -273,85 +278,47 @@ export default function QuestionCard({
 
       {/* ── Explanation (review/feedback only) ── */}
       {showFeedback && question.explanation && (
-        <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-800 animate-fade-in">
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
+        <div className="mt-4 pt-1 animate-fade-in">
+          <div
             className="
-              w-full flex items-center justify-between
-              px-4 py-2.5 rounded-xl shadow-sm
-              bg-emerald-800 dark:bg-emerald-900 text-white
-              hover:bg-emerald-700 dark:hover:bg-emerald-800
-              transition-all active:scale-[0.99]
+              p-4 md:p-5 relative rounded-2xl shadow-sm
+              bg-emerald-50/80 dark:bg-emerald-950/30
+              border border-emerald-200 dark:border-emerald-800/60
             "
           >
-            <div className="flex items-center gap-2.5">
+            <div className="absolute top-4 right-4 opacity-5 dark:opacity-10 pointer-events-none text-emerald-900 dark:text-emerald-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
+                width="60"
+                height="60"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="1"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
               </svg>
-              <span className="font-bold text-sm tracking-wider">
-                ব্যাখ্যা (Explanation)
-              </span>
             </div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
-            >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </button>
 
-          <div
-            className={`
-              grid transition-all duration-300 ease-in-out
-              ${isExpanded ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 mt-0'}
-            `}
-          >
-            <div className="overflow-hidden">
-              <div
-                className="
-                  p-4 md:p-5 relative rounded-r-xl shadow-sm
-                  bg-[#F8FAF9] dark:bg-emerald-950/20
-                  border-l-4 border-emerald-800 dark:border-emerald-600
-                "
+            <div className="flex items-center gap-2 mb-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-[18px] h-[18px] text-emerald-600 dark:text-emerald-400"
               >
-                <div className="absolute top-4 right-4 opacity-5 dark:opacity-10 pointer-events-none text-emerald-900 dark:text-emerald-500">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="60"
-                    height="60"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                  </svg>
-                </div>
+                <path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.226 17.834a.75.75 0 0 0-1.06 1.06l1.591 1.59a.75.75 0 0 0 1.06-1.061l-1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.166 7.226a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591Z" />
+              </svg>
+              <h4 className="text-xs font-black tracking-wide text-emerald-700 dark:text-emerald-400 uppercase">
+                ব্যাখ্যা (Explanation)
+              </h4>
+            </div>
 
-                <div className="text-[15px] md:text-base text-neutral-800 dark:text-neutral-200 leading-[1.8] font-serif-exam relative z-10">
-                  <LatexText text={question.explanation} />
-                </div>
-              </div>
+            <div className="text-[14px] md:text-[15px] text-neutral-800 dark:text-neutral-200 leading-[1.8] font-serif-exam relative z-10">
+              <LatexText text={question.explanation} />
             </div>
           </div>
         </div>
