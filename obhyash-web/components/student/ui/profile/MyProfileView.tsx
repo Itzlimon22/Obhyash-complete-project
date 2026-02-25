@@ -134,24 +134,26 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
             প্রোফাইল
           </h1>
         </div>
-        <div className="flex gap-3">
-          {onViewNotifications && (
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <div className="flex gap-3 w-full sm:w-auto">
+            {onViewNotifications && (
+              <button
+                onClick={onViewNotifications}
+                className="flex-1 sm:flex-none px-5 py-2.5 sm:px-6 sm:py-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl font-bold text-base sm:text-lg text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all active:scale-95 shadow-sm"
+              >
+                নোটিফিকেশন
+              </button>
+            )}
             <button
-              onClick={onViewNotifications}
-              className="px-5 py-2.5 sm:px-6 sm:py-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl font-bold text-base sm:text-lg text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all active:scale-95 shadow-sm"
+              onClick={onEditProfile}
+              className="flex-1 sm:flex-none px-5 py-2.5 sm:px-6 sm:py-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl font-bold text-base sm:text-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all active:scale-95 shadow-sm"
             >
-              নোটিফিকেশন
+              এডিট করো
             </button>
-          )}
-          <button
-            onClick={onEditProfile}
-            className="px-5 py-2.5 sm:px-6 sm:py-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl font-bold text-base sm:text-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all active:scale-95 shadow-sm w-fit"
-          >
-            এডিট করো
-          </button>
+          </div>
           <Link
             href="/referral"
-            className="flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 rounded-xl font-bold text-base sm:text-lg hover:bg-red-100 dark:hover:bg-red-900/40 transition-all active:scale-95 shadow-sm w-fit"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 rounded-xl font-bold text-base sm:text-lg hover:bg-red-100 dark:hover:bg-red-900/40 transition-all active:scale-95 shadow-sm w-full sm:w-fit"
           >
             <Gift className="w-5 h-5" />
             রেফার করুন

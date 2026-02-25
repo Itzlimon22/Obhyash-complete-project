@@ -18,6 +18,7 @@ import {
   Loader2,
   Eye,
   EyeOff,
+  Gift,
 } from 'lucide-react';
 import Logo from '@/components/student/ui/Logo';
 import SocialLoginButton from '@/components/auth/SocialLoginButton';
@@ -53,6 +54,7 @@ export default function SignupPage() {
     email: '',
     password: '',
     confirmPassword: '',
+    referralCode: '',
   });
 
   const handleChange = (
@@ -197,6 +199,19 @@ export default function SignupPage() {
         if (data.session) {
           router.push('/dashboard');
           return;
+        }
+
+        // Handle referral code redemption
+        if (formData.referralCode) {
+          try {
+            await fetch('/api/referral/redeem', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ code: formData.referralCode }),
+            });
+          } catch (e) {
+            console.error('Failed to redeem referral code', e);
+          }
         }
 
         setSuccess(true);
@@ -497,6 +512,27 @@ export default function SignupPage() {
                         className="w-full pl-12 pr-4 py-2.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 md:py-3.5"
                       />
                     </div>
+                  </div>
+
+                  <div className="space-y-1.5 pt-2">
+                    <label className="text-sm font-semibold text-emerald-700 dark:text-emerald-400 ml-1 flex items-center gap-1.5">
+                      <Gift className="w-4 h-4" />
+                      রেফারেল কোড (optional)
+                    </label>
+                    <div className="relative group">
+                      <input
+                        type="text"
+                        name="referralCode"
+                        value={formData.referralCode}
+                        onChange={handleChange}
+                        placeholder="কোড থাকলে এখানে লিখুন"
+                        className="w-full px-4 text-center tracking-[0.2em] font-bold py-2.5 uppercase bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-emerald-800 dark:text-emerald-200 md:py-3.5"
+                      />
+                    </div>
+                    <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80 ml-1">
+                      রেফারেল কোড ব্যবহার করলে পাবেন ১ মাসের{' '}
+                      <b>ফ্রি Premium Subscriptions!</b>
+                    </p>
                   </div>
                 </div>
               </div>
