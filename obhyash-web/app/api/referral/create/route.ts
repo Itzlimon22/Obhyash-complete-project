@@ -65,6 +65,16 @@ export const POST = async (req: Request) => {
 
       if (updateErr)
         return NextResponse.json({ error: updateErr.message }, { status: 500 });
+
+      // Notify the user that their code was updated
+      await supabase.from('notifications').insert({
+        user_id: user.id,
+        title: 'রেফারেল কোড আপডেট!',
+        message: `আপনার রেফারেল কোড পরিবর্তন করা হয়েছে। আপনার নতুন কোড: ${customCode}`,
+        type: 'info',
+        is_read: false,
+      });
+
       return NextResponse.json({ referral: updated });
     }
     return NextResponse.json({ referral: existing });
@@ -109,6 +119,15 @@ export const POST = async (req: Request) => {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  // Notify the user that their code was created
+  await supabase.from('notifications').insert({
+    user_id: user.id,
+    title: 'রেফারেল কোড তৈরি!',
+    message: `আপনার রেফারেল কোড সফলভাবে তৈরি হয়েছে: ${code}`,
+    type: 'success',
+    is_read: false,
+  });
 
   return NextResponse.json({ referral });
 };

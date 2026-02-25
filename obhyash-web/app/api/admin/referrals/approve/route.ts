@@ -62,6 +62,25 @@ export const POST = async (req: Request) => {
       .update({ admin_status: 'Rejected' })
       .eq('id', historyId);
 
+    // Insert notification for the referrer about the rejection
+    await supabaseAdmin.from('notifications').insert({
+      user_id: (history.referral as any).owner_id,
+      title: 'রেফারেল বাতিল!',
+      message: 'আপনার একটি রেফারেল অ্যাডমিন কর্তৃক বাতিল করা হয়েছে।',
+      type: 'warning',
+      is_read: false,
+    });
+
+    // Insert notification for the referee about the rejection
+    await supabaseAdmin.from('notifications').insert({
+      user_id: history.redeemed_by,
+      title: 'রেফারেল বাতিল!',
+      message:
+        'দুঃখিত, আপনার রেফারেল বোনাস রিকোয়েস্টটি অ্যাডমিন কর্তৃক বাতিল করা হয়েছে।',
+      type: 'error',
+      is_read: false,
+    });
+
     return NextResponse.json({ success: true, message: 'Referral rejected.' });
   }
 

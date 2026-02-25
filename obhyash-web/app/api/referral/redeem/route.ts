@@ -95,6 +95,16 @@ export const POST = async (req: Request) => {
     reward_given: false,
   });
 
+  // Notify the referrer that someone used their code
+  await supabaseAdmin.from('notifications').insert({
+    user_id: referral.owner_id,
+    title: 'নতুন রেফারেল!',
+    message:
+      'আপনার রেফারেল কোড ব্যবহার করে একজন নতুন ইউজার যুক্ত হয়েছে। অ্যাডমিন রিভিউ করার পর আপনি ১ মাসের ফ্রি প্রিমিয়াম পাবেন।',
+    type: 'info',
+    is_read: false,
+  });
+
   return NextResponse.json({
     success: true,
     message: 'রেফারেল কোড গৃহীত হয়েছে! অ্যাডমিন এপ্রুভালের পর বোনাস পাবেন।',
