@@ -25,24 +25,8 @@ export const GET = async () => {
 
   // 2. Fetch all referrals history across the platform
   // Join with referral code and the users table for both referrer and redeemer
-  // Because of RLS, make sure the Service Role or similar is used if Admin role doesn't override it,
-  // but since we check role='Admin' above, we might need a bypass if RLS restricts SELECT.
-  // Actually, 'users' has "Public profiles are viewable by everyone" for SELECT,
-  // and for referrals, we've set "Anyone can read referrals".
-  // For referral_history, we only have "Owners can read their referral history", so we need to use service role bypass.
-
-  const supabaseAdmin = await createClient(true); // Assuming createClient(true) returns a service-role client, or we create one here.
-  // We don't have a built-in true parameter in createClient.
-  // Let's check how other admin endpoints bypass RLS.
-  // It's possible Admin users have a postgres policy or we should use service_role key.
-  // Actually, let's just use the default supabase client and if RLS blocks it, we know why.
-  // Wait, let's look at how admin fetches subscriptions.
-  // In `app/(admin)/admin/subscriptions/page.tsx`, it just uses the regular `createClient()` from `@/utils/supabase/client`.
-  // Which means RLS in those tables either allows Admin or allows anyone to read for admin dashboard.
-  // However, for `referral_history`, our policy is:
-  // create policy "Owners can read their referral history" on public.referral_history for select using ( referral_id in ( select id from public.referrals where owner_id = auth.uid() ) );
-  // So an admin won't be able to read it unless they are the owner!
-  // We must fix the RLS policy for `referral_history` and `referrals` to allow 'Admin' role users to read all.
+  // Because of RLS, make sure the Service Role or similar is used if Admin role doesn't override it.
+  // We've provided a separate SQL script to grant Admin users SELECT access to these tables.
 
   const { data: history, error: historyErr } = await supabase
     .from('referral_history')
