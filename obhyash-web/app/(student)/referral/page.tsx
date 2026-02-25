@@ -158,92 +158,187 @@ export default function ReferralPage() {
       onLogout={handleLogout}
       toggleTheme={toggleTheme}
       isDarkMode={theme === 'dark'}
-      title="রেফারেল প্রোগ্রাম"
+      title="রেফারেল"
+      noPadding
     >
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5 pb-16 animate-fade-in">
-        {/* ── Back button ── */}
-        <button
-          onClick={() => goTo('profile')}
-          className="flex items-center gap-1.5 text-sm font-bold text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-white transition-colors"
-        >
-          <ChevronLeft className="w-4 h-4" /> প্রোফাইলে ফিরুন
-        </button>
+      <div className="min-h-full bg-neutral-50 dark:bg-black pb-24 animate-fade-in relative font-sans">
+        {/* ── Top Header Bar (Mobile App Style) ── */}
+        <div className="bg-emerald-900 text-white px-4 pt-6 pb-4 md:pt-8 md:pb-6 rounded-b-[2.5rem] shadow-xl relative overflow-hidden z-10">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-800 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3"></div>
+          <div className="absolute top-0 left-0 w-48 h-48 bg-emerald-950 rounded-full blur-3xl opacity-50 -translate-y-1/2 -translate-x-1/2"></div>
 
-        {/* ── Hero banner ── */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 p-7 sm:p-10 shadow-2xl text-white">
-          {/* decorative circles */}
-          <div className="pointer-events-none absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/5" />
-          <div className="pointer-events-none absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white/10" />
-          <div className="pointer-events-none absolute bottom-0 left-0 w-32 h-32 rounded-full bg-emerald-700/30 -mb-10 -ml-10" />
-
-          <div className="relative z-10 flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-              <Gift className="w-7 h-7 text-emerald-300" />
-            </div>
-            <div>
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-widest bg-emerald-700/60 border border-emerald-600/40 text-emerald-200 mb-2 inline-block">
-                রেফারেল প্রোগ্রাম
-              </span>
-              <h1 className="text-2xl sm:text-3xl font-black mb-1.5">
-                বন্ধুকে আমন্ত্রণ জানাও
-              </h1>
-              <p className="text-emerald-200/80 text-sm leading-relaxed max-w-sm">
-                তোমার কোড শেয়ার করো। বন্ধু সাইন আপ করলে তুমি পাবে{' '}
-                <span className="text-white font-bold">১ মাস প্রিমিয়াম</span>,
-                বন্ধুও পাবে বিনামূল্যে প্রিমিয়াম।
-              </p>
-            </div>
+          <div className="relative z-10 flex items-center justify-between mb-6">
+            <button
+              onClick={() => goTo('profile')}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition backdrop-blur-md"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <h1 className="text-lg font-black tracking-wide">
+              রেফারেল প্রোগ্রাম
+            </h1>
+            <div className="w-10"></div> {/* Spacer for centering */}
           </div>
 
-          {/* Stats row */}
-          <div className="relative z-10 mt-7 grid grid-cols-3 gap-3">
+          <div className="relative z-10 text-center px-2">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-inner mb-4">
+              <Gift className="w-8 h-8 text-emerald-300 drop-shadow-md" />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-black mb-2 leading-tight">
+              বন্ধুদের আমন্ত্রণ জানাও
+            </h2>
+            <p className="text-emerald-100/90 text-[13px] md:text-sm max-w-[280px] mx-auto leading-relaxed font-medium">
+              তোমার কোড শেয়ার করো। বন্ধু প্রিমিয়াম পেলে তুমিও পাবে{' '}
+              <span className="font-bold text-white">১ মাস ফ্রি!</span>
+            </p>
+          </div>
+        </div>
+
+        {/* ── Main Content Container ── */}
+        <div className="px-4 -mt-6 relative z-20 space-y-4 max-w-2xl mx-auto">
+          {/* ── Stats Row ── */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-4">
             {[
               {
                 icon: Users,
                 label: 'মোট রেফারেল',
-                value: loading ? '—' : String(data.history.length),
+                value: loading ? '-' : data.history.length,
               },
               {
                 icon: Crown,
                 label: 'অর্জিত মাস',
-                value: loading ? '—' : String(data.history.length),
+                value: loading
+                  ? '-'
+                  : data.history.filter((h) => h.admin_status === 'Approved')
+                      .length,
               },
               {
                 icon: TrendingUp,
-                label: 'পুরস্কার (মাস)',
-                value: loading ? '—' : String(data.history.length),
+                label: 'পেন্ডিং',
+                value: loading
+                  ? '-'
+                  : data.history.filter((h) => h.admin_status === 'Pending')
+                      .length,
               },
-            ].map(({ icon: Icon, label, value }) => (
+            ].map(({ icon: Icon, label, value }, idx) => (
               <div
-                key={label}
-                className="bg-white/10 border border-white/10 backdrop-blur-sm rounded-2xl p-3 sm:p-4 text-center"
+                key={idx}
+                className="bg-white dark:bg-neutral-900 p-3 sm:p-5 rounded-3xl shadow-sm border border-neutral-100 dark:border-neutral-800 flex flex-col items-center justify-center text-center transition-transform hover:scale-[1.02]"
               >
-                <Icon className="w-5 h-5 text-emerald-300 mx-auto mb-1.5" />
-                <div className="text-2xl font-black text-white">{value}</div>
-                <div className="text-[10px] sm:text-xs text-emerald-200/70 font-medium leading-tight mt-0.5">
+                <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600 dark:text-emerald-400 mb-1.5" />
+                <span className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white tabular-nums">
+                  {value}
+                </span>
+                <span className="text-[10px] sm:text-[11px] font-bold text-neutral-500 dark:text-neutral-400 mt-0.5">
                   {label}
-                </div>
+                </span>
               </div>
             ))}
           </div>
-        </div>
 
-        {/* ── Referral Code Card ── */}
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 shadow-sm">
-          <h2 className="text-base font-black text-neutral-800 dark:text-white mb-4 flex items-center gap-2">
-            <span className="w-6 h-6 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-              <Gift className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
-            </span>
-            তোমার রেফারেল কোড
-          </h2>
+          {/* ── Referral Code Card ── */}
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-[2rem] p-5 sm:p-7 shadow-sm relative overflow-hidden">
+            {/* subtle background decor */}
+            <div className="absolute -right-6 -top-6 w-32 h-32 bg-red-500/5 dark:bg-red-500/10 rounded-full blur-2xl pointer-events-none" />
 
-          {loading ? (
-            <div className="h-14 bg-neutral-100 dark:bg-neutral-800 rounded-2xl animate-pulse" />
-          ) : data.referral?.code ? (
-            <div className="space-y-4">
-              {/* code display or editor */}
-              {isEditing ? (
-                <div className="flex items-center gap-2">
+            <h3 className="text-[13px] font-black uppercase tracking-wider text-red-600 dark:text-red-500 mb-4 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-600"></span>
+              তোমার রেফারেল কোড
+            </h3>
+
+            {loading ? (
+              <div className="h-14 bg-neutral-100 dark:bg-neutral-800 rounded-2xl animate-pulse" />
+            ) : data.referral?.code ? (
+              <div className="space-y-4">
+                {/* code display or editor */}
+                {isEditing ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={customCodeInput}
+                      onChange={(e) =>
+                        setCustomCodeInput(
+                          e.target.value
+                            .toUpperCase()
+                            .replace(/[^A-Z0-9]/g, ''),
+                        )
+                      }
+                      className="flex-1 px-4 py-3.5 text-lg font-black tracking-widest text-center border-2 border-emerald-500/30 rounded-2xl dark:bg-neutral-950 outline-none focus:border-emerald-500 transition-all text-neutral-900 dark:text-white"
+                      placeholder="নগদ/বিকাশ"
+                      maxLength={15}
+                    />
+                    <button
+                      onClick={() => generateCode(customCodeInput)}
+                      disabled={generating || customCodeInput.length < 4}
+                      className="p-3 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-700 transition disabled:opacity-50"
+                    >
+                      {generating ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <CheckCheck className="w-5 h-5" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setIsEditing(false)}
+                      className="p-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 rounded-2xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-neutral-100 dark:bg-neutral-800 rounded-2xl transform transition-transform group-hover:scale-[1.02]"></div>
+                      <div className="relative flex items-center justify-between p-2 pl-5 bg-neutral-50 dark:bg-neutral-950 rounded-2xl border border-neutral-200 dark:border-neutral-800 border-dashed group-hover:border-solid transition-all">
+                        <code className="text-2xl font-black tracking-[0.2em] text-neutral-900 dark:text-white uppercase select-all">
+                          {data.referral.code}
+                        </code>
+                        <button
+                          onClick={() => {
+                            setCustomCodeInput(data.referral!.code);
+                            setIsEditing(true);
+                          }}
+                          className="p-3 text-neutral-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl transition-colors"
+                          title="কোড এডিট করুন"
+                        >
+                          <Edit2 size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* action buttons */}
+                <div className="grid grid-cols-3 gap-2 mt-4 relative z-10">
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={copyCode}
+                    className="flex flex-col items-center justify-center gap-1 py-3 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold text-xs hover:bg-neutral-200 transition-colors"
+                  >
+                    <Copy className="w-5 h-5 mb-0.5" />
+                    কোড
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={copyLink}
+                    className="flex flex-col items-center justify-center gap-1 py-3 rounded-2xl bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold text-xs hover:bg-neutral-200 transition-colors"
+                  >
+                    <LinkIcon className="w-5 h-5 mb-0.5" />
+                    লিংক
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={shareCode}
+                    className="flex flex-col items-center justify-center gap-1 py-3 rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20"
+                  >
+                    <Share2 className="w-5 h-5 mb-0.5" />
+                    শেয়ার
+                  </motion.button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     value={customCodeInput}
@@ -252,267 +347,190 @@ export default function ReferralPage() {
                         e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''),
                       )
                     }
-                    className="flex-1 px-4 py-3 text-lg font-bold border rounded-2xl dark:bg-neutral-950 dark:border-neutral-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
-                    placeholder="কাস্টম কোড লিখুন"
-                    maxLength={20}
+                    className="flex-1 px-4 py-3.5 border-2 border-neutral-200 dark:border-neutral-800 rounded-2xl dark:bg-neutral-950 outline-none focus:border-emerald-500 transition-all font-black tracking-widest text-center"
+                    placeholder="CODE (ঐচ্ছিক)"
+                    maxLength={15}
                   />
-                  <button
-                    onClick={() => generateCode(customCodeInput)}
-                    disabled={generating || customCodeInput.length < 4}
-                    className="p-3 bg-emerald-600 text-white rounded-2xl hover:bg-emerald-700 transition disabled:opacity-50"
-                  >
-                    {generating ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <CheckCheck className="w-5 h-5" />
-                    )}
-                  </button>
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    className="p-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 rounded-2xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-3 p-4 bg-neutral-50 dark:bg-neutral-950 rounded-2xl border border-neutral-200 dark:border-neutral-800 group/code">
-                  <code className="flex-1 text-2xl font-black tracking-[0.25em] text-neutral-900 dark:text-white text-center">
-                    {data.referral.code}
-                  </code>
-                  <button
-                    onClick={() => {
-                      setCustomCodeInput(data.referral!.code);
-                      setIsEditing(true);
-                    }}
-                    className="p-2 text-neutral-400 hover:text-emerald-600 transition opacity-0 group-hover/code:opacity-100"
-                    title="কোড এডিট করুন"
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                  <motion.button
-                    whileTap={{ scale: 0.92 }}
-                    onClick={copyCode}
-                    className={`p-2.5 rounded-xl font-bold transition-colors ${
-                      copied
-                        ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
-                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                    }`}
-                  >
-                    {copied ? (
-                      <CheckCheck className="w-4 h-4" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </motion.button>
-                </div>
-              )}
-
-              {/* action buttons */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <motion.button
-                  whileTap={{ scale: 0.96 }}
-                  onClick={copyCode}
-                  className="flex items-center justify-center gap-2 py-3 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
-                >
-                  <Copy className="w-4 h-4" />
-                  কোড
-                </motion.button>
-                <motion.button
-                  whileTap={{ scale: 0.96 }}
-                  onClick={copyLink}
-                  className="flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-900 hover:bg-emerald-950 text-white font-bold text-sm transition-colors shadow-md"
-                >
-                  <LinkIcon className="w-4 h-4" />
-                  লিংক
-                </motion.button>
-                <motion.button
-                  whileTap={{ scale: 0.96 }}
-                  onClick={shareCode}
-                  className="flex items-center justify-center gap-2 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm transition-colors shadow-md col-span-2 sm:col-span-1"
-                >
-                  <Share2 className="w-4 h-4" />
-                  শেয়ার করো
-                </motion.button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  type="text"
-                  value={customCodeInput}
-                  onChange={(e) =>
-                    setCustomCodeInput(
-                      e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''),
-                    )
-                  }
-                  className="flex-1 px-4 py-3 border rounded-2xl dark:bg-neutral-950 dark:border-neutral-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold"
-                  placeholder="নিজের কোড লিখুন (ঐচ্ছিক)"
-                  maxLength={20}
-                />
-                <div className="flex gap-2">
-                  <motion.button
-                    whileTap={{ scale: 0.96 }}
-                    onClick={() => {
-                      if (customCodeInput && customCodeInput.length < 4) {
-                        toast.error('কোড কমপক্ষে ৪ অক্ষরের হতে হবে');
-                        return;
-                      }
-                      generateCode(customCodeInput || undefined);
-                    }}
-                    disabled={generating}
-                    className="flex-1 sm:flex-none px-6 py-3 rounded-2xl bg-emerald-900 hover:bg-emerald-950 text-white font-black text-sm shadow-lg shadow-emerald-900/10 disabled:opacity-60 transition-all"
-                  >
-                    {generating ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      'সেভ করুন'
-                    )}
-                  </motion.button>
-                  {!customCodeInput && (
+                  <div className="flex gap-2">
                     <motion.button
                       whileTap={{ scale: 0.96 }}
-                      onClick={() => generateCode()}
+                      onClick={() => {
+                        if (customCodeInput && customCodeInput.length < 4) {
+                          toast.error('কোড কমপক্ষে ৪ অক্ষরের হতে হবে');
+                          return;
+                        }
+                        generateCode(customCodeInput || undefined);
+                      }}
                       disabled={generating}
-                      className="px-4 py-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-2xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition font-bold text-xs"
+                      className="flex-1 sm:flex-none px-6 py-3 rounded-2xl bg-emerald-900 hover:bg-emerald-950 text-white font-black text-sm shadow-lg shadow-emerald-900/10 disabled:opacity-60 transition-all"
                     >
-                      অটো
+                      {generating ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        'সেভ করুন'
+                      )}
                     </motion.button>
-                  )}
+                    {!customCodeInput && (
+                      <motion.button
+                        whileTap={{ scale: 0.96 }}
+                        onClick={() => generateCode()}
+                        disabled={generating}
+                        className="px-4 py-3 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-2xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition font-bold text-xs"
+                      >
+                        অটো
+                      </motion.button>
+                    )}
+                  </div>
                 </div>
+                <p className="text-center text-xs text-neutral-500 dark:text-neutral-400">
+                  আপনি নিজের পছন্দমতো কোড দিতে পারেন অথবা 'অটো' বাটনে ক্লিক করতে
+                  পারেন।
+                </p>
               </div>
-              <p className="text-center text-xs text-neutral-500 dark:text-neutral-400">
-                আপনি নিজের পছন্দমতো কোড দিতে পারেন অথবা 'অটো' বাটনে ক্লিক করতে
-                পারেন।
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* ── How it works ── */}
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 shadow-sm">
-          <h2 className="text-base font-black text-neutral-800 dark:text-white mb-4">
-            কীভাবে কাজ করে?
-          </h2>
-          <ol className="space-y-4">
-            {[
-              {
-                step: '১',
-                title: 'কোড তৈরি করো',
-                desc: 'একটি ইউনিক রেফারেল কোড জেনারেট করো।',
-              },
-              {
-                step: '২',
-                title: 'বন্ধুকে শেয়ার করো',
-                desc: 'লিংক বা কোড শেয়ার করো যেকোনো বন্ধুকে।',
-              },
-              {
-                step: '৩',
-                title: 'দুজনেই পুরস্কার পাও',
-                desc: 'বন্ধু সাইন আপ করলে তুমি এবং বন্ধু — দুজনেই ১ মাস বিনামূল্যে প্রিমিয়াম পাবে!',
-              },
-            ].map(({ step, title, desc }) => (
-              <li key={step} className="flex items-start gap-4">
-                <span className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 font-black text-sm flex items-center justify-center shrink-0">
-                  {step}
-                </span>
-                <div>
-                  <div className="font-bold text-neutral-900 dark:text-white text-sm">
-                    {title}
-                  </div>
-                  <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-                    {desc}
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        {/* ── History ── */}
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl overflow-hidden shadow-sm">
-          <div className="px-6 py-5 border-b border-neutral-100 dark:border-neutral-800">
-            <h2 className="text-base font-black text-neutral-800 dark:text-white">
-              রিডিম্পশন ইতিহাস
-            </h2>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-              কারা তোমার কোড ব্যবহার করেছে
-            </p>
+            )}
           </div>
 
-          {loading ? (
-            <div className="p-6 space-y-3">
-              {[1, 2].map((i) => (
-                <div key={i} className="flex gap-3 animate-pulse">
-                  <div className="w-9 h-9 bg-neutral-100 dark:bg-neutral-800 rounded-xl shrink-0" />
-                  <div className="flex-1 space-y-2 py-1">
-                    <div className="h-3 bg-neutral-100 dark:bg-neutral-800 rounded w-1/2" />
-                    <div className="h-2.5 bg-neutral-100 dark:bg-neutral-800 rounded w-1/3" />
+          {/* ── How it works ── */}
+          <div className="px-1 mb-8">
+            <h3 className="text-[13px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-500 mb-4 px-2">
+              কীভাবে কাজ করে?
+            </h3>
+            <div className="space-y-3">
+              {[
+                {
+                  step: '১',
+                  title: 'কোড তৈরি করো',
+                  desc: 'একটি ইউনিক রেফারেল কোড জেনারেট করো।',
+                },
+                {
+                  step: '২',
+                  title: 'বন্ধুকে শেয়ার করো',
+                  desc: 'লিংক বা কোড শেয়ার করো যেকোনো বন্ধুকে।',
+                },
+                {
+                  step: '৩',
+                  title: 'দুজনেই পুরস্কার পাও',
+                  desc: 'বন্ধু সাইন আপ করলে তুমি এবং বন্ধু — দুজনেই ১ মাস বিনামূল্যে প্রিমিয়াম পাবে!',
+                },
+              ].map(({ step, title, desc }, idx) => (
+                <div
+                  key={step}
+                  className="flex gap-4 p-4 bg-white dark:bg-neutral-900 rounded-[2rem] border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group"
+                >
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 rounded-bl-[3rem] transition-transform group-hover:scale-110"></div>
+                  <div className="w-12 h-12 rounded-[1.25rem] bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-black text-lg flex items-center justify-center shrink-0 border border-emerald-100 dark:border-emerald-900/30">
+                    {step}
+                  </div>
+                  <div className="pt-1 z-10">
+                    <h4 className="font-black text-neutral-900 dark:text-white text-[15px] mb-0.5">
+                      {title}
+                    </h4>
+                    <p className="text-[13px] text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed">
+                      {desc}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
-          ) : data.history.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-14 h-14 mb-4 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
-                <Users className="w-6 h-6 text-neutral-400 dark:text-neutral-600" />
-              </div>
-              <p className="font-bold text-neutral-700 dark:text-neutral-300 text-sm">
-                এখনও কেউ কোড ব্যবহার করেনি
-              </p>
-              <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
-                বন্ধুদের সাথে শেয়ার করো!
+          </div>
+
+          {/* ── History ── */}
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-[2rem] overflow-hidden shadow-sm">
+            <div className="px-5 py-5 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/10">
+              <h3 className="text-sm font-black uppercase text-neutral-800 dark:text-white">
+                হিস্ট্রি
+              </h3>
+              <p className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 mt-1 uppercase tracking-wider">
+                কারা তোমার কোড ব্যবহার করেছে
               </p>
             </div>
-          ) : (
-            <ul className="divide-y divide-neutral-100 dark:divide-neutral-800">
-              {data.history.map((h) => (
-                <li
-                  key={h.id}
-                  className="flex items-center gap-4 px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-                    <Users className="w-5 h-5 text-emerald-700 dark:text-emerald-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm text-neutral-900 dark:text-white truncate">
-                      {h.redeemed_by.name || h.redeemed_by.email}
-                    </p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                        {new Date(h.redeemed_at).toLocaleDateString('bn-BD', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
-                      </p>
-                      <span className="text-[10px] text-neutral-300">•</span>
-                      <span
-                        className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                          h.admin_status === 'Approved'
-                            ? 'bg-emerald-100/50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400'
-                            : h.admin_status === 'Rejected'
-                              ? 'bg-red-100/50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-                              : 'bg-amber-100/50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
-                        }`}
-                      >
-                        {h.admin_status === 'Approved'
-                          ? 'সফল'
-                          : h.admin_status === 'Rejected'
-                            ? 'বাতিল'
-                            : 'পেন্ডিং'}
-                      </span>
+
+            {loading ? (
+              <div className="p-6 space-y-3">
+                {[1, 2].map((i) => (
+                  <div key={i} className="flex gap-3 animate-pulse">
+                    <div className="w-9 h-9 bg-neutral-100 dark:bg-neutral-800 rounded-xl shrink-0" />
+                    <div className="flex-1 space-y-2 py-1">
+                      <div className="h-3 bg-neutral-100 dark:bg-neutral-800 rounded w-1/2" />
+                      <div className="h-2.5 bg-neutral-100 dark:bg-neutral-800 rounded w-1/3" />
                     </div>
                   </div>
-                  {h.admin_status === 'Approved' && (
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 shrink-0">
-                      +১ মাস
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
+                ))}
+              </div>
+            ) : data.history.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="w-14 h-14 mb-4 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-neutral-400 dark:text-neutral-600" />
+                </div>
+                <p className="font-bold text-neutral-700 dark:text-neutral-300 text-sm">
+                  এখনও কেউ কোড ব্যবহার করেনি
+                </p>
+                <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-1">
+                  বন্ধুদের সাথে শেয়ার করো!
+                </p>
+              </div>
+            ) : (
+              <ul className="divide-y divide-neutral-100 dark:divide-neutral-800">
+                {data.history.map((h) => (
+                  <li
+                    key={h.id}
+                    className="flex items-center gap-4 px-5 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+                  >
+                    <div className="w-12 h-12 rounded-[1.25rem] bg-emerald-50 dark:bg-emerald-900/20 flex flex-col items-center justify-center shrink-0 border border-emerald-100/50 dark:border-emerald-800/50">
+                      <span className="text-xs font-black text-emerald-600 dark:text-emerald-500">
+                        {new Date(h.redeemed_at).getDate()}
+                      </span>
+                      <span className="text-[8px] font-bold uppercase text-emerald-500/80">
+                        {new Date(h.redeemed_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-black text-[15px] text-neutral-900 dark:text-white truncate">
+                        {h.redeemed_by.name || h.redeemed_by.email}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                          {new Date(h.redeemed_at).toLocaleDateString('bn-BD', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}
+                        </p>
+                        <span className="text-[10px] text-neutral-300">•</span>
+                        <span
+                          className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                            h.admin_status === 'Approved'
+                              ? 'bg-emerald-500 text-white'
+                              : h.admin_status === 'Rejected'
+                                ? 'bg-red-500 text-white'
+                                : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300'
+                          }`}
+                        >
+                          {h.admin_status === 'Approved'
+                            ? 'সফল'
+                            : h.admin_status === 'Rejected'
+                              ? 'বাতিল'
+                              : 'পেন্ডিং'}
+                        </span>
+                      </div>
+                    </div>
+                    {h.admin_status === 'Approved' && (
+                      <div className="flex bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1.5 rounded-xl border border-emerald-100 dark:border-emerald-800/30 flex-col items-center justify-center">
+                        <span className="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-500/70 uppercase">
+                          রিওয়ার্ড
+                        </span>
+                        <span className="text-sm font-black text-emerald-700 dark:text-emerald-400">
+                          +১ মাস
+                        </span>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </AppLayout>
