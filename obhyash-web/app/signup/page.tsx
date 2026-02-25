@@ -195,23 +195,29 @@ export default function SignupPage() {
           toast.error(getErrorMessage(profileError));
         }
 
-        // If Auto-Confirm is enabled in Supabase, we get a session immediately.
-        if (data.session) {
-          router.push('/dashboard');
-          return;
-        }
-
-        // Handle referral code redemption
-        if (formData.referralCode) {
+        // Handle referral code redemption if auto-confirmed (we have session)
+        if (data.session && formData.referralCode) {
           try {
-            await fetch('/api/referral/redeem', {
+            const res = await fetch('/api/referral/redeem', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ code: formData.referralCode }),
             });
+            const json = await res.json();
+            if (json.error) {
+              toast.error(json.error);
+            } else {
+              toast.success('রেফারেল বোনাস যোগ করা হয়েছে!');
+            }
           } catch (e) {
             console.error('Failed to redeem referral code', e);
           }
+        }
+
+        // If Auto-Confirm is enabled in Supabase, we get a session immediately.
+        if (data.session) {
+          router.push('/dashboard');
+          return;
         }
 
         setSuccess(true);
