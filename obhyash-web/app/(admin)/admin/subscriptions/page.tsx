@@ -24,9 +24,11 @@ import {
   Image as ImageIcon,
   LayoutGrid,
   List,
+  Gift,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 interface PaymentRequest {
   id: string;
@@ -619,6 +621,14 @@ export default function SubscriptionsPage() {
                 </button>
               </div>
             )}
+
+            <Link
+              href="/admin/referrals"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-xs sm:text-sm font-bold rounded-xl border border-indigo-200 dark:border-indigo-800 transition-all shadow-sm active:scale-95"
+            >
+              <Gift size={16} />
+              <span>রেফারেল</span>
+            </Link>
 
             <button
               onClick={handleExport}
