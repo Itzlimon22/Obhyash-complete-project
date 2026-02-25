@@ -5,7 +5,7 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 export const POST = async (req: Request) => {
   const supabase = await createClient();
 
-  // 1. Verify Authentication & Role
+  // 1.Verify Authentication & Role
   const {
     data: { user },
   } = await supabase.auth.getUser();
