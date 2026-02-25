@@ -118,15 +118,27 @@ export default function ReferralPage() {
                   >
                     <Edit2 size={14} />
                   </button>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(data.referral!.code);
-                      toast.success('কোড কপি করা হয়েছে!');
-                    }}
-                    className="text-sm text-emerald-600 dark:text-emerald-400 underline ml-2"
-                  >
-                    কপি করুন
-                  </button>
+                  <div className="flex gap-3 ml-2">
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(data.referral!.code);
+                        toast.success('কোড কপি করা হয়েছে!');
+                      }}
+                      className="text-sm text-emerald-600 dark:text-emerald-400 underline hover:text-emerald-700 transition"
+                    >
+                      কোড কপি
+                    </button>
+                    <button
+                      onClick={() => {
+                        const link = `${window.location.origin}/signup?ref=${data.referral!.code}`;
+                        navigator.clipboard.writeText(link);
+                        toast.success('রেফারেল লিংক কপি করা হয়েছে!');
+                      }}
+                      className="text-sm text-emerald-600 dark:text-emerald-400 underline hover:text-emerald-700 transition"
+                    >
+                      লিংক কপি
+                    </button>
+                  </div>
                 </>
               )}
             </div>
