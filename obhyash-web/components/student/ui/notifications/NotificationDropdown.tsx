@@ -33,6 +33,14 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   onClose,
 }) => {
   const [activeTab, setActiveTab] = useState<'all' | 'unread'>('unread');
+  const [isMobile, setIsMobile] = useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const displayedNotifications =
     activeTab === 'unread'
@@ -170,7 +178,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 
   return (
     <>
-      {mobileSheet}
+      {isMobile && mobileSheet}
       {desktopDropdown}
     </>
   );
