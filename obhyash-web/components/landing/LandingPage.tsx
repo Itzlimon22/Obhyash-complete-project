@@ -1105,6 +1105,15 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     সচরাচর জিজ্ঞাসিত প্রশ্ন (FAQ)
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    href="/referral"
+                    className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5 font-semibold"
+                  >
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    রেফারেল প্রোগ্রাম 🎁
+                  </Link>
+                </li>
               </ul>
             </div>
 

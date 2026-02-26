@@ -98,23 +98,13 @@ export const POST = async (req: Request) => {
 
   // Generate a unique code if custom is not provided
   let code = customCode || generateCode();
-  let attempts = 0;
-  while (!customCode && attempts < 5) {
-    const { data: conflict } = await supabase
-      .from('referrals')
-      .select('id')
-      .eq('code', code)
-      .single();
-    if (!conflict) break;
-    code = generateCode();
-    attempts++;
-  }
 
   // Attempt to insert the referral, handling possible duplicate code errors
-  let attempts = 0;
+  let attemptCount = 0;
   const maxAttempts = 5;
   let referralData = null;
-  while (attempts < maxAttempts) {
+
+  while (attemptCount < maxAttempts) {
     const { data, error } = await supabase
       .from('referrals')
       .insert({ owner_id: user.id, code, created_at: new Date().toISOString() })
@@ -130,7 +120,7 @@ export const POST = async (req: Request) => {
     if (error.code === '23505') {
       // Generate a new code and retry
       code = generateCode();
-      attempts++;
+      attemptCount++;
       continue;
     }
 
@@ -158,15 +148,4 @@ export const POST = async (req: Request) => {
   });
 
   return NextResponse.json({ referral: referralData });
-
-  // Notify the user that their code was created
-  await supabase.from('notifications').insert({
-    user_id: user.id,
-    title: 'রেফারেল কোড তৈরি!',
-    message: `আপনার রেফারেল কোড সফলভাবে তৈরি হয়েছে: ${code}`,
-    type: 'system',
-    is_read: false,
-  });
-
-  return NextResponse.json({ referral });
 };
