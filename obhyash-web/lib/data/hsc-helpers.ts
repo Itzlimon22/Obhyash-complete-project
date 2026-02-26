@@ -6,7 +6,41 @@
  */
 import { hscSubjects } from './hsc';
 
-// ─── Subjects ────────────────────────────────────────────────────────
+// ─── Subject Aliases (English to Bengali) ────────────────────────────
+const SUBJECT_ALIASES: Record<string, string> = {
+  // Science
+  physics: 'পদার্থবিজ্ঞান',
+  chemistry: 'রসায়ন',
+  biology: 'জীববিজ্ঞান',
+  'higher math': 'উচ্চতর গণিত',
+  math: 'উচ্চতর গণিত',
+  ict: 'তথ্য ও যোগাযোগ প্রযুক্তি',
+  // Humanities/Social
+  history: 'ইতিহাস',
+  civics: 'পৌরনীতি ও সুশাসন',
+  economics: 'অর্থনীতি',
+  geography: 'ভূগোল',
+  sociology: 'সমাজবিজ্ঞান',
+  logic: 'যুক্তিবিদ্যা',
+  psychology: 'মনোবিজ্ঞান',
+  // Commerce
+  accounting: 'হিসাববিজ্ঞান',
+  finance: 'ফিন্যান্স',
+  management: 'ব্যবস্থাপনা',
+  marketing: 'মার্কেটিং',
+  // General
+  bangla: 'বাংলা',
+  english: 'English',
+};
+
+function normalizeForMatch(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/hsc\s+/g, '') // remove hsc prefix
+    .replace(/subject:?\s+/g, '') // remove subject prefix
+    .replace(/\s+/g, ' ') // collapse spaces
+    .trim();
+}
 
 /** Get all HSC subjects as dropdown items */
 export function getHscSubjectList(): {
@@ -21,16 +55,33 @@ export function getHscSubjectList(): {
   }));
 }
 
-/** Find a subject by ID or by name (case-insensitive, partial match) */
 export function findHscSubject(idOrName: string) {
-  const lower = idOrName.toLowerCase();
-  return hscSubjects.find(
-    (s) =>
-      s.id === idOrName ||
-      s.name.toLowerCase() === lower ||
-      s.name.toLowerCase().includes(lower) ||
-      lower.includes(s.name.toLowerCase()),
-  );
+  const norm = normalizeForMatch(idOrName);
+
+  // Try direct ID match first
+  const byId = hscSubjects.find((s) => s.id === idOrName);
+  if (byId) return byId;
+
+  // Try Alias match (e.g. "physics" -> "পদার্থবিজ্ঞান")
+  let targetName = norm;
+  for (const [eng, ben] of Object.entries(SUBJECT_ALIASES)) {
+    if (norm.includes(eng)) {
+      // If user said "physics 1", we want to search for "পদার্থবিজ্ঞান 1"
+      targetName = norm.replace(eng, ben);
+      break;
+    }
+  }
+
+  const targetLower = targetName.toLowerCase();
+
+  return hscSubjects.find((s) => {
+    const sNameLower = s.name.toLowerCase();
+    return (
+      sNameLower === targetLower ||
+      sNameLower.includes(targetLower) ||
+      targetLower.includes(sNameLower)
+    );
+  });
 }
 
 // ─── Chapters ────────────────────────────────────────────────────────
@@ -44,17 +95,18 @@ export function getHscChapterList(
   return subject.chapters.map((c) => ({ id: c.id, name: c.name }));
 }
 
-/** Find a chapter by ID or by name across all subjects */
 export function findHscChapter(idOrName: string) {
-  const lower = idOrName.toLowerCase();
+  const norm = normalizeForMatch(idOrName);
   for (const subject of hscSubjects) {
-    const chapter = subject.chapters.find(
-      (c) =>
+    const chapter = subject.chapters.find((c) => {
+      const cNameLower = c.name.toLowerCase();
+      return (
         c.id === idOrName ||
-        c.name.toLowerCase() === lower ||
-        c.name.toLowerCase().includes(lower) ||
-        lower.includes(c.name.toLowerCase()),
-    );
+        cNameLower === norm ||
+        cNameLower.includes(norm) ||
+        norm.includes(cNameLower)
+      );
+    });
     if (chapter) return { chapter, subject };
   }
   return undefined;

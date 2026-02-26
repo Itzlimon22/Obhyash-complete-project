@@ -424,13 +424,13 @@ const EditModal: React.FC<{
   //    are populated on the very first render (no useEffect delay). ──
   const [localData, setLocalData] = React.useState<Partial<Question>>(() => {
     const subject =
-      resolveSubjectName(data.subject || '') ?? data.subject ?? '';
+      resolveSubjectName(data.subject || '') || data.subject || '';
     const chapter = subject
-      ? (resolveChapterName(subject, data.chapter || '') ?? data.chapter ?? '')
-      : (data.chapter ?? '');
+      ? resolveChapterName(subject, data.chapter || '') || data.chapter || ''
+      : data.chapter || '';
     const topic = chapter
-      ? (resolveTopicName(chapter, data.topic || '') ?? data.topic ?? '')
-      : (data.topic ?? '');
+      ? resolveTopicName(chapter, data.topic || '') || data.topic || ''
+      : data.topic || '';
     return { ...data, subject, chapter, topic };
   });
 
@@ -1013,13 +1013,13 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   // Resolve subject/chapter/topic to canonical names (including serial→name for topics)
   const resolveTopicSerialsLocally = (questions: Partial<Question>[]) => {
     return questions.map((q) => {
-      const subject = resolveSubjectName(q.subject || '') ?? q.subject ?? '';
+      const subject = resolveSubjectName(q.subject || '') || q.subject || '';
       const chapter = subject
-        ? (resolveChapterName(subject, q.chapter || '') ?? q.chapter ?? '')
-        : (q.chapter ?? '');
+        ? resolveChapterName(subject, q.chapter || '') || q.chapter || ''
+        : q.chapter || '';
       const topic = chapter
-        ? (resolveTopicName(chapter, q.topic || '') ?? q.topic ?? '')
-        : (q.topic ?? '');
+        ? resolveTopicName(chapter, q.topic || '') || q.topic || ''
+        : q.topic || '';
       return { ...q, subject, chapter, topic };
     });
   };
