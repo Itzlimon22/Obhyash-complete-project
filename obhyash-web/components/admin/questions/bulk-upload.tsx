@@ -895,6 +895,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
   // ── Filters & View state ──
   const [showOnlyErrors, setShowOnlyErrors] = useState(false);
+  const [uploadMethod, setUploadMethod] = useState<'file' | 'json'>('file');
 
   // ── Bulk Action State ──
   const [bulkSubject, setBulkSubject] = useState('');
@@ -1418,114 +1419,159 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Templates */}
-          <div>
-            <h4 className="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3">
-              টেম্পলেট ডাউনলোড করুন
-            </h4>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                {
-                  fmt: 'json' as const,
-                  icon: FileJson,
-                  label: 'JSON',
-                  color: 'bg-red-50 dark:bg-red-900/20 text-red-600',
-                },
-                {
-                  fmt: 'csv' as const,
-                  icon: FileText,
-                  label: 'CSV',
-                  color:
-                    'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600',
-                },
-                {
-                  fmt: 'xlsx' as const,
-                  icon: FileSpreadsheet,
-                  label: 'Excel',
-                  color:
-                    'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600',
-                },
-              ].map((t) => (
-                <button
-                  key={t.fmt}
-                  onClick={() => downloadTemplate(t.fmt)}
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:border-emerald-300 dark:hover:border-emerald-800 hover:shadow-sm transition-all group"
-                >
-                  <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center ${t.color} group-hover:scale-110 transition-transform`}
-                  >
-                    <t.icon size={20} />
-                  </div>
-                  <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
-                    {t.label}
-                  </span>
-                  <Download
-                    size={12}
-                    className="text-neutral-400 group-hover:text-emerald-500"
-                  />
-                </button>
-              ))}
-            </div>
+          {/* Tab Selection */}
+          <div className="flex p-1 bg-neutral-100 dark:bg-neutral-900 rounded-xl max-w-sm mx-auto mb-2 border border-neutral-200 dark:border-neutral-800">
+            <button
+              onClick={() => setUploadMethod('file')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${
+                uploadMethod === 'file'
+                  ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm'
+                  : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+              }`}
+            >
+              <FileUp size={14} />
+              ফাইল আপলোড
+            </button>
+            <button
+              onClick={() => setUploadMethod('json')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${
+                uploadMethod === 'json'
+                  ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white shadow-sm'
+                  : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+              }`}
+            >
+              <FileJson size={14} />
+              সরাসরি পেস্ট (JSON)
+            </button>
           </div>
 
-          {/* Upload Area */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left: Dropzone */}
-            <label className="relative border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-2xl p-8 text-center hover:border-emerald-500 bg-neutral-50/50 dark:bg-neutral-950/50 cursor-pointer flex flex-col items-center justify-center transition-all h-64 group">
-              <input
-                type="file"
-                onChange={handleFile}
-                className="hidden"
-                accept=".csv,.json,.xlsx,.xls"
-              />
-              <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-transform">
-                <FileUp size={28} />
-              </div>
-              <h3 className="text-base font-bold text-neutral-900 dark:text-white mb-1">
-                ফাইল সিলেক্ট অথবা ড্র্যাগ করুন
-              </h3>
-              <p className="text-xs text-neutral-500 mb-5">
-                JSON, CSV, Excel (.xlsx) — সর্বোচ্চ ৫MB
-              </p>
-              <div className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-500/25 transition-all">
-                {isProcessing ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 size={16} className="animate-spin" />
-                    পার্স করা হচ্ছে...
-                  </span>
-                ) : (
-                  'ফাইল আপলোড করুন'
-                )}
-              </div>
-            </label>
+          <div className="animate-in fade-in zoom-in-95 duration-200">
+            {uploadMethod === 'file' ? (
+              <div className="space-y-6">
+                {/* Templates */}
+                <div>
+                  <h4 className="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    টেম্পলেট ডাউনলোড করুন
+                  </h4>
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      {
+                        fmt: 'json' as const,
+                        icon: FileJson,
+                        label: 'JSON',
+                        color: 'bg-red-50 dark:bg-red-900/20 text-red-600',
+                      },
+                      {
+                        fmt: 'csv' as const,
+                        icon: FileText,
+                        label: 'CSV',
+                        color:
+                          'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600',
+                      },
+                      {
+                        fmt: 'xlsx' as const,
+                        icon: FileSpreadsheet,
+                        label: 'Excel',
+                        color:
+                          'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600',
+                      },
+                    ].map((t) => (
+                      <button
+                        key={t.fmt}
+                        onClick={() => downloadTemplate(t.fmt)}
+                        className="flex flex-col items-center gap-2 p-4 rounded-xl border border-neutral-200 dark:border-neutral-700 hover:border-emerald-300 dark:hover:border-emerald-800 hover:shadow-sm transition-all group"
+                      >
+                        <div
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center ${t.color} group-hover:scale-110 transition-transform`}
+                        >
+                          <t.icon size={20} />
+                        </div>
+                        <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
+                          {t.label}
+                        </span>
+                        <Download
+                          size={12}
+                          className="text-neutral-400 group-hover:text-emerald-500"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-            {/* Right: Json Code Paste */}
-            <div className="relative border border-neutral-200 dark:border-neutral-700 rounded-2xl p-4 flex flex-col focus-within:border-emerald-500 bg-white dark:bg-neutral-950 transition-all h-64">
-              <div className="flex items-center gap-2 mb-2 text-neutral-700 dark:text-neutral-300">
-                <FileJson size={18} className="text-emerald-600" />
-                <h3 className="text-sm font-bold">JSON টেক্সট পেস্ট করুন</h3>
+                {/* Dropzone */}
+                <label className="relative border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-2xl p-8 text-center hover:border-emerald-500 bg-neutral-50/50 dark:bg-neutral-950/50 cursor-pointer flex flex-col items-center justify-center transition-all h-64 group">
+                  <input
+                    type="file"
+                    onChange={handleFile}
+                    className="hidden"
+                    accept=".csv,.json,.xlsx,.xls"
+                  />
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-transform">
+                    <FileUp size={28} />
+                  </div>
+                  <h3 className="text-base font-bold text-neutral-900 dark:text-white mb-1">
+                    ফাইল সিলেক্ট অথবা ড্র্যাগ করুন
+                  </h3>
+                  <p className="text-xs text-neutral-500 mb-5">
+                    JSON, CSV, Excel (.xlsx) — সর্বোচ্চ ৫MB
+                  </p>
+                  <div className="px-10 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-xl shadow-emerald-500/25 transition-all">
+                    {isProcessing ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 size={16} className="animate-spin" />
+                        পার্স করা হচ্ছে...
+                      </span>
+                    ) : (
+                      'ফাইল আপলোড করুন'
+                    )}
+                  </div>
+                </label>
               </div>
-              <textarea
-                value={directJsonText}
-                onChange={(e) => setDirectJsonText(e.target.value)}
-                placeholder='[ { "question": "..." } ]'
-                className="flex-1 w-full bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 text-xs font-mono text-neutral-800 dark:text-neutral-300 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/50 mb-3"
-              />
-              <button
-                onClick={handleJsonTextSubmit}
-                disabled={isProcessing || !directJsonText.trim()}
-                className="w-full py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 rounded-xl font-bold text-sm shadow-md transition-all disabled:opacity-50 flex items-center justify-center"
-              >
-                {isProcessing ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 size={16} className="animate-spin" />
-                    প্রসেস হচ্ছে...
+            ) : (
+              /* Json Code Paste */
+              <div className="relative border border-neutral-200 dark:border-neutral-700 rounded-2xl p-6 flex flex-col focus-within:border-emerald-500 bg-white dark:bg-neutral-950 transition-all h-[420px] shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
+                    <FileJson size={18} className="text-emerald-600" />
+                    <h3 className="text-sm font-bold">
+                      JSON টেক্সট পেস্ট করুন
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-mono text-neutral-400">
+                    ARRAY OF QUESTION OBJECTS
                   </span>
-                ) : (
-                  'ফাইল আপলোড করো'
-                )}
-              </button>
-            </div>
+                </div>
+                <textarea
+                  value={directJsonText}
+                  onChange={(e) => setDirectJsonText(e.target.value)}
+                  placeholder='[ 
+  { 
+    "question": "ধ্রুবক g এর মান কত?",
+    "options": ["9.8", "10", "8.9", "7"],
+    "answer": "option1"
+  } 
+]'
+                  className="flex-1 w-full bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 rounded-xl p-4 text-xs font-mono text-neutral-800 dark:text-neutral-300 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/50 mb-4 leading-relaxed"
+                />
+                <button
+                  onClick={handleJsonTextSubmit}
+                  disabled={isProcessing || !directJsonText.trim()}
+                  className="w-full py-4 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 rounded-xl font-extrabold text-sm shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      প্রসেস হচ্ছে...
+                    </>
+                  ) : (
+                    <>
+                      <Save size={18} />
+                      টেক্সট ইম্পোর্ট করুন
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
