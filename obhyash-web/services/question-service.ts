@@ -474,48 +474,47 @@ export const bulkUpdateMetadata = async (
 };
 
 /**
- * Check which question texts already exist in the database.
+ * Check which questions already exist in the database using their fingerprints.
  * Returns a Set of indices (0-based) that are duplicates.
  */
 export const checkDuplicateQuestions = async (
-  questionTexts: string[],
+  questions: Partial<Question>[],
 ): Promise<Set<number>> => {
   const duplicateIndices = new Set<number>();
-  if (!isSupabaseConfigured() || !supabase || questionTexts.length === 0) {
+  if (!isSupabaseConfigured() || !supabase || questions.length === 0) {
     return duplicateIndices;
   }
 
   try {
-    // Batch: check 20 at a time to avoid overly large queries
-    const BATCH_SIZE = 20;
-    for (let i = 0; i < questionTexts.length; i += BATCH_SIZE) {
-      const batch = questionTexts.slice(i, i + BATCH_SIZE);
-      const trimmedBatch = batch
-        .map((t) => t.trim())
-        .filter((t) => t.length > 0);
+    // 1. Generate fingerprints for all input questions
+    const fingerprintPromises = questions.map(async (q) => {
+      return await generateQuestionFingerprint({
+        question: q.question || '',
+        options: q.options || [],
+        subject: q.subject,
+        chapter: q.chapter,
+      });
+    });
 
-      if (trimmedBatch.length === 0) continue;
+    const fingerprints = await Promise.all(fingerprintPromises);
 
-      // Build OR filter for exact matches
-      const orFilter = trimmedBatch
-        .map((text) => `question.eq.${text}`)
-        .join(',');
+    // 2. Batch check against database (100 at a time)
+    const BATCH_SIZE = 100;
+    for (let i = 0; i < fingerprints.length; i += BATCH_SIZE) {
+      const batch = fingerprints.slice(i, i + BATCH_SIZE);
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('questions')
-        .select('question')
-        .or(orFilter)
-        .limit(BATCH_SIZE);
+        .select('fingerprint')
+        .in('fingerprint', batch);
+
+      if (error) throw error;
 
       if (data && data.length > 0) {
-        const existingTexts = new Set(
-          data.map((d: { question: string }) =>
-            d.question.trim().toLowerCase(),
-          ),
-        );
+        const existingFingerprints = new Set(data.map((d) => d.fingerprint));
 
-        batch.forEach((text, batchIdx) => {
-          if (existingTexts.has(text.trim().toLowerCase())) {
+        batch.forEach((fp, batchIdx) => {
+          if (existingFingerprints.has(fp)) {
             duplicateIndices.add(i + batchIdx);
           }
         });
@@ -523,7 +522,6 @@ export const checkDuplicateQuestions = async (
     }
   } catch (err) {
     console.error('Duplicate check error:', err);
-    // Don't block the upload if dedup fails
   }
 
   return duplicateIndices;

@@ -72,21 +72,29 @@ function getHelpfulJsonError(rawText: string, error: any): string {
   const posMatch = baseMessage.match(/position (\d+)/);
   if (posMatch) {
     const pos = parseInt(posMatch[1]);
+
+    // Calculate line and column
+    const linesBefore = rawText.substring(0, pos).split('\n');
+    const lineNum = linesBefore.length;
+    const colNum = linesBefore[linesBefore.length - 1].length + 1;
+
+    helpfulMessage = `লাইন ${lineNum}, কলাম ${colNum} এ ত্রুটি: ${baseMessage}`;
+
     const snippet = rawText.substring(
       Math.max(0, pos - 30),
       Math.min(rawText.length, pos + 30),
     );
-    helpfulMessage += `\nসমস্যাটি এই অংশের আশেপাশে:\n"...${snippet}..."`;
+    helpfulMessage += `\n\nসমস্যাটি এই অংশের আশেপাশে:\n"...${snippet}..."`;
 
-    if (snippet.includes(',}') || snippet.includes(']')) {
-      helpfulMessage += '\nটিপস: ব্র্যাকেটের আগে অতিরিক্ত কমা (,) থাকতে পারে।';
+    if (snippet.includes(',}') || snippet.includes(',]')) {
+      helpfulMessage +=
+        '\n👉 টিপস: ব্র্যাকেটের আগে অতিরিক্ত কমা (,) থাকতে পারে।';
     } else if (snippet.includes("'")) {
       helpfulMessage +=
-        '\nটিপস: JSON এর প্রপার্টি এবং ভ্যালু ডাবল কোট (") দিয়ে লিখতে হয়, সিঙ্গেল কোট (\') নয়।';
+        '\n👉 টিপস: JSON এ ডাবল কোট (") ব্যবহার করো, সিঙ্গেল কোট (\') নয়।';
     }
   } else if (baseMessage.includes('Unexpected end')) {
-    helpfulMessage +=
-      '\nটিপস: শেষে কোনো ব্র্যাকেট } বা ] বন্ধ করতে ভুলে গেছেন হতে পারে।';
+    helpfulMessage += '\n👉 টিপস: একটি বন্ধনী (} বা ]) মিসিং হতে পারে।';
   }
 
   return helpfulMessage;
@@ -896,6 +904,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   // ── Filters & View state ──
   const [showOnlyErrors, setShowOnlyErrors] = useState(false);
   const [uploadMethod, setUploadMethod] = useState<'file' | 'json'>('file');
+  const jsonFixAreaRef = useRef<HTMLTextAreaElement>(null);
 
   // ── Bulk Action State ──
   const [bulkSubject, setBulkSubject] = useState('');
@@ -960,11 +969,22 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
   // ── Unified processor: raw rows -> Question[] with dedup ──
   const processRawData = useCallback(
-    (rows: Record<string, string>[]): Partial<Question>[] => {
+    async (rows: Record<string, string>[]): Promise<Partial<Question>[]> => {
       const parseErrors: ParseError[] = [];
-      const questions = rows.map((row, i) =>
-        normalizeRawRow(row, i, parseErrors),
-      );
+      const questions: Partial<Question>[] = [];
+
+      // Process in chunks of 50 to keep UI responsive
+      const CHUNK_SIZE = 50;
+      for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
+        const chunk = rows.slice(i, i + CHUNK_SIZE);
+        const processedChunk = chunk.map((row, j) =>
+          normalizeRawRow(row, i + j, parseErrors),
+        );
+        questions.push(...processedChunk);
+
+        // Yield to browser after each chunk
+        await new Promise((r) => setTimeout(r, 0));
+      }
 
       // In-batch duplicate detection
       const seen = new Map<string, number>();
@@ -1101,14 +1121,16 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         );
       }
 
-      let questions = processRawData(rawRows);
+      const processedQuestions = await processRawData(rawRows);
+
+      // Async point to let UI update
+      await new Promise((r) => setTimeout(r, 0));
 
       // Resolve Topic Serials Synchronously using hscSubjects
-      questions = resolveTopicSerialsLocally(questions);
+      const finalQuestions = resolveTopicSerialsLocally(processedQuestions);
 
-      // Cross-upload duplicate check against DB
-      const questionTexts = questions.map((q) => q.question || '');
-      const dbDuplicates = await checkDuplicateQuestions(questionTexts);
+      // Cross-upload duplicate check against DB (Now using Question objects)
+      const dbDuplicates = await checkDuplicateQuestions(finalQuestions);
       if (dbDuplicates.size > 0) {
         const dupErrors: ParseError[] = [];
         dbDuplicates.forEach((idx) => {
@@ -1121,8 +1143,8 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         setErrors((prev) => [...prev, ...dupErrors]);
       }
 
-      setParsedData(questions);
-      setSelectedIndices(new Set(questions.map((_, i) => i)));
+      setParsedData(finalQuestions);
+      setSelectedIndices(new Set(finalQuestions.map((_, i) => i)));
       setStep(2);
     } catch (error) {
       alert(
@@ -1140,10 +1162,13 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
   // ── Manual JSON Fix Handler ────────────────────────────────────────
   const handleJsonFix = async () => {
+    const fixedText = jsonFixAreaRef.current?.value || '';
+    if (!fixedText.trim()) return;
+
     setIsProcessing(true);
     setJsonErrorMsg('');
     try {
-      const data = JSON.parse(rawJsonText);
+      const data = JSON.parse(fixedText);
       const rawRows = (Array.isArray(data) ? data : [data]).map(
         (row: Record<string, unknown>) => {
           const mapped: Record<string, string> = {};
@@ -1163,11 +1188,13 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
       if (rawRows.length > MAX_ROW_COUNT)
         throw new Error(`সর্বোচ্চ ${MAX_ROW_COUNT} টি সারি অনুমোদিত।`);
 
-      let questions = processRawData(rawRows);
-      questions = resolveTopicSerialsLocally(questions);
+      const processedQuestions = await processRawData(rawRows);
+      // Async point to let UI update
+      await new Promise((r) => setTimeout(r, 10));
+      const finalQuestions = resolveTopicSerialsLocally(processedQuestions);
 
-      const questionTexts = questions.map((q) => q.question || '');
-      const dbDuplicates = await checkDuplicateQuestions(questionTexts);
+      // Cross-upload duplicate check against DB (Now using Question objects)
+      const dbDuplicates = await checkDuplicateQuestions(finalQuestions);
       if (dbDuplicates.size > 0) {
         const dupErrors: ParseError[] = [];
         dbDuplicates.forEach((idx) => {
@@ -1180,8 +1207,8 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         setErrors((prev) => [...prev, ...dupErrors]);
       }
 
-      setParsedData(questions);
-      setSelectedIndices(new Set(questions.map((_, i) => i)));
+      setParsedData(finalQuestions);
+      setSelectedIndices(new Set(finalQuestions.map((_, i) => i)));
       setShowJsonEditor(false); // Close editor on success
       setStep(2);
     } catch (err: any) {
@@ -1233,11 +1260,12 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
       if (rawRows.length > MAX_ROW_COUNT)
         throw new Error(`সর্বোচ্চ ${MAX_ROW_COUNT} টি সারি অনুমোদিত।`);
 
-      let questions = processRawData(rawRows);
-      questions = resolveTopicSerialsLocally(questions);
+      const processedQuestions = await processRawData(rawRows);
+      // Async point to let UI update
+      await new Promise((r) => setTimeout(r, 10));
+      const finalQuestions = resolveTopicSerialsLocally(processedQuestions);
 
-      const questionTexts = questions.map((q) => q.question || '');
-      const dbDuplicates = await checkDuplicateQuestions(questionTexts);
+      const dbDuplicates = await checkDuplicateQuestions(finalQuestions);
       if (dbDuplicates.size > 0) {
         const dupErrors: ParseError[] = [];
         dbDuplicates.forEach((idx) => {
@@ -1251,8 +1279,8 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
       }
 
       setFileName('Pasted JSON text');
-      setParsedData(questions);
-      setSelectedIndices(new Set(questions.map((_, i) => i)));
+      setParsedData(finalQuestions);
+      setSelectedIndices(new Set(finalQuestions.map((_, i) => i)));
       setStep(2);
     } catch (error) {
       alert(error instanceof Error ? error.message : 'JSON পার্স করতে ব্যর্থ।');
@@ -2019,8 +2047,8 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
               </p>
 
               <textarea
-                value={rawJsonText}
-                onChange={(e) => setRawJsonText(e.target.value)}
+                ref={jsonFixAreaRef}
+                defaultValue={rawJsonText}
                 className="w-full flex-1 p-4 font-mono text-sm leading-relaxed rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
                 spellCheck={false}
               />
