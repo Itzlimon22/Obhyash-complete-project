@@ -44,6 +44,7 @@ import {
 } from '@/services/question-service';
 import { standardizeInstituteName } from '@/lib/data/institute-helpers';
 import { validateLatex } from '@/lib/latex-utils';
+import { extractJsonObjects } from '@/lib/resilient-parse';
 
 // ─── Types ───────────────────────────────────────────────────────────
 interface BulkUploadProps {
@@ -1054,30 +1055,28 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
       if (ext === 'json') {
         const text = await file.text();
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (err: any) {
+        const { data, errors: jsonErrors } = extractJsonObjects(text);
+
+        if (jsonErrors.length > 0 && data.length === 0) {
           setRawJsonText(text);
-          setJsonErrorMsg(getHelpfulJsonError(text, err));
+          setJsonErrorMsg(jsonErrors[0]);
           setShowJsonEditor(true);
           setIsProcessing(false);
           e.target.value = '';
-          return; // Stop processing further here
+          return;
         }
-        rawRows = (Array.isArray(data) ? data : [data]).map(
-          (row: Record<string, unknown>) => {
-            const mapped: Record<string, string> = {};
-            Object.entries(row).forEach(([k, v]) => {
-              if (v !== null && typeof v === 'object') {
-                mapped[k.trim().toLowerCase()] = JSON.stringify(v);
-              } else {
-                mapped[k.trim().toLowerCase()] = String(v ?? '');
-              }
-            });
-            return mapped;
-          },
-        );
+
+        rawRows = data.map((row: Record<string, unknown>) => {
+          const mapped: Record<string, string> = {};
+          Object.entries(row).forEach(([k, v]) => {
+            if (v !== null && typeof v === 'object') {
+              mapped[k.trim().toLowerCase()] = JSON.stringify(v);
+            } else {
+              mapped[k.trim().toLowerCase()] = String(v ?? '');
+            }
+          });
+          return mapped;
+        });
       } else if (ext === 'csv') {
         const text = await file.text();
         const result = Papa.parse<Record<string, string>>(text, {
@@ -1144,7 +1143,13 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
       }
 
       setParsedData(finalQuestions);
-      setSelectedIndices(new Set(finalQuestions.map((_, i) => i)));
+      // Auto-skip logic: only select indices that don't have errors
+      const errorIndices = new Set(errors.map((e) => e.row - 1));
+      setSelectedIndices(
+        new Set(
+          finalQuestions.map((_, i) => i).filter((i) => !errorIndices.has(i)),
+        ),
+      );
       setStep(2);
     } catch (error) {
       alert(
@@ -1168,20 +1173,23 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
     setIsProcessing(true);
     setJsonErrorMsg('');
     try {
-      const data = JSON.parse(fixedText);
-      const rawRows = (Array.isArray(data) ? data : [data]).map(
-        (row: Record<string, unknown>) => {
-          const mapped: Record<string, string> = {};
-          Object.entries(row).forEach(([k, v]) => {
-            if (v !== null && typeof v === 'object') {
-              mapped[k.trim().toLowerCase()] = JSON.stringify(v);
-            } else {
-              mapped[k.trim().toLowerCase()] = String(v ?? '');
-            }
-          });
-          return mapped;
-        },
-      );
+      const { data, errors: jsonErrors } = extractJsonObjects(fixedText);
+
+      if (jsonErrors.length > 0 && data.length === 0) {
+        throw new Error(jsonErrors[0]);
+      }
+
+      const rawRows = data.map((row: Record<string, unknown>) => {
+        const mapped: Record<string, string> = {};
+        Object.entries(row).forEach(([k, v]) => {
+          if (v !== null && typeof v === 'object') {
+            mapped[k.trim().toLowerCase()] = JSON.stringify(v);
+          } else {
+            mapped[k.trim().toLowerCase()] = String(v ?? '');
+          }
+        });
+        return mapped;
+      });
 
       if (rawRows.length === 0)
         throw new Error('ফাইলে কোনো ডাটা পাওয়া যায়নি।');
@@ -1208,7 +1216,13 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
       }
 
       setParsedData(finalQuestions);
-      setSelectedIndices(new Set(finalQuestions.map((_, i) => i)));
+      const errorIndices = new Set(errors.map((e) => e.row - 1));
+      setSelectedIndices(
+        new Set(
+          finalQuestions.map((_, i) => i).filter((i) => !errorIndices.has(i)),
+        ),
+      );
+
       setShowJsonEditor(false); // Close editor on success
       setStep(2);
     } catch (err: any) {
@@ -1230,30 +1244,27 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
     setImportSuccess(false);
 
     try {
-      let data;
-      try {
-        data = JSON.parse(directJsonText);
-      } catch (err: any) {
+      const { data, errors: jsonErrors } = extractJsonObjects(directJsonText);
+
+      if (jsonErrors.length > 0 && data.length === 0) {
         setRawJsonText(directJsonText);
-        setJsonErrorMsg(getHelpfulJsonError(directJsonText, err));
+        setJsonErrorMsg(jsonErrors[0]);
         setShowJsonEditor(true);
         setIsProcessing(false);
         return;
       }
 
-      const rawRows = (Array.isArray(data) ? data : [data]).map(
-        (row: Record<string, unknown>) => {
-          const mapped: Record<string, string> = {};
-          Object.entries(row).forEach(([k, v]) => {
-            if (v !== null && typeof v === 'object') {
-              mapped[k.trim().toLowerCase()] = JSON.stringify(v);
-            } else {
-              mapped[k.trim().toLowerCase()] = String(v ?? '');
-            }
-          });
-          return mapped;
-        },
-      );
+      const rawRows = data.map((row: Record<string, unknown>) => {
+        const mapped: Record<string, string> = {};
+        Object.entries(row).forEach(([k, v]) => {
+          if (v !== null && typeof v === 'object') {
+            mapped[k.trim().toLowerCase()] = JSON.stringify(v);
+          } else {
+            mapped[k.trim().toLowerCase()] = String(v ?? '');
+          }
+        });
+        return mapped;
+      });
 
       if (rawRows.length === 0)
         throw new Error('টেক্সটে কোনো ডাটা পাওয়া যায়নি।');
@@ -1280,7 +1291,12 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
       setFileName('Pasted JSON text');
       setParsedData(finalQuestions);
-      setSelectedIndices(new Set(finalQuestions.map((_, i) => i)));
+      const errorIndices = new Set(errors.map((e) => e.row - 1));
+      setSelectedIndices(
+        new Set(
+          finalQuestions.map((_, i) => i).filter((i) => !errorIndices.has(i)),
+        ),
+      );
       setStep(2);
     } catch (error) {
       alert(error instanceof Error ? error.message : 'JSON পার্স করতে ব্যর্থ।');
