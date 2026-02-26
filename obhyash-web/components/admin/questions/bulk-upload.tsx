@@ -1049,7 +1049,11 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           (row: Record<string, unknown>) => {
             const mapped: Record<string, string> = {};
             Object.entries(row).forEach(([k, v]) => {
-              mapped[k.trim().toLowerCase()] = String(v ?? '');
+              if (v !== null && typeof v === 'object') {
+                mapped[k.trim().toLowerCase()] = JSON.stringify(v);
+              } else {
+                mapped[k.trim().toLowerCase()] = String(v ?? '');
+              }
             });
             return mapped;
           },
@@ -1144,7 +1148,11 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         (row: Record<string, unknown>) => {
           const mapped: Record<string, string> = {};
           Object.entries(row).forEach(([k, v]) => {
-            mapped[k.trim().toLowerCase()] = String(v ?? '');
+            if (v !== null && typeof v === 'object') {
+              mapped[k.trim().toLowerCase()] = JSON.stringify(v);
+            } else {
+              mapped[k.trim().toLowerCase()] = String(v ?? '');
+            }
           });
           return mapped;
         },
@@ -1210,7 +1218,11 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         (row: Record<string, unknown>) => {
           const mapped: Record<string, string> = {};
           Object.entries(row).forEach(([k, v]) => {
-            mapped[k.trim().toLowerCase()] = String(v ?? '');
+            if (v !== null && typeof v === 'object') {
+              mapped[k.trim().toLowerCase()] = JSON.stringify(v);
+            } else {
+              mapped[k.trim().toLowerCase()] = String(v ?? '');
+            }
           });
           return mapped;
         },
