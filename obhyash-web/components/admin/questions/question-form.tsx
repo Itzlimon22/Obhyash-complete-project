@@ -14,6 +14,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { RichTextEditor } from '@/components/admin/questions/rich-text-editor';
 import { toast } from 'sonner';
 import { standardizeInstituteName } from '@/lib/data/institute-helpers';
+import { validateLatex } from '@/lib/latex-utils';
 
 interface QuestionFormProps {
   initialData: Partial<Question>;
@@ -88,6 +89,28 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
     ) {
       toast.error('সঠিক উত্তর নির্বাচন করো');
       return;
+    }
+
+    // --- LaTeX Validation ---
+    const questionVal = validateLatex(data.question || '');
+    if (!questionVal.isValid) {
+      toast.error(`প্রশ্ন: ${questionVal.error}`);
+      return;
+    }
+
+    const explanationVal = validateLatex(data.explanation || '');
+    if (!explanationVal.isValid) {
+      toast.error(`ব্যাখ্যা: ${explanationVal.error}`);
+      return;
+    }
+
+    const optsToValidate = data.options || [];
+    for (let i = 0; i < optsToValidate.length; i++) {
+      const optVal = validateLatex(optsToValidate[i]);
+      if (!optVal.isValid) {
+        toast.error(`অপশন ${String.fromCharCode(65 + i)}: ${optVal.error}`);
+        return;
+      }
     }
 
     // Standardize institutes
@@ -306,6 +329,11 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                   onChange={(val) => setData({ ...data, question: val })}
                   placeholder="প্রশ্নের বিবরণ লেখো (LaTeX and formatting supported)..."
                 />
+                {!validateLatex(data.question || '').isValid && (
+                  <p className="text-[10px] text-red-500 font-bold mt-1">
+                    ⚠ {validateLatex(data.question || '').error}
+                  </p>
+                )}
 
                 {data.question && (
                   <div className="p-4 bg-neutral-50 border border-neutral-100 rounded-xl min-h-[60px]">
@@ -434,8 +462,15 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 
                       {/* Option Math Preview */}
                       {opt && (
-                        <div className="ml-10 mt-1 pb-1 text-xs text-neutral-700">
-                          <MathRenderer text={opt} />
+                        <div className="ml-10 mt-1 pb-1">
+                          {!validateLatex(opt).isValid && (
+                            <p className="text-[10px] text-red-500 font-bold mb-1">
+                              ⚠ {validateLatex(opt).error}
+                            </p>
+                          )}
+                          <div className="text-xs text-neutral-700">
+                            <MathRenderer text={opt} />
+                          </div>
                         </div>
                       )}
                     </div>
@@ -486,6 +521,11 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                 onChange={(val) => setData({ ...data, explanation: val })}
                 placeholder="সঠিক উত্তরের ব্যাখ্যা লেখো (LaTeX and formatting supported)..."
               />
+              {!validateLatex(data.explanation || '').isValid && (
+                <p className="text-[10px] text-red-500 font-bold mt-1">
+                  ⚠ {validateLatex(data.explanation || '').error}
+                </p>
+              )}
 
               {data.explanation && (
                 <div className="p-4 bg-neutral-50 border border-neutral-100 rounded-xl min-h-[60px]">

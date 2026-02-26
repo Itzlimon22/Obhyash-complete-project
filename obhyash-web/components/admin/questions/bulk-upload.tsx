@@ -38,6 +38,7 @@ import {
 } from '@/lib/data/hsc-helpers';
 import { checkDuplicateQuestions } from '@/services/question-service';
 import { standardizeInstituteName } from '@/lib/data/institute-helpers';
+import { validateLatex } from '@/lib/latex-utils';
 
 // ─── Types ───────────────────────────────────────────────────────────
 interface BulkUploadProps {
@@ -260,6 +261,29 @@ function normalizeRawRow(
       message: 'বিষয় আবশ্যক',
     });
   }
+
+  // LaTeX Validation
+  const fieldsToValidate = [
+    { name: 'প্রশ্ন', value: q.question },
+    { name: 'ব্যাখ্যা', value: q.explanation },
+    ...options.map((opt, i) => ({
+      name: `অপশন ${String.fromCharCode(65 + i)}`,
+      value: opt,
+    })),
+  ];
+
+  fieldsToValidate.forEach((field) => {
+    if (field.value) {
+      const validation = validateLatex(field.value);
+      if (!validation.isValid) {
+        parseErrors.push({
+          row: rowIndex + 1,
+          field: field.name,
+          message: validation.error || 'LaTeX সিনট্যাক্স ভুল',
+        });
+      }
+    }
+  });
 
   return q;
 }
@@ -607,10 +631,15 @@ const EditModal: React.FC<{
                 <textarea
                   value={localData.question || ''}
                   onChange={(e) => update({ question: e.target.value })}
-                  className={`${fieldCls} resize-none`}
+                  className={`${fieldCls} resize-none ${localData.question && !validateLatex(localData.question).isValid ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                   rows={4}
                   placeholder="প্রশ্নের বিবরণ লেখো..."
                 />
+                {!validateLatex(localData.question || '').isValid && (
+                  <p className="text-[10px] text-red-500 font-bold mt-1">
+                    ⚠ {validateLatex(localData.question || '').error}
+                  </p>
+                )}
                 {localData.question && (
                   <div className="p-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 rounded-xl">
                     <span className="text-[9px] text-neutral-400 uppercase tracking-widest font-bold mb-1 block">
@@ -743,10 +772,15 @@ const EditModal: React.FC<{
               <textarea
                 value={localData.explanation || ''}
                 onChange={(e) => update({ explanation: e.target.value })}
-                className={`${fieldCls} resize-none`}
+                className={`${fieldCls} resize-none ${localData.explanation && !validateLatex(localData.explanation).isValid ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
                 rows={3}
                 placeholder="সঠিক উত্তরের ব্যাখ্যা লেখো..."
               />
+              {!validateLatex(localData.explanation || '').isValid && (
+                <p className="text-[10px] text-red-500 font-bold mt-1">
+                  ⚠ {validateLatex(localData.explanation || '').error}
+                </p>
+              )}
               {localData.explanation && (
                 <div className="p-3 bg-red-50/60 dark:bg-red-900/10 border border-red-100 dark:border-red-800/50 rounded-xl">
                   <span className="text-[9px] text-red-600 uppercase tracking-widest font-bold mb-1 block">
@@ -847,6 +881,9 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   const [rawJsonText, setRawJsonText] = useState('');
   const [jsonErrorMsg, setJsonErrorMsg] = useState('');
   const [directJsonText, setDirectJsonText] = useState('');
+
+  // ── Filters & View state ──
+  const [showOnlyErrors, setShowOnlyErrors] = useState(false);
 
   // ── Bulk Action State ──
   const [bulkSubject, setBulkSubject] = useState('');
@@ -1520,6 +1557,19 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
             {isAllSelected ? <CheckSquare size={14} /> : <Square size={14} />}
             {isAllSelected ? 'সব বাদ দাও' : 'সব সিলেক্ট'}
           </button>
+
+          <button
+            onClick={() => setShowOnlyErrors(!showOnlyErrors)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-[0.98] border ${
+              showOnlyErrors
+                ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
+                : 'bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700'
+            }`}
+          >
+            <AlertCircle size={14} />
+            {showOnlyErrors ? 'সব প্রশ্ন দেখাও' : 'শুধু ভুলগুলো (Errors) দেখাও'}
+          </button>
+
           {selectedIndices.size > 0 && (
             <button
               onClick={removeSelected}
@@ -1626,101 +1676,107 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
       {/* Question List */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 custom-scrollbar bg-neutral-50/30 dark:bg-[#0a0a0a]">
-        {parsedData.map((q, i) => {
-          const isSelected = selectedIndices.has(i);
-          const hasError = errors.some((err) => err.row === i + 1);
+        {parsedData
+          .map((q, i) => ({ q, i }))
+          .filter(({ i }) => {
+            if (!showOnlyErrors) return true;
+            return errors.some((err) => err.row === i + 1);
+          })
+          .map(({ q, i }) => {
+            const isSelected = selectedIndices.has(i);
+            const hasError = errors.some((err) => err.row === i + 1);
 
-          return (
-            <div
-              key={i}
-              className={`p-4 sm:p-5 rounded-2xl transition-all duration-200 relative overflow-hidden group ${
-                isSelected
-                  ? 'bg-emerald-50/80 dark:bg-emerald-900/10 border-2 border-emerald-500/40 shadow-[0_4px_12px_-4px_rgba(16,185,129,0.15)] dark:shadow-none'
-                  : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-neutral-300 dark:hover:border-neutral-700'
-              } ${hasError ? 'border-red-300 dark:border-red-800 ring-1 ring-red-400/20' : ''}`}
-            >
-              <div className="flex items-start gap-3 sm:gap-4">
-                <input
-                  type="checkbox"
-                  checked={isSelected}
-                  onChange={() => toggleSelection(i)}
-                  className="mt-1 w-4.5 h-4.5 rounded border-neutral-300 dark:border-neutral-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer transition-all"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                    <span className="text-xs font-extrabold text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-md">
-                      #{i + 1}
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => setPreviewQuestion(q)}
-                        className="p-1 px-2 text-[10px] md:text-xs font-bold text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20 rounded-md transition-colors"
-                      >
-                        <Eye size={14} className="inline mr-1" />
-                        দেখো
-                      </button>
-                      <button
-                        onClick={() => handleEditQuestion(i)}
-                        className="p-1 px-2 text-[10px] md:text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-md transition-colors"
-                      >
-                        <Edit size={14} className="inline mr-1" />
-                        সম্পাদনা
-                      </button>
-                      <button
-                        onClick={() => removeQuestion(i)}
-                        className="p-1 px-2 text-[10px] md:text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-md transition-colors"
-                      >
-                        <Trash2 size={14} className="inline mr-1" />
-                        মুছুন
-                      </button>
+            return (
+              <div
+                key={i}
+                className={`p-4 sm:p-5 rounded-2xl transition-all duration-200 relative overflow-hidden group ${
+                  isSelected
+                    ? 'bg-emerald-50/80 dark:bg-emerald-900/10 border-2 border-emerald-500/40 shadow-[0_4px_12px_-4px_rgba(16,185,129,0.15)] dark:shadow-none'
+                    : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm hover:border-neutral-300 dark:hover:border-neutral-700'
+                } ${hasError ? 'border-red-300 dark:border-red-800 ring-1 ring-red-400/20' : ''}`}
+              >
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleSelection(i)}
+                    className="mt-1 w-4.5 h-4.5 rounded border-neutral-300 dark:border-neutral-700 text-emerald-600 focus:ring-emerald-500 cursor-pointer transition-all"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                      <span className="text-xs font-extrabold text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-md">
+                        #{i + 1}
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => setPreviewQuestion(q)}
+                          className="p-1 px-2 text-[10px] md:text-xs font-bold text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-900/20 rounded-md transition-colors"
+                        >
+                          <Eye size={14} className="inline mr-1" />
+                          দেখো
+                        </button>
+                        <button
+                          onClick={() => handleEditQuestion(i)}
+                          className="p-1 px-2 text-[10px] md:text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                        >
+                          <Edit size={14} className="inline mr-1" />
+                          সম্পাদনা
+                        </button>
+                        <button
+                          onClick={() => removeQuestion(i)}
+                          className="p-1 px-2 text-[10px] md:text-xs font-bold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                        >
+                          <Trash2 size={14} className="inline mr-1" />
+                          মুছুন
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <p className="text-sm font-medium text-neutral-900 dark:text-neutral-200 line-clamp-2 mb-2">
-                    {q.question}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 font-bold">
-                      {q.subject || '—'}
-                    </span>
-                    {q.chapter && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-bold truncate max-w-[180px]">
-                        📖 {q.chapter}
+                    <p className="text-sm font-medium text-neutral-900 dark:text-neutral-200 line-clamp-2 mb-2">
+                      {q.question}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 font-bold">
+                        {q.subject || '—'}
                       </span>
-                    )}
-                    {q.topic && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-bold truncate max-w-[180px]">
-                        🏷️ {q.topic}
-                      </span>
-                    )}
-                    {q.correctAnswer && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 font-bold truncate max-w-[150px]">
-                        ✓ {q.correctAnswer}
-                      </span>
-                    )}
-                    {q.difficulty && (
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                          q.difficulty === 'Easy'
-                            ? 'bg-green-50 text-green-600'
-                            : q.difficulty === 'Hard'
-                              ? 'bg-red-50 text-red-600'
-                              : 'bg-red-50 text-red-600'
-                        }`}
-                      >
-                        {q.difficulty}
-                      </span>
-                    )}
-                    {hasError && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-bold">
-                        ⚠ ত্রুটি
-                      </span>
-                    )}
+                      {q.chapter && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-bold truncate max-w-[180px]">
+                          📖 {q.chapter}
+                        </span>
+                      )}
+                      {q.topic && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-bold truncate max-w-[180px]">
+                          🏷️ {q.topic}
+                        </span>
+                      )}
+                      {q.correctAnswer && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 font-bold truncate max-w-[150px]">
+                          ✓ {q.correctAnswer}
+                        </span>
+                      )}
+                      {q.difficulty && (
+                        <span
+                          className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                            q.difficulty === 'Easy'
+                              ? 'bg-green-50 text-green-600'
+                              : q.difficulty === 'Hard'
+                                ? 'bg-red-50 text-red-600'
+                                : 'bg-red-50 text-red-600'
+                          }`}
+                        >
+                          {q.difficulty}
+                        </span>
+                      )}
+                      {hasError && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-50 text-red-600 font-bold">
+                          ⚠ ত্রুটি
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
 
       {/* Progress Bar */}
