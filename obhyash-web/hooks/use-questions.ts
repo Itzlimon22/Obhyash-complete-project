@@ -6,6 +6,7 @@ import {
   deleteQuestions,
   bulkUpdateQuestionStatus,
   bulkUpdateMetadata,
+  bulkCreateQuestions,
   QuestionFilters,
 } from '@/services/database';
 import { Question, QuestionStatus } from '@/lib/types';
@@ -262,48 +263,36 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
       isImporting: true,
     });
 
-    let completed = 0;
-    let failed = 0;
-    const failedRows: number[] = [];
+    try {
+      // Use the new atomic bulk create service
+      const result = await bulkCreateQuestions(data);
 
-    for (let i = 0; i < data.length; i++) {
-      try {
-        const result = await createQuestion(data[i]);
-        if (result.success) {
-          completed++;
-        } else {
-          failed++;
-          failedRows.push(i + 1);
-        }
-      } catch {
-        failed++;
-        failedRows.push(i + 1);
-      }
       setImportProgress({
         total,
-        completed,
-        failed,
-        failedRows: [...failedRows],
-        isImporting: true,
+        completed: result.count,
+        failed: result.errors + result.duplicates,
+        failedRows: [], // Result doesn't currently return specific row indices for failure in a simple way
+        isImporting: false,
       });
-    }
 
-    setImportProgress({
-      total,
-      completed,
-      failed,
-      failedRows,
-      isImporting: false,
-    });
-
-    if (completed > 0) {
-      toast.success(
-        `${completed} টি প্রশ্ন ইম্পোর্ট হয়েছে${failed > 0 ? `, ${failed} টি ব্যর্থ` : ''}`,
-      );
-      await fetchQuestions();
-      return true;
-    } else {
-      toast.error('ইম্পোর্ট ব্যর্থ হয়েছে');
+      if (result.success && result.count > 0) {
+        toast.success(
+          `${result.count} টি প্রশ্ন ইম্পোর্ট হয়েছে${result.duplicates > 0 ? `, ${result.duplicates} টি ডুপ্লিকেট বাদ পড়েছে` : ''}${result.errors > 0 ? `, ${result.errors} টি ব্যর্থ` : ''}`,
+          { duration: 5000 },
+        );
+        await fetchQuestions();
+        return true;
+      } else if (result.duplicates > 0 && result.count === 0) {
+        toast.error('সবগুলো প্রশ্নই ডুপ্লিকেট হিসেবে চিহ্নিত হয়েছে');
+        return false;
+      } else {
+        toast.error(result.errorDetails?.[0] || 'ইম্পোর্ট ব্যর্থ হয়েছে');
+        return false;
+      }
+    } catch (err) {
+      console.error('Import error:', err);
+      setImportProgress((prev) => ({ ...prev, isImporting: false }));
+      toast.error('ইম্পোর্ট করার সময় একটি সমস্যা হয়েছে');
       return false;
     }
   };

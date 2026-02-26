@@ -1,6 +1,7 @@
 import { Question } from '@/lib/types';
 import { supabase, isSupabaseConfigured } from './core';
 import { createNotification } from './notification-service';
+import { generateQuestionFingerprint } from '@/lib/crypto-utils';
 
 // --- TYPES ---
 export interface QuestionFilters {
@@ -212,6 +213,14 @@ export const createQuestion = async (
           ? [question.correctAnswerIndex]
           : [0]);
 
+      // Generate fingerprint for deduplication
+      const fingerprint = await generateQuestionFingerprint({
+        question: question.question || '',
+        options: question.options || [],
+        subject: question.subject,
+        chapter: question.chapter,
+      });
+
       const payload = {
         question: question.question,
         options: question.options || [],
@@ -235,6 +244,7 @@ export const createQuestion = async (
         image_url: question.imageUrl,
         option_images: question.optionImages,
         explanation_image_url: question.explanationImageUrl,
+        fingerprint,
         // Sync: Add random_id for Smart Fetch
         random_id: Math.random(),
       };
@@ -516,22 +526,32 @@ export const checkDuplicateQuestions = async (
  */
 export const bulkCreateQuestions = async (
   questions: Partial<Question>[],
-): Promise<{ success: boolean; count: number; errors: unknown[] }> => {
+): Promise<{
+  success: boolean;
+  count: number;
+  duplicates: number;
+  errors: number;
+  errorDetails: string[];
+}> => {
   if (isSupabaseConfigured() && supabase) {
     try {
-      // Map Question objects to database format
-      const payload = questions.map((q) => {
+      // Map Question objects to database format and generate fingerprints
+      const payloadPromises = questions.map(async (q) => {
         const correctAnswerIndices =
           q.correctAnswerIndices ||
           (q.correctAnswerIndex !== undefined ? [q.correctAnswerIndex] : [0]);
 
+        const fingerprint = await generateQuestionFingerprint({
+          question: q.question || '',
+          options: q.options || [],
+          subject: q.subject,
+          chapter: q.chapter,
+        });
+
         return {
-          question: q.question, // Maps to 'question' column
-          // content: q.content, // parsing 'content' if it exists, but usually 'question' is the column
+          question: q.question,
           options: q.options || [],
           correct_answer_indices: correctAnswerIndices,
-          correct_answer: q.correctAnswer, // Legacy
-          correct_answer_index: q.correctAnswerIndex, // Legacy
           explanation: q.explanation,
           type: q.type || 'MCQ',
           difficulty: q.difficulty || 'Medium',
@@ -551,29 +571,55 @@ export const bulkCreateQuestions = async (
           image_url: q.imageUrl,
           option_images: q.optionImages,
           explanation_image_url: q.explanationImageUrl,
-          // Sync: Add random_id for Smart Fetch
+          fingerprint,
           random_id: Math.random(),
         };
       });
 
-      const { data, error } = await supabase
-        .from('questions')
-        .insert(payload)
-        .select();
+      const payload = await Promise.all(payloadPromises);
+
+      // Use the new SQL RPC for atomic bulk merge
+      const { data, error } = await supabase.rpc('bulk_merge_questions', {
+        p_questions: payload,
+      });
 
       if (error) {
-        console.error('Bulk insert error:', error);
-        return { success: false, count: 0, errors: [error] };
+        console.error('Bulk merge error:', error);
+        return {
+          success: false,
+          count: 0,
+          duplicates: 0,
+          errors: questions.length,
+          errorDetails: [error.message],
+        };
       }
 
-      return { success: true, count: data?.length || 0, errors: [] };
+      return {
+        success: true,
+        count: data.inserted || 0,
+        duplicates: data.duplicates || 0,
+        errors: data.errors || 0,
+        errorDetails: data.error_details || [],
+      };
     } catch (err) {
       console.error('Bulk insert exception:', err);
-      return { success: false, count: 0, errors: [err] };
+      return {
+        success: false,
+        count: 0,
+        duplicates: 0,
+        errors: questions.length,
+        errorDetails: [err instanceof Error ? err.message : String(err)],
+      };
     }
   }
 
-  return { success: false, count: 0, errors: ['Supabase not configured'] };
+  return {
+    success: false,
+    count: 0,
+    duplicates: 0,
+    errors: questions.length,
+    errorDetails: ['Supabase not configured'],
+  };
 };
 /**
  * Get multiple questions by IDs
