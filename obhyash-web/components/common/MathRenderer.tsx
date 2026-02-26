@@ -1,8 +1,11 @@
 'use client';
 
-// ✅ This import is crucial for symbols to look correct
 import 'katex/dist/katex.min.css';
-import { InlineMath, BlockMath } from 'react-katex';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import remarkGfm from 'remark-gfm';
+import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
 
 interface MathRendererProps {
   text: string;
@@ -12,22 +15,24 @@ interface MathRendererProps {
 export function MathRenderer({ text, block = false }: MathRendererProps) {
   if (!text) return null;
 
-  // Split text by $ symbols to identify LaTeX parts (e.g., $E=mc^2$)
-  const parts = text.split(/(\$.*?\$)/g);
-
   return (
-    <span className={block ? 'block my-2' : 'inline'}>
-      {parts.map((part, i) => {
-        if (part.startsWith('$') && part.endsWith('$')) {
-          const content = part.slice(1, -1);
-          return block ? (
-            <BlockMath key={i} math={content} />
-          ) : (
-            <InlineMath key={i} math={content} />
-          );
-        }
-        return <span key={i}>{part}</span>;
-      })}
-    </span>
+    <div
+      className={`prose prose-sm max-w-none dark:prose-invert 
+        prose-p:leading-relaxed prose-p:my-1
+        prose-li:my-0.5 prose-ul:my-1
+        ${block ? 'my-2' : 'inline'}`}
+    >
+      <ReactMarkdown
+        remarkPlugins={[remarkMath, remarkGfm]}
+        rehypePlugins={[rehypeKatex, rehypeRaw]}
+        components={{
+          p: ({ node, ...props }) => (
+            <span {...props} className={block ? 'block mb-2' : ''} />
+          ),
+        }}
+      >
+        {text}
+      </ReactMarkdown>
+    </div>
   );
 }
