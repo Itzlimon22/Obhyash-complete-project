@@ -9,6 +9,7 @@ import {
   resolveSubjectName,
   resolveChapterName,
   resolveTopicName,
+  resolveTaxonomyHierarchy,
 } from '@/lib/data/hsc-helpers';
 import { Trash2, Edit, Copy } from 'lucide-react';
 
@@ -96,18 +97,15 @@ const EditableRow = ({
     return '';
   };
 
-  const cleanSubject = (localQ.subject || '').trim();
-  const canonicalSubject = cleanSubject
-    ? resolveSubjectName(cleanSubject) || cleanSubject
-    : '';
-  const cleanChapter = (localQ.chapter || '').trim();
-  const canonicalChapter = cleanChapter
-    ? resolveChapterName(canonicalSubject, cleanChapter) || cleanChapter
-    : '';
-  const cleanTopic = (localQ.topic || '').trim();
-  const canonicalTopic = cleanTopic
-    ? resolveTopicName(canonicalChapter, cleanTopic) || cleanTopic
-    : '';
+  const {
+    subject: canonicalSubject,
+    chapter: canonicalChapter,
+    topic: canonicalTopic,
+  } = resolveTaxonomyHierarchy(
+    localQ.subject || '',
+    localQ.chapter || '',
+    localQ.topic || '',
+  );
 
   const availableSubjects = getHscSubjectList();
   const availableChapters = canonicalSubject

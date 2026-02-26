@@ -36,6 +36,7 @@ import {
   resolveSubjectName,
   resolveChapterName,
   resolveTopicName,
+  resolveTaxonomyHierarchy,
 } from '@/lib/data/hsc-helpers';
 import {
   checkDuplicateQuestions,
@@ -423,14 +424,11 @@ const EditModal: React.FC<{
   // ── Normalize synchronously in useState initializer so dropdowns
   //    are populated on the very first render (no useEffect delay). ──
   const [localData, setLocalData] = React.useState<Partial<Question>>(() => {
-    const subject =
-      resolveSubjectName(data.subject || '') || data.subject || '';
-    const chapter = subject
-      ? resolveChapterName(subject, data.chapter || '') || data.chapter || ''
-      : data.chapter || '';
-    const topic = chapter
-      ? resolveTopicName(chapter, data.topic || '') || data.topic || ''
-      : data.topic || '';
+    const { subject, chapter, topic } = resolveTaxonomyHierarchy(
+      data.subject || '',
+      data.chapter || '',
+      data.topic || '',
+    );
     return { ...data, subject, chapter, topic };
   });
 
@@ -1013,13 +1011,11 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   // Resolve subject/chapter/topic to canonical names (including serial→name for topics)
   const resolveTopicSerialsLocally = (questions: Partial<Question>[]) => {
     return questions.map((q) => {
-      const subject = resolveSubjectName(q.subject || '') || q.subject || '';
-      const chapter = subject
-        ? resolveChapterName(subject, q.chapter || '') || q.chapter || ''
-        : q.chapter || '';
-      const topic = chapter
-        ? resolveTopicName(chapter, q.topic || '') || q.topic || ''
-        : q.topic || '';
+      const { subject, chapter, topic } = resolveTaxonomyHierarchy(
+        q.subject || '',
+        q.chapter || '',
+        q.topic || '',
+      );
       return { ...q, subject, chapter, topic };
     });
   };

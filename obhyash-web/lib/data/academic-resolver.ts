@@ -24,9 +24,58 @@ export async function resolveAcademicIds(
   if (!subjectName) return resolution;
 
   try {
-    // 1. Resolve Subject
-    // We fetch all subjects and find the closest match (normalize capitalization and spacing)
     const subjects = await getSubjects();
+
+    // 1. Try Bottom-Up: Topic -> Chapter -> Subject
+    if (topicName) {
+      for (const s of subjects) {
+        const chapters = await getChapters(s.id);
+        const topics = await getTopics(chapters.map((c) => c.id));
+        const targetTopic = topics.find(
+          (t) =>
+            t.name.trim().toLowerCase() === topicName.trim().toLowerCase() ||
+            t.id.trim().toLowerCase() === topicName.trim().toLowerCase(),
+        );
+        if (targetTopic) {
+          return {
+            subjectId: s.id,
+            chapterId: targetTopic.chapter_id,
+            topicId: targetTopic.id,
+          };
+        }
+      }
+    }
+
+    // 2. Try Mid-Level Bottom-Up: Chapter -> Subject
+    if (chapterName) {
+      for (const s of subjects) {
+        const chapters = await getChapters(s.id);
+        const targetChapter = chapters.find(
+          (c) =>
+            c.name.trim().toLowerCase() === chapterName.trim().toLowerCase() ||
+            c.id.trim().toLowerCase() === chapterName.trim().toLowerCase(),
+        );
+
+        if (targetChapter) {
+          resolution.subjectId = s.id;
+          resolution.chapterId = targetChapter.id;
+
+          if (topicName) {
+            const topics = await getTopics(targetChapter.id);
+            const targetTopic = topics.find(
+              (t) =>
+                t.name.trim().toLowerCase() ===
+                  topicName.trim().toLowerCase() ||
+                t.id.trim().toLowerCase() === topicName.trim().toLowerCase(),
+            );
+            if (targetTopic) resolution.topicId = targetTopic.id;
+          }
+          return resolution;
+        }
+      }
+    }
+
+    // 3. Fallback: Subject-first resolution (Top-Down)
     const targetSubject = subjects.find(
       (s) =>
         s.name.trim().toLowerCase() === subjectName.trim().toLowerCase() ||
@@ -36,8 +85,6 @@ export async function resolveAcademicIds(
 
     if (targetSubject) {
       resolution.subjectId = targetSubject.id;
-
-      // 2. Resolve Chapter
       if (chapterName) {
         const chapters = await getChapters(targetSubject.id);
         const targetChapter = chapters.find(
@@ -45,11 +92,8 @@ export async function resolveAcademicIds(
             c.name.trim().toLowerCase() === chapterName.trim().toLowerCase() ||
             c.id.trim().toLowerCase() === chapterName.trim().toLowerCase(),
         );
-
         if (targetChapter) {
           resolution.chapterId = targetChapter.id;
-
-          // 3. Resolve Topic
           if (topicName) {
             const topics = await getTopics(targetChapter.id);
             const targetTopic = topics.find(
@@ -58,10 +102,7 @@ export async function resolveAcademicIds(
                   topicName.trim().toLowerCase() ||
                 t.id.trim().toLowerCase() === topicName.trim().toLowerCase(),
             );
-
-            if (targetTopic) {
-              resolution.topicId = targetTopic.id;
-            }
+            if (targetTopic) resolution.topicId = targetTopic.id;
           }
         }
       }

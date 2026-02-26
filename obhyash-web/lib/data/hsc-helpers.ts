@@ -118,17 +118,49 @@ export function findHscChapter(idOrName: string) {
 export function getHscTopicList(
   chapterIdOrName: string,
 ): { id: string; name: string }[] {
-  for (const subject of hscSubjects) {
-    for (const chapter of subject.chapters) {
-      if (
-        chapter.id === chapterIdOrName ||
-        chapter.name.toLowerCase() === chapterIdOrName.toLowerCase()
-      ) {
-        return chapter.topics.map((t) => ({ id: t.id, name: t.name }));
-      }
+  const chapterInfo = findHscChapter(chapterIdOrName);
+  if (!chapterInfo) return [];
+  return chapterInfo.chapter.topics.map((t) => ({ id: t.id, name: t.name }));
+}
+
+export function findHscTopic(idOrName: string, chapterIdOrName?: string) {
+  const norm = normalizeForMatch(idOrName);
+
+  // If chapter is provided, search within it first
+  if (chapterIdOrName) {
+    const chapterInfo = findHscChapter(chapterIdOrName);
+    if (chapterInfo) {
+      const topic = chapterInfo.chapter.topics.find(
+        (t) =>
+          t.id === idOrName ||
+          normalizeForMatch(t.name) === norm ||
+          normalizeForMatch(t.name).includes(norm),
+      );
+      if (topic)
+        return {
+          topic,
+          chapter: chapterInfo.chapter,
+          subject: chapterInfo.subject,
+        };
     }
   }
-  return [];
+
+  // Global search
+  for (const subject of hscSubjects) {
+    for (const chapter of subject.chapters) {
+      const topic = chapter.topics.find((t) => {
+        const tNameNorm = normalizeForMatch(t.name);
+        return (
+          t.id === idOrName ||
+          tNameNorm === norm ||
+          tNameNorm.includes(norm) ||
+          norm.includes(tNameNorm)
+        );
+      });
+      if (topic) return { topic, chapter, subject };
+    }
+  }
+  return undefined;
 }
 
 // ─── Resolve helpers (for bulk upload name matching) ─────────────────
@@ -138,49 +170,75 @@ export function resolveSubjectName(input: string): string | undefined {
   return findHscSubject(input)?.name;
 }
 
-/** Resolve a chapter name to the canonical hsc.ts name (within a subject) */
+/** Resolve a chapter name to the canonical hsc.ts name (robust resolution) */
 export function resolveChapterName(
-  subjectIdOrName: string,
+  subjectInput: string,
   chapterInput: string,
 ): string | undefined {
-  const subject = findHscSubject(subjectIdOrName);
-  if (!subject) return undefined;
-  const lower = chapterInput.toLowerCase();
-  const chapter = subject.chapters.find(
-    (c) =>
-      c.id === chapterInput ||
-      c.name.toLowerCase() === lower ||
-      c.name.toLowerCase().includes(lower) ||
-      lower.includes(c.name.toLowerCase()),
-  );
-  return chapter?.name;
+  if (!chapterInput) return undefined;
+
+  // Try finding chapter within the suggested subject first
+  const subject = findHscSubject(subjectInput);
+  if (subject) {
+    const norm = normalizeForMatch(chapterInput);
+    const chapter = subject.chapters.find((c) => {
+      const cNameNorm = normalizeForMatch(c.name);
+      return (
+        c.id === chapterInput ||
+        cNameNorm === norm ||
+        cNameNorm.includes(norm) ||
+        norm.includes(cNameNorm)
+      );
+    });
+    if (chapter) return chapter.name;
+  }
+
+  // If not found in subject, search GLOBALLY (this fixes Subject mapping if chapter is unique)
+  return findHscChapter(chapterInput)?.chapter.name;
 }
 
-/** Resolve a topic name to the canonical hsc.ts name (within a chapter) */
+/** Resolve a topic name to the canonical hsc.ts name (robust resolution) */
 export function resolveTopicName(
-  chapterIdOrName: string,
+  chapterInput: string,
   topicInput: string,
 ): string | undefined {
-  for (const subject of hscSubjects) {
-    for (const chapter of subject.chapters) {
-      if (
-        chapter.id === chapterIdOrName ||
-        chapter.name.toLowerCase() === chapterIdOrName.toLowerCase()
-      ) {
-        const lower = topicInput.toLowerCase();
-        const isSerial = /^\d+$/.test(topicInput.trim());
-        const topic = chapter.topics.find((t) => {
-          if (isSerial) return t.serial?.toString() === topicInput.trim();
-          return (
-            t.id === topicInput ||
-            t.name.toLowerCase() === lower ||
-            t.name.toLowerCase().includes(lower) ||
-            lower.includes(t.name.toLowerCase())
-          );
-        });
-        return topic?.name;
-      }
-    }
+  if (!topicInput) return undefined;
+  return findHscTopic(topicInput, chapterInput)?.topic.name;
+}
+
+/**
+ * Perform a full hierarchy resolution (Subject -> Chapter -> Topic).
+ * This is the ultimate "fix-all" for taxonomy mapping.
+ */
+export function resolveTaxonomyHierarchy(
+  subjInp: string,
+  chapInp: string,
+  topInp: string,
+): { subject: string; chapter: string; topic: string } {
+  // 1. Try resolving Topic first (as it's often the most specific)
+  const topicRes = findHscTopic(topInp, chapInp);
+  if (topicRes) {
+    return {
+      subject: topicRes.subject.name,
+      chapter: topicRes.chapter.name,
+      topic: topicRes.topic.name,
+    };
   }
-  return undefined;
+
+  // 2. Try resolving Chapter if Topic failed
+  const chapRes = findHscChapter(chapInp);
+  if (chapRes) {
+    return {
+      subject: chapRes.subject.name,
+      chapter: chapRes.chapter.name,
+      topic: resolveTopicName(chapRes.chapter.name, topInp) || topInp,
+    };
+  }
+
+  // 3. Last fallback: resolve Subject normally
+  const subjName = resolveSubjectName(subjInp) || subjInp;
+  const chapName = resolveChapterName(subjName, chapInp) || chapInp;
+  const topName = resolveTopicName(chapName, topInp) || topInp;
+
+  return { subject: subjName, chapter: chapName, topic: topName };
 }
