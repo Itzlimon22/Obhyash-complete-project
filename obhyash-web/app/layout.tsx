@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 // ✅ Import the specific fonts you requested
-import { Inter, Anek_Bangla } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'sonner';
 import AuthProvider from '@/components/auth/AuthProvider';
@@ -9,13 +9,6 @@ import AuthProvider from '@/components/auth/AuthProvider';
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
-});
-
-// ✅ Configure Anek Bangla (Bengali text)
-const anekBangla = Anek_Bangla({
-  variable: '--font-anek',
-  subsets: ['bengali', 'latin'],
-  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -44,11 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     // ✅ Added 'dark' class for theme and font variables
-    <html
-      lang="en"
-      className={`${anekBangla.variable} ${inter.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/icon-512.png" />
         <link

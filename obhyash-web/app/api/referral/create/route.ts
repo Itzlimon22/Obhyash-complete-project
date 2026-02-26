@@ -110,15 +110,54 @@ export const POST = async (req: Request) => {
     attempts++;
   }
 
-  const { data: referral, error } = await supabase
-    .from('referrals')
-    .insert({ owner_id: user.id, code, created_at: new Date().toISOString() })
-    .select()
-    .single();
+  // Attempt to insert the referral, handling possible duplicate code errors
+  let attempts = 0;
+  const maxAttempts = 5;
+  let referralData = null;
+  while (attempts < maxAttempts) {
+    const { data, error } = await supabase
+      .from('referrals')
+      .insert({ owner_id: user.id, code, created_at: new Date().toISOString() })
+      .select()
+      .single();
 
-  if (error) {
+    if (!error) {
+      referralData = data;
+      break; // success
+    }
+
+    // Unique constraint violation (Postgres error code 23505)
+    if (error.code === '23505') {
+      // Generate a new code and retry
+      code = generateCode();
+      attempts++;
+      continue;
+    }
+
+    // Other errors – abort
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  if (!referralData) {
+    return NextResponse.json(
+      {
+        error:
+          'Failed to generate a unique referral code after multiple attempts.',
+      },
+      { status: 500 },
+    );
+  }
+
+  // Notify the user that their code was created
+  await supabase.from('notifications').insert({
+    user_id: user.id,
+    title: 'রেফারেল কোড তৈরি!',
+    message: `আপনার রেফারেল কোড সফলভাবে তৈরি হয়েছে: ${code}`,
+    type: 'system',
+    is_read: false,
+  });
+
+  return NextResponse.json({ referral: referralData });
 
   // Notify the user that their code was created
   await supabase.from('notifications').insert({

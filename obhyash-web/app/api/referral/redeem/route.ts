@@ -46,44 +46,21 @@ export const POST = async (req: Request) => {
     );
   }
 
-  if (referral.owner_id === targetUserId) {
-    return NextResponse.json(
-      { error: 'You cannot use your own referral code' },
-      { status: 400 },
-    );
-  }
+  // Use atomic stored procedure for redemption checks and history insertion
+  const { error: txnError } = await supabaseAdmin.rpc('redeem_referral_tx', {
+    p_referral_id: referral.id,
+    p_redeemer_id: targetUserId,
+  });
 
-  // Check if already redeemed by this targetUser
-  const { data: existing } = await supabaseAdmin
-    .from('referral_history')
-    .select('id')
-    .eq('referral_id', referral.id)
-    .eq('redeemed_by', targetUserId)
-    .single();
-
-  if (existing) {
-    return NextResponse.json(
-      { error: 'You have already used this referral code' },
-      { status: 400 },
-    );
-  }
-
-  // Check monthly limit (max 10 redemptions per owner per month)
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
-
-  const { count: monthlyRedemptions } = await supabaseAdmin
-    .from('referral_history')
-    .select('id', { count: 'exact', head: true })
-    .eq('referral_id', referral.id)
-    .gte('redeemed_at', startOfMonth.toISOString());
-
-  if (monthlyRedemptions && monthlyRedemptions >= 10) {
-    return NextResponse.json(
-      { error: 'This referral code has reached its monthly limit.' },
-      { status: 400 },
-    );
+  if (txnError) {
+    // Map known error codes to appropriate HTTP status
+    const statusMap: Record<string, number> = {
+      P0002: 400, // self‑referral
+      P0003: 400, // already redeemed
+      P0004: 400, // monthly limit reached
+    };
+    const status = statusMap[txnError.code] ?? 500;
+    return NextResponse.json({ error: txnError.message }, { status });
   }
 
   // Record history as Pending

@@ -89,6 +89,7 @@
     position: relative;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
+    font-family: var(--font-inter), var(--font-anek), system-ui;
     font-size: 15px; /* Mobile Base */
   }
 
