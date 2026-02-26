@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   Upload,
   FileSpreadsheet,
@@ -27,7 +27,8 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
-
+import { generateQuestionFingerprintSync } from '@/lib/crypto-utils';
+import { resolveAcademicIds } from '@/lib/data/academic-resolver';
 import {
   getHscSubjectList,
   getHscChapterList,
@@ -36,7 +37,11 @@ import {
   resolveChapterName,
   resolveTopicName,
 } from '@/lib/data/hsc-helpers';
-import { checkDuplicateQuestions } from '@/services/question-service';
+import {
+  checkDuplicateQuestions,
+  getBulkUploadJobStatus,
+  BulkUploadJob,
+} from '@/services/question-service';
 import { standardizeInstituteName } from '@/lib/data/institute-helpers';
 import { validateLatex } from '@/lib/latex-utils';
 
@@ -284,6 +289,12 @@ function normalizeRawRow(
       }
     }
   });
+
+  // --- Relational Taxonomy Resolution ---
+  // Note: This is an async operation, but normalization is usually sync.
+  // We will do a "best effort" or mark for later resolution if needed.
+  // For now, let's keep it simple and resolve during the IMPORT phase primarily,
+  // or provide a "Resolve IDs" button in the UI.
 
   return q;
 }
@@ -860,7 +871,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   onCancel,
   importProgress,
 }) => {
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 'complete'>(1);
   const [parsedData, setParsedData] = useState<Partial<Question>[]>([]);
   const [errors, setErrors] = useState<ParseError[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -1305,6 +1316,30 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
     setSelectedIndices(new Set());
   };
 
+  // --- Background Job Polling ---
+  const [activeJob, setActiveJob] = useState<BulkUploadJob | null>(null);
+  const pollingInterval = useRef<NodeJS.Timeout | null>(null);
+
+  const startPolling = (jobId: string) => {
+    if (pollingInterval.current) clearInterval(pollingInterval.current);
+
+    pollingInterval.current = setInterval(async () => {
+      const status = await getBulkUploadJobStatus(jobId);
+      if (status) {
+        setActiveJob(status);
+        if (status.status === 'Completed' || status.status === 'Failed') {
+          if (pollingInterval.current) clearInterval(pollingInterval.current);
+        }
+      }
+    }, 2000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (pollingInterval.current) clearInterval(pollingInterval.current);
+    };
+  }, []);
+
   // ── Import handler ─────────────────────────────────────────────────
   const handleImport = async () => {
     const toImport =
@@ -1318,7 +1353,30 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
     setIsProcessing(true);
     try {
-      const success = await onImport(toImport);
+      // --- ID Resolution Phase ---
+      // Assuming 'toast' is available globally or imported from a library like react-hot-toast
+      // toast.loading('শ্রেণীকরণ (Taxonomy) যাচাই করা হচ্ছে...');
+      const resolvedQuestions = await Promise.all(
+        toImport.map(async (q) => {
+          const ids = await resolveAcademicIds(
+            q.subject || '',
+            q.chapter || '',
+            q.topic || '',
+          );
+          return {
+            ...q,
+            subjectId: ids.subjectId,
+            chapterId: ids.chapterId,
+            topicId: ids.topicId,
+          };
+        }),
+      );
+      // toast.dismiss();
+
+      const success = await onImport(resolvedQuestions as Partial<Question>[]);
+
+      // Check if a job ID was returned via importProgress (needs hook update to store jobId)
+      // For now, the hook handles the summary toast.
       if (success) {
         setImportSuccess(true);
         setTimeout(() => onCancel(), 2000);
@@ -1786,25 +1844,31 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           <div className="px-5 py-4 bg-white dark:bg-neutral-900 border-t border-neutral-100 dark:border-neutral-800">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300">
-                ইমপোর্ট প্রগ্রেস
+                {activeJob ? 'সার্ভার ইমপোর্ট প্রগ্রেস' : 'ইমপোর্ট প্রগ্রেস'}
               </span>
               <div className="flex items-center gap-3">
                 <span className="text-xs font-mono text-neutral-500">
-                  {importProgress.completed + importProgress.failed}/
-                  {importProgress.total}
+                  {activeJob
+                    ? `${activeJob.processed_rows} / ${activeJob.total_rows}`
+                    : `${importProgress.completed + importProgress.failed} / ${importProgress.total}`}
                 </span>
-                {importProgress.failed > 0 && (
+                {(activeJob
+                  ? activeJob.error_rows > 0
+                  : importProgress.failed > 0) && (
                   <span className="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded-full font-bold">
-                    {importProgress.failed} ব্যর্থ
+                    {activeJob ? activeJob.error_rows : importProgress.failed}{' '}
+                    ব্যর্থ
                   </span>
                 )}
               </div>
             </div>
             <div className="w-full h-3 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-300 ease-out"
+                className={`h-full bg-gradient-to-r ${activeJob?.status === 'Failed' ? 'from-red-500 to-red-400' : 'from-emerald-500 to-emerald-400'} rounded-full transition-all duration-300 ease-out`}
                 style={{
-                  width: `${importProgress.total > 0 ? ((importProgress.completed + importProgress.failed) / importProgress.total) * 100 : 0}%`,
+                  width: activeJob
+                    ? `${(activeJob.processed_rows / activeJob.total_rows) * 100}%`
+                    : `${importProgress.total > 0 ? ((importProgress.completed + importProgress.failed) / importProgress.total) * 100 : 0}%`,
                 }}
               />
             </div>
@@ -1836,10 +1900,12 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           {isProcessing ? (
             <>
               <Loader2 className="animate-spin" size={18} />
-              ইমপোর্ট হচ্ছে...{' '}
-              {importProgress
-                ? `(${importProgress.completed + importProgress.failed}/${importProgress.total})`
-                : ''}
+              {activeJob ? 'সার্ভারে হচ্ছে...' : 'ইমপোর্ট হচ্ছে...'}
+              {activeJob
+                ? ` (${activeJob.processed_rows}/${activeJob.total_rows})`
+                : importProgress
+                  ? ` (${importProgress.completed + importProgress.failed}/${importProgress.total})`
+                  : ''}
             </>
           ) : (
             <>

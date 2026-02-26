@@ -22,6 +22,19 @@ export interface PaginatedQuestionsResponse {
   pageSize: number;
 }
 
+export interface BulkUploadJob {
+  id: string;
+  status: 'Processing' | 'Completed' | 'Failed';
+  total_rows: number;
+  processed_rows: number;
+  inserted_rows: number;
+  duplicate_rows: number;
+  error_rows: number;
+  errors: string[];
+  created_at: string;
+  updated_at: string;
+}
+
 /**
  * Fetch paginated questions with filters, search, and sorting
  */
@@ -517,24 +530,67 @@ export const checkDuplicateQuestions = async (
 };
 
 /**
- * Bulk create questions (for imports from bulk upload)
- * Accepts database format with snake_case fields
+ * Create a new bulk upload job
  */
+export const createBulkUploadJob = async (
+  totalRows: number,
+): Promise<{ id: string | null; error?: string }> => {
+  if (isSupabaseConfigured() && supabase) {
+    const { data, error } = await supabase
+      .from('bulk_upload_jobs')
+      .insert({ total_rows: totalRows, status: 'Processing' })
+      .select('id')
+      .single();
+
+    if (error) return { id: null, error: error.message };
+    return { id: data.id };
+  }
+  return { id: null, error: 'Database not configured' };
+};
+
+/**
+ * Get status of a bulk upload job
+ */
+export const getBulkUploadJobStatus = async (
+  id: string,
+): Promise<BulkUploadJob | null> => {
+  if (isSupabaseConfigured() && supabase) {
+    const { data, error } = await supabase
+      .from('bulk_upload_jobs')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) return null;
+    return data as BulkUploadJob;
+  }
+  return null;
+};
+
 /**
  * Bulk create questions (for imports from bulk upload)
  * Accepts application Question objects and maps to database format
  */
 export const bulkCreateQuestions = async (
   questions: Partial<Question>[],
+  jobId?: string,
 ): Promise<{
   success: boolean;
   count: number;
   duplicates: number;
   errors: number;
   errorDetails: string[];
+  jobId?: string;
 }> => {
   if (isSupabaseConfigured() && supabase) {
     try {
+      // If noJobID provided but many questions, create one
+      let internalJobId = jobId;
+      if (!internalJobId && questions.length > 50) {
+        const jobRes = await createBulkUploadJob(questions.length);
+        internalJobId = jobRes.id || undefined;
+      }
+
       // Map Question objects to database format and generate fingerprints
       const payloadPromises = questions.map(async (q) => {
         const correctAnswerIndices =
@@ -556,8 +612,11 @@ export const bulkCreateQuestions = async (
           type: q.type || 'MCQ',
           difficulty: q.difficulty || 'Medium',
           subject: q.subject,
+          subject_id: q.subjectId, // From Relational Taxonomy
           chapter: q.chapter,
+          chapter_id: q.chapterId, // From Relational Taxonomy
           topic: q.topic,
+          topic_id: q.topicId, // From Relational Taxonomy
           stream: q.stream,
           division: q.division,
           section: q.section,
@@ -578,9 +637,10 @@ export const bulkCreateQuestions = async (
 
       const payload = await Promise.all(payloadPromises);
 
-      // Use the new SQL RPC for atomic bulk merge
-      const { data, error } = await supabase.rpc('bulk_merge_questions', {
+      // Use the modernized SQL RPC for atomic bulk merge with job support
+      const { data, error } = await supabase.rpc('bulk_merge_questions_v2', {
         p_questions: payload,
+        p_job_id: internalJobId || null,
       });
 
       if (error) {
@@ -591,6 +651,7 @@ export const bulkCreateQuestions = async (
           duplicates: 0,
           errors: questions.length,
           errorDetails: [error.message],
+          jobId: internalJobId,
         };
       }
 
@@ -600,6 +661,7 @@ export const bulkCreateQuestions = async (
         duplicates: data.duplicates || 0,
         errors: data.errors || 0,
         errorDetails: data.error_details || [],
+        jobId: internalJobId,
       };
     } catch (err) {
       console.error('Bulk insert exception:', err);

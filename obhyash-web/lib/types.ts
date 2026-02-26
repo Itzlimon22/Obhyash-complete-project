@@ -70,9 +70,12 @@ export interface Question {
   type: QuestionType;
   difficulty: QuestionDifficulty;
   subject: string;
+  subjectId?: string; // Reference to subjects(id)
   subjectLabel?: string; // Human-readable display name (e.g. "পদার্থবিজ্ঞান (Physics)")
   chapter: string;
+  chapterId?: string; // Reference to chapters(id)
   topic?: string;
+  topicId?: string; // Reference to topics(id)
 
   // Media (All optional)
   imageUrl?: string; // Question image
