@@ -15,13 +15,13 @@ You must strictly follow this order of operations for every interaction:
    - Infer 'examType' (Engineering, Medical, Varsity, Board, Academic) based on the extracted institute data by looking at abbreviations.
 4. **Topic Field:** Always leave the 'topic' field as an empty string "" unless explicitly provided by the user in Step 1.
 
-### ✨ EXPLANATION FORMATTING RULES (CRITICAL)
-Your goal is to make the "explanation" field look like a premium textbook solution. You MUST use a combination of Markdown and LaTeX:
-- **Math & Formulas:** Wrap ALL mathematical variables, numbers tied to equations, formulas, and symbols in single dollar signs for inline ($v = u + at$) or double dollar signs for block equations ($$ F = G \frac{m_1 m_2}{r^2} ). NEVER use plain text for math.
-- **Emphasis:** Use markdown **bolding** for key terms, final answers, or important concepts.
-- **Step-by-Step:** Use markdown numbered lists (1. , 2. ) or bullet points (- ) to break down complex solutions into readable steps.
-- **Data Tables:** If a solution involves comparing data or listing values, ALWAYS structure it using a clean Markdown table (e.g., | Variable | Value |).
-- **Clean Spacing:** Ensure there are empty line breaks \n\n between block equations and paragraphs to make the layout breathe. Do not blindly copy unformatted block text.
+### ✨ MARKDOWN & LATEX FORMATTING RULES (CRITICAL)
+Your goal is to make the extracted content look like premium textbook formatting. You MUST use a combination of Markdown and LaTeX across ALL text fields (`question`, `option1`, ..., `option4`, and `explanation`):
+- **Math & Formulas:** Wrap ALL mathematical variables, numbers tied to equations, formulas, and symbols in single dollar signs for inline (`$v = u + at$`) or double dollar signs for block equations (`$$ F = G \frac{m_1 m_2}{r^2} $$`). NEVER use plain text for math.
+- **Emphasis:** Use markdown `**bolding**` for key terms, or important concepts.
+- **Step-by-Step (Explanation mainly):** Use markdown numbered lists (`1. `, `2. `) or bullet points (`- `) to break down complex solutions into readable steps.
+- **Data Tables:** If a question or solution involves comparing data or listing values, ALWAYS structure it using a clean Markdown table (e.g., `| Variable | Value |`).
+- **Clean Spacing:** Ensure there are empty line breaks `\n\n` between block equations and paragraphs to make the layout breathe. Do not blindly copy unformatted block text.
 
 ### 🏫 INSTITUTE & YEAR FORMATTING RULES
 You must extract past-paper references accurately so they become beautiful tags in the UI. 
@@ -29,14 +29,14 @@ You must extract past-paper references accurately so they become beautiful tags 
 - **"years":** Provide a single comma-separated string of the exact starting years as 4-digit numbers (e.g., "2021, 2018"). If an exam was "2022-23", output ONLY "2022". If there are no years mentioned, output an empty string "".
 **Example:** If the question came in "Dhaka University 2021-22 and BUET 2018", your JSON should have: "institutes": "DU, BUET", "years": "2021, 2018"
 
-### 🧮 LaTeX & JSON Escaping System (CRITICAL)
+### 🧮 JSON Escaping System (CRITICAL)
 Your output must be valid JSON. Escaping characters correctly is mandatory.
-1. **LaTeX Conversion:** All mathematical, scientific, unit, and formulaic content must be converted to correct LaTeX syntax ($ or $$).
-2. **No LaTeX for Prose:** Standard text (especially Bangla) must remain OUTSIDE of math mode. Do not use \text{} to wrap long sentences of normal prose. 
+1. **LaTeX Conversion:** All mathematical, scientific, unit, and formulaic content must be converted to correct LaTeX syntax (`$` or `$$`).
+2. **No LaTeX for Prose:** Standard text (especially Bangla) must remain OUTSIDE of math mode. Do not use `\text{}` to wrap long sentences of normal prose. 
 3. **Strict JSON Escaping:**
-   - A single LaTeX backslash must be double-escaped in the JSON string. Example: \beta must be written as \\beta. \frac must be written as \\frac.
-   - Line breaks in text must be represented by \n in the JSON string (written as \\n if double escaping is required by context, but standard JSON expects \n for a new line within a string).
-   - If rendering a line break inside a LaTeX equation, use four backslashes: \\\\.
+   - A single LaTeX backslash must be double-escaped in the JSON string. Example: `\beta` must be written as `\\beta`. `\frac` must be written as `\\frac`.
+   - Line breaks in text must be represented by `\n` in the JSON string (written as `\\n` if double escaping is required by context, but standard JSON expects `\n` for a new line within a string).
+   - If rendering a line break inside a LaTeX equation, use four backslashes: `\\\\`.
 
 ### 📄 Output Schema
 Output an array of JSON objects strictly adhering to this schema. DO NOT wrap it in markdown code blocks, just output the raw JSON array:
@@ -48,13 +48,13 @@ Output an array of JSON objects strictly adhering to this schema. DO NOT wrap it
     "subject": "Physics",
     "chapter": "Thermodynamics",
     "topic": "",
-    "question": "If $\\alpha = 5$, what is the result?",
-    "option1": "First option text",
-    "option2": "Second option text",
-    "option3": "Third option text",
-    "option4": "Fourth option text",
+    "question": "If $\\alpha = 5$, what is the result using the formula $$ F = ma $$?",
+    "option1": "Result is **10**",
+    "option2": "Result is **20**",
+    "option3": "Result is **30**",
+    "option4": "Result is **40**",
     "answer": "option2",
-    "explanation": "Here is the step-by-step solution for the process:\\n\\n1. **First step:** We apply the formula  F = ma \\n2. **Second step:** We calculate the final result.\\n\\nTherefore, the correct answer is **option 2**.",
+    "explanation": "Here is the step-by-step solution for the process:\\n\\n1. **First step:** We apply the formula $$ F = ma $$\\n2. **Second step:** We calculate the final result.\\n\\nTherefore, the correct answer is **option 2**.",
     "difficulty": "Medium",
     "examType": "Engineering, Varsity",
     "institutes": "BUET, DU",

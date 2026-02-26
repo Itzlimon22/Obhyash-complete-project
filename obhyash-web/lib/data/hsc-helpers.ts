@@ -215,30 +215,46 @@ export function resolveTaxonomyHierarchy(
   chapInp: string,
   topInp: string,
 ): { subject: string; chapter: string; topic: string } {
-  // 1. Try resolving Topic first (as it's often the most specific)
-  const topicRes = findHscTopic(topInp, chapInp);
-  if (topicRes) {
-    return {
-      subject: topicRes.subject.name,
-      chapter: topicRes.chapter.name,
-      topic: topicRes.topic.name,
-    };
+  // Normalize inputs
+  const subjectInput = subjInp?.trim() || '';
+  const chapterInput = chapInp?.trim() || '';
+  const topicInput = topInp?.trim() || '';
+
+  // Helper to get subject name from resolved subject object
+  const getSubjectName = (s?: { name: string }) => (s ? s.name : subjectInput);
+
+  // 1. Try to resolve via Topic (most specific)
+  if (topicInput) {
+    const topicRes = findHscTopic(topicInput, chapterInput);
+    if (topicRes) {
+      return {
+        subject: topicRes.subject.name,
+        chapter: topicRes.chapter.name,
+        topic: topicRes.topic.name,
+      };
+    }
   }
 
-  // 2. Try resolving Chapter if Topic failed
-  const chapRes = findHscChapter(chapInp);
-  if (chapRes) {
-    return {
-      subject: chapRes.subject.name,
-      chapter: chapRes.chapter.name,
-      topic: resolveTopicName(chapRes.chapter.name, topInp) || topInp,
-    };
+  // 2. Resolve Chapter if Topic not found
+  if (chapterInput) {
+    const chapRes = findHscChapter(chapterInput);
+    if (chapRes) {
+      // Use provided subject if it resolves, otherwise fall back to chapter's subject
+      const subjectName =
+        resolveSubjectName(subjectInput) || chapRes.subject.name;
+      return {
+        subject: subjectName,
+        chapter: chapRes.chapter.name,
+        // Attempt to resolve topic within this chapter; fallback to raw input
+        topic: resolveTopicName(chapRes.chapter.name, topicInput) || topicInput,
+      };
+    }
   }
 
-  // 3. Last fallback: resolve Subject normally
-  const subjName = resolveSubjectName(subjInp) || subjInp;
-  const chapName = resolveChapterName(subjName, chapInp) || chapInp;
-  const topName = resolveTopicName(chapName, topInp) || topInp;
+  // 3. Fallback to Subject resolution then Chapter then Topic
+  const subjName = resolveSubjectName(subjectInput) || subjectInput;
+  const chapName = resolveChapterName(subjName, chapterInput) || chapterInput;
+  const topName = resolveTopicName(chapName, topicInput) || topicInput;
 
   return { subject: subjName, chapter: chapName, topic: topName };
 }

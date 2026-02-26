@@ -25,6 +25,9 @@ const LatexText: React.FC<LatexTextProps> = ({ text, className = '' }) => {
       <ReactMarkdown
         remarkPlugins={[remarkMath, remarkGfm]}
         rehypePlugins={[rehypeKatex, rehypeRaw]}
+        components={{
+          p: ({ node, ...props }) => <span {...props} className="block mb-1" />,
+        }}
       >
         {content}
       </ReactMarkdown>
