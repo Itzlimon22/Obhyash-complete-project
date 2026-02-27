@@ -387,10 +387,13 @@ export default async function BlogPostPage({
                   {post.author.initials}
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900 dark:text-slate-100">
+                  <Link
+                    href={`/blog/author/${encodeURIComponent(post.author.name)}`}
+                    className="font-bold text-lg text-slate-900 dark:text-slate-100 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+                  >
                     {post.author.name}
-                  </p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                  </Link>
+                  <p className="text-sm font-medium text-rose-600 dark:text-rose-400 mt-0.5">
                     {post.author.role}
                   </p>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed font-anek">

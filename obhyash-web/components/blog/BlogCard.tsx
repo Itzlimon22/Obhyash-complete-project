@@ -53,10 +53,14 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
                   {post.author.initials}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  <Link
+                    href={`/blog/author/${encodeURIComponent(post.author.name)}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+                  >
                     {post.author.name}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs text-slate-400 font-anek">
+                  </Link>
+                  <div className="flex items-center gap-2 text-xs text-slate-400 font-anek mt-0.5">
                     <span>{formatDate(post.publishedAt)}</span>
                     <span>·</span>
                     <Clock className="w-3 h-3" />
@@ -117,9 +121,17 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
                 {post.author.initials}
               </div>
               <div className="flex items-center gap-1.5 text-xs text-slate-400 font-anek">
+                <Link
+                  href={`/blog/author/${encodeURIComponent(post.author.name)}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="font-medium text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+                >
+                  {post.author.name}
+                </Link>
+                <span className="opacity-50">•</span>
                 <Clock className="w-3 h-3" />
                 <span>{post.readTime} মিনিট</span>
-                <span>·</span>
+                <span className="opacity-50">•</span>
                 <span>{formatDate(post.publishedAt)}</span>
               </div>
             </div>

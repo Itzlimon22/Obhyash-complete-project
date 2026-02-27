@@ -20,6 +20,7 @@ import {
   BookOpen,
   Bell,
   AlertTriangle,
+  MessageSquare,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@/lib/utils/supabase';
@@ -106,6 +107,12 @@ const SIDEBAR_NAVIGATION: { title?: string; items: NavItem[] }[] = [
         icon: AlertTriangle,
         href: '/admin/complaints',
         count: 0,
+      },
+      {
+        id: 'blog-management',
+        label: 'ব্লগ ম্যানেজমেন্ট',
+        icon: MessageSquare,
+        href: '/admin/blog-management',
       },
     ],
   },
