@@ -9,15 +9,15 @@ interface BlogCardProps {
 
 const CATEGORY_COLORS: Record<string, string> = {
   'Study Tips':
-    'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 border-rose-100 dark:border-rose-500/20',
+    'bg-slate-100 text-slate-700 dark:bg-[#202020] dark:text-slate-300 border-slate-200 dark:border-[#383838]',
   'MCQ Techniques':
-    'bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400 border-violet-100 dark:border-violet-500/20',
+    'bg-slate-100 text-slate-700 dark:bg-[#202020] dark:text-slate-300 border-slate-200 dark:border-[#383838]',
   'Exam Prep':
-    'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20',
+    'bg-slate-100 text-slate-700 dark:bg-[#202020] dark:text-slate-300 border-slate-200 dark:border-[#383838]',
   'Time Management':
-    'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 border-amber-100 dark:border-amber-500/20',
+    'bg-slate-100 text-slate-700 dark:bg-[#202020] dark:text-slate-300 border-slate-200 dark:border-[#383838]',
   Motivation:
-    'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400 border-sky-100 dark:border-sky-500/20',
+    'bg-slate-100 text-slate-700 dark:bg-[#202020] dark:text-slate-300 border-slate-200 dark:border-[#383838]',
 };
 
 function formatDate(dateStr: string) {
@@ -37,10 +37,7 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
   if (featured) {
     return (
       <Link href={`/blog/${post.slug}`} className="group block">
-        <article className="relative overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-rose-200 dark:hover:border-rose-900/60 shadow-sm hover:shadow-xl hover:shadow-rose-500/10 transition-all duration-300 hover:-translate-y-1">
-          {/* Gradient top bar */}
-          <div className={`h-1.5 w-full bg-gradient-to-r ${post.coverColor}`} />
-
+        <article className="relative overflow-hidden rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] hover:border-slate-300 dark:hover:border-[#404040] shadow-sm hover:shadow-md transition-all duration-200">
           <div className="p-6 sm:p-8 md:p-10">
             {/* Featured badge + Category */}
             <div className="flex flex-wrap items-center gap-2.5 mb-5">
@@ -55,10 +52,10 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mb-4 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors duration-200 leading-snug">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors duration-200 leading-[1.6]">
               {post.title}
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 text-base leading-relaxed mb-6 line-clamp-3">
+            <p className="text-slate-500 dark:text-slate-400 text-[15px] sm:text-base leading-[1.7] mb-6 line-clamp-3">
               {post.excerpt}
             </p>
 
@@ -66,7 +63,7 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 {/* Author avatar */}
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center text-white text-xs font-bold shadow-md shadow-rose-500/30">
+                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 text-[10px] font-bold">
                   {post.author.initials}
                 </div>
                 <div>
@@ -82,9 +79,9 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
                 </div>
               </div>
 
-              <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-500 to-rose-600 text-white text-sm font-semibold rounded-xl shadow-md shadow-rose-500/30 group-hover:shadow-rose-500/50 group-hover:scale-[1.03] transition-all duration-200">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-[#1e1e1e] hover:bg-slate-200 dark:hover:bg-[#2b2b2b] text-slate-700 dark:text-slate-300 text-sm font-semibold rounded-lg transition-all duration-200">
                 Read Article
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
               </span>
             </div>
           </div>
@@ -95,10 +92,7 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
 
   return (
     <Link href={`/blog/${post.slug}`} className="group block h-full">
-      <article className="flex flex-col h-full overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-rose-200 dark:hover:border-rose-900/60 shadow-sm hover:shadow-lg hover:shadow-rose-500/10 transition-all duration-300 hover:-translate-y-1">
-        {/* Gradient top bar */}
-        <div className={`h-1 w-full bg-gradient-to-r ${post.coverColor}`} />
-
+      <article className="flex flex-col h-full overflow-hidden rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] hover:border-slate-300 dark:hover:border-[#404040] shadow-sm hover:shadow-md transition-all duration-200">
         <div className="flex flex-col flex-1 p-5 sm:p-6">
           {/* Category badge */}
           <div className="mb-4">
@@ -110,10 +104,10 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
             </span>
           </div>
 
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3 line-clamp-2 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors duration-200 leading-snug">
+          <h3 className="text-[17px] font-bold text-slate-900 dark:text-slate-100 mb-2.5 line-clamp-2 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors duration-200 leading-[1.6]">
             {post.title}
           </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-5 line-clamp-3 flex-grow">
+          <p className="text-[14px] text-slate-500 dark:text-slate-400 leading-[1.7] mb-5 line-clamp-3 flex-grow">
             {post.excerpt}
           </p>
 
@@ -129,11 +123,10 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
             ))}
           </div>
 
-          {/* Author & meta */}
-          <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-[#2b2b2b]">
             <div className="flex items-center gap-2">
               <div
-                className={`w-7 h-7 rounded-full bg-gradient-to-br ${post.coverColor} flex items-center justify-center text-white text-[10px] font-bold`}
+                className={`w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 text-[9px] font-bold`}
               >
                 {post.author.initials}
               </div>

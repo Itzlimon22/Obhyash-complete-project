@@ -129,51 +129,30 @@ export default async function BlogPostPage({
       <ViewTracker slug={post.slug} />
 
       {/* ─── Post Hero ─── */}
-      <section className="relative overflow-hidden bg-white dark:bg-slate-900 border-b border-slate-200/70 dark:border-slate-800">
-        {/* Gradient color bar at top based on category */}
-        <div className={`h-1 w-full bg-gradient-to-r ${post.coverColor}`} />
-
-        {/* Background grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b40_1px,transparent_1px),linear-gradient(to_bottom,#1e293b40_1px,transparent_1px)] bg-[size:3rem_3rem]" />
-        <div className="absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-rose-50/60 via-transparent to-transparent dark:from-rose-950/15" />
-
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+      <section className="bg-white dark:bg-[#121212]">
+        <div className="relative max-w-4xl mx-auto mt-16 px-4 sm:px-6">
           {/* Breadcrumb */}
-          <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 mb-8">
+          <div className="flex flex-wrap items-center gap-1.5 text-[13px] text-slate-400 dark:text-slate-500 mb-8 font-medium">
             <Link
               href="/blog"
-              className="hover:text-rose-500 transition-colors flex items-center gap-1"
+              className="hover:text-slate-800 dark:hover:text-slate-300 transition-colors flex items-center gap-1"
             >
-              <BookOpen className="w-3 h-3" />
+              <BookOpen className="w-3.5 h-3.5" />
               Blog
             </Link>
-            <span>/</span>
-            <span className="text-slate-600 dark:text-slate-300 font-medium truncate max-w-[200px] sm:max-w-none">
-              {post.title}
-            </span>
           </div>
 
-          {/* Category badge */}
-          <div className="mb-5">
-            <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border ${categoryStyle}`}
-            >
-              <Tag className="w-3 h-3" />
-              {post.category}
-            </span>
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white leading-[1.15] tracking-tight mb-5">
+          <h1 className="text-3xl sm:text-4xl md:text-[44px] font-bold text-slate-900 dark:text-slate-100 leading-[1.2] tracking-tight mb-8">
             {post.title}
           </h1>
-          <p className="text-lg text-slate-500 dark:text-slate-400 leading-relaxed mb-8 max-w-2xl">
+          <p className="text-lg text-slate-500 dark:text-slate-400 leading-[1.6] mb-8 font-medium">
             {post.excerpt}
           </p>
 
           {/* Author meta row */}
-          <div className="flex flex-wrap items-center gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex flex-wrap items-center gap-4 pb-8 border-b border-slate-100 dark:border-[#2b2b2b]">
             <div
-              className={`w-10 h-10 rounded-full bg-gradient-to-br ${post.coverColor} flex items-center justify-center text-white text-sm font-bold shadow-md`}
+              className={`w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 text-sm font-semibold`}
             >
               {post.author.initials}
             </div>
@@ -214,14 +193,16 @@ export default async function BlogPostPage({
             {/* Post body */}
             <div
               className="prose prose-slate dark:prose-invert max-w-none
-                prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-slate-900 dark:prose-headings:text-white
-                prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:pb-3 prose-h2:border-b prose-h2:border-slate-100 dark:prose-h2:border-slate-800
-                prose-h3:text-xl prose-h3:mt-8
-                prose-p:text-slate-600 dark:prose-p:text-slate-300 prose-p:leading-8 prose-p:text-base sm:prose-p:text-[17px]
-                prose-li:text-slate-600 dark:prose-li:text-slate-300 prose-li:leading-7
-                prose-strong:text-slate-900 dark:prose-strong:text-white prose-strong:font-bold
-                prose-a:text-rose-600 dark:prose-a:text-rose-400 prose-a:no-underline hover:prose-a:underline
-                prose-ul:space-y-1 prose-ol:space-y-1
+                text-slate-900 dark:text-slate-50
+                prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-slate-900 dark:prose-headings:text-slate-100
+                prose-h2:text-2xl sm:prose-h2:text-[26px] prose-h2:mt-12 prose-h2:mb-4 prose-h2:border-none
+                prose-h3:text-xl sm:prose-h3:text-[22px] prose-h3:mt-8
+                prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-p:leading-[1.8] sm:prose-p:leading-[1.9] prose-p:text-[17px] sm:prose-p:text-[18px] prose-p:mb-8
+                prose-li:text-slate-700 dark:prose-li:text-slate-300 prose-li:leading-[1.8] prose-li:text-[17px] sm:prose-li:text-[18px]
+                prose-strong:text-slate-900 dark:prose-strong:text-slate-100 font-medium
+                prose-a:text-slate-900 dark:prose-a:text-slate-200 prose-a:underline hover:prose-a:no-underline
+                prose-blockquote:border-l-4 prose-blockquote:border-slate-800 dark:prose-blockquote:border-slate-200 prose-blockquote:pl-6 prose-blockquote:italic
+                prose-ul:space-y-2 prose-ol:space-y-2
               "
             >
               <ReactMarkdown
@@ -250,15 +231,15 @@ export default async function BlogPostPage({
             </div>
 
             {/* Author Bio block */}
-            <div className="mt-10 p-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+            <div className="mt-10 p-6 rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b]">
               <div className="flex items-start gap-4">
                 <div
-                  className={`w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br ${post.coverColor} flex items-center justify-center text-white font-bold text-lg shadow-md`}
+                  className={`w-12 h-12 shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-semibold text-lg`}
                 >
                   {post.author.initials}
                 </div>
                 <div>
-                  <p className="font-bold text-slate-900 dark:text-white">
+                  <p className="font-semibold text-slate-900 dark:text-slate-100">
                     {post.author.name}
                   </p>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
@@ -278,32 +259,29 @@ export default async function BlogPostPage({
           <aside className="lg:w-[35%] xl:w-[32%] space-y-6">
             <div className="lg:sticky lg:top-24 space-y-6">
               {/* Dashboard promo */}
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-500 to-rose-700 p-6 text-white shadow-xl shadow-rose-500/20">
-                <div className="absolute -top-8 -right-8 w-28 h-28 bg-white/10 rounded-full blur-2xl pointer-events-none" />
-                <div className="relative z-10">
-                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-4">
-                    <LayoutDashboard className="w-5 h-5" />
-                  </div>
-                  <h3 className="font-extrabold text-lg mb-2">
-                    Practice Makes Perfect
-                  </h3>
-                  <p className="text-rose-100 text-sm leading-relaxed mb-5">
-                    Apply what you&apos;ve read with real board-level MCQ exams
-                    on Obhyash.
-                  </p>
-                  <Link
-                    href="/"
-                    className="flex items-center justify-center gap-2 w-full py-2.5 bg-white text-rose-600 font-bold text-sm rounded-xl hover:bg-rose-50 hover:scale-[1.02] transition-all duration-200 shadow-md"
-                  >
-                    Go to Dashboard
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
+              <div className="rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] p-6 text-slate-900 dark:text-slate-100">
+                <div className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-[#2b2b2b] flex items-center justify-center mb-4">
+                  <LayoutDashboard className="w-4 h-4 text-slate-700 dark:text-slate-300" />
                 </div>
+                <h3 className="font-bold text-[15px] mb-2">
+                  Practice Makes Perfect
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-[1.6] mb-5">
+                  Apply what you&apos;ve read with real board-level MCQ exams on
+                  Obhyash.
+                </p>
+                <Link
+                  href="/"
+                  className="flex items-center justify-center gap-2 w-full py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-medium text-sm rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
+                >
+                  Go to Dashboard
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
 
               {/* Reading info card */}
-              <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 space-y-3">
-                <h3 className="font-bold text-sm text-slate-900 dark:text-white uppercase tracking-wider">
+              <div className="rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] p-5 space-y-3">
+                <h3 className="font-semibold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   Article Info
                 </h3>
                 <div className="space-y-2 text-sm text-slate-500 dark:text-slate-400">
@@ -336,10 +314,9 @@ export default async function BlogPostPage({
                 </div>
               </div>
 
-              {/* Related posts */}
               {related.length > 0 && (
-                <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5">
-                  <h3 className="font-bold text-sm text-slate-900 dark:text-white uppercase tracking-wider mb-4">
+                <div className="rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] p-5">
+                  <h3 className="font-semibold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">
                     Related Posts
                   </h3>
                   <div className="space-y-4">
@@ -371,7 +348,7 @@ export default async function BlogPostPage({
               {/* All posts link */}
               <Link
                 href="/blog"
-                className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border-2 border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 font-semibold text-sm hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:border-rose-300 dark:hover:border-rose-700 transition-all duration-200"
+                className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-[#383838] text-slate-600 dark:text-slate-300 font-medium text-[13px] hover:bg-slate-50 dark:hover:bg-[#1a1a1a] transition-colors"
               >
                 <BookOpen className="w-4 h-4" />
                 View All Articles

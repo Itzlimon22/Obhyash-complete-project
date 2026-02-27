@@ -52,30 +52,22 @@ export default function BlogListingClient({
   return (
     <>
       {/* ─── Hero Section ─── */}
-      <section className="relative overflow-hidden bg-white dark:bg-slate-900 border-b border-slate-200/70 dark:border-slate-800">
-        {/* Background grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b40_1px,transparent_1px),linear-gradient(to_bottom,#1e293b40_1px,transparent_1px)] bg-[size:3rem_3rem]" />
-        {/* Radial glow */}
-        <div className="absolute inset-x-0 top-0 h-96 bg-gradient-to-b from-rose-50/70 via-transparent to-transparent dark:from-rose-950/20 dark:via-transparent" />
-
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
+      <section className="relative overflow-hidden bg-white dark:bg-[#121212] border-b border-slate-100 dark:border-[#2b2b2b]">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
           {/* Pill badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-full border border-rose-100 dark:border-rose-500/20 uppercase tracking-wider animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 bg-slate-100 dark:bg-[#202020] text-slate-600 dark:text-slate-300 text-xs font-semibold rounded-full border border-slate-200 dark:border-[#383838] uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
             Knowledge for Students
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 dark:text-white leading-[1.1] tracking-tight mb-5 animate-fade-in">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-slate-50 leading-[1.25] tracking-tight mb-5 animate-fade-in">
             Study Smarter,{' '}
-            <span className="relative inline-block">
-              <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-rose-700">
-                Score Higher
-              </span>
-              <span className="absolute inset-x-0 bottom-1 h-3 bg-rose-100 dark:bg-rose-500/20 -z-10 rounded-sm" />
+            <span className="text-slate-600 dark:text-slate-400">
+              Score Higher
             </span>
           </h1>
 
-          <p className="text-lg sm:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10">
+          <p className="text-base sm:text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10">
             Expert tips, proven exam strategies, and insights to help
             Bangladeshi students ace SSC, HSC, and beyond.
           </p>
@@ -89,9 +81,9 @@ export default function BlogListingClient({
             ].map(({ icon: Icon, label }) => (
               <div
                 key={label}
-                className="flex items-center gap-2 text-sm font-semibold text-slate-500 dark:text-slate-400"
+                className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-500"
               >
-                <Icon className="w-4 h-4 text-rose-500" />
+                <Icon className="w-4 h-4" />
                 {label}
               </div>
             ))}
@@ -105,24 +97,24 @@ export default function BlogListingClient({
               placeholder="Search articles…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 shadow-sm shadow-slate-900/5 focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-400 transition-all text-sm"
+              className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-[#383838] bg-slate-50 dark:bg-[#1a1a1a] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 transition-all text-sm"
             />
           </div>
         </div>
       </section>
 
       {/* ─── Category Filter ─── */}
-      <div className="sticky top-16 z-40 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-800/60">
+      <div className="sticky top-16 z-40 bg-white/90 dark:bg-[#121212]/90 backdrop-blur-md border-b border-slate-100 dark:border-[#2b2b2b]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 overflow-x-auto">
           <div className="flex items-center gap-2 min-w-max mx-auto justify-start sm:justify-center">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-200 border ${
+                className={`px-3 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors border ${
                   activeCategory === cat
-                    ? 'bg-rose-500 text-white border-rose-500 shadow-md shadow-rose-500/30 scale-[1.03]'
-                    : 'bg-white dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-rose-200 dark:hover:border-rose-900 hover:text-rose-600 dark:hover:text-rose-400'
+                    ? 'bg-slate-800 text-white border-slate-800 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200'
+                    : 'bg-transparent text-slate-600 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-[#202020]'
                 }`}
               >
                 {cat}
@@ -138,17 +130,17 @@ export default function BlogListingClient({
         {!searchQuery &&
           activeCategory === 'All' &&
           recommendedPosts.length > 0 && (
-            <div className="mb-16 pt-4 border-b border-slate-100 dark:border-slate-800/80 pb-16">
+            <div className="mb-16 pt-4 border-b border-slate-100 dark:border-[#2b2b2b] pb-16">
               {isGuest ? (
                 <>
                   <div className="flex items-center gap-2 mb-5">
-                    <TrendingUp className="w-5 h-5 text-rose-500" />
+                    <TrendingUp className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                     <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">
                       Trending among Students
                     </h2>
                   </div>
-                  <div className="bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-500/10 dark:to-pink-500/10 border border-rose-100 dark:border-rose-500/20 rounded-2xl p-6 mb-8 text-center flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
-                    <p className="text-rose-800 dark:text-rose-300 font-medium text-sm sm:text-base text-left max-w-2xl leading-relaxed">
+                  <div className="bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] rounded-xl p-6 mb-8 text-center flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <p className="text-slate-600 dark:text-slate-400 font-medium text-sm sm:text-[15px] text-left max-w-2xl leading-[1.6]">
                       <strong>New here?</strong> Register on Obhyash to get
                       personalized study tips, exam strategies, and articles
                       tailored exactly to your academic weak subjects based on
@@ -156,7 +148,7 @@ export default function BlogListingClient({
                     </p>
                     <a
                       href="/login"
-                      className="shrink-0 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl transition-all shadow-md shadow-rose-500/20 text-sm hover:-translate-y-0.5 whitespace-nowrap"
+                      className="shrink-0 px-5 py-2.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-medium rounded-lg transition-colors text-sm hover:bg-slate-800 dark:hover:bg-slate-200 whitespace-nowrap"
                     >
                       Create Free Account
                     </a>
@@ -164,8 +156,8 @@ export default function BlogListingClient({
                 </>
               ) : (
                 <div className="flex items-center gap-2 mb-6">
-                  <Sparkles className="w-6 h-6 text-rose-500" />
-                  <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 tracking-tight">
+                  <Sparkles className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+                  <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 tracking-tight">
                     Recommended for You
                   </h2>
                 </div>
@@ -178,12 +170,11 @@ export default function BlogListingClient({
             </div>
           )}
 
-        {/* Featured Post */}
         {showFeatured && (
           <div className="mb-10">
-            <div className="flex items-center gap-2 mb-5">
-              <Sparkles className="w-4 h-4 text-rose-500" />
-              <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-4 h-4 text-slate-400" />
+              <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 Featured Post
               </h2>
             </div>
@@ -238,26 +229,22 @@ export default function BlogListingClient({
 
       {/* ─── CTA Banner ─── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-rose-500 via-rose-600 to-rose-700 p-8 sm:p-12 text-white text-center shadow-2xl shadow-rose-500/30">
-          {/* Decorative blobs */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-
+        <div className="relative overflow-hidden rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] p-8 sm:p-12 text-center shadow-sm">
           <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-5 bg-white/20 text-white text-xs font-bold rounded-full uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-3 py-1 mb-5 bg-white/50 dark:bg-[#2a2a2a] text-slate-600 dark:text-slate-300 text-[11px] font-bold rounded-full uppercase tracking-wider border border-slate-200 dark:border-[#383838]">
               <Sparkles className="w-3.5 h-3.5" />
               Obhyash Platform
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold mb-3">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-3">
               Ready to practice what you&apos;ve learned?
             </h2>
-            <p className="text-rose-100 mb-7 max-w-lg mx-auto">
+            <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-lg mx-auto text-[15px] leading-[1.6]">
               Take real board-level MCQ practice exams, track your progress, and
               identify weak spots — all in one place.
             </p>
             <a
               href="/"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-rose-600 font-bold rounded-xl hover:bg-rose-50 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 shadow-lg"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors text-sm"
             >
               Open Student Dashboard
             </a>
