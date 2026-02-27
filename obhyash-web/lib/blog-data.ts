@@ -1,5 +1,9 @@
 import { Client } from '@notionhq/client';
 import { NotionToMarkdown } from 'notion-to-md';
+import { unstable_cache } from 'next/cache';
+import fs from 'fs';
+import path from 'path';
+import matter from 'gray-matter';
 
 export interface BlogPost {
   slug: string;
@@ -60,11 +64,7 @@ const getPropertyValue = (property: any, type: string): any => {
   }
 };
 
-let cachedPosts: BlogPost[] | null = null;
-let lastFetchTime = 0;
-const CACHE_TTL = 3600 * 1000; // 1 hour cache in memory to avoid Rate Limits
-
-export async function getAllPosts(): Promise<BlogPost[]> {
+const fetchAllPostsFromNotion = async (): Promise<BlogPost[]> => {
   if (!process.env.NOTION_API_KEY || !process.env.NOTION_DATABASE_ID) {
     console.warn(
       'NOTION_API_KEY or NOTION_DATABASE_ID not set. Returning empty blog posts.',
@@ -72,15 +72,10 @@ export async function getAllPosts(): Promise<BlogPost[]> {
     return [];
   }
 
-  // Basic in-memory caching
-  const now = Date.now();
-  if (cachedPosts && now - lastFetchTime < CACHE_TTL) {
-    return cachedPosts;
-  }
-
   try {
     const response = await (notion.databases as any).query({
       database_id: process.env.NOTION_DATABASE_ID,
+      page_size: 100, // Reasonable limit to prevent massive payload timeouts
       filter: {
         property: 'Status',
         status: {
@@ -141,14 +136,75 @@ export async function getAllPosts(): Promise<BlogPost[]> {
       }),
     );
 
-    cachedPosts = posts;
-    lastFetchTime = now;
     return posts;
   } catch (error) {
     console.error('Error fetching Notion blog posts:', error);
     return [];
   }
-}
+};
+
+const getLocalPosts = async (): Promise<BlogPost[]> => {
+  const contentDir = path.join(process.cwd(), 'content', 'blog');
+
+  if (!fs.existsSync(contentDir)) {
+    return [];
+  }
+
+  const files = fs
+    .readdirSync(contentDir)
+    .filter((file) => file.endsWith('.md'));
+
+  const posts = files.map((file) => {
+    const filePath = path.join(contentDir, file);
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    const { data, content } = matter(fileContent);
+
+    return {
+      slug: data.slug || file.replace(/\.md$/, ''),
+      title: data.title || 'Untitled',
+      excerpt: data.excerpt || '',
+      category: data.category || 'Uncategorized',
+      tags: data.tags || [],
+      author: {
+        name: data.author?.name || 'Obhyash Team',
+        role: data.author?.role || 'Editor',
+        initials: data.author?.initials || 'OT',
+      },
+      publishedAt:
+        data.publishedAt || new Date(fs.statSync(filePath).mtime).toISOString(),
+      readTime: data.readTime || 5,
+      featured: data.featured || false,
+      coverColor: data.coverColor || 'from-neutral-500 to-neutral-600',
+      content: content,
+    } as BlogPost;
+  });
+
+  return posts;
+};
+
+export const getAllPosts = unstable_cache(
+  async () => {
+    // Fetch from both robust sources concurrently
+    const [notionPosts, localPosts] = await Promise.all([
+      fetchAllPostsFromNotion(),
+      getLocalPosts(),
+    ]);
+
+    // Combine and sort by date descending (newest first)
+    const combinedPosts = [...notionPosts, ...localPosts];
+    combinedPosts.sort(
+      (a, b) =>
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+    );
+
+    return combinedPosts;
+  },
+  ['obhyash-blog-posts'],
+  {
+    revalidate: 3600,
+    tags: ['blog-posts'],
+  },
+);
 
 export async function getBlogPost(slug: string): Promise<BlogPost | undefined> {
   const posts = await getAllPosts();
