@@ -223,6 +223,20 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [supabase, router, user?.id]);
 
+  // Keep‑alive ping to maintain Supabase session
+  useEffect(() => {
+    if (!supabase) return;
+    const interval = setInterval(
+      () => {
+        fetch('/api/ping', { method: 'GET', credentials: 'include' }).catch(
+          () => {},
+        );
+      },
+      5 * 60 * 1000,
+    ); // every 5 minutes
+    return () => clearInterval(interval);
+  }, [supabase]);
+  // Sign out function
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -231,6 +245,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/login');
   };
 
+  // Refresh profile function
   const refreshProfile = async () => {
     if (user) {
       const userProfile = await fetchProfile(user.id);
