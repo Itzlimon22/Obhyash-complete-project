@@ -94,11 +94,11 @@ export const NotificationDropdown = () => {
   const loadNotifications = useCallback(async () => {
     setLoading(true);
     try {
-      const [notifications, unreadCount] = await Promise.all([
-        getNotifications(),
+      const [{ data: notificationsData }, unreadCount] = await Promise.all([
+        getNotifications(10, 0),
         getUnreadNotificationCount(),
       ]);
-      setNotifications(notifications);
+      setNotifications(notificationsData);
       setUnreadCount(unreadCount);
     } catch (error) {
       console.error('Failed to load notifications', error);

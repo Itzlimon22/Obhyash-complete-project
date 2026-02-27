@@ -106,7 +106,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
       setNotificationsLoading(true);
       try {
-        const notifs = await getNotifications();
+        const { data: notifs } = await getNotifications();
         setNotifications(notifs);
 
         const count = await getUnreadNotificationCount();

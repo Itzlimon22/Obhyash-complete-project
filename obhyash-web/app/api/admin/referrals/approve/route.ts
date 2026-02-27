@@ -85,17 +85,37 @@ export const POST = async (req: Request) => {
   }
 
   // Action is approve
-  // Helper: extend subscription by 1 month
+  // Helper: extend subscription by 30 days
   const extendSubscription = async (userId: string) => {
     const { data: userProfile } = await supabaseAdmin
       .from('users')
       .select('subscription')
       .eq('id', userId)
       .single();
+
     const sub = userProfile?.subscription || {};
-    const currentExpiry = sub.expiry ? new Date(sub.expiry) : new Date();
-    if (currentExpiry < new Date()) currentExpiry.setTime(new Date().getTime());
-    currentExpiry.setMonth(currentExpiry.getMonth() + 1);
+
+    // Parse existing expiry or use current date if none
+    let currentExpiry = new Date();
+    if (sub.expiry) {
+      const parsedExpiry = new Date(sub.expiry);
+      // Validate that the parsed date is actually valid before using it
+      if (!isNaN(parsedExpiry.getTime())) {
+        currentExpiry = parsedExpiry;
+      }
+    }
+
+    const now = new Date();
+
+    // If the expiry is in the past (or it's a new sub), reset it to right now
+    if (currentExpiry < now) {
+      currentExpiry = new Date();
+    }
+
+    // Add exactly 30 days accurately using Date methods (better than setMonth because
+    // setMonth can cause issues at the end of months like Jan 31 -> Feb 28/31)
+    currentExpiry.setDate(currentExpiry.getDate() + 30);
+
     await supabaseAdmin
       .from('users')
       .update({

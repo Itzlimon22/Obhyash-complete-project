@@ -6,14 +6,16 @@ import {
 import { supabase, isSupabaseConfigured } from './core';
 
 /**
- * Get user's notifications
- * @param limit - Number of notifications to fetch (default: 10)
+ * Get user's notifications with pagination
+ * @param limit - Number of notifications to fetch (default: 50)
+ * @param offset - Pagination offset (default: 0)
  * @param unreadOnly - Fetch only unread notifications
  */
 export const getNotifications = async (
-  limit: number = 10,
+  limit: number = 50,
+  offset: number = 0,
   unreadOnly: boolean = false,
-): Promise<Notification[]> => {
+): Promise<{ data: Notification[]; hasMore: boolean }> => {
   if (isSupabaseConfigured() && supabase) {
     try {
       const {
@@ -22,36 +24,38 @@ export const getNotifications = async (
 
       if (!user) {
         console.warn('No authenticated user found');
-        return [];
+        return { data: [], hasMore: false };
       }
 
       let query = supabase
         .from('notifications')
-        .select('*')
+        .select('*', { count: 'exact' })
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(limit);
+        .range(offset, offset + limit - 1);
 
       if (unreadOnly) {
         query = query.eq('is_read', false);
       }
 
-      const { data, error } = await query;
+      const { data, count, error } = await query;
 
       if (error) {
         console.error('Error fetching notifications:', error);
         throw error;
       }
 
-      return data || [];
+      const hasMore = count ? offset + (data?.length || 0) < count : false;
+
+      return { data: data || [], hasMore };
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
-      return [];
+      return { data: [], hasMore: false };
     }
   }
 
   // Return empty array if database not configured
-  return [];
+  return { data: [], hasMore: false };
 };
 
 /**
