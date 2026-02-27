@@ -2,15 +2,12 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getBlogPost } from '@/lib/blog-data';
-import { getAdvancedRecommendations } from '@/lib/blog-recommendations';
-import { createClient } from '@/utils/supabase/server';
 import ViewTracker from '@/components/blog/ViewTracker';
 import {
   ArrowLeft,
   Clock,
   Calendar,
   Tag,
-  LayoutDashboard,
   ArrowRight,
   BookOpen,
   Info,
@@ -89,13 +86,6 @@ export default async function BlogPostPage({
   const { slug } = await params;
   const post = await getBlogPost(slug);
   if (!post) notFound();
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const related = await getAdvancedRecommendations(post.slug, user?.id);
 
   const categoryStyle =
     'bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700';
@@ -301,11 +291,10 @@ export default async function BlogPostPage({
         </div>
       </section>
 
-      {/* ─── Two-column layout ─── */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-        <div className="flex flex-col lg:flex-row-reverse gap-8 lg:gap-12 xl:gap-16 justify-end">
-          {/* ── Article Content (Right on Desktop / 70%) ── */}
-          <article className="lg:w-[68%] xl:w-[72%] min-w-0">
+      {/* ─── Single-column layout ─── */}
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+        <div className="flex flex-col gap-10">
+          <article className="min-w-0">
             {/* Back link */}
             <Link
               href="/blog"
@@ -315,6 +304,46 @@ export default async function BlogPostPage({
               ব্লগে ফিরে যান
             </Link>
 
+            {/* Top Cards: Table of Contents & Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+              <TableOfContents items={tocItems} />
+
+              {/* Reading info card */}
+              <div className="rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] p-5 space-y-3 font-anek">
+                <h3 className="font-semibold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  আর্টিকেল তথ্য
+                </h3>
+                <div className="space-y-4 text-sm text-slate-500 dark:text-slate-400 mt-4">
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <Clock className="w-4 h-4" /> পড়ার সময়
+                    </span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-200">
+                      {post.readTime} মিনিট
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" /> প্রকাশিত
+                    </span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-200">
+                      {formatDate(post.publishedAt)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <Tag className="w-4 h-4" /> ক্যাটাগরি
+                    </span>
+                    <span
+                      className={`font-semibold px-2.5 py-1 text-xs rounded-full border ${categoryStyle}`}
+                    >
+                      {post.category}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Post body */}
             <div
               className="prose prose-slate dark:prose-invert max-w-none
@@ -322,7 +351,7 @@ export default async function BlogPostPage({
                 prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-slate-900 dark:prose-headings:text-slate-100
                 prose-h2:text-2xl sm:prose-h2:text-[26px] prose-h2:mt-12 prose-h2:mb-4 prose-h2:border-none
                 prose-h3:text-xl sm:prose-h3:text-[22px] prose-h3:mt-8
-                prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-p:leading-[1.8] sm:prose-p:leading-[1.9] prose-p:text-[17px] sm:prose-p:text-[18px] prose-p:mb-8
+                prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-p:leading-[1.8] sm:prose-p:leading-[1.9] prose-p:text-[17px] sm:prose-p:text-[18px] prose-p:mb-8 text-justify
                 prose-li:text-slate-700 dark:prose-li:text-slate-300 prose-li:leading-[1.8] prose-li:text-[17px] sm:prose-li:text-[18px]
                 prose-strong:text-slate-900 dark:prose-strong:text-slate-100 font-medium
                 prose-a:text-slate-900 dark:prose-a:text-slate-200 prose-a:underline hover:prose-a:no-underline
@@ -407,108 +436,6 @@ export default async function BlogPostPage({
               <CommentSection postSlug={post.slug} />
             </div>
           </article>
-
-          {/* ── Sticky Sidebar (Left on Desktop / 30%) ── */}
-          <aside className="lg:w-[32%] xl:w-[28%] space-y-6">
-            <div className="lg:sticky lg:top-24 space-y-6">
-              {/* Dashboard promo */}
-              <div className="rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] p-6 text-slate-900 dark:text-slate-100 font-anek">
-                <div className="w-8 h-8 rounded-lg bg-slate-200 dark:bg-[#2b2b2b] flex items-center justify-center mb-4">
-                  <LayoutDashboard className="w-4 h-4 text-slate-700 dark:text-slate-300" />
-                </div>
-                <h3 className="font-bold text-[15px] mb-2">অনুশীলনেই সাফল্য</h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm leading-[1.6] mb-5">
-                  আপনি যা পড়েছেন তা অভ্যাস-এ রিয়েল বোর্ড-স্ট্যান্ডার্ড MCQ
-                  পরীক্ষার মাধ্যমে প্রয়োগ করুন।
-                </p>
-                <Link
-                  href="/"
-                  className="flex items-center justify-center gap-2 w-full py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-medium text-sm rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
-                >
-                  ড্যাশবোর্ডে যান
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-
-              {/* Table of Contents */}
-              <TableOfContents items={tocItems} />
-
-              {/* Reading info card */}
-              <div className="rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] p-5 space-y-3 font-anek">
-                <h3 className="font-semibold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  আর্টিকেল তথ্য
-                </h3>
-                <div className="space-y-2 text-sm text-slate-500 dark:text-slate-400">
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Clock className="w-3.5 h-3.5" /> পড়ার সময়
-                    </span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-200">
-                      {post.readTime} মিনিট
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5" /> প্রকাশিত
-                    </span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-200">
-                      {formatDate(post.publishedAt)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Tag className="w-3.5 h-3.5" /> ক্যাটাগরি
-                    </span>
-                    <span
-                      className={`font-semibold px-2 py-0.5 text-xs rounded-full border ${categoryStyle}`}
-                    >
-                      {post.category}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {related.length > 0 && (
-                <div className="rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] p-5 font-anek">
-                  <h3 className="font-semibold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">
-                    সম্পর্কিত পোস্ট
-                  </h3>
-                  <div className="space-y-4">
-                    {related.map((rp) => (
-                      <Link
-                        key={rp.slug}
-                        href={`/blog/${rp.slug}`}
-                        className="group flex items-start gap-3"
-                      >
-                        <div
-                          className={`w-8 h-8 shrink-0 rounded-lg bg-gradient-to-br ${rp.coverColor} flex items-center justify-center text-white text-xs font-bold`}
-                        >
-                          {rp.author.initials}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors line-clamp-2 leading-snug">
-                            {rp.title}
-                          </p>
-                          <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-                            <Clock className="w-3 h-3" /> {rp.readTime} মিনিট
-                          </p>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* All posts link */}
-              <Link
-                href="/blog"
-                className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-[#383838] text-slate-600 dark:text-slate-300 font-medium text-[13px] hover:bg-slate-50 dark:hover:bg-[#1a1a1a] transition-colors font-anek"
-              >
-                <BookOpen className="w-4 h-4" />
-                সকল আর্টিকেল দেখুন
-              </Link>
-            </div>
-          </aside>
         </div>
       </div>
     </>

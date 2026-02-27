@@ -49,7 +49,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     { id: 'history', label: 'ইতিহাস', icon: Clock },
     { id: 'leaderboard', label: 'লিডারবোর্ড', icon: Trophy },
     { id: 'analysis', label: 'এনালাইসিস', icon: BarChart3 },
-    { id: 'complaint', label: 'সাপোর্ট ও অভিযোগ', icon: MessageSquare },
   ];
 
   const handleLinkClick = (id: string) => {
