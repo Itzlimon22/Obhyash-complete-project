@@ -135,7 +135,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
   const opponentXp = user.xp || 0;
 
   return (
-    <div className="min-h-screen bg-[#fdfbf7] dark:bg-neutral-950 p-4 md:p-8 animate-fade-in transition-colors font-sans">
+    <div className="min-h-screen bg-[#fdfbf7] dark:bg-neutral-950 px-2 py-4 md:p-8 animate-fade-in transition-colors font-sans">
       <div className="max-w-6xl mx-auto">
         {/* Back Button */}
         <button

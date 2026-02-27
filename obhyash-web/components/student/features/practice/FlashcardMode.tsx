@@ -216,7 +216,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
 
       {/* ── Card ── */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-4 pt-6 pb-24">
+        <div className="max-w-3xl mx-auto px-2 md:px-4 pt-4 pb-24">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={currentIndex}
@@ -235,14 +235,14 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                 `}
               >
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 pt-5 pb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+                <div className="flex items-center justify-between px-2 pt-2 pb-1.5 md:px-5 md:pt-4 md:pb-2">
+                  <div className="flex items-center gap-1.5 md:gap-2">
+                    <span className="text-[11px] md:text-xs font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
                       প্রশ্ন {toBengaliNumeral(currentIndex + 1)}
                     </span>
                     {phase === 'revealed' && (
                       <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                        className={`px-1.5 py-0.5 md:px-2 rounded text-[9px] md:text-[10px] font-bold ${
                           isCorrect
                             ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400'
                             : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
@@ -252,24 +252,24 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                       </span>
                     )}
                     {(current.subjectLabel || current.subject) && (
-                      <span className="px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-[10px] font-bold">
+                      <span className="px-1.5 py-0.5 md:px-2 rounded bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-[9px] md:text-[10px] font-bold">
                         {current.subjectLabel || current.subject}
                       </span>
                     )}
                   </div>
-                  <span className="text-xs font-bold text-neutral-400 dark:text-neutral-500">
+                  <span className="text-[11px] md:text-xs font-bold text-neutral-400 dark:text-neutral-500">
                     {current.points} Marks
                   </span>
                 </div>
 
-                <div className="px-5 pb-6">
+                <div className="px-2 pb-2 md:px-5 md:pb-6">
                   {/* Question text */}
-                  <h3 className="text-neutral-900 dark:text-neutral-100 font-serif-exam text-lg md:text-xl leading-relaxed mb-6">
+                  <h3 className="text-neutral-900 dark:text-neutral-100 font-serif-exam text-base md:text-xl leading-relaxed mb-3 md:mb-6 px-1.5 md:px-0">
                     <LatexText text={current.question} />
                   </h3>
 
                   {/* 2-column options grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 md:gap-3">
                     {current.options.map((option, idx) => {
                       const { bgClass, borderClass, iconBorder, iconText } =
                         getOptionClasses(idx);
@@ -281,7 +281,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                           }
                           onClick={() => handleSelect(idx)}
                           className={`
-                            relative flex items-start gap-4 p-4 rounded-xl transition-all duration-200 border h-full
+                            relative flex items-center gap-2 md:items-start md:gap-4 p-2 md:p-4 rounded-lg md:rounded-xl transition-all duration-200 border h-full
                             ${phase === 'selecting' ? 'cursor-pointer' : 'cursor-default'}
                             ${bgClass} ${borderClass}
                           `}
@@ -296,7 +296,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                           />
                           {/* Custom radio circle */}
                           <div
-                            className={`mt-0.5 w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all shrink-0 ${iconBorder}`}
+                            className={`w-5 h-5 md:mt-0.5 md:w-6 md:h-6 rounded-full flex items-center justify-center border-2 transition-all shrink-0 ${iconBorder}`}
                           >
                             <span className="text-xs font-bold">
                               {iconText}
@@ -304,7 +304,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                           </div>
                           {/* Option text */}
                           <div
-                            className={`text-base font-medium leading-relaxed select-none ${
+                            className={`text-[13px] md:text-base font-medium leading-[1.35] md:leading-relaxed select-none font-serif-exam ${
                               selectedIdx === idx ||
                               (phase === 'revealed' && idx === correctIndex)
                                 ? 'text-neutral-900 dark:text-neutral-100'
@@ -324,15 +324,15 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                       <motion.div
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mt-6 pt-4 border-t border-neutral-100 dark:border-neutral-800"
+                        className="mt-3 md:mt-6 pt-3 md:pt-4 border-t border-neutral-100 dark:border-neutral-800"
                       >
-                        <div className="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-xl border border-emerald-100 dark:border-emerald-800/30">
-                          <h4 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+                        <div className="bg-emerald-50 dark:bg-emerald-900/10 p-2.5 md:p-4 rounded-md md:rounded-xl border border-emerald-100 dark:border-emerald-800/30">
+                          <h4 className="text-[10px] md:text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1.5 md:mb-2 flex items-center gap-1.5 md:gap-2">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               viewBox="0 0 24 24"
                               fill="currentColor"
-                              className="w-4 h-4"
+                              className="w-3.5 h-3.5 md:w-4 md:h-4"
                             >
                               <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
                               <path
@@ -341,9 +341,9 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                                 clipRule="evenodd"
                               />
                             </svg>
-                            ব্যাখ্যা (Explanation)
+                            ব্যাখ্যা
                           </h4>
-                          <div className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif-exam">
+                          <div className="text-[13px] md:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif-exam">
                             <LatexText text={current.explanation} />
                           </div>
                         </div>

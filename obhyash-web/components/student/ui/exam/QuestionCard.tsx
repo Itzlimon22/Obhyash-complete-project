@@ -58,7 +58,7 @@ export default function QuestionCard({
     <div
       id={`question-${question.id}`}
       className={`
-        relative mb-4 scroll-mt-24
+        relative mb-3 md:mb-4 scroll-mt-24
         bg-white dark:bg-[#1a1a1a]
         border border-[#e5e5e5] dark:border-[#2a2a2a]
         rounded-lg overflow-hidden
@@ -69,9 +69,9 @@ export default function QuestionCard({
       `}
     >
       {/* ── Top section ── */}
-      <div className="px-4 pt-4 pb-3 md:px-5 md:pt-4">
+      <div className="px-1.5 pt-2 pb-1.5 md:px-4 md:pt-3">
         {/* Question text row */}
-        <div className="flex items-start gap-2 mb-3">
+        <div className="flex items-start gap-1.5 mb-1.5">
           {/* Serial number */}
           {serialNumber !== undefined && (
             <span className="shrink-0 font-semibold text-[15px] md:text-base text-neutral-800 dark:text-neutral-200 leading-[1.7]">
@@ -159,7 +159,7 @@ export default function QuestionCard({
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-8 2a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
               />
             </svg>
           </button>
@@ -169,8 +169,8 @@ export default function QuestionCard({
       {/* ── Options grid ── */}
       <div
         className={`
-          px-4 pb-4 md:px-5 md:pb-4
-          grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2
+          px-1.5 pb-2 md:px-4 md:pb-3
+          grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1
           ${readOnly || isOmrMode ? 'pointer-events-none' : ''}
         `}
       >
@@ -226,8 +226,8 @@ export default function QuestionCard({
             <label
               key={idx}
               className={`
-                group relative flex items-center gap-2.5
-                px-3 py-2 rounded-md
+                group relative flex items-center gap-1.5
+                px-1.5 py-1 rounded-md
                 transition-colors duration-150
                 ${isOmrMode || readOnly ? 'cursor-default' : 'cursor-pointer'}
                 ${boxClass}
@@ -261,7 +261,7 @@ export default function QuestionCard({
 
               {/* Option text */}
               <div
-                className={`text-sm md:text-[14px] leading-[1.55] select-none font-serif-exam ${textClass}`}
+                className={`text-[13px] md:text-[14px] leading-[1.35] md:leading-[1.55] select-none font-serif-exam ${textClass}`}
               >
                 <LatexText text={option} />
               </div>
@@ -272,10 +272,10 @@ export default function QuestionCard({
 
       {/* ── Explanation ── */}
       {showFeedback && question.explanation && (
-        <div className="mx-4 mb-4 md:mx-5 md:mb-4 animate-fade-in">
+        <div className="mx-1.5 mb-1.5 md:mx-4 md:mb-3 animate-fade-in">
           <div
             className="
-              p-4 md:p-5 rounded-md
+              p-2.5 md:p-4 rounded-md
               bg-emerald-50 dark:bg-[#0d2a1e]
               border border-emerald-200 dark:border-emerald-800/60
             "

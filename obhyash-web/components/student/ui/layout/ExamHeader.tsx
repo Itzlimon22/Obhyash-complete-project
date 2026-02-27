@@ -65,7 +65,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
         }
       `}
       >
-        <div className="max-w-7xl mx-auto px-3 md:px-4 h-12 md:h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-2 md:px-4 h-12 md:h-16 flex items-center justify-between">
           {/* Left: Title & Back (Hidden Title on Mobile) */}
           <div className="flex items-center gap-2 md:gap-3 overflow-hidden">
             {onExit && (

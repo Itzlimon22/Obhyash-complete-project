@@ -151,7 +151,7 @@ const ResultView: React.FC<ResultViewProps> = ({
   }, [correctCount, questions.length, isHistoryMode]);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 animate-fade-in pb-20 relative">
+    <div className="max-w-5xl mx-auto px-2 md:px-4 py-8 animate-fade-in pb-20 relative">
       {/* Header Section */}
       <div className="text-center mb-8 mt-8">
         <h2 className="text-2xl md:text-4xl font-bold text-neutral-900 dark:text-white mb-3">
@@ -232,7 +232,7 @@ const ResultView: React.FC<ResultViewProps> = ({
         </div>
       </div>
       {/* Exam Details Section */}
-      <div className="bg-neutral-50 dark:bg-neutral-800/40 border-y sm:border border-neutral-100 dark:border-neutral-800 py-3.5 mb-8 -mx-4 sm:mx-0 px-4 sm:rounded-2xl flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] sm:text-xs md:text-sm font-bold text-neutral-500 dark:text-neutral-400">
+      <div className="bg-neutral-50 dark:bg-neutral-800/40 border-y sm:border border-neutral-100 dark:border-neutral-800 py-3.5 mb-8 -mx-2 sm:mx-0 px-2 sm:px-4 sm:rounded-2xl flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] sm:text-xs md:text-sm font-bold text-neutral-500 dark:text-neutral-400">
         <div className="flex items-center gap-1.5">
           <svg
             xmlns="http://www.w3.org/2000/svg"

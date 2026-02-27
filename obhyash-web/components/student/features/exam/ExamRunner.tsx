@@ -194,7 +194,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
     >
       <div className="relative min-h-full flex flex-col bg-[#f8fafc] dark:bg-black">
         {/* Exam Container (Scrollable) */}
-        <div className="flex-1 px-4 py-6 md:px-8 max-w-4xl mx-auto w-full">
+        <div className="flex-1 px-2 py-4 md:px-8 max-w-4xl mx-auto w-full">
           {/* Header Info - REPLACED with ExamDetailsCard */}
           <ExamDetailsCard
             details={examDetails}

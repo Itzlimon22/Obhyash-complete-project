@@ -114,7 +114,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 p-4 md:p-8 animate-fade-in transition-colors font-sans pb-24">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 px-2 py-4 md:p-8 animate-fade-in transition-colors font-sans pb-24">
       {/* HEADER SECTION */}
       <div className="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">

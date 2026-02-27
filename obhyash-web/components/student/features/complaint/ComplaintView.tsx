@@ -29,7 +29,8 @@ const COMPLAINT_TYPES = [
     label: 'কারিগরি সমস্যা',
     subLabel: 'Technical Issue',
     icon: Zap,
-    color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
+    color:
+      'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
     borderColor: 'group-hover:border-emerald-500',
     description: 'অ্যাপ ক্র্যাশ, লোডিং সমস্যা বা এরর',
   },
@@ -57,8 +58,7 @@ const COMPLAINT_TYPES = [
     label: 'নতুন ফিচার আইডিয়া',
     subLabel: 'Feature Request',
     icon: AlertCircle,
-    color:
-      'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+    color: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
     borderColor: 'group-hover:border-red-500',
     description: 'নতুন কোনো সুবিধা বা ফিচার চান?',
   },
@@ -212,7 +212,7 @@ export const ComplaintView: React.FC = () => {
 
   // --- Main Render ---
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 md:py-12 space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-5xl mx-auto px-2 py-4 md:p-6 space-y-6 md:space-y-8 animate-in slide-in-from-bottom-4 duration-500">
       {/* Tab Switcher */}
       <div className="flex gap-2 p-1 bg-neutral-100 dark:bg-neutral-800 rounded-xl w-fit mx-auto">
         <button

@@ -69,7 +69,7 @@ const NotificationsView: React.FC = () => {
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   return (
-    <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950 p-4 md:p-8">
+    <div className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950 px-2 py-4 md:p-8">
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Header Section */}
         <div className="flex items-end justify-between pb-4 border-b border-neutral-200 dark:border-neutral-800">

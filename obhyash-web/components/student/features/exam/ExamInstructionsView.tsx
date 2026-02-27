@@ -44,7 +44,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto pb-12 px-4 md:px-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="w-full max-w-4xl mx-auto pb-12 px-2 md:px-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Back Button */}
       <button
         onClick={onBack}

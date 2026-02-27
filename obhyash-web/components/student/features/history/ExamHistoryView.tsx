@@ -391,29 +391,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
     <div className="min-h-screen bg-[#f5f5f5] dark:bg-[#0e0e0e] transition-colors pb-28 md:pb-10">
       {/* ── Android-style top app bar (mobile) / Desktop header ── */}
       <header className="sticky top-0 z-30 bg-white dark:bg-[#161616] border-b border-neutral-200 dark:border-neutral-800 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 h-14 md:h-16 flex items-center gap-3">
-          <button
-            onClick={onBack}
-            className="p-2 -ml-1 rounded-full text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors active:scale-95"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-              />
-            </svg>
-          </button>
-          <h1 className="text-[17px] md:text-lg font-bold text-neutral-900 dark:text-white flex-1 truncate">
-            পরীক্ষার ইতিহাস
-          </h1>
+        <div className="max-w-6xl mx-auto px-4 h-14 md:h-16 flex items-center justify-end gap-3">
           {/* Desktop tab strip */}
           <div className="hidden md:flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 rounded-xl p-1">
             {TABS.map((tab) => (
@@ -437,7 +415,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 pt-4 md:pt-6 space-y-4">
+      <div className="max-w-6xl mx-auto px-2 md:px-4 pt-4 md:pt-6 space-y-4">
         {/* ── Filters row ── */}
         {activeTab === 'exams' && (
           <div className="flex flex-col sm:flex-row gap-2">
@@ -640,10 +618,10 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                         key={item.id}
                         className="bg-white dark:bg-[#1c1c1c] rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden active:scale-[0.99] transition-transform"
                       >
-                        <div className="flex items-center gap-3 px-4 py-3.5">
+                        <div className="flex items-center gap-3 px-4 py-2">
                           {/* Score Ring */}
                           {!isPending && !isRejected ? (
-                            <ScoreRing percent={scorePercent} size={48} />
+                            <ScoreRing percent={scorePercent} size={36} />
                           ) : (
                             <div
                               className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black uppercase ${isPending ? 'bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300' : 'bg-red-100 dark:bg-red-900/30 text-red-600'}`}
@@ -733,7 +711,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                             </p>
                           </div>
                           {!isPending && !isRejected && (
-                            <ScoreRing percent={scorePercent} size={52} />
+                            <ScoreRing percent={scorePercent} size={36} />
                           )}
                           {isPending && (
                             <span className="text-[10px] font-black uppercase tracking-widest bg-neutral-800 dark:bg-white text-white dark:text-black px-2.5 py-1 rounded-lg">
