@@ -1,0 +1,108 @@
+# Obhyash Blog Documentation
+
+This file explains the structure, functionality, and maintenance instructions for the Obhyash Blog section.
+
+## 1. Directory Structure
+
+The blog section is designed to be completely independent of the main student/admin application shell to ensure clean UI and better SEO.
+
+\`\`\`
+obhyash-web/
+├── content/
+│   └── blog/                       <-- 📝 THIS IS WHERE YOU WRITE POSTS
+│       ├── how-to-solve-mcq.md
+│       ├── top-10-study-tips.md
+│       └── ... (your markdown files)
+│
+├── lib/
+│   └── blog-data.ts                <-- ⚙️ The engine that reads your .md files
+│
+├── app/
+│   └── blog/                       <-- 🛣️ The Routing Layer
+│       ├── layout.tsx              (Standalone layout, no app sidebar/header)
+│       ├── page.tsx                (The main blog listing page at /blog)
+│       └── [slug]/
+│           └── page.tsx            (The individual reading page at /blog/my-post)
+│
+└── components/
+    └── blog/                       <-- 🧩 The UI Components
+        ├── BlogHeader.tsx          (The glassmorphism navbar)
+        ├── BlogFooter.tsx          (The footer)
+        ├── BlogCard.tsx            (The post preview cards)
+        └── BlogListingClient.tsx   (The interactive grid, search, and filters)
+\`\`\`
+
+---
+
+## 2. Writing a New Blog Post
+
+Writing new blog posts does not require any code changes. Simply create a new Markdown (\`.md\`) file in the \`content/blog/\` folder.
+
+**Step 1:** Create your Markdown file. The filename becomes the URL slug.
+*Example:* \`content/blog/effective-exam-strategies.md\` becomes \`obhyash.com/blog/effective-exam-strategies\`
+
+**Step 2:** Add the required **Frontmatter** at the top of the file to provide metadata.
+
+\`\`\`markdown
+---
+title: "Effective Exam Strategies for Top Scorers"
+excerpt: "Learn the secrets that top students use to maximize their scores without burning out."
+category: "Exam Prep"
+tags: ["Success", "Focus", "Exams"]
+authorName: "Obhyash Team"
+authorRole: "Education Expert"
+authorInitials: "OT"
+publishedAt: "2026-03-15"
+readTime: 5
+featured: false
+coverColor: "from-blue-500 to-indigo-600"
+---
+
+## Your First Heading
+
+Start writing your post content here! You can use standard Markdown for formatting:
+- **Bold text**
+- *Italics*
+- [Links](https://obhyash.com)
+\`\`\`
+
+### Frontmatter Fields Explained:
+- \`featured\`: Set to \`true\` if you want this post to be highlighted at the top of the main blog page. Only one or a few posts should be featured.
+- \`coverColor\`: A tailwind gradient string (e.g., \`from-emerald-500 to-teal-600\`) used for visual styling of the card and header.
+- \`category\`: Must be one of the pre-defined categories (e.g., "Study Tips", "Exam Prep"). See maintenance below for adding categories.
+
+---
+
+## 3. Core Engine Mechanics
+
+If you need to understand how the code works under the hood:
+
+### A. The Data Pipeline (\`lib/blog-data.ts\`)
+We use the \`gray-matter\` package to parse the \`.md\` files on the server. This file reads the \`content/blog/\` directory, extracts the YAML frontmatter and the markdown body, and serves it as structured data to the pages.
+
+### B. The Reading UI & SEO (\`app/blog/[slug]/page.tsx\`)
+- **SEO Elements**: Uses Next.js \`generateMetadata()\` to create dynamic page titles, descriptions, and OpenGraph (social media) cards based on your frontmatter.
+- **Rich Results**: Injects JSON-LD \`Article\` schema into the page so Google understands the content perfectly.
+- **Rendering**: Converts your Markdown body into HTML and styles it beautifully using the Tailwind Typography plugin (\`@tailwindcss/typography\` via the \`.prose\` class).
+
+### C. The Standalone Shell (\`app/blog/layout.tsx\`)
+This layout guarantees that the blog does not inherit the complex navigation or sidebars from the main student application. It purely wraps content between the custom \`<BlogHeader />\` and \`<BlogFooter />\`.
+
+---
+
+## 4. Maintenance & Customization
+
+### Adding a New Category
+If you want to introduce a new category (e.g., "Motivational Stories"):
+1. Open \`lib/blog-data.ts\` and add your new category to the \`BLOG_CATEGORIES\` array.
+2. Open \`app/blog/[slug]/page.tsx\` and add a color profile for the new category in the \`CATEGORY_COLORS\` object.
+
+### Modifying the UI
+- **Navbar Settings**: Edit \`components/blog/BlogHeader.tsx\`.
+- **Listing Cards**: Edit \`components/blog/BlogCard.tsx\`.
+- **Search & Filters**: Edit \`components/blog/BlogListingClient.tsx\`.
+
+### Adding Images
+To embed images within a blog post:
+1. Place the image inside the \`public/images/blog/\` directory.
+2. In your Markdown file, use: \`![Image Alt Text](/images/blog/my-image.png)\`

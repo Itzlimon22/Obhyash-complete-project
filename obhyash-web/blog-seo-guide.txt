@@ -1,0 +1,43 @@
+# How to Rank Your Obhyash Blog on Google Search
+
+To rank your new blog pages on Google Search, you need a combination of the Technical SEO (which is already built into the code) and Content & Off-Page SEO (which you will do when writing).
+
+Here is the complete strategy for ranking your Obhyash blog:
+
+## 1. The Technical SEO (Already Done For You ✅)
+We have already built the technical foundation Google loves:
+* Dynamic Meta Tags: Every time you add a new .md file, the system automatically generates the <title> and <meta description> tags using your frontmatter.
+* JSON-LD Structured Data: We added invisible Article schema to every post. This tells Google exactly what the article is about, who wrote it, and when it was published, increasing your chances of getting "Rich Snippets" (like a box at the top of Google results).
+* Fast Loading (Next.js): The blog pages are statically generated, meaning they load instantly. Site speed is a major Google ranking factor.
+* Mobile Optimized: Google uses mobile-first indexing. Your blog is fully responsive and looks great on phones.
+* Canonical URLs: We added canonical tags to prevent "duplicate content" penalties.
+
+## 2. Keyword Research (Before You Write)
+You need to write about what students are actually searching for.
+* Identify Questions: Use tools like Google Autocomplete, AnswerThePublic, or Ahrefs Free Keyword Generator. Type in "HSC preparation" and see what questions pop up (e.g., "How to get A+ in HSC Physics").
+* Long-Tail Keywords: Don't try to rank for just "SSC". Try to rank for "SSC 2026 Biology Chapter 2 MCQ PDF". These are easier to rank for and highly targeted.
+
+## 3. Writing SEO-Optimized Content
+When you write your .md files, follow these rules:
+* The Title: Ensure your primary keyword is in the title: field of your frontmatter. Make it catchy (e.g., "10 Proven Tips to..." instead of just "Tips for...").
+* The Excerpt: Write a compelling excerpt: in the frontmatter. This often becomes the text people see under the blue link in Google. Make them want to click.
+* Headings (H2, H3): Use standard markdown headings (## and ###) to structure your post. Include variations of your keywords in these headings. Google scans headings to understand the article's structure.
+* Content Length & Quality: Google favors comprehensive content. Aim for 800-1500 words per post. Make it genuinely helpful for Bangladeshi students. Don't just stuff keywords.
+* Internal Linking: When writing a new post, link to your older posts. (e.g., "As we mentioned in our Time Management Guide..."). Also, make sure to link back to your main app/dashboard where relevant to drive conversions!
+
+## 4. Image Optimization
+If you add images to your markdown files (using ![Alt text](/images/...)):
+* Use Descriptive Alt Text: Google can't "see" images, it reads the Alt Text. Instead of ![image], use ![HSC Biology cell structure diagram].
+* Compress Images: Large images slow down your page. Compress images (using tools like TinyPNG) to under 100kb before putting them in the public/images/ folder.
+
+## 5. Getting Backlinks (Off-Page SEO)
+To convince Google your site is authoritative, other sites need to link to yours.
+* Share on Social Media: Share every new blog post on the Obhyash Facebook page, relevant Facebook Groups (like HSC/SSC preparation groups), and YouTube descriptions.
+* Guest Posting: Write articles for other educational websites in Bangladesh and include a link back to your blog.
+* Create "Linkable" Assets: If you publish a highly detailed "Complete Syllabus PDF for Admission 2026", other students and teachers will naturally link to it from their own sites or social media.
+
+## 6. Submit to Google Search Console
+To get Google to index your new blog quickly:
+1. Go to Google Search Console and verify ownership of obhyash.com.
+2. Submit your sitemap (if you have one generated, e.g., obhyash.com/sitemap.xml).
+3. Whenever you publish a very important new blog post, copy the URL (e.g., obhyash.com/blog/my-new-post) and paste it into the search bar at the top of Google Search Console, then click "Request Indexing". This forces Google to crawl it immediately.

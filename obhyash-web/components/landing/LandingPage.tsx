@@ -304,6 +304,12 @@ const LandingPage: React.FC<LandingPageProps> = ({
             >
               প্রাইসিং
             </button>
+            <Link
+              href="/blog"
+              className="px-3 py-2 text-sm font-medium hover:text-emerald-600 dark:hover:text-emerald-400"
+            >
+              ব্লগ
+            </Link>
             <div className="h-6 w-px bg-neutral-200 dark:bg-neutral-700 mx-1"></div>
 
             <button
@@ -1066,12 +1072,12 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </button>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    href="/blog"
                     className="hover:text-red-600 dark:hover:text-red-400 transition-colors"
                   >
                     ব্লগ
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
