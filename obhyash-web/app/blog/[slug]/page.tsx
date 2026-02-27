@@ -245,7 +245,7 @@ export default async function BlogPostPage({
 
       {/* ─── Post Hero ─── */}
       <section className="bg-white dark:bg-[#121212]">
-        <div className="relative max-w-5xl mx-auto mt-16 px-4 sm:px-6">
+        <div className="relative max-w-6xl mx-auto mt-16 px-4 sm:px-6">
           {/* Breadcrumb */}
           <div className="flex flex-wrap items-center gap-1.5 text-[13px] text-slate-400 dark:text-slate-500 mb-8 font-medium">
             <Link
@@ -292,7 +292,7 @@ export default async function BlogPostPage({
       </section>
 
       {/* ─── Single-column layout ─── */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <div className="flex flex-col gap-10">
           <article className="min-w-0">
             {/* Back link */}
