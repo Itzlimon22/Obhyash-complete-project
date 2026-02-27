@@ -25,7 +25,7 @@ export async function getAdvancedRecommendations(
   currentSlug: string | null = null,
   userId: string | null = null,
 ): Promise<BlogPost[]> {
-  const allPosts = getAllPosts();
+  const allPosts = await getAllPosts();
   let userTags: Record<string, number> = {};
   let userCategories: Record<string, number> = {};
 
@@ -109,7 +109,7 @@ export async function getAdvancedRecommendations(
 }
 
 export async function getMostViewedPosts(): Promise<BlogPost[]> {
-  const allPosts = getAllPosts();
+  const allPosts = await getAllPosts();
   try {
     const supabase = await createClient();
 

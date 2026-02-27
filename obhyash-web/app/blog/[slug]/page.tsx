@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { blogPosts, getBlogPost } from '@/lib/blog-data';
+import { getBlogPost } from '@/lib/blog-data';
 import { getAdvancedRecommendations } from '@/lib/blog-recommendations';
 import { createClient } from '@/utils/supabase/server';
 import ViewTracker from '@/components/blog/ViewTracker';
@@ -14,6 +14,12 @@ import {
   ArrowRight,
   BookOpen,
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import remarkGfm from 'remark-gfm';
+import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
+import 'katex/dist/katex.min.css';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -22,7 +28,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = getBlogPost(slug);
+  const post = await getBlogPost(slug);
   if (!post) return {};
 
   return {
@@ -79,7 +85,7 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = getBlogPost(slug);
+  const post = await getBlogPost(slug);
   if (!post) notFound();
 
   const supabase = await createClient();
@@ -217,8 +223,14 @@ export default async function BlogPostPage({
                 prose-a:text-rose-600 dark:prose-a:text-rose-400 prose-a:no-underline hover:prose-a:underline
                 prose-ul:space-y-1 prose-ol:space-y-1
               "
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
+            >
+              <ReactMarkdown
+                remarkPlugins={[remarkMath, remarkGfm]}
+                rehypePlugins={[rehypeKatex, rehypeRaw]}
+              >
+                {post.content}
+              </ReactMarkdown>
+            </div>
 
             {/* Tags */}
             <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">

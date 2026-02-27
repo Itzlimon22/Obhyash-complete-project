@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import { getAllPosts } from '@/lib/blog-data';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://obhyash.com';
 
   // Core App Routes
@@ -21,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // Dynamic Blog Post Routes
-  const posts = getAllPosts();
+  const posts = await getAllPosts();
   const blogRoutes = posts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: new Date(post.publishedAt).toISOString(),

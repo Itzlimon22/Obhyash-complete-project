@@ -1,5 +1,10 @@
 import type { Metadata } from 'next';
-import { blogPosts, getFeaturedPost, BLOG_CATEGORIES, BlogPost } from '@/lib/blog-data';
+import {
+  getAllPosts,
+  getFeaturedPost,
+  BLOG_CATEGORIES,
+  BlogPost,
+} from '@/lib/blog-data';
 import BlogListingClient from '@/components/blog/BlogListingClient';
 import { createClient } from '@/utils/supabase/server';
 import {
@@ -24,8 +29,8 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
-  const featured = getFeaturedPost();
-  const allPosts = blogPosts;
+  const featured = await getFeaturedPost();
+  const allPosts = await getAllPosts();
 
   const supabase = await createClient();
   const {
