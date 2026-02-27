@@ -9,7 +9,7 @@ export async function generateMetadata({
 }: {
   params: { name: string };
 }): Promise<Metadata> {
-  const decodedName = decodeURIComponent(params.name);
+  const decodedName = decodeURIComponent(params.name).replace(/\+/g, ' ');
   return {
     title: `${decodedName} - Author Profile | Obhyash Blog`,
     description: `Read all articles and study tips written by ${decodedName} on Obhyash.`,
@@ -24,12 +24,15 @@ export default async function AuthorProfilePage({
 }: {
   params: { name: string };
 }) {
-  const decodedName = decodeURIComponent(params.name);
+  const decodedName = decodeURIComponent(params.name)
+    .replace(/\+/g, ' ')
+    .trim();
   const allPosts = await getAllPosts();
 
   // Find all posts by this precise author name
   const authorPosts = allPosts.filter(
-    (post) => post.author.name.toLowerCase() === decodedName.toLowerCase(),
+    (post) =>
+      post.author.name.trim().toLowerCase() === decodedName.toLowerCase(),
   );
 
   // If this author doesn't exist or has 0 posts, show 404

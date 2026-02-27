@@ -382,7 +382,7 @@ export default async function BlogPostPage({
                 </div>
                 <div>
                   <Link
-                    href={`/blog/author/${encodeURIComponent(post.author.name)}`}
+                    href={`/blog/author/${post.author.name}`}
                     className="font-bold text-lg text-slate-900 dark:text-slate-100 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
                   >
                     {post.author.name}

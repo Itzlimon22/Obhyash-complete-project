@@ -54,7 +54,7 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
                 </div>
                 <div>
                   <Link
-                    href={`/blog/author/${encodeURIComponent(post.author.name)}`}
+                    href={`/blog/author/${post.author.name}`}
                     onClick={(e) => e.stopPropagation()}
                     className="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
                   >
@@ -122,7 +122,7 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
               </div>
               <div className="flex items-center gap-1.5 text-xs text-slate-400 font-anek">
                 <Link
-                  href={`/blog/author/${encodeURIComponent(post.author.name)}`}
+                  href={`/blog/author/${post.author.name}`}
                   onClick={(e) => e.stopPropagation()}
                   className="font-medium text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
                 >
