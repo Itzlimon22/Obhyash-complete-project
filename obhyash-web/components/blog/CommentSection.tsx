@@ -153,7 +153,7 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
             >
               {/* Avatar */}
               <div
-                className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0 ${
+                className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-white font-semibold ${
                   comment.user?.avatarColor || 'bg-slate-800'
                 }`}
               >

@@ -302,10 +302,10 @@ export default async function BlogPostPage({
       </section>
 
       {/* ─── Two-column layout ─── */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-        <div className="flex flex-col lg:flex-row gap-10 lg:gap-14 xl:gap-16">
-          {/* ── Article Content (Left / 70%) ── */}
-          <article className="lg:w-[65%] xl:w-[68%] min-w-0">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        <div className="flex flex-col lg:flex-row-reverse gap-8 lg:gap-12 xl:gap-16 justify-end">
+          {/* ── Article Content (Right on Desktop / 70%) ── */}
+          <article className="lg:w-[68%] xl:w-[72%] min-w-0">
             {/* Back link */}
             <Link
               href="/blog"
@@ -344,17 +344,6 @@ export default async function BlogPostPage({
               </ReactMarkdown>
             </div>
 
-            {/* Interaction Ribbon (Likes + Social Share) */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mt-12 bg-slate-50 dark:bg-[#1a1a1a] p-4 rounded-2xl border border-slate-100 dark:border-[#2b2b2b]">
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-slate-500 dark:text-slate-400 font-anek">
-                  পোস্টটি কেমন লাগলো?
-                </span>
-                <LikeButton postSlug={post.slug} />
-              </div>
-              <SocialShare url={jsonLd.url} title={post.title} />
-            </div>
-
             {/* Tags */}
             <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
               <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 font-anek">
@@ -372,14 +361,19 @@ export default async function BlogPostPage({
               </div>
             </div>
 
-            {/* Newsletter Subscription */}
-            <NewsletterSubscribe />
-
-            {/* Comments Section */}
-            <CommentSection postSlug={post.slug} />
+            {/* Interaction Ribbon (Likes + Social Share) */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mt-10 bg-slate-50 dark:bg-[#1a1a1a] p-4 rounded-2xl border border-slate-100 dark:border-[#2b2b2b]">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-slate-500 dark:text-slate-400 font-anek">
+                  পোস্টটি কেমন লাগলো?
+                </span>
+                <LikeButton postSlug={post.slug} />
+              </div>
+              <SocialShare url={jsonLd.url} title={post.title} />
+            </div>
 
             {/* Author Bio block */}
-            <div className="mt-10 p-6 rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b]">
+            <div className="mt-10 mb-8 p-6 rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b]">
               <div className="flex items-start gap-4">
                 <div
                   className={`w-12 h-12 shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-semibold text-lg`}
@@ -404,10 +398,18 @@ export default async function BlogPostPage({
                 </div>
               </div>
             </div>
+
+            {/* Newsletter Subscription */}
+            <NewsletterSubscribe />
+
+            {/* Comments Section */}
+            <div className="mt-10">
+              <CommentSection postSlug={post.slug} />
+            </div>
           </article>
 
-          {/* ── Sticky Sidebar (Right / 30%) ── */}
-          <aside className="lg:w-[35%] xl:w-[32%] space-y-6">
+          {/* ── Sticky Sidebar (Left on Desktop / 30%) ── */}
+          <aside className="lg:w-[32%] xl:w-[28%] space-y-6">
             <div className="lg:sticky lg:top-24 space-y-6">
               {/* Dashboard promo */}
               <div className="rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] p-6 text-slate-900 dark:text-slate-100 font-anek">
