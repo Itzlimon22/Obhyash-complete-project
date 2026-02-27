@@ -292,7 +292,7 @@ export default async function BlogPostPage({
       </section>
 
       {/* ─── Single-column layout ─── */}
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <div className="flex flex-col gap-10">
           <article className="min-w-0">
             {/* Back link */}
