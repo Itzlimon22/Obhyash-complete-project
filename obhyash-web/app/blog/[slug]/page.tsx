@@ -373,12 +373,6 @@ export default async function BlogPostPage({
                 {post.content}
               </ReactMarkdown>
             </div>
-
-            {/* Comments Section */}
-            <div className="mt-12">
-              <CommentSection postSlug={post.slug} />
-            </div>
-
             {/* Tags */}
             <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
               <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 font-anek">
@@ -394,6 +388,11 @@ export default async function BlogPostPage({
                   </span>
                 ))}
               </div>
+            </div>
+
+            {/* Comments Section */}
+            <div className="mt-12">
+              <CommentSection postSlug={post.slug} />
             </div>
 
             {/* Interaction Ribbon (Likes + Social Share) */}

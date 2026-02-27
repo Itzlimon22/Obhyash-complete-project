@@ -1122,7 +1122,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
                 <li>
                   <Link
-                    href="/referral"
+                    href="/referral-program"
                     className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5 font-semibold"
                   >
                     <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
