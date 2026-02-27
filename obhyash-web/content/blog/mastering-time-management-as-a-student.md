@@ -1,4 +1,17 @@
----\ntitle: "Mastering Time Management: A Student's Practical Handbook"\nexcerpt: "Feeling overwhelmed between classes, homework, and exam prep? This no-nonsense guide to student time management will help you get control of your schedule and stress."\ncategory: "Time Management"\ntags: ["Time Management","Productivity","Study Schedule","Student Life"]\nauthorName: "Obhyash Team"\nauthorRole: "Student Success Coach"\nauthorInitials: "OT"\npublishedAt: "2026-02-05"\nreadTime: 5\nfeatured: false\ncoverColor: "from-amber-500 to-orange-600"\n---\n## The Time Problem Most Students Face
+---
+title: "Mastering Time Management: A Student's Practical Handbook"
+excerpt: "Feeling overwhelmed between classes, homework, and exam prep? This no-nonsense guide to student time management will help you get control of your schedule and stress."
+category: "Time Management"
+tags: ["Time Management","Productivity","Study Schedule","Student Life"]
+authorName: "Obhyash Team"
+authorRole: "Student Success Coach"
+authorInitials: "OT"
+publishedAt: "2026-02-05"
+readTime: 5
+featured: false
+coverColor: "from-amber-500 to-orange-600"
+---
+## The Time Problem Most Students Face
 You have the same 24 hours as everyone else. The difference between students who excel and those who struggle isn't intelligence — it's how they manage those 24 hours.
 
 ## Step 1: Know Where Your Time Goes

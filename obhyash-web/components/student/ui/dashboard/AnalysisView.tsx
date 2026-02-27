@@ -150,7 +150,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
 
       {/* Overview Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col items-center justify-center text-center">
           <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
             মোট পরীক্ষা
           </p>
@@ -158,7 +158,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
             {analytics.totalExams}
           </p>
         </div>
-        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col items-center justify-center text-center">
           <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
             গড় স্কোর
           </p>
@@ -166,7 +166,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
             {analytics.avgScore}%
           </p>
         </div>
-        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col items-center justify-center text-center">
           <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
             সঠিকতা
           </p>
@@ -174,7 +174,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
             {analytics.avgAccuracy}%
           </p>
         </div>
-        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col items-center justify-center text-center">
           <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
             মোট সময়
           </p>

@@ -1,4 +1,17 @@
----\ntitle: "How to Solve MCQs Faster & More Accurately: The Ultimate Guide"\nexcerpt: "Speed and accuracy in MCQ exams can be the difference between a pass and a top grade. Learn the proven elimination techniques and cognitive tricks that top scorers use."\ncategory: "MCQ Techniques"\ntags: ["MCQ","Exam Strategy","Speed","Accuracy"]\nauthorName: "Obhyash Team"\nauthorRole: "Exam Strategist"\nauthorInitials: "OT"\npublishedAt: "2026-02-15"\nreadTime: 6\nfeatured: false\ncoverColor: "from-violet-500 to-purple-600"\n---\n## The MCQ Mindset
+---
+title: "How to Solve MCQs Faster & More Accurately: The Ultimate Guide"
+excerpt: "Speed and accuracy in MCQ exams can be the difference between a pass and a top grade. Learn the proven elimination techniques and cognitive tricks that top scorers use."
+category: "MCQ Techniques"
+tags: ["MCQ","Exam Strategy","Speed","Accuracy"]
+authorName: "Obhyash Team"
+authorRole: "Exam Strategist"
+authorInitials: "OT"
+publishedAt: "2026-02-15"
+readTime: 6
+featured: false
+coverColor: "from-violet-500 to-purple-600"
+---
+## The MCQ Mindset
 Multiple Choice Questions aren't just about knowing the answer — they're about **eliminating wrong answers**. Understanding this shift in approach is what separates average students from top scorers.
 
 ## Technique 1: Process of Elimination (POE)

@@ -1,4 +1,17 @@
----\ntitle: "How Obhyash Helps You Study Smarter, Not Just Harder"\nexcerpt: "Discover how Obhyash's AI-powered exam platform, OMR scanner, personalized analytics, and vast question bank are designed to maximize your exam scores efficiently."\ncategory: "Study Tips"\ntags: ["Obhyash","EdTech","Study Platform","OMR Scan","Analytics"]\nauthorName: "Obhyash Team"\nauthorRole: "Product Team"\nauthorInitials: "OT"\npublishedAt: "2026-01-28"\nreadTime: 4\nfeatured: false\ncoverColor: "from-sky-500 to-blue-600"\n---\n## The Problem with Traditional Studying
+---
+title: "How Obhyash Helps You Study Smarter, Not Just Harder"
+excerpt: "Discover how Obhyash's AI-powered exam platform, OMR scanner, personalized analytics, and vast question bank are designed to maximize your exam scores efficiently."
+category: "Study Tips"
+tags: ["Obhyash","EdTech","Study Platform","OMR Scan","Analytics"]
+authorName: "Obhyash Team"
+authorRole: "Product Team"
+authorInitials: "OT"
+publishedAt: "2026-01-28"
+readTime: 4
+featured: false
+coverColor: "from-sky-500 to-blue-600"
+---
+## The Problem with Traditional Studying
 Most students study the same way regardless of what they know or don't know. They read through all chapters equally, even topics they've already mastered. This is hugely inefficient — you're spending time where you least need it.
 
 ## Personalized Practice with Analytics

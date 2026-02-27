@@ -187,7 +187,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
       <div className="max-w-7xl mx-auto space-y-6">
         {/* KPI CARDS ROW */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex items-center gap-5 transition-all hover:border-red-200 dark:hover:border-red-900 group">
+          <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center text-center gap-4 transition-all hover:border-red-200 dark:hover:border-red-900 group">
             <div className="w-14 h-14 rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 dark:text-red-400 shadow-sm group-hover:scale-105 transition-transform">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -204,7 +204,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                 />
               </svg>
             </div>
-            <div>
+            <div className="flex flex-col items-center">
               <p className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
                 মোট প্রশ্ন উত্তর
               </p>
@@ -214,7 +214,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
             </div>
           </div>
 
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex items-center gap-5 transition-all hover:border-emerald-200 dark:hover:border-emerald-900 group">
+          <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center text-center gap-4 transition-all hover:border-emerald-200 dark:hover:border-emerald-900 group">
             <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm group-hover:scale-105 transition-transform">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -231,7 +231,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                 />
               </svg>
             </div>
-            <div>
+            <div className="flex flex-col items-center">
               <p className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
                 সঠিকতার হার
               </p>
@@ -241,7 +241,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
             </div>
           </div>
 
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex items-center gap-5 transition-all hover:border-red-200 dark:hover:border-red-900 group">
+          <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center text-center gap-4 transition-all hover:border-red-200 dark:hover:border-red-900 group">
             <div className="w-14 h-14 rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 dark:text-red-400 shadow-sm group-hover:scale-105 transition-transform">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -258,7 +258,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                 />
               </svg>
             </div>
-            <div>
+            <div className="flex flex-col items-center">
               <p className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
                 গড় সময় (প্রশ্ন প্রতি)
               </p>

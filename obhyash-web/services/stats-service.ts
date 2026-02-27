@@ -219,167 +219,148 @@ export const getSubjectAnalysis = async (
   timeFilter: 'all' | 'month' | 'week',
 ): Promise<SubjectAnalysis> => {
   if (isSupabaseConfigured() && supabase) {
-    const { data, error } = await supabase.rpc('get_subject_analytics', {
-      p_user_id: userId,
-      p_subject: subject,
-      p_time_filter: timeFilter,
-    });
+    // Bypassing buggy RPC 'get_subject_analytics' directly to TS fallback to ensure accurate reporting
+    try {
+      let dateFilter = new Date();
+      if (timeFilter === 'week') {
+        dateFilter.setDate(dateFilter.getDate() - 7);
+      } else if (timeFilter === 'month') {
+        dateFilter.setMonth(dateFilter.getMonth() - 1);
+      } else {
+        dateFilter = new Date('1970-01-01');
+      }
 
-    if (!error && data) {
-      return data as SubjectAnalysis;
-    } else {
-      console.warn(
-        'RPC Error (Subject Analysis). Attempting fallback...',
-        error,
-      );
+      const { data: rawData, error: fallbackError } = await supabase
+        .from('exam_results')
+        .select(
+          'id, total_questions, correct_count, wrong_count, time_taken, date, subject, chapters, questions, user_answers',
+        )
+        .eq('user_id', userId)
+        .eq('status', 'evaluated')
+        .gte('date', dateFilter.toISOString());
 
-      try {
-        let dateFilter = new Date();
-        if (timeFilter === 'week') {
-          dateFilter.setDate(dateFilter.getDate() - 7);
-        } else if (timeFilter === 'month') {
-          dateFilter.setMonth(dateFilter.getMonth() - 1);
-        } else {
-          dateFilter = new Date('1970-01-01');
-        }
+      if (!fallbackError && rawData) {
+        // Filter by subject manually
+        const targetSubjLower = subject.toLowerCase();
+        const filteredExams = rawData.filter((exam) => {
+          if (!exam.subject) return false;
+          const sLower = exam.subject.toLowerCase();
+          return (
+            sLower === targetSubjLower ||
+            sLower.includes(targetSubjLower) ||
+            (targetSubjLower === 'physics' &&
+              sLower.includes('পদার্থবিজ্ঞান')) ||
+            (targetSubjLower === 'chemistry' && sLower.includes('রসায়ন')) ||
+            (targetSubjLower === 'math' &&
+              (sLower.includes('গণিত') || sLower.includes('math'))) ||
+            (targetSubjLower === 'biology' &&
+              (sLower.includes('জীববিজ্ঞান') || sLower.includes('bio'))) ||
+            (targetSubjLower === 'bangla' && sLower.includes('বাংলা')) ||
+            (targetSubjLower === 'english' && sLower.includes('ইংরেজি')) ||
+            (targetSubjLower === 'gk' && sLower.includes('সাধারণ জ্ঞান')) ||
+            (targetSubjLower === 'ict' && sLower.includes('আইসিটি'))
+          );
+        });
 
-        const { data: rawData, error: fallbackError } = await supabase
-          .from('exam_results')
-          .select(
-            'id, total_questions, correct_count, wrong_count, time_taken, date, subject, chapters, questions, user_answers',
-          )
-          .eq('user_id', userId)
-          .eq('status', 'evaluated')
-          .gte('date', dateFilter.toISOString());
+        let totalQuestions = 0;
+        let correct = 0;
+        let wrong = 0;
+        let totalTime = 0;
+        let skipped = 0;
 
-        if (!fallbackError && rawData) {
-          // Filter by subject manually
-          const targetSubjLower = subject.toLowerCase();
-          const filteredExams = rawData.filter((exam) => {
-            if (!exam.subject) return false;
-            const sLower = exam.subject.toLowerCase();
-            return (
-              sLower === targetSubjLower ||
-              sLower.includes(targetSubjLower) ||
-              (targetSubjLower === 'physics' &&
-                sLower.includes('পদার্থবিজ্ঞান')) ||
-              (targetSubjLower === 'chemistry' && sLower.includes('রসায়ন')) ||
-              (targetSubjLower === 'math' &&
-                (sLower.includes('গণিত') || sLower.includes('math'))) ||
-              (targetSubjLower === 'biology' &&
-                (sLower.includes('জীববিজ্ঞান') || sLower.includes('bio'))) ||
-              (targetSubjLower === 'bangla' && sLower.includes('বাংলা')) ||
-              (targetSubjLower === 'english' && sLower.includes('ইংরেজি')) ||
-              (targetSubjLower === 'gk' && sLower.includes('সাধারণ জ্ঞান')) ||
-              (targetSubjLower === 'ict' && sLower.includes('আইসিটি'))
-            );
-          });
+        const chapterMap = new Map<
+          string,
+          { name: string; total: number; correct: number }
+        >();
 
-          let totalQuestions = 0;
-          let correct = 0;
-          let wrong = 0;
-          let totalTime = 0;
-          let skipped = 0;
+        filteredExams.forEach((exam) => {
+          totalQuestions += exam.total_questions || 0;
+          correct += exam.correct_count || 0;
+          wrong += exam.wrong_count || 0;
+          totalTime += exam.time_taken || 0;
+          skipped += Math.max(
+            0,
+            (exam.total_questions || 0) -
+              ((exam.correct_count || 0) + (exam.wrong_count || 0)),
+          );
 
-          const chapterMap = new Map<
-            string,
-            { name: string; total: number; correct: number }
-          >();
+          // Better chapter extraction using actual questions and answers
+          if (exam.questions && Array.isArray(exam.questions)) {
+            const answers = exam.user_answers || {};
 
-          filteredExams.forEach((exam) => {
-            totalQuestions += exam.total_questions || 0;
-            correct += exam.correct_count || 0;
-            wrong += exam.wrong_count || 0;
-            totalTime += exam.time_taken || 0;
-            skipped += Math.max(
-              0,
-              (exam.total_questions || 0) -
-                ((exam.correct_count || 0) + (exam.wrong_count || 0)),
-            );
+            exam.questions.forEach((q: Question & Record<string, unknown>) => {
+              // Determine chapter/topic name (Fallback to 'General' if both missing)
+              const cName = q.topic || q.chapter || 'General';
 
-            // Better chapter extraction using actual questions and answers
-            if (exam.questions && Array.isArray(exam.questions)) {
-              const answers = exam.user_answers || {};
-
-              exam.questions.forEach(
-                (q: Question & Record<string, unknown>) => {
-                  // Determine chapter/topic name (Fallback to 'General' if both missing)
-                  const cName = q.topic || q.chapter || 'General';
-
-                  if (!chapterMap.has(cName)) {
-                    chapterMap.set(cName, {
-                      name: cName,
-                      total: 0,
-                      correct: 0,
-                    });
-                  }
-
-                  const cData = chapterMap.get(cName)!;
-                  cData.total += 1; // 1 Question
-
-                  const userAnswer = answers[q.id];
-                  if (
-                    userAnswer !== undefined &&
-                    userAnswer === q.correctAnswerIndex
-                  ) {
-                    cData!.correct += 1;
-                  }
-                },
-              );
-            } else {
-              // Legacy fallback if `questions` array is missing
-              const chaptersText = exam.chapters || 'General';
-              const chaptersArray = chaptersText
-                .split(',')
-                .map((c: string) => c.trim())
-                .filter(Boolean);
-
-              if (chaptersArray.length > 0) {
-                const wTotal =
-                  (exam.total_questions || 0) / chaptersArray.length;
-                const wCorrect =
-                  (exam.correct_count || 0) / chaptersArray.length;
-
-                chaptersArray.forEach((chap: string) => {
-                  if (!chapterMap.has(chap)) {
-                    chapterMap.set(chap, { name: chap, total: 0, correct: 0 });
-                  }
-                  const cData = chapterMap.get(chap)!;
-                  cData.total += wTotal;
-                  cData.correct += wCorrect;
+              if (!chapterMap.has(cName)) {
+                chapterMap.set(cName, {
+                  name: cName,
+                  total: 0,
+                  correct: 0,
                 });
               }
+
+              const cData = chapterMap.get(cName)!;
+              cData.total += 1; // 1 Question
+
+              const userAnswer = answers[q.id];
+              if (
+                userAnswer !== undefined &&
+                userAnswer === q.correctAnswerIndex
+              ) {
+                cData!.correct += 1;
+              }
+            });
+          } else {
+            // Legacy fallback if `questions` array is missing
+            const chaptersText = exam.chapters || 'General';
+            const chaptersArray = chaptersText
+              .split(',')
+              .map((c: string) => c.trim())
+              .filter(Boolean);
+
+            if (chaptersArray.length > 0) {
+              const wTotal = (exam.total_questions || 0) / chaptersArray.length;
+              const wCorrect = (exam.correct_count || 0) / chaptersArray.length;
+
+              chaptersArray.forEach((chap: string) => {
+                if (!chapterMap.has(chap)) {
+                  chapterMap.set(chap, { name: chap, total: 0, correct: 0 });
+                }
+                const cData = chapterMap.get(chap)!;
+                cData.total += wTotal;
+                cData.correct += wCorrect;
+              });
             }
-          });
+          }
+        });
 
-          const chapterPerformance = Array.from(chapterMap.values())
-            .map((c) => ({
-              name: c.name,
-              total: Math.round(c.total),
-              correct: Math.round(c.correct),
-              accuracy:
-                c.total > 0 ? Math.round((c.correct / c.total) * 100) : 0,
-            }))
-            .sort((a, b) => b.total - a.total);
+        const chapterPerformance = Array.from(chapterMap.values())
+          .map((c) => ({
+            name: c.name,
+            total: Math.round(c.total),
+            correct: Math.round(c.correct),
+            accuracy: c.total > 0 ? Math.round((c.correct / c.total) * 100) : 0,
+          }))
+          .sort((a, b) => b.total - a.total);
 
-          return {
-            totalQuestions,
-            correct,
-            wrong,
-            skipped,
-            accuracy:
-              totalQuestions > 0
-                ? Math.round((correct / totalQuestions) * 100)
-                : 0,
-            averageTime:
-              totalQuestions > 0 ? Math.round(totalTime / totalQuestions) : 0,
-            chapterPerformance,
-            mistakes: [],
-          };
-        }
-      } catch (fallbackEx) {
-        console.error('Fallback subject analysis failed', fallbackEx);
+        return {
+          totalQuestions,
+          correct,
+          wrong,
+          skipped,
+          accuracy:
+            totalQuestions > 0
+              ? Math.round((correct / totalQuestions) * 100)
+              : 0,
+          averageTime:
+            totalQuestions > 0 ? Math.round(totalTime / totalQuestions) : 0,
+          chapterPerformance,
+          mistakes: [],
+        };
       }
+    } catch (fallbackEx) {
+      console.error('Fallback subject analysis failed', fallbackEx);
     }
   }
 
@@ -401,157 +382,129 @@ export const getOverallAnalytics = async (
   timeFilter: 'all' | 'month' | 'week',
 ): Promise<OverallAnalytics> => {
   if (isSupabaseConfigured() && supabase) {
-    // 1. Try the new optimized RPC for summary stats
-    const { data: summary, error: summaryError } = await supabase.rpc(
-      'get_dashboard_summary',
-      { p_user_id: userId },
-    );
-
-    const { data, error } = await supabase.rpc('get_overall_analytics', {
-      p_user_id: userId,
-      p_time_filter: timeFilter,
-    });
-
-    if (!error && data) {
-      // Merge results: Use summary from the new RPC if available
-      return {
-        totalExams: summary?.totalExams ?? data.totalExams ?? 0,
-        avgScore: summary?.avgScore ?? data.avgScore ?? 0,
-        avgAccuracy: summary?.avgAccuracy ?? data.avgAccuracy ?? 0,
-        totalTime: data.totalTime || 0,
-        timelineData: data.timelineData || [],
-        subjectData: data.subjectData || [],
-      };
-    } else {
-      console.warn(
-        'RPC Error (Overall Analytics). Attempting fallback...',
-        error,
-      );
-
-      try {
-        // Fallback: Calculate analytics client-side if RPC fails or is missing
-        let dateFilter = new Date();
-        if (timeFilter === 'week') {
-          dateFilter.setDate(dateFilter.getDate() - 7);
-        } else if (timeFilter === 'month') {
-          dateFilter.setMonth(dateFilter.getMonth() - 1);
-        } else {
-          dateFilter = new Date('1970-01-01');
-        }
-
-        const { data: rawData, error: fallbackError } = await supabase
-          .from('exam_results')
-          .select(
-            'score, total_marks, total_questions, correct_count, wrong_count, time_taken, date, subject',
-          )
-          .eq('user_id', userId)
-          .eq('status', 'evaluated')
-          .gte('date', dateFilter.toISOString());
-
-        if (!fallbackError && rawData) {
-          let totalQuestions = 0;
-          let totalCorrect = 0;
-          let totalTime = 0;
-          let scoreSum = 0;
-
-          const subjectMap = new Map<
-            string,
-            {
-              name: string;
-              correct: number;
-              wrong: number;
-              skipped: number;
-              total: number;
-            }
-          >();
-          const timelineMap = new Map<
-            string,
-            { name: string; score: number; _count: number; fullDate: string }
-          >();
-
-          rawData.forEach((exam) => {
-            totalQuestions += exam.total_questions || 0;
-            totalCorrect += exam.correct_count || 0;
-            totalTime += exam.time_taken || 0;
-
-            if (exam.total_marks > 0) {
-              scoreSum += (exam.score / exam.total_marks) * 100;
-            }
-
-            // Subject aggregate
-            const subj = exam.subject || 'General';
-            if (!subjectMap.has(subj)) {
-              subjectMap.set(subj, {
-                name: subj,
-                correct: 0,
-                wrong: 0,
-                skipped: 0,
-                total: 0,
-              });
-            }
-            const sData = subjectMap.get(subj)!;
-            sData.correct += exam.correct_count || 0;
-            sData.wrong += exam.wrong_count || 0;
-            sData.total += exam.total_questions || 0;
-            sData.skipped += Math.max(
-              0,
-              (exam.total_questions || 0) -
-                ((exam.correct_count || 0) + (exam.wrong_count || 0)),
-            );
-
-            // Timeline aggregate
-            const examDate = new Date(exam.date);
-            const dateStr = examDate.toLocaleDateString('bn-BD', {
-              day: 'numeric',
-              month: 'short',
-            });
-            if (!timelineMap.has(dateStr)) {
-              timelineMap.set(dateStr, {
-                name: dateStr,
-                score: 0,
-                _count: 0,
-                fullDate: exam.date,
-              });
-            }
-            const tData = timelineMap.get(dateStr)!;
-            tData._count += 1;
-            tData.score +=
-              exam.total_marks > 0 ? (exam.score / exam.total_marks) * 100 : 0;
-          });
-
-          const timelineData = Array.from(timelineMap.values())
-            .map((t) => ({
-              name: t.name,
-              score: Math.round(t.score / t._count),
-              fullDate: new Date(t.fullDate).toLocaleDateString('bn-BD', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              }),
-            }))
-            .sort(
-              (a, b) =>
-                new Date(a.fullDate).getTime() - new Date(b.fullDate).getTime(),
-            );
-
-          return {
-            totalExams: rawData.length,
-            avgScore:
-              rawData.length > 0 ? Math.round(scoreSum / rawData.length) : 0,
-            avgAccuracy:
-              totalQuestions > 0
-                ? Math.round((totalCorrect / totalQuestions) * 100)
-                : 0,
-            totalTime,
-            timelineData,
-            subjectData: Array.from(subjectMap.values()).sort(
-              (a, b) => b.total - a.total,
-            ),
-          };
-        }
-      } catch (fallbackEx) {
-        console.error('Fallback analytics failed', fallbackEx);
+    // Bypassing buggy RPCs to use safe TS fallback for accurate metric calculation
+    try {
+      let dateFilter = new Date();
+      if (timeFilter === 'week') {
+        dateFilter.setDate(dateFilter.getDate() - 7);
+      } else if (timeFilter === 'month') {
+        dateFilter.setMonth(dateFilter.getMonth() - 1);
+      } else {
+        dateFilter = new Date('1970-01-01');
       }
+
+      const { data: rawData, error: fallbackError } = await supabase
+        .from('exam_results')
+        .select(
+          'score, total_marks, total_questions, correct_count, wrong_count, time_taken, date, subject',
+        )
+        .eq('user_id', userId)
+        .eq('status', 'evaluated')
+        .gte('date', dateFilter.toISOString());
+
+      if (!fallbackError && rawData) {
+        let totalQuestions = 0;
+        let totalCorrect = 0;
+        let totalTime = 0;
+        let scoreSum = 0;
+
+        const subjectMap = new Map<
+          string,
+          {
+            name: string;
+            correct: number;
+            wrong: number;
+            skipped: number;
+            total: number;
+          }
+        >();
+        const timelineMap = new Map<
+          string,
+          { name: string; score: number; _count: number; fullDate: string }
+        >();
+
+        rawData.forEach((exam) => {
+          totalQuestions += exam.total_questions || 0;
+          totalCorrect += exam.correct_count || 0;
+          totalTime += exam.time_taken || 0;
+
+          if (exam.total_marks > 0) {
+            scoreSum += (exam.score / exam.total_marks) * 100;
+          }
+
+          // Subject aggregate
+          const subj = exam.subject || 'General';
+          if (!subjectMap.has(subj)) {
+            subjectMap.set(subj, {
+              name: subj,
+              correct: 0,
+              wrong: 0,
+              skipped: 0,
+              total: 0,
+            });
+          }
+          const sData = subjectMap.get(subj)!;
+          sData.correct += exam.correct_count || 0;
+          sData.wrong += exam.wrong_count || 0;
+          sData.total += exam.total_questions || 0;
+          sData.skipped += Math.max(
+            0,
+            (exam.total_questions || 0) -
+              ((exam.correct_count || 0) + (exam.wrong_count || 0)),
+          );
+
+          // Timeline aggregate
+          const examDate = new Date(exam.date);
+          const dateStr = examDate.toLocaleDateString('bn-BD', {
+            day: 'numeric',
+            month: 'short',
+          });
+          if (!timelineMap.has(dateStr)) {
+            timelineMap.set(dateStr, {
+              name: dateStr,
+              score: 0,
+              _count: 0,
+              fullDate: exam.date,
+            });
+          }
+          const tData = timelineMap.get(dateStr)!;
+          tData._count += 1;
+          tData.score +=
+            exam.total_marks > 0 ? (exam.score / exam.total_marks) * 100 : 0;
+        });
+
+        const timelineData = Array.from(timelineMap.values())
+          .map((t) => ({
+            name: t.name,
+            score: Math.round(t.score / t._count),
+            fullDate: new Date(t.fullDate).toLocaleDateString('bn-BD', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            }),
+          }))
+          .sort(
+            (a, b) =>
+              new Date(a.fullDate).getTime() - new Date(b.fullDate).getTime(),
+          );
+
+        return {
+          totalExams: rawData.length,
+          avgScore:
+            rawData.length > 0 ? Math.round(scoreSum / rawData.length) : 0,
+          avgAccuracy:
+            totalQuestions > 0
+              ? Math.round((totalCorrect / totalQuestions) * 100)
+              : 0,
+          totalTime,
+          timelineData,
+          subjectData: Array.from(subjectMap.values()).sort(
+            (a, b) => b.total - a.total,
+          ),
+        };
+      }
+    } catch (fallbackEx) {
+      console.error('Fallback analytics failed', fallbackEx);
     }
   }
 

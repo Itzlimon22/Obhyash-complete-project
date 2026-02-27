@@ -210,20 +210,19 @@ Obhyash's basic plan is completely free, giving you access to daily practice exa
 
 blogPosts.forEach((post) => {
   const { content, slug, ...frontmatter } = post;
-  let md = '---' + '\\n';
-  md += 'title: ' + JSON.stringify(frontmatter.title) + '\\n';
-  md += 'excerpt: ' + JSON.stringify(frontmatter.excerpt) + '\\n';
-  md += 'category: ' + JSON.stringify(frontmatter.category) + '\\n';
-  md += 'tags: ' + JSON.stringify(frontmatter.tags) + '\\n';
-  md += 'authorName: ' + JSON.stringify(frontmatter.author.name) + '\\n';
-  md += 'authorRole: ' + JSON.stringify(frontmatter.author.role) + '\\n';
-  md +=
-    'authorInitials: ' + JSON.stringify(frontmatter.author.initials) + '\\n';
-  md += 'publishedAt: ' + JSON.stringify(frontmatter.publishedAt) + '\\n';
-  md += 'readTime: ' + frontmatter.readTime + '\\n';
-  md += 'featured: ' + frontmatter.featured + '\\n';
-  md += 'coverColor: ' + JSON.stringify(frontmatter.coverColor) + '\\n';
-  md += '---' + '\\n';
+  let md = '---\n';
+  md += 'title: ' + JSON.stringify(frontmatter.title) + '\n';
+  md += 'excerpt: ' + JSON.stringify(frontmatter.excerpt) + '\n';
+  md += 'category: ' + JSON.stringify(frontmatter.category) + '\n';
+  md += 'tags: ' + JSON.stringify(frontmatter.tags) + '\n';
+  md += 'authorName: ' + JSON.stringify(frontmatter.author.name) + '\n';
+  md += 'authorRole: ' + JSON.stringify(frontmatter.author.role) + '\n';
+  md += 'authorInitials: ' + JSON.stringify(frontmatter.author.initials) + '\n';
+  md += 'publishedAt: ' + JSON.stringify(frontmatter.publishedAt) + '\n';
+  md += 'readTime: ' + frontmatter.readTime + '\n';
+  md += 'featured: ' + frontmatter.featured + '\n';
+  md += 'coverColor: ' + JSON.stringify(frontmatter.coverColor) + '\n';
+  md += '---\n';
   md += content;
 
   fs.writeFileSync(path.join(contentDir, slug + '.md'), md);

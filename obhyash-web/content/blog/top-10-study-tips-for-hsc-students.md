@@ -1,4 +1,17 @@
----\ntitle: "Top 10 Study Tips Every HSC Student Must Know"\nexcerpt: "Struggling to keep up with your HSC syllabus? These 10 research-backed study techniques will transform how you learn and help you score higher in exams."\ncategory: "Study Tips"\ntags: ["HSC","Study Tips","Academic Success","Learning"]\nauthorName: "Obhyash Team"\nauthorRole: "Education Expert"\nauthorInitials: "OT"\npublishedAt: "2026-02-20"\nreadTime: 7\nfeatured: true\ncoverColor: "from-rose-500 to-pink-600"\n---\n## Why Most Students Study the Wrong Way
+---
+title: "Top 10 Study Tips Every HSC Student Must Know"
+excerpt: "Struggling to keep up with your HSC syllabus? These 10 research-backed study techniques will transform how you learn and help you score higher in exams."
+category: "Study Tips"
+tags: ["HSC","Study Tips","Academic Success","Learning"]
+authorName: "Obhyash Team"
+authorRole: "Education Expert"
+authorInitials: "OT"
+publishedAt: "2026-02-20"
+readTime: 7
+featured: true
+coverColor: "from-rose-500 to-pink-600"
+---
+## Why Most Students Study the Wrong Way
 Many students spend hours reading textbooks but still struggle during exams. The problem isn't how much you study — it's **how** you study. Science-backed learning techniques can dramatically improve your retention and exam performance.
 
 ## 1. Active Recall Over Passive Reading

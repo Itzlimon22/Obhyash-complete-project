@@ -1,4 +1,17 @@
----\ntitle: "The Complete SSC Exam Preparation Guide for 2026"\nexcerpt: "A structured, month-by-month SSC preparation roadmap covering every subject, revision strategy, and last-minute tips to maximize your board exam score."\ncategory: "Exam Prep"\ntags: ["SSC","Board Exam","Preparation","Roadmap"]\nauthorName: "Obhyash Team"\nauthorRole: "Academic Advisor"\nauthorInitials: "OT"\npublishedAt: "2026-02-10"\nreadTime: 9\nfeatured: false\ncoverColor: "from-emerald-500 to-teal-600"\n---\n## Starting Your SSC Journey
+---
+title: "The Complete SSC Exam Preparation Guide for 2026"
+excerpt: "A structured, month-by-month SSC preparation roadmap covering every subject, revision strategy, and last-minute tips to maximize your board exam score."
+category: "Exam Prep"
+tags: ["SSC","Board Exam","Preparation","Roadmap"]
+authorName: "Obhyash Team"
+authorRole: "Academic Advisor"
+authorInitials: "OT"
+publishedAt: "2026-02-10"
+readTime: 9
+featured: false
+coverColor: "from-emerald-500 to-teal-600"
+---
+## Starting Your SSC Journey
 The SSC exam tests 10 subjects across hundreds of chapters. Success requires a **systematic approach**, not last-minute cramming. This guide gives you a proven preparation strategy from the beginning right up to exam day.
 
 ## Phase 1: Foundation (3-4 Months Before Exam)
