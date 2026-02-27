@@ -390,10 +390,10 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   return (
     <div className="min-h-screen bg-[#f5f5f5] dark:bg-[#0e0e0e] transition-colors pb-28 md:pb-10">
       {/* ── Android-style top app bar (mobile) / Desktop header ── */}
-      <header className="sticky top-0 z-30 bg-white dark:bg-[#161616] border-b border-neutral-200 dark:border-neutral-800 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 h-14 md:h-16 flex items-center justify-end gap-3">
-          {/* Desktop tab strip */}
-          <div className="hidden md:flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 rounded-xl p-1">
+      <header className="sticky top-0 z-30 bg-white dark:bg-[#161616] border-b border-neutral-200 dark:border-neutral-800 shadow-sm overflow-x-auto hide-scrollbar">
+        <div className="max-w-6xl mx-auto px-2 md:px-4 py-2 md:py-0 md:h-16 flex items-center justify-start md:justify-end gap-3 min-w-max w-fit md:w-full">
+          {/* Tab strip */}
+          <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 rounded-xl p-1">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -418,9 +418,9 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       <div className="max-w-6xl mx-auto px-2 md:px-4 pt-4 md:pt-6 space-y-4">
         {/* ── Filters row ── */}
         {activeTab === 'exams' && (
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="grid grid-cols-2 md:flex md:flex-row gap-2">
             {/* Search */}
-            <div className="relative flex-1">
+            <div className="relative col-span-2 md:flex-1">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -443,18 +443,18 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   setVisibleCount(9);
                 }}
                 placeholder="খুঁজুন..."
-                className="w-full bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 rounded-xl pl-9 pr-3 py-2.5 text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all"
+                className="w-full bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 rounded-xl pl-9 pr-3 py-2 text-sm text-neutral-800 dark:text-neutral-200 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all h-[42px]"
               />
             </div>
             {/* Subject */}
-            <div className="relative">
+            <div className="relative col-span-1 border-r border-neutral-200 dark:border-neutral-700 md:border-r-0">
               <select
                 value={filterSubject}
                 onChange={(e) => {
                   setFilterSubject(e.target.value);
                   setVisibleCount(9);
                 }}
-                className="appearance-none bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 text-sm rounded-xl px-3 pr-8 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all w-full sm:w-auto cursor-pointer"
+                className="appearance-none bg-white dark:bg-[#1c1c1c] border md:border-neutral-200 dark:md:border-neutral-700 text-neutral-700 dark:text-neutral-300 text-sm rounded-l-xl md:rounded-xl px-3 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all w-full h-[42px] cursor-pointer"
               >
                 <option value="">সকল বিষয়</option>
                 {uniqueSubjects.map(([code, label]) => (
@@ -485,7 +485,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 setFilterDate(e.target.value);
                 setVisibleCount(9);
               }}
-              className="bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all w-full sm:w-auto"
+              className="col-span-1 bg-white dark:bg-[#1c1c1c] border-t border-r border-neutral-200 dark:border-neutral-700 md:border md:border-neutral-200 dark:md:border-neutral-700 text-neutral-700 dark:text-neutral-300 text-sm rounded-r-xl md:rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all w-full h-[42px]"
             />
             {/* Sort */}
             <select
@@ -496,7 +496,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                 );
                 setVisibleCount(9);
               }}
-              className="bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all w-full sm:w-auto cursor-pointer"
+              className="col-span-2 md:col-span-1 bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all w-full md:w-auto h-[42px] cursor-pointer mt-1 md:mt-0"
             >
               <option value="date">তারিখ অনুযায়ী</option>
               <option value="score-high">স্কোর: বেশি আগে</option>
