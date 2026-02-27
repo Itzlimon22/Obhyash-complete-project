@@ -40,11 +40,15 @@ export default async function AuthorProfilePage({
   }
   const allPosts = await getAllPosts();
 
+  // Helper to remove all whitespace and zero-width characters for robust comparison
+  const sanitizeForMatch = (str: string) => {
+    return str.toLowerCase().replace(/[\s\u200B-\u200D\uFEFF]/g, '');
+  };
+
   // Find all posts by this precise author name
-  const authorPosts = allPosts.filter(
-    (post) =>
-      post.author.name.trim().toLowerCase() === decodedName.toLowerCase(),
-  );
+  const authorPosts = allPosts.filter((post) => {
+    return sanitizeForMatch(post.author.name) === sanitizeForMatch(decodedName);
+  });
 
   // If this author doesn't exist or has 0 posts, show 404
   if (authorPosts.length === 0) {
