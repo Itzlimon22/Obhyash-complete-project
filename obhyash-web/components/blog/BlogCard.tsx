@@ -40,9 +40,9 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
         <article className="relative overflow-hidden rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] hover:border-slate-300 dark:hover:border-[#404040] shadow-sm hover:shadow-md transition-all duration-200">
           <div className="p-6 sm:p-8 md:p-10">
             {/* Featured badge + Category */}
-            <div className="flex flex-wrap items-center gap-2.5 mb-5">
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-500 text-white text-xs font-bold rounded-full uppercase tracking-wider">
-                ⭐ Featured
+            <div className="flex flex-wrap items-center gap-2.5 mb-5 font-anek">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-500 text-white text-[11px] font-bold rounded-full uppercase tracking-wider">
+                ⭐ নির্বাচিত
               </span>
               <span
                 className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full border ${categoryStyle}`}
@@ -52,10 +52,10 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
               </span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors duration-200 leading-[1.6]">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors duration-200 leading-[1.6] font-anek">
               {post.title}
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 text-[15px] sm:text-base leading-[1.7] mb-6 line-clamp-3">
+            <p className="text-slate-500 dark:text-slate-400 text-[15px] sm:text-base leading-[1.7] mb-6 line-clamp-3 font-anek">
               {post.excerpt}
             </p>
 
@@ -70,17 +70,17 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
                   <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                     {post.author.name}
                   </p>
-                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <div className="flex items-center gap-2 text-xs text-slate-400 font-anek">
                     <span>{formatDate(post.publishedAt)}</span>
                     <span>·</span>
                     <Clock className="w-3 h-3" />
-                    <span>{post.readTime} min read</span>
+                    <span>{post.readTime} মিনিট</span>
                   </div>
                 </div>
               </div>
 
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-[#1e1e1e] hover:bg-slate-200 dark:hover:bg-[#2b2b2b] text-slate-700 dark:text-slate-300 text-sm font-semibold rounded-lg transition-all duration-200">
-                Read Article
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-[#1e1e1e] hover:bg-slate-200 dark:hover:bg-[#2b2b2b] text-slate-700 dark:text-slate-300 text-sm font-semibold rounded-lg transition-all duration-200 font-anek">
+                বিস্তারিত পড়ুন
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
               </span>
             </div>
@@ -104,10 +104,10 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
             </span>
           </div>
 
-          <h3 className="text-[17px] font-bold text-slate-900 dark:text-slate-100 mb-2.5 line-clamp-2 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors duration-200 leading-[1.6]">
+          <h3 className="text-[17px] font-bold text-slate-900 dark:text-slate-100 mb-2.5 line-clamp-2 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors duration-200 leading-[1.6] font-anek">
             {post.title}
           </h3>
-          <p className="text-[14px] text-slate-500 dark:text-slate-400 leading-[1.7] mb-5 line-clamp-3 flex-grow">
+          <p className="text-[14px] text-slate-500 dark:text-slate-400 leading-[1.7] mb-5 line-clamp-3 flex-grow font-anek">
             {post.excerpt}
           </p>
 
@@ -130,9 +130,9 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
               >
                 {post.author.initials}
               </div>
-              <div className="flex items-center gap-1.5 text-xs text-slate-400">
+              <div className="flex items-center gap-1.5 text-xs text-slate-400 font-anek">
                 <Clock className="w-3 h-3" />
-                <span>{post.readTime} min</span>
+                <span>{post.readTime} মিনিট</span>
                 <span>·</span>
                 <span>{formatDate(post.publishedAt)}</span>
               </div>
