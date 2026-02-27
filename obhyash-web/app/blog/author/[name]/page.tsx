@@ -7,9 +7,15 @@ import { PencilLine, BookOpen } from 'lucide-react';
 export async function generateMetadata({
   params,
 }: {
-  params: { name: string };
+  params: Promise<{ name: string }>;
 }): Promise<Metadata> {
-  const decodedName = decodeURIComponent(params.name).replace(/\+/g, ' ');
+  const { name } = await params;
+  let decodedName = name;
+  try {
+    decodedName = decodeURIComponent(name).replace(/\+/g, ' ');
+  } catch (e) {
+    decodedName = name.replace(/\+/g, ' ');
+  }
   return {
     title: `${decodedName} - Author Profile | Obhyash Blog`,
     description: `Read all articles and study tips written by ${decodedName} on Obhyash.`,
@@ -22,11 +28,16 @@ export const revalidate = 3600;
 export default async function AuthorProfilePage({
   params,
 }: {
-  params: { name: string };
+  params: Promise<{ name: string }>;
 }) {
-  const decodedName = decodeURIComponent(params.name)
-    .replace(/\+/g, ' ')
-    .trim();
+  const { name } = await params;
+
+  let decodedName = name;
+  try {
+    decodedName = decodeURIComponent(name).replace(/\+/g, ' ').trim();
+  } catch (e) {
+    decodedName = name.replace(/\+/g, ' ').trim();
+  }
   const allPosts = await getAllPosts();
 
   // Find all posts by this precise author name

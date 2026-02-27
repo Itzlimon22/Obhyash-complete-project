@@ -305,18 +305,18 @@ export default async function BlogPostPage({
             </Link>
 
             {/* Top Cards: Table of Contents & Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
               <TableOfContents items={tocItems} />
 
               {/* Reading info card */}
-              <div className="rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] p-5 space-y-3 font-anek">
+              <div className="rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] p-4 sm:p-5 space-y-2 sm:space-y-3 font-anek">
                 <h3 className="font-semibold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   আর্টিকেল তথ্য
                 </h3>
-                <div className="space-y-4 text-sm text-slate-500 dark:text-slate-400 mt-4">
+                <div className="space-y-3 sm:space-y-4 text-[13px] sm:text-sm text-slate-500 dark:text-slate-400 mt-3 sm:mt-4">
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <Clock className="w-4 h-4" /> পড়ার সময়
+                      <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> পড়ার সময়
                     </span>
                     <span className="font-semibold text-slate-700 dark:text-slate-200">
                       {post.readTime} মিনিট
@@ -324,7 +324,8 @@ export default async function BlogPostPage({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" /> প্রকাশিত
+                      <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />{' '}
+                      প্রকাশিত
                     </span>
                     <span className="font-semibold text-slate-700 dark:text-slate-200">
                       {formatDate(post.publishedAt)}
@@ -332,10 +333,10 @@ export default async function BlogPostPage({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <Tag className="w-4 h-4" /> ক্যাটাগরি
+                      <Tag className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> ক্যাটাগরি
                     </span>
                     <span
-                      className={`font-semibold px-2.5 py-1 text-xs rounded-full border ${categoryStyle}`}
+                      className={`font-semibold px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs rounded-full border ${categoryStyle}`}
                     >
                       {post.category}
                     </span>
@@ -371,6 +372,11 @@ export default async function BlogPostPage({
               >
                 {post.content}
               </ReactMarkdown>
+            </div>
+
+            {/* Comments Section */}
+            <div className="mt-12">
+              <CommentSection postSlug={post.slug} />
             </div>
 
             {/* Tags */}
@@ -430,11 +436,6 @@ export default async function BlogPostPage({
 
             {/* Newsletter Subscription */}
             <NewsletterSubscribe />
-
-            {/* Comments Section */}
-            <div className="mt-10">
-              <CommentSection postSlug={post.slug} />
-            </div>
           </article>
         </div>
       </div>

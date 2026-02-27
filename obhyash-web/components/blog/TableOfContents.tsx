@@ -39,11 +39,11 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
   if (items.length === 0) return null;
 
   return (
-    <div className="rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] p-5 font-anek">
-      <h3 className="font-semibold text-[15px] text-slate-900 dark:text-slate-100 mb-4">
+    <div className="rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] p-4 sm:p-5 font-anek">
+      <h3 className="font-semibold text-[14px] sm:text-[15px] text-slate-900 dark:text-slate-100 mb-3 sm:mb-4">
         সূচিপত্র
       </h3>
-      <nav className="flex flex-col space-y-2.5 relative">
+      <nav className="flex flex-col space-y-2 sm:space-y-2.5 relative">
         {/* Animated vertical line */}
         <div className="absolute left-[3px] top-1 bottom-1 w-px bg-slate-200 dark:bg-slate-700" />
 
