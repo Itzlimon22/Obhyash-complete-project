@@ -12,6 +12,7 @@ import { createClient } from '@/utils/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { UserProfile } from '@/lib/types';
 import { toast } from 'sonner';
+import { mutate } from 'swr';
 import { mapDbRowToProfile } from '@/services/user-service';
 
 interface AuthContextType {
@@ -165,6 +166,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           profile.id !== session.user.id ||
           event === 'USER_UPDATED' ||
           event === 'TOKEN_REFRESHED';
+
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          // Invalidate all SWR caches to force re-fetches with the fresh token
+          // This fixes the issue where an expired session hangs the app data
+          mutate(() => true, undefined, { revalidate: true });
+        }
 
         if (shouldFetchProfile) {
           const userProfile = await fetchProfile(session.user.id);
