@@ -34,6 +34,7 @@ import SocialShare from '@/components/blog/SocialShare';
 import TableOfContents from '@/components/blog/TableOfContents';
 import CommentSection from '@/components/blog/CommentSection';
 import LikeButton from '@/components/blog/LikeButton';
+import NewsletterSubscribe from '@/components/blog/NewsletterSubscribe';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -370,6 +371,9 @@ export default async function BlogPostPage({
                 ))}
               </div>
             </div>
+
+            {/* Newsletter Subscription */}
+            <NewsletterSubscribe />
 
             {/* Comments Section */}
             <CommentSection postSlug={post.slug} />
