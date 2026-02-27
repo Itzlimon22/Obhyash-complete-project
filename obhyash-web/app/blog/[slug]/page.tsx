@@ -13,13 +13,27 @@ import {
   LayoutDashboard,
   ArrowRight,
   BookOpen,
+  Info,
+  AlertTriangle,
+  Lightbulb,
+  CheckCircle2,
+  AlertOctagon,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
+import rehypeSlug from 'rehype-slug';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.css';
 import 'katex/dist/katex.min.css';
+
+import ProgressBar from '@/components/blog/ProgressBar';
+import SocialShare from '@/components/blog/SocialShare';
+import TableOfContents from '@/components/blog/TableOfContents';
+import CommentSection from '@/components/blog/CommentSection';
+import LikeButton from '@/components/blog/LikeButton';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -105,8 +119,132 @@ export default async function BlogPostPage({
     url: `https://obhyash.com/blog/${post.slug}`,
   };
 
+  // Extract headings for Table of Contents
+  const extractHeadings = (markdown: string) => {
+    const headingRegex = /^(#{2,3})\s+(.+)$/gm;
+    const items = [];
+    let match;
+    while ((match = headingRegex.exec(markdown)) !== null) {
+      const level = match[1].length;
+      const text = match[2].trim();
+      const id = text
+        .toLowerCase()
+        .replace(/[^a-z0-9\u0980-\u09FF]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      items.push({ id, text, level });
+    }
+    return items;
+  };
+  const tocItems = extractHeadings(post.content);
+
+  // Custom Markdown Callout components
+  const MarkdownComponents = {
+    blockquote: ({ node, children, ...props }: any) => {
+      // Check if this is a custom callout
+      const text = children?.[1]?.props?.children;
+      let calloutType = null;
+      let cleanText = children;
+
+      if (typeof text === 'string') {
+        const match = text.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
+        if (match) {
+          calloutType = match[1].toUpperCase();
+          // Remove the tag from the text when rendering
+          const updatedChild = { ...children[1] };
+          updatedChild.props = {
+            ...updatedChild.props,
+            children: text.replace(
+              /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/i,
+              '',
+            ),
+          };
+          cleanText = [children[0], updatedChild, ...children.slice(2)];
+        }
+      }
+
+      if (!calloutType) {
+        return <blockquote {...props}>{children}</blockquote>;
+      }
+
+      // Render custom gorgeous callout boxes
+      const config: any = {
+        NOTE: {
+          color:
+            'bg-blue-50/50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20 text-blue-900 dark:text-blue-200',
+          icon: <Info className="w-5 h-5 text-blue-500" />,
+        },
+        TIP: {
+          color:
+            'bg-emerald-50/50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-900 dark:text-emerald-200',
+          icon: <Lightbulb className="w-5 h-5 text-emerald-500" />,
+        },
+        IMPORTANT: {
+          color:
+            'bg-purple-50/50 dark:bg-purple-500/10 border-purple-200 dark:border-purple-500/20 text-purple-900 dark:text-purple-200',
+          icon: <CheckCircle2 className="w-5 h-5 text-purple-500" />,
+        },
+        WARNING: {
+          color:
+            'bg-amber-50/50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 text-amber-900 dark:text-amber-200',
+          icon: <AlertTriangle className="w-5 h-5 text-amber-500" />,
+        },
+        CAUTION: {
+          color:
+            'bg-rose-50/50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-900 dark:text-rose-200',
+          icon: <AlertOctagon className="w-5 h-5 text-rose-500" />,
+        },
+      };
+
+      const { color, icon } = config[calloutType] || config.NOTE;
+
+      return (
+        <div
+          className={`not-prose flex gap-3 p-4 my-6 rounded-xl border ${color} font-anek`}
+        >
+          <div className="shrink-0 mt-0.5">{icon}</div>
+          <div className="text-[16px] leading-relaxed [&>p]:m-0">
+            {cleanText}
+          </div>
+        </div>
+      );
+    },
+    pre: ({ node, ...props }: any) => (
+      <div className="relative group rounded-xl overflow-hidden my-6 bg-[#0d1117] border border-slate-800">
+        <div className="flex items-center px-4 py-2 bg-[#161b22] border-b border-slate-800">
+          <div className="flex gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
+          </div>
+        </div>
+        <pre
+          {...props}
+          className="p-4 overflow-x-auto text-[14px] leading-relaxed font-mono m-0 bg-transparent"
+        />
+      </div>
+    ),
+    code: ({ node, inline, className, children, ...props }: any) => {
+      if (inline) {
+        return (
+          <code
+            className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md text-[14px] font-mono font-medium text-rose-600 dark:text-rose-400 before:content-none after:content-none"
+            {...props}
+          >
+            {children}
+          </code>
+        );
+      }
+      return (
+        <code className={className} {...props}>
+          {children}
+        </code>
+      );
+    },
+  };
+
   return (
     <>
+      <ProgressBar />
       {/* JSON-LD */}
       <script
         type="application/ld+json"
@@ -193,10 +331,27 @@ export default async function BlogPostPage({
             >
               <ReactMarkdown
                 remarkPlugins={[remarkMath, remarkGfm]}
-                rehypePlugins={[rehypeKatex, rehypeRaw]}
+                rehypePlugins={[
+                  rehypeKatex,
+                  rehypeRaw,
+                  rehypeSlug,
+                  rehypeHighlight,
+                ]}
+                components={MarkdownComponents}
               >
                 {post.content}
               </ReactMarkdown>
+            </div>
+
+            {/* Interaction Ribbon (Likes + Social Share) */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mt-12 bg-slate-50 dark:bg-[#1a1a1a] p-4 rounded-2xl border border-slate-100 dark:border-[#2b2b2b]">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-slate-500 dark:text-slate-400 font-anek">
+                  পোস্টটি কেমন লাগলো?
+                </span>
+                <LikeButton postSlug={post.slug} />
+              </div>
+              <SocialShare url={jsonLd.url} title={post.title} />
             </div>
 
             {/* Tags */}
@@ -215,6 +370,9 @@ export default async function BlogPostPage({
                 ))}
               </div>
             </div>
+
+            {/* Comments Section */}
+            <CommentSection postSlug={post.slug} />
 
             {/* Author Bio block */}
             <div className="mt-10 p-6 rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b]">
@@ -262,6 +420,9 @@ export default async function BlogPostPage({
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
+
+              {/* Table of Contents */}
+              <TableOfContents items={tocItems} />
 
               {/* Reading info card */}
               <div className="rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] p-5 space-y-3 font-anek">

@@ -1,0 +1,87 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { cookies } from 'next/headers';
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const slug = searchParams.get('slug');
+
+    if (!slug) {
+      return NextResponse.json(
+        { error: 'Post slug is required' },
+        { status: 400 },
+      );
+    }
+
+    const cookieStore = cookies();
+    const supabase = await createClient();
+
+    // Fetch comments and join with the users table to get name and avatar info
+    const { data: comments, error } = await supabase
+      .from('blog_comments')
+      .select('*, user:user_id(name, avatarUrl, avatarColor)')
+      .eq('post_slug', slug)
+      .order('created_at', { ascending: false }); // Newest first
+
+    if (error) throw error;
+
+    return NextResponse.json({ comments });
+  } catch (error: any) {
+    console.error('Error fetching comments:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch comments' },
+      { status: 500 },
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const cookieStore = cookies();
+    const supabase = await createClient();
+
+    // Verify authentication
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'You must be logged in to comment' },
+        { status: 401 },
+      );
+    }
+
+    const { slug, content } = await request.json();
+
+    if (!slug || !content || content.trim() === '') {
+      return NextResponse.json(
+        { error: 'Slug and content are required' },
+        { status: 400 },
+      );
+    }
+
+    // Insert comment
+    const { data: newComment, error: insertError } = await supabase
+      .from('blog_comments')
+      .insert({
+        post_slug: slug,
+        user_id: user.id,
+        content: content.trim(),
+      })
+      .select('*, user:user_id(name, avatarUrl, avatarColor)')
+      .single();
+
+    if (insertError) throw insertError;
+
+    return NextResponse.json({ comment: newComment });
+  } catch (error: any) {
+    console.error('Error posting comment:', error);
+    return NextResponse.json(
+      { error: 'Failed to post comment' },
+      { status: 500 },
+    );
+  }
+}

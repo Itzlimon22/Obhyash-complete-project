@@ -596,3 +596,29 @@ export interface AppComplaint {
   created_at: string;
   updated_at: string;
 }
+
+// ==========================================
+// 12. BLOG & COMMUNITY
+// ==========================================
+
+export interface BlogComment {
+  id: string;
+  post_slug: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  // Joined relation from the users table
+  user?: {
+    name: string;
+    avatarUrl?: string;
+    avatarColor?: string;
+  };
+}
+
+export interface BlogLike {
+  id: string;
+  post_slug: string;
+  user_id: string;
+  created_at: string;
+}
