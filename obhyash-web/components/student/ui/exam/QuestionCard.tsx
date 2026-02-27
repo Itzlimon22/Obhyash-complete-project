@@ -58,29 +58,27 @@ export default function QuestionCard({
     <div
       id={`question-${question.id}`}
       className={`
-        relative mb-3 md:mb-4 scroll-mt-24
-        bg-white dark:bg-[#1a1a1a]
-        border border-[#e5e5e5] dark:border-[#2a2a2a]
-        rounded-lg overflow-hidden
-        shadow-[0_1px_3px_rgba(0,0,0,0.07)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]
-        transition-shadow duration-200
-        hover:shadow-[0_2px_8px_rgba(0,0,0,0.10)] dark:hover:shadow-[0_2px_8px_rgba(0,0,0,0.4)]
-        ${isFlagged ? 'ring-2 ring-orange-300/50' : ''}
+        relative mb-6 scroll-mt-24
+        bg-white dark:bg-neutral-900
+        border border-neutral-200/80 dark:border-neutral-800
+        rounded-xl
+        transition-all duration-200
+        ${isFlagged ? 'ring-2 ring-orange-400' : ''}
       `}
     >
       {/* ── Top section ── */}
-      <div className="px-1.5 pt-2 pb-1.5 md:px-4 md:pt-3">
+      <div className="px-3 pt-4 pb-2 md:px-5 md:pt-5">
         {/* Question text row */}
-        <div className="flex items-start gap-1.5 mb-1.5">
+        <div className="flex items-start gap-2.5 mb-3">
           {/* Serial number */}
           {serialNumber !== undefined && (
-            <span className="shrink-0 font-semibold text-[15px] md:text-base text-neutral-800 dark:text-neutral-200 leading-[1.7]">
+            <span className="shrink-0 font-bold text-base md:text-lg text-neutral-800 dark:text-neutral-200 leading-snug">
               {toBengaliNumeral(serialNumber)}.
             </span>
           )}
 
           {/* Question text */}
-          <div className="min-w-0 text-[15px] md:text-base text-neutral-900 dark:text-neutral-100 leading-[1.75] font-serif-exam">
+          <div className="min-w-0 text-base md:text-lg text-neutral-900 dark:text-neutral-100 leading-relaxed font-serif-exam font-medium">
             <LatexText text={question.question} />
           </div>
         </div>
@@ -169,8 +167,8 @@ export default function QuestionCard({
       {/* ── Options grid ── */}
       <div
         className={`
-          px-1.5 pb-2 md:px-4 md:pb-3
-          grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1
+          px-3 pb-4 md:px-5 md:pb-5
+          grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3
           ${readOnly || isOmrMode ? 'pointer-events-none' : ''}
         `}
       >
@@ -181,54 +179,54 @@ export default function QuestionCard({
 
           let iconText = banglaIndex;
           let iconBg =
-            'bg-transparent border border-neutral-400 dark:border-neutral-500';
-          let iconFg = 'text-neutral-500 dark:text-neutral-400';
+            'bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:shadow-none';
+          let iconFg = 'text-neutral-600 dark:text-neutral-300';
           let boxClass =
-            'bg-[#f4f4f5] dark:bg-[#252525] border border-transparent hover:bg-[#eaeaeb] dark:hover:bg-[#2e2e2e]';
+            'bg-[#f8f9fa] dark:bg-[#1f1f1f] border border-[#e5e7eb] dark:border-[#333] hover:bg-[#f1f3f5] dark:hover:bg-[#2a2a2a]';
           let textClass = 'text-neutral-800 dark:text-neutral-200';
 
           if (showFeedback) {
             if (isCorrect) {
               boxClass =
-                'bg-[#ecfdf5] dark:bg-[#0d3326] border border-emerald-300 dark:border-emerald-700';
+                'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800';
               iconBg = 'bg-emerald-500 border-emerald-500';
               iconFg = 'text-white';
-              textClass = 'text-emerald-900 dark:text-emerald-100 font-medium';
+              textClass = 'text-emerald-700 dark:text-emerald-300 font-bold';
               iconText = '✓';
             } else if (isSelected) {
               boxClass =
-                'bg-[#fff1f2] dark:bg-[#3a0d13] border border-red-300 dark:border-red-800';
+                'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
               iconBg = 'bg-red-500 border-red-500';
               iconFg = 'text-white';
-              textClass = 'text-red-800 dark:text-red-200 font-medium';
+              textClass = 'text-red-700 dark:text-red-300 font-bold';
               iconText = '✕';
             } else {
               boxClass =
-                'bg-[#f4f4f5] dark:bg-[#252525] border border-transparent opacity-55';
+                'bg-[#f8f9fa] dark:bg-[#1f1f1f] border border-[#e5e7eb] dark:border-[#333] opacity-60';
             }
           } else if (showAnswer && isCorrect) {
             boxClass =
-              'bg-[#ecfdf5] dark:bg-[#0d3326] border border-emerald-300 dark:border-emerald-700';
+              'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800';
             iconBg = 'bg-emerald-500 border-emerald-500';
             iconFg = 'text-white';
-            textClass = 'text-emerald-900 dark:text-emerald-100 font-medium';
+            textClass = 'text-emerald-700 dark:text-emerald-300 font-bold';
             iconText = '✓';
           } else if (isSelected) {
             boxClass =
-              'bg-[#f0f0f0] dark:bg-[#303030] border border-neutral-400 dark:border-neutral-500';
+              'bg-neutral-200 dark:bg-neutral-700 border-neutral-400 dark:border-neutral-500';
             iconBg =
               'bg-neutral-800 border-neutral-800 dark:bg-neutral-200 dark:border-neutral-200';
             iconFg = 'text-white dark:text-neutral-900';
-            textClass = 'text-neutral-900 dark:text-white font-medium';
+            textClass = 'text-neutral-900 dark:text-white font-bold';
           }
 
           return (
             <label
               key={idx}
               className={`
-                group relative flex items-center gap-1.5
-                px-1.5 py-1 rounded-md
-                transition-colors duration-150
+                group relative flex items-start gap-3
+                px-3 py-2.5 rounded-xl border
+                transition-all duration-200
                 ${isOmrMode || readOnly ? 'cursor-default' : 'cursor-pointer'}
                 ${boxClass}
               `}
@@ -247,13 +245,13 @@ export default function QuestionCard({
               {/* Circle badge */}
               <div
                 className={`
-                  w-5 h-5 rounded-full flex items-center justify-center
-                  shrink-0 transition-all duration-150
+                  w-6 h-6 rounded-full flex items-center justify-center mt-0.5
+                  shrink-0 transition-all duration-200
                   ${iconBg}
                 `}
               >
                 <span
-                  className={`text-[10px] font-bold leading-none ${iconFg}`}
+                  className={`text-[11px] font-bold leading-none ${iconFg}`}
                 >
                   {iconText}
                 </span>
@@ -261,7 +259,7 @@ export default function QuestionCard({
 
               {/* Option text */}
               <div
-                className={`text-[13px] md:text-[14px] leading-[1.35] md:leading-[1.55] select-none font-serif-exam ${textClass}`}
+                className={`flex-1 text-[14px] md:text-[15px] leading-relaxed select-none font-serif-exam mt-[1px] ${textClass}`}
               >
                 <LatexText text={option} />
               </div>
@@ -272,28 +270,34 @@ export default function QuestionCard({
 
       {/* ── Explanation ── */}
       {showFeedback && question.explanation && (
-        <div className="mx-1.5 mb-1.5 md:mx-4 md:mb-3 animate-fade-in">
+        <div className="mx-3 mb-4 md:mx-5 md:mb-5 animate-fade-in">
           <div
             className="
-              p-2.5 md:p-4 rounded-md
-              bg-emerald-50 dark:bg-[#0d2a1e]
-              border border-emerald-200 dark:border-emerald-800/60
+              p-4 md:p-5 rounded-xl
+              bg-neutral-50/80 dark:bg-[#1c1c1c]
+              border border-neutral-200/80 dark:border-[#333]
             "
           >
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-3 border-b border-neutral-200/60 dark:border-neutral-800/60 pb-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-4 h-4 text-neutral-500 dark:text-neutral-400 shrink-0"
               >
-                <path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.226 17.834a.75.75 0 0 0-1.06 1.06l1.591 1.59a.75.75 0 0 0 1.06-1.061l-1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.166 7.226a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591Z" />
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 16v-4"></path>
+                <path d="M12 8h.01"></path>
               </svg>
-              <h4 className="text-[11px] font-black tracking-wide text-emerald-700 dark:text-emerald-400 uppercase">
-                ব্যাখ্যা
+              <h4 className="text-[13px] md:text-sm font-bold tracking-wide text-neutral-800 dark:text-neutral-200">
+                সঠিক উত্তর ও ব্যাখ্যা
               </h4>
             </div>
-            <div className="text-[13.5px] md:text-sm text-neutral-700 dark:text-neutral-200 leading-[1.8] font-serif-exam">
+            <div className="text-[14px] md:text-[15px] text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif-exam">
               <LatexText text={question.explanation} />
             </div>
           </div>
