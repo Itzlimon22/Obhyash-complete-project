@@ -5,6 +5,28 @@ import { BlogPost } from '@/lib/blog-data';
 import BlogCard from '@/components/blog/BlogCard';
 import { BookOpen, Sparkles, TrendingUp, Search } from 'lucide-react';
 
+const SUB_CATEGORIES = [
+  'সব',
+  'পদার্থবিজ্ঞান',
+  'রসায়ন',
+  'জীববিজ্ঞান',
+  'উচ্চতর গণিত',
+  'আইসিটি',
+  'হিসাববিজ্ঞান',
+  'ব্যবসায় সংগঠন ও ব্যবস্থাপনা',
+  'ফিন্যান্স/ব্যাংকিং',
+  'উৎপাদন ব্যবস্থাপনা ও বিপণন',
+  'বাংলাদেশ ও বিশ্বপরিচয়',
+  'ভূগোল',
+  'পৌরনীতি',
+  'ইসলাম শিক্ষা',
+  'বাংলা ১ম পত্র',
+  'বাংলা ২য় পত্র',
+  'ইংরেজি ১ম পত্র',
+  'ইংরেজি ২য় পত্র',
+  'সাধারণ গণিত',
+];
+
 const CATEGORY_TRANSLATIONS: Record<string, string> = {
   All: 'সব',
   'Study Tips': 'স্টাডি টিপস',
@@ -30,6 +52,7 @@ export default function BlogListingClient({
   isGuest,
 }: BlogListingClientProps) {
   const [activeCategory, setActiveCategory] = useState('All');
+  const [activeSubCategory, setActiveSubCategory] = useState('সব');
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredPosts = useMemo(() => {
@@ -37,6 +60,13 @@ export default function BlogListingClient({
 
     if (activeCategory !== 'All') {
       result = result.filter((p) => p.category === activeCategory);
+    }
+
+    if (
+      activeCategory === 'বিষয়ভিত্তিক পড়াশোনা' &&
+      activeSubCategory !== 'সব'
+    ) {
+      result = result.filter((p) => p.tags.includes(activeSubCategory));
     }
 
     if (searchQuery.trim()) {
@@ -50,13 +80,21 @@ export default function BlogListingClient({
     }
 
     return result;
-  }, [posts, activeCategory, searchQuery]);
+  }, [posts, activeCategory, activeSubCategory, searchQuery]);
 
   const nonFeaturedFiltered = filteredPosts.filter(
-    (p) => !p.featured || activeCategory !== 'All' || searchQuery,
+    (p) =>
+      !p.featured ||
+      activeCategory !== 'All' ||
+      activeSubCategory !== 'সব' ||
+      searchQuery,
   );
 
-  const showFeatured = !searchQuery && activeCategory === 'All' && featuredPost;
+  const showFeatured =
+    !searchQuery &&
+    activeCategory === 'All' &&
+    activeSubCategory === 'সব' &&
+    featuredPost;
 
   return (
     <>
@@ -119,17 +157,38 @@ export default function BlogListingClient({
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setActiveCategory(cat)}
+                onClick={() => {
+                  setActiveCategory(cat);
+                  setActiveSubCategory('সব');
+                }}
                 className={`px-3.5 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors border font-anek ${
                   activeCategory === cat
                     ? 'bg-slate-800 text-white border-slate-800 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200'
                     : 'bg-transparent text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#383838] hover:bg-slate-50 dark:hover:bg-[#1a1a1a]'
                 }`}
               >
-                {CATEGORY_TRANSLATIONS[cat] || cat}
+                {cat === 'All' ? 'সব' : cat}
               </button>
             ))}
           </div>
+
+          {activeCategory === 'বিষয়ভিত্তিক পড়াশোনা' && (
+            <div className="flex items-center gap-2 min-w-max mx-auto justify-start sm:justify-center mt-3 border-t border-slate-100 dark:border-[#2b2b2b] pt-3">
+              {SUB_CATEGORIES.map((subcat) => (
+                <button
+                  key={subcat}
+                  onClick={() => setActiveSubCategory(subcat)}
+                  className={`px-3 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors border font-anek ${
+                    activeSubCategory === subcat
+                      ? 'bg-slate-100 dark:bg-[#202020] text-slate-800 dark:text-slate-200 border-slate-300 dark:border-[#404040]'
+                      : 'bg-transparent text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-50 dark:hover:bg-[#1a1a1a]'
+                  }`}
+                >
+                  {subcat}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -138,6 +197,7 @@ export default function BlogListingClient({
         {/* Recommended Top Section (Only shown if no search) */}
         {!searchQuery &&
           activeCategory === 'All' &&
+          activeSubCategory === 'সব' &&
           recommendedPosts.length > 0 && (
             <div className="mb-16 pt-4 border-b border-slate-100 dark:border-[#2b2b2b] pb-16">
               {isGuest ? (
@@ -227,6 +287,7 @@ export default function BlogListingClient({
               onClick={() => {
                 setSearchQuery('');
                 setActiveCategory('All');
+                setActiveSubCategory('সব');
               }}
               className="mt-4 px-4 py-2 text-sm font-semibold text-rose-600 hover:text-rose-700 transition-colors font-anek"
             >

@@ -2,24 +2,6 @@ import Link from 'next/link';
 import { BlogPost } from '@/lib/blog-data';
 import { Clock, ArrowRight, Tag } from 'lucide-react';
 
-interface BlogCardProps {
-  post: BlogPost;
-  featured?: boolean;
-}
-
-const CATEGORY_COLORS: Record<string, string> = {
-  'Study Tips':
-    'bg-slate-100 text-slate-700 dark:bg-[#202020] dark:text-slate-300 border-slate-200 dark:border-[#383838]',
-  'MCQ Techniques':
-    'bg-slate-100 text-slate-700 dark:bg-[#202020] dark:text-slate-300 border-slate-200 dark:border-[#383838]',
-  'Exam Prep':
-    'bg-slate-100 text-slate-700 dark:bg-[#202020] dark:text-slate-300 border-slate-200 dark:border-[#383838]',
-  'Time Management':
-    'bg-slate-100 text-slate-700 dark:bg-[#202020] dark:text-slate-300 border-slate-200 dark:border-[#383838]',
-  Motivation:
-    'bg-slate-100 text-slate-700 dark:bg-[#202020] dark:text-slate-300 border-slate-200 dark:border-[#383838]',
-};
-
 function formatDate(dateStr: string) {
   const date = new Date(dateStr);
   return date.toLocaleDateString('en-US', {
@@ -29,10 +11,14 @@ function formatDate(dateStr: string) {
   });
 }
 
+interface BlogCardProps {
+  post: BlogPost;
+  featured?: boolean;
+}
+
 export default function BlogCard({ post, featured = false }: BlogCardProps) {
   const categoryStyle =
-    CATEGORY_COLORS[post.category] ??
-    'bg-slate-50 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600';
+    'bg-slate-100 text-slate-700 dark:bg-[#202020] dark:text-slate-300 border-slate-200 dark:border-[#383838]';
 
   if (featured) {
     return (

@@ -21,11 +21,16 @@ export interface BlogPost {
 
 export const BLOG_CATEGORIES = [
   'All',
-  'Study Tips',
-  'Exam Prep',
-  'MCQ Techniques',
-  'Time Management',
-  'Motivation',
+  'এসএসসি কর্নার',
+  'এইচএসসি কর্নার',
+  'বিষয়ভিত্তিক পড়াশোনা',
+  'বোর্ড পরীক্ষা প্রস্তুতি',
+  'মডেল টেস্ট ও সমাধান',
+  'স্টাডি টিপস ও রুটিন',
+  'মোটিভেশন ও মানসিক স্বাস্থ্য',
+  'ক্যারিয়ার ও ভর্তি গাইড',
+  'রিসোর্স হাব (PDF/নোটস)',
+  'নোটিশ ও শিক্ষা আপডেট',
 ];
 
 // Initialize Notion Client (fails gracefully if missing env vars)
