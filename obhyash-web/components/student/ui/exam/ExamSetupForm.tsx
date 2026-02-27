@@ -389,7 +389,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             </span>
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-neutral-900 dark:text-white tracking-tight">
-            পরীক্ষা সেটআপ করো
+            পরীক্ষা সেটআপ
           </h1>
         </div>
 

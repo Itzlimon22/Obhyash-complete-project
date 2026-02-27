@@ -255,12 +255,12 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       availableSubjects.find((s) => s.id === subject)?.name || subject;
 
     if (!subject) {
-      setValidationError('অনুগ্রহ করে একটি বিষয় নির্বাচন করো।');
+      setValidationError('একটি বিষয় নির্বাচন করো।');
       return;
     }
 
     if (examTypes.length === 0) {
-      setValidationError('অনুগ্রহ করে কমপক্ষে একটি পরীক্ষার ধরণ নির্বাচন করো।');
+      setValidationError('কমপক্ষে একটি পরীক্ষার ধরণ নির্বাচন করো।');
       return;
     }
 
