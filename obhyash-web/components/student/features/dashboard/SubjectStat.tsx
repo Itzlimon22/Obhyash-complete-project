@@ -119,22 +119,22 @@ const SubjectItem: React.FC<{
 
             {/* Conditionally render Details button */}
             {onClick && (
-              <div className="flex justify-end">
+              <div className="flex justify-center mt-2">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onClick();
                   }}
-                  className="text-xs font-bold text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-white flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700"
+                  className="text-xs font-bold text-neutral-600 hover:text-red-600 dark:text-neutral-400 dark:hover:text-red-400 flex items-center justify-center gap-1.5 transition-colors px-6 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 w-full md:w-auto"
                 >
-                  বিস্তারিত রিপোর্ট
+                  বিস্তারিত রিপোর্ট দেখুন
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={2}
                     stroke="currentColor"
-                    className="w-3 h-3"
+                    className="w-3.5 h-3.5"
                   >
                     <path
                       strokeLinecap="round"
@@ -193,7 +193,7 @@ const SubjectStat: React.FC<SubjectStatProps> = ({
         </h3>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+      <div className="flex flex-col gap-3 md:gap-4">
         {data.map((subject, idx) => (
           <SubjectItem
             key={idx}
