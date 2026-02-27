@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
-import { blogPosts, getFeaturedPost, BLOG_CATEGORIES } from '@/lib/blog-data';
+import { blogPosts, getFeaturedPost, BLOG_CATEGORIES, BlogPost } from '@/lib/blog-data';
 import BlogListingClient from '@/components/blog/BlogListingClient';
+import { createClient } from '@/utils/supabase/server';
+import {
+  getAdvancedRecommendations,
+  getMostViewedPosts,
+} from '@/lib/blog-recommendations';
 
 export const metadata: Metadata = {
   title: 'Obhyash Blog — Study Tips, Exam Strategies & More for Students',
@@ -18,15 +23,36 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogPage() {
+export default async function BlogPage() {
   const featured = getFeaturedPost();
   const allPosts = blogPosts;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let recommendedPosts: BlogPost[] = [];
+  let isGuest = true;
+
+  try {
+    if (user) {
+      isGuest = false;
+      recommendedPosts = await getAdvancedRecommendations(null, user.id);
+    } else {
+      recommendedPosts = await getMostViewedPosts();
+    }
+  } catch (error) {
+    console.error('Failed to load recommended posts:', error);
+  }
 
   return (
     <BlogListingClient
       posts={allPosts}
       featuredPost={featured}
       categories={BLOG_CATEGORIES}
+      recommendedPosts={recommendedPosts}
+      isGuest={isGuest}
     />
   );
 }

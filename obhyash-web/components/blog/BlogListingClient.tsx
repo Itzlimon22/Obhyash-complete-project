@@ -9,12 +9,16 @@ interface BlogListingClientProps {
   posts: BlogPost[];
   featuredPost?: BlogPost;
   categories: string[];
+  recommendedPosts: BlogPost[];
+  isGuest: boolean;
 }
 
 export default function BlogListingClient({
   posts,
   featuredPost,
   categories,
+  recommendedPosts,
+  isGuest,
 }: BlogListingClientProps) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -130,6 +134,50 @@ export default function BlogListingClient({
 
       {/* ─── Main Content ─── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        {/* Recommended Top Section (Only shown if no search) */}
+        {!searchQuery &&
+          activeCategory === 'All' &&
+          recommendedPosts.length > 0 && (
+            <div className="mb-16 pt-4 border-b border-slate-100 dark:border-slate-800/80 pb-16">
+              {isGuest ? (
+                <>
+                  <div className="flex items-center gap-2 mb-5">
+                    <TrendingUp className="w-5 h-5 text-rose-500" />
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">
+                      Trending among Students
+                    </h2>
+                  </div>
+                  <div className="bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-500/10 dark:to-pink-500/10 border border-rose-100 dark:border-rose-500/20 rounded-2xl p-6 mb-8 text-center flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+                    <p className="text-rose-800 dark:text-rose-300 font-medium text-sm sm:text-base text-left max-w-2xl leading-relaxed">
+                      <strong>New here?</strong> Register on Obhyash to get
+                      personalized study tips, exam strategies, and articles
+                      tailored exactly to your academic weak subjects based on
+                      your practice data.
+                    </p>
+                    <a
+                      href="/login"
+                      className="shrink-0 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl transition-all shadow-md shadow-rose-500/20 text-sm hover:-translate-y-0.5 whitespace-nowrap"
+                    >
+                      Create Free Account
+                    </a>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center gap-2 mb-6">
+                  <Sparkles className="w-6 h-6 text-rose-500" />
+                  <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 tracking-tight">
+                    Recommended for You
+                  </h2>
+                </div>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+                {recommendedPosts.map((post) => (
+                  <BlogCard key={post.slug + '-rec'} post={post} />
+                ))}
+              </div>
+            </div>
+          )}
+
         {/* Featured Post */}
         {showFeatured && (
           <div className="mb-10">

@@ -113,6 +113,12 @@ const SIDEBAR_NAVIGATION: { title?: string; items: NavItem[] }[] = [
 
 const BOTTOM_NAVIGATION: NavItem[] = [
   {
+    id: 'blog',
+    label: 'ব্লগ',
+    icon: BookOpen,
+    href: '/blog',
+  },
+  {
     id: 'settings',
     label: 'সেটিংস',
     icon: Settings,

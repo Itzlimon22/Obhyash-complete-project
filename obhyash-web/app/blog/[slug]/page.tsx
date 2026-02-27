@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { blogPosts, getBlogPost, getRelatedPosts } from '@/lib/blog-data';
+import { blogPosts, getBlogPost } from '@/lib/blog-data';
+import { getAdvancedRecommendations } from '@/lib/blog-recommendations';
+import { createClient } from '@/utils/supabase/server';
+import ViewTracker from '@/components/blog/ViewTracker';
 import {
   ArrowLeft,
   Clock,
@@ -11,11 +14,6 @@ import {
   ArrowRight,
   BookOpen,
 } from 'lucide-react';
-
-// ─── Static Generation ─────────────────────────────────────────────
-export async function generateStaticParams() {
-  return blogPosts.map((post) => ({ slug: post.slug }));
-}
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -84,7 +82,13 @@ export default async function BlogPostPage({
   const post = getBlogPost(slug);
   if (!post) notFound();
 
-  const related = getRelatedPosts(post.slug, post.category);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const related = await getAdvancedRecommendations(post.slug, user?.id);
+
   const categoryStyle =
     CATEGORY_COLORS[post.category] ??
     'bg-slate-50 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600';
@@ -116,6 +120,7 @@ export default async function BlogPostPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <ViewTracker slug={post.slug} />
 
       {/* ─── Post Hero ─── */}
       <section className="relative overflow-hidden bg-white dark:bg-slate-900 border-b border-slate-200/70 dark:border-slate-800">
