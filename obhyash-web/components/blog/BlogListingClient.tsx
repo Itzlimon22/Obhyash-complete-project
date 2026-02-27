@@ -5,6 +5,15 @@ import { BlogPost } from '@/lib/blog-data';
 import BlogCard from '@/components/blog/BlogCard';
 import { BookOpen, Sparkles, TrendingUp, Search } from 'lucide-react';
 
+const CATEGORY_TRANSLATIONS: Record<string, string> = {
+  All: 'সব',
+  'Study Tips': 'স্টাডি টিপস',
+  'Exam Prep': 'পরীক্ষার প্রস্তুতি',
+  'MCQ Techniques': 'MCQ কৌশল',
+  'Time Management': 'সময় ব্যবস্থাপনা',
+  Motivation: 'অনুপ্রেরণা',
+};
+
 interface BlogListingClientProps {
   posts: BlogPost[];
   featuredPost?: BlogPost;
@@ -111,13 +120,13 @@ export default function BlogListingClient({
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-3 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors border ${
+                className={`px-3.5 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors border font-anek ${
                   activeCategory === cat
                     ? 'bg-slate-800 text-white border-slate-800 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200'
-                    : 'bg-transparent text-slate-600 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-[#202020]'
+                    : 'bg-transparent text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#383838] hover:bg-slate-50 dark:hover:bg-[#1a1a1a]'
                 }`}
               >
-                {cat}
+                {CATEGORY_TRANSLATIONS[cat] || cat}
               </button>
             ))}
           </div>
