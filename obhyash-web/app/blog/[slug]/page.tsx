@@ -154,7 +154,14 @@ export default async function BlogPostPage({
       }
 
       if (!calloutType) {
-        return <blockquote {...props}>{children}</blockquote>;
+        return (
+          <blockquote
+            className="border-l-4 border-rose-500 dark:border-rose-400 pl-5 sm:pl-6 py-2 sm:py-3 my-6 sm:my-8 bg-rose-50/50 dark:bg-rose-900/10 rounded-r-xl italic text-slate-700 dark:text-slate-300 text-[16px] sm:text-[17px] leading-relaxed"
+            {...props}
+          >
+            {children}
+          </blockquote>
+        );
       }
 
       // Render custom gorgeous callout boxes
@@ -190,27 +197,27 @@ export default async function BlogPostPage({
 
       return (
         <div
-          className={`not-prose flex gap-3 p-4 my-6 rounded-xl border ${color} font-anek`}
+          className={`not-prose flex flex-col sm:flex-row gap-3 p-4 sm:p-5 my-6 sm:my-8 rounded-xl border ${color} font-anek`}
         >
           <div className="shrink-0 mt-0.5">{icon}</div>
-          <div className="text-[16px] leading-relaxed [&>p]:m-0">
+          <div className="text-[15px] sm:text-[16px] leading-relaxed [&>p]:m-0">
             {cleanText}
           </div>
         </div>
       );
     },
     pre: ({ node, ...props }: any) => (
-      <div className="relative group rounded-xl overflow-hidden my-6 bg-[#0d1117] border border-slate-800">
-        <div className="flex items-center px-4 py-2 bg-[#161b22] border-b border-slate-800">
+      <div className="relative group rounded-xl overflow-hidden my-6 sm:my-8 bg-[#0d1117] border border-slate-800 shadow-xl">
+        <div className="flex items-center px-4 py-2 sm:py-2.5 bg-[#161b22] border-b border-slate-800">
           <div className="flex gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-slate-700/80"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-slate-700/80"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-slate-700/80"></div>
           </div>
         </div>
         <pre
           {...props}
-          className="p-4 overflow-x-auto text-[14px] leading-relaxed font-mono m-0 bg-transparent"
+          className="p-4 sm:p-5 overflow-x-auto text-[13px] sm:text-[14px] leading-relaxed font-mono m-0 bg-transparent text-slate-300 custom-scrollbar"
         />
       </div>
     ),
@@ -218,7 +225,7 @@ export default async function BlogPostPage({
       if (inline) {
         return (
           <code
-            className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md text-[14px] font-mono font-medium text-rose-600 dark:text-rose-400 before:content-none after:content-none"
+            className="bg-rose-50 dark:bg-rose-500/10 px-1.5 py-0.5 rounded-md text-[13px] sm:text-[14px] font-mono font-medium text-rose-600 dark:text-rose-400 before:content-none after:content-none border border-rose-100 dark:border-rose-900/30"
             {...props}
           >
             {children}
@@ -231,6 +238,147 @@ export default async function BlogPostPage({
         </code>
       );
     },
+    table: ({ node, ...props }: any) => (
+      <div className="overflow-x-auto my-8 sm:my-10 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm custom-scrollbar">
+        <table
+          className="w-full text-left border-collapse m-0 min-w-[500px] text-[14px] sm:text-[15px]"
+          {...props}
+        />
+      </div>
+    ),
+    thead: ({ node, ...props }: any) => (
+      <thead
+        className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold"
+        {...props}
+      />
+    ),
+    th: ({ node, ...props }: any) => (
+      <th
+        className="p-3 sm:p-4 align-middle font-semibold border-slate-200 dark:border-slate-800 whitespace-nowrap"
+        {...props}
+      />
+    ),
+    td: ({ node, ...props }: any) => (
+      <td
+        className="p-3 sm:p-4 align-middle border-t border-slate-100 dark:border-slate-800/50 text-slate-600 dark:text-slate-400"
+        {...props}
+      />
+    ),
+    tr: ({ node, ...props }: any) => (
+      <tr
+        className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
+        {...props}
+      />
+    ),
+    img: ({ node, ...props }: any) => (
+      <span className="block my-8 sm:my-10 group relative rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+        <img
+          {...props}
+          className="w-full h-auto object-contain max-h-[600px] md:group-hover:scale-[1.01] transition-transform duration-500 m-0"
+          loading="lazy"
+        />
+        {props.alt && (
+          <span className="block text-center text-[13px] sm:text-sm text-slate-500 dark:text-slate-400 p-3 font-anek italic bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+            {props.alt}
+          </span>
+        )}
+      </span>
+    ),
+    ul: ({ node, ...props }: any) => (
+      <ul
+        className="list-none ml-2 sm:ml-4 space-y-2 sm:space-y-3 my-6 sm:my-8"
+        {...props}
+      />
+    ),
+    ol: ({ node, ...props }: any) => (
+      <ol
+        className="list-decimal list-outside ml-5 sm:ml-6 space-y-2 sm:space-y-3 marker:text-rose-500/80 dark:marker:text-rose-400/80 marker:font-semibold my-6 font-anek"
+        {...props}
+      />
+    ),
+    li: ({ node, ...props }: any) => {
+      // For unordered lists, add custom bullet icon
+      const isUnordered = node?.parent?.tagName === 'ul';
+      if (isUnordered) {
+        return (
+          <li className="relative pl-6 sm:pl-7 text-slate-700 dark:text-slate-300 leading-[1.8] text-[16px] sm:text-[17px] md:text-[18px]">
+            <span className="absolute left-1 sm:left-1.5 top-[10px] sm:top-2.5 w-1.5 h-1.5 rounded-full bg-rose-500 dark:bg-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.4)]"></span>
+            {props.children}
+          </li>
+        );
+      }
+      return (
+        <li
+          className="pl-1 sm:pl-2 text-slate-700 dark:text-slate-300 leading-[1.8] text-[16px] sm:text-[17px] md:text-[18px]"
+          {...props}
+        />
+      );
+    },
+    a: ({ node, ...props }: any) => (
+      <a
+        className="text-rose-600 dark:text-rose-400 font-semibold underline decoration-rose-200 dark:decoration-rose-900 underline-offset-4 hover:decoration-rose-500 dark:hover:decoration-rose-500 transition-colors inline-block"
+        target="_blank"
+        rel="noopener noreferrer"
+        {...props}
+      />
+    ),
+    hr: ({ node, ...props }: any) => (
+      <hr
+        className="my-10 sm:my-14 border-slate-200 dark:border-slate-800"
+        {...props}
+      />
+    ),
+    h1: ({ node, ...props }: any) => (
+      <h1
+        className="text-3xl sm:text-4xl md:text-[40px] font-extrabold mt-12 sm:mt-16 mb-6 sm:mb-8 text-slate-900 dark:text-slate-50 font-anek tracking-tight leading-tight"
+        {...props}
+      />
+    ),
+    h2: ({ node, ...props }: any) => (
+      <h2
+        className="text-2xl sm:text-3xl md:text-[32px] font-bold mt-12 sm:mt-14 mb-5 sm:mb-6 text-slate-900 dark:text-slate-50 border-b border-slate-100 dark:border-slate-800/80 pb-3 font-anek tracking-tight"
+        {...props}
+      />
+    ),
+    h3: ({ node, ...props }: any) => (
+      <h3
+        className="text-xl sm:text-2xl md:text-[26px] font-bold mt-10 mb-4 sm:mb-5 text-slate-800 dark:text-slate-100 font-anek"
+        {...props}
+      />
+    ),
+    h4: ({ node, ...props }: any) => (
+      <h4
+        className="text-lg sm:text-xl md:text-[22px] font-bold mt-8 mb-3 sm:mb-4 text-slate-800 dark:text-slate-200 font-anek"
+        {...props}
+      />
+    ),
+    h5: ({ node, ...props }: any) => (
+      <h5
+        className="text-[17px] sm:text-[19px] font-bold mt-6 mb-3 text-slate-700 dark:text-slate-300 font-anek"
+        {...props}
+      />
+    ),
+    h6: ({ node, ...props }: any) => (
+      <h6
+        className="text-[15px] sm:text-[17px] font-bold mt-6 mb-2 text-slate-600 dark:text-slate-400 font-anek uppercase tracking-wide"
+        {...props}
+      />
+    ),
+    iframe: ({ node, ...props }: any) => (
+      <div className="relative w-full aspect-video my-8 sm:my-10 rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800 bg-slate-900">
+        <iframe
+          className="absolute inset-0 w-full h-full border-0"
+          allowFullScreen
+          {...props}
+        />
+      </div>
+    ),
+    p: ({ node, ...props }: any) => (
+      <p
+        className="text-slate-700 dark:text-slate-300 leading-[1.8] sm:leading-[1.9] text-[16.5px] sm:text-[17px] md:text-[18px] mb-6 sm:mb-8 text-justify font-normal"
+        {...props}
+      />
+    ),
   };
 
   return (
@@ -347,17 +495,8 @@ export default async function BlogPostPage({
 
             {/* Post body */}
             <div
-              className="prose prose-slate dark:prose-invert max-w-none
-                text-slate-900 dark:text-slate-50
-                prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-slate-900 dark:prose-headings:text-slate-100
-                prose-h2:text-2xl sm:prose-h2:text-[26px] prose-h2:mt-12 prose-h2:mb-4 prose-h2:border-none
-                prose-h3:text-xl sm:prose-h3:text-[22px] prose-h3:mt-8
-                prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-p:leading-[1.8] sm:prose-p:leading-[1.9] prose-p:text-[17px] sm:prose-p:text-[18px] prose-p:mb-8 text-justify
-                prose-li:text-slate-700 dark:prose-li:text-slate-300 prose-li:leading-[1.8] prose-li:text-[17px] sm:prose-li:text-[18px]
+              className="prose prose-slate dark:prose-invert max-w-none w-full
                 prose-strong:text-slate-900 dark:prose-strong:text-slate-100 font-medium
-                prose-a:text-rose-600 dark:prose-a:text-rose-400 prose-a:no-underline hover:prose-a:underline
-                prose-blockquote:border-l-4 prose-blockquote:border-black/10 dark:prose-blockquote:border-white/10 prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-slate-500
-                prose-ul:space-y-2 prose-ol:space-y-2
               "
             >
               <ReactMarkdown

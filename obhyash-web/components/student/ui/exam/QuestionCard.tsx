@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Question } from '@/lib/types';
 import LatexText from '../common/LatexText';
 import { toBengaliNumeral } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface QuestionCardProps {
   question: Question;
@@ -37,6 +38,7 @@ export default function QuestionCard({
   onToggleBookmark,
 }: QuestionCardProps) {
   const isAnswered = selectedOptionIndex !== undefined;
+  const [isExplanationOpen, setIsExplanationOpen] = useState(false);
 
   // Build institute/year tags
   const tags: string[] = [];
@@ -67,18 +69,18 @@ export default function QuestionCard({
       `}
     >
       {/* ── Top section ── */}
-      <div className="px-3 pt-4 pb-2 md:px-5 md:pt-5">
+      <div className="px-2 pt-3 pb-2 md:px-5 md:pt-5">
         {/* Question text row */}
-        <div className="flex items-start gap-2.5 mb-3">
+        <div className="flex items-baseline gap-2 mb-2">
           {/* Serial number */}
           {serialNumber !== undefined && (
-            <span className="shrink-0 font-bold text-base md:text-lg text-neutral-800 dark:text-neutral-200 leading-snug">
+            <span className="shrink-0 font-bold text-[14px] md:text-[15px] text-neutral-800 dark:text-neutral-200">
               {toBengaliNumeral(serialNumber)}.
             </span>
           )}
 
           {/* Question text */}
-          <div className="min-w-0 text-base md:text-lg text-neutral-900 dark:text-neutral-100 leading-relaxed font-serif-exam font-medium">
+          <div className="min-w-0 text-[14px] md:text-[15px] text-neutral-900 dark:text-neutral-100 leading-[1.4] font-serif-exam font-medium">
             <LatexText text={question.question} />
           </div>
         </div>
@@ -167,8 +169,8 @@ export default function QuestionCard({
       {/* ── Options grid ── */}
       <div
         className={`
-          px-3 pb-4 md:px-5 md:pb-5
-          grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3
+          px-2 pb-3 md:px-5 md:pb-4
+          grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2.5 items-stretch
           ${readOnly || isOmrMode ? 'pointer-events-none' : ''}
         `}
       >
@@ -224,8 +226,8 @@ export default function QuestionCard({
             <label
               key={idx}
               className={`
-                group relative flex items-start gap-3
-                px-3 py-2.5 rounded-xl border
+                group relative flex items-start gap-2.5 w-full h-full
+                px-3 py-1.5 rounded-lg border
                 transition-all duration-200
                 ${isOmrMode || readOnly ? 'cursor-default' : 'cursor-pointer'}
                 ${boxClass}
@@ -245,13 +247,13 @@ export default function QuestionCard({
               {/* Circle badge */}
               <div
                 className={`
-                  w-6 h-6 rounded-full flex items-center justify-center mt-0.5
+                  w-5 h-5 rounded-full flex items-center justify-center mt-px
                   shrink-0 transition-all duration-200
                   ${iconBg}
                 `}
               >
                 <span
-                  className={`text-[11px] font-bold leading-none ${iconFg}`}
+                  className={`text-[10px] font-bold leading-none ${iconFg}`}
                 >
                   {iconText}
                 </span>
@@ -259,7 +261,7 @@ export default function QuestionCard({
 
               {/* Option text */}
               <div
-                className={`flex-1 text-[14px] md:text-[15px] leading-relaxed select-none font-serif-exam mt-[1px] ${textClass}`}
+                className={`flex-1 text-[13px] md:text-[14px] leading-[1.4] select-none font-serif-exam ${textClass}`}
               >
                 <LatexText text={option} />
               </div>
@@ -270,36 +272,84 @@ export default function QuestionCard({
 
       {/* ── Explanation ── */}
       {showFeedback && question.explanation && (
-        <div className="mx-3 mb-4 md:mx-5 md:mb-5 animate-fade-in">
+        <div className="mx-2 mb-3 md:mx-5 md:mb-5 animate-fade-in">
           <div
             className="
-              p-4 md:p-5 rounded-xl
+              rounded-xl overflow-hidden
               bg-neutral-50/80 dark:bg-[#1c1c1c]
               border border-neutral-200/80 dark:border-[#333]
             "
           >
-            <div className="flex items-center gap-2 mb-3 border-b border-neutral-200/60 dark:border-neutral-800/60 pb-3">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-4 h-4 text-neutral-500 dark:text-neutral-400 shrink-0"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M12 16v-4"></path>
-                <path d="M12 8h.01"></path>
-              </svg>
-              <h4 className="text-[13px] md:text-sm font-bold tracking-wide text-neutral-800 dark:text-neutral-200">
-                সঠিক উত্তর ও ব্যাখ্যা
-              </h4>
-            </div>
-            <div className="text-[14px] md:text-[15px] text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif-exam">
-              <LatexText text={question.explanation} />
-            </div>
+            {/* Toggle Button */}
+            <button
+              onClick={() => setIsExplanationOpen(!isExplanationOpen)}
+              className="w-full flex items-center justify-between p-3 md:p-4 hover:bg-neutral-100/50 dark:hover:bg-[#252525] transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 flex items-center justify-center rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-3.5 h-3.5 shrink-0"
+                  >
+                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </div>
+                <h4 className="text-[13px] md:text-[14px] font-bold tracking-wide text-neutral-800 dark:text-neutral-200">
+                  সঠিক উত্তর ও ব্যাখ্যা
+                </h4>
+              </div>
+              <div className="text-neutral-400 dark:text-neutral-500 bg-white dark:bg-neutral-800 p-1 rounded-full border border-neutral-200 dark:border-neutral-700 shadow-sm">
+                {isExplanationOpen ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </div>
+            </button>
+
+            {/* Collapsible Content */}
+            <AnimatePresence>
+              {isExplanationOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="px-4 pb-4 md:px-5 md:pb-5 pt-1 border-t border-neutral-200/60 dark:border-neutral-800/60"
+                >
+                  <div className="text-[13px] md:text-[14px] text-neutral-700 dark:text-neutral-300 leading-[1.4] font-serif-exam mt-2">
+                    {question.correctAnswerIndex !== undefined && (
+                      <div className="mb-2.5 p-2 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/30 rounded-lg">
+                        <span className="text-emerald-700 dark:text-emerald-400 font-bold block mb-0.5">
+                          সঠিক উত্তর:
+                        </span>
+                        <div className="text-emerald-800 dark:text-emerald-200 font-medium">
+                          <LatexText
+                            text={
+                              question.options[question.correctAnswerIndex] ||
+                              question.correctAnswer ||
+                              ''
+                            }
+                          />
+                        </div>
+                      </div>
+                    )}
+                    <LatexText
+                      text={question.explanation}
+                      className="text-[12px] md:text-[13px]"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       )}
