@@ -129,8 +129,33 @@ function normalizeRawRow(
     tags: [],
   };
 
+  // Helper: Format inline roman numerals into newlines
+  const formatRomanList = (text: string): string => {
+    if (!text) return text;
+    // Look for i., ii., iii., iv. etc and ensure they are on new lines
+    // Be careful to not replace just any 'i.' in the middle of a word, so check for word boundaries or spaces
+    let formatted = text.replace(/(?:\s+|^)i\.\s+/g, '\n\ni. ');
+    formatted = formatted.replace(/(?:\s+|^)ii\.\s+/g, '\nii. ');
+    formatted = formatted.replace(/(?:\s+|^)iii\.\s+/g, '\niii. ');
+    formatted = formatted.replace(/(?:\s+|^)iv\.\s+/g, '\niv. ');
+
+    // Sometimes they use roman numerals with parentheses like (i), (ii), (iii), (iv)
+    formatted = formatted.replace(/(?:\s+|^)\(i\)\s+/g, '\n\n(i) ');
+    formatted = formatted.replace(/(?:\s+|^)\(ii\)\s+/g, '\n(ii) ');
+    formatted = formatted.replace(/(?:\s+|^)\(iii\)\s+/g, '\n(iii) ');
+    formatted = formatted.replace(/(?:\s+|^)\(iv\)\s+/g, '\n(iv) ');
+
+    // Add a newline before the final question part
+    formatted = formatted.replace(
+      /(?:\s+|^)নিচের কোনটি সঠিক\?/g,
+      '\n\nনিচের কোনটি সঠিক?',
+    );
+
+    return formatted.trim();
+  };
+
   // Map flat fields
-  q.question = get('question', 'content');
+  q.question = formatRomanList(get('question', 'content'));
   q.subject = get('subject');
   q.chapter = get('chapter');
   q.topic = get('topic');
