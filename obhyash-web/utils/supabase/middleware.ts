@@ -2,10 +2,8 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
+  let supabaseResponse = NextResponse.next({
+    request,
   });
 
   const supabase = createServerClient(
@@ -17,122 +15,84 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value);
-            response.cookies.set(name, value, options);
-          });
-
-          // Refreshed session, create new response
-          response = NextResponse.next({
-            request,
-          });
+          // Set cookies on the request first
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value),
+          );
+          // Then rebuild the response with updated request and set cookies on it
+          supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
+            supabaseResponse.cookies.set(name, value, options),
           );
         },
       },
     },
   );
 
-  // 1. Get User
+  // IMPORTANT: Always call getUser() to refresh the session cookie if needed.
+  // Never use getSession() here — it doesn't validate the token server-side.
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // 2. Define Paths
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
-  const isStudentRoute = request.nextUrl.pathname.startsWith('/dashboard');
-  const isTeacherRoute = request.nextUrl.pathname.startsWith('/teacher'); // Added
-  const isAuthRoute = ['/login', '/signup'].includes(request.nextUrl.pathname);
+  // Define route types
+  const { pathname } = request.nextUrl;
+  const isAdminRoute = pathname.startsWith('/admin');
+  const isStudentRoute = pathname.startsWith('/dashboard');
+  const isTeacherRoute = pathname.startsWith('/teacher');
+  const isAuthRoute = pathname === '/login' || pathname === '/signup';
+  const isProtectedRoute = isAdminRoute || isStudentRoute || isTeacherRoute;
 
-  // 3. Security Checks
-
-  // SCENARIO A: Not Logged In -> Kick to Login
-  if (!user && (isAdminRoute || isStudentRoute || isTeacherRoute)) {
+  // SCENARIO A: Not logged in and trying to access a protected route
+  if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    // Use the base response to ensure cookies are carried over
-    const redirectResponse = NextResponse.redirect(url);
-    response.cookies.getAll().forEach((cookie) => {
-      redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
-    });
-    return redirectResponse;
+    return NextResponse.redirect(url);
   }
 
-  // SCENARIO B: Logged In -> Check Roles
-  if (user) {
-    // If accessing Auth routes while logged in, redirect to appropriate dashboard
-    if (isAuthRoute) {
-      const { data: profile } = await supabase
-        .from('users')
-        .select('role, status')
-        .eq('id', user.id)
-        .single();
+  // SCENARIO B: Logged in — fetch profile once for all role/status checks
+  if (user && (isProtectedRoute || isAuthRoute)) {
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role, status')
+      .eq('id', user.id)
+      .single();
 
-      const role = profile?.role || 'Student';
-      const status = profile?.status || 'Active';
+    const role = (profile?.role ?? 'student').toLowerCase();
+    const status = profile?.status ?? 'Active';
+    const isInactive = status === 'Inactive' || status === 'Suspended';
+
+    // Deactivated/suspended users get kicked out everywhere
+    if (isInactive && pathname !== '/deactivated') {
+      return NextResponse.redirect(new URL('/deactivated', request.url));
+    }
+
+    // Logged-in users visiting auth pages get redirected to their dashboard
+    if (isAuthRoute) {
       const url = request.nextUrl.clone();
 
-      if (status === 'Inactive' || status === 'Suspended') {
-        url.pathname = '/deactivated';
-      } else if (role.toLowerCase() === 'admin') {
+      if (role === 'admin') {
         url.pathname = '/admin/dashboard';
-      } else if (role.toLowerCase() === 'teacher') {
+      } else if (role === 'teacher') {
         url.pathname = '/teacher/dashboard';
       } else {
         url.pathname = '/dashboard';
       }
 
-      const redirectResponse = NextResponse.redirect(url);
-      response.cookies.getAll().forEach((cookie) => {
-        redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
-      });
-      return redirectResponse;
+      return NextResponse.redirect(url);
     }
 
-    // Role-based protection
-    if (isAdminRoute || isStudentRoute || isTeacherRoute) {
-      const { data: profile } = await supabase
-        .from('users')
-        .select('role, status')
-        .eq('id', user.id)
-        .single();
+    // Role-based route protection
+    if (isAdminRoute && role !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
 
-      const role = profile?.role || 'Student';
-      const status = profile?.status || 'Active';
-
-      // ENFORCE STATUS CHECK
-      if (status === 'Inactive' || status === 'Suspended') {
-        const redirectResponse = NextResponse.redirect(
-          new URL('/deactivated', request.url),
-        );
-        response.cookies.getAll().forEach((cookie) => {
-          redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
-        });
-        return redirectResponse;
-      }
-
-      if (isAdminRoute && role.toLowerCase() !== 'admin') {
-        const redirectResponse = NextResponse.redirect(
-          new URL('/dashboard', request.url),
-        );
-        response.cookies.getAll().forEach((cookie) => {
-          redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
-        });
-        return redirectResponse;
-      }
-
-      if (isTeacherRoute && role.toLowerCase() !== 'teacher') {
-        const redirectResponse = NextResponse.redirect(
-          new URL('/dashboard', request.url),
-        );
-        response.cookies.getAll().forEach((cookie) => {
-          redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
-        });
-        return redirectResponse;
-      }
+    if (isTeacherRoute && role !== 'teacher') {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }
 
-  return response;
+  // IMPORTANT: Always return supabaseResponse (not a plain NextResponse.next())
+  // so that refreshed session cookies are forwarded to the browser.
+  return supabaseResponse;
 }

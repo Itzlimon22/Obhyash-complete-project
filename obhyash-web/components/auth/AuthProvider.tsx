@@ -6,12 +6,13 @@ import {
   useEffect,
   useState,
   ReactNode,
+  useMemo,
+  useCallback,
 } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { UserProfile } from '@/lib/types';
-import { toast } from 'sonner';
 import { mutate } from 'swr';
 import { mapDbRowToProfile } from '@/services/user-service';
 
@@ -38,64 +39,62 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showCorruptionModal, setShowCorruptionModal] = useState(false);
-  const router = useRouter();
-  const pathname = usePathname();
-  const supabase = createClient();
 
-  // Optimistic UI: Initial load from localStorage
+  const router = useRouter();
+  const supabase = useMemo(() => createClient(), []);
+
+  // Optimistic profile load (for fast UI on refresh/revisit)
   useEffect(() => {
-    const cachedProfileStr = localStorage.getItem('obhyash_user_profile');
-    if (cachedProfileStr) {
-      try {
-        const cachedProfile = JSON.parse(cachedProfileStr) as UserProfile;
-        if (cachedProfile && cachedProfile.id) {
-          setProfile(cachedProfile);
-        }
-      } catch (e) {
-        console.error('Initial cache parse error', e);
+    try {
+      const cachedProfileStr = localStorage.getItem('obhyash_user_profile');
+      if (!cachedProfileStr) return;
+
+      const cachedProfile = JSON.parse(cachedProfileStr) as UserProfile;
+      if (cachedProfile?.id) {
+        setProfile(cachedProfile);
       }
+    } catch (e) {
+      console.error('Initial cache parse error', e);
+      localStorage.removeItem('obhyash_user_profile');
     }
   }, []);
 
-  const fetchProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
+  const fetchProfile = useCallback(
+    async (userId: string): Promise<UserProfile | null> => {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', userId)
+          .single();
 
-      if (error) {
-        console.error('Error fetching profile:', error);
+        if (error) {
+          console.error('Error fetching profile:', error);
+          return null;
+        }
+
+        if (!data) return null;
+
+        const userProfile = mapDbRowToProfile(data);
+        localStorage.setItem(
+          'obhyash_user_profile',
+          JSON.stringify(userProfile),
+        );
+        return userProfile;
+      } catch (error) {
+        console.error('Unexpected error fetching profile:', error);
         return null;
       }
-
-      if (!data) return null;
-
-      const userProfile = mapDbRowToProfile(data);
-      localStorage.setItem('obhyash_user_profile', JSON.stringify(userProfile));
-      return userProfile;
-    } catch (error) {
-      console.error('Unexpected error fetching profile:', error);
-      return null;
-    }
-  };
+    },
+    [supabase],
+  );
 
   useEffect(() => {
     let isMounted = true;
 
     const initializeAuth = async () => {
       try {
-        // Use getSession first for faster persistence check, then getUser for security
-        const {
-          data: { session },
-          error: sessionError,
-        } = await supabase.auth.getSession();
-
-        if (sessionError) {
-          console.error('Session retrieval error:', sessionError);
-        }
-
+        // Secure auth check (server-validated user)
         const {
           data: { user: currentUser },
           error: authError,
@@ -104,36 +103,39 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         if (authError || !currentUser) {
           if (authError && authError.name !== 'AuthSessionMissingError') {
             console.error('Auth verification error:', authError);
-            // If it's a suspicious error (not just missing), it might be corruption
+
+            // Suspicious situation: cache exists but auth invalid
             if (localStorage.getItem('obhyash_user_profile')) {
               setShowCorruptionModal(true);
             }
           } else {
-            // Definitively no session
+            // No session
             if (isMounted) {
               setUser(null);
               setProfile(null);
-              localStorage.removeItem('obhyash_user_profile');
             }
+            localStorage.removeItem('obhyash_user_profile');
           }
         } else {
           if (isMounted) setUser(currentUser);
 
-          // Verify if cached profile matches authentication
+          // Ensure cached profile belongs to current user
           const cachedProfileStr = localStorage.getItem('obhyash_user_profile');
           if (cachedProfileStr) {
             try {
               const cachedProfile = JSON.parse(cachedProfileStr) as UserProfile;
-              if (cachedProfile && cachedProfile.id !== currentUser.id) {
+              if (cachedProfile?.id && cachedProfile.id !== currentUser.id) {
                 console.warn('Identity mismatch - clearing stale cache');
                 localStorage.removeItem('obhyash_user_profile');
+                if (isMounted) setProfile(null);
               }
-            } catch (e) {
+            } catch {
               localStorage.removeItem('obhyash_user_profile');
+              if (isMounted) setProfile(null);
             }
           }
 
-          // Background profile refresh
+          // Fresh profile from DB
           const userProfile = await fetchProfile(currentUser.id);
           if (userProfile && isMounted) {
             setProfile(userProfile);
@@ -155,6 +157,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         if (isMounted) setUser(session.user);
 
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          // Revalidate all SWR caches after auth changes
           mutate(() => true, undefined, { revalidate: true });
         }
 
@@ -176,27 +179,31 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       isMounted = false;
       subscription.unsubscribe();
     };
-  }, [supabase, router, profile?.id]);
+  }, [supabase, router, fetchProfile]);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setProfile(null);
+  const signOut = useCallback(async () => {
+    // Listener will handle state reset + redirect on SIGNED_OUT
     localStorage.removeItem('obhyash_user_profile');
-    router.push('/login');
-  };
-
-  const refreshProfile = async () => {
-    if (user) {
-      const userProfile = await fetchProfile(user.id);
-      if (userProfile) setProfile(userProfile);
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Sign out error:', error);
+      // fallback cleanup if event doesn’t fire due to error
+      setUser(null);
+      setProfile(null);
+      router.push('/login');
     }
-  };
+  }, [supabase, router]);
 
-  const handleForceLogout = async () => {
+  const refreshProfile = useCallback(async () => {
+    if (!user) return;
+    const userProfile = await fetchProfile(user.id);
+    if (userProfile) setProfile(userProfile);
+  }, [user, fetchProfile]);
+
+  const handleForceLogout = useCallback(async () => {
     setShowCorruptionModal(false);
     await signOut();
-  };
+  }, [signOut]);
 
   return (
     <AuthContext.Provider
