@@ -4,6 +4,7 @@ import 'katex/dist/katex.min.css';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 
@@ -23,7 +24,7 @@ export function MathRenderer({ text, block = false }: MathRendererProps) {
         ${block ? 'my-2' : 'inline'}`}
     >
       <ReactMarkdown
-        remarkPlugins={[remarkMath, remarkGfm]}
+        remarkPlugins={[remarkMath, remarkGfm, remarkBreaks]}
         rehypePlugins={[rehypeKatex, rehypeRaw]}
         components={{
           p: ({ node, ...props }) => (
