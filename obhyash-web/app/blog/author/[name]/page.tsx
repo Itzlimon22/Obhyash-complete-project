@@ -23,7 +23,6 @@ export async function generateMetadata({
 }
 
 // ISR Revalidation
-export const revalidate = 3600;
 
 export default async function AuthorProfilePage({
   params,
