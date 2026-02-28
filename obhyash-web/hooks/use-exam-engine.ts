@@ -98,13 +98,14 @@ export const useExamEngine = () => {
 
     currentQuestions.forEach((q) => {
       const ua = currentAnswers[q.id];
+      const points = q.points ?? 1;
       if (ua !== undefined) {
         if (ua === q.correctAnswerIndex) {
-          rawScore += q.points ?? 0;
+          rawScore += points;
           correctCount++;
         } else {
           wrongCount++;
-          negativeMarks += (q.points ?? 0) * negativeRate;
+          negativeMarks += points * negativeRate;
         }
       }
     });
@@ -139,7 +140,7 @@ export const useExamEngine = () => {
         topics: cfg.topics,
         totalQuestions: qs.length,
         durationMinutes: cfg.durationMinutes,
-        totalMarks: qs.reduce((acc, q) => acc + (q.points || 0), 0),
+        totalMarks: qs.reduce((acc, q) => acc + (q.points || 1), 0),
         negativeMarking: cfg.negativeMarking,
       });
       setUserAnswers({});

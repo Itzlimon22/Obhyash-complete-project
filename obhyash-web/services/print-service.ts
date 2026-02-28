@@ -30,11 +30,25 @@ const renderLatex = (text: string): string => {
     .join('');
 };
 
-// Restored Image Helper (Critical for questions with diagrams)
-const renderImage = (imageUrl?: string) => {
-  if (!imageUrl) return '';
-  return `<div style="margin: 10px 0; text-align: center;">
-            <img src="${imageUrl}" style="max-width: 100%; max-height: 200px; border: 1px solid #eee; border-radius: 4px;" alt="Question Image" />
+// Helper to render question metadata (Institutes and Years)
+const renderQuestionMeta = (q: Question): string => {
+  const years =
+    q.years && q.years.length > 0 ? q.years : q.year ? [q.year] : [];
+  const institutes =
+    q.institutes && q.institutes.length > 0
+      ? q.institutes
+      : q.institute
+        ? [q.institute]
+        : [];
+
+  if (years.length === 0 && institutes.length === 0) return '';
+
+  const metaParts = [];
+  if (institutes.length > 0) metaParts.push(institutes.join(', '));
+  if (years.length > 0) metaParts.push(years.join(', '));
+
+  return `<div style="font-size: 8.5pt; color: #555; font-style: italic; margin-bottom: 6px; display: block;">
+            [${metaParts.join(' | ')}]
           </div>`;
 };
 
@@ -56,18 +70,18 @@ export const printQuestionPaper = (
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
         <style>
           @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&family=Times+New+Roman:ital,wght@0,400;0,700;1,400&display=swap');
-          @page { size: A4; margin: 1.5cm; }
-          body { font-family: 'Times New Roman', 'Noto Serif Bengali', serif; font-size: 11pt; color: #000; line-height: 1.4; margin: 0; }
-          .header-container { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-          .institution-name { font-size: 22pt; font-weight: bold; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
-          .exam-title { font-size: 14pt; font-weight: bold; margin: 5px 0 15px 0; border: 1px solid #000; display: inline-block; padding: 5px 20px; border-radius: 4px; }
-          .meta-table { width: 100%; margin-top: 15px; border-collapse: collapse; }
-          .meta-table td { padding: 4px 0; font-weight: bold; font-size: 10pt; vertical-align: bottom; }
-          .content-wrapper { column-count: 2; column-gap: 40px; column-rule: 1px solid #ccc; }
-          .question-item { break-inside: avoid; margin-bottom: 12px; }
-          .q-header { display: flex; align-items: baseline; font-weight: bold; margin-bottom: 4px; }
-          .options-list { list-style-type: none; padding: 0; margin: 0 0 0 25px; display: flex; flex-wrap: wrap; }
-          .option-item { width: 50%; padding-right: 5px; margin-bottom: 2px; }
+          @page { size: A4; margin: 1cm; }
+          body { font-family: 'Times New Roman', 'Noto Serif Bengali', serif; font-size: 10.5pt; color: #000; line-height: 1.35; margin: 0; padding: 0.5cm; }
+          .header-container { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 15px; }
+          .institution-name { font-size: 20pt; font-weight: bold; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
+          .exam-title { font-size: 13pt; font-weight: bold; margin: 4px 0 10px 0; border: 1px solid #000; display: inline-block; padding: 4px 15px; border-radius: 4px; }
+          .meta-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
+          .meta-table td { padding: 2px 0; font-weight: bold; font-size: 9.5pt; vertical-align: bottom; }
+          .content-wrapper { column-count: 2; column-gap: 30px; column-rule: 0.5px solid #000; }
+          .question-item { break-inside: avoid; margin-bottom: 15px; padding-bottom: 5px; }
+          .q-header { display: flex; align-items: baseline; font-weight: bold; margin-bottom: 2px; }
+          .options-list { list-style-type: none; padding: 0; margin: 0 0 0 22px; display: flex; flex-wrap: wrap; }
+          .option-item { width: 50%; padding-right: 4px; margin-bottom: 1px; font-size: 9.5pt; }
           @media print { button { display: none; } }
         </style>
       </head>
@@ -75,12 +89,12 @@ export const printQuestionPaper = (
         <div class="header-container">
           <h1 class="institution-name">Obhyash (অভ্যাস) Exam Platform</h1>
           <div class="exam-title">${details.subject}</div>
-          <div style="font-size: 10pt; margin-top: -10px; margin-bottom: 10px;">${details.examType}</div>
+          <div style="font-size: 9.5pt; margin-top: -8px; margin-bottom: 8px;">${details.examType}</div>
           <table class="meta-table">
             <tr>
-              <td width="35%">Time: ${details.durationMinutes} Minutes</td>
-              <td width="30%" align="center">Chapter: ${details.chapters}</td>
-              <td width="35%" align="right">Full Marks: ${details.totalMarks}</td>
+              <td width="35%">সময়: ${details.durationMinutes} মিনিট</td>
+              <td width="30%" align="center">অধ্যায়: ${details.chapters}</td>
+              <td width="35%" align="right">পূর্ণমান: ${details.totalMarks}</td>
             </tr>
           </table>
         </div>
@@ -90,18 +104,19 @@ export const printQuestionPaper = (
               (q, idx) => `
             <div class="question-item">
               <div class="q-header">
-                <span style="min-width:25px">${idx + 1}.</span>
-                    <span>${renderLatex(q.question || '')}</span>
-                    ${renderImage(q.imageUrl)} 
-                </div>
-                <span style="font-size:9pt;margin-left:5px">[${q.points}]</span>
+                <span style="min-width:22px">${idx + 1}.</span>
+                <span>${renderLatex(q.question || '')}</span>
+              </div>
+              ${renderImage(q.imageUrl)}
+              <div style="margin-left:22px">
+                ${renderQuestionMeta(q)}
               </div>
               <ul class="options-list">
                 ${q.options
                   .map(
                     (opt, oIdx) => `
                   <li class="option-item">
-                    <span style="font-weight:bold;margin-right:5px">(${['a', 'b', 'c', 'd'][oIdx]})</span>
+                    <span style="font-weight:bold;margin-right:4px">(${['ক', 'খ', 'গ', 'ঘ'][oIdx]})</span>
                     <span>${renderLatex(opt)}</span>
                   </li>
                 `,
@@ -351,9 +366,11 @@ export const printResultWithExplanations = (
   if (!printWindow) return;
 
   // Calculate score for the report
-  const score = Object.values(userAnswers).filter(
-    (ua, idx) => questions[idx] && questions[idx].correctAnswerIndex === ua,
-  ).length;
+  const score = questions.reduce((acc, q) => {
+    const ua = userAnswers[q.id];
+    return acc + (ua === q.correctAnswerIndex ? q.points || 1 : 0);
+  }, 0);
+  const totalPoints = questions.reduce((acc, q) => acc + (q.points || 1), 0);
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -364,25 +381,25 @@ export const printResultWithExplanations = (
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
         <style>
           @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&family=Times+New+Roman:ital,wght@0,400;0,700;1,400&display=swap');
-          @page { size: A4; margin: 1.5cm; }
-          body { font-family: 'Times New Roman', 'Noto Serif Bengali', serif; font-size: 11pt; color: #000; line-height: 1.4; margin: 0; }
-          .header-container { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
-          .institution-name { font-size: 22pt; font-weight: bold; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
-          .exam-title { font-size: 14pt; font-weight: bold; margin: 5px 0 15px 0; border: 1px solid #000; display: inline-block; padding: 5px 20px; border-radius: 4px; }
-          .meta-table { width: 100%; margin-top: 15px; border-collapse: collapse; }
-          .meta-table td { padding: 4px 0; font-weight: bold; font-size: 10pt; vertical-align: bottom; }
-          .content-wrapper { column-count: 2; column-gap: 40px; column-rule: 1px solid #ccc; }
-          .question-item { break-inside: avoid; margin-bottom: 20px; border-bottom: 1px dashed #ddd; padding-bottom: 15px; }
-          .q-header { display: flex; align-items: baseline; font-weight: bold; margin-bottom: 4px; }
-          .options-list { list-style-type: none; padding: 0; margin: 0 0 0 25px; display: flex; flex-wrap: wrap; }
-          .option-item { width: 50%; padding-right: 5px; margin-bottom: 2px; font-size: 10pt; }
-          .solution-box { margin-top: 8px; padding: 8px; background-color: #f8f9fa; border-left: 3px solid #333; font-size: 9pt; page-break-inside: avoid; }
-          .sol-row { margin-bottom: 3px; }
-          .label { font-weight: bold; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.5px; color: #444; }
+          @page { size: A4; margin: 1cm; }
+          body { font-family: 'Times New Roman', 'Noto Serif Bengali', serif; font-size: 10pt; color: #000; line-height: 1.3; margin: 0; padding: 0.5cm; }
+          .header-container { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 15px; }
+          .institution-name { font-size: 20pt; font-weight: bold; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
+          .exam-title { font-size: 13pt; font-weight: bold; margin: 4px 0 10px 0; border: 1px solid #000; display: inline-block; padding: 4px 15px; border-radius: 4px; }
+          .meta-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
+          .meta-table td { padding: 2px 0; font-weight: bold; font-size: 9pt; vertical-align: bottom; }
+          .content-wrapper { column-count: 2; column-gap: 30px; column-rule: 0.5px solid #000; }
+          .question-item { break-inside: avoid; margin-bottom: 18px; border-bottom: 0.5px dashed #ccc; padding-bottom: 10px; }
+          .q-header { display: flex; align-items: baseline; font-weight: bold; margin-bottom: 2px; }
+          .options-list { list-style-type: none; padding: 0; margin: 4px 0 4px 22px; display: flex; flex-wrap: wrap; }
+          .option-item { width: 50%; padding-right: 4px; margin-bottom: 1px; font-size: 9pt; }
+          .solution-box { margin-top: 6px; padding: 6px; background-color: #f9f9f9; border-left: 2px solid #333; font-size: 8.5pt; }
+          .sol-row { margin-bottom: 2px; }
+          .label { font-weight: bold; font-size: 8pt; text-transform: uppercase; color: #444; }
           .correct { color: #15803d; font-weight: bold; }
           .wrong { color: #b91c1c; font-weight: bold; }
           .skipped { color: #d97706; font-style: italic; }
-          .exp-text { font-style: italic; color: #333; display: block; margin-top: 2px; }
+          .exp-text { font-style: italic; color: #333; display: block; margin-top: 2px; line-height: 1.25; }
           @media print { button { display: none; } body { -webkit-print-color-adjust: exact; } }
         </style>
       </head>
@@ -390,12 +407,12 @@ export const printResultWithExplanations = (
         <div class="header-container">
           <h1 class="institution-name">Obhyash (অভ্যাস) Exam Platform</h1>
           <div class="exam-title">${details.subject} - Solution</div>
-          <div style="font-size: 10pt; margin-top: -10px; margin-bottom: 10px;">${details.examType}</div>
+          <div style="font-size: 9pt; margin-top: -8px; margin-bottom: 8px;">${details.examType}</div>
           <table class="meta-table">
             <tr>
-              <td width="30%">Time: ${details.durationMinutes} Minutes</td>
-              <td width="40%" align="center">Chapter: ${details.chapters}</td>
-              <td width="30%" align="right">Your Score: ${score} / ${questions.length}</td>
+              <td width="30%">সময়: ${details.durationMinutes} মিনিট</td>
+              <td width="40%" align="center">অধ্যায়: ${details.chapters}</td>
+              <td width="30%" align="right">নম্বর: ${score.toFixed(1)} / ${totalPoints}</td>
             </tr>
           </table>
         </div>
@@ -406,27 +423,28 @@ export const printResultWithExplanations = (
               const isCorrect = userAns === q.correctAnswerIndex;
               const isSkipped = userAns === undefined;
               const userAnsLabel = isSkipped
-                ? 'Skipped'
-                : ['a', 'b', 'c', 'd'][userAns];
-              const correctAnsLabel = ['a', 'b', 'c', 'd'][
+                ? 'উত্তর নেই'
+                : ['ক', 'খ', 'গ', 'ঘ'][userAns];
+              const correctAnsLabel = ['ক', 'খ', 'গ', 'ঘ'][
                 q.correctAnswerIndex
               ];
 
               return `
             <div class="question-item">
               <div class="q-header">
-                <span style="min-width:25px">${idx + 1}.</span>
-                    <span>${renderLatex(q.question || '')}</span>
-                    ${renderImage(q.imageUrl)} 
-                </div>
-                <span style="font-size:9pt;margin-left:5px">[${q.points}]</span>
+                <span style="min-width:22px">${idx + 1}.</span>
+                <span>${renderLatex(q.question || '')}</span>
+              </div>
+              ${renderImage(q.imageUrl)}
+              <div style="margin-left:22px">
+                ${renderQuestionMeta(q)}
               </div>
               <ul class="options-list">
                 ${q.options
                   .map(
                     (opt, oIdx) => `
                   <li class="option-item">
-                    <span style="font-weight:bold;margin-right:5px">(${['a', 'b', 'c', 'd'][oIdx]})</span>
+                    <span style="font-weight:bold;margin-right:4px">(${['ক', 'খ', 'গ', 'ঘ'][oIdx]})</span>
                     <span>${renderLatex(opt)}</span>
                   </li>
                 `,
@@ -435,17 +453,17 @@ export const printResultWithExplanations = (
               </ul>
               <div class="solution-box">
                  <div class="sol-row">
-                    <span class="label">Correct Answer:</span> <span class="correct">(${correctAnsLabel}) ${renderLatex(q.options[q.correctAnswerIndex])}</span>
+                    <span class="label">সঠিক উত্তর:</span> <span class="correct">(${correctAnsLabel}) ${renderLatex(q.options[q.correctAnswerIndex])}</span>
                  </div>
                  <div class="sol-row">
-                    <span class="label">Your Answer:</span> 
+                    <span class="label">তোমার উত্তর:</span> 
                     <span class="${isSkipped ? 'skipped' : isCorrect ? 'correct' : 'wrong'}">
-                        ${isSkipped ? 'Skipped' : `(${userAnsLabel}) ${renderLatex(q.options[userAns])}`}
+                        ${isSkipped ? 'উত্তর নেই' : `(${userAnsLabel}) ${renderLatex(q.options[userAns])}`}
                     </span>
                  </div>
-                 <div style="margin-top:6px;">
-                    <span class="label">Explanation:</span> 
-                    <span class="exp-text">${renderLatex(q.explanation || 'No explanation provided.')}</span>
+                 <div style="margin-top:4px;">
+                    <span class="label">ব্যাখ্যা:</span> 
+                    <span class="exp-text">${renderLatex(q.explanation || 'কোনো ব্যাখ্যা দেওয়া নেই।')}</span>
                  </div>
               </div>
             </div>
@@ -711,3 +729,7 @@ export const printInvoice = (invoice: Invoice, user: UserProfile) => {
   printWindow.document.write(htmlContent);
   printWindow.document.close();
 };
+function renderImage(imageUrl: string | undefined) {
+  throw new Error('Function not implemented.');
+}
+

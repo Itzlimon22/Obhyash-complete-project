@@ -99,44 +99,24 @@ const ReportModal: React.FC<ReportModalProps> = ({
 
   return (
     <Portal>
-      <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
-        {/* Modal / Bottom Sheet */}
-        <div className="bg-white dark:bg-black w-full max-w-md sm:rounded-3xl rounded-t-3xl shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden transform transition-all animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-200 max-h-[90vh] sm:max-h-[85vh] flex flex-col">
-          {/* Mobile Handle Indicator */}
-          <div className="w-full flex justify-center pt-3 pb-1 sm:hidden">
-            <div className="w-10 h-1.5 bg-black/10 dark:bg-white/10 rounded-full" />
-          </div>
+      <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+        {/* Modal Content */}
+        <div className="bg-white dark:bg-neutral-900 w-full max-w-sm sm:rounded-[2.5rem] rounded-t-[2.5rem] shadow-2xl border border-black/5 dark:border-white/5 overflow-hidden transform transition-all animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-200 flex flex-col relative">
+          {/* Close Button Top Right */}
+          <button
+            onClick={onClose}
+            className="absolute top-6 right-6 z-20 p-2 rounded-full bg-black/5 dark:bg-white/5 text-neutral-400 hover:text-black dark:hover:text-white transition-all active:scale-95"
+          >
+            <X size={18} />
+          </button>
 
-          {/* Header */}
-          <div className="px-4 py-3 sm:px-6 sm:py-5 border-b border-black/10 dark:border-white/10 flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400">
-                <AlertCircle size={22} />
-              </div>
-              <div>
-                <h3 className="text-lg font-black text-black dark:text-white leading-tight">
-                  প্রশ্ন রিপোর্ট করুন
-                </h3>
-                <p className="text-[10px] font-black text-black/40 dark:text-white/40 uppercase tracking-widest mt-0.5">
-                  Question #{questionId}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          <div className="p-4 sm:p-6 overflow-y-auto">
-            {/* Report Type Selection */}
-            <div className="mb-5 sm:mb-6">
-              <label className="block text-xs font-black text-black/40 dark:text-white/40 uppercase tracking-widest mb-4">
-                সমস্যার ধরণ নির্বাচন করুন
-              </label>
-              <div className="grid grid-cols-2 gap-2">
+          <div className="p-8 sm:p-10">
+            {/* 6 Category Cards */}
+            <div className="mb-8">
+              <h3 className="text-xl font-black text-black dark:text-white mb-6 pr-10">
+                সমস্যাটি রিপোর্ট করুন
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {REPORT_TYPES.map((type) => {
                   const Icon = type.icon;
                   const isSelected = selectedType === type.id;
@@ -145,64 +125,70 @@ const ReportModal: React.FC<ReportModalProps> = ({
                       key={type.id}
                       onClick={() => setSelectedType(type.id)}
                       className={`
-                        flex items-center gap-1.5 px-2.5 py-2.5 sm:px-3 sm:py-3 rounded-xl text-[11px] sm:text-xs font-black transition-all duration-200 border-2 uppercase tracking-wide
+                        flex flex-col items-center justify-center gap-2.5 p-4 rounded-[1.5rem] transition-all duration-300 border-2
                         ${
                           isSelected
-                            ? 'bg-red-50 dark:bg-red-900/20 border-red-500 text-red-700 dark:text-red-400'
-                            : 'bg-black/5 dark:bg-white/5 border-transparent text-black/60 dark:text-white/60 hover:bg-black/10 dark:hover:bg-white/10'
+                            ? 'bg-red-50 dark:bg-red-900/20 border-red-500 text-red-700 dark:text-red-400 shadow-lg shadow-red-500/10'
+                            : 'bg-neutral-50 dark:bg-neutral-800/50 border-transparent text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
                         }
                       `}
                     >
-                      <Icon
-                        size={14}
-                        className={
-                          isSelected
-                            ? 'text-red-600 dark:text-red-400'
-                            : 'text-black/40 dark:text-white/40'
-                        }
-                      />
-                      {type.label}
+                      <div
+                        className={`p-2 rounded-xl ${isSelected ? 'bg-red-100 dark:bg-red-900/40 text-red-600' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400'}`}
+                      >
+                        <Icon size={18} />
+                      </div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-center">
+                        {type.label}
+                      </span>
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* Comment Section */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-xs font-black text-black/40 dark:text-white/40 uppercase tracking-widest">
-                  অতিরিক্ত মন্তব্য
+            {/* Smart Input Section */}
+            <div className="relative group">
+              <div className="flex justify-between items-center mb-2 px-1">
+                <label className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.2em]">
+                  মন্তব্য দিন
                 </label>
-                <span className="text-[10px] font-black text-black/30 dark:text-white/30">
+                <span className="text-[10px] font-bold text-neutral-300">
                   {comment.length}/৫০০
                 </span>
               </div>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value.slice(0, 500))}
-                placeholder="সমস্যার বিস্তারিত এখানে লেখো..."
-                className="w-full h-20 sm:h-24 p-3 sm:p-4 rounded-xl border-2 border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-black dark:text-white placeholder:text-black/30 dark:placeholder:text-white/30 focus:outline-none focus:border-red-500/50 transition-all resize-none text-[13px] sm:text-sm leading-relaxed"
-              />
-            </div>
 
-            {/* Reference Image Upload */}
-            <div className="mb-5 sm:mb-6">
-              <label className="block text-xs font-black text-black/40 dark:text-white/40 uppercase tracking-widest mb-4">
-                রেফারেন্স ছবি (অপশনাল)
-              </label>
+              <div className="relative">
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value.slice(0, 500))}
+                  placeholder="সমস্যার বিস্তারিত এখানে লিখুন..."
+                  className="w-full h-32 p-5 pb-12 rounded-[1.5rem] border-2 border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30 text-neutral-900 dark:text-white placeholder:text-neutral-300 dark:placeholder:text-neutral-600 focus:outline-none focus:border-red-500/30 transition-all resize-none text-sm leading-relaxed"
+                />
 
-              {!imagePreview ? (
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-black/10 dark:border-white/10 rounded-xl p-4 sm:p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center mb-2 text-black/40 dark:text-white/40">
-                    <Upload size={18} />
+                {/* Floating Action Bar inside input */}
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none">
+                  <div className="flex items-center gap-2 pointer-events-auto">
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`p-2 rounded-full transition-all active:scale-90 ${imagePreview ? 'bg-emerald-500 text-white' : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-500 hover:text-black dark:hover:text-white'}`}
+                      title="ছবি সংযুক্ত করুন"
+                    >
+                      {imagePreview ? (
+                        <Check size={16} />
+                      ) : (
+                        <Upload size={16} />
+                      )}
+                    </button>
+                    {imagePreview && (
+                      <button
+                        onClick={clearImage}
+                        className="p-1 px-2.5 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 text-[10px] font-bold rounded-full border border-red-200 dark:border-red-800"
+                      >
+                        মুছুন
+                      </button>
+                    )}
                   </div>
-                  <p className="text-xs font-black text-black/40 dark:text-white/40 uppercase tracking-wide">
-                    ছবি যুক্ত করতে ট্যাপ করুন
-                  </p>
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -211,47 +197,27 @@ const ReportModal: React.FC<ReportModalProps> = ({
                     className="hidden"
                   />
                 </div>
-              ) : (
-                <div className="relative rounded-xl overflow-hidden border border-black/10 dark:border-white/10">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-40 object-cover"
-                  />
-                  <button
-                    onClick={clearImage}
-                    className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-full shadow-md hover:bg-red-700 transition-colors"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                  <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 backdrop-blur-md rounded-lg text-[10px] font-black text-white flex items-center gap-1">
-                    <Check size={10} /> সংযুক্ত
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-2.5 sm:gap-3 mt-4">
+            <div className="grid grid-cols-2 gap-3 mt-8">
               <button
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="flex-1 py-3 sm:py-3.5 rounded-xl font-black text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5 transition-colors disabled:opacity-50 uppercase tracking-wide text-[11px] sm:text-sm"
+                className="py-4 rounded-[1.25rem] font-bold text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all active:scale-95 text-xs uppercase tracking-widest"
               >
                 বাতিল
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={!selectedType || isSubmitting}
-                className="flex-[2] py-3 sm:py-3.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black rounded-xl shadow-lg shadow-red-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-wide text-[11px] sm:text-sm"
+                className="py-4 bg-red-600 hover:bg-red-700 disabled:opacity-30 disabled:cursor-not-allowed text-white font-bold rounded-[1.25rem] shadow-xl shadow-red-500/20 transition-all active:scale-95 flex items-center justify-center gap-2 text-xs uppercase tracking-widest"
               >
                 {isSubmitting ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    অপেক্ষা করো...
-                  </>
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                  'রিপোর্ট জমা দাও'
+                  'রিপোর্ট পাঠান'
                 )}
               </button>
             </div>

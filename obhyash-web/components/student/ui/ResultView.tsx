@@ -73,15 +73,16 @@ const ResultView: React.FC<ResultViewProps> = ({
 
     questions.forEach((q) => {
       const ua = userAnswers[q.id];
+      const points = q.points ?? 1;
       if (ua === undefined) {
         skippedCount++;
       } else if (ua === q.correctAnswerIndex) {
-        rawScore += q.points ?? 0;
+        rawScore += points;
         correctCount++;
       } else {
         wrongCount++;
         // Negative marking calculation based on prop
-        negativeMarksDeduction += (q.points ?? 0) * negativeMarking;
+        negativeMarksDeduction += points * negativeMarking;
       }
     });
 
@@ -103,8 +104,9 @@ const ResultView: React.FC<ResultViewProps> = ({
     skippedCount,
     negativeMarksDeduction,
   } = calculateStats();
-  const totalPoints = questions.reduce((acc, q) => acc + (q.points ?? 0), 0);
-  const percentage = Math.round((finalScore / totalPoints) * 100);
+  const totalPoints = questions.reduce((acc, q) => acc + (q.points ?? 1), 0);
+  const percentage =
+    totalPoints > 0 ? Math.round((finalScore / totalPoints) * 100) : 0;
 
   // Helper to format time seconds into mm:ss format
   const formatDuration = (seconds: number) => {

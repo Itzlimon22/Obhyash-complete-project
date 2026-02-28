@@ -51,13 +51,14 @@ export default function OmrDashboard({ initialData }: OmrDashboardProps) {
 
       result.questions.forEach((q) => {
         const ua = detectedAnswers[q.id];
-        if (ua !== undefined && typeof q.points === 'number') {
+        const points = q.points || 1;
+        if (ua !== undefined) {
           if (ua === q.correctAnswerIndex) {
-            rawScore += q.points;
+            rawScore += points;
             correctCount++;
           } else {
             wrongCount++;
-            rawScore -= q.points * result.negativeMarking;
+            rawScore -= points * result.negativeMarking;
           }
         }
       });
