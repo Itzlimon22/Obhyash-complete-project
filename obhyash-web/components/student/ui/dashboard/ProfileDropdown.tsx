@@ -113,32 +113,35 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
               </button>
             ))}
 
-            {/* Divider */}
-            <div className="h-px bg-neutral-100 dark:bg-neutral-800 my-2 mx-1"></div>
-
-            {/* Dark Mode Toggle */}
-            <div
-              className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors cursor-pointer select-none"
-              onClick={toggleTheme}
-            >
-              <div className="flex items-center gap-3 text-neutral-600 dark:text-neutral-300 text-sm font-medium">
-                {isDarkMode ? (
-                  <Moon className="w-4 h-4 text-neutral-400" />
-                ) : (
-                  <Sun className="w-4 h-4 text-neutral-400" />
-                )}
-                ডার্ক মোড
-              </div>
-              <div
-                className={`w-10 h-6 rounded-full p-1 transition-colors duration-300 flex items-center ${
-                  isDarkMode ? 'bg-emerald-600' : 'bg-neutral-300'
-                }`}
-              >
-                <div
-                  className={`w-4 h-4 rounded-full bg-white shadow-sm transform transition-transform duration-300 ${
-                    isDarkMode ? 'translate-x-4' : 'translate-x-0'
+            {/* Theme Toggle Section */}
+            <div className="px-3 py-3">
+              <div className="bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl flex items-center">
+                <button
+                  onClick={() => !isDarkMode && toggleTheme()}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                    !isDarkMode
+                      ? 'bg-white text-emerald-600 shadow-sm'
+                      : 'text-neutral-500 hover:text-neutral-300'
                   }`}
-                />
+                >
+                  <Sun
+                    className={`w-3.5 h-3.5 ${!isDarkMode ? 'text-emerald-500' : 'text-neutral-500'}`}
+                  />
+                  লাইট
+                </button>
+                <button
+                  onClick={() => isDarkMode && toggleTheme()}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                    isDarkMode
+                      ? 'bg-neutral-900 text-emerald-500 shadow-sm border border-neutral-700/50'
+                      : 'text-neutral-500 hover:text-neutral-700'
+                  }`}
+                >
+                  <Moon
+                    className={`w-3.5 h-3.5 ${isDarkMode ? 'text-emerald-400' : 'text-neutral-500'}`}
+                  />
+                  ডার্ক
+                </button>
               </div>
             </div>
 

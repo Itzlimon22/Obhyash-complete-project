@@ -98,8 +98,8 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
   };
 
   return (
-    <div className="mb-6 md:mb-8 overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0">
-      <div className="flex gap-3 md:gap-4 min-w-max md:justify-center">
+    <div className="mb-8 md:mb-12 overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+      <div className="flex gap-4 md:gap-6 min-w-max md:justify-center px-2">
         {LEVELS.map((level) => {
           const isSelected = selectedLevel === level.id;
           const isUserLevel = currentUser?.level === level.id;
@@ -109,41 +109,70 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
               key={level.id}
               onClick={() => setSelectedLevel(level.id)}
               className={`
-                            relative flex flex-col items-center p-3 md:p-4 rounded-2xl border-2 transition-all min-w-[105px] md:min-w-[130px] overflow-hidden
-                            ${
-                              isSelected
-                                ? `border-transparent ring-2 ring-offset-2 ring-red-500 dark:ring-offset-neutral-950 shadow-lg scale-105`
-                                : 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-neutral-300 dark:hover:border-neutral-700'
-                            }
-                        `}
+                relative flex flex-col items-center p-4 md:p-6 rounded-[2rem] border-2 transition-all duration-300 min-w-[120px] md:min-w-[150px]
+                ${
+                  isSelected
+                    ? `border-neutral-900/10 dark:border-white/10 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] scale-105 z-10`
+                    : 'border-transparent bg-transparent hover:bg-neutral-100/50 dark:hover:bg-neutral-800/30'
+                }
+              `}
             >
+              {/* "Your Level" Badge */}
               {isUserLevel && (
-                <div className="absolute top-2 right-2 w-2 h-2 md:w-2.5 md:h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm"></div>
+                <div className="absolute -top-1 px-2.5 py-0.5 bg-red-500 text-white text-[9px] font-black uppercase tracking-tighter rounded-full shadow-lg shadow-red-500/20 z-20 animate-bounce">
+                  You
+                </div>
               )}
-              {isSelected && (
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${level.color} opacity-10`}
-                ></div>
-              )}
+
+              {/* Icon Container with Glossy Gradient */}
               <div
                 className={`
-                            w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mb-2 text-white bg-gradient-to-br shadow-sm
-                            ${level.color}
-                            ${!isSelected ? 'grayscale opacity-60' : ''}
-                        `}
+                  relative w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mb-3 text-white transition-all duration-500
+                  bg-gradient-to-br ${level.color} shadow-lg
+                  ${isSelected ? 'scale-110 rotate-3' : 'grayscale opacity-40 scale-95'}
+                `}
               >
-                {getIcon(level.id)}
+                {/* Glossy Overlay */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/20 to-transparent opacity-60"></div>
+                <div className="relative z-10 scale-110 md:scale-125">
+                  {getIcon(level.id)}
+                </div>
               </div>
+
+              {/* Label */}
               <span
-                className={`text-xs md:text-sm font-bold mb-1 ${isSelected ? 'text-neutral-900 dark:text-white' : 'text-neutral-500'}`}
+                className={`text-[13px] md:text-base font-black mb-1.5 tracking-tight transition-colors duration-300 ${
+                  isSelected
+                    ? 'text-neutral-900 dark:text-white'
+                    : 'text-neutral-400 dark:text-neutral-500'
+                }`}
               >
                 {level.label.split(' ')[0]}
               </span>
-              <span
-                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400`}
+
+              {/* Student Count Chip */}
+              <div
+                className={`
+                  flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold transition-all duration-300
+                  ${
+                    isSelected
+                      ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900'
+                      : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400'
+                  }
+                `}
               >
-                {levelCounts[level.id] || 0} Students
-              </span>
+                <div
+                  className={`w-1 h-1 rounded-full ${isSelected ? 'bg-emerald-400 animate-pulse' : 'bg-neutral-300 dark:bg-neutral-600'}`}
+                ></div>
+                {levelCounts[level.id] || 0}
+              </div>
+
+              {/* Underline for active state */}
+              {isSelected && (
+                <div
+                  className={`absolute bottom-3 w-8 h-1 rounded-full bg-gradient-to-r ${level.color} shadow-sm`}
+                ></div>
+              )}
             </button>
           );
         })}

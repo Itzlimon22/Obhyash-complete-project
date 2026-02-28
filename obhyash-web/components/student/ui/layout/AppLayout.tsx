@@ -13,6 +13,8 @@ import {
   ChevronRight,
   Menu,
   X,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Sidebar from './Sidebar';
@@ -398,18 +400,49 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                         অভিযোগ ও পরামর্শ
                       </button>
                       <div className="h-px bg-neutral-100 dark:bg-neutral-800 my-1"></div>
-                      <div className="px-3 py-2 flex items-center justify-between">
-                        <span className="text-[13px] font-bold text-neutral-700 dark:text-neutral-300">
-                          ডার্ক মোড
-                        </span>
-                        <button
-                          onClick={toggleTheme}
-                          className={`w-8 h-4.5 rounded-full relative transition-colors ${isDarkMode ? 'bg-emerald-600' : 'bg-neutral-300 dark:bg-neutral-700'}`}
-                        >
-                          <div
-                            className={`absolute top-0.5 left-0.5 w-3.5 h-3.5 bg-white rounded-full transition-transform shadow-sm ${isDarkMode ? 'translate-x-3.5' : 'translate-x-0'}`}
-                          ></div>
-                        </button>
+                      <div className="px-3 py-3">
+                        <div className="bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl flex items-center relative">
+                          <button
+                            onClick={() => !isDarkMode && toggleTheme()}
+                            className={`flex-1 flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg text-xs font-bold transition-all relative z-10 ${
+                              !isDarkMode
+                                ? 'text-emerald-600'
+                                : 'text-neutral-500 hover:text-neutral-300'
+                            }`}
+                          >
+                            <Sun
+                              className={`w-3.5 h-3.5 ${!isDarkMode ? 'text-emerald-500' : 'text-neutral-500'}`}
+                            />
+                            লাইট
+                          </button>
+                          <button
+                            onClick={() => isDarkMode && toggleTheme()}
+                            className={`flex-1 flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg text-xs font-bold transition-all relative z-10 ${
+                              isDarkMode
+                                ? 'text-emerald-500'
+                                : 'text-neutral-500 hover:text-neutral-700'
+                            }`}
+                          >
+                            <Moon
+                              className={`w-3.5 h-3.5 ${isDarkMode ? 'text-emerald-400' : 'text-neutral-500'}`}
+                            />
+                            ডার্ক
+                          </button>
+
+                          {/* Active State Background Indicator */}
+                          <motion.div
+                            initial={false}
+                            animate={{
+                              x: isDarkMode ? '100%' : '0%',
+                            }}
+                            transition={{
+                              type: 'spring',
+                              stiffness: 300,
+                              damping: 30,
+                            }}
+                            className="absolute inset-y-1 left-1 w-[calc(50%-4px)] bg-white dark:bg-neutral-900 rounded-lg shadow-sm border dark:border-neutral-700/50"
+                          />
+                        </div>
                       </div>
                       <div className="h-px bg-neutral-100 dark:bg-neutral-800 my-1"></div>
                       <button
