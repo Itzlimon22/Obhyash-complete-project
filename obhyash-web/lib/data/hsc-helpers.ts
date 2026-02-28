@@ -34,12 +34,66 @@ const SUBJECT_ALIASES: Record<string, string> = {
 };
 
 function normalizeForMatch(str: string): string {
-  return str
-    .toLowerCase()
-    .replace(/hsc\s+/g, '') // remove hsc prefix
-    .replace(/subject:?\s+/g, '') // remove subject prefix
-    .replace(/\s+/g, ' ') // collapse spaces
-    .trim();
+  return (
+    str
+      .toLowerCase()
+      .replace(/hsc\s+/g, '') // remove hsc prefix
+      .replace(/subject:?\s+/g, '') // remove subject prefix
+      // Normalize Bengali characters
+      .replace(/য়/g, 'য়')
+      .replace(/ড়/g, 'ড়')
+      .replace(/ঢ়/g, 'ঢ়')
+      // and sometimes spaces are typed strangely
+      .replace(/\s+/g, ' ') // collapse spaces
+      .trim()
+  );
+}
+
+// ─── Fuzzy Matching Algorithm ────────────────────────────────────────
+function levenshteinDistance(a: string, b: string): number {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+
+  const matrix = Array.from({ length: a.length + 1 }, () =>
+    new Array(b.length + 1).fill(0),
+  );
+
+  for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+  for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1, // deletion
+        matrix[i][j - 1] + 1, // insertion
+        matrix[i - 1][j - 1] + cost, // substitution
+      );
+    }
+  }
+
+  return matrix[a.length][b.length];
+}
+
+function getSimilarity(a: string, b: string): number {
+  const distance = levenshteinDistance(a, b);
+  const maxLength = Math.max(a.length, b.length);
+  return maxLength === 0 ? 1 : 1 - distance / maxLength;
+}
+
+// Special check to avoid confusing 1st and 2nd papers/parts
+function hasSafeNumberMatch(inputStr: string, matchStr: string): boolean {
+  const isPaper1 = /(1|১|১ম|1st|first)/i.test(inputStr);
+  const isPaper2 = /(2|২|২য়|2nd|second)/i.test(inputStr);
+
+  const matchHas1 = /(1|১|১ম|1st|first)/i.test(matchStr);
+  const matchHas2 = /(2|২|২য়|2nd|second)/i.test(matchStr);
+
+  if (isPaper1 && !matchHas1) return false;
+  if (isPaper2 && !matchHas2) return false;
+  if (!isPaper1 && !isPaper2 && (matchHas1 || matchHas2)) return false;
+
+  return true;
 }
 
 /** Get all HSC subjects as dropdown items */
@@ -74,7 +128,7 @@ export function findHscSubject(idOrName: string) {
 
   const targetLower = targetName.toLowerCase();
 
-  return hscSubjects.find((s) => {
+  const exactMatch = hscSubjects.find((s) => {
     const sNameLower = s.name.toLowerCase();
     return (
       sNameLower === targetLower ||
@@ -82,6 +136,28 @@ export function findHscSubject(idOrName: string) {
       targetLower.includes(sNameLower)
     );
   });
+
+  if (exactMatch) return exactMatch;
+
+  // Fallback to Fuzzy Search (80% similarity threshold)
+  let bestMatch: any = undefined;
+  let highestScore = 0;
+
+  for (const s of hscSubjects) {
+    const sNameLower = s.name.toLowerCase();
+    const score = getSimilarity(targetLower, sNameLower);
+
+    if (
+      score > highestScore &&
+      score >= 0.8 &&
+      hasSafeNumberMatch(targetLower, sNameLower)
+    ) {
+      highestScore = score;
+      bestMatch = s;
+    }
+  }
+
+  return bestMatch;
 }
 
 // ─── Chapters ────────────────────────────────────────────────────────
@@ -92,11 +168,13 @@ export function getHscChapterList(
 ): { id: string; name: string }[] {
   const subject = findHscSubject(subjectIdOrName);
   if (!subject) return [];
-  return subject.chapters.map((c) => ({ id: c.id, name: c.name }));
+  return subject.chapters.map((c: { id: any; name: any; }) => ({ id: c.id, name: c.name }));
 }
 
 export function findHscChapter(idOrName: string) {
   const norm = normalizeForMatch(idOrName);
+
+  // Exact/Include Match
   for (const subject of hscSubjects) {
     const chapter = subject.chapters.find((c) => {
       const cNameLower = c.name.toLowerCase();
@@ -109,7 +187,29 @@ export function findHscChapter(idOrName: string) {
     });
     if (chapter) return { chapter, subject };
   }
-  return undefined;
+
+  // Fuzzy Match (80% similarity threshold)
+  let bestMatch: any = undefined;
+  let highestScore = 0;
+
+  for (const subject of hscSubjects) {
+    for (const c of subject.chapters) {
+      if (c.id === idOrName) continue; // Already checked
+      const cNameLower = c.name.toLowerCase();
+      const score = getSimilarity(norm, cNameLower);
+
+      if (
+        score > highestScore &&
+        score >= 0.8 &&
+        hasSafeNumberMatch(norm, cNameLower)
+      ) {
+        highestScore = score;
+        bestMatch = { chapter: c, subject };
+      }
+    }
+  }
+
+  return bestMatch;
 }
 
 // ─── Topics ──────────────────────────────────────────────────────────
@@ -120,7 +220,7 @@ export function getHscTopicList(
 ): { id: string; name: string }[] {
   const chapterInfo = findHscChapter(chapterIdOrName);
   if (!chapterInfo) return [];
-  return chapterInfo.chapter.topics.map((t) => ({ id: t.id, name: t.name }));
+  return chapterInfo.chapter.topics.map((t: { id: any; name: any; }) => ({ id: t.id, name: t.name }));
 }
 
 export function findHscTopic(idOrName: string, chapterIdOrName?: string) {
@@ -130,22 +230,54 @@ export function findHscTopic(idOrName: string, chapterIdOrName?: string) {
   if (chapterIdOrName) {
     const chapterInfo = findHscChapter(chapterIdOrName);
     if (chapterInfo) {
-      const topic = chapterInfo.chapter.topics.find(
-        (t) =>
+      // Exact/Include Match
+      let topic = chapterInfo.chapter.topics.find(
+        (t: { id: string; name: string; }) =>
           t.id === idOrName ||
           normalizeForMatch(t.name) === norm ||
-          normalizeForMatch(t.name).includes(norm),
+          normalizeForMatch(t.name).includes(norm) ||
+          (t as any).serial?.toString() === norm,
       );
-      if (topic)
+
+      if (topic) {
         return {
           topic,
           chapter: chapterInfo.chapter,
           subject: chapterInfo.subject,
         };
+      }
+
+      // Fuzzy Match within chapter (80% similarity threshold)
+      let bestMatch: any = undefined;
+      let highestScore = 0;
+
+      for (const t of chapterInfo.chapter.topics) {
+        if (t.id === idOrName || (t as any).serial?.toString() === norm)
+          continue;
+        const tNameNorm = normalizeForMatch(t.name);
+        const score = getSimilarity(norm, tNameNorm);
+
+        if (
+          score > highestScore &&
+          score >= 0.8 &&
+          hasSafeNumberMatch(norm, tNameNorm)
+        ) {
+          highestScore = score;
+          bestMatch = t;
+        }
+      }
+
+      if (bestMatch) {
+        return {
+          topic: bestMatch,
+          chapter: chapterInfo.chapter,
+          subject: chapterInfo.subject,
+        };
+      }
     }
   }
 
-  // Global search
+  // Global Exact/Include search
   for (const subject of hscSubjects) {
     for (const chapter of subject.chapters) {
       const topic = chapter.topics.find((t) => {
@@ -154,13 +286,39 @@ export function findHscTopic(idOrName: string, chapterIdOrName?: string) {
           t.id === idOrName ||
           tNameNorm === norm ||
           tNameNorm.includes(norm) ||
-          norm.includes(tNameNorm)
+          norm.includes(tNameNorm) ||
+          (t as any).serial?.toString() === norm
         );
       });
       if (topic) return { topic, chapter, subject };
     }
   }
-  return undefined;
+
+  // Global Fuzzy search (80% similarity threshold)
+  let bestGlobalMatch: any = undefined;
+  let highestGlobalScore = 0;
+
+  for (const subject of hscSubjects) {
+    for (const chapter of subject.chapters) {
+      for (const t of chapter.topics) {
+        if (t.id === idOrName || (t as any).serial?.toString() === norm)
+          continue;
+        const tNameNorm = normalizeForMatch(t.name);
+        const score = getSimilarity(norm, tNameNorm);
+
+        if (
+          score > highestGlobalScore &&
+          score >= 0.8 &&
+          hasSafeNumberMatch(norm, tNameNorm)
+        ) {
+          highestGlobalScore = score;
+          bestGlobalMatch = { topic: t, chapter, subject };
+        }
+      }
+    }
+  }
+
+  return bestGlobalMatch;
 }
 
 // ─── Resolve helpers (for bulk upload name matching) ─────────────────
@@ -181,7 +339,7 @@ export function resolveChapterName(
   const subject = findHscSubject(subjectInput);
   if (subject) {
     const norm = normalizeForMatch(chapterInput);
-    const chapter = subject.chapters.find((c) => {
+    const chapter = subject.chapters.find((c: { name: string; id: string; }) => {
       const cNameNorm = normalizeForMatch(c.name);
       return (
         c.id === chapterInput ||
@@ -210,13 +368,14 @@ export function resolveTopicName(
     const chapterInfo = findHscChapter(chapterInput);
     if (chapterInfo) {
       const norm = normalizeForMatch(topicInput);
-      const topic = chapterInfo.chapter.topics.find((t) => {
+      const topic = chapterInfo.chapter.topics.find((t: { name: string; id: string; }) => {
         const tNameNorm = normalizeForMatch(t.name);
         return (
           t.id === topicInput ||
           tNameNorm === norm ||
           tNameNorm.includes(norm) ||
-          norm.includes(tNameNorm)
+          norm.includes(tNameNorm) ||
+          (t as any).serial?.toString() === norm
         );
       });
       if (topic) return topic.name;
