@@ -211,7 +211,12 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       filtered.sort((a, b) => b.score / b.totalMarks - a.score / a.totalMarks);
     else if (sortBy === 'score-low')
       filtered.sort((a, b) => a.score / a.totalMarks - b.score / b.totalMarks);
-    else filtered.reverse();
+    else {
+      // Sort by date newest first
+      filtered.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      );
+    }
     return filtered;
   }, [history, filterSubject, filterDate, searchText, sortBy]);
 
