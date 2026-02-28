@@ -16,6 +16,28 @@ interface MathRendererProps {
 export function MathRenderer({ text, block = false }: MathRendererProps) {
   if (!text) return null;
 
+  // Enhance formatting for list items that are often pasted inline
+  let formattedText = text;
+
+  // Format i., ii., iii. etc
+  // Use (?:\s+|^|-) to match space, start of string, or a dash before the numeral
+  formattedText = formattedText.replace(
+    /(?:\s+|^|-)(i|ii|iii|iv|v)\.\s+/gi,
+    '\n$1. ',
+  );
+
+  // Format parenthesis numerals (i), (ii), etc
+  formattedText = formattedText.replace(
+    /(?:\s+|^|-)\((i|ii|iii|iv|v)\)\s+/gi,
+    '\n($1) ',
+  );
+
+  // Catch the typical ending question and push it to a new line
+  formattedText = formattedText.replace(
+    /(?:\s+|^)নিচের কোনটি সঠিক\?/g,
+    '\n\nনিচের কোনটি সঠিক?',
+  );
+
   return (
     <div
       className={`prose prose-sm max-w-none dark:prose-invert 
@@ -32,7 +54,7 @@ export function MathRenderer({ text, block = false }: MathRendererProps) {
           ),
         }}
       >
-        {text}
+        {formattedText}
       </ReactMarkdown>
     </div>
   );
