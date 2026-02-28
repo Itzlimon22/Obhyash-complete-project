@@ -136,7 +136,7 @@ export default function AnalyticsPage() {
       const totalExams = exams?.length || 0;
       const averageScore =
         exams && exams.length > 0
-          ? exams.reduce((sum, exam) => sum + (exam.score || 0), 0) /
+          ? exams.reduce((sum: number, exam: ExamData) => sum + (exam.score || 0), 0) /
             exams.length
           : 0;
 
