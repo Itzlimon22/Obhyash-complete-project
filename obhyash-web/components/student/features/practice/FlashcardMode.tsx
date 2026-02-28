@@ -78,6 +78,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
   );
 
   const handleNext = useCallback(() => {
+    // If skipping (selectedIdx is null), we treat it as struggling or just move on
     const grade: FlashcardGrade =
       selectedIdx === correctIndex ? 'got_it' : 'struggling';
     const newResults = [
@@ -104,6 +105,19 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
     total,
     onComplete,
   ]);
+
+  const handlePrevious = useCallback(() => {
+    if (currentIndex === 0) return;
+
+    const prevResult = results[results.length - 1];
+    if (!prevResult) return;
+
+    setDirection(-1);
+    setResults(results.slice(0, -1));
+    setCurrentIndex((i) => i - 1);
+    setSelectedIdx(prevResult.selectedIndex);
+    setPhase('revealed');
+  }, [currentIndex, results]);
 
   // Option styling mirrored from QuestionCard
   const getOptionClasses = (idx: number) => {
@@ -357,44 +371,98 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
         </div>
       </div>
 
-      {/* ── Fixed bottom next button ── */}
-      <AnimatePresence>
-        {phase === 'revealed' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm border-t border-neutral-200 dark:border-neutral-800"
+      {/* ── Fixed bottom navigation bar ── */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 z-50">
+        <div className="max-w-3xl mx-auto flex items-center gap-3">
+          {/* Previous Button */}
+          <button
+            onClick={handlePrevious}
+            disabled={currentIndex === 0}
+            className={`
+              flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm transition-all
+              ${
+                currentIndex === 0
+                  ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'
+                  : 'bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-700 active:scale-95'
+              }
+            `}
           >
-            <div className="max-w-3xl mx-auto flex items-center gap-4">
-              {/* Result chip */}
-              <div
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm ${
-                  isCorrect
-                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                    : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-                }`}
-              >
-                {isCorrect ? '✓ সঠিক' : '✗ ভুল'}
-              </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 19.5 8.25 12l7.5-7.5"
+              />
+            </svg>
+            <span className="hidden sm:inline">পেছনে</span>
+          </button>
 
-              {/* Next / finish button */}
-              <button
-                onClick={handleNext}
-                className={`flex-1 py-3 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98] shadow-md ${
-                  isCorrect
-                    ? 'bg-emerald-700 hover:bg-emerald-800'
-                    : 'bg-red-600 hover:bg-red-700'
-                }`}
+          {/* Result Chip (Only in revealed phase) */}
+          <AnimatePresence>
+            {phase === 'revealed' && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className={`
+                  flex items-center gap-1.5 px-3 py-2 rounded-lg font-bold text-[12px] md:text-sm shrink-0
+                  ${
+                    selectedIdx === correctIndex
+                      ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                      : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                  }
+                `}
               >
-                {currentIndex + 1 >= total
-                  ? 'ফলাফল দেখো →'
-                  : 'পরবর্তী প্রশ্ন →'}
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                {selectedIdx === correctIndex ? '✓ সঠিক' : '✗ ভুল'}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Next / Skip Button */}
+          <button
+            onClick={handleNext}
+            className={`
+              flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98] shadow-md
+              ${
+                phase === 'revealed'
+                  ? selectedIdx === correctIndex
+                    ? 'bg-emerald-700 hover:bg-emerald-800 shadow-emerald-700/20'
+                    : 'bg-red-600 hover:bg-red-700 shadow-red-600/20'
+                  : 'bg-neutral-800 dark:bg-neutral-200 dark:text-neutral-900 hover:bg-neutral-900 dark:hover:bg-white shadow-neutral-800/20'
+              }
+            `}
+          >
+            <span>
+              {currentIndex + 1 >= total
+                ? 'ফলাফল দেখো'
+                : phase === 'selecting'
+                  ? 'পরবর্তী (স্কিপ)'
+                  : 'পরবর্তী প্রশ্ন'}
+            </span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m8.25 4.5 7.5 7.5-7.5 7.5"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

@@ -38,7 +38,7 @@ export default function QuestionCard({
   onToggleBookmark,
 }: QuestionCardProps) {
   const isAnswered = selectedOptionIndex !== undefined;
-  const [isExplanationOpen, setIsExplanationOpen] = useState(false);
+  const [isExplanationOpen, setIsExplanationOpen] = useState(showFeedback);
 
   // Build institute/year tags
   const tags: string[] = [];
@@ -167,13 +167,13 @@ export default function QuestionCard({
       </div>
 
       {/* ── Options grid ── */}
-      <div
-        className={`
-          px-2 pb-3 md:px-5 md:pb-4
-          grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2.5 items-stretch
-          ${readOnly || isOmrMode ? 'pointer-events-none' : ''}
-        `}
-      >
+<div
+  className={`
+    px-4 pb-4 md:px-6 md:pb-5
+    grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3 items-stretch
+    ${readOnly || isOmrMode ? 'pointer-events-none' : ''}
+  `}
+>
         {question.options.map((option, idx) => {
           const isSelected = selectedOptionIndex === idx;
           const isCorrect = idx === question.correctAnswerIndex;
@@ -190,29 +190,26 @@ export default function QuestionCard({
           if (showFeedback) {
             if (isCorrect) {
               boxClass =
-                'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800';
+                'bg-emerald-50/40 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800';
               iconBg = 'bg-emerald-500 border-emerald-500';
               iconFg = 'text-white';
               textClass = 'text-emerald-700 dark:text-emerald-300 font-bold';
-              iconText = '✓';
             } else if (isSelected) {
               boxClass =
-                'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
+                'bg-red-50/40 dark:bg-red-900/10 border-red-200 dark:border-red-800';
               iconBg = 'bg-red-500 border-red-500';
               iconFg = 'text-white';
               textClass = 'text-red-700 dark:text-red-300 font-bold';
-              iconText = '✕';
             } else {
               boxClass =
                 'bg-[#f8f9fa] dark:bg-[#1f1f1f] border border-[#e5e7eb] dark:border-[#333] opacity-60';
             }
           } else if (showAnswer && isCorrect) {
             boxClass =
-              'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800';
+              'bg-emerald-50/40 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800';
             iconBg = 'bg-emerald-500 border-emerald-500';
             iconFg = 'text-white';
             textClass = 'text-emerald-700 dark:text-emerald-300 font-bold';
-            iconText = '✓';
           } else if (isSelected) {
             boxClass =
               'bg-neutral-200 dark:bg-neutral-700 border-neutral-400 dark:border-neutral-500';
@@ -247,12 +244,12 @@ export default function QuestionCard({
               {/* Circle badge */}
               <div
                 className={`
-                  w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all duration-200
+                  w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-200
                   ${iconBg}
                 `}
               >
                 <span
-                  className={`text-[10px] font-bold leading-none ${iconFg}`}
+                  className={`text-[14px] font-bold leading-none ${iconFg}`}
                 >
                   {iconText}
                 </span>
@@ -279,33 +276,12 @@ export default function QuestionCard({
               border border-neutral-200/80 dark:border-[#333]
             "
           >
-            {/* Toggle Button */}
+            {/* Toggle Button - Minimal Header */}
             <button
               onClick={() => setIsExplanationOpen(!isExplanationOpen)}
-              className="w-full flex items-center justify-between p-3 md:p-4 hover:bg-neutral-100/50 dark:hover:bg-[#252525] transition-colors"
+              className="w-full flex items-center justify-end p-2 transition-colors hover:bg-emerald-100/30 dark:hover:bg-emerald-900/20"
             >
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 flex items-center justify-center rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-3.5 h-3.5 shrink-0"
-                  >
-                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                  </svg>
-                </div>
-                <h4 className="text-[13px] md:text-[14px] font-bold tracking-wide text-neutral-800 dark:text-neutral-200">
-                  ব্যাখ্যা
-                </h4>
-              </div>
-              <div className="text-neutral-400 dark:text-neutral-500 bg-white dark:bg-neutral-800 p-1 rounded-full border border-neutral-200 dark:border-neutral-700 shadow-sm">
+              <div className="text-emerald-600 dark:text-emerald-400 p-1 rounded-md border border-emerald-200/60 dark:border-emerald-800/60 shadow-sm bg-white/50 dark:bg-neutral-800/50">
                 {isExplanationOpen ? (
                   <ChevronUp className="w-4 h-4" />
                 ) : (
@@ -322,18 +298,17 @@ export default function QuestionCard({
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="px-4 pb-4 md:px-5 md:pb-5 pt-1 border-t border-neutral-200/60 dark:border-neutral-800/60"
+                  className="px-4 pb-4 md:px-5 md:pb-5 pt-1 bg-emerald-50/50 dark:bg-emerald-900/10 border-t border-emerald-200 dark:border-emerald-800/60"
                 >
                   <div className="text-[14px] md:text-[15px] text-neutral-700 dark:text-neutral-300 leading-[1.4] font-serif-exam mt-2">
                     {question.correctAnswerIndex !== undefined && (
-                      <div className="font-bold text-emerald-600 dark:text-emerald-500 mb-2">
+                      <div className="font-extrabold text-emerald-700 dark:text-emerald-400 text-base mb-3 pb-2 border-b border-emerald-200/50 dark:border-emerald-800/30">
                         সঠিক উত্তর :{' '}
-                        {['ক', 'খ', 'গ', 'ঘ'][question.correctAnswerIndex] ||
-                          ''}
+                        {BANGLA_INDICES[question.correctAnswerIndex] || ''}
                       </div>
                     )}
                     {question.explanation && (
-                      <div className="font-bold text-neutral-800 dark:text-neutral-200 mb-1">
+                      <div className="font-bold text-neutral-900 dark:text-neutral-100 mb-2">
                         ব্যাখ্যা :
                       </div>
                     )}
