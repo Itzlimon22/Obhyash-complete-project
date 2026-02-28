@@ -54,7 +54,7 @@ export const getUserBookmarks = async (
     if (error) throw error;
 
     const bookmarkSet = new Set<number | string>();
-    data?.forEach((item: any) => {
+    data?.forEach((item: { question_id: number | string }) => {
       bookmarkSet.add(item.question_id);
     });
     return bookmarkSet;

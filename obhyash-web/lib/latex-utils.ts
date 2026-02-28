@@ -23,9 +23,14 @@ export function validateLatex(text: string): {
         // __parse is an internal KaTeX function but it's the most efficient for validation
         // Alternatively, we use the standard renderToString in a try/catch
         katex.renderToString(content, { throwOnError: true });
-      } catch (err: any) {
+      } catch (err: unknown) {
         // Strip out common KaTeX noise from error messages for better UX
-        const message = err.message || String(err);
+        let message: string;
+        if (typeof err === 'object' && err !== null && 'message' in err && typeof (err as { message: unknown }).message === 'string') {
+          message = (err as { message: string }).message;
+        } else {
+          message = String(err);
+        }
         const cleanMessage = message
           .replace(/^KaTeX parse error: /i, '')
           .replace(/ at position \d+:.*/, '');

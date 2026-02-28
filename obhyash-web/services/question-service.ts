@@ -511,7 +511,7 @@ export const checkDuplicateQuestions = async (
       if (error) throw error;
 
       if (data && data.length > 0) {
-        const existingFingerprints = new Set(data.map((d) => d.fingerprint));
+        const existingFingerprints = new Set(data.map((d: { fingerprint: string }) => d.fingerprint));
 
         batch.forEach((fp, batchIdx) => {
           if (existingFingerprints.has(fp)) {
@@ -602,7 +602,7 @@ export const bulkCreateQuestions = async (
           chapter: q.chapter,
         });
 
-        const isValidUUID = (id: any) =>
+        const isValidUUID = (id: unknown) =>
           typeof id === 'string' &&
           /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
             id,

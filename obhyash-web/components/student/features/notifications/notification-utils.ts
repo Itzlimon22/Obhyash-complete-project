@@ -234,8 +234,11 @@ export const getNotificationStyle = (type: NotificationType | string) => {
 
 // --- DATE GROUPING UTILS ---
 
-export const groupNotificationsByDate = (notifications: any[]) => {
-  const groups: { label: string; items: any[] }[] = [
+// Add this import if Notification is not already imported
+import type { Notification } from '@/lib/types';
+
+export const groupNotificationsByDate = (notifications: Notification[]) => {
+  const groups: { label: string; items: Notification[] }[] = [
     { label: 'আজকে (Today)', items: [] },
     { label: 'গতকাল (Yesterday)', items: [] },
     { label: 'আগের (Earlier)', items: [] },

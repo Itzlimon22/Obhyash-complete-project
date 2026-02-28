@@ -3,6 +3,15 @@ import { SUBJECT_METADATA, SubjectMetadata } from '@/lib/mock-data';
 export { SUBJECT_METADATA };
 export type { SubjectMetadata };
 
+type Subject = {
+  id: string;
+  name?: string;
+  name_en?: string;
+  icon?: string;
+  division?: string;
+  stream?: string;
+};
+
 const SUBJECT_ICONS: Record<string, string> = {
   Physics: '⚛️',
   Chemistry: '🧪',
@@ -52,7 +61,7 @@ export const getSubjects = async (
     );
     if (!error && data) {
       // Optional Subject Filtering Logic
-      const filteredData = data.filter((subject) => {
+      const filteredData = data.filter((subject: Subject) => {
         const subName = (subject.name_en || subject.name || '').toLowerCase();
         const subId = (subject.id || '').toLowerCase();
 
@@ -73,8 +82,8 @@ export const getSubjects = async (
 
       // Deduplicate subjects by name to prevent "Chemistry Ch 1" appearing twice
       // if multiple entries exist with the same name in the database.
-      const uniqueSubjects = new Map<string, any>();
-      filteredData.forEach((s) => {
+      const uniqueSubjects = new Map<string, Subject>();
+      filteredData.forEach((s: Subject) => {
         const name = s.name || s.name_en || '';
         if (name && !uniqueSubjects.has(name)) {
           uniqueSubjects.set(name, s);
@@ -84,7 +93,11 @@ export const getSubjects = async (
       // Enrich with icons
       return Array.from(uniqueSubjects.values()).map((s) => ({
         ...s,
-        icon: s.icon || SUBJECT_ICONS[s.name] || SUBJECT_ICONS[s.id] || '📘',
+        name: s.name || s.name_en || '', // Ensure 'name' is always a string
+        icon: s.icon 
+          || (s.name ? SUBJECT_ICONS[s.name] : undefined) 
+          || (s.id ? SUBJECT_ICONS[s.id] : undefined) 
+          || '📘',
       }));
     }
   }

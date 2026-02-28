@@ -20,28 +20,29 @@ export function useBookmarks(userId: string | undefined) {
   // ── Initial fetch ───────────────────────────────────────────────────────────
   useEffect(() => {
     if (!userId) {
-      setBookmarkedIds(new Set());
       return;
     }
 
     let cancelled = false;
-    setIsLoading(true);
 
-    getUserBookmarks(userId)
-      .then((ids) => {
+    const fetchBookmarks = async () => {
+      setIsLoading(true);
+      try {
+        const ids = await getUserBookmarks(userId);
         if (!cancelled) {
           // Normalise every ID to string so Set.has() always works regardless
           // of whether a question ID was stored as a number or string.
           const normalised = new Set<string>([...ids].map((id) => String(id)));
           setBookmarkedIds(normalised);
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error('[useBookmarks] fetch error', err);
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setIsLoading(false);
-      });
+      }
+    };
+
+    fetchBookmarks();
 
     return () => {
       cancelled = true;

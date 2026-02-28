@@ -67,7 +67,7 @@ interface ParseError {
 }
 
 // ─── JSON Error Helper ───────────────────────────────────────────────
-function getHelpfulJsonError(rawText: string, error: any): string {
+function getHelpfulJsonError(rawText: string, error: unknown): string {
   const baseMessage = error instanceof Error ? error.message : String(error);
   let helpfulMessage = baseMessage;
 
@@ -1246,11 +1246,13 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
       setShowJsonEditor(false); // Close editor on success
       setStep(2);
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (err instanceof SyntaxError) {
         setJsonErrorMsg(getHelpfulJsonError(rawJsonText, err));
-      } else {
+      } else if (err instanceof Error) {
         setJsonErrorMsg(err.message || 'অজানা ত্রুটি');
+      } else {
+        setJsonErrorMsg('অজানা ত্রুটি');
       }
     } finally {
       setIsProcessing(false);

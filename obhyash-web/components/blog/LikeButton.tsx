@@ -70,7 +70,7 @@ export default function LikeButton({ postSlug }: LikeButtonProps) {
 
       // Revalidate SWR silently in the background
       mutate();
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Revert to previous state if API call failed
       setLocalHasLiked(previousHasLiked);
       setLocalLikes(previousLikes);

@@ -182,7 +182,7 @@ export default function QuestionCard({
           const isCorrect = idx === question.correctAnswerIndex;
           const banglaIndex = BANGLA_INDICES[idx] || (idx + 1).toString();
 
-          let iconText = banglaIndex;
+          const iconText = banglaIndex;
           let iconBg =
             'bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:shadow-none';
           let iconFg = 'text-neutral-600 dark:text-neutral-300';

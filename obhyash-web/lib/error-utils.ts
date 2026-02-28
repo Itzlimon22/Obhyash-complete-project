@@ -1,8 +1,10 @@
-export const getErrorMessage = (error: any): string => {
+export const getErrorMessage = (error: unknown): string => {
   const message =
     typeof error === 'string'
       ? error
-      : error?.message || 'Something went wrong';
+      : typeof error === 'object' && error !== null && 'message' in error && typeof (error as Record<string, unknown>).message === 'string'
+        ? (error as { message: string }).message
+        : 'Something went wrong';
 
   // Auth & Password Errors
   if (

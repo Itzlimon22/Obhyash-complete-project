@@ -26,7 +26,7 @@ const BANGLA_INDICES = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 
 function playCorrectSound() {
   try {
     const ctx = new (
-      window.AudioContext || (window as any).webkitAudioContext
+      window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext
     )();
     const o = ctx.createOscillator();
     const g = ctx.createGain();

@@ -3,10 +3,10 @@
  * structure (like an outer array) is broken.
  */
 export function extractJsonObjects(text: string): {
-  data: any[];
+  data: unknown[];
   errors: string[];
 } {
-  const data: any[] = [];
+  const data: unknown[] = [];
   const errors: string[] = [];
 
   const trimmedText = text.trim();
@@ -23,7 +23,7 @@ export function extractJsonObjects(text: string): {
   // 2. Try JSON Lines (one object per line)
   const lines = trimmedText.split('\n');
   let lineSuccessCount = 0;
-  const lineResults: any[] = [];
+  const lineResults: unknown[] = [];
 
   lines.forEach((line) => {
     const trimmedLine = line.trim();

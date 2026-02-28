@@ -157,7 +157,13 @@ const NotificationsView: React.FC = () => {
                           exit={{ opacity: 0, x: -100 }}
                           onClick={() =>
                             !notif.is_read &&
-                            handleMarkRead(notif.id, {} as any)
+                            handleMarkRead(
+                              notif.id,
+                              // Create a synthetic MouseEvent for type safety
+                              {
+                                stopPropagation: () => {},
+                              } as unknown as React.MouseEvent<HTMLDivElement>
+                            )
                           }
                           className={`relative group p-4 sm:p-5 rounded-3xl border transition-all duration-300 cursor-pointer overflow-hidden
                             ${

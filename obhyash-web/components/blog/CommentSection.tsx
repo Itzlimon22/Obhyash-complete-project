@@ -48,7 +48,7 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
       await mutate();
       setContent('');
       toast.success('আপনার মতামত সফলভাবে পোস্ট করা হয়েছে!');
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error('মতামত পোস্ট করতে সমস্যা হয়েছে।');
     } finally {
       setIsSubmitting(false);

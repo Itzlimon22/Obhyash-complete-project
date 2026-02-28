@@ -153,7 +153,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
         newPassword: '',
         confirmPassword: '',
       }));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Save Error:', error);
       toast.error(getErrorMessage(error));
     }

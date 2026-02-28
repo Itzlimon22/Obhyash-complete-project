@@ -42,7 +42,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
     // Actually UserProfile interface in types.ts doesn't explicitly have recentExams, but User does.
     // Let's check types.ts again. UserProfile extends Partial<User>.
     // So distinct properties are optional.
-    const opponentHistory = (user as any).recentExams || [];
+    const opponentHistory = (user as UserProfile & { recentExams?: ExamResult[] }).recentExams || [];
     const opponentStats = calculateActivityStats(opponentHistory);
 
     // Merge them by day name

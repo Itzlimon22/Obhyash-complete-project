@@ -76,10 +76,7 @@ export function QuestionFormDialog({
     return getInitialFormData();
   });
 
-  useEffect(() => {
-    setFormData(getInitialFormData());
-  }, [question]);
-
+  // Remove useEffect and initialize state directly from props
   if (!formData) return null;
 
   const handleUpdate = async () => {

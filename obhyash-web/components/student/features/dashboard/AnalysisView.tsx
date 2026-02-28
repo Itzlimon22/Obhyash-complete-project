@@ -71,7 +71,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
       id: s.name,
       name: getSubjectDisplayName(s.name),
     }));
-  }, [analytics?.subjectData]);
+  }, [analytics && analytics.subjectData]);
 
   // Check if we have no data
   if (isLoading) {

@@ -137,7 +137,7 @@ export const fetchQuestionsWithDiagnostics = async (
       `🎯 Multi-bucket strategy: ${combinations.length} combinations, ~${bucketSize} per bucket`,
     );
 
-    let allCollectedQuestions: Question[] = [];
+    const allCollectedQuestions: Question[] = [];
     const seenIds = new Set<string | number>();
 
     // 4. Fetch per bucket

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { BlogPost } from '@/lib/blog-data';
 import BlogCard from '@/components/blog/BlogCard';
 import { BookOpen, Sparkles, TrendingUp, Search } from 'lucide-react';
@@ -306,12 +307,12 @@ export default function BlogListingClient({
               বোর্ড স্ট্যান্ডার্ড MCQ মডেল টেস্ট দিন, আপনার অগ্রগতি ট্র্যাক করুন
               এবং দুর্বল বিষয়গুলো চিহ্নিত করুন — সবই এক জায়গায়।
             </p>
-            <a
+            <Link
               href="/"
               className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors text-sm font-anek"
             >
               স্টুডেন্ট ড্যাশবোর্ডে যান
-            </a>
+            </Link>
           </div>
         </div>
       </section>

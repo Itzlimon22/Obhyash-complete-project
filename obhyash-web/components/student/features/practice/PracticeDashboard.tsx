@@ -15,7 +15,7 @@ interface PracticeDashboardProps {
   history: ExamResult[];
   onStartPractice: (questions: Question[], details: ExamDetails) => void; // kept for compatibility
   onNavigateToMock: () => void;
-  subjects?: any[];
+  subjects?: string[];
   currentUser?: UserProfile | null;
 }
 

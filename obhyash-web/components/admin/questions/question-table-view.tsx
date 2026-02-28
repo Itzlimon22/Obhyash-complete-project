@@ -53,7 +53,10 @@ const EditableRow = ({
     }
   };
 
-  const updateField = (field: keyof Question, value: any) => {
+  const updateField = (
+    field: keyof Question,
+    value: Question[keyof Question]
+  ) => {
     setLocalQ((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -329,10 +332,11 @@ const EditableRow = ({
 
       <td className={`${tdClass} min-w-[120px]`}>
         <select
-          value={localQ.difficulty || ''}
+          value={localQ.difficulty ?? ''}
           onChange={(e) => {
-            updateField('difficulty', e.target.value);
-            const newQ = { ...localQ, difficulty: e.target.value as any };
+            const value = e.target.value as 'Easy' | 'Medium' | 'Hard';
+            updateField('difficulty', value);
+            const newQ = { ...localQ, difficulty: value };
             setLocalQ(newQ);
             onSave(newQ);
           }}
@@ -350,7 +354,7 @@ const EditableRow = ({
           value={localQ.status || 'Pending'}
           onChange={(e) => {
             updateField('status', e.target.value);
-            const newQ = { ...localQ, status: e.target.value as any };
+            const newQ = { ...localQ, status: e.target.value as 'Pending' | 'Approved' | 'Rejected' | 'Draft' };
             setLocalQ(newQ);
             onSave(newQ);
           }}

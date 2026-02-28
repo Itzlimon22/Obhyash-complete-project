@@ -244,7 +244,7 @@ export const getSubjectAnalysis = async (
         // Filter by subject manually
         const targetLabel = getSubjectDisplayName(subject).toLowerCase();
 
-        const filteredExams = rawData.filter((exam) => {
+        const filteredExams = rawData.filter((exam: ExamResult) => {
           if (!exam.subject) return false;
 
           // Resolve both the stored subject and the target subject to display names for robust matching

@@ -57,7 +57,7 @@ interface StudentRootProps {
   theme: 'light' | 'dark';
   toggleTheme: () => void;
   onLogout: () => void;
-  subjects?: any[];
+  subjects?: { id: string; name: string; [key: string]: unknown }[];
 }
 
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -151,16 +151,20 @@ export default function StudentRoot({
       }
 
       return success;
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('Exam start failed', e);
-      const isNoQuestions = e.message?.includes('No questions found');
+      const errorMessage =
+        typeof e === 'object' && e !== null && 'message' in e
+          ? String((e as { message?: string }).message)
+          : 'Unknown error starting exam';
+      const isNoQuestions = errorMessage.includes('No questions found');
 
       toast.error(
         isNoQuestions
           ? 'দুঃখিত, কোনো প্রশ্ন পাওয়া যায়নি। অন্য টপিক নির্বাচন করো।'
           : 'পরীক্ষা শুরু করতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
         {
-          description: e.message || 'Unknown error starting exam',
+          description: errorMessage,
         },
       );
       return false;
@@ -624,7 +628,7 @@ export default function StudentRoot({
               history={examHistory}
               onStartPractice={startCustomExam}
               onNavigateToMock={() => setActiveTab('setup')}
-              subjects={subjects}
+              subjects={subjects.map((s) => s.id)}
               currentUser={currentUser}
             />
           </AppLayout>
@@ -771,7 +775,7 @@ export default function StudentRoot({
         <>
           <ExamRunner
             appState={appState}
-            examDetails={examDetails}
+            examDetails={examDetails ?? undefined}
             questions={questions}
             userAnswers={userAnswers}
             setUserAnswers={setUserAnswers}
@@ -877,7 +881,7 @@ export default function StudentRoot({
             currentUser={currentUser}
             bookmarkedIds={bookmarkedIds}
             onToggleBookmark={toggleBookmark}
-            examDetails={examDetails}
+            examDetails={examDetails ?? undefined}
           />
         </AppLayout>
       );

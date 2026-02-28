@@ -168,7 +168,7 @@ export function getHscChapterList(
 ): { id: string; name: string }[] {
   const subject = findHscSubject(subjectIdOrName);
   if (!subject) return [];
-  return subject.chapters.map((c: { id: any; name: any; }) => ({ id: c.id, name: c.name }));
+  return subject.chapters.map((c: { id: string; name: string }) => ({ id: c.id, name: c.name }));
 }
 
 export function findHscChapter(idOrName: string) {

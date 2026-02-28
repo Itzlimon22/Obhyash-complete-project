@@ -69,7 +69,7 @@ export default function TeacherProfileView({
   user,
   stats,
 }: TeacherProfileViewProps) {
-  const teacherData = user as any;
+  const teacherData = user as UserProfile;
 
   const joinDate = user.createdAt
     ? new Date(user.createdAt).toLocaleDateString('bn-BD', {

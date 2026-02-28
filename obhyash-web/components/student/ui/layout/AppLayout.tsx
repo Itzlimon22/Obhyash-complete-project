@@ -140,7 +140,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             table: 'notifications',
             filter: `user_id=eq.${user.id}`,
           },
-          (payload) => {
+          (payload: { new: Notification }) => {
             console.log('🔔 New Notification:', payload.new);
 
             // Add new notification to state

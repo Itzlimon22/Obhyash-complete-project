@@ -35,8 +35,8 @@ interface ExamSetupFormProps {
 
 interface Subject {
   id: string;
-  label: string;
-  icon: string | React.ReactNode;
+  label?: string;
+  icon?: string | React.ReactNode;
   name: string;
   rawName?: string; // Added rawName
 }
@@ -188,16 +188,27 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         setIsFetchingData(true);
         const { getUserProfile, getSubjects } =
           await import('@/services/database');
-        const user = await getUserProfile('me');
+        interface UserProfile {
+          division?: string;
+          section?: string;
+          stream?: string;
+          optional_subject?: string;
+        }
+        const user: UserProfile | null = await getUserProfile('me');
 
         if (user) {
           const subjects = await getSubjects(
-            user.division || (user as any).section,
+            user.division || user.section,
             user.stream,
-            (user as any).optional_subject,
+            user.optional_subject,
           );
 
-          const formattedSubjects = subjects.map((sub: any) => {
+          interface RawSubject extends Subject {
+            name_bn?: string;
+            name_en?: string;
+            icon?: string;
+          }
+          const formattedSubjects = subjects.map((sub: RawSubject) => {
             const nameBn = sub.name_bn || sub.name;
             const nameEn = sub.name || sub.name_en;
             const label =
@@ -210,7 +221,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               label: label,
               icon:
                 sub.icon ||
-                STATIC_SUBJECT_ICONS[sub.name_en] ||
+                STATIC_SUBJECT_ICONS[sub.name_en ?? ''] ||
                 STATIC_SUBJECT_ICONS[sub.id] ||
                 STATIC_SUBJECT_ICONS.default,
               name: label,
@@ -339,7 +350,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         durationMinutes: duration,
         negativeMarking,
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
     }
   };
@@ -451,7 +462,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 title="টপিক"
                 items={availableTopics.map((t) => t.name)}
                 groupedItems={availableTopics.reduce(
-                  (acc, topic: any) => {
+                  (acc, topic: TopicItem) => {
                     const chapterName =
                       availableChapters.find((c) => c.id === topic.chapter_id)
                         ?.name || 'Other';

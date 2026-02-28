@@ -26,8 +26,8 @@ export async function getAdvancedRecommendations(
   userId: string | null = null,
 ): Promise<BlogPost[]> {
   const allPosts = await getAllPosts();
-  let userTags: Record<string, number> = {};
-  let userCategories: Record<string, number> = {};
+  const userTags: Record<string, number> = {};
+  const userCategories: Record<string, number> = {};
 
   // 1. Build User Taste Profile
   if (userId) {

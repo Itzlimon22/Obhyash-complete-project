@@ -26,7 +26,10 @@ interface ResultViewProps {
   bookmarkedIds?: Set<string>;
   /** Toggle a bookmark via useBookmarks hook */
   onToggleBookmark?: (questionId: string | number) => void;
-  examDetails?: any;
+  examDetails?: {
+    subjectLabel?: string;
+    // Add other expected properties here if needed
+  };
 }
 
 const ResultView: React.FC<ResultViewProps> = ({

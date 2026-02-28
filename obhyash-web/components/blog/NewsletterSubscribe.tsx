@@ -30,8 +30,10 @@ export default function NewsletterSubscribe() {
 
       toast.success(data.message);
       setEmail('');
-    } catch (err: any) {
-      toast.error(err.message || 'সাবস্ক্রাইব করতে সমস্যা হয়েছে।');
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'সাবস্ক্রাইব করতে সমস্যা হয়েছে।';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

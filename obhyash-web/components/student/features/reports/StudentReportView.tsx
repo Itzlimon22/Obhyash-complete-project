@@ -88,7 +88,16 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
     }
   };
 
-  const QuestionViewer = ({ question }: { question: any }) => {
+  interface Question {
+    question: string;
+    options?: string[];
+    correct_answer_indices?: number[];
+    explanation?: string;
+    subject?: string;
+    [key: string]: unknown;
+  }
+
+  const QuestionViewer = ({ question }: { question: Question }) => {
     if (!question) return null;
     return (
       <div className="space-y-4">
@@ -232,7 +241,9 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                         </DialogTitle>
                       </DialogHeader>
                       <div className="mt-2 text-left">
-                        <QuestionViewer question={report.question} />
+                        {report.question ? (
+                          <QuestionViewer question={report.question as Question} />
+                        ) : null}
                       </div>
                     </DialogContent>
                   </Dialog>
@@ -271,7 +282,9 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                             </DialogTitle>
                           </DialogHeader>
                           <div className="mt-2 text-left">
-                            <QuestionViewer question={report.question} />
+                            {report.question && (
+                              <QuestionViewer question={report.question as Question} />
+                            )}
                           </div>
                         </DialogContent>
                       </Dialog>
@@ -285,7 +298,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                             আপনার মন্তব্য
                           </h4>
                           <p className="text-[13px] md:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-medium ml-2">
-                            "{report.description || 'কোনো বিবরণ নেই'}"
+                            &quot;{report.description || 'কোনো বিবরণ নেই'}&quot;
                           </p>
                         </div>
                       </div>

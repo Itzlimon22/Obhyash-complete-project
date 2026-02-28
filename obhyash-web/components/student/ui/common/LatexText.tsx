@@ -40,7 +40,7 @@ const LatexText: React.FC<LatexTextProps> = ({ text, className = '' }) => {
 
   const MarkdownComponents: any = {
     p: ({ node, ...props }: any) => <span {...props} className="block mb-1" />,
-    table: ({ node, ...props }: any) => (
+    table: ({ node, ...props }: React.TableHTMLAttributes<HTMLTableElement>) => (
       <div className="overflow-x-auto my-3 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-sm custom-scrollbar max-w-full">
         <table
           className="w-full text-left border-collapse m-0 text-sm"
@@ -48,7 +48,7 @@ const LatexText: React.FC<LatexTextProps> = ({ text, className = '' }) => {
         />
       </div>
     ),
-    thead: ({ node, ...props }: any) => (
+    thead: ({ node, ...props }: React.TableHTMLAttributes<HTMLTableSectionElement>) => (
       <thead
         className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 font-semibold"
         {...props}

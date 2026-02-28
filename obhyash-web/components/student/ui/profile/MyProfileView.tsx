@@ -439,7 +439,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
                       strokeWidth: 2,
                       strokeDasharray: '5 5',
                     }}
-                    formatter={(value: any) => [`${value ?? 0} XP`, 'অর্জিত']}
+                    formatter={(value: unknown, name: unknown) => [`${value ?? 0} XP`, 'অর্জিত']}
                   />
                   <Area
                     type="monotone"

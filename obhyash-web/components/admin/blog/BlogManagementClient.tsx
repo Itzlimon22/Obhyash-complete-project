@@ -75,7 +75,7 @@ export default function BlogManagementClient() {
     error,
     mutate,
     isLoading: dataLoading,
-  } = useSWR<{ data: any[]; totalCount: number }>(
+  } = useSWR<{ data: Comment[] | Subscriber[]; totalCount: number }>(
     `/api/admin/blog/data?type=${activeTab}&page=${page}&pageSize=${pageSize}`,
     fetcher,
   );
@@ -105,7 +105,7 @@ export default function BlogManagementClient() {
 
       toast.success('কমেন্টটি সফলভাবে মুছে ফেলা হয়েছে।');
       mutate(); // Reload the table
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error('কমেন্ট মুছতে সমস্যা হয়েছে!');
     } finally {
       setDeletingId(null);
@@ -117,12 +117,15 @@ export default function BlogManagementClient() {
     const q = searchQuery.toLowerCase();
 
     if (activeTab === 'subscribers') {
-      return item.email.toLowerCase().includes(q);
+      // item is Subscriber
+      return (item as Subscriber).email.toLowerCase().includes(q);
     } else {
+      // item is Comment
+      const comment = item as Comment;
       return (
-        item.content.toLowerCase().includes(q) ||
-        item.user?.name.toLowerCase().includes(q) ||
-        item.post_slug.toLowerCase().includes(q)
+        comment.content.toLowerCase().includes(q) ||
+        comment.user?.name.toLowerCase().includes(q) ||
+        comment.post_slug.toLowerCase().includes(q)
       );
     }
   });
@@ -373,7 +376,7 @@ function MetricCard({
 }: {
   title: string;
   value: number;
-  icon: any;
+  icon: React.ElementType;
   loading: boolean;
   color: 'blue' | 'rose' | 'emerald';
 }) {

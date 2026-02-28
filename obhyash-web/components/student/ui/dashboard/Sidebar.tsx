@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   Sparkles,
   LayoutDashboard,
@@ -138,7 +139,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             })}
 
             {/* External Blog Link */}
-            <a
+            <Link
               href="/blog"
               title={collapsed ? 'ব্লগ' : ''}
               className={`
@@ -168,7 +169,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   ব্লগ
                 </span>
               )}
-            </a>
+            </Link>
           </nav>
 
           {/* Footer - Profile */}

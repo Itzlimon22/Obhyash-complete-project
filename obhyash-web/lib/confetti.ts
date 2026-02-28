@@ -16,7 +16,7 @@ export const celebration = {
       return Math.random() * (max - min) + min;
     }
 
-    const interval: any = setInterval(function () {
+    const interval = setInterval(function () {
       const timeLeft = animationEnd - Date.now();
 
       if (timeLeft <= 0) {
@@ -87,7 +87,7 @@ export const celebration = {
       origin: { y: 0.7 },
     };
 
-    function fire(particleRatio: number, opts: any) {
+    function fire(particleRatio: number, opts: confetti.Options) {
       confetti({
         ...defaults,
         ...opts,

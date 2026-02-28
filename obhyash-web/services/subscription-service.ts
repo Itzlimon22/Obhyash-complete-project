@@ -151,7 +151,14 @@ export const getUserPaymentMethods = async (): Promise<PaymentMethod[]> => {
     return [];
   }
 
-  return data.map((method: any) => ({
+  return data.map((method: {
+    id: string;
+    type: string;
+    last4: string;
+    number: string;
+    expiry: string;
+    is_default: boolean;
+  }) => ({
     id: method.id,
     type: method.type,
     last4: method.last4,

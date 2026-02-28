@@ -124,8 +124,11 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
         .map((s) => standardizeInstituteName(s))
         .filter(Boolean);
 
-      data.institutes = unifiedInstitutes;
-      data.institute = unifiedInstitutes[0] || '';
+      setData((prev) => ({
+        ...prev,
+        institutes: unifiedInstitutes,
+        institute: unifiedInstitutes[0] || '',
+      }));
     }
 
     onSave(data);
