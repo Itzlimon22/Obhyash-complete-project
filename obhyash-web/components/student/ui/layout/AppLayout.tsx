@@ -44,6 +44,9 @@ interface AppLayoutProps {
   user?: UserProfile;
   isLiveExam?: boolean;
   onSubmit?: () => void;
+  isOmrMode?: boolean;
+  onUpload?: () => void;
+  hasSelectedScript?: boolean;
 }
 
 const AppLayout: React.FC<AppLayoutProps> = ({
@@ -60,6 +63,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   user,
   isLiveExam,
   onSubmit,
+  isOmrMode,
+  onUpload,
+  hasSelectedScript,
 }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -435,6 +441,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             onMenuClick={() => setIsSidebarOpen(true)}
             isLiveExam={isLiveExam}
             onSubmit={onSubmit}
+            isOmrMode={isOmrMode}
+            onUpload={onUpload}
+            hasSelectedScript={hasSelectedScript}
           />
         )}
       </div>

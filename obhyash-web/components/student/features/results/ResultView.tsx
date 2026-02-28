@@ -3,7 +3,9 @@ import { Question, UserAnswers, ExamResult } from '@/lib/types';
 import { toast } from 'sonner';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import ResultStats from '@/components/student/ui/results/ResultStats';
+import ExamDetailsCard from '@/components/student/ui/exam/ExamDetailsCard';
 import ReviewList from './ReviewList';
+import { ExamDetails } from '@/lib/types';
 
 interface ResultViewProps {
   questions: Question[];
@@ -222,6 +224,25 @@ const ResultView: React.FC<ResultViewProps> = ({
         skippedCount={skippedCount}
         negativeMarking={negativeMarking}
         negativeMarksDeduction={negativeMarksDeduction}
+      />
+
+      <ExamDetailsCard
+        details={
+          {
+            subject: result.subject,
+            subjectLabel:
+              result.subjectLabel || getSubjectDisplayName(result.subject),
+            examType: result.examType || 'Daily',
+            chapters: result.chapters || 'সকল অধ্যায়',
+            topics: '',
+            totalQuestions: result.totalQuestions,
+            durationMinutes: Math.ceil(result.timeTaken / 60),
+            totalMarks: result.totalMarks,
+            negativeMarking: result.negativeMarking,
+          } as ExamDetails
+        }
+        totalQuestions={questions.length}
+        negativeMarking={result.negativeMarking}
       />
 
       <ReviewList

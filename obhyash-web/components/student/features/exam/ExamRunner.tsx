@@ -174,6 +174,9 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
       noPadding={true}
       isLiveExam={true}
       onSubmit={handleSubmitRequest}
+      isOmrMode={isOmrMode}
+      onUpload={() => setIsUploadModalOpen(true)}
+      hasSelectedScript={!!selectedScript}
       customHeader={
         <ExamHeader
           details={examDetails}

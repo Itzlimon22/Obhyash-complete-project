@@ -30,6 +30,8 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
   onDownloadQuestionPaper,
   onDownloadOMR,
   onExit,
+  answeredCount = 0,
+  totalQuestions = 0,
 }) => {
   const [showDownloads, setShowDownloads] = useState(false);
 
@@ -53,11 +55,19 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
   };
 
   return (
-    <header className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 h-16 flex items-center justify-between px-4 md:px-6 shadow-sm z-50 sticky top-0">
-      {/* ── Left Section: Logo ── */}
-      <div className="flex items-center gap-3">
-        <Logo variant="icon" size="sm" />
-        <div className="hidden md:block">
+    <header className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 h-16 flex items-center justify-between px-3 md:px-6 shadow-sm z-50 sticky top-0">
+      {/* ── Left Section: Logo & Mobile Progress ── */}
+      <div className="flex items-center gap-2 md:gap-3">
+        {/* Mobile: Progress Indicator (12/30) */}
+        <div className="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-xs font-black font-mono text-emerald-700 dark:text-emerald-400 tabular-nums">
+            {answeredCount}/{totalQuestions}
+          </span>
+        </div>
+
+        <div className="hidden md:flex items-center gap-3">
+          <Logo variant="icon" size="sm" />
           <h1 className="text-sm font-black text-neutral-900 dark:text-white uppercase tracking-wider">
             Live Exam
           </h1>
@@ -65,7 +75,17 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
       </div>
 
       {/* ── Right Section: Controls ── */}
-      <div className="flex items-center gap-2 md:gap-4">
+      <div className="flex items-center gap-1.5 md:gap-4">
+        {/* Desktop: Progress (Answered: 12/30) */}
+        <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700">
+          <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+            Answered:
+          </span>
+          <span className="text-sm font-black font-mono text-neutral-700 dark:text-neutral-300">
+            {answeredCount}/{totalQuestions}
+          </span>
+        </div>
+
         {/* OMR Toggle */}
         <div
           className={`flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 px-2.5 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700 transition-all ${isGracePeriod ? 'opacity-50 pointer-events-none' : ''}`}
@@ -88,7 +108,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowDownloads(!showDownloads)}
-            className="p-2.5 rounded-xl text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800 transition-all border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700"
+            className="p-2 rounded-xl md:p-2.5 text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800 transition-all border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -173,7 +193,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
 
         {/* Timer */}
         <div
-          className={`flex items-center gap-2 px-3 py-1.5 md:px-5 md:py-2.5 rounded-xl border transition-all duration-300 ${getTimerStyles()}`}
+          className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 md:px-5 md:py-2.5 rounded-xl border transition-all duration-300 ${getTimerStyles()}`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -181,7 +201,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
             viewBox="0 0 24 24"
             strokeWidth={2.5}
             stroke="currentColor"
-            className="w-4 h-4"
+            className="w-3.5 h-3.5 md:w-4 md:h-4"
           >
             <path
               strokeLinecap="round"
@@ -189,7 +209,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
               d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
             />
           </svg>
-          <span className="text-base md:text-xl font-black font-mono leading-none tracking-tight">
+          <span className="text-sm md:text-xl font-black font-mono leading-none tracking-tight">
             {formatTime(displayTime)}
           </span>
         </div>
