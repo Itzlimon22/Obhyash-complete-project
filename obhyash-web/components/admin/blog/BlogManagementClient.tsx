@@ -13,8 +13,11 @@ import {
   Calendar,
   AlertTriangle,
   Loader2,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Pagination } from '@/components/admin/questions/pagination';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -51,6 +54,15 @@ export default function BlogManagementClient() {
   const [searchQuery, setSearchQuery] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+
+  // Reset page when tab or search changes
+  useEffect(() => {
+    setPage(1);
+  }, [activeTab, searchQuery]);
+
   // Focus: Aesthetic Metric Cards
   const { data: metrics, isLoading: metricsLoading } = useSWR<BlogMetrics>(
     '/api/admin/blog/metrics',
@@ -59,11 +71,18 @@ export default function BlogManagementClient() {
 
   // Focus: Content Tables
   const {
-    data: listData,
+    data: responseData,
     error,
     mutate,
     isLoading: dataLoading,
-  } = useSWR<any[]>(`/api/admin/blog/data?type=${activeTab}`, fetcher);
+  } = useSWR<{ data: any[]; totalCount: number }>(
+    `/api/admin/blog/data?type=${activeTab}&page=${page}&pageSize=${pageSize}`,
+    fetcher,
+  );
+
+  const listData = responseData?.data;
+  const totalCount = responseData?.totalCount || 0;
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   const handleDeleteComment = async (id: string) => {
     if (
@@ -322,6 +341,23 @@ export default function BlogManagementClient() {
             </table>
           )}
         </div>
+
+        {/* 3. Pagination */}
+        {!dataLoading && !error && listData && listData.length > 0 && (
+          <div className="border-t border-slate-200 dark:border-[#2b2b2b]">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              totalCount={totalCount}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPage(1);
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

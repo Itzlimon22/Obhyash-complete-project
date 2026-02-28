@@ -20,19 +20,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const page = parseInt(searchParams.get('page') || '1');
+    const pageSize = parseInt(searchParams.get('pageSize') || '20');
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
     if (type === 'subscribers') {
-      const { data, error } = await supabase
+      const { data, error, count } = await supabase
         .from('newsletter_subscribers')
-        .select('*')
-        .order('subscribed_at', { ascending: false });
+        .select('*', { count: 'exact' })
+        .order('subscribed_at', { ascending: false })
+        .range(from, to);
 
       if (error) throw error;
-      return NextResponse.json(data);
+      return NextResponse.json({ data, totalCount: count || 0 });
     }
 
     if (type === 'comments') {
       // Get all comments AND the associated user data
-      const { data, error } = await supabase
+      const { data, error, count } = await supabase
         .from('blog_comments')
         .select(
           `
@@ -43,11 +49,13 @@ export async function GET(request: NextRequest) {
             avatar_url
           )
         `,
+          { count: 'exact' },
         )
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
       if (error) throw error;
-      return NextResponse.json(data);
+      return NextResponse.json({ data, totalCount: count || 0 });
     }
 
     return NextResponse.json(

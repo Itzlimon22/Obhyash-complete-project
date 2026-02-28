@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 import Portal from '@/components/ui/portal';
 import { resolveReport } from '@/services/report-service';
-import { Report } from '@/lib/types';
+import { Report, UserProfile } from '@/lib/types';
+import { getUserProfile } from '@/services/user-service';
 
 interface ReportDetailsModalProps {
   report: Report;
@@ -28,6 +29,27 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [adminComment, setAdminComment] = useState('');
+  const [reporterProfile, setReporterProfile] = useState<UserProfile | null>(
+    null,
+  );
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+
+  React.useEffect(() => {
+    if (isOpen && report?.reporter_id) {
+      const fetchProfile = async () => {
+        setIsLoadingProfile(true);
+        try {
+          const profile = await getUserProfile(report.reporter_id as string);
+          setReporterProfile(profile);
+        } catch (error) {
+          console.error('Error fetching reporter profile:', error);
+        } finally {
+          setIsLoadingProfile(false);
+        }
+      };
+      fetchProfile();
+    }
+  }, [isOpen, report?.reporter_id]);
 
   if (!isOpen || !report) return null;
 
@@ -72,22 +94,58 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
 
           <div className="p-6 overflow-y-auto flex-1">
             {/* Reporter Info */}
-            <div className="w-full flex items-center gap-3 mb-6 p-4 bg-black/5 dark:bg-white/5 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-black/5 dark:border-white/5">
-              <div className="w-10 h-10 rounded-full bg-emerald-700 flex items-center justify-center text-white font-black text-sm">
-                <User size={18} />
+            <div className="w-full flex flex-col sm:flex-row sm:items-center gap-4 mb-6 p-4 bg-emerald-50/50 dark:bg-emerald-950/10 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
+              <div className="flex items-center gap-3 flex-1">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-lg shadow-sm shrink-0"
+                  style={{
+                    backgroundColor: reporterProfile?.avatarColor || '#065f46',
+                  }}
+                >
+                  {reporterProfile?.avatarUrl ? (
+                    <img
+                      src={reporterProfile.avatarUrl}
+                      alt=""
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <User size={22} />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-base font-black text-black dark:text-white truncate">
+                      {reporterProfile?.name || report.reporter_name}
+                    </p>
+                    {report.reporter_id && (
+                      <span className="px-2 py-0.5 bg-black/5 dark:bg-white/5 rounded text-[10px] font-bold text-black/40 dark:text-white/40 border border-black/5 dark:border-white/5 tabular-nums">
+                        ID: {report.reporter_id.slice(0, 8)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
+                    <p className="text-[11px] text-black/50 dark:text-white/50 flex items-center gap-1 font-bold">
+                      <Calendar size={12} className="shrink-0" />
+                      {formatDate(report.created_at)}
+                    </p>
+                    {reporterProfile?.email && (
+                      <p className="text-[11px] text-black/50 dark:text-white/50 flex items-center gap-1 font-bold">
+                        <MessageSquare size={12} className="shrink-0" />
+                        {reporterProfile.email}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-black text-black dark:text-white">
-                  {report.reporter_name || 'Unknown User'}
-                </p>
-                <p className="text-xs text-black/50 dark:text-white/50 flex items-center gap-1 font-bold mt-0.5">
-                  <Calendar size={12} />
-                  {formatDate(report.created_at)}
-                </p>
-              </div>
-              {report.reporter_id && (
-                <div className="w-full ml-auto px-3 py-1 bg-white dark:bg-black rounded-t-2xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 border border-black/10 dark:border-white/10 text-xs font-black text-black/50 dark:text-white/50">
-                  {report.reporter_id.slice(0, 8)}...
+
+              {reporterProfile?.phone && (
+                <div className="sm:pl-4 sm:border-l border-emerald-200 dark:border-emerald-800 flex flex-col justify-center">
+                  <p className="text-[10px] uppercase tracking-widest font-black text-emerald-600/50 dark:text-emerald-400/50 mb-0.5">
+                    Phone
+                  </p>
+                  <p className="text-xs font-black text-emerald-700 dark:text-emerald-400 tabular-nums">
+                    {reporterProfile.phone}
+                  </p>
                 </div>
               )}
             </div>
@@ -145,15 +203,26 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
             {/* Reference Image */}
             {report.image_url && (
               <div className="mb-6">
-                <h4 className="text-xs font-black text-black/40 dark:text-white/40 uppercase tracking-widest mb-3">
+                <h4 className="text-xs font-black text-black/40 dark:text-white/40 uppercase tracking-widest mb-3 flex items-center gap-2">
+                  <ExternalLink size={14} />
                   রেফারেন্স ছবি
                 </h4>
-                <div className="relative group rounded-xl overflow-hidden border border-black/10 dark:border-white/10">
+                <div className="relative group rounded-xl overflow-hidden border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 min-h-[100px] flex items-center justify-center">
                   <img
                     src={report.image_url}
                     alt="Reference"
-                    className="w-full h-auto max-h-[300px] object-contain bg-black/5 dark:bg-white/5"
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        'https://placehold.co/600x400?text=Image+Not+Found';
+                    }}
+                    className="w-full h-auto max-h-[400px] object-contain"
                   />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                    <span className="text-white text-xs font-black uppercase tracking-widest px-3 py-1.5 bg-black/60 rounded-full backdrop-blur-md">
+                      ট্যাপ করে বড় করে দেখো
+                    </span>
+                  </div>
                   <a
                     href={report.image_url}
                     target="_blank"

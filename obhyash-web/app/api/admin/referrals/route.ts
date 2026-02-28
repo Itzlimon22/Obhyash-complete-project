@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
-export const GET = async () => {
+export const GET = async (request: NextRequest) => {
   const supabase = await createClient();
   const supabaseAdmin = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -28,12 +28,18 @@ export const GET = async () => {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  // 2. Fetch all referrals history across the platform
-  // Join with referral code and the users table for both referrer and redeemer
-  // Because of RLS, make sure the Service Role or similar is used if Admin role doesn't override it.
-  // We use the service role key to bypass the RLS policies which were rolled back
-  // Admin requires full view of all data.
-  const { data: history, error: historyErr } = await supabaseAdmin
+  // 2. Fetch all referrals history across the platform with pagination
+  const { searchParams } = new URL(request.url);
+  const page = parseInt(searchParams.get('page') || '1');
+  const pageSize = parseInt(searchParams.get('pageSize') || '20');
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const {
+    data: history,
+    error: historyErr,
+    count,
+  } = await supabaseAdmin
     .from('referral_history')
     .select(
       `
@@ -48,25 +54,34 @@ export const GET = async () => {
         owner:users!referrals_owner_id_fkey(id, name, email)
       )
     `,
+      { count: 'exact' },
     )
-    .order('redeemed_at', { ascending: false });
+    .order('redeemed_at', { ascending: false })
+    .range(from, to);
 
   if (historyErr) {
     return NextResponse.json({ error: historyErr.message }, { status: 500 });
   }
 
-  // Aggregate basic stats
-  const totalRedemptions = history?.length || 0;
+  // Aggregate stats (Note: For large datasets, this should be a separate query or an RPC)
+  // For now, we'll fetch the total count for the stats
+  const { count: totalRedemptionsCount } = await supabaseAdmin
+    .from('referral_history')
+    .select('*', { count: 'exact', head: true });
 
-  // Unique referrers count
+  const { data: uniqueReferrersData } = await supabaseAdmin
+    .from('referral_history')
+    .select('referral(owner_id)');
+
   const uniqueReferrers = new Set(
-    history?.map((h) => (h.referral as any)?.owner?.id).filter(Boolean),
+    uniqueReferrersData?.map((h: any) => h.referral?.owner_id).filter(Boolean),
   ).size;
 
   return NextResponse.json({
     data: history,
+    totalCount: count || 0,
     stats: {
-      totalRedemptions,
+      totalRedemptions: totalRedemptionsCount || 0,
       uniqueReferrers,
     },
   });

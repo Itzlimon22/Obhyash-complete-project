@@ -10,8 +10,11 @@ import {
   Calendar,
   CheckCircle,
   XCircle,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Pagination } from '@/components/admin/questions/pagination';
 
 interface ReferralHistory {
   id: string;
@@ -44,20 +47,33 @@ export default function AdminReferralsPage() {
     uniqueReferrers: 0,
   });
 
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [totalCount, setTotalCount] = useState(0);
+  const totalPages = Math.ceil(totalCount / pageSize);
+
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [page, pageSize]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery]);
 
   const fetchData = async (showToast = false) => {
     if (showToast) setIsRefreshing(true);
     try {
-      const res = await fetch('/api/admin/referrals');
+      const res = await fetch(
+        `/api/admin/referrals?page=${page}&pageSize=${pageSize}`,
+      );
       const json = await res.json();
       if (!res.ok) {
         throw new Error(json.error || 'Failed to fetch referrals');
       }
 
       setHistory(json.data || []);
+      setTotalCount(json.totalCount || 0);
       setStats(json.stats || { totalRedemptions: 0, uniqueReferrers: 0 });
 
       if (showToast) toast.success('ডেটা রিফ্রেশ করা হয়েছে');
@@ -301,6 +317,21 @@ export default function AdminReferralsPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {!isLoading && history.length > 0 && (
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              totalCount={totalCount}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPage(1);
+              }}
+            />
+          )}
         </div>
       </div>
     </div>

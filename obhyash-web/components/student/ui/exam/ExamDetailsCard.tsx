@@ -1,7 +1,14 @@
 import React from 'react';
 import { ExamDetails } from '@/lib/types';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
-import { Clock, BookOpen, AlertCircle, Target } from 'lucide-react';
+import {
+  Clock,
+  BookOpen,
+  AlertCircle,
+  Target,
+  Layers,
+  Award,
+} from 'lucide-react';
 
 interface ExamDetailsCardProps {
   details: ExamDetails;
@@ -17,131 +24,105 @@ const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({
   const subjectName =
     details.subjectLabel || getSubjectDisplayName(details.subject);
 
+  // Calculate Full Marks if not explicitly provided
+  const fullMarks = details.totalMarks || totalQuestions;
+
+  const infoItems = [
+    {
+      label: 'বিষয়',
+      value: subjectName,
+      icon: BookOpen,
+      color: 'emerald',
+      bg: 'bg-emerald-50 dark:bg-emerald-900/20',
+      text: 'text-emerald-700 dark:text-emerald-300',
+      iconBg: 'bg-emerald-500',
+    },
+    {
+      label: 'অধ্যায়',
+      value: details.chapters || 'সকল অধ্যায়',
+      icon: Layers,
+      color: 'indigo',
+      bg: 'bg-indigo-50 dark:bg-indigo-900/20',
+      text: 'text-indigo-700 dark:text-indigo-300',
+      iconBg: 'bg-indigo-500',
+    },
+    {
+      label: 'সময়',
+      value: `${details.durationMinutes || 0} মিনিট`,
+      icon: Clock,
+      color: 'sky',
+      bg: 'bg-sky-50 dark:bg-sky-900/20',
+      text: 'text-sky-700 dark:text-sky-300',
+      iconBg: 'bg-sky-500',
+    },
+    {
+      label: 'মোট প্রশ্ন',
+      value: `${totalQuestions} টি`,
+      icon: Target,
+      color: 'violet',
+      bg: 'bg-violet-50 dark:bg-violet-900/20',
+      text: 'text-violet-700 dark:text-violet-300',
+      iconBg: 'bg-violet-500',
+    },
+    {
+      label: 'নেগেটিভ মার্ক',
+      value: negativeMarking > 0 ? `-${negativeMarking}` : 'নেই',
+      icon: AlertCircle,
+      color: negativeMarking > 0 ? 'red' : 'neutral',
+      bg:
+        negativeMarking > 0
+          ? 'bg-red-50 dark:bg-red-900/20'
+          : 'bg-neutral-50 dark:bg-neutral-800/20',
+      text:
+        negativeMarking > 0
+          ? 'text-red-700 dark:text-red-300'
+          : 'text-neutral-600 dark:text-neutral-400',
+      iconBg: negativeMarking > 0 ? 'bg-red-500' : 'bg-neutral-400',
+    },
+    {
+      label: 'পূর্ণমান',
+      value: `${fullMarks}`,
+      icon: Award,
+      color: 'amber',
+      bg: 'bg-amber-50 dark:bg-amber-900/20',
+      text: 'text-amber-700 dark:text-amber-300',
+      iconBg: 'bg-amber-500',
+    },
+  ];
+
   return (
-    <div className="
-      bg-white dark:bg-neutral-900
-      rounded-xl mb-4
-      border border-neutral-200/80 dark:border-neutral-800
-      shadow-sm
-      overflow-hidden
-    ">
-
-      {/* ── Subject Header ── */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-neutral-100 dark:border-neutral-800">
-        <div className="
-          w-9 h-9 rounded-lg shrink-0
-          bg-emerald-500
-          flex items-center justify-center
-        ">
-          <BookOpen size={17} className="text-white" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-0.5">
-            বিষয়
-          </p>
-          <p className="text-sm font-bold text-neutral-900 dark:text-white truncate leading-tight">
-            {subjectName}
-          </p>
-        </div>
-      </div>
-
-      {/* ── Stats Row ── */}
-      <div className="grid grid-cols-3 gap-3 p-3">
-
-        {/* Time */}
-        <div className="
-          flex flex-col gap-1.5 rounded-xl p-3
-          bg-sky-50 dark:bg-sky-950/40
-          border border-sky-100 dark:border-sky-900/50
-        ">
-          <div className="w-7 h-7 rounded-lg bg-sky-500 flex items-center justify-center shrink-0">
-            <Clock size={14} className="text-white" />
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+      {infoItems.map((item, idx) => (
+        <div
+          key={idx}
+          className={`
+            flex flex-col gap-2 p-3 rounded-2xl border border-neutral-200/50 dark:border-neutral-800/50
+            ${item.bg} shadow-sm transition-all hover:scale-[1.02]
+          `}
+        >
+          <div className="flex items-center gap-2">
+            <div
+              className={`w-7 h-7 rounded-lg ${item.iconBg} flex items-center justify-center shrink-0 shadow-sm`}
+            >
+              <item.icon size={14} className="text-white" />
+            </div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-neutral-500 dark:text-neutral-400 opacity-80">
+              {item.label}
+            </p>
           </div>
-          <div>
-            <p className="text-[9px] font-bold uppercase tracking-widest text-sky-500 dark:text-sky-500 mb-0.5">
-              সময়
-            </p>
-            <p className="text-xl font-black leading-none text-sky-700 dark:text-sky-300">
-              {details.durationMinutes || 0}
-            </p>
-            <p className="text-[10px] font-semibold text-sky-400 dark:text-sky-500 mt-0.5">
-              মিনিট
+          <div className="flex items-end justify-between">
+            <p
+              className={`text-base font-black truncate leading-tight ${item.text}`}
+            >
+              {item.value}
             </p>
           </div>
         </div>
-
-        {/* Total Questions */}
-        <div className="
-          flex flex-col gap-1.5 rounded-xl p-3
-          bg-emerald-50 dark:bg-emerald-950/40
-          border border-emerald-100 dark:border-emerald-900/50
-        ">
-          <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center shrink-0">
-            <Target size={14} className="text-white" />
-          </div>
-          <div>
-            <p className="text-[9px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-500 mb-0.5">
-              প্রশ্ন
-            </p>
-            <p className="text-xl font-black leading-none text-emerald-700 dark:text-emerald-300">
-              {totalQuestions}
-            </p>
-            <p className="text-[10px] font-semibold text-emerald-400 dark:text-emerald-500 mt-0.5">
-              টি
-            </p>
-          </div>
-        </div>
-
-        {/* Negative Marking */}
-        <div className={`
-          flex flex-col gap-1.5 rounded-xl p-3 border
-          ${negativeMarking > 0
-            ? 'bg-red-50 dark:bg-red-950/40 border-red-100 dark:border-red-900/50'
-            : 'bg-neutral-50 dark:bg-neutral-800/50 border-neutral-100 dark:border-neutral-700/50'
-          }
-        `}>
-          <div className={`
-            w-7 h-7 rounded-lg flex items-center justify-center shrink-0
-            ${negativeMarking > 0
-              ? 'bg-red-500'
-              : 'bg-neutral-300 dark:bg-neutral-700'}
-          `}>
-            <AlertCircle size={14} className="text-white" />
-          </div>
-          <div>
-            <p className={`
-              text-[9px] font-bold uppercase tracking-widest mb-0.5
-              ${negativeMarking > 0
-                ? 'text-red-500 dark:text-red-500'
-                : 'text-neutral-400 dark:text-neutral-500'}
-            `}>
-              নেগেটিভ
-            </p>
-            {negativeMarking > 0 ? (
-              <>
-                <p className="text-xl font-black leading-none text-red-700 dark:text-red-300">
-                  -{negativeMarking}
-                </p>
-                <p className="text-[10px] font-semibold text-red-400 dark:text-red-500 mt-0.5">
-                  / ভুল
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-base font-black leading-none text-neutral-500 dark:text-neutral-400">
-                  নেই
-                </p>
-                <p className="text-[10px] font-semibold text-neutral-400 dark:text-neutral-500 mt-0.5">
-                  প্রযোজ্য নয়
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-
-      </div>
+      ))}
     </div>
   );
 };
+
+export default ExamDetailsCard;
 
 export default ExamDetailsCard;

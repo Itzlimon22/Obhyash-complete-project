@@ -240,13 +240,13 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
         </div>
 
         {/* Sticky Footer for Submit - HIDDEN ON MOBILE (moved to bottom nav) */}
-        <div className="sticky bottom-0 left-0 right-0 py-4 px-4 bg-white/90 dark:bg-black/90 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] hidden sm:block">
-          <div className="max-w-3xl mx-auto flex justify-center">
+        <div className="sticky bottom-0 left-0 right-0 py-2 px-6 bg-white/90 dark:bg-black/90 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] hidden sm:block">
+          <div className="max-w-4xl mx-auto flex justify-start">
             {isOmrMode ? (
               <div className="flex gap-3 w-full sm:w-auto">
                 <button
                   onClick={() => setIsUploadModalOpen(true)}
-                  className={`flex-1 sm:flex-none px-4 py-3 rounded-xl font-bold text-sm border transition-colors flex items-center justify-center gap-2 ${selectedScript ? 'border-emerald-500 text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20' : 'border-neutral-300 dark:border-neutral-600 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800'}`}
+                  className={`flex-1 sm:flex-none px-4 py-2 rounded-xl font-bold text-sm border transition-colors flex items-center justify-center gap-2 ${selectedScript ? 'border-emerald-500 text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20' : 'border-neutral-300 dark:border-neutral-600 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800'}`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -262,12 +262,12 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                       d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
                     />
                   </svg>
-                  {selectedScript ? 'স্ক্রিপ্ট সংযুক্ত' : 'OMR ক্যাপচার'}
+                  {selectedScript ? 'Add স্ক্রিপ্ট ' : 'OMR ক্যাপচার'}
                 </button>
                 <button
                   onClick={handleSubmitRequest}
                   disabled={!selectedScript}
-                  className="flex-1 sm:flex-none px-8 py-3 bg-emerald-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+                  className="flex-1 sm:flex-none px-6 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
                 >
                   স্ক্রিপ্ট জমা দাও
                 </button>
@@ -275,7 +275,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
             ) : (
               <button
                 onClick={handleSubmitRequest}
-                className="w-full sm:w-auto min-w-[200px] bg-red-600 hover:bg-red-700 text-white font-bold text-base py-3 px-8 rounded-xl shadow-lg shadow-red-500/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full sm:w-auto sm:min-w-[170px] bg-red-600 hover:bg-red-700 text-white font-bold text-sm py-2 px-6 rounded-xl shadow-lg shadow-red-500/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
