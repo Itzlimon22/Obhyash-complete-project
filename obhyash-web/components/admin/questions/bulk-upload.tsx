@@ -1087,7 +1087,8 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           return;
         }
 
-        rawRows = data.map((row: Record<string, unknown>) => {
+        rawRows = data.map((value) => {
+          const row = value as Record<string, unknown>;
           const mapped: Record<string, string> = {};
           Object.entries(row).forEach(([k, v]) => {
             if (v !== null && typeof v === 'object') {
@@ -1200,9 +1201,10 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         throw new Error(jsonErrors[0]);
       }
 
-      const rawRows = data.map((row: Record<string, unknown>) => {
+      const rawRows = data.map((row, idx) => {
+        const r = row as Record<string, unknown>;
         const mapped: Record<string, string> = {};
-        Object.entries(row).forEach(([k, v]) => {
+        Object.entries(r).forEach(([k, v]) => {
           if (v !== null && typeof v === 'object') {
             mapped[k.trim().toLowerCase()] = JSON.stringify(v);
           } else {
@@ -1277,9 +1279,10 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         return;
       }
 
-      const rawRows = data.map((row: Record<string, unknown>) => {
+      const rawRows = data.map((row) => {
+        const r = row as Record<string, unknown>;
         const mapped: Record<string, string> = {};
-        Object.entries(row).forEach(([k, v]) => {
+        Object.entries(r).forEach(([k, v]) => {
           if (v !== null && typeof v === 'object') {
             mapped[k.trim().toLowerCase()] = JSON.stringify(v);
           } else {
