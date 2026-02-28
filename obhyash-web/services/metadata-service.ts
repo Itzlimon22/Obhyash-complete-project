@@ -71,8 +71,18 @@ export const getSubjects = async (
         return true;
       });
 
+      // Deduplicate subjects by name to prevent "Chemistry Ch 1" appearing twice
+      // if multiple entries exist with the same name in the database.
+      const uniqueSubjects = new Map<string, any>();
+      filteredData.forEach((s) => {
+        const name = s.name || s.name_en || '';
+        if (name && !uniqueSubjects.has(name)) {
+          uniqueSubjects.set(name, s);
+        }
+      });
+
       // Enrich with icons
-      return filteredData.map((s) => ({
+      return Array.from(uniqueSubjects.values()).map((s) => ({
         ...s,
         icon: s.icon || SUBJECT_ICONS[s.name] || SUBJECT_ICONS[s.id] || '📘',
       }));

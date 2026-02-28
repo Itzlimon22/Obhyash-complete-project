@@ -11,11 +11,11 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts';
-import { ExamResult } from 'lib/types';
-import { getSubjectAnalysis, SubjectAnalysis } from 'services/database';
+import { ExamResult } from '@/lib/types';
+import { getSubjectAnalysis, SubjectAnalysis } from '@/services/database';
 import { printSubjectReport } from '@/services/print-service';
-import { supabase } from 'services/core';
-import LatexText from 'components/student/ui/LatexText';
+import { supabase } from '@/services/core';
+import LatexText from '@/components/student/ui/LatexText';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 
 interface SubjectReportViewProps {
@@ -188,16 +188,16 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
 
       <div className="max-w-7xl mx-auto space-y-6">
         {/* KPI CARDS ROW */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex items-center gap-5 transition-all hover:border-red-200 dark:hover:border-red-900 group">
-            <div className="w-14 h-14 rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 dark:text-red-400 shadow-sm group-hover:scale-105 transition-transform">
+        <div className="grid grid-cols-3 gap-2 md:grid-cols-3 md:gap-6">
+          <div className="bg-white dark:bg-neutral-900 p-3 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col md:flex-row items-center justify-center md:items-center gap-2 md:gap-5 transition-all hover:border-red-200 dark:hover:border-red-900 group">
+            <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 dark:text-red-400 shadow-sm group-hover:scale-105 transition-transform shrink-0">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-7 h-7"
+                className="w-5 h-5 md:w-7 md:h-7"
               >
                 <path
                   strokeLinecap="round"
@@ -206,25 +206,25 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                 />
               </svg>
             </div>
-            <div>
-              <p className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
-                মোট প্রশ্ন উত্তর
+            <div className="text-center md:text-left min-w-0 w-full">
+              <p className="text-[9px] md:text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-tight md:tracking-wide truncate">
+                মোট প্রশ্ন
               </p>
-              <h3 className="text-3xl font-extrabold text-neutral-900 dark:text-white mt-1">
+              <h3 className="text-base md:text-3xl font-extrabold text-neutral-900 dark:text-white mt-0.5 md:mt-1 truncate">
                 {stats.totalQuestions}
               </h3>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex items-center gap-5 transition-all hover:border-emerald-200 dark:hover:border-emerald-900 group">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm group-hover:scale-105 transition-transform">
+          <div className="bg-white dark:bg-neutral-900 p-3 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col md:flex-row items-center justify-center md:items-center gap-2 md:gap-5 transition-all hover:border-emerald-200 dark:hover:border-emerald-900 group">
+            <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm group-hover:scale-105 transition-transform shrink-0">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-7 h-7"
+                className="w-5 h-5 md:w-7 md:h-7"
               >
                 <path
                   strokeLinecap="round"
@@ -233,25 +233,25 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                 />
               </svg>
             </div>
-            <div>
-              <p className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
+            <div className="text-center md:text-left min-w-0 w-full">
+              <p className="text-[9px] md:text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-tight md:tracking-wide truncate">
                 সঠিকতার হার
               </p>
-              <h3 className="text-3xl font-extrabold text-neutral-900 dark:text-white mt-1">
+              <h3 className="text-base md:text-3xl font-extrabold text-neutral-900 dark:text-white mt-0.5 md:mt-1 truncate">
                 {stats.accuracy}%
               </h3>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex items-center gap-5 transition-all hover:border-red-200 dark:hover:border-red-900 group">
-            <div className="w-14 h-14 rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 dark:text-red-400 shadow-sm group-hover:scale-105 transition-transform">
+          <div className="bg-white dark:bg-neutral-900 p-3 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col md:flex-row items-center justify-center md:items-center gap-2 md:gap-5 transition-all hover:border-red-200 dark:hover:border-red-900 group">
+            <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-600 dark:text-red-400 shadow-sm group-hover:scale-105 transition-transform shrink-0">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-7 h-7"
+                className="w-5 h-5 md:w-7 md:h-7"
               >
                 <path
                   strokeLinecap="round"
@@ -260,11 +260,11 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                 />
               </svg>
             </div>
-            <div>
-              <p className="text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
-                গড় সময় (প্রশ্ন প্রতি)
+            <div className="text-center md:text-left min-w-0 w-full">
+              <p className="text-[9px] md:text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-tight md:tracking-wide truncate">
+                গড় সময়
               </p>
-              <h3 className="text-3xl font-extrabold text-neutral-900 dark:text-white mt-1">
+              <h3 className="text-base md:text-3xl font-extrabold text-neutral-900 dark:text-white mt-0.5 md:mt-1 truncate">
                 {stats.averageTime}s
               </h3>
             </div>

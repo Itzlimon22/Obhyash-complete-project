@@ -1,6 +1,7 @@
 import { UserProfile, ExamResult, Question } from '@/lib/types';
 import { supabase, isSupabaseConfigured } from './core';
 import { LEVELS } from '@/components/dashboard/leaderboard/leaderboardData';
+import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 
 // --- TYPES ---
 export interface SubjectAnalysis {
@@ -241,24 +242,36 @@ export const getSubjectAnalysis = async (
 
       if (!fallbackError && rawData) {
         // Filter by subject manually
-        const targetSubjLower = subject.toLowerCase();
+        const targetLabel = getSubjectDisplayName(subject).toLowerCase();
+
         const filteredExams = rawData.filter((exam) => {
           if (!exam.subject) return false;
-          const sLower = exam.subject.toLowerCase();
+
+          // Resolve both the stored subject and the target subject to display names for robust matching
+          const storedLabel = getSubjectDisplayName(exam.subject).toLowerCase();
+          const rawSubject = exam.subject.toLowerCase();
+          const targetSubjLower = subject.toLowerCase();
+
           return (
-            sLower === targetSubjLower ||
-            sLower.includes(targetSubjLower) ||
-            (targetSubjLower === 'physics' &&
-              sLower.includes('পদার্থবিজ্ঞান')) ||
-            (targetSubjLower === 'chemistry' && sLower.includes('রসায়ন')) ||
-            (targetSubjLower === 'math' &&
-              (sLower.includes('গণিত') || sLower.includes('math'))) ||
-            (targetSubjLower === 'biology' &&
-              (sLower.includes('জীববিজ্ঞান') || sLower.includes('bio'))) ||
-            (targetSubjLower === 'bangla' && sLower.includes('বাংলা')) ||
-            (targetSubjLower === 'english' && sLower.includes('ইংরেজি')) ||
-            (targetSubjLower === 'gk' && sLower.includes('সাধারণ জ্ঞান')) ||
-            (targetSubjLower === 'ict' && sLower.includes('আইসিটি'))
+            rawSubject === targetSubjLower ||
+            storedLabel === targetLabel ||
+            storedLabel.includes(targetLabel) || // e.g. "Physics 1st" includes "Physics"
+            targetLabel.includes(storedLabel) ||
+            // Legacy fallbacks for specific subjects
+            (targetLabel.includes('physics') &&
+              storedLabel.includes('পদার্থবিজ্ঞান')) ||
+            (targetLabel.includes('chemistry') &&
+              storedLabel.includes('রসায়ন')) ||
+            (targetLabel.includes('math') && storedLabel.includes('গণিত')) ||
+            (targetLabel.includes('biology') &&
+              storedLabel.includes('জীববিজ্ঞান')) ||
+            (targetLabel.includes('bangla') && storedLabel.includes('বাংলা')) ||
+            (targetLabel.includes('english') &&
+              storedLabel.includes('ইংরেজি')) ||
+            (targetLabel.includes('gk') &&
+              (storedLabel.includes('সাধারণ জ্ঞান') || rawSubject === 'gk')) ||
+            (targetLabel.includes('ict') &&
+              (storedLabel.includes('আইসিটি') || rawSubject === 'ict'))
           );
         });
 

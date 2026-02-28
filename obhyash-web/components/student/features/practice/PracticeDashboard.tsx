@@ -170,13 +170,21 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   const baseList = activeTab === 'mistakes' ? mistakes : globalBookmarks;
 
   const allSubjects = useMemo(() => {
-    const subjectMap = new Map<string, string>();
+    // Group subjects by their display label to avoid duplicates like "Chemistry Ch 1" appearing twice
+    // even if they have different internal IDs.
+    const labelMap = new Map<string, string>();
     baseList.forEach((q) => {
-      if (q.subject && !subjectMap.has(q.subject)) {
-        subjectMap.set(q.subject, q.subjectLabel || q.subject);
+      const label = q.subjectLabel || q.subject;
+      if (label && !labelMap.has(label)) {
+        labelMap.set(label, q.subject);
       }
     });
-    return Array.from(subjectMap.entries());
+
+    // Return entries as [id, label] for the pills
+    // We use the first ID we found as the representative ID for the pill key
+    return Array.from(labelMap.entries()).map(
+      ([label, id]) => [id, label] as [string, string],
+    );
   }, [baseList]);
 
   // Reset filter when tab changes
@@ -188,8 +196,15 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   // ── Filtered list ───────────────────────────────────────────────────────────
   const currentList = useMemo(() => {
     if (subjectFilter === 'all') return baseList;
-    return baseList.filter((q) => q.subject === subjectFilter);
-  }, [baseList, subjectFilter]);
+    // Find the display label associated with the selected subject ID (the "code")
+    const targetLabel = allSubjects.find(([id]) => id === subjectFilter)?.[1];
+
+    // Filter questions by their display label so that all underlying IDs for the same
+    // display name (e.g. "Chemistry Ch 1") are shown together.
+    return baseList.filter(
+      (q) => (q.subjectLabel || q.subject) === targetLabel,
+    );
+  }, [baseList, subjectFilter, allSubjects]);
 
   // Due-today derived
   const dueCount = useMemo(
