@@ -44,7 +44,7 @@ export default function ActivityLogModal({
             table: 'user_activity_log',
             filter: `user_id=eq.${userId}`,
           },
-          (payload) => {
+          (payload: { new: ActivityLog }) => {
             setActivities((prev) => [payload.new as ActivityLog, ...prev]);
           },
         )
