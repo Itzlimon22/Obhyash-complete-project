@@ -99,22 +99,16 @@ export default function BlogListingClient({
   return (
     <>
       {/* ─── Hero Section ─── */}
-      <section className="relative overflow-hidden bg-[#FAF6F3] dark:bg-[#121212] border-b border-slate-100 dark:border-[#2b2b2b]">
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
-          {/* Pill badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 bg-slate-100 dark:bg-[#202020] text-slate-600 dark:text-slate-300 text-xs font-semibold rounded-full border border-slate-200 dark:border-[#383838] uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
-            শিক্ষার্থীদের জন্য
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-slate-50 leading-[1.25] tracking-tight mb-5 animate-fade-in font-anek">
+      <section className="relative overflow-hidden bg-[#FAF6F3] dark:bg-[#0a0a0a]">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 dark:text-slate-50 leading-[1.15] tracking-tight mb-6 animate-fade-in font-anek">
             স্মার্ট প্রস্তুতি,{' '}
-            <span className="text-slate-600 dark:text-slate-400">
+            <span className="text-slate-500 dark:text-slate-400 font-light">
               সেরা ফলাফল
             </span>
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10 font-anek">
+          <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10 font-anek font-light">
             বাংলাদেশের শিক্ষার্থীদের SSC, HSC এবং অন্যান্য পরীক্ষায় সফল হতে
             সাহায্য করার জন্য বিশেষজ্ঞ টিপস, পরীক্ষিত কৌশল এবং দিকনির্দেশনা।
           </p>
@@ -144,14 +138,14 @@ export default function BlogListingClient({
               placeholder="আর্টিকেল খুঁজুন…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-[#383838] bg-slate-50 dark:bg-[#1a1a1a] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-300 dark:focus:ring-slate-600 transition-all text-sm"
+              className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-black/5 dark:border-white/5 bg-white shadow-sm dark:bg-[#111] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10 transition-all text-[15px] font-anek"
             />
           </div>
         </div>
       </section>
 
       {/* ─── Category Filter ─── */}
-      <div className="sticky top-16 z-40 bg-[#FAF6F3]/90 dark:bg-[#121212]/90 backdrop-blur-md border-b border-slate-100 dark:border-[#2b2b2b]">
+      <div className="sticky top-16 z-40 bg-[#FAF6F3]/90 dark:bg-[#0a0a0a]/90 backdrop-blur-md pb-4 pt-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 overflow-x-auto">
           <div className="flex items-center gap-2 min-w-max mx-auto justify-start sm:justify-center">
             {categories.map((cat) => (
@@ -163,8 +157,8 @@ export default function BlogListingClient({
                 }}
                 className={`px-3.5 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors border font-anek ${
                   activeCategory === cat
-                    ? 'bg-slate-800 text-white border-slate-800 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200'
-                    : 'bg-transparent text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#383838] hover:bg-slate-50 dark:hover:bg-[#1a1a1a]'
+                    ? 'bg-slate-900 text-white dark:bg-white dark:text-black shadow-sm'
+                    : 'bg-transparent text-slate-600 dark:text-slate-400 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
               >
                 {cat === 'All' ? 'সব' : cat}
@@ -208,8 +202,8 @@ export default function BlogListingClient({
                       শিক্ষার্থীদের কাছে জনপ্রিয়
                     </h2>
                   </div>
-                  <div className="bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] rounded-xl p-6 mb-8 text-center flex flex-col sm:flex-row items-center justify-between gap-6">
-                    <p className="text-slate-600 dark:text-slate-400 font-medium text-sm sm:text-[15px] text-left max-w-2xl leading-[1.6]">
+                  <div className="bg-white dark:bg-[#111] border border-black/5 dark:border-white/5 rounded-2xl p-6 sm:p-8 mb-8 text-center flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+                    <p className="text-slate-600 dark:text-slate-400 font-medium text-[15px] sm:text-[16px] text-left max-w-2xl leading-[1.6]">
                       <strong>এখানে নতুন?</strong> অভ্যাস-এ রেজিস্টার করে আপনার
                       অনুশীলনের তথ্যের ওপর ভিত্তি করে আপনার দুর্বল বিষয়গুলোর
                       জন্য নির্দিষ্ট স্টাডি টিপস, পরীক্ষার কৌশল এবং আর্টিকেল

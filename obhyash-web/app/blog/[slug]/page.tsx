@@ -257,15 +257,15 @@ export default async function BlogPostPage({
             </Link>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-[44px] font-bold text-slate-900 dark:text-slate-100 leading-[1.2] tracking-tight mb-8 font-anek">
+          <h1 className="text-4xl sm:text-5xl md:text-[56px] font-extrabold text-slate-900 dark:text-slate-50 leading-[1.15] tracking-tight mb-6 font-anek">
             {post.title}
           </h1>
-          <p className="text-lg text-slate-500 dark:text-slate-400 leading-[1.6] mb-8 font-medium font-anek">
+          <p className="text-xl text-slate-600 dark:text-slate-400 leading-[1.6] mb-8 font-light font-anek max-w-4xl">
             {post.excerpt}
           </p>
 
           {/* Author meta row */}
-          <div className="flex flex-wrap items-center gap-4 pb-8 border-b border-slate-100 dark:border-[#2b2b2b]">
+          <div className="flex flex-wrap items-center gap-4 pb-12">
             <div
               className={`w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 text-sm font-semibold`}
             >
@@ -309,7 +309,7 @@ export default async function BlogPostPage({
               <TableOfContents items={tocItems} />
 
               {/* Reading info card */}
-              <div className="rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] p-4 sm:p-5 space-y-2 sm:space-y-3 font-anek">
+              <div className="rounded-2xl bg-[#fafafa] dark:bg-[#111] p-5 space-y-3 font-anek">
                 <h3 className="font-semibold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   আর্টিকেল তথ্য
                 </h3>
@@ -355,8 +355,8 @@ export default async function BlogPostPage({
                 prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-p:leading-[1.8] sm:prose-p:leading-[1.9] prose-p:text-[17px] sm:prose-p:text-[18px] prose-p:mb-8 text-justify
                 prose-li:text-slate-700 dark:prose-li:text-slate-300 prose-li:leading-[1.8] prose-li:text-[17px] sm:prose-li:text-[18px]
                 prose-strong:text-slate-900 dark:prose-strong:text-slate-100 font-medium
-                prose-a:text-slate-900 dark:prose-a:text-slate-200 prose-a:underline hover:prose-a:no-underline
-                prose-blockquote:border-l-4 prose-blockquote:border-slate-800 dark:prose-blockquote:border-slate-200 prose-blockquote:pl-6 prose-blockquote:italic
+                prose-a:text-rose-600 dark:prose-a:text-rose-400 prose-a:no-underline hover:prose-a:underline
+                prose-blockquote:border-l-4 prose-blockquote:border-black/10 dark:prose-blockquote:border-white/10 prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-slate-500
                 prose-ul:space-y-2 prose-ol:space-y-2
               "
             >

@@ -18,12 +18,12 @@ interface BlogCardProps {
 
 export default function BlogCard({ post, featured = false }: BlogCardProps) {
   const categoryStyle =
-    'bg-slate-100 text-slate-700 dark:bg-[#202020] dark:text-slate-300 border-slate-200 dark:border-[#383838]';
+    'bg-slate-50 text-slate-600 dark:bg-[#1a1a1a] dark:text-slate-400 border border-slate-100 dark:border-white/5';
 
   if (featured) {
     return (
       <Link href={`/blog/${post.slug}`} className="group block">
-        <article className="relative overflow-hidden rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] hover:border-slate-300 dark:hover:border-[#404040] shadow-sm hover:shadow-md transition-all duration-200">
+        <article className="relative bg-white dark:bg-[#111] overflow-hidden rounded-2xl border border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300">
           <div className="p-6 sm:p-8 md:p-10">
             {/* Featured badge + Category */}
             <div className="flex flex-wrap items-center gap-2.5 mb-5 font-anek">
@@ -82,7 +82,7 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
 
   return (
     <Link href={`/blog/${post.slug}`} className="group block h-full">
-      <article className="flex flex-col h-full overflow-hidden rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] hover:border-slate-300 dark:hover:border-[#404040] shadow-sm hover:shadow-md transition-all duration-200">
+      <article className="flex flex-col h-full bg-white dark:bg-[#111] overflow-hidden rounded-2xl border border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300">
         <div className="flex flex-col flex-1 p-5 sm:p-6">
           {/* Category badge */}
           <div className="mb-4">
