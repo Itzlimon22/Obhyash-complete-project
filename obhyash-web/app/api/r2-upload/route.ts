@@ -33,9 +33,20 @@ export async function POST(request: Request) {
     // Generate a secure upload URL valid for 5 minutes
     const signedUrl = await getSignedUrl(r2, command, { expiresIn: 300 });
 
-    const r2Domain =
+    const rawDomain =
       process.env.NEXT_PUBLIC_R2_DOMAIN ||
+      process.env.R2_PUBLIC_DOMAIN ||
       'pub-6560195307b14ca49f6f183b13bfa841.r2.dev';
+
+    // Strip "http://", "https://" and any trailing slashes to prevent "https://https://"
+    const r2Domain = rawDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+    if (r2Domain.includes('.r2.cloudflarestorage.com')) {
+      console.warn(
+        'WARNING: R2 public domain is set to the S3 API endpoint. ' +
+          'This will cause 401 Unauthorized errors. Use your pub-*.r2.dev or custom domain instead.',
+      );
+    }
 
     return NextResponse.json({
       uploadUrl: signedUrl,

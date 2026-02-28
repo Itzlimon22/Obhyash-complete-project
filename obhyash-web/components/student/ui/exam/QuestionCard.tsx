@@ -69,7 +69,7 @@ export default function QuestionCard({
       `}
     >
       {/* ── Top section ── */}
-      <div className="px-1 pt-3 pb-2 md:px-5 md:pt-5">
+      <div className="px-2 pt-3 pb-2 md:px-5 md:pt-5">
         {/* Question text row */}
         <div className="flex items-baseline gap-2 mb-2">
           {/* Serial number */}
@@ -169,7 +169,7 @@ export default function QuestionCard({
       {/* ── Options grid ── */}
       <div
         className={`
-          px-1 pb-3 md:px-5 md:pb-4
+          px-2 pb-3 md:px-5 md:pb-4
           grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2.5 items-stretch
           ${readOnly || isOmrMode ? 'pointer-events-none' : ''}
         `}
@@ -271,7 +271,7 @@ export default function QuestionCard({
 
       {/* ── Explanation ── */}
       {showFeedback && question.explanation && (
-        <div className="mx-1 mb-3 md:mx-5 md:mb-5 animate-fade-in">
+        <div className="mx-2 mb-3 md:mx-5 md:mb-5 animate-fade-in">
           <div
             className="
               rounded-xl overflow-hidden

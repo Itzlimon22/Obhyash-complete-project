@@ -101,9 +101,14 @@ const ReportModal: React.FC<ReportModalProps> = ({
     <Portal>
       <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
         {/* Modal / Bottom Sheet */}
-        <div className="bg-white dark:bg-black w-full max-w-md sm:rounded-3xl rounded-t-3xl shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden transform transition-all animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-200 max-h-[50vh] sm:max-h-[85vh] flex flex-col">
+        <div className="bg-white dark:bg-black w-full max-w-md sm:rounded-3xl rounded-t-3xl shadow-2xl border border-black/10 dark:border-white/10 overflow-hidden transform transition-all animate-in slide-in-from-bottom-10 sm:zoom-in-95 duration-200 max-h-[90vh] sm:max-h-[85vh] flex flex-col">
+          {/* Mobile Handle Indicator */}
+          <div className="w-full flex justify-center pt-3 pb-1 sm:hidden">
+            <div className="w-10 h-1.5 bg-black/10 dark:bg-white/10 rounded-full" />
+          </div>
+
           {/* Header */}
-          <div className="px-6 py-5 border-b border-black/10 dark:border-white/10 flex justify-between items-center">
+          <div className="px-4 py-3 sm:px-6 sm:py-5 border-b border-black/10 dark:border-white/10 flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400">
                 <AlertCircle size={22} />
@@ -125,9 +130,9 @@ const ReportModal: React.FC<ReportModalProps> = ({
             </button>
           </div>
 
-          <div className="p-6 overflow-y-auto">
+          <div className="p-4 sm:p-6 overflow-y-auto">
             {/* Report Type Selection */}
-            <div className="mb-6">
+            <div className="mb-5 sm:mb-6">
               <label className="block text-xs font-black text-black/40 dark:text-white/40 uppercase tracking-widest mb-4">
                 সমস্যার ধরণ নির্বাচন করুন
               </label>
@@ -140,7 +145,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
                       key={type.id}
                       onClick={() => setSelectedType(type.id)}
                       className={`
-                        flex items-center gap-2 px-3 py-3 rounded-xl text-xs font-black transition-all duration-200 border-2 uppercase tracking-wide
+                        flex items-center gap-1.5 px-2.5 py-2.5 sm:px-3 sm:py-3 rounded-xl text-[11px] sm:text-xs font-black transition-all duration-200 border-2 uppercase tracking-wide
                         ${
                           isSelected
                             ? 'bg-red-50 dark:bg-red-900/20 border-red-500 text-red-700 dark:text-red-400'
@@ -177,12 +182,12 @@ const ReportModal: React.FC<ReportModalProps> = ({
                 value={comment}
                 onChange={(e) => setComment(e.target.value.slice(0, 500))}
                 placeholder="সমস্যার বিস্তারিত এখানে লেখো..."
-                className="w-full h-24 p-4 rounded-xl border-2 border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-black dark:text-white placeholder:text-black/30 dark:placeholder:text-white/30 focus:outline-none focus:border-red-500/50 transition-all resize-none text-sm leading-relaxed"
+                className="w-full h-20 sm:h-24 p-3 sm:p-4 rounded-xl border-2 border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-black dark:text-white placeholder:text-black/30 dark:placeholder:text-white/30 focus:outline-none focus:border-red-500/50 transition-all resize-none text-[13px] sm:text-sm leading-relaxed"
               />
             </div>
 
             {/* Reference Image Upload */}
-            <div className="mb-6">
+            <div className="mb-5 sm:mb-6">
               <label className="block text-xs font-black text-black/40 dark:text-white/40 uppercase tracking-widest mb-4">
                 রেফারেন্স ছবি (অপশনাল)
               </label>
@@ -190,7 +195,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
               {!imagePreview ? (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-black/10 dark:border-white/10 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                  className="border-2 border-dashed border-black/10 dark:border-white/10 rounded-xl p-4 sm:p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                 >
                   <div className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center mb-2 text-black/40 dark:text-white/40">
                     <Upload size={18} />
@@ -227,18 +232,18 @@ const ReportModal: React.FC<ReportModalProps> = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-3 mt-4">
+            <div className="flex gap-2.5 sm:gap-3 mt-4">
               <button
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="flex-1 py-3.5 rounded-xl font-black text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5 transition-colors disabled:opacity-50 uppercase tracking-wide text-sm"
+                className="flex-1 py-3 sm:py-3.5 rounded-xl font-black text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5 transition-colors disabled:opacity-50 uppercase tracking-wide text-[11px] sm:text-sm"
               >
                 বাতিল
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={!selectedType || isSubmitting}
-                className="flex-[2] py-3.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black rounded-xl shadow-lg shadow-red-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-wide text-sm"
+                className="flex-[2] py-3 sm:py-3.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black rounded-xl shadow-lg shadow-red-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 uppercase tracking-wide text-[11px] sm:text-sm"
               >
                 {isSubmitting ? (
                   <>
