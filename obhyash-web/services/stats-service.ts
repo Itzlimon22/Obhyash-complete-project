@@ -286,22 +286,30 @@ export const getSubjectAnalysis = async (
           { name: string; total: number; correct: number }
         >();
 
-        filteredExams.forEach((exam) => {
-          totalQuestions += exam.total_questions || 0;
-          correct += exam.correct_count || 0;
-          wrong += exam.wrong_count || 0;
-          totalTime += exam.time_taken || 0;
+        filteredExams.forEach((exam: ExamResult) => {
+          totalQuestions += exam.totalQuestions || 0;
+          correct += exam.correctCount || 0;
+          wrong += exam.wrongCount || 0;
+          totalTime += exam.timeTaken || 0;
           skipped += Math.max(
             0,
-            (exam.total_questions || 0) -
-              ((exam.correct_count || 0) + (exam.wrong_count || 0)),
+            (exam.totalQuestions || 0) -
+              ((exam.correctCount || 0) + (exam.wrongCount || 0)),
           );
 
           // Better chapter extraction using actual questions and answers
           if (exam.questions && Array.isArray(exam.questions)) {
-            const answers = exam.user_answers || {};
+            const answers = exam.userAnswers || {};
 
-            exam.questions.forEach((q: Question & Record<string, unknown>) => {
+            // Define a more specific type for questions if needed
+            type ExtendedQuestion = Question & {
+              topic?: string;
+              chapter?: string;
+              id: string | number;
+              correctAnswerIndex?: number;
+            };
+
+            exam.questions.forEach((q: ExtendedQuestion) => {
               // Determine chapter/topic name (Fallback to 'General' if both missing)
               const cName = q.topic || q.chapter || 'General';
 
@@ -333,8 +341,8 @@ export const getSubjectAnalysis = async (
               .filter(Boolean);
 
             if (chaptersArray.length > 0) {
-              const wTotal = (exam.total_questions || 0) / chaptersArray.length;
-              const wCorrect = (exam.correct_count || 0) / chaptersArray.length;
+              const wTotal = (exam.totalQuestions || 0) / chaptersArray.length;
+              const wCorrect = (exam.correctCount || 0) / chaptersArray.length;
 
               chaptersArray.forEach((chap: string) => {
                 if (!chapterMap.has(chap)) {
@@ -436,55 +444,66 @@ export const getOverallAnalytics = async (
           { name: string; score: number; _count: number; fullDate: string }
         >();
 
-        rawData.forEach((exam) => {
-          totalQuestions += exam.total_questions || 0;
-          totalCorrect += exam.correct_count || 0;
-          totalTime += exam.time_taken || 0;
+        rawData.forEach(
+          (exam: {
+            score: number;
+            total_marks: number;
+            total_questions: number;
+            correct_count: number;
+            wrong_count: number;
+            time_taken: number;
+            date: string;
+            subject?: string;
+          }) => {
+            totalQuestions += exam.total_questions || 0;
+            totalCorrect += exam.correct_count || 0;
+            totalTime += exam.time_taken || 0;
 
-          if (exam.total_marks > 0) {
-            scoreSum += (exam.score / exam.total_marks) * 100;
-          }
+            if (exam.total_marks > 0) {
+              scoreSum += (exam.score / exam.total_marks) * 100;
+            }
 
-          // Subject aggregate
-          const subj = exam.subject || 'General';
-          if (!subjectMap.has(subj)) {
-            subjectMap.set(subj, {
-              name: subj,
-              correct: 0,
-              wrong: 0,
-              skipped: 0,
-              total: 0,
+            // Subject aggregate
+            const subj = exam.subject || 'General';
+            if (!subjectMap.has(subj)) {
+              subjectMap.set(subj, {
+                name: subj,
+                correct: 0,
+                wrong: 0,
+                skipped: 0,
+                total: 0,
+              });
+            }
+            const sData = subjectMap.get(subj)!;
+            sData.correct += exam.correct_count || 0;
+            sData.wrong += exam.wrong_count || 0;
+            sData.total += exam.total_questions || 0;
+            sData.skipped += Math.max(
+              0,
+              (exam.total_questions || 0) -
+                ((exam.correct_count || 0) + (exam.wrong_count || 0)),
+            );
+
+            // Timeline aggregate
+            const examDate = new Date(exam.date);
+            const dateStr = examDate.toLocaleDateString('bn-BD', {
+              day: 'numeric',
+              month: 'short',
             });
-          }
-          const sData = subjectMap.get(subj)!;
-          sData.correct += exam.correct_count || 0;
-          sData.wrong += exam.wrong_count || 0;
-          sData.total += exam.total_questions || 0;
-          sData.skipped += Math.max(
-            0,
-            (exam.total_questions || 0) -
-              ((exam.correct_count || 0) + (exam.wrong_count || 0)),
-          );
-
-          // Timeline aggregate
-          const examDate = new Date(exam.date);
-          const dateStr = examDate.toLocaleDateString('bn-BD', {
-            day: 'numeric',
-            month: 'short',
-          });
-          if (!timelineMap.has(dateStr)) {
-            timelineMap.set(dateStr, {
-              name: dateStr,
-              score: 0,
-              _count: 0,
-              fullDate: exam.date,
-            });
-          }
-          const tData = timelineMap.get(dateStr)!;
-          tData._count += 1;
-          tData.score +=
-            exam.total_marks > 0 ? (exam.score / exam.total_marks) * 100 : 0;
-        });
+            if (!timelineMap.has(dateStr)) {
+              timelineMap.set(dateStr, {
+                name: dateStr,
+                score: 0,
+                _count: 0,
+                fullDate: exam.date,
+              });
+            }
+            const tData = timelineMap.get(dateStr)!;
+            tData._count += 1;
+            tData.score +=
+              exam.total_marks > 0 ? (exam.score / exam.total_marks) * 100 : 0;
+          },
+        );
 
         const timelineData = Array.from(timelineMap.values())
           .map((t) => ({
@@ -553,9 +572,9 @@ export const getTeacherStats = async (
 
       const stats = {
         totalQuestions: data?.length || 0,
-        approved: data?.filter((q) => q.status === 'Approved').length || 0,
-        pending: data?.filter((q) => q.status === 'Pending').length || 0,
-        rejected: data?.filter((q) => q.status === 'Rejected').length || 0,
+        approved: data?.filter((q: { status: string }) => q.status === 'Approved').length || 0,
+        pending: data?.filter((q: { status: string }) => q.status === 'Pending').length || 0,
+        rejected: data?.filter((q: { status: string }) => q.status === 'Rejected').length || 0,
       };
 
       return stats;

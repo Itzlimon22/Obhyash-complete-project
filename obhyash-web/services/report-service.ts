@@ -86,7 +86,7 @@ export const getReports = async (
 
     // Manually fetch questions to avoid Foreign Key relation errors
     const questionIds = Array.from(
-      new Set(reports.map((r) => r.question_id).filter(Boolean)),
+      new Set(reports.map((r: Report) => r.question_id).filter(Boolean)),
     );
 
     if (questionIds.length > 0) {
@@ -98,10 +98,12 @@ export const getReports = async (
         .in('id', questionIds);
 
       if (questionsData) {
-        const questionMap = new Map(questionsData.map((q) => [q.id, q]));
+        const questionMap = new Map(
+          questionsData.map((q: { id: number; question: string; options: string[]; correct_answer_indices: number[]; explanation: string; subject: string }) => [q.id, q])
+        );
 
         // Map questions back to reports
-        const mappedReports = reports.map((report) => ({
+        const mappedReports = reports.map((report: Report) => ({
           ...report,
           question: questionMap.get(report.question_id) || null,
         })) as unknown as Report[];
@@ -182,7 +184,7 @@ export const getUserReports = async (
 
     // Manually fetch questions to avoid Foreign Key relation errors
     const questionIds = Array.from(
-      new Set(reports.map((r) => r.question_id).filter(Boolean)),
+      new Set(reports.map((r: { question_id: unknown; }) => r.question_id).filter(Boolean)),
     );
 
     if (questionIds.length > 0) {
@@ -194,10 +196,10 @@ export const getUserReports = async (
         .in('id', questionIds);
 
       if (questionsData) {
-        const questionMap = new Map(questionsData.map((q) => [q.id, q]));
+        const questionMap = new Map(questionsData.map((q: { id: unknown; }) => [q.id, q]));
 
         // Map questions back to reports
-        return reports.map((report) => ({
+        return reports.map((report: { question_id: unknown; }) => ({
           ...report,
           question: questionMap.get(report.question_id) || null,
         })) as unknown as Report[];
