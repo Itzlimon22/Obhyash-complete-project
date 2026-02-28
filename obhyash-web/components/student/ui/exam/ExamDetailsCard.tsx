@@ -124,5 +124,3 @@ const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({
 };
 
 export default ExamDetailsCard;
-
-export default ExamDetailsCard;
