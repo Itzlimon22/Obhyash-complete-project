@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import { User } from '@supabase/supabase-js';
+import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { UserProfile } from '@/lib/types';
 import { mutate } from 'swr';
 import { mapDbRowToProfile } from '@/services/user-service';
@@ -94,7 +94,17 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     const initializeAuth = async () => {
       try {
-        // Secure auth check (server-validated user)
+        // 1. Check for valid session
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
+
+        if (sessionError) {
+          console.error('Session retrieval error:', sessionError);
+        }
+
+        // 2. Refresh user if session exists
         const {
           data: { user: currentUser },
           error: authError,
@@ -103,39 +113,38 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         if (authError || !currentUser) {
           if (authError && authError.name !== 'AuthSessionMissingError') {
             console.error('Auth verification error:', authError);
-
-            // Suspicious situation: cache exists but auth invalid
+            // Suspect corruption only if we have a profile but can't verify identity
             if (localStorage.getItem('obhyash_user_profile')) {
               setShowCorruptionModal(true);
             }
           } else {
-            // No session
+            // No valid session
             if (isMounted) {
               setUser(null);
               setProfile(null);
+              localStorage.removeItem('obhyash_user_profile');
             }
-            localStorage.removeItem('obhyash_user_profile');
           }
         } else {
+          // Valid user found
           if (isMounted) setUser(currentUser);
 
-          // Ensure cached profile belongs to current user
+          // Sync profile
           const cachedProfileStr = localStorage.getItem('obhyash_user_profile');
           if (cachedProfileStr) {
             try {
               const cachedProfile = JSON.parse(cachedProfileStr) as UserProfile;
-              if (cachedProfile?.id && cachedProfile.id !== currentUser.id) {
-                console.warn('Identity mismatch - clearing stale cache');
+              if (cachedProfile?.id && cachedProfile.id === currentUser.id) {
+                if (isMounted) setProfile(cachedProfile);
+              } else {
                 localStorage.removeItem('obhyash_user_profile');
-                if (isMounted) setProfile(null);
               }
             } catch {
               localStorage.removeItem('obhyash_user_profile');
-              if (isMounted) setProfile(null);
             }
           }
 
-          // Fresh profile from DB
+          // Fetch fresh profile from server
           const userProfile = await fetchProfile(currentUser.id);
           if (userProfile && isMounted) {
             setProfile(userProfile);
@@ -152,28 +161,36 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        if (isMounted) setUser(session.user);
+    } = supabase.auth.onAuthStateChange(
+      async (event: AuthChangeEvent, session: Session | null) => {
+        console.log('Auth event change:', event);
 
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          // Revalidate all SWR caches after auth changes
-          mutate(() => true, undefined, { revalidate: true });
-        }
+        if (session?.user) {
+          if (isMounted) setUser(session.user);
 
-        const userProfile = await fetchProfile(session.user.id);
-        if (userProfile && isMounted) {
-          setProfile(userProfile);
+          if (
+            event === 'SIGNED_IN' ||
+            event === 'TOKEN_REFRESHED' ||
+            event === 'INITIAL_SESSION'
+          ) {
+            // Revalidate all SWR caches after auth changes
+            mutate(() => true, undefined, { revalidate: true });
+
+            const userProfile = await fetchProfile(session.user.id);
+            if (userProfile && isMounted) {
+              setProfile(userProfile);
+            }
+          }
+        } else if (event === 'SIGNED_OUT') {
+          if (isMounted) {
+            setUser(null);
+            setProfile(null);
+          }
+          localStorage.removeItem('obhyash_user_profile');
+          router.push('/login');
         }
-      } else if (event === 'SIGNED_OUT') {
-        if (isMounted) {
-          setUser(null);
-          setProfile(null);
-        }
-        localStorage.removeItem('obhyash_user_profile');
-        router.push('/login');
-      }
-    });
+      },
+    );
 
     return () => {
       isMounted = false;
