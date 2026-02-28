@@ -37,9 +37,25 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showCorruptionModal, setShowCorruptionModal] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const supabase = createClient();
+
+  // Optimistic UI: Initial load from localStorage
+  useEffect(() => {
+    const cachedProfileStr = localStorage.getItem('obhyash_user_profile');
+    if (cachedProfileStr) {
+      try {
+        const cachedProfile = JSON.parse(cachedProfileStr) as UserProfile;
+        if (cachedProfile && cachedProfile.id) {
+          setProfile(cachedProfile);
+        }
+      } catch (e) {
+        console.error('Initial cache parse error', e);
+      }
+    }
+  }, []);
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -56,15 +72,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!data) return null;
 
-      // Use centralized mapping logic
       const userProfile = mapDbRowToProfile(data);
-
-      // Cache the correctly-mapped profile in local storage
       localStorage.setItem('obhyash_user_profile', JSON.stringify(userProfile));
       return userProfile;
     } catch (error) {
       console.error('Unexpected error fetching profile:', error);
-      toast.error('Failed to load user profile. Please refresh.');
       return null;
     }
   };
@@ -72,178 +84,100 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isMounted = true;
 
-    // START of initializeAuth
     const initializeAuth = async () => {
-      // Safety Timeout to prevent infinite loading
-      const timeoutId = setTimeout(() => {
-        if (isMounted && loading) {
-          console.warn('⚠️ Auth check timed out - Forcing load completion');
-          setLoading(false);
-        }
-      }, 5000); // 5 seconds max wait
-
       try {
-        // 1. Get current user (server-validated via Cookie)
+        // Use getSession first for faster persistence check, then getUser for security
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
+
+        if (sessionError) {
+          console.error('Session retrieval error:', sessionError);
+        }
+
         const {
           data: { user: currentUser },
           error: authError,
         } = await supabase.auth.getUser();
 
         if (authError || !currentUser) {
-          // AuthSessionMissingError is expected when no user is logged in — don't spam console
           if (authError && authError.name !== 'AuthSessionMissingError') {
-            console.error('Auth check error:', authError);
+            console.error('Auth verification error:', authError);
+            // If it's a suspicious error (not just missing), it might be corruption
+            if (localStorage.getItem('obhyash_user_profile')) {
+              setShowCorruptionModal(true);
+            }
+          } else {
+            // Definitively no session
+            if (isMounted) {
+              setUser(null);
+              setProfile(null);
+              localStorage.removeItem('obhyash_user_profile');
+            }
           }
-          // No valid session, clear everything immediately
-          if (isMounted) {
-            setUser(null);
-            setProfile(null);
-          }
-          localStorage.removeItem('obhyash_user_profile');
         } else {
-          // Valid Session exists
           if (isMounted) setUser(currentUser);
 
-          // 2. Try to load cached profile FOR THIS USER
+          // Verify if cached profile matches authentication
           const cachedProfileStr = localStorage.getItem('obhyash_user_profile');
-          let hasCachedProfile = false;
-
           if (cachedProfileStr) {
             try {
               const cachedProfile = JSON.parse(cachedProfileStr) as UserProfile;
-              // START FIX: Ensure cached profile matches current user AND has valid data
-              if (
-                cachedProfile &&
-                cachedProfile.id === currentUser.id &&
-                cachedProfile.role
-              ) {
-                if (isMounted) {
-                  setProfile(cachedProfile);
-                  // ✅ OPTIMISTIC UI: We have a valid user and profile, stop loading immediately
-                  setLoading(false);
-                }
-                hasCachedProfile = true;
-              } else {
-                // Invalid cache (wrong user or malformed), clear it
-                console.warn('Clearing invalid/stale profile cache');
+              if (cachedProfile && cachedProfile.id !== currentUser.id) {
+                console.warn('Identity mismatch - clearing stale cache');
                 localStorage.removeItem('obhyash_user_profile');
               }
-              // END FIX
             } catch (e) {
-              console.error('Cache parse error', e);
               localStorage.removeItem('obhyash_user_profile');
             }
           }
 
-          // 3. Fetch/Update Profile (Background validation)
-          // Even if we loaded from cache, we fetch fresh data to update transparently
+          // Background profile refresh
           const userProfile = await fetchProfile(currentUser.id);
           if (userProfile && isMounted) {
             setProfile(userProfile);
           }
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
+        console.error('Auth initialization sequence failed:', error);
       } finally {
-        // Prepare to stop loading if not already stopped by cache hit
         if (isMounted) setLoading(false);
-        clearTimeout(timeoutId); // Clear timeout if successful
       }
     };
 
     initializeAuth();
 
-    // 4. Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         if (isMounted) setUser(session.user);
 
-        // Fetch profile if missing or user changed or token refreshed
-        const shouldFetchProfile =
-          !profile ||
-          profile.id !== session.user.id ||
-          event === 'USER_UPDATED' ||
-          event === 'TOKEN_REFRESHED';
-
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          // Invalidate all SWR caches to force re-fetches with the fresh token
-          // This fixes the issue where an expired session hangs the app data
           mutate(() => true, undefined, { revalidate: true });
         }
 
-        if (shouldFetchProfile) {
-          const userProfile = await fetchProfile(session.user.id);
-          if (userProfile && isMounted) {
-            setProfile(userProfile);
-          }
+        const userProfile = await fetchProfile(session.user.id);
+        if (userProfile && isMounted) {
+          setProfile(userProfile);
         }
-      } else {
-        // Signed out or session expired
+      } else if (event === 'SIGNED_OUT') {
         if (isMounted) {
           setUser(null);
           setProfile(null);
         }
         localStorage.removeItem('obhyash_user_profile');
-
-        if (event === 'SIGNED_OUT') {
-          router.push('/login');
-        }
+        router.push('/login');
       }
     });
-
-    // 5. Realtime Subscription for Profile Updates
-    const profileSubscription = supabase
-      .channel(`public:users:id=eq.${user?.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'users',
-          filter: `id=eq.${user?.id}`,
-        },
-        (payload) => {
-          console.log('🔄 Realtime Profile Update Detected:', payload);
-          if (payload.new) {
-            const updatedProfile = mapDbRowToProfile(
-              payload.new,
-              user?.email,
-              user?.phone,
-              user?.created_at,
-            );
-            setProfile(updatedProfile);
-            localStorage.setItem(
-              'obhyash_user_profile',
-              JSON.stringify(updatedProfile),
-            );
-          }
-        },
-      )
-      .subscribe();
 
     return () => {
       isMounted = false;
       subscription.unsubscribe();
-      supabase.removeChannel(profileSubscription);
     };
-  }, [supabase, router, user?.id]);
+  }, [supabase, router, profile?.id]);
 
-  // Keep‑alive ping to maintain Supabase session
-  useEffect(() => {
-    if (!supabase) return;
-    const interval = setInterval(
-      () => {
-        fetch('/api/ping', { method: 'GET', credentials: 'include' }).catch(
-          () => {},
-        );
-      },
-      5 * 60 * 1000,
-    ); // every 5 minutes
-    return () => clearInterval(interval);
-  }, [supabase]);
-  // Sign out function
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -252,7 +186,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/login');
   };
 
-  // Refresh profile function
   const refreshProfile = async () => {
     if (user) {
       const userProfile = await fetchProfile(user.id);
@@ -260,11 +193,40 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const handleForceLogout = async () => {
+    setShowCorruptionModal(false);
+    await signOut();
+  };
+
   return (
     <AuthContext.Provider
       value={{ user, profile, loading, signOut, refreshProfile }}
     >
       {children}
+
+      {/* Corruption / Expiry Confirmation Modal */}
+      {showCorruptionModal && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white dark:bg-neutral-950 w-full max-w-sm rounded-[2rem] p-8 shadow-2xl border border-neutral-200 dark:border-neutral-800 text-center animate-in zoom-in-95 duration-300">
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-3xl">⚠️</span>
+            </div>
+            <h3 className="text-xl font-black text-neutral-900 dark:text-white mb-3 tracking-tight">
+              সেশন সমস্যা!
+            </h3>
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-8 leading-relaxed">
+              আপনার লগইন সেশনটি মেয়াদোত্তীর্ণ বা ত্রুটিপূর্ণ হয়েছে। নিরবচ্ছিন্ন
+              অভিজ্ঞতার জন্য দয়া করে আবার লগইন করুন।
+            </p>
+            <button
+              onClick={handleForceLogout}
+              className="w-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-bold py-3.5 rounded-2xl shadow-lg active:scale-95 transition-all text-sm mb-3"
+            >
+              আবার লগইন করুন
+            </button>
+          </div>
+        </div>
+      )}
     </AuthContext.Provider>
   );
 }

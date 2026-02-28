@@ -25,10 +25,15 @@ export default function DashboardClient({
     return 'light';
   });
 
-  // Cache user profile locally for instant loading on next visit
+  // Sync user profile locally for instant loading on next visit
   useEffect(() => {
-    if (user?.id) {
-      localStorage.setItem('obhyash_user_profile', JSON.stringify(user));
+    if (user && user.id) {
+      const currentCache = localStorage.getItem('obhyash_user_profile');
+      const userDataStr = JSON.stringify(user);
+
+      if (currentCache !== userDataStr) {
+        localStorage.setItem('obhyash_user_profile', userDataStr);
+      }
     }
   }, [user]);
 
