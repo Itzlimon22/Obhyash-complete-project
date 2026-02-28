@@ -1,6 +1,8 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import BlogManagementClient from '@/components/admin/blog/BlogManagementClient';
+import { Suspense } from 'react';
+import { Loader2 } from 'lucide-react';
 
 export const metadata = {
   title: 'Blog Management | Obhyash Admin',
@@ -39,7 +41,15 @@ export default async function BlogManagementPage() {
         </div>
 
         {/* Client Dashboard */}
-        <BlogManagementClient />
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center p-20 text-slate-400">
+              <Loader2 className="w-8 h-8 animate-spin" />
+            </div>
+          }
+        >
+          <BlogManagementClient />
+        </Suspense>
       </div>
     </div>
   );

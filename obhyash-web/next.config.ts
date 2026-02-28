@@ -21,9 +21,8 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  experimental: {
-    cacheComponents: true,
-  },
+  cacheComponents: true,
+  experimental: {},
 };
 
 export default nextConfig;
