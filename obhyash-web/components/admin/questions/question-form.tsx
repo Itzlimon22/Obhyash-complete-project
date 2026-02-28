@@ -9,6 +9,7 @@ import {
   getHscTopicList,
   findHscSubject,
   findHscChapter,
+  resolveTaxonomyHierarchy,
 } from '@/lib/data/hsc-helpers';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { RichTextEditor } from '@/components/admin/questions/rich-text-editor';
@@ -27,7 +28,14 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
   onSave,
   onCancel,
 }) => {
-  const [data, setData] = useState<Partial<Question>>(initialData);
+  const [data, setData] = useState<Partial<Question>>(() => {
+    const { subject, chapter, topic } = resolveTaxonomyHierarchy(
+      initialData.subject || '',
+      initialData.chapter || '',
+      initialData.topic || '',
+    );
+    return { ...initialData, subject, chapter, topic };
+  });
 
   const updateOption = (idx: number, val: string) => {
     const opts = [...(data.options || [])];
@@ -35,27 +43,22 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
     setData({ ...data, options: opts });
   };
 
+  const fieldCls =
+    'w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-600 transition-all';
+  const labelCls =
+    'text-[10px] font-extrabold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest mb-1.5 block';
+
   // --- Synchronous Dropdown Data from hsc.ts (Single Source of Truth) ---
   const availableSubjects = useMemo(() => getHscSubjectList(), []);
 
-  // To ensure the dropdowns work even if ID is passed instead of Name
-  const currentSubjectName = data.subject
-    ? findHscSubject(data.subject)?.name || data.subject
-    : '';
-  const currentChapterName =
-    data.chapter && currentSubjectName
-      ? findHscChapter(data.chapter)?.chapter.name || data.chapter
-      : '';
-  const currentTopicName = data.topic ? data.topic : '';
-
   const availableChapters = useMemo(
-    () => (currentSubjectName ? getHscChapterList(currentSubjectName) : []),
-    [currentSubjectName],
+    () => (data.subject ? getHscChapterList(data.subject) : []),
+    [data.subject],
   );
 
   const availableTopics = useMemo(
-    () => (currentChapterName ? getHscTopicList(currentChapterName) : []),
-    [currentChapterName],
+    () => (data.chapter ? getHscTopicList(data.chapter) : []),
+    [data.chapter],
   );
 
   const handleSave = () => {
@@ -156,11 +159,9 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 bg-neutral-50 rounded-xl border border-neutral-100">
             {/* Subject */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                বিষয়
-              </label>
+              <label className={labelCls}>বিষয়</label>
               <select
-                value={currentSubjectName}
+                value={data.subject || ''}
                 onChange={(e) =>
                   setData({
                     ...data,
@@ -169,7 +170,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                     topic: '',
                   })
                 }
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
+                className={fieldCls}
               >
                 <option value="">নির্বাচন করো</option>
                 {availableSubjects.map((s) => (
@@ -182,16 +183,14 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 
             {/* Chapter */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                অধ্যায়
-              </label>
+              <label className={labelCls}>অধ্যায়</label>
               <select
-                value={currentChapterName}
+                value={data.chapter || ''}
                 onChange={(e) =>
                   setData({ ...data, chapter: e.target.value, topic: '' })
                 }
-                disabled={!currentSubjectName}
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none disabled:opacity-50"
+                disabled={!data.subject}
+                className={`${fieldCls} disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 <option value="">নির্বাচন করুন</option>
                 {availableChapters.map((c) => (
@@ -204,14 +203,12 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 
             {/* Topic */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                টপিক
-              </label>
+              <label className={labelCls}>টপিক</label>
               <select
-                value={currentTopicName}
+                value={data.topic || ''}
                 onChange={(e) => setData({ ...data, topic: e.target.value })}
-                disabled={!currentChapterName}
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none disabled:opacity-50"
+                disabled={!data.chapter}
+                className={`${fieldCls} disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 <option value="">নির্বাচন করুন</option>
                 {availableTopics.map((t) => (
@@ -224,9 +221,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 
             {/* Difficulty */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                কাঠিন্য মাত্রা
-              </label>
+              <label className={labelCls}>কাঠিন্য মাত্রা</label>
               <select
                 value={data.difficulty || 'Medium'}
                 onChange={(e) =>
@@ -235,7 +230,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                     difficulty: e.target.value as 'Easy' | 'Medium' | 'Hard',
                   })
                 }
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
+                className={fieldCls}
               >
                 <option>Easy</option>
                 <option>Medium</option>
@@ -245,68 +240,58 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 
             {/* Stream */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                স্ট্রিম (Stream)
-              </label>
+              <label className={labelCls}>স্ট্রিম (Stream)</label>
               <input
                 value={data.stream || ''}
                 onChange={(e) => setData({ ...data, stream: e.target.value })}
                 placeholder="e.g. HSC"
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
+                className={fieldCls}
               />
             </div>
 
             {/* Section */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                বিভাগ (Section)
-              </label>
+              <label className={labelCls}>বিভাগ (Section)</label>
               <input
                 value={data.section || data.division || ''}
                 onChange={(e) => setData({ ...data, section: e.target.value })}
                 placeholder="e.g. Science"
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
+                className={fieldCls}
               />
             </div>
 
             {/* Exam Type */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                পরীক্ষার ধরন
-              </label>
+              <label className={labelCls}>পরীক্ষার ধরন</label>
               <input
                 value={data.examType || ''}
                 onChange={(e) => setData({ ...data, examType: e.target.value })}
                 placeholder="e.g. Medical,Varsity"
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
+                className={fieldCls}
               />
             </div>
 
             {/* Year */}
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                বছর
-              </label>
+              <label className={labelCls}>বছর</label>
               <input
                 value={data.year || ''}
                 onChange={(e) => setData({ ...data, year: e.target.value })}
                 placeholder="e.g. 2023"
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
+                className={fieldCls}
               />
             </div>
 
             {/* Institute */}
             <div className="space-y-1.5 md:col-span-2">
-              <label className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">
-                প্রতিষ্ঠান (Institute)
-              </label>
+              <label className={labelCls}>প্রতিষ্ঠান (Institute)</label>
               <input
                 value={data.institute || data.institutes?.join(',') || ''}
                 onChange={(e) =>
                   setData({ ...data, institute: e.target.value })
                 }
                 placeholder="e.g. Buet,Ruet,DMC"
-                className="w-full p-2.5 rounded-lg border border-neutral-200 bg-white text-sm outline-none"
+                className={fieldCls}
               />
             </div>
           </div>
