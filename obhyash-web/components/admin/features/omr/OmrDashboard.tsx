@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { ExamResult } from '@/lib/types'; // Adjust path if needed
 import { evaluateOMRScript } from '@/services/gemini-service'; // Adjust path
-import { supabase } from '@/lib/utils/supabase'; // ✅ Import Supabase
+import { supabase } from '@/services/core'; // ✅ Import Supabase
 
 interface OmrDashboardProps {
   initialData: ExamResult[];

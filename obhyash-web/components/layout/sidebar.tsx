@@ -23,7 +23,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@/lib/utils/supabase';
+import { createClient } from '@/utils/supabase/client';
 
 // --- Types ---
 interface NavItem {
@@ -143,7 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
 
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

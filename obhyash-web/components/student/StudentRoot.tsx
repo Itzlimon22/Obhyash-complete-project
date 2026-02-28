@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 
 // Types & Services
 import { UserProfile, AppState, ExamConfig, ExamResult } from '@/lib/types';
@@ -69,6 +70,7 @@ export default function StudentRoot({
   onLogout,
   subjects = [],
 }: StudentRootProps) {
+  const router = useRouter();
   // ... (keeping existing hooks and state)
   const engine = useExamEngine();
   const supabase = createClient();
@@ -497,6 +499,8 @@ export default function StudentRoot({
               }}
               onLeaderboardClick={() => setActiveTab('leaderboard')}
               onAnalysisClick={() => setActiveTab('analysis')}
+              onPracticeClick={() => handleTabChange('practice')}
+              onBlogClick={() => router.push('/blog')}
               history={examHistory}
             />
           </AppLayout>

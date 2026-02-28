@@ -33,6 +33,8 @@ interface DashboardProps {
   onSubjectClick: (subject: string) => void;
   onLeaderboardClick: () => void;
   onAnalysisClick: () => void;
+  onPracticeClick: () => void;
+  onBlogClick: () => void;
   history: ExamResult[];
 }
 
@@ -70,6 +72,8 @@ const Dashboard: React.FC<DashboardProps> = ({
   onSubjectClick,
   onLeaderboardClick,
   onAnalysisClick,
+  onPracticeClick,
+  onBlogClick,
   history,
 }) => {
   const { data: subjects = [], isLoading: isLoadingStats } = useSWR(
@@ -175,21 +179,20 @@ const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 px-1">
       {/* Cards Section - Order 1 on Mobile, Top Left on Desktop */}
-      <div className="lg:col-span-2 grid grid-cols-2 gap-3 md:gap-5 h-fit">
+      <div className="lg:col-span-2 grid grid-cols-3 gap-2 md:gap-4 h-fit">
         <button
           onClick={onMockExamClick}
-          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-emerald-50/50 dark:from-neutral-900 dark:to-emerald-950/20 p-4 md:p-5 rounded-2xl shadow-[0_2px_12px_-2px_rgba(4,120,87,0.08)] dark:shadow-none border border-emerald-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2.5 md:gap-3 hover:border-emerald-300 dark:hover:border-emerald-900/50 transition-all text-center h-full group active:scale-[0.97] duration-200"
+          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-emerald-50/50 dark:from-neutral-900 dark:to-emerald-950/20 p-3 md:p-4 rounded-2xl shadow-[0_2px_12px_-2px_rgba(4,120,87,0.08)] dark:shadow-none border border-emerald-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-2.5 hover:border-emerald-300 dark:hover:border-emerald-900/50 transition-all text-center h-full group active:scale-[0.97] duration-200"
         >
-          <div className="absolute top-0 right-0 w-14 h-14 md:w-20 md:h-20 bg-gradient-to-br from-emerald-100/30 to-transparent dark:from-emerald-900/10 rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-
-          <div className="w-11 h-11 md:w-13 md:h-13 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-emerald-100 dark:border-neutral-700 flex items-center justify-center text-emerald-700 dark:text-emerald-500 group-hover:scale-105 transition-transform relative z-10">
+          <div className="absolute top-0 right-0 w-10 h-10 md:w-16 md:h-16 bg-gradient-to-br from-emerald-100/30 to-transparent dark:from-emerald-900/10 rounded-bl-3xl -mr-3 -mt-3 transition-transform group-hover:scale-110"></div>
+          <div className="w-9 h-9 md:w-11 md:h-11 bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-emerald-100 dark:border-neutral-700 flex items-center justify-center text-emerald-700 dark:text-emerald-500 group-hover:scale-105 transition-transform relative z-10">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.8}
               stroke="currentColor"
-              className="w-5 h-5 md:w-6 md:h-6"
+              className="w-4.5 h-4.5 md:w-5 md:h-5"
             >
               <path
                 strokeLinecap="round"
@@ -198,27 +201,50 @@ const Dashboard: React.FC<DashboardProps> = ({
               />
             </svg>
           </div>
-          <div className="relative z-10">
-            <h3 className="font-extrabold text-[13px] md:text-base text-neutral-800 dark:text-neutral-200 leading-tight group-hover:text-emerald-700 dark:group-hover:text-emerald-500 transition-colors">
-              মক পরীক্ষা
-            </h3>
-          </div>
+          <h3 className="relative z-10 font-extrabold text-[11px] md:text-sm text-neutral-800 dark:text-neutral-200 leading-tight group-hover:text-emerald-700 dark:group-hover:text-emerald-500 transition-colors">
+            মক পরীক্ষা
+          </h3>
         </button>
 
         <button
-          onClick={onHistoryClick}
-          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-neutral-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-4 md:p-5 rounded-2xl shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 flex flex-col justify-center items-center gap-2.5 md:gap-3 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all text-center h-full group active:scale-[0.97] duration-200"
+          onClick={onPracticeClick}
+          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-emerald-50/50 dark:from-neutral-900 dark:to-emerald-950/20 p-3 md:p-4 rounded-2xl shadow-[0_2px_12px_-2px_rgba(4,120,87,0.08)] dark:shadow-none border border-emerald-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-2.5 hover:border-emerald-300 dark:hover:border-emerald-900/50 transition-all text-center h-full group active:scale-[0.97] duration-200"
         >
-          <div className="absolute top-0 right-0 w-14 h-14 md:w-20 md:h-20 bg-gradient-to-br from-neutral-100/30 to-transparent rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-
-          <div className="w-11 h-11 md:w-13 md:h-13 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-neutral-100 dark:border-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-400 group-hover:scale-105 transition-transform relative z-10">
+          <div className="absolute top-0 right-0 w-10 h-10 md:w-16 md:h-16 bg-gradient-to-br from-emerald-100/30 to-transparent dark:from-emerald-900/10 rounded-bl-3xl -mr-3 -mt-3 transition-transform group-hover:scale-110"></div>
+          <div className="w-9 h-9 md:w-11 md:h-11 bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-emerald-100 dark:border-neutral-700 flex items-center justify-center text-emerald-700 dark:text-emerald-500 group-hover:scale-105 transition-transform relative z-10">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.8}
               stroke="currentColor"
-              className="w-5 h-5 md:w-6 md:h-6"
+              className="w-4.5 h-4.5 md:w-5 md:h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25"
+              />
+            </svg>
+          </div>
+          <h3 className="relative z-10 font-extrabold text-[11px] md:text-sm text-neutral-800 dark:text-neutral-200 leading-tight group-hover:text-emerald-700 dark:group-hover:text-emerald-500 transition-colors">
+            অনুশীলন
+          </h3>
+        </button>
+
+        <button
+          onClick={onHistoryClick}
+          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-neutral-50/80 dark:from-neutral-900 dark:to-neutral-800/50 p-3 md:p-4 rounded-2xl shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border border-neutral-100 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-2.5 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all text-center h-full group active:scale-[0.97] duration-200"
+        >
+          <div className="absolute top-0 right-0 w-10 h-10 md:w-16 md:h-16 bg-gradient-to-br from-neutral-100/30 to-transparent rounded-bl-3xl -mr-3 -mt-3 transition-transform group-hover:scale-110"></div>
+          <div className="w-9 h-9 md:w-11 md:h-11 bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-400 group-hover:scale-105 transition-transform relative z-10">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.8}
+              stroke="currentColor"
+              className="w-4.5 h-4.5 md:w-5 md:h-5"
             >
               <path
                 strokeLinecap="round"
@@ -227,27 +253,24 @@ const Dashboard: React.FC<DashboardProps> = ({
               />
             </svg>
           </div>
-          <div className="relative z-10">
-            <h3 className="font-extrabold text-[13px] md:text-base text-neutral-800 dark:text-neutral-200 leading-tight group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
-              ইতিহাস
-            </h3>
-          </div>
+          <h3 className="relative z-10 font-extrabold text-[11px] md:text-sm text-neutral-800 dark:text-neutral-200 leading-tight group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
+            ইতিহাস
+          </h3>
         </button>
 
         <button
           onClick={onLeaderboardClick}
-          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-emerald-50/80 dark:from-neutral-900 dark:to-emerald-950/20 p-4 md:p-5 rounded-2xl shadow-[0_2px_12px_-2px_rgba(126,34,206,0.06)] dark:shadow-none border border-emerald-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2.5 md:gap-3 hover:border-emerald-300 dark:hover:border-emerald-900/50 transition-all text-center h-full group active:scale-[0.97] duration-200"
+          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-emerald-50/80 dark:from-neutral-900 dark:to-emerald-950/20 p-3 md:p-4 rounded-2xl shadow-[0_2px_12px_-2px_rgba(126,34,206,0.06)] dark:shadow-none border border-emerald-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-2.5 hover:border-emerald-300 dark:hover:border-emerald-900/50 transition-all text-center h-full group active:scale-[0.97] duration-200"
         >
-          <div className="absolute top-0 right-0 w-14 h-14 md:w-20 md:h-20 bg-gradient-to-br from-emerald-100/20 to-transparent dark:from-emerald-900/10 rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-
-          <div className="w-11 h-11 md:w-13 md:h-13 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-emerald-100 dark:border-neutral-700 flex items-center justify-center text-emerald-700 dark:text-emerald-400 group-hover:scale-105 transition-transform relative z-10">
+          <div className="absolute top-0 right-0 w-10 h-10 md:w-16 md:h-16 bg-gradient-to-br from-emerald-100/20 to-transparent dark:from-emerald-900/10 rounded-bl-3xl -mr-3 -mt-3 transition-transform group-hover:scale-110"></div>
+          <div className="w-9 h-9 md:w-11 md:h-11 bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-emerald-100 dark:border-neutral-700 flex items-center justify-center text-emerald-700 dark:text-emerald-400 group-hover:scale-105 transition-transform relative z-10">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.8}
               stroke="currentColor"
-              className="w-5 h-5 md:w-6 md:h-6"
+              className="w-4.5 h-4.5 md:w-5 md:h-5"
             >
               <path
                 strokeLinecap="round"
@@ -256,27 +279,24 @@ const Dashboard: React.FC<DashboardProps> = ({
               />
             </svg>
           </div>
-          <div className="relative z-10">
-            <h3 className="font-extrabold text-[13px] md:text-base text-neutral-800 dark:text-neutral-200 leading-tight group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
-              লিডারবোর্ড
-            </h3>
-          </div>
+          <h3 className="relative z-10 font-extrabold text-[11px] md:text-sm text-neutral-800 dark:text-neutral-200 leading-tight group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+            লিডারবোর্ড
+          </h3>
         </button>
 
         <button
           onClick={onAnalysisClick}
-          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-emerald-50/80 dark:from-neutral-900 dark:to-emerald-950/20 p-4 md:p-5 rounded-2xl shadow-[0_2px_12px_-2px_rgba(5,150,105,0.08)] dark:shadow-none border border-emerald-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2.5 md:gap-3 hover:border-emerald-300 dark:hover:border-emerald-900/50 transition-all text-center h-full group active:scale-[0.97] duration-200"
+          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-emerald-50/80 dark:from-neutral-900 dark:to-emerald-950/20 p-3 md:p-4 rounded-2xl shadow-[0_2px_12px_-2px_rgba(5,150,105,0.08)] dark:shadow-none border border-emerald-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-2.5 hover:border-emerald-300 dark:hover:border-emerald-900/50 transition-all text-center h-full group active:scale-[0.97] duration-200"
         >
-          <div className="absolute top-0 right-0 w-14 h-14 md:w-20 md:h-20 bg-gradient-to-br from-emerald-100/20 to-transparent dark:from-emerald-900/10 rounded-bl-3xl -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-
-          <div className="w-11 h-11 md:w-13 md:h-13 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-emerald-100 dark:border-neutral-700 flex items-center justify-center text-emerald-700 dark:text-emerald-500 group-hover:scale-105 transition-transform relative z-10">
+          <div className="absolute top-0 right-0 w-10 h-10 md:w-16 md:h-16 bg-gradient-to-br from-emerald-100/20 to-transparent dark:from-emerald-900/10 rounded-bl-3xl -mr-3 -mt-3 transition-transform group-hover:scale-110"></div>
+          <div className="w-9 h-9 md:w-11 md:h-11 bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-emerald-100 dark:border-neutral-700 flex items-center justify-center text-emerald-700 dark:text-emerald-500 group-hover:scale-105 transition-transform relative z-10">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.8}
               stroke="currentColor"
-              className="w-5 h-5 md:w-6 md:h-6"
+              className="w-4.5 h-4.5 md:w-5 md:h-5"
             >
               <path
                 strokeLinecap="round"
@@ -290,11 +310,40 @@ const Dashboard: React.FC<DashboardProps> = ({
               />
             </svg>
           </div>
-          <div className="relative z-10">
-            <h3 className="font-extrabold text-[13px] md:text-base text-neutral-800 dark:text-neutral-200 leading-tight group-hover:text-emerald-700 dark:group-hover:text-emerald-500 transition-colors">
-              এনালাইসিস
-            </h3>
+          <h3 className="relative z-10 font-extrabold text-[11px] md:text-sm text-neutral-800 dark:text-neutral-200 leading-tight group-hover:text-emerald-700 dark:group-hover:text-emerald-500 transition-colors">
+            এনালাইসিস
+          </h3>
+        </button>
+
+        <button
+          onClick={onBlogClick}
+          className="col-span-1 relative overflow-hidden bg-gradient-to-br from-white to-emerald-50/80 dark:from-neutral-900 dark:to-emerald-950/20 p-3 md:p-4 rounded-2xl shadow-[0_2px_12px_-2px_rgba(5,150,105,0.08)] dark:shadow-none border border-emerald-100/50 dark:border-neutral-800 flex flex-col justify-center items-center gap-2 md:gap-2.5 hover:border-emerald-300 dark:hover:border-emerald-900/50 transition-all text-center h-full group active:scale-[0.97] duration-200"
+        >
+          <div className="absolute top-0 right-0 w-10 h-10 md:w-16 md:h-16 bg-gradient-to-br from-emerald-100/20 to-transparent dark:from-emerald-900/10 rounded-bl-3xl -mr-3 -mt-3 transition-transform group-hover:scale-110"></div>
+          <div className="w-9 h-9 md:w-11 md:h-11 bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-emerald-100 dark:border-neutral-700 flex items-center justify-center text-emerald-700 dark:text-emerald-500 group-hover:scale-105 transition-transform relative z-10">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.8}
+              stroke="currentColor"
+              className="w-4.5 h-4.5 md:w-5 md:h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.625-12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-3.75 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+              />
+            </svg>
           </div>
+          <h3 className="relative z-10 font-extrabold text-[11px] md:text-sm text-neutral-800 dark:text-neutral-200 leading-tight group-hover:text-emerald-700 dark:group-hover:text-emerald-500 transition-colors">
+            ব্লগ
+          </h3>
         </button>
       </div>
 

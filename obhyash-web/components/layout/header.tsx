@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/admin/notifications/notification-dropdown';
 import { usePathname, useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@/lib/utils/supabase';
+import { createClient } from '@/utils/supabase/client';
 import { getUserProfile } from '@/services/database';
 import { UserProfile } from '@/lib/types';
 import Link from 'next/link';
@@ -33,7 +33,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   // Load Theme Preference from LocalStorage
   useLayoutEffect(() => {

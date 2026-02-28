@@ -1,6 +1,6 @@
-import { supabase } from '@/lib/utils/supabase';
+import { createClient } from '@/utils/supabase/client';
 
-export { supabase };
+export const supabase = createClient();
 
 export const isSupabaseConfigured = () =>
   !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
