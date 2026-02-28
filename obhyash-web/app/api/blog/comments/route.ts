@@ -20,7 +20,9 @@ export async function GET(request: NextRequest) {
     // Fetch comments and join with the users table to get name and avatar info
     const { data: comments, error } = await supabase
       .from('blog_comments')
-      .select('*, user:user_id(name, avatarUrl, avatarColor)')
+      .select(
+        '*, user:user_id(name, avatarUrl:avatar_url, avatarColor:avatar_color)',
+      )
       .eq('post_slug', slug)
       .order('created_at', { ascending: false }); // Newest first
 
@@ -71,7 +73,9 @@ export async function POST(request: NextRequest) {
         user_id: user.id,
         content: content.trim(),
       })
-      .select('*, user:user_id(name, avatarUrl, avatarColor)')
+      .select(
+        '*, user:user_id(name, avatarUrl:avatar_url, avatarColor:avatar_color)',
+      )
       .single();
 
     if (insertError) throw insertError;
