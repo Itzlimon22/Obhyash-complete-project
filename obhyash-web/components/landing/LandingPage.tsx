@@ -4,12 +4,15 @@ import dynamic from 'next/dynamic';
 
 // Next.js dynamic import lazy-loads heavy components (like LaTeX/ReactMarkdown)
 // This strictly separates the heavy math syntax parsing JS from the main page bundle.
-const LatexText = dynamic(() => import('@/components/student/ui/LatexText'), {
-  ssr: false,
-  loading: () => (
-    <div className="h-4 w-3/4 animate-pulse bg-neutral-200 dark:bg-neutral-800 rounded"></div>
-  ),
-});
+const LatexText = dynamic(
+  () => import('@/components/student/ui/common/LatexText'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-4 w-3/4 animate-pulse bg-neutral-200 dark:bg-neutral-800 rounded"></div>
+    ),
+  },
+);
 import {
   History,
   Moon,

@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import DeleteConfirmModal from '@/components/student/ui/common/DeleteConfirmModal';
 import { ExamResult, Question } from '@/lib/types';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
-import LatexText from '@/components/student/ui/LatexText';
+import LatexText from '@/components/student/ui/common/LatexText';
 import QuestionCard from '@/components/student/ui/exam/QuestionCard';
 
 interface ExamHistoryViewProps {

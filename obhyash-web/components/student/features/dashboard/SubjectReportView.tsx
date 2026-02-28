@@ -15,7 +15,7 @@ import { ExamResult } from '@/lib/types';
 import { getSubjectAnalysis, SubjectAnalysis } from '@/services/database';
 import { printSubjectReport } from '@/services/print-service';
 import { supabase } from '@/services/core';
-import LatexText from '@/components/student/ui/LatexText';
+import LatexText from '@/components/student/ui/common/LatexText';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 
 interface SubjectReportViewProps {

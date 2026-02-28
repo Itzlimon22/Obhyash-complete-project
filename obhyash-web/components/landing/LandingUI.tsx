@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import LatexText from '@/components/student/ui/LatexText';
+import LatexText from '@/components/student/ui/common/LatexText';
 import { CheckCircle } from 'lucide-react';
 
 interface LandingPageProps {
