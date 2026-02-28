@@ -56,6 +56,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [results, setResults] = useState<FlashcardResult[]>([]);
   const [direction, setDirection] = useState(1);
+  const [isExplanationOpen, setIsExplanationOpen] = useState(false);
 
   const current = questions[currentIndex];
   const total = questions.length;
@@ -96,6 +97,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
     setCurrentIndex((i) => i + 1);
     setPhase('selecting');
     setSelectedIdx(null);
+    setIsExplanationOpen(false);
   }, [
     selectedIdx,
     correctIndex,
@@ -117,6 +119,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
     setCurrentIndex((i) => i - 1);
     setSelectedIdx(prevResult.selectedIndex);
     setPhase('revealed');
+    setIsExplanationOpen(false);
   }, [currentIndex, results]);
 
   // Option styling mirrored from QuestionCard
@@ -230,7 +233,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
 
       {/* ── Card ── */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-2 md:px-4 pt-4 pb-24">
+        <div className="max-w-3xl mx-auto px-2 md:px-4 pt-4 pb-40">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={currentIndex}
@@ -332,36 +335,83 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                     })}
                   </div>
 
-                  {/* Explanation — shown after answering, same as QuestionCard */}
-                  <AnimatePresence>
+                  {/* Explanation — unified collapsible design */}
+                  <AnimatePresence initial={false}>
                     {phase === 'revealed' && current.explanation && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-3 md:mt-6 pt-3 md:pt-4 border-t border-neutral-100 dark:border-neutral-800"
-                      >
-                        <div className="bg-emerald-50 dark:bg-emerald-900/10 p-2.5 md:p-4 rounded-md md:rounded-xl border border-emerald-100 dark:border-emerald-800/30">
-                          <h4 className="text-[10px] md:text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1.5 md:mb-2 flex items-center gap-1.5 md:gap-2">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                              className="w-3.5 h-3.5 md:w-4 md:h-4"
+                      <div className="mt-4 md:mt-6 border-t border-neutral-100 dark:border-neutral-800 pt-4">
+                        <div
+                          className={`
+                            rounded-xl overflow-hidden transition-all duration-300
+                            ${isExplanationOpen ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/60' : 'bg-neutral-50/80 dark:bg-[#1c1c1c] border-neutral-200/80 dark:border-[#333]'}
+                            border
+                          `}
+                        >
+                          {/* Header / Toggle Row */}
+                          <button
+                            onClick={() =>
+                              setIsExplanationOpen(!isExplanationOpen)
+                            }
+                            className="w-full flex items-center justify-between p-3 md:px-4 md:py-3.5 transition-colors hover:bg-emerald-100/20 dark:hover:bg-emerald-900/20"
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                              <span className="text-[14px] md:text-[15px] font-extrabold text-emerald-700 dark:text-emerald-400">
+                                সঠিক উত্তর :{' '}
+                                {BANGLA_INDICES[
+                                  current.correctAnswerIndex ?? 0
+                                ] || ''}
+                              </span>
+                            </div>
+                            <div
+                              className="text-emerald-600 dark:text-emerald-400 p-1 rounded-lg border border-emerald-200/60 dark:border-emerald-800/60 shadow-sm bg-white dark:bg-neutral-800 transition-transform duration-300"
+                              style={{
+                                transform: isExplanationOpen
+                                  ? 'rotate(180deg)'
+                                  : 'rotate(0deg)',
+                              }}
                             >
-                              <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                              <path
-                                fillRule="evenodd"
-                                d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            ব্যাখ্যা
-                          </h4>
-                          <div className="text-[13px] md:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif-exam">
-                            <LatexText text={current.explanation} />
-                          </div>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="m6 9 6 6 6-6" />
+                              </svg>
+                            </div>
+                          </button>
+
+                          {/* Collapsible Content */}
+                          <AnimatePresence initial={false}>
+                            {isExplanationOpen && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{
+                                  type: 'spring',
+                                  stiffness: 300,
+                                  damping: 30,
+                                }}
+                              >
+                                <div className="px-4 pb-4 md:px-5 md:pb-5 pt-1 border-t border-emerald-200/50 dark:border-emerald-800/30">
+                                  <div className="text-[14px] md:text-[15px] text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif-exam mt-3">
+                                    <LatexText
+                                      text={current.explanation || ''}
+                                      className="text-[14px] md:text-[15px]"
+                                    />
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
-                      </motion.div>
+                      </div>
                     )}
                   </AnimatePresence>
                 </div>
@@ -372,7 +422,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
       </div>
 
       {/* ── Fixed bottom navigation bar ── */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 z-50">
+      <div className="fixed bottom-0 left-0 right-0 p-4 pb-[max(1rem,env(safe-area-inset-bottom)+0.5rem)] bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md border-t border-neutral-200 dark:border-neutral-800 z-[60] shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
         <div className="max-w-3xl mx-auto flex items-center gap-3">
           {/* Previous Button */}
           <button

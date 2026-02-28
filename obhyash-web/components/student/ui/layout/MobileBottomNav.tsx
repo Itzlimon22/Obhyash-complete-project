@@ -62,15 +62,17 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               </button>
             </div>
           ) : (
-            <button
-              onClick={onSubmit}
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-extrabold text-[14px] py-3 px-6 rounded-xl shadow-lg shadow-red-600/20 active:scale-[0.96] transition-all flex items-center justify-center gap-2.5"
-            >
-              <div className="w-5 h-5 flex items-center justify-center bg-white/20 rounded-full">
-                <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-              </div>
-              পরীক্ষা শেষ করো
-            </button>
+            <div className="flex justify-end flex-1">
+              <button
+                onClick={onSubmit}
+                className="w-auto bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-[13px] py-2.5 px-5 rounded-xl shadow-lg shadow-emerald-900/20 active:scale-[0.96] transition-all flex items-center justify-center gap-2"
+              >
+                <div className="w-4 h-4 flex items-center justify-center bg-white/20 rounded-full">
+                  <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                </div>
+                পরীক্ষা শেষ করো
+              </button>
+            </div>
           )}
           <button
             onClick={onMenuClick}

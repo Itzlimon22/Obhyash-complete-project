@@ -167,13 +167,13 @@ export default function QuestionCard({
       </div>
 
       {/* ── Options grid ── */}
-<div
-  className={`
+      <div
+        className={`
     px-4 pb-4 md:px-6 md:pb-5
     grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3 items-stretch
     ${readOnly || isOmrMode ? 'pointer-events-none' : ''}
   `}
->
+      >
         {question.options.map((option, idx) => {
           const isSelected = selectedOptionIndex === idx;
           const isCorrect = idx === question.correctAnswerIndex;
@@ -268,54 +268,54 @@ export default function QuestionCard({
 
       {/* ── Explanation ── */}
       {showFeedback && question.explanation && (
-        <div className="mx-2 mb-3 md:mx-5 md:mb-5 animate-fade-in">
+        <div className="mx-2 mb-3 md:mx-5 md:mb-5">
           <div
-            className="
-              rounded-xl overflow-hidden
-              bg-neutral-50/80 dark:bg-[#1c1c1c]
-              border border-neutral-200/80 dark:border-[#333]
-            "
+            className={`
+              rounded-xl overflow-hidden transition-all duration-300
+              ${isExplanationOpen ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/60' : 'bg-neutral-50/80 dark:bg-[#1c1c1c] border-neutral-200/80 dark:border-[#333]'}
+              border
+            `}
           >
-            {/* Toggle Button - Minimal Header */}
+            {/* Header / Toggle Row */}
             <button
               onClick={() => setIsExplanationOpen(!isExplanationOpen)}
-              className="w-full flex items-center justify-end p-2 transition-colors hover:bg-emerald-100/30 dark:hover:bg-emerald-900/20"
+              className="w-full flex items-center justify-between p-3 md:px-4 md:py-3.5 transition-colors hover:bg-emerald-100/20 dark:hover:bg-emerald-900/20"
             >
-              <div className="text-emerald-600 dark:text-emerald-400 p-1 rounded-md border border-emerald-200/60 dark:border-emerald-800/60 shadow-sm bg-white/50 dark:bg-neutral-800/50">
-                {isExplanationOpen ? (
-                  <ChevronUp className="w-4 h-4" />
-                ) : (
-                  <ChevronDown className="w-4 h-4" />
-                )}
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[14px] md:text-[15px] font-extrabold text-emerald-700 dark:text-emerald-400">
+                  সঠিক উত্তর :{' '}
+                  {BANGLA_INDICES[question.correctAnswerIndex ?? 0] || ''}
+                </span>
+              </div>
+              <div
+                className="text-emerald-600 dark:text-emerald-400 p-1 rounded-lg border border-emerald-200/60 dark:border-emerald-800/60 shadow-sm bg-white dark:bg-neutral-800 transition-transform duration-300"
+                style={{
+                  transform: isExplanationOpen
+                    ? 'rotate(180deg)'
+                    : 'rotate(0deg)',
+                }}
+              >
+                <ChevronDown className="w-4 h-4" />
               </div>
             </button>
 
             {/* Collapsible Content */}
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
               {isExplanationOpen && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="px-4 pb-4 md:px-5 md:pb-5 pt-1 bg-emerald-50/50 dark:bg-emerald-900/10 border-t border-emerald-200 dark:border-emerald-800/60"
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 >
-                  <div className="text-[14px] md:text-[15px] text-neutral-700 dark:text-neutral-300 leading-[1.4] font-serif-exam mt-2">
-                    {question.correctAnswerIndex !== undefined && (
-                      <div className="font-extrabold text-emerald-700 dark:text-emerald-400 text-base mb-3 pb-2 border-b border-emerald-200/50 dark:border-emerald-800/30">
-                        সঠিক উত্তর :{' '}
-                        {BANGLA_INDICES[question.correctAnswerIndex] || ''}
-                      </div>
-                    )}
-                    {question.explanation && (
-                      <div className="font-bold text-neutral-900 dark:text-neutral-100 mb-2">
-                        ব্যাখ্যা :
-                      </div>
-                    )}
-                    <LatexText
-                      text={question.explanation || ''}
-                      className="text-[14px] md:text-[15px]"
-                    />
+                  <div className="px-4 pb-4 md:px-5 md:pb-5 pt-1 border-t border-emerald-200/50 dark:border-emerald-800/30">
+                    <div className="text-[14px] md:text-[15px] text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif-exam mt-3">
+                      <LatexText
+                        text={question.explanation || ''}
+                        className="text-[14px] md:text-[15px]"
+                      />
+                    </div>
                   </div>
                 </motion.div>
               )}
