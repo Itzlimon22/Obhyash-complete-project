@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 // ✅ Import the specific fonts you requested
 import { Inter } from 'next/font/google';
 import './globals.css';
@@ -48,25 +49,26 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased overflow-x-hidden selection:bg-brand-500/30 bg-paper-50 text-paper-900 dark:bg-paper-900 dark:text-paper-50 font-sans">
-        <AuthProvider>
-          {/* Render the application */}
-          {children}
+        <Suspense fallback={null}>
+          <AuthProvider>
+            {children}
 
-          {/* ✅ Render the Toast Container (Overlay) */}
-          <Toaster
-            position="top-center"
-            richColors
-            expand={true}
-            closeButton
-            theme="light"
-            toastOptions={{
-              className: 'font-anek',
-              style: {
-                borderRadius: '1rem',
-              },
-            }}
-          />
-        </AuthProvider>
+            {/* ✅ Render the Toast Container (Overlay) */}
+            <Toaster
+              position="top-center"
+              richColors
+              expand={true}
+              closeButton
+              theme="light"
+              toastOptions={{
+                className: 'font-anek',
+                style: {
+                  borderRadius: '1rem',
+                },
+              }}
+            />
+          </AuthProvider>
+        </Suspense>
       </body>
     </html>
   );

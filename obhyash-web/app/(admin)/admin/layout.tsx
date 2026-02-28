@@ -7,8 +7,8 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClientLayout>
-      <Suspense fallback={null}>{children}</Suspense>
-    </ClientLayout>
+    <Suspense fallback={null}>
+      <ClientLayout>{children}</ClientLayout>
+    </Suspense>
   );
 }
