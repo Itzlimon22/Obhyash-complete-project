@@ -602,6 +602,12 @@ export const bulkCreateQuestions = async (
           chapter: q.chapter,
         });
 
+        const isValidUUID = (id: any) =>
+          typeof id === 'string' &&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            id,
+          );
+
         return {
           question: q.question,
           options: q.options || [],
@@ -610,11 +616,11 @@ export const bulkCreateQuestions = async (
           type: q.type || 'MCQ',
           difficulty: q.difficulty || 'Medium',
           subject: q.subject,
-          subject_id: q.subjectId, // From Relational Taxonomy
+          subject_id: isValidUUID(q.subjectId) ? q.subjectId : null,
           chapter: q.chapter,
-          chapter_id: q.chapterId, // From Relational Taxonomy
+          chapter_id: isValidUUID(q.chapterId) ? q.chapterId : null,
           topic: q.topic,
-          topic_id: q.topicId, // From Relational Taxonomy
+          topic_id: isValidUUID(q.topicId) ? q.topicId : null,
           stream: q.stream,
           division: q.division,
           section: q.section,
