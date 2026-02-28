@@ -63,6 +63,8 @@ export default function BulkEmailModal({
       // OR better: Just call a single RPC if it existed.
       // I'll opt to fetch emails then insert.
 
+      type User = { id: string; email: string };
+
       const { data: users, error: userError } = await supabase
         .from('users')
         .select('id, email')
@@ -77,7 +79,7 @@ export default function BulkEmailModal({
       const { error: insertError } = await supabase
         .from('email_notifications')
         .insert(
-          users.map((u) => ({
+          (users as User[]).map((u: User) => ({
             user_id: u.id,
             recipient_email: u.email,
             subject,
