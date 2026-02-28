@@ -236,6 +236,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                     })
                   }
                   isOmrMode={isOmrMode}
+                  hideMetadata={true}
                 />
               );
             })}

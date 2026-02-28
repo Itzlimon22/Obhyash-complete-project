@@ -30,6 +30,14 @@ const renderLatex = (text: string): string => {
     .join('');
 };
 
+// Restored Image Helper (Critical for questions with diagrams)
+const renderImage = (imageUrl?: string) => {
+  if (!imageUrl) return '';
+  return `<div style="margin: 10px 0; text-align: center;">
+            <img src="${imageUrl}" style="max-width: 100%; max-height: 200px; border: 1px solid #eee; border-radius: 4px;" alt="Question Image" />
+          </div>`;
+};
+
 // Helper to render question metadata (Institutes and Years)
 const renderQuestionMeta = (q: Question): string => {
   const years =
@@ -729,7 +737,3 @@ export const printInvoice = (invoice: Invoice, user: UserProfile) => {
   printWindow.document.write(htmlContent);
   printWindow.document.close();
 };
-function renderImage(imageUrl: string | undefined) {
-  throw new Error('Function not implemented.');
-}
-

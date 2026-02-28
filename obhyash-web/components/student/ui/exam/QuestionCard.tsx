@@ -19,6 +19,7 @@ interface QuestionCardProps {
   showAnswer?: boolean;
   isBookmarked?: boolean;
   onToggleBookmark?: () => void;
+  hideMetadata?: boolean;
 }
 
 const BANGLA_INDICES = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ'];
@@ -36,6 +37,7 @@ export default function QuestionCard({
   showAnswer = false,
   isBookmarked = false,
   onToggleBookmark,
+  hideMetadata = false,
 }: QuestionCardProps) {
   const isAnswered = selectedOptionIndex !== undefined;
   const [isExplanationOpen, setIsExplanationOpen] = useState(showFeedback);
@@ -88,20 +90,21 @@ export default function QuestionCard({
         {/* Tags + action buttons row */}
         <div className="flex items-center justify-end gap-2 flex-wrap">
           {/* Institute/year tags */}
-          {tags.map((tag, i) => (
-            <span
-              key={i}
-              className="
+          {!hideMetadata &&
+            tags.map((tag, i) => (
+              <span
+                key={i}
+                className="
                 inline-flex items-center text-[11px] font-semibold
                 px-2.5 py-0.5 rounded-sm
                 bg-[#e8f4f0] text-[#1a7a5a]
                 dark:bg-[#0d3326] dark:text-[#4ecca3]
                 tracking-wide
               "
-            >
-              {tag}
-            </span>
-          ))}
+              >
+                {tag}
+              </span>
+            ))}
 
           {/* Bookmark button */}
           <motion.button
