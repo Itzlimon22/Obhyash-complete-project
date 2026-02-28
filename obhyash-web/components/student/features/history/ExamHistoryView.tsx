@@ -220,7 +220,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
 
   const stats = useMemo(() => {
     const ev = filteredHistory.filter(
-      (h) => !h.status || h.status === 'evaluated',
+      (h) => (!h.status || h.status === 'evaluated') && h.totalMarks > 0,
     );
     const total = ev.length;
     const avgScore =
@@ -390,7 +390,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   return (
     <div className="min-h-screen bg-[#f5f5f5] dark:bg-[#0e0e0e] transition-colors pb-28 md:pb-10">
       {/* ── Android-style top app bar (mobile) / Desktop header ── */}
-      <header className="sticky top-0 z-30 bg-white dark:bg-[#161616] border-b border-neutral-200 dark:border-neutral-800 shadow-sm overflow-x-auto hide-scrollbar">
+      <header className="bg-white dark:bg-[#161616] border-b border-neutral-200 dark:border-neutral-800 shadow-sm overflow-x-auto hide-scrollbar">
         <div className="max-w-6xl mx-auto px-2 md:px-4 py-2 md:py-0 md:h-16 flex items-center justify-start md:justify-end gap-3 min-w-max w-fit md:w-full">
           {/* Tab strip */}
           <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 rounded-xl p-1">
@@ -636,7 +636,6 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                               {item.subjectLabel || item.subject}
                             </p>
                             <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium truncate">
-                              {item.examType || 'Practice Exam'} •{' '}
                               {formatDate(item.date)}
                             </p>
                             {!isPending && !isRejected && (
@@ -706,9 +705,6 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                             <h3 className="text-[17px] font-black text-neutral-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors leading-tight line-clamp-2">
                               {item.subjectLabel || item.subject}
                             </h3>
-                            <p className="text-xs text-neutral-400 dark:text-neutral-500 font-semibold mt-0.5">
-                              {item.examType || 'Practice Exam'}
-                            </p>
                           </div>
                           {!isPending && !isRejected && (
                             <ScoreRing percent={scorePercent} size={36} />

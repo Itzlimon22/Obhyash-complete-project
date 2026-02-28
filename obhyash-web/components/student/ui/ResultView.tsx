@@ -151,13 +151,13 @@ const ResultView: React.FC<ResultViewProps> = ({
   }, [correctCount, questions.length, isHistoryMode]);
 
   return (
-    <div className="max-w-5xl mx-auto px-2 md:px-4 py-8 animate-fade-in pb-20 relative">
+    <div className="max-w-5xl mx-auto px-2 md:px-4 pt-4 pb-20 animate-fade-in relative">
       {/* Header Section */}
-      <div className="text-center mb-8 mt-8">
-        <h2 className="text-2xl md:text-4xl font-bold text-neutral-900 dark:text-white mb-3">
+      <div className="text-center mb-6 mt-2">
+        <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white mb-2">
           {feedback.title}
         </h2>
-        <p className="text-neutral-600 dark:text-neutral-300 text-base md:text-xl">
+        <p className="text-neutral-600 dark:text-neutral-300 text-sm md:text-base">
           {feedback.text}
         </p>
 
@@ -183,11 +183,11 @@ const ResultView: React.FC<ResultViewProps> = ({
             </div>
           )}
 
-        <div className="flex flex-wrap justify-center gap-3 mt-4">
+        <div className="flex flex-col items-center gap-2 mt-5 sm:max-w-sm mx-auto">
           {onDownloadQuestionPaper && (
             <button
               onClick={onDownloadQuestionPaper}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-emerald-600 dark:text-emerald-400 rounded-lg text-sm font-bold hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors border border-neutral-200 dark:border-neutral-700"
+              className="w-full flex justify-center items-center gap-2 px-4 py-2.5 bg-neutral-100 dark:bg-neutral-800 text-emerald-600 dark:text-emerald-400 rounded-lg text-sm font-bold hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors border border-neutral-200 dark:border-neutral-700"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -210,7 +210,7 @@ const ResultView: React.FC<ResultViewProps> = ({
           {onDownloadResultWithExplanations && (
             <button
               onClick={onDownloadResultWithExplanations}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg text-sm font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-100 dark:border-emerald-800"
+              className="w-full flex justify-center items-center gap-2 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg text-sm font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-100 dark:border-emerald-800"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -232,7 +232,7 @@ const ResultView: React.FC<ResultViewProps> = ({
         </div>
       </div>
       {/* Exam Details Section */}
-      <div className="bg-neutral-50 dark:bg-neutral-800/40 border-y sm:border border-neutral-100 dark:border-neutral-800 py-3.5 mb-8 -mx-2 sm:mx-0 px-2 sm:px-4 sm:rounded-2xl flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] sm:text-xs md:text-sm font-bold text-neutral-500 dark:text-neutral-400">
+      <div className="bg-neutral-50 dark:bg-neutral-800/40 border-y sm:border border-neutral-100 dark:border-neutral-800 py-2 mb-6 -mx-2 sm:mx-0 px-2 sm:px-4 sm:rounded-xl flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] sm:text-xs md:text-sm font-bold text-neutral-500 dark:text-neutral-400">
         <div className="flex items-center gap-1.5">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -287,9 +287,9 @@ const ResultView: React.FC<ResultViewProps> = ({
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 mb-12">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-5 mb-8">
         {/* Accuracy */}
-        <div className="bg-white dark:bg-neutral-900 p-3 sm:p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
+        <div className="bg-white dark:bg-neutral-900 p-2.5 sm:p-5 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
           <div className="relative w-16 h-16 sm:w-32 sm:h-32 flex items-center justify-center mb-2 sm:mb-4">
             <svg className="w-full h-full transform -rotate-90">
               <circle
@@ -326,7 +326,7 @@ const ResultView: React.FC<ResultViewProps> = ({
         </div>
 
         {/* Points */}
-        <div className="bg-white dark:bg-neutral-900 p-3 sm:p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
+        <div className="bg-white dark:bg-neutral-900 p-2.5 sm:p-5 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
           <div className="w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center mb-2 sm:mb-4 text-red-600 dark:text-red-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -355,7 +355,7 @@ const ResultView: React.FC<ResultViewProps> = ({
         </div>
 
         {/* Time taken replaced XP gained */}
-        <div className="bg-white dark:bg-neutral-900 p-3 sm:p-6 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
+        <div className="bg-white dark:bg-neutral-900 p-2.5 sm:p-5 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center transition-colors">
           <div className="w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mb-2 sm:mb-4 text-emerald-600 dark:text-emerald-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -382,17 +382,17 @@ const ResultView: React.FC<ResultViewProps> = ({
       </div>
 
       {/* SUMMARY TABLE */}
-      <div className="mb-12 bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden">
-        <div className="px-6 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/40">
-          <h3 className="text-xl font-bold text-neutral-800 dark:text-white">
+      <div className="mb-8 bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden">
+        <div className="px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/40">
+          <h3 className="text-lg font-bold text-neutral-800 dark:text-white">
             ফলাফল বিস্তারিত
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-neutral-100 dark:divide-neutral-800 text-sm md:text-base">
+        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-neutral-100 dark:divide-neutral-800 text-xs sm:text-sm">
           {/* Left Column */}
           <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
-            <div className="flex justify-between items-center px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
+            <div className="flex justify-between items-center px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
               <span className="font-medium text-neutral-600 dark:text-neutral-300">
                 মোট প্রশ্ন
               </span>
@@ -400,7 +400,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                 {questions.length}
               </span>
             </div>
-            <div className="flex justify-between items-center px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
+            <div className="flex justify-between items-center px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
               <span className="font-medium text-neutral-600 dark:text-neutral-300">
                 উত্তর দেওয়া হয়েছে
               </span>
@@ -408,7 +408,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                 {correctCount + wrongCount}
               </span>
             </div>
-            <div className="flex justify-between items-center px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
+            <div className="flex justify-between items-center px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
               <span className="font-medium text-neutral-600 dark:text-neutral-300">
                 উত্তর দেওয়া হয়নি
               </span>
@@ -420,7 +420,7 @@ const ResultView: React.FC<ResultViewProps> = ({
 
           {/* Right Column */}
           <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
-            <div className="flex justify-between items-center px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
+            <div className="flex justify-between items-center px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
               <span className="font-medium text-emerald-600 dark:text-emerald-400">
                 সঠিক উত্তর
               </span>
@@ -428,7 +428,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                 {correctCount}
               </span>
             </div>
-            <div className="flex justify-between items-center px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
+            <div className="flex justify-between items-center px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/20">
               <span className="font-medium text-red-600 dark:text-red-400">
                 ভুল উত্তর
               </span>
@@ -436,7 +436,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                 {wrongCount}
               </span>
             </div>
-            <div className="flex justify-between items-center px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/20 bg-red-50/50 dark:bg-red-900/10">
+            <div className="flex justify-between items-center px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800/20 bg-red-50/50 dark:bg-red-900/10">
               <span className="font-medium text-red-700 dark:text-red-300">
                 নেগেটিভ মার্কিং ({negativeMarking}x)
               </span>
@@ -448,11 +448,11 @@ const ResultView: React.FC<ResultViewProps> = ({
         </div>
 
         {/* Total Score Footer */}
-        <div className="border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/80 dark:bg-neutral-800/40 px-6 py-5 flex justify-between items-center">
-          <span className="font-bold text-lg md:text-xl text-neutral-900 dark:text-white">
+        <div className="border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/80 dark:bg-neutral-800/40 px-4 py-3.5 flex justify-between items-center">
+          <span className="font-bold text-base md:text-lg text-neutral-900 dark:text-white">
             মোট প্রাপ্ত নম্বর
           </span>
-          <span className="font-bold text-lg md:text-xl text-emerald-600 dark:text-emerald-400">
+          <span className="font-bold text-base md:text-lg text-emerald-600 dark:text-emerald-400">
             {finalScore.toFixed(2)} / {totalPoints}
           </span>
         </div>

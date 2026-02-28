@@ -69,7 +69,7 @@ export default function QuestionCard({
       `}
     >
       {/* ── Top section ── */}
-      <div className="px-2 pt-3 pb-2 md:px-5 md:pt-5">
+      <div className="px-1 pt-3 pb-2 md:px-5 md:pt-5">
         {/* Question text row */}
         <div className="flex items-baseline gap-2 mb-2">
           {/* Serial number */}
@@ -169,7 +169,7 @@ export default function QuestionCard({
       {/* ── Options grid ── */}
       <div
         className={`
-          px-2 pb-3 md:px-5 md:pb-4
+          px-1 pb-3 md:px-5 md:pb-4
           grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2.5 items-stretch
           ${readOnly || isOmrMode ? 'pointer-events-none' : ''}
         `}
@@ -226,8 +226,8 @@ export default function QuestionCard({
             <label
               key={idx}
               className={`
-                group relative flex items-start gap-2.5 w-full h-full
-                px-3 py-1.5 rounded-lg border
+                group relative flex items-center gap-2.5 w-full h-full
+                px-3 py-1.5 rounded-md border
                 transition-all duration-200
                 ${isOmrMode || readOnly ? 'cursor-default' : 'cursor-pointer'}
                 ${boxClass}
@@ -247,8 +247,7 @@ export default function QuestionCard({
               {/* Circle badge */}
               <div
                 className={`
-                  w-5 h-5 rounded-full flex items-center justify-center mt-px
-                  shrink-0 transition-all duration-200
+                  w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all duration-200
                   ${iconBg}
                 `}
               >
@@ -272,7 +271,7 @@ export default function QuestionCard({
 
       {/* ── Explanation ── */}
       {showFeedback && question.explanation && (
-        <div className="mx-2 mb-3 md:mx-5 md:mb-5 animate-fade-in">
+        <div className="mx-1 mb-3 md:mx-5 md:mb-5 animate-fade-in">
           <div
             className="
               rounded-xl overflow-hidden
@@ -303,7 +302,7 @@ export default function QuestionCard({
                   </svg>
                 </div>
                 <h4 className="text-[13px] md:text-[14px] font-bold tracking-wide text-neutral-800 dark:text-neutral-200">
-                  সঠিক উত্তর ও ব্যাখ্যা
+                  ব্যাখ্যা
                 </h4>
               </div>
               <div className="text-neutral-400 dark:text-neutral-500 bg-white dark:bg-neutral-800 p-1 rounded-full border border-neutral-200 dark:border-neutral-700 shadow-sm">
@@ -325,26 +324,22 @@ export default function QuestionCard({
                   transition={{ duration: 0.2 }}
                   className="px-4 pb-4 md:px-5 md:pb-5 pt-1 border-t border-neutral-200/60 dark:border-neutral-800/60"
                 >
-                  <div className="text-[13px] md:text-[14px] text-neutral-700 dark:text-neutral-300 leading-[1.4] font-serif-exam mt-2">
+                  <div className="text-[14px] md:text-[15px] text-neutral-700 dark:text-neutral-300 leading-[1.4] font-serif-exam mt-2">
                     {question.correctAnswerIndex !== undefined && (
-                      <div className="mb-2.5 p-2 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800/30 rounded-lg">
-                        <span className="text-emerald-700 dark:text-emerald-400 font-bold block mb-0.5">
-                          সঠিক উত্তর:
-                        </span>
-                        <div className="text-emerald-800 dark:text-emerald-200 font-medium">
-                          <LatexText
-                            text={
-                              question.options[question.correctAnswerIndex] ||
-                              question.correctAnswer ||
-                              ''
-                            }
-                          />
-                        </div>
+                      <div className="font-bold text-emerald-600 dark:text-emerald-500 mb-2">
+                        সঠিক উত্তর :{' '}
+                        {['ক', 'খ', 'গ', 'ঘ'][question.correctAnswerIndex] ||
+                          ''}
+                      </div>
+                    )}
+                    {question.explanation && (
+                      <div className="font-bold text-neutral-800 dark:text-neutral-200 mb-1">
+                        ব্যাখ্যা :
                       </div>
                     )}
                     <LatexText
-                      text={question.explanation}
-                      className="text-[12px] md:text-[13px]"
+                      text={question.explanation || ''}
+                      className="text-[14px] md:text-[15px]"
                     />
                   </div>
                 </motion.div>
