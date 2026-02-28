@@ -99,7 +99,7 @@ export default function BlogListingClient({
   return (
     <>
       {/* ─── Hero Section ─── */}
-      <section className="relative overflow-hidden bg-white dark:bg-[#121212] border-b border-slate-100 dark:border-[#2b2b2b]">
+      <section className="relative overflow-hidden bg-[#FAF6F3] dark:bg-[#121212] border-b border-slate-100 dark:border-[#2b2b2b]">
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
           {/* Pill badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 bg-slate-100 dark:bg-[#202020] text-slate-600 dark:text-slate-300 text-xs font-semibold rounded-full border border-slate-200 dark:border-[#383838] uppercase tracking-wider">
@@ -151,7 +151,7 @@ export default function BlogListingClient({
       </section>
 
       {/* ─── Category Filter ─── */}
-      <div className="sticky top-16 z-40 bg-white/90 dark:bg-[#121212]/90 backdrop-blur-md border-b border-slate-100 dark:border-[#2b2b2b]">
+      <div className="sticky top-16 z-40 bg-[#FAF6F3]/90 dark:bg-[#121212]/90 backdrop-blur-md border-b border-slate-100 dark:border-[#2b2b2b]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 overflow-x-auto">
           <div className="flex items-center gap-2 min-w-max mx-auto justify-start sm:justify-center">
             {categories.map((cat) => (

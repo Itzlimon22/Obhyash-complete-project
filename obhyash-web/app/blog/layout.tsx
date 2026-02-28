@@ -43,7 +43,7 @@ export default function BlogLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-[#121212] text-slate-900 dark:text-slate-100 font-sans tracking-tight">
+    <div className="min-h-screen flex flex-col bg-[#FAF6F3] dark:bg-[#121212] text-slate-900 dark:text-slate-100 font-sans tracking-tight">
       <BlogHeader />
       <main className="flex-1">{children}</main>
       <BlogFooter />

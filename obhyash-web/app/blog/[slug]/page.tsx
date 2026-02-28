@@ -244,7 +244,7 @@ export default async function BlogPostPage({
       <ViewTracker slug={post.slug} />
 
       {/* ─── Post Hero ─── */}
-      <section className="bg-white dark:bg-[#121212]">
+      <section className="bg-[#FAF6F3] dark:bg-[#121212]">
         <div className="relative max-w-6xl mx-auto mt-16 px-4 sm:px-6">
           {/* Breadcrumb */}
           <div className="flex flex-wrap items-center gap-1.5 text-[13px] text-slate-400 dark:text-slate-500 mb-8 font-medium">

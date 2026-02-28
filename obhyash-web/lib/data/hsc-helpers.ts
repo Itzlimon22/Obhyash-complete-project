@@ -191,9 +191,11 @@ export function resolveChapterName(
       );
     });
     if (chapter) return chapter.name;
+    // Do not fall back to global search if subject was explicitly provided
+    return undefined;
   }
 
-  // If not found in subject, search GLOBALLY (this fixes Subject mapping if chapter is unique)
+  // If subject not provided or found, search GLOBALLY
   return findHscChapter(chapterInput)?.chapter.name;
 }
 
@@ -203,7 +205,27 @@ export function resolveTopicName(
   topicInput: string,
 ): string | undefined {
   if (!topicInput) return undefined;
-  return findHscTopic(topicInput, chapterInput)?.topic.name;
+
+  if (chapterInput) {
+    const chapterInfo = findHscChapter(chapterInput);
+    if (chapterInfo) {
+      const norm = normalizeForMatch(topicInput);
+      const topic = chapterInfo.chapter.topics.find((t) => {
+        const tNameNorm = normalizeForMatch(t.name);
+        return (
+          t.id === topicInput ||
+          tNameNorm === norm ||
+          tNameNorm.includes(norm) ||
+          norm.includes(tNameNorm)
+        );
+      });
+      if (topic) return topic.name;
+    }
+    // Do not fall back to global search if chapter was explicitly provided
+    return undefined;
+  }
+
+  return findHscTopic(topicInput)?.topic.name;
 }
 
 /**
@@ -220,41 +242,46 @@ export function resolveTaxonomyHierarchy(
   const chapterInput = chapInp?.trim() || '';
   const topicInput = topInp?.trim() || '';
 
-  // Helper to get subject name from resolved subject object
-  const getSubjectName = (s?: { name: string }) => (s ? s.name : subjectInput);
+  let finalSubject = subjectInput;
+  let finalChapter = chapterInput;
+  let finalTopic = topicInput;
 
-  // 1. Try to resolve via Topic (most specific)
-  if (topicInput) {
-    const topicRes = findHscTopic(topicInput, chapterInput);
-    if (topicRes) {
-      return {
-        subject: topicRes.subject.name,
-        chapter: topicRes.chapter.name,
-        topic: topicRes.topic.name,
-      };
-    }
+  // 1. Try to establish Subject
+  const resolvedSubj = resolveSubjectName(subjectInput);
+  if (resolvedSubj) {
+    finalSubject = resolvedSubj;
   }
 
-  // 2. Resolve Chapter if Topic not found
-  if (chapterInput) {
+  // 2. Try to establish Chapter based on Subject
+  if (finalSubject && chapterInput) {
+    const resolvedChap = resolveChapterName(finalSubject, chapterInput);
+    if (resolvedChap) {
+      finalChapter = resolvedChap;
+    }
+  } else if (!finalSubject && chapterInput) {
+    // Glob search chapter
     const chapRes = findHscChapter(chapterInput);
     if (chapRes) {
-      // Use provided subject if it resolves, otherwise fall back to chapter's subject
-      const subjectName =
-        resolveSubjectName(subjectInput) || chapRes.subject.name;
-      return {
-        subject: subjectName,
-        chapter: chapRes.chapter.name,
-        // Attempt to resolve topic within this chapter; fallback to raw input
-        topic: resolveTopicName(chapRes.chapter.name, topicInput) || topicInput,
-      };
+      finalSubject = chapRes.subject.name;
+      finalChapter = chapRes.chapter.name;
     }
   }
 
-  // 3. Fallback to Subject resolution then Chapter then Topic
-  const subjName = resolveSubjectName(subjectInput) || subjectInput;
-  const chapName = resolveChapterName(subjName, chapterInput) || chapterInput;
-  const topName = resolveTopicName(chapName, topicInput) || topicInput;
+  // 3. Try to establish Topic based on Chapter
+  if (finalChapter && topicInput) {
+    const resolvedTop = resolveTopicName(finalChapter, topicInput);
+    if (resolvedTop) {
+      finalTopic = resolvedTop;
+    }
+  } else if (!finalChapter && topicInput) {
+    // Glob search topic
+    const topRes = findHscTopic(topicInput);
+    if (topRes) {
+      finalSubject = topRes.subject.name;
+      finalChapter = topRes.chapter.name;
+      finalTopic = topRes.topic.name;
+    }
+  }
 
-  return { subject: subjName, chapter: chapName, topic: topName };
+  return { subject: finalSubject, chapter: finalChapter, topic: finalTopic };
 }
