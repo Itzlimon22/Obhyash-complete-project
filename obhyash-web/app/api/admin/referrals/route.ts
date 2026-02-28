@@ -1,10 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, connection } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-
-export const dynamic = 'force-dynamic';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
-export const GET = async (request: NextRequest) => {
+export async function GET(request: NextRequest) {
+  await connection();
   const supabase = await createClient();
   const supabaseAdmin = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -87,4 +86,4 @@ export const GET = async (request: NextRequest) => {
       uniqueReferrers,
     },
   });
-};
+}

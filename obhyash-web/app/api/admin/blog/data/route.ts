@@ -1,10 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, connection } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-
-export const dynamic = 'force-dynamic';
 
 // Fetch all comments or subscribers securely
 export async function GET(request: NextRequest) {
+  await connection();
   try {
     const supabase = await createClient();
     const { searchParams } = new URL(request.url);
@@ -75,6 +74,7 @@ export async function GET(request: NextRequest) {
 
 // Delete an offensive comment
 export async function DELETE(request: NextRequest) {
+  await connection();
   try {
     const supabase = await createClient();
 
