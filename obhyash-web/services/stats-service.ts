@@ -231,6 +231,19 @@ export const getSubjectAnalysis = async (
         dateFilter = new Date('1970-01-01');
       }
 
+      type RawExamRow = {
+        id: any;
+        total_questions: any;
+        correct_count: any;
+        wrong_count: any;
+        time_taken: any;
+        date: any;
+        subject: any;
+        chapters: any;
+        questions: any;
+        user_answers: any;
+      };
+
       const { data: rawData, error: fallbackError } = await supabase
         .from('exam_results')
         .select(
@@ -244,7 +257,7 @@ export const getSubjectAnalysis = async (
         // Filter by subject manually
         const targetLabel = getSubjectDisplayName(subject).toLowerCase();
 
-        const filteredExams = rawData.filter((exam: ExamResult) => {
+        const filteredExams = (rawData as RawExamRow[]).filter((exam) => {
           if (!exam.subject) return false;
 
           // Resolve both the stored subject and the target subject to display names for robust matching
@@ -261,7 +274,7 @@ export const getSubjectAnalysis = async (
             (targetLabel.includes('physics') &&
               storedLabel.includes('পদার্থবিজ্ঞান')) ||
             (targetLabel.includes('chemistry') &&
-              storedLabel.includes('রসায়ন')) ||
+              storedLabel.includes('রসায়ন')) ||
             (targetLabel.includes('math') && storedLabel.includes('গণিত')) ||
             (targetLabel.includes('biology') &&
               storedLabel.includes('জীববিজ্ঞান')) ||
@@ -286,20 +299,20 @@ export const getSubjectAnalysis = async (
           { name: string; total: number; correct: number }
         >();
 
-        filteredExams.forEach((exam: ExamResult) => {
-          totalQuestions += exam.totalQuestions || 0;
-          correct += exam.correctCount || 0;
-          wrong += exam.wrongCount || 0;
-          totalTime += exam.timeTaken || 0;
+        filteredExams.forEach((exam) => {
+          totalQuestions += exam.total_questions || 0;
+          correct += exam.correct_count || 0;
+          wrong += exam.wrong_count || 0;
+          totalTime += exam.time_taken || 0;
           skipped += Math.max(
             0,
-            (exam.totalQuestions || 0) -
-              ((exam.correctCount || 0) + (exam.wrongCount || 0)),
+            (exam.total_questions || 0) -
+              ((exam.correct_count || 0) + (exam.wrong_count || 0)),
           );
 
           // Better chapter extraction using actual questions and answers
           if (exam.questions && Array.isArray(exam.questions)) {
-            const answers = exam.userAnswers || {};
+            const answers = exam.user_answers || {};
 
             // Define a more specific type for questions if needed
             type ExtendedQuestion = Question & {
@@ -341,8 +354,8 @@ export const getSubjectAnalysis = async (
               .filter(Boolean);
 
             if (chaptersArray.length > 0) {
-              const wTotal = (exam.totalQuestions || 0) / chaptersArray.length;
-              const wCorrect = (exam.correctCount || 0) / chaptersArray.length;
+              const wTotal = (exam.total_questions || 0) / chaptersArray.length;
+              const wCorrect = (exam.correct_count || 0) / chaptersArray.length;
 
               chaptersArray.forEach((chap: string) => {
                 if (!chapterMap.has(chap)) {
@@ -572,9 +585,15 @@ export const getTeacherStats = async (
 
       const stats = {
         totalQuestions: data?.length || 0,
-        approved: data?.filter((q: { status: string }) => q.status === 'Approved').length || 0,
-        pending: data?.filter((q: { status: string }) => q.status === 'Pending').length || 0,
-        rejected: data?.filter((q: { status: string }) => q.status === 'Rejected').length || 0,
+        approved:
+          data?.filter((q: { status: string }) => q.status === 'Approved')
+            .length || 0,
+        pending:
+          data?.filter((q: { status: string }) => q.status === 'Pending')
+            .length || 0,
+        rejected:
+          data?.filter((q: { status: string }) => q.status === 'Rejected')
+            .length || 0,
       };
 
       return stats;
