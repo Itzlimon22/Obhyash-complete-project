@@ -7,7 +7,7 @@ import { createClient } from '@/utils/supabase/client';
 import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';
 import SocialLoginButton from '@/components/auth/SocialLoginButton';
 
-const AUTH_TIMEOUT_MS = 15000;
+const AUTH_TIMEOUT_MS = 30000;
 
 async function withTimeout<T>(
   promise: PromiseLike<T>,
@@ -91,7 +91,7 @@ export default function LoginPage() {
       const message = err instanceof Error ? err.message : '';
       setError(
         message.includes('সময়') || message.toLowerCase().includes('timeout')
-          ? 'রেসপন্স পেতে দেরি হচ্ছে। ইন্টারনেট চেক করে আবার চেষ্টা করুন।'
+          ? 'সার্ভার রেসপন্স দিতে দেরি করছে। একটু পরে আবার চেষ্টা করুন।'
           : 'একটি সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।',
       );
       setLoading(false);

@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'sonner';
 import AuthProvider from '@/components/auth/AuthProvider';
+import { Analytics } from '@vercel/analytics/next';
 
 // ✅ Configure Inter (English text)
 const inter = Inter({
@@ -67,6 +68,7 @@ export default function RootLayout({
                 },
               }}
             />
+            <Analytics />
           </AuthProvider>
         </Suspense>
       </body>

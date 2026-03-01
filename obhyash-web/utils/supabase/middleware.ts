@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const AUTH_TIMEOUT_MS = 10000;
+const AUTH_TIMEOUT_MS = 20000;
 
 async function withTimeout<T>(
   promise: PromiseLike<T>,

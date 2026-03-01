@@ -24,7 +24,7 @@ import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/error-utils';
 import { getRandomAvatar } from '@/lib/avatar-utils';
 
-const AUTH_TIMEOUT_MS = 15000;
+const AUTH_TIMEOUT_MS = 30000;
 
 async function withTimeout<T>(
   promise: PromiseLike<T>,
