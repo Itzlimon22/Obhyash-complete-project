@@ -151,8 +151,8 @@ function SignupForm() {
     setError(null);
 
     try {
-      // 1. Sign Up
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      // 1. Sign Up with a 15-second timeout to prevent infinite loading
+      const authPromise = supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -164,6 +164,15 @@ function SignupForm() {
           },
         },
       });
+
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Auth timed out')), 15000),
+      );
+
+      const { data, error: signUpError } = (await Promise.race([
+        authPromise,
+        timeoutPromise,
+      ])) as any;
 
       if (signUpError) throw signUpError;
 

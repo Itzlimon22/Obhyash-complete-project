@@ -51,7 +51,7 @@ export async function updateSession(request: NextRequest) {
     const response = NextResponse.redirect(url);
     // Copy cookies from supabaseResponse to the redirect response
     supabaseResponse.cookies.getAll().forEach((cookie) => {
-      response.cookies.set(cookie.name, cookie.value);
+      response.cookies.set(cookie);
     });
     return response;
   }
@@ -74,7 +74,7 @@ export async function updateSession(request: NextRequest) {
         new URL('/deactivated', request.url),
       );
       supabaseResponse.cookies.getAll().forEach((cookie) => {
-        response.cookies.set(cookie.name, cookie.value);
+        response.cookies.set(cookie);
       });
       return response;
     }
@@ -93,7 +93,7 @@ export async function updateSession(request: NextRequest) {
 
       const response = NextResponse.redirect(url);
       supabaseResponse.cookies.getAll().forEach((cookie) => {
-        response.cookies.set(cookie.name, cookie.value);
+        response.cookies.set(cookie);
       });
       return response;
     }
@@ -104,7 +104,7 @@ export async function updateSession(request: NextRequest) {
         new URL('/dashboard', request.url),
       );
       supabaseResponse.cookies.getAll().forEach((cookie) => {
-        response.cookies.set(cookie.name, cookie.value);
+        response.cookies.set(cookie);
       });
       return response;
     }
@@ -114,7 +114,7 @@ export async function updateSession(request: NextRequest) {
         new URL('/dashboard', request.url),
       );
       supabaseResponse.cookies.getAll().forEach((cookie) => {
-        response.cookies.set(cookie.name, cookie.value);
+        response.cookies.set(cookie);
       });
       return response;
     }

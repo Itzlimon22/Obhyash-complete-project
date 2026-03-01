@@ -23,14 +23,20 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      // 1. Log in
-      const {
-        data: { user },
-        error: signInError,
-      } = await supabase.auth.signInWithPassword({
+      // 1. Log in with a 15-second timeout to prevent infinite loading
+      const authPromise = supabase.auth.signInWithPassword({
         email,
         password,
       });
+
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Auth timed out')), 15000),
+      );
+
+      const {
+        data: { user },
+        error: signInError,
+      } = (await Promise.race([authPromise, timeoutPromise])) as any;
 
       if (signInError) {
         if (signInError.message.includes('Email not confirmed')) {
