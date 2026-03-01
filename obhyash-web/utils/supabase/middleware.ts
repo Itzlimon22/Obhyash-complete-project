@@ -157,6 +157,27 @@ export async function updateSession(request: NextRequest) {
       });
       return response;
     }
+
+    // Forward admins and teachers away from the student dashboard
+    if (isStudentRoute && role === 'admin') {
+      const response = NextResponse.redirect(
+        new URL('/admin/dashboard', request.url),
+      );
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        response.cookies.set(cookie);
+      });
+      return response;
+    }
+
+    if (isStudentRoute && role === 'teacher') {
+      const response = NextResponse.redirect(
+        new URL('/teacher/dashboard', request.url),
+      );
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        response.cookies.set(cookie);
+      });
+      return response;
+    }
   }
 
   // IMPORTANT: Always return supabaseResponse (not a plain NextResponse.next())

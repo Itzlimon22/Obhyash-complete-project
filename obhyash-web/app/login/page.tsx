@@ -64,25 +64,10 @@ export default function LoginPage() {
         return;
       }
 
-      // 2. Login Success! Now Find User Role manually.
+      // 2. Login Success! Redirect to /dashboard — middleware handles
+      // role-based forwarding (admin → /admin/dashboard, teacher → /teacher/dashboard).
       if (user) {
-        const { data: profile } = await withTimeout(
-          supabase.from('users').select('role').eq('id', user.id).single(),
-          'প্রোফাইল তথ্য আনতে দেরি হচ্ছে। আবার চেষ্টা করুন।',
-        );
-
-        const role = profile?.role || 'Student';
-
-        setLoading(false);
-
-        // Redirect based on role (case-insensitive)
-        if (role.toLowerCase() === 'admin') {
-          router.push('/admin/dashboard');
-        } else if (role.toLowerCase() === 'teacher') {
-          router.push('/teacher/dashboard');
-        } else {
-          router.push('/dashboard');
-        }
+        router.push('/dashboard');
       } else {
         setLoading(false);
       }
