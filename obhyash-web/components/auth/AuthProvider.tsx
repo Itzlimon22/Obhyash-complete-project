@@ -135,10 +135,24 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       try {
         // getUser() validates the JWT against the Supabase server.
         // Unlike getSession(), it never returns stale data.
+        // Wrapped in a timeout to prevent infinite loading if Supabase is unreachable.
+        const authResult = await Promise.race([
+          supabase.auth.getUser(),
+          new Promise<{ data: { user: null }; error: Error }>((resolve) =>
+            setTimeout(
+              () =>
+                resolve({
+                  data: { user: null },
+                  error: new Error('Auth timeout'),
+                }),
+              10000,
+            ),
+          ),
+        ]);
         const {
           data: { user: currentUser },
           error: authError,
-        } = await supabase.auth.getUser();
+        } = authResult as Awaited<ReturnType<typeof supabase.auth.getUser>>;
 
         if (authError || !currentUser) {
           if (authError && isHardAuthError(authError)) {

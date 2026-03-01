@@ -1,4 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -9,15 +10,18 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-let supabaseInstance: ReturnType<typeof createBrowserClient> | null = null;
+// Use globalThis to persist the singleton across Next.js hot module reloads in dev.
+// This prevents auth state from being reset every time a file changes.
+const globalForSupabase = globalThis as typeof globalThis & {
+  _supabaseInstance?: SupabaseClient;
+};
 
-export function createClient() {
-  // Return existing singleton (works on both server and client).
-  // createBrowserClient handles the SSR case internally — we do NOT
-  // need a separate server-side bypass here.
-  if (supabaseInstance) return supabaseInstance;
+export function createClient(): SupabaseClient {
+  if (globalForSupabase._supabaseInstance) {
+    return globalForSupabase._supabaseInstance;
+  }
 
-  supabaseInstance = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+  const instance = createBrowserClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
@@ -28,5 +32,6 @@ export function createClient() {
     },
   });
 
-  return supabaseInstance;
+  globalForSupabase._supabaseInstance = instance;
+  return instance;
 }
