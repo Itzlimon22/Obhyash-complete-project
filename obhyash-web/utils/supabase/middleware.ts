@@ -20,10 +20,11 @@ export async function updateSession(request: NextRequest) {
             request.cookies.set(name, value),
           );
           // Then rebuild the response with updated request and set cookies on it
-          supabaseResponse = NextResponse.next({ request });
+          const updatedResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options),
+            updatedResponse.cookies.set(name, value, options),
           );
+          supabaseResponse = updatedResponse;
         },
       },
     },
@@ -47,7 +48,12 @@ export async function updateSession(request: NextRequest) {
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    return NextResponse.redirect(url);
+    const response = NextResponse.redirect(url);
+    // Copy cookies from supabaseResponse to the redirect response
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      response.cookies.set(cookie.name, cookie.value);
+    });
+    return response;
   }
 
   // SCENARIO B: Logged in — fetch profile once for all role/status checks
@@ -64,7 +70,13 @@ export async function updateSession(request: NextRequest) {
 
     // Deactivated/suspended users get kicked out everywhere
     if (isInactive && pathname !== '/deactivated') {
-      return NextResponse.redirect(new URL('/deactivated', request.url));
+      const response = NextResponse.redirect(
+        new URL('/deactivated', request.url),
+      );
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        response.cookies.set(cookie.name, cookie.value);
+      });
+      return response;
     }
 
     // Logged-in users visiting auth pages get redirected to their dashboard
@@ -79,16 +91,32 @@ export async function updateSession(request: NextRequest) {
         url.pathname = '/dashboard';
       }
 
-      return NextResponse.redirect(url);
+      const response = NextResponse.redirect(url);
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        response.cookies.set(cookie.name, cookie.value);
+      });
+      return response;
     }
 
     // Role-based route protection
     if (isAdminRoute && role !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      const response = NextResponse.redirect(
+        new URL('/dashboard', request.url),
+      );
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        response.cookies.set(cookie.name, cookie.value);
+      });
+      return response;
     }
 
     if (isTeacherRoute && role !== 'teacher') {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      const response = NextResponse.redirect(
+        new URL('/dashboard', request.url),
+      );
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        response.cookies.set(cookie.name, cookie.value);
+      });
+      return response;
     }
   }
 

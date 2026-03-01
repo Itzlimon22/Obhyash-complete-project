@@ -22,45 +22,56 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    // 1. Log in
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      // 1. Log in
+      const {
+        data: { user },
+        error: signInError,
+      } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (signInError) {
-      if (signInError.message.includes('Email not confirmed')) {
-        setError('দয়া করে আপনার ইমেইল চেক করুন এবং ভেরিফাই লিংক এ ক্লিক করুন।');
-      } else {
-        setError('ইমেইল বা পাসওয়ার্ড ভুল হয়েছে। আবার চেষ্টা করুন।');
+      if (signInError) {
+        if (signInError.message.includes('Email not confirmed')) {
+          setError(
+            'দয়া করে আপনার ইমেইল চেক করুন এবং ভেরিফাই লিংক এ ক্লিক করুন।',
+          );
+        } else {
+          setError('ইমেইল বা পাসওয়ার্ড ভুল হয়েছে। আবার চেষ্টা করুন।');
+        }
+        setLoading(false);
+        return;
       }
-      setLoading(false);
-      return;
-    }
 
-    // 2. Login Success! Now Find User Role manually.
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      // 2. Login Success! Now Find User Role manually.
+      if (user) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', user.id)
+          .single();
 
-    if (user) {
-      const { data: profile } = await supabase
-        .from('users')
-        .select('role')
-        .eq('id', user.id)
-        .single();
+        const role = profile?.role || 'Student';
 
-      const role = profile?.role || 'Student';
+        // Redirect based on role (case-insensitive)
+        if (role.toLowerCase() === 'admin') {
+          router.push('/admin/dashboard');
+        } else if (role.toLowerCase() === 'teacher') {
+          router.push('/teacher/dashboard');
+        } else {
+          router.push('/dashboard');
+        }
 
-      // Redirect based on role (case-insensitive)
-      if (role.toLowerCase() === 'admin') {
-        router.push('/admin/dashboard');
-      } else if (role.toLowerCase() === 'teacher') {
-        router.push('/teacher/dashboard');
+        // Note: We don't setLoading(false) here because we're redirecting,
+        // but if the navigation is slow, the spinner will keep spinning.
+        // The middleware will also handle the redirect if they try to come back.
       } else {
-        router.push('/dashboard');
+        setLoading(false);
       }
-    } else {
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('একটি সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।');
       setLoading(false);
     }
   };

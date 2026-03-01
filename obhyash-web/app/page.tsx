@@ -83,9 +83,12 @@ export default function Home() {
   // --- ROUTING ---
 
   if (currentUser) {
-    if (currentUser.role === 'Admin' || currentUser.role === 'Teacher') {
-      // Redirect admin/teacher users to the admin panel
-      router.push('/admin');
+    if (currentUser.role === 'Admin') {
+      router.push('/admin/dashboard');
+      return null;
+    }
+    if (currentUser.role === 'Teacher') {
+      router.push('/teacher/dashboard');
       return null;
     }
 
