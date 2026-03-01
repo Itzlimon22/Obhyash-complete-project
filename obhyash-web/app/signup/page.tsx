@@ -27,7 +27,7 @@ import { getRandomAvatar } from '@/lib/avatar-utils';
 const AUTH_TIMEOUT_MS = 15000;
 
 async function withTimeout<T>(
-  promise: Promise<T>,
+  promise: PromiseLike<T>,
   timeoutMessage: string,
   timeoutMs = AUTH_TIMEOUT_MS,
 ): Promise<T> {
@@ -38,7 +38,7 @@ async function withTimeout<T>(
   });
 
   try {
-    return await Promise.race([promise, timeoutPromise]);
+    return await Promise.race([Promise.resolve(promise), timeoutPromise]);
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
   }
