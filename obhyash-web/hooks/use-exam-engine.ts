@@ -392,32 +392,8 @@ export const useExamEngine = () => {
           newResult.status = 'evaluated';
         } else {
           newResult.scriptImageData = selectedScript?.base64;
-          try {
-            if (selectedScript?.base64) {
-              const detectedAnswers = await evaluateOMRScript(
-                selectedScript.base64,
-                questions,
-              );
-              const stats = calculateExamStats(
-                questions,
-                detectedAnswers,
-                examDetailsRef.current?.negativeMarking || 0,
-              );
-              newResult.userAnswers = detectedAnswers;
-              newResult.score = stats.finalScore;
-              newResult.correctCount = stats.correctCount;
-              newResult.wrongCount = stats.wrongCount;
-              newResult.status = 'evaluated';
-            }
-          } catch (error: unknown) {
-            console.error('Auto-evaluation failed', error);
-            if (error instanceof Error) {
-              setOmrError(error.message);
-            } else {
-              setOmrError('An unknown error occurred during auto-evaluation.');
-            }
-            newResult.status = 'pending';
-          }
+          // AI Evaluation has been disabled. Status is set to 'pending' for manual review.
+          newResult.status = 'pending';
         }
 
         // Save using central database service

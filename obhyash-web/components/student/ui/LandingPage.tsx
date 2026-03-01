@@ -17,8 +17,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
 }) => {
   const features = [
     {
-      title: 'AI-Powered Evaluation',
-      desc: 'Instant feedback on your OMR scripts using advanced Gemini Vision AI.',
+      title: 'Advanced Evaluation',
+      desc: 'Instant feedback on your OMR scripts for efficient learning.',
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -221,9 +221,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </h1>
 
             <p className="text-lg text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Join thousands of students preparing for Academic, Admission, and
               Competitive exams. Generate custom question papers, practice
-              online, or scan your OMR sheets for instant AI grading.
+              online, or scan your OMR sheets for instant grading.
             </p>
 
             <div className="flex justify-center lg:justify-start pt-4">
@@ -340,7 +339,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 name: 'Farhana Rimi',
                 role: 'HSC Candidate',
                 quote:
-                  "Zenith's explanation for every math problem helped me understand my mistakes clearly.",
+                  "Zenith's custom exam builder and OMR features helped me track my progress effectively.",
                 bg: 'bg-emerald-50 dark:bg-emerald-900/10 text-emerald-600',
               },
               {

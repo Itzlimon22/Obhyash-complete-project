@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: 'Obhyash (অভ্যাস) Exam Platform',
-  description: 'A high-performance, AI-powered examination interface.',
+  description: 'A high-performance examination interface.',
 };
 
 export default function DashboardLayout({
