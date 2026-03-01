@@ -8,10 +8,11 @@ import {
   ReactNode,
   useMemo,
   useCallback,
+  useRef,
 } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
+import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { UserProfile } from '@/lib/types';
 import { mutate } from 'swr';
 import { mapDbRowToProfile } from '@/services/user-service';
@@ -34,31 +35,72 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+const PROFILE_KEY = 'obhyash_user_profile';
+
+function readCachedProfile(): UserProfile | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(PROFILE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as UserProfile;
+    return parsed?.id ? parsed : null;
+  } catch {
+    localStorage.removeItem(PROFILE_KEY);
+    return null;
+  }
+}
+
+function writeCachedProfile(profile: UserProfile) {
+  try {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+  } catch {
+    // storage quota exceeded — non-fatal
+  }
+}
+
+function clearCachedProfile() {
+  try {
+    localStorage.removeItem(PROFILE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+/**
+ * Returns true only for hard auth failures (invalid/expired JWT).
+ * Generic network errors (offline, Supabase cold-start) return false
+ * to prevent false "session corruption" modals.
+ */
+function isHardAuthError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const err = error as { name?: string; status?: number; code?: string };
+  if (err.name === 'AuthApiError') return true;
+  if (err.status === 401) return true;
+  if (err.code === 'invalid_jwt' || err.code === 'token_expired') return true;
+  return false;
+}
+
+// ─── Provider ───────────────────────────────────────────────────────────────
+
 export default function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(
+    // Serve cached profile instantly — eliminates skeleton flash on refresh
+    () => readCachedProfile(),
+  );
   const [loading, setLoading] = useState(true);
   const [showCorruptionModal, setShowCorruptionModal] = useState(false);
 
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
 
-  // Optimistic profile load (for fast UI on refresh/revisit)
-  useEffect(() => {
-    try {
-      const cachedProfileStr = localStorage.getItem('obhyash_user_profile');
-      if (!cachedProfileStr) return;
+  // Prevent double-fetch when onAuthStateChange fires INITIAL_SESSION
+  // right after initializeAuth has already loaded the profile.
+  const initDoneRef = useRef(false);
 
-      const cachedProfile = JSON.parse(cachedProfileStr) as UserProfile;
-      if (cachedProfile?.id) {
-        setProfile(cachedProfile);
-      }
-    } catch (e) {
-      console.error('Initial cache parse error', e);
-      localStorage.removeItem('obhyash_user_profile');
-    }
-  }, []);
-
+  // ── fetchProfile ──────────────────────────────────────────────────────────
   const fetchProfile = useCallback(
     async (userId: string): Promise<UserProfile | null> => {
       try {
@@ -72,14 +114,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           console.error('Error fetching profile:', error);
           return null;
         }
-
         if (!data) return null;
 
         const userProfile = mapDbRowToProfile(data);
-        localStorage.setItem(
-          'obhyash_user_profile',
-          JSON.stringify(userProfile),
-        );
+        writeCachedProfile(userProfile);
         return userProfile;
       } catch (error) {
         console.error('Unexpected error fetching profile:', error);
@@ -89,96 +127,101 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     [supabase],
   );
 
+  // ── initializeAuth (runs once on mount) ───────────────────────────────────
   useEffect(() => {
     let isMounted = true;
 
     const initializeAuth = async () => {
       try {
-        // 1. Check for valid session
-        const {
-          data: { session },
-          error: sessionError,
-        } = await supabase.auth.getSession();
-
-        if (sessionError) {
-          console.error('Session retrieval error:', sessionError);
-        }
-
-        // 2. Refresh user if session exists
+        // getUser() validates the JWT against the Supabase server.
+        // Unlike getSession(), it never returns stale data.
         const {
           data: { user: currentUser },
           error: authError,
         } = await supabase.auth.getUser();
 
         if (authError || !currentUser) {
-          if (authError && authError.name !== 'AuthSessionMissingError') {
-            console.error('Auth verification error:', authError);
-            // Suspect corruption only if we have a profile but can't verify identity
-            if (localStorage.getItem('obhyash_user_profile')) {
-              setShowCorruptionModal(true);
+          if (authError && isHardAuthError(authError)) {
+            // Real auth failure (invalid/expired token) — check if we have
+            // a stale profile in cache and show the re-login modal.
+            if (readCachedProfile()) {
+              if (isMounted) setShowCorruptionModal(true);
+            } else {
+              if (isMounted) {
+                setUser(null);
+                setProfile(null);
+              }
             }
+          } else if (authError) {
+            // Soft failure (network glitch, Supabase cold-start) — don't
+            // destroy the session. The cached profile already shows in UI.
+            console.warn(
+              'Soft auth check failure (network?):',
+              authError.message,
+            );
           } else {
-            // No valid session
+            // No user at all — clean state
             if (isMounted) {
               setUser(null);
               setProfile(null);
-              localStorage.removeItem('obhyash_user_profile');
+              clearCachedProfile();
             }
           }
         } else {
-          // Valid user found
+          // ✅ Valid user confirmed by server
           if (isMounted) setUser(currentUser);
 
-          // Sync profile
-          const cachedProfileStr = localStorage.getItem('obhyash_user_profile');
-          if (cachedProfileStr) {
-            try {
-              const cachedProfile = JSON.parse(cachedProfileStr) as UserProfile;
-              if (cachedProfile?.id && cachedProfile.id === currentUser.id) {
-                if (isMounted) setProfile(cachedProfile);
-              } else {
-                localStorage.removeItem('obhyash_user_profile');
-              }
-            } catch {
-              localStorage.removeItem('obhyash_user_profile');
-            }
+          // Validate cached profile belongs to this user
+          const cached = readCachedProfile();
+          if (cached && cached.id === currentUser.id) {
+            if (isMounted) setProfile(cached);
+          } else {
+            clearCachedProfile();
           }
 
-          // Fetch fresh profile from server
-          const userProfile = await fetchProfile(currentUser.id);
-          if (userProfile && isMounted) {
-            setProfile(userProfile);
-          }
+          // Fetch fresh profile from DB (updates cache automatically)
+          const fresh = await fetchProfile(currentUser.id);
+          if (fresh && isMounted) setProfile(fresh);
         }
       } catch (error) {
         console.error('Auth initialization sequence failed:', error);
       } finally {
-        if (isMounted) setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+          initDoneRef.current = true;
+        }
       }
     };
 
     initializeAuth();
 
+    // ── onAuthStateChange — handles token refresh & sign-in/out events ──────
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
-        console.log('Auth event change:', event);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[Auth] event:', event);
+        }
 
         if (session?.user) {
           if (isMounted) setUser(session.user);
 
-          if (
-            event === 'SIGNED_IN' ||
-            event === 'TOKEN_REFRESHED' ||
-            event === 'INITIAL_SESSION'
-          ) {
-            // Revalidate all SWR caches after auth changes
+          if (event === 'SIGNED_IN') {
+            // Fresh login — invalidate all SWR caches and load profile
             mutate(() => true, undefined, { revalidate: true });
-
-            const userProfile = await fetchProfile(session.user.id);
-            if (userProfile && isMounted) {
-              setProfile(userProfile);
+            const fresh = await fetchProfile(session.user.id);
+            if (fresh && isMounted) setProfile(fresh);
+          } else if (event === 'TOKEN_REFRESHED') {
+            // Silently refresh profile in background
+            const fresh = await fetchProfile(session.user.id);
+            if (fresh && isMounted) setProfile(fresh);
+          } else if (event === 'INITIAL_SESSION') {
+            // Only fetch profile if initializeAuth hasn't already done it
+            if (!initDoneRef.current) {
+              mutate(() => true, undefined, { revalidate: true });
+              const fresh = await fetchProfile(session.user.id);
+              if (fresh && isMounted) setProfile(fresh);
             }
           }
         } else if (event === 'SIGNED_OUT') {
@@ -186,7 +229,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             setUser(null);
             setProfile(null);
           }
-          localStorage.removeItem('obhyash_user_profile');
+          clearCachedProfile();
           router.push('/login');
         }
       },
@@ -198,25 +241,28 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [supabase, router, fetchProfile]);
 
+  // ── signOut ───────────────────────────────────────────────────────────────
   const signOut = useCallback(async () => {
-    // Listener will handle state reset + redirect on SIGNED_OUT
-    localStorage.removeItem('obhyash_user_profile');
+    clearCachedProfile();
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error('Sign out error:', error);
-      // fallback cleanup if event doesn’t fire due to error
+      // Fallback manual cleanup if the event doesn't fire
       setUser(null);
       setProfile(null);
       router.push('/login');
     }
+    // If signOut succeeds, the SIGNED_OUT event handler above handles redirect
   }, [supabase, router]);
 
+  // ── refreshProfile ────────────────────────────────────────────────────────
   const refreshProfile = useCallback(async () => {
     if (!user) return;
-    const userProfile = await fetchProfile(user.id);
-    if (userProfile) setProfile(userProfile);
+    const fresh = await fetchProfile(user.id);
+    if (fresh) setProfile(fresh);
   }, [user, fetchProfile]);
 
+  // ── handleForceLogout ─────────────────────────────────────────────────────
   const handleForceLogout = useCallback(async () => {
     setShowCorruptionModal(false);
     await signOut();
@@ -228,7 +274,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     >
       {children}
 
-      {/* Corruption / Expiry Confirmation Modal */}
+      {/* Re-login modal — only shows for genuine invalid-JWT errors */}
       {showCorruptionModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-white dark:bg-neutral-950 w-full max-w-sm rounded-[2rem] p-8 shadow-2xl border border-neutral-200 dark:border-neutral-800 text-center animate-in zoom-in-95 duration-300">
@@ -239,8 +285,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
               সেশন সমস্যা!
             </h3>
             <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-8 leading-relaxed">
-              আপনার লগইন সেশনটি মেয়াদোত্তীর্ণ বা ত্রুটিপূর্ণ হয়েছে। নিরবচ্ছিন্ন
-              অভিজ্ঞতার জন্য দয়া করে আবার লগইন করুন।
+              আপনার লগইন সেশনটি মেয়াদোত্তীর্ণ বা ত্রুটিপূর্ণ হয়েছে।
+              নিরবচ্ছিন্ন অভিজ্ঞতার জন্য দয়া করে আবার লগইন করুন।
             </p>
             <button
               onClick={handleForceLogout}

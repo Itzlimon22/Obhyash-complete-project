@@ -12,10 +12,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 let supabaseInstance: ReturnType<typeof createBrowserClient> | null = null;
 
 export function createClient() {
-  if (typeof window === 'undefined') {
-    return createBrowserClient(supabaseUrl, supabaseAnonKey);
-  }
-
+  // Return existing singleton (works on both server and client).
+  // createBrowserClient handles the SSR case internally — we do NOT
+  // need a separate server-side bypass here.
   if (supabaseInstance) return supabaseInstance;
 
   supabaseInstance = createBrowserClient(supabaseUrl, supabaseAnonKey, {
@@ -23,6 +22,9 @@ export function createClient() {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
+      // Stable key — prevents accidental clearing by other libraries
+      // and makes debugging straightforward.
+      storageKey: 'obhyash_auth',
     },
   });
 

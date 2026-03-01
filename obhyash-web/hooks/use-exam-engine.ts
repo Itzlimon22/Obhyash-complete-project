@@ -14,6 +14,33 @@ import {
 } from '@/services/exam-service';
 import { evaluateOMRScript } from '../services/gemini-service';
 import { cacheQuestions, getCachedQuestions } from '@/services/question-cache';
+import { toast } from 'sonner';
+
+// ─── Tiny XOR cipher for exam progress (tamper-resistance, not security) ───
+// Key is mixed with the persistence key so even the same data looks different
+// across different exam sessions.
+const CIPHER_KEY = 'obhyash_exam_2025';
+
+function xorCipher(input: string, key: string): string {
+  return input
+    .split('')
+    .map((ch, i) =>
+      String.fromCharCode(ch.charCodeAt(0) ^ key.charCodeAt(i % key.length)),
+    )
+    .join('');
+}
+
+function encryptAnswers(answers: Record<string | number, number>): string {
+  return btoa(xorCipher(JSON.stringify(answers), CIPHER_KEY));
+}
+
+function decryptAnswers(encrypted: string): Record<string | number, number> {
+  try {
+    return JSON.parse(xorCipher(atob(encrypted), CIPHER_KEY));
+  } catch {
+    return {};
+  }
+}
 
 /**
  * Core hook for the Exam Engine logic.
@@ -442,16 +469,16 @@ export const useExamEngine = () => {
       const stateToSave = {
         questions,
         examDetails,
-        userAnswers,
+        userAnswers: encryptAnswers(userAnswers), // XOR-ciphered
         flaggedQuestions: Array.from(flaggedQuestions),
         dbSessionId,
-        // We save the TARGET end time to calculate remaining time accurately on reload
-        // storedTimeLeft is just a snapshot, but targetEndTime is absolute
+        // Absolute epoch ms timestamp — enables real timer resume across closes
         targetEndTime: Date.now() + timeLeft * 1000,
         graceTimeLeft,
         isOmrMode,
         appState,
         lastUpdated: Date.now(),
+        version: 2,
       };
 
       localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(stateToSave));
@@ -510,19 +537,45 @@ export const useExamEngine = () => {
             restoredTimeLeft = 0;
           }
 
-          console.log('♻️ Restoring Exam Session:', parsed);
+          // Restore exam state
+          console.log(
+            '♻️ Restoring exam session (version:',
+            parsed.version,
+            ')',
+          );
+
+          // Notify user so they know the session was restored
+          toast.info('পূর্বের পরীক্ষার সেশন পুনরুদ্ধার হচ্ছে...', {
+            duration: 3000,
+            id: 'exam-restore',
+          });
 
           setQuestions(parsed.questions || []);
           setExamDetails(parsed.examDetails || null);
-          setUserAnswers(parsed.userAnswers || {});
+          // Decrypt answers (v2) or use raw (v1 fallback)
+          const restoredAnswers =
+            typeof parsed.userAnswers === 'string'
+              ? decryptAnswers(parsed.userAnswers)
+              : (parsed.userAnswers ?? {});
+          setUserAnswers(restoredAnswers);
           setFlaggedQuestions(new Set(parsed.flaggedQuestions || []));
           setDbSessionId(parsed.dbSessionId || null);
           setTimeLeft(restoredTimeLeft);
           setGraceTimeLeft(parsed.graceTimeLeft || 0);
           setIsOmrMode(parsed.isOmrMode || false);
 
-          // Restore state (Triggering UI to show ExamRunner)
-          // If time is 0, the runner will see it and trigger auto-submit logic
+          if (restoredTimeLeft <= 0 && parsed.appState === AppState.ACTIVE) {
+            // Expired while away — restore state first, then submitExam will
+            // fire immediately in the timer effect when it sees timeLeft=0
+            console.warn('⚠️ Exam expired while away — auto-submitting');
+            toast.warning(
+              'পরীক্ষার সময় শেষ হয়ে গেছে। ফলাফল হিসাব করা হচ্ছে...',
+              {
+                duration: 4000,
+              },
+            );
+          }
+
           setAppState(parsed.appState || AppState.IDLE);
         } catch (e) {
           console.error('Failed to hydrate exam state:', e);
