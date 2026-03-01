@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import LatexText from '@/components/student/ui/common/LatexText';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, ArrowRight, User, BookOpen, Clock } from 'lucide-react';
+import Link from 'next/link';
+import { BlogPost } from '@/lib/blog-data';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -157,6 +159,24 @@ const LandingPage: React.FC<LandingPageProps> = ({
   const [activeDemoTab, setActiveDemoTab] = useState<
     'generate' | 'omr' | 'analytics'
   >('generate');
+  const [latestPosts, setLatestPosts] = useState<BlogPost[]>([]);
+  const marqueeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchLatestPosts = async () => {
+      try {
+        const res = await fetch('/api/blog/latest');
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setLatestPosts(data);
+        }
+      } catch (err) {
+        console.error('Error fetching latest posts:', err);
+      }
+    };
+    fetchLatestPosts();
+  }, []);
+
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const demoQuestion = {
@@ -902,8 +922,87 @@ const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
+      {/* Blog Highlights Marquee Section */}
+      {latestPosts.length > 0 && (
+        <section className="py-20 bg-white dark:bg-black overflow-hidden border-t border-red-50 dark:border-neutral-900">
+          <div className="max-w-7xl mx-auto px-4 lg:px-6">
+            <div className="flex flex-col lg:flex-row gap-12 items-center">
+              <div className="lg:w-1/3 space-y-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 text-red-700 dark:text-red-400 text-xs font-bold uppercase tracking-wider">
+                  <BookOpen className="w-3.5 h-3.5" />
+                  শিক্ষা ও খবর
+                </div>
+                <h2 className="text-3xl lg:text-4xl font-extrabold text-neutral-900 dark:text-white leading-tight">
+                  রিসোর্স হাব ও <br />
+                  <span className="text-red-600">শিক্ষামূলক ব্লগ</span>
+                </h2>
+                <p className="text-neutral-600 dark:text-neutral-400 text-lg">
+                  আপনার স্বপ্ন ছোঁয়ার যাত্রায় আমাদের সেরা টিপস ও গাইডলাইনগুলো
+                  দেখে নাও। প্রতিটি পোস্ট আপনার প্রস্তুতিকে আরও সহজ করবে।
+                </p>
+                <Link
+                  href="/blog"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-neutral-900 dark:bg-white text-white dark:text-black rounded-xl font-bold hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-all active:scale-95 group shadow-xl"
+                >
+                  সব ব্লগ দেখুন
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+
+              <div className="lg:w-2/3 w-full">
+                <div className="relative h-[500px] w-full overflow-hidden rounded-[2.5rem] border border-neutral-100 dark:border-neutral-800 shadow-2xl bg-neutral-50 dark:bg-neutral-900/50 group/marquee">
+                  <div
+                    ref={marqueeRef}
+                    className="flex flex-col gap-4 p-4 animate-marquee-vertical group-hover/marquee:[animation-play-state:paused]"
+                  >
+                    {[...latestPosts, ...latestPosts].map((post, idx) => (
+                      <Link
+                        key={`${post.slug}-${idx}`}
+                        href={`/blog/${post.slug}`}
+                        className="block w-full bg-white dark:bg-black rounded-3xl p-6 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-red-500/10 hover:border-red-200 dark:hover:border-red-900/40 transition-all duration-300 group/card"
+                      >
+                        <div className="flex gap-6 items-start">
+                          <div
+                            className={`w-24 h-24 shrink-0 rounded-2xl bg-gradient-to-br ${post.coverColor || 'from-neutral-200 to-neutral-300'} flex items-center justify-center text-white font-bold text-2xl shadow-lg`}
+                          >
+                            {post.author.initials}
+                          </div>
+                          <div className="flex-1 space-y-2">
+                            <div className="flex items-center gap-3">
+                              <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-100 dark:border-emerald-800 uppercase tracking-wider">
+                                {post.category}
+                              </span>
+                              <span className="flex items-center gap-1 text-[11px] text-neutral-400 font-medium">
+                                <Clock className="w-3 h-3" />
+                                {post.readTime} min read
+                              </span>
+                            </div>
+                            <h3 className="text-xl font-bold text-neutral-900 dark:text-white group-hover/card:text-red-600 transition-colors line-clamp-2">
+                              {post.title}
+                            </h3>
+                            <p className="text-neutral-500 dark:text-neutral-400 text-sm line-clamp-1">
+                              {post.excerpt}
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                  {/* Fading Overlays */}
+                  <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-neutral-50 dark:from-neutral-950 to-transparent pointer-events-none z-10"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-neutral-50 dark:from-neutral-950 to-transparent pointer-events-none z-10"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Pricing Section */}
-      <section className="py-20 bg-neutral-50 dark:bg-black border-y border-red-100 dark:border-neutral-800 relative">
+      <section
+        id="pricing"
+        className="py-20 bg-neutral-50 dark:bg-black border-y border-red-100 dark:border-neutral-800 relative"
+      >
         <div className="max-w-7xl mx-auto px-4 lg:px-6 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mt-2">
