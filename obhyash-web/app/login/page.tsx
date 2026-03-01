@@ -44,19 +44,15 @@ export default function LoginPage() {
     } = await supabase.auth.getUser();
 
     if (user) {
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile } = await supabase
         .from('users')
         .select('role')
         .eq('id', user.id)
         .single();
 
-      // console.log('1. User ID:', user.id);
-      // console.log('2. Database Error:', profileError);
-      // console.log('3. Profile Data:', profile);
-
       const role = profile?.role || 'Student';
 
-      // 3. Force Redirect based on role (case-insensitive)
+      // Redirect based on role (case-insensitive)
       if (role.toLowerCase() === 'admin') {
         router.push('/admin/dashboard');
       } else if (role.toLowerCase() === 'teacher') {
@@ -64,9 +60,8 @@ export default function LoginPage() {
       } else {
         router.push('/dashboard');
       }
-
-      // Force a hard refresh to ensure middleware picks up the new cookiee
-      router.refresh();
+    } else {
+      setLoading(false);
     }
   };
 
