@@ -21,16 +21,7 @@ export function createClient(): SupabaseClient {
     return globalForSupabase._supabaseInstance;
   }
 
-  const instance = createBrowserClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      // Stable key — prevents accidental clearing by other libraries
-      // and makes debugging straightforward.
-      storageKey: 'obhyash_auth',
-    },
-  });
+  const instance = createBrowserClient(supabaseUrl, supabaseAnonKey);
 
   globalForSupabase._supabaseInstance = instance;
   return instance;
