@@ -2,6 +2,26 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
+const AUTH_TIMEOUT_MS = 10000;
+
+async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMessage: string,
+  timeoutMs = AUTH_TIMEOUT_MS,
+): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+  });
+
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+}
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
@@ -32,19 +52,24 @@ export async function GET(request: Request) {
         },
       },
     );
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await withTimeout(
+      supabase.auth.exchangeCodeForSession(code),
+      'Auth callback exchange timed out',
+    );
     if (!error) {
       // Fetch user role to redirect to correct dashboard
       const {
         data: { user },
-      } = await supabase.auth.getUser();
+      } = await withTimeout(
+        supabase.auth.getUser(),
+        'Auth user fetch timed out',
+      );
       let redirectPath = next;
       if (user) {
-        const { data: profile } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', user.id)
-          .single();
+        const { data: profile } = await withTimeout(
+          supabase.from('users').select('role').eq('id', user.id).single(),
+          'Auth profile lookup timed out',
+        );
         const role = profile?.role?.toLowerCase() || 'student';
         if (role === 'admin') redirectPath = '/admin/dashboard';
         else if (role === 'teacher') redirectPath = '/teacher/dashboard';

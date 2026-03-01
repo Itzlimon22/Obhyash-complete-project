@@ -5,8 +5,27 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { Mail, Lock, LogIn, Loader2 } from 'lucide-react';
-import Logo from '@/components/student/ui/Logo';
 import SocialLoginButton from '@/components/auth/SocialLoginButton';
+
+const AUTH_TIMEOUT_MS = 15000;
+
+async function withTimeout<T>(
+  promise: PromiseLike<T>,
+  timeoutMessage: string,
+  timeoutMs = AUTH_TIMEOUT_MS,
+): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+  });
+
+  try {
+    return await Promise.race([Promise.resolve(promise), timeoutPromise]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -23,20 +42,15 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      // 1. Log in with a 15-second timeout to prevent infinite loading
-      const authPromise = supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Auth timed out')), 15000),
+      const { data, error: signInError } = await withTimeout(
+        supabase.auth.signInWithPassword({
+          email,
+          password,
+        }),
+        'লগইন অনুরোধের সময়সীমা শেষ হয়েছে। আবার চেষ্টা করুন।',
       );
 
-      const {
-        data: { user },
-        error: signInError,
-      } = (await Promise.race([authPromise, timeoutPromise])) as any;
+      const user = data?.user;
 
       if (signInError) {
         if (signInError.message.includes('Email not confirmed')) {
@@ -52,13 +66,14 @@ export default function LoginPage() {
 
       // 2. Login Success! Now Find User Role manually.
       if (user) {
-        const { data: profile } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', user.id)
-          .single();
+        const { data: profile } = await withTimeout(
+          supabase.from('users').select('role').eq('id', user.id).single(),
+          'প্রোফাইল তথ্য আনতে দেরি হচ্ছে। আবার চেষ্টা করুন।',
+        );
 
         const role = profile?.role || 'Student';
+
+        setLoading(false);
 
         // Redirect based on role (case-insensitive)
         if (role.toLowerCase() === 'admin') {
@@ -68,16 +83,17 @@ export default function LoginPage() {
         } else {
           router.push('/dashboard');
         }
-
-        // Note: We don't setLoading(false) here because we're redirecting,
-        // but if the navigation is slow, the spinner will keep spinning.
-        // The middleware will also handle the redirect if they try to come back.
       } else {
         setLoading(false);
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('একটি সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।');
+      const message = err instanceof Error ? err.message : '';
+      setError(
+        message.includes('সময়') || message.toLowerCase().includes('timeout')
+          ? 'রেসপন্স পেতে দেরি হচ্ছে। ইন্টারনেট চেক করে আবার চেষ্টা করুন।'
+          : 'একটি সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।',
+      );
       setLoading(false);
     }
   };

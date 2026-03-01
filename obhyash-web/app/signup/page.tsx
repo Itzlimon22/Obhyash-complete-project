@@ -20,11 +20,29 @@ import {
   EyeOff,
   Gift,
 } from 'lucide-react';
-import Logo from '@/components/student/ui/Logo';
-import SocialLoginButton from '@/components/auth/SocialLoginButton';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/error-utils';
 import { getRandomAvatar } from '@/lib/avatar-utils';
+
+const AUTH_TIMEOUT_MS = 15000;
+
+async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMessage: string,
+  timeoutMs = AUTH_TIMEOUT_MS,
+): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+  });
+
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+}
 
 function SignupForm() {
   const router = useRouter();
@@ -151,28 +169,21 @@ function SignupForm() {
     setError(null);
 
     try {
-      // 1. Sign Up with a 15-second timeout to prevent infinite loading
-      const authPromise = supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          emailRedirectTo: `${location.origin}/dashboard`,
-          data: {
-            full_name: formData.name,
-            name: formData.name,
-            role: 'Student',
+      const { data, error: signUpError } = await withTimeout(
+        supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            emailRedirectTo: `${location.origin}/dashboard`,
+            data: {
+              full_name: formData.name,
+              name: formData.name,
+              role: 'Student',
+            },
           },
-        },
-      });
-
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Auth timed out')), 15000),
+        }),
+        'রেজিস্ট্রেশন অনুরোধের সময়সীমা শেষ হয়েছে। আবার চেষ্টা করুন।',
       );
-
-      const { data, error: signUpError } = (await Promise.race([
-        authPromise,
-        timeoutPromise,
-      ])) as any;
 
       if (signUpError) throw signUpError;
 
@@ -180,34 +191,37 @@ function SignupForm() {
         // 2. Create User Profile (upsert to handle DB trigger conflict)
         // The handle_new_user trigger may have already created a minimal row,
         // so we use upsert to merge the full signup data into it.
-        const { error: profileError } = await supabase.from('users').upsert(
-          {
-            id: data.user.id,
-            email: formData.email,
-            name: formData.name,
-            phone: formData.phone,
-            gender: formData.gender || null,
-            institute: formData.institute,
-            stream: formData.stream,
-            division: formData.group, // Mapping group -> division
-            batch: formData.batch,
-            role: 'Student',
-            status: 'Active',
-            avatar_url: getRandomAvatar(formData.gender, data.user.id),
-            subscription: {
-              plan: 'Free',
-              expiry: new Date(
-                Date.now() + 365 * 24 * 60 * 60 * 1000,
-              ).toISOString(),
+        const { error: profileError } = await withTimeout(
+          supabase.from('users').upsert(
+            {
+              id: data.user.id,
+              email: formData.email,
+              name: formData.name,
+              phone: formData.phone,
+              gender: formData.gender || null,
+              institute: formData.institute,
+              stream: formData.stream,
+              division: formData.group, // Mapping group -> division
+              batch: formData.batch,
+              role: 'Student',
               status: 'Active',
+              avatar_url: getRandomAvatar(formData.gender, data.user.id),
+              subscription: {
+                plan: 'Free',
+                expiry: new Date(
+                  Date.now() + 365 * 24 * 60 * 60 * 1000,
+                ).toISOString(),
+                status: 'Active',
+              },
+              xp: 0,
+              level: 'Beginner',
+              exams_taken: 0,
+              enrolled_exams: 0,
+              last_active: new Date().toISOString(),
             },
-            xp: 0,
-            level: 'Beginner',
-            exams_taken: 0,
-            enrolled_exams: 0,
-            last_active: new Date().toISOString(),
-          },
-          { onConflict: 'id' },
+            { onConflict: 'id' },
+          ),
+          'প্রোফাইল তৈরি করতে দেরি হচ্ছে। আবার চেষ্টা করুন।',
         );
 
         if (profileError) {
@@ -218,15 +232,23 @@ function SignupForm() {
         // Handle referral code redemption
         if (formData.referralCode) {
           try {
-            const res = await fetch('/api/referral/redeem', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                code: formData.referralCode,
-                newUserId: data.user.id,
+            const res = await withTimeout(
+              fetch('/api/referral/redeem', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  code: formData.referralCode,
+                  newUserId: data.user.id,
+                }),
               }),
-            });
-            const json = await res.json();
+              'রেফারেল যাচাই করতে দেরি হচ্ছে। পরে আবার চেষ্টা করুন।',
+              10000,
+            );
+            const json = await withTimeout(
+              res.json(),
+              'রেফারেল সার্ভার রেসপন্স পেতে দেরি হচ্ছে।',
+              10000,
+            );
             if (json.error) {
               toast.error(json.error);
             } else {

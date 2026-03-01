@@ -1,6 +1,26 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+const AUTH_TIMEOUT_MS = 10000;
+
+async function withTimeout<T>(
+  promise: PromiseLike<T>,
+  timeoutMessage: string,
+  timeoutMs = AUTH_TIMEOUT_MS,
+): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs);
+  });
+
+  try {
+    return await Promise.race([Promise.resolve(promise), timeoutPromise]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -32,9 +52,18 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: Always call getUser() to refresh the session cookie if needed.
   // Never use getSession() here — it doesn't validate the token server-side.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user: { id: string } | null = null;
+  try {
+    const {
+      data: { user: authUser },
+    } = await withTimeout(
+      supabase.auth.getUser(),
+      'Session refresh timed out in middleware',
+    );
+    user = authUser;
+  } catch (error) {
+    console.error('Middleware auth refresh error:', error);
+  }
 
   // Define route types
   const { pathname } = request.nextUrl;
@@ -58,11 +87,21 @@ export async function updateSession(request: NextRequest) {
 
   // SCENARIO B: Logged in — fetch profile once for all role/status checks
   if (user && (isProtectedRoute || isAuthRoute)) {
-    const { data: profile } = await supabase
-      .from('users')
-      .select('role, status')
-      .eq('id', user.id)
-      .single();
+    let profile: { role?: string | null; status?: string | null } | null = null;
+
+    try {
+      const { data } = await withTimeout(
+        supabase
+          .from('users')
+          .select('role, status')
+          .eq('id', user.id)
+          .single(),
+        'Profile lookup timed out in middleware',
+      );
+      profile = data;
+    } catch (error) {
+      console.error('Middleware profile fetch error:', error);
+    }
 
     const role = (profile?.role ?? 'student').toLowerCase();
     const status = profile?.status ?? 'Active';
