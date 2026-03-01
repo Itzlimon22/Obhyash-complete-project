@@ -151,21 +151,23 @@ export const getUserPaymentMethods = async (): Promise<PaymentMethod[]> => {
     return [];
   }
 
-  return data.map((method: {
-    id: string;
-    type: string;
-    last4: string;
-    number: string;
-    expiry: string;
-    is_default: boolean;
-  }) => ({
-    id: method.id,
-    type: method.type,
-    last4: method.last4,
-    number: method.number,
-    expiry: method.expiry,
-    isDefault: method.is_default,
-  }));
+  return data.map(
+    (method: {
+      id: string;
+      type: string;
+      last4: string;
+      number: string;
+      expiry: string;
+      is_default: boolean;
+    }) => ({
+      id: method.id,
+      type: method.type as PaymentMethod['type'],
+      last4: method.last4,
+      number: method.number,
+      expiry: method.expiry,
+      isDefault: method.is_default,
+    }),
+  );
 };
 
 export const deletePaymentMethod = async (id: string): Promise<void> => {
@@ -225,7 +227,7 @@ export const addPaymentMethod = async (
 
   return {
     id: data.id,
-    type: data.type,
+    type: data.type as PaymentMethod['type'],
     last4: data.last4,
     number: data.number,
     expiry: data.expiry,
