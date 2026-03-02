@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node -e \"const{readdirSync,unlinkSync,statSync}=require('fs'),{join}=require('path');function rm(d){try{readdirSync(d).forEach(f=>{const p=join(d,f);statSync(p).isDirectory()?rm(p):f.endsWith('.map')&&unlinkSync(p)})}catch(e){}}rm('.next/server');\"",
     "start": "next start",
     "lint": "eslint"
   },
