@@ -111,13 +111,28 @@ export function useSessionMonitor({
         }
       });
 
-      await channel.subscribe(async (status: string) => {
-        if (status === 'SUBSCRIBED' && mounted) {
-          // Broadcast our presence
-          await channel.track({ session_id: mySessionId });
-        }
-      });
+      const subscribeWithRetry = async (attempt = 0) => {
+        if (!mounted) return;
 
+        const status = await channel.subscribe(async (status: string) => {
+          if (status === 'SUBSCRIBED' && mounted) {
+            // Broadcast our presence
+            await channel.track({ session_id: mySessionId });
+          } else if (status === 'CHANNEL_ERROR' || status === 'CLOSED') {
+            if (mounted && attempt < 5) {
+              const delay = Math.pow(2, attempt) * 1000;
+              if (process.env.NODE_ENV === 'development') {
+                console.warn(
+                  `[Realtime] Subscription failed (${status}), retrying in ${delay}ms...`,
+                );
+              }
+              setTimeout(() => subscribeWithRetry(attempt + 1), delay);
+            }
+          }
+        });
+      };
+
+      await subscribeWithRetry();
       channelRef.current = channel;
     };
 

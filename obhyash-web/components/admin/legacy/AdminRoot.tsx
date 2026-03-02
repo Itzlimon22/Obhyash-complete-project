@@ -6,6 +6,8 @@ import { UserProfile, ExamResult } from '@/lib/types';
 import AdminDashboard from '@/components/student/ui/AdminDashboard'; // Currently here
 import { getExamHistory } from '@/services/database';
 import { createClient } from '@/utils/supabase/client';
+import { useSessionMonitor } from '@/hooks/use-session-monitor';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 interface AdminRootProps {
   user: UserProfile;
@@ -20,6 +22,14 @@ export default function AdminRoot({
   isDarkMode,
   onLogout,
 }: AdminRootProps) {
+  const { signOut } = useAuth();
+
+  // Multi-device session monitor - keeps the Supabase Realtime connection warm
+  useSessionMonitor({
+    userId: user.id,
+    onForcedSignOut: signOut,
+  });
+
   const [history, setHistory] = useState<ExamResult[]>([]);
   const [loading, setLoading] = useState(true);
 

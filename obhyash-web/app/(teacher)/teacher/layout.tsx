@@ -1,13 +1,22 @@
 'use client';
 
-import React from 'react';
 import TeacherSidebar from '@/components/teacher/layout/TeacherSidebar';
+import { useSessionMonitor } from '@/hooks/use-session-monitor';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 export default function TeacherLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user, profile, signOut } = useAuth();
+
+  // Multi-device session monitor - keeps the Supabase Realtime connection warm
+  useSessionMonitor({
+    userId: profile?.id || user?.id,
+    onForcedSignOut: signOut,
+  });
+
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
       <TeacherSidebar />

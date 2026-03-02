@@ -16,6 +16,7 @@ import { createClient } from '@/utils/supabase/client';
 // Hooks
 import { useExamEngine } from '@/hooks/use-exam-engine';
 import { useBookmarks } from '@/hooks/use-bookmarks';
+import { useSessionMonitor } from '@/hooks/use-session-monitor';
 
 // Components - Layout & Common
 import AppLayout from '@/components/student/ui/layout/AppLayout';
@@ -78,10 +79,17 @@ export default function StudentRoot({
     user: authUser,
     profile: authProfile,
     loading: authLoading,
+    signOut: authSignOut,
   } = useAuth();
 
   // Use authProfile if available, otherwise fall back to initialUser
   const effectiveUser = authProfile || initialUser;
+
+  // Multi-device session monitor - keeps the Supabase Realtime connection warm
+  useSessionMonitor({
+    userId: effectiveUser?.id,
+    onForcedSignOut: authSignOut,
+  });
 
   const {
     appState,

@@ -76,9 +76,18 @@ function clearCachedProfile() {
 function isHardAuthError(error: unknown): boolean {
   if (!error || typeof error !== 'object') return false;
   const err = error as { name?: string; status?: number; code?: string };
-  if (err.name === 'AuthApiError') return true;
+  if (err.name === 'AuthApiError') {
+    // Some API errors are just rate limits or network issues.
+    // Only fail if it's explicitly about invalid/expired credentials.
+    if (err.status === 400 || err.status === 403) return true;
+  }
   if (err.status === 401) return true;
-  if (err.code === 'invalid_jwt' || err.code === 'token_expired') return true;
+  if (
+    err.code === 'invalid_jwt' ||
+    err.code === 'token_expired' ||
+    err.code === 'session_not_found'
+  )
+    return true;
   return false;
 }
 
@@ -239,6 +248,50 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     initializeAuth();
 
+    // ── Resiliency Listeners (Network & Focus) ───────────────────────────────
+    const handleHealthCheck = async () => {
+      if (!isMounted || !initDoneRef.current) return;
+
+      // If we are offline, don't ping (it will just fail and trigger errors)
+      if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+
+      try {
+        // getUser() is the authoritative way to verify the session with the server.
+        const { data, error } = await supabase.auth.getUser();
+        if (error && isHardAuthError(error)) {
+          console.warn('[Auth] Health check failed - session may be corrupted');
+          setShowCorruptionModal(true);
+        } else if (data.user) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[Auth] Health check: OK');
+          }
+          setUser(data.user);
+        }
+      } catch (err) {
+        // Soft failure, ignore
+      }
+    };
+
+    const onOnline = () => {
+      if (process.env.NODE_ENV === 'development')
+        console.log('[Auth] Back online - checking session');
+      handleHealthCheck();
+    };
+
+    const onFocus = () => {
+      // Small debounce to avoid multiple pings if user clicks fast
+      handleHealthCheck();
+    };
+
+    window.addEventListener('online', onOnline);
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') onFocus();
+    });
+
+    // ── Heartbeat (Every 10 minutes) ─────────────────────────────────────────
+    const heartbeat = setInterval(handleHealthCheck, 10 * 60 * 1000);
+
     // ── onAuthStateChange — handles token refresh & sign-in/out events ──────
     const {
       data: { subscription },
@@ -290,6 +343,9 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       isMounted = false;
       subscription.unsubscribe();
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('focus', onFocus);
+      clearInterval(heartbeat);
     };
   }, [supabase, router, fetchProfile]);
 

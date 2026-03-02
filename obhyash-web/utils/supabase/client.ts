@@ -21,7 +21,19 @@ export function createClient(): SupabaseClient {
     return globalForSupabase._supabaseInstance;
   }
 
-  const instance = createBrowserClient(supabaseUrl, supabaseAnonKey);
+  const instance = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce',
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 10,
+      },
+    },
+  });
 
   globalForSupabase._supabaseInstance = instance;
   return instance;
