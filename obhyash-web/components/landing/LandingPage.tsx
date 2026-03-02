@@ -788,78 +788,92 @@ const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* Blog Highlights Marquee Section */}
+      {/* Blog Highlights Section */}
       {latestPosts.length > 0 && (
         <section className="py-24 bg-white dark:bg-black overflow-hidden border-t border-neutral-100 dark:border-neutral-900">
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
-            <div className="flex flex-col lg:flex-row gap-16 items-center">
-              <div className="lg:w-1/3 space-y-8">
+            <div className="flex flex-col lg:flex-row gap-12 items-end mb-12">
+              <div className="lg:w-2/3 space-y-6">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
                   <BookOpen className="w-3.5 h-3.5" />
-                  Latest from Blog
+                  ব্লগ থেকে সর্বশেষ
                 </div>
                 <h2 className="text-4xl lg:text-5xl font-extrabold text-neutral-900 dark:text-white leading-tight font-serif-exam">
-                  Resources & <br />
+                  রিসোর্স ও <br />
                   <span className="text-emerald-700 dark:text-emerald-500">
-                    Study Guides
+                    স্টাডি গাইড
                   </span>
                 </h2>
-                <p className="text-neutral-600 dark:text-neutral-400 text-lg leading-relaxed">
-                  Discover expert study tips, MCQ techniques, and preparation
-                  strategies to help you excel in your exams.
+                <p className="text-neutral-600 dark:text-neutral-400 text-lg leading-relaxed max-w-2xl">
+                  আপনার পরীক্ষার প্রস্তুতির জন্য বিশেষজ্ঞ টিপস, MCQ টেকনিক এবং
+                  কার্যকরী কৌশলগুলো জেনে নিন।
                 </p>
+              </div>
+              <div className="lg:w-1/3 flex justify-start lg:justify-end">
                 <Link
                   href="/blog"
                   className="inline-flex items-center gap-3 px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold transition-all active:scale-95 group shadow-xl shadow-emerald-700/20"
                 >
-                  Visit Blog
+                  ব্লগ দেখুন
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
+            </div>
 
-              <div className="lg:w-2/3 w-full">
-                <div className="relative h-[600px] w-full overflow-hidden rounded-[3rem] border border-neutral-200 dark:border-neutral-800 shadow-2xl bg-neutral-50/50 dark:bg-neutral-900/30 group/marquee">
-                  <div
-                    ref={marqueeRef}
-                    className="flex flex-col gap-6 p-6 animate-marquee-vertical group-hover/marquee:[animation-play-state:paused]"
+            {/* Horizontal Scroll Cards */}
+            <div className="relative group">
+              {/* Mobile Scroll Hint */}
+              <div className="md:hidden flex justify-end mb-4 text-[10px] text-neutral-400 font-bold uppercase tracking-widest animate-pulse gap-1 items-center">
+                বামে স্ক্রল করুন <ArrowRight className="w-3 h-3" />
+              </div>
+
+              <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
+                {latestPosts.map((post, idx) => (
+                  <Link
+                    key={`${post.slug}-${idx}`}
+                    href={`/blog/${post.slug}`}
+                    className="flex-shrink-0 w-[85%] sm:w-[450px] snap-center block group/card"
                   >
-                    {[...latestPosts, ...latestPosts].map((post, idx) => (
-                      <Link
-                        key={`${post.slug}-${idx}`}
-                        href={`/blog/${post.slug}`}
-                        className="block w-full bg-white dark:bg-black rounded-[2rem] p-8 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-2xl hover:shadow-emerald-500/10 hover:border-emerald-200 dark:hover:border-emerald-900/40 transition-all duration-500 group/card"
-                      >
-                        <div className="flex gap-8 items-start">
-                          <div
-                            className={`w-28 h-28 shrink-0 rounded-3xl bg-gradient-to-br ${post.coverColor || 'from-neutral-200 to-neutral-300'} flex items-center justify-center text-white font-bold text-3xl shadow-lg transform group-hover/card:scale-105 transition-transform duration-500`}
-                          >
-                            {post.author.initials}
-                          </div>
-                          <div className="flex-1 space-y-4">
-                            <div className="flex items-center gap-4">
-                              <span className="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs font-bold border border-emerald-100 dark:border-emerald-800 uppercase tracking-widest">
-                                {post.category}
-                              </span>
-                              <span className="flex items-center gap-1.5 text-xs text-neutral-400 font-semibold">
-                                <Clock className="w-4 h-4" />
-                                {post.readTime} min read
-                              </span>
-                            </div>
-                            <h3 className="text-2xl font-bold text-neutral-900 dark:text-white group-hover/card:text-emerald-700 dark:group-hover/card:text-emerald-500 transition-colors line-clamp-2">
-                              {post.title}
-                            </h3>
-                            <p className="text-neutral-500 dark:text-neutral-400 leading-relaxed font-medium line-clamp-2">
-                              {post.excerpt}
-                            </p>
-                          </div>
+                    <div className="h-full bg-white dark:bg-neutral-900 rounded-[2.5rem] border border-neutral-100 dark:border-neutral-800 p-6 sm:p-8 flex flex-col gap-6 transition-all duration-500 hover:border-emerald-200 dark:hover:border-emerald-900/40 hover:shadow-2xl hover:shadow-emerald-500/5 relative overflow-hidden">
+                      {/* Decorative Background Blob */}
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -z-10 group-hover/card:bg-emerald-500/10 transition-colors"></div>
+
+                      <div className="flex gap-6 items-start">
+                        <div
+                          className={`w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-3xl bg-gradient-to-br ${post.coverColor || 'from-neutral-200 to-neutral-300'} flex items-center justify-center text-white font-bold text-2xl sm:text-3xl shadow-lg transform group-hover/card:scale-105 transition-transform duration-500`}
+                        >
+                          {post.author.initials}
                         </div>
-                      </Link>
-                    ))}
-                  </div>
-                  {/* Fading Overlays */}
-                  <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white dark:from-black to-transparent pointer-events-none z-10"></div>
-                  <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-black to-transparent pointer-events-none z-10"></div>
-                </div>
+                        <div className="flex-1 space-y-3">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold border border-emerald-100 dark:border-emerald-800 uppercase tracking-widest">
+                              {post.category}
+                            </span>
+                            <span className="flex items-center gap-1.5 text-[10px] text-neutral-400 font-bold uppercase tracking-wider">
+                              <Clock className="w-3.5 h-3.5" />
+                              {post.readTime} মিনিট পড়া
+                            </span>
+                          </div>
+                          <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white group-hover/card:text-emerald-700 dark:group-hover/card:text-emerald-500 transition-colors line-clamp-2 leading-tight">
+                            {post.title}
+                          </h3>
+                        </div>
+                      </div>
+                      <div className="space-y-4">
+                        <p className="text-neutral-500 dark:text-neutral-400 text-sm sm:text-base leading-relaxed font-medium line-clamp-3">
+                          {post.excerpt}
+                        </p>
+                        <div className="flex items-center gap-3 pt-2 text-emerald-600 dark:text-emerald-400 font-bold text-xs">
+                          <span>আরও পড়ুন</span>
+                          <ArrowRight className="w-4 h-4 group-hover/card:translate-x-2 transition-transform" />
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+
+                {/* Blank space for end of scroll padding */}
+                <div className="flex-shrink-0 w-4 md:hidden"></div>
               </div>
             </div>
           </div>
