@@ -13,7 +13,7 @@ const UserProgress: React.FC<UserProgressProps> = ({
 }) => {
   const currentUserLevelInfo = LEVELS.find((l) => l.id === currentUser.level);
 
-  // Calculate next level requirements
+  // Calculate next level requirement
   const nextLevelIndex = currentUserLevelInfo
     ? LEVELS.findIndex((l) => l.id === currentUserLevelInfo.id) - 1
     : -1;
