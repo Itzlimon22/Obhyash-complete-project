@@ -13,6 +13,7 @@ import { UserProfile } from '@/lib/types';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import { Eye, ChevronRight, RefreshCw } from 'lucide-react';
 import { ReportSkeleton } from '@/components/student/ui/common/Skeletons';
+import LatexText from '@/components/student/ui/common/LatexText';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import {
@@ -102,9 +103,9 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
     return (
       <div className="space-y-4">
         <div className="bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-xl border border-neutral-100 dark:border-neutral-700">
-          <p className="font-bold text-neutral-900 dark:text-white mb-3">
-            {question.question}
-          </p>
+          <div className="font-bold text-neutral-900 dark:text-white mb-3">
+            <LatexText text={question.question} />
+          </div>
           <div className="space-y-2">
             {question.options?.map((opt: string, idx: number) => {
               const alphabet = ['ক', 'খ', 'গ', 'ঘ'];
@@ -117,7 +118,9 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                   className={`flex items-start gap-3 p-2.5 rounded-lg border text-sm ${isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-400' : 'bg-white border-neutral-100 text-neutral-600 dark:bg-neutral-900 dark:border-neutral-800 dark:text-neutral-400'}`}
                 >
                   <span className="font-bold">{alphabet[idx]}৷</span>
-                  <span>{opt}</span>
+                  <div className="flex-1">
+                    <LatexText text={opt} />
+                  </div>
                 </div>
               );
             })}
@@ -128,9 +131,9 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
             <h4 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1.5">
               ব্যাখ্যা
             </h4>
-            <p className="text-sm text-emerald-800 dark:text-emerald-200 leading-relaxed">
-              {question.explanation}
-            </p>
+            <div className="text-sm text-emerald-800 dark:text-emerald-200 leading-relaxed">
+              <LatexText text={question.explanation} />
+            </div>
           </div>
         )}
       </div>
@@ -242,7 +245,9 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                       </DialogHeader>
                       <div className="mt-2 text-left">
                         {report.question ? (
-                          <QuestionViewer question={report.question as Question} />
+                          <QuestionViewer
+                            question={report.question as Question}
+                          />
                         ) : null}
                       </div>
                     </DialogContent>
@@ -283,7 +288,9 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                           </DialogHeader>
                           <div className="mt-2 text-left">
                             {report.question && (
-                              <QuestionViewer question={report.question as Question} />
+                              <QuestionViewer
+                                question={report.question as Question}
+                              />
                             )}
                           </div>
                         </DialogContent>

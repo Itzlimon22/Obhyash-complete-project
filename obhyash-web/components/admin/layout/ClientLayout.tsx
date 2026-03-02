@@ -4,16 +4,23 @@ import React, { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import AdminMobileBottomNav from '@/components/admin/layout/AdminMobileBottomNav';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user, profile, loading } = useAuth();
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const handleResize = () => {
       if (window.innerWidth < 1024) {
         setIsMobile(true);
@@ -27,6 +34,43 @@ export default function ClientLayout({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Redirect if definitely not an admin once loading is done
+  useEffect(() => {
+    if (mounted && !loading && !user) {
+      router.replace('/login');
+    } else if (
+      mounted &&
+      !loading &&
+      user &&
+      profile &&
+      profile.role !== 'Admin'
+    ) {
+      // If not an admin, send to appropriate home or error
+      if (profile.role === 'Student') router.replace('/dashboard');
+      else if (profile.role === 'Teacher') router.replace('/teacher/dashboard');
+      else router.replace('/');
+    }
+  }, [mounted, loading, user, profile, router]);
+
+  // Loading state for initial session hydration
+  if (loading || !mounted) {
+    return (
+      <div className="min-h-screen bg-neutral-50 dark:bg-black flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
+          <p className="text-sm font-bold text-neutral-500 animate-pulse">
+            Restoring Admin Session...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Prevent flash before redirect
+  if (!user || (profile && profile.role !== 'Admin')) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white font-sans flex">

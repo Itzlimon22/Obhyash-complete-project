@@ -249,10 +249,7 @@ export default function QuestionManagementView({
                   </p>
                 </div>
                 <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                  <Clock
-                    size={18}
-                    className="text-red-600 dark:text-red-400"
-                  />
+                  <Clock size={18} className="text-red-600 dark:text-red-400" />
                 </div>
               </div>
             </div>
@@ -459,7 +456,7 @@ export default function QuestionManagementView({
                       {String.fromCharCode(65 + i)}
                     </span>
                     <span className="text-sm text-neutral-900 dark:text-neutral-200">
-                      {opt}
+                      <MathText text={opt} />
                     </span>
                   </div>
                 ))}

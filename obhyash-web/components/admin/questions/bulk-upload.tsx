@@ -688,7 +688,7 @@ const EditModal: React.FC<{
                     <span className="text-[9px] text-neutral-400 uppercase tracking-widest font-bold mb-1 block">
                       প্রিভিউ
                     </span>
-                    <MathRenderer text={localData.question} />
+                    <MathRenderer text={localData.question || ''} />
                   </div>
                 )}
                 <div>
@@ -829,7 +829,7 @@ const EditModal: React.FC<{
                   <span className="text-[9px] text-red-600 uppercase tracking-widest font-bold mb-1 block">
                     সমাধান প্রিভিউ
                   </span>
-                  <MathRenderer text={localData.explanation} />
+                  <MathRenderer text={localData.explanation || ''} />
                 </div>
               )}
             </div>
@@ -1917,9 +1917,9 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                         </button>
                       </div>
                     </div>
-                    <p className="text-sm font-medium text-neutral-900 dark:text-neutral-200 line-clamp-2 mb-2">
-                      {q.question}
-                    </p>
+                    <div className="text-sm font-medium text-neutral-900 dark:text-neutral-200 line-clamp-2 mb-2">
+                      <MathRenderer text={q.question || ''} />
+                    </div>
                     <div className="flex flex-wrap gap-1.5">
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 font-bold">
                         {q.subject || '—'}
@@ -1935,9 +1935,10 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                         </span>
                       )}
                       {q.correctAnswer && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 font-bold truncate max-w-[150px]">
-                          ✓ {q.correctAnswer}
-                        </span>
+                        <div className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 font-bold truncate max-w-[150px] flex items-center gap-1">
+                          <span>✓</span>{' '}
+                          <MathRenderer text={q.correctAnswer || ''} />
+                        </div>
                       )}
                       {q.difficulty && (
                         <span

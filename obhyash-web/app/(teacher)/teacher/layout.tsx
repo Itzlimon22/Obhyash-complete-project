@@ -3,19 +3,71 @@
 import TeacherSidebar from '@/components/teacher/layout/TeacherSidebar';
 import { useSessionMonitor } from '@/hooks/use-session-monitor';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 export default function TeacherLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, loading, signOut } = useAuth();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Multi-device session monitor - keeps the Supabase Realtime connection warm
   useSessionMonitor({
     userId: profile?.id || user?.id,
     onForcedSignOut: signOut,
   });
+
+  // Redirect if definitely not a teacher once loading is done
+  useEffect(() => {
+    if (mounted && !loading && !user) {
+      router.replace('/login');
+    } else if (
+      mounted &&
+      !loading &&
+      user &&
+      profile &&
+      profile.role !== 'Teacher'
+    ) {
+      // If admin, they might be visiting. But if not teacher/admin, redirect
+      if (profile.role === 'Student') router.replace('/dashboard');
+      else if (profile.role === 'Admin') {
+        // Allow admin for now? Or keep separate.
+        // For strictness, if this is teacher-only layout:
+        // router.replace('/admin/dashboard');
+      }
+    }
+  }, [mounted, loading, user, profile, router]);
+
+  // Loading state for initial session hydration
+  if (loading || !mounted) {
+    return (
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
+          <p className="text-sm font-bold text-neutral-500 animate-pulse">
+            রিসেট হচ্ছে সেশন (Restoring Session)...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Prevent flash before redirect
+  if (
+    !user ||
+    (profile && profile.role !== 'Teacher' && profile.role !== 'Admin')
+  ) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
