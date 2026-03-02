@@ -127,7 +127,12 @@ export const useExamEngine = () => {
       const ua = currentAnswers[q.id];
       const points = q.points ?? 1;
       if (ua !== undefined) {
-        if (ua === q.correctAnswerIndex) {
+        // Correct if answer matches singular index OR is contained in indices array
+        const isCorrect =
+          ua === q.correctAnswerIndex ||
+          (q.correctAnswerIndices && q.correctAnswerIndices.includes(ua));
+
+        if (isCorrect) {
           rawScore += points;
           correctCount++;
         } else {

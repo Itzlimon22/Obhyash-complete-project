@@ -176,20 +176,28 @@ export const fetchQuestionsWithDiagnostics = async (
           }
 
           if (data && data.length > 0) {
-            bucketQuestions = (data as unknown as QuestionDbRow[]).map(
-              (q) =>
-                ({
-                  ...q,
-                  createdAt: q.created_at,
-                  correctAnswer: q.correct_answer,
-                  correctAnswerIndex: q.correct_answer_index,
-                  correctAnswerIndices: q.correct_answer_indices || [],
-                  imageUrl: q.image_url,
-                  optionImages: q.option_images || [],
-                  explanationImageUrl: q.explanation_image_url,
-                  examType: q.exam_type,
-                }) as unknown as Question,
-            );
+            bucketQuestions = (data as unknown as QuestionDbRow[]).map((q) => {
+              const indices = q.correct_answer_indices || [];
+              const rawIndex =
+                q.correct_answer_index !== undefined &&
+                q.correct_answer_index !== null
+                  ? q.correct_answer_index
+                  : indices.length > 0
+                    ? indices[0]
+                    : 0;
+
+              return {
+                ...q,
+                createdAt: q.created_at,
+                correctAnswer: q.correct_answer,
+                correctAnswerIndex: rawIndex,
+                correctAnswerIndices: indices.length > 0 ? indices : [rawIndex],
+                imageUrl: q.image_url,
+                optionImages: q.option_images || [],
+                explanationImageUrl: q.explanation_image_url,
+                examType: q.exam_type,
+              } as unknown as Question;
+            });
             rpcSuccess = true;
             break;
           }
@@ -236,20 +244,28 @@ export const fetchQuestionsWithDiagnostics = async (
             `❌ Bucket ${i + 1} Legacy Error: ${error.message}`,
           );
         } else if (data && data.length > 0) {
-          bucketQuestions = (data as unknown as QuestionDbRow[]).map(
-            (q) =>
-              ({
-                ...q,
-                createdAt: q.created_at,
-                correctAnswer: q.correct_answer,
-                correctAnswerIndex: q.correct_answer_index,
-                correctAnswerIndices: q.correct_answer_indices || [],
-                imageUrl: q.image_url,
-                optionImages: q.option_images || [],
-                explanationImageUrl: q.explanation_image_url,
-                examType: q.exam_type,
-              }) as unknown as Question,
-          );
+          bucketQuestions = (data as unknown as QuestionDbRow[]).map((q) => {
+            const indices = q.correct_answer_indices || [];
+            const rawIndex =
+              q.correct_answer_index !== undefined &&
+              q.correct_answer_index !== null
+                ? q.correct_answer_index
+                : indices.length > 0
+                  ? indices[0]
+                  : 0;
+
+            return {
+              ...q,
+              createdAt: q.created_at,
+              correctAnswer: q.correct_answer,
+              correctAnswerIndex: rawIndex,
+              correctAnswerIndices: indices.length > 0 ? indices : [rawIndex],
+              imageUrl: q.image_url,
+              optionImages: q.option_images || [],
+              explanationImageUrl: q.explanation_image_url,
+              examType: q.exam_type,
+            } as unknown as Question;
+          });
           if (debug.fetchMethod === 'none') debug.fetchMethod = 'LEGACY_MULTI';
         }
       }
@@ -612,7 +628,21 @@ const mapDbResultToExamResult = (data: ExamResultDbRow): ExamResult => {
     wrongCount: data.wrong_count,
     timeTaken: data.time_taken,
     negativeMarking: data.negative_marking,
-    questions: data.questions,
+    questions: data.questions?.map((q) => {
+      const indices = q.correctAnswerIndices || [];
+      const rawIndex =
+        q.correctAnswerIndex !== undefined && q.correctAnswerIndex !== null
+          ? q.correctAnswerIndex
+          : indices.length > 0
+            ? indices[0]
+            : 0;
+
+      return {
+        ...q,
+        correctAnswerIndex: rawIndex,
+        correctAnswerIndices: indices.length > 0 ? indices : [rawIndex],
+      };
+    }),
     userAnswers: data.user_answers,
     flaggedQuestions: data.flagged_questions || [],
     chapters: data.chapters || 'General',
