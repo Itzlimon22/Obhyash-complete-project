@@ -94,6 +94,7 @@ export const getLeaderboardUsers = async (
       }));
 
     try {
+      console.log('Leaderboard: Querying public_profiles...');
       // Try querying with role filter (requires public_profiles to have 'role' column)
       const { data, error } = await supabase
         .from('public_profiles')
@@ -104,6 +105,7 @@ export const getLeaderboardUsers = async (
         .ilike('role', 'student')
         .order('xp', { ascending: false })
         .limit(100);
+      console.log('Leaderboard: Query complete', data?.length, error);
 
       if (!error && data) {
         return mapUsers(data, level);

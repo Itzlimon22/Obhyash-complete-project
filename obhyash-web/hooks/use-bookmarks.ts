@@ -13,13 +13,16 @@ import { toggleBookmark, getUserBookmarks } from '@/services/bookmark-service';
  *  - toggle        : (id) => void — optimistic toggle with DB sync + toast
  *  - isLoading     : boolean      — true while initial fetch is in progress
  */
-export function useBookmarks(userId: string | undefined) {
+export function useBookmarks(
+  userId: string | undefined,
+  loading: boolean = false,
+) {
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
 
   // ── Initial fetch ───────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!userId) {
+    if (!userId || loading) {
       return;
     }
 

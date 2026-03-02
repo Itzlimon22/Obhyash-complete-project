@@ -193,7 +193,7 @@ export default function StudentRoot({
     bookmarkedIds,
     isBookmarked,
     toggle: toggleBookmark,
-  } = useBookmarks(currentUser?.id);
+  } = useBookmarks(currentUser?.id, authLoading);
 
   // Streak Celebration State
   const [showStreakCelebration, setShowStreakCelebration] = useState(false);
@@ -212,9 +212,10 @@ export default function StudentRoot({
   useEffect(() => {
     let isMounted = true;
 
-    const handleStreakAndHistory = async () => {
-      if (!currentUser?.id) return;
+    // Do not initiate DB calls until auth initialization completes to avoid Supabase JS deadlock
+    if (authLoading || !currentUser?.id) return;
 
+    const handleStreakAndHistory = async () => {
       try {
         // ✅ Immediately compute the display streak from existing data
         // This prevents stale streak showing in header before async check runs
@@ -263,7 +264,7 @@ export default function StudentRoot({
     return () => {
       isMounted = false;
     };
-  }, [currentUser?.id]);
+  }, [currentUser?.id, authLoading]);
 
   // Resume detection: check for unfinished exam on mount
   useEffect(() => {

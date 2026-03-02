@@ -18,6 +18,8 @@ import { supabase } from '@/services/core';
 import LatexText from '@/components/student/ui/common/LatexText';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 
+import { useAuth } from '@/components/auth/AuthProvider';
+
 interface SubjectReportViewProps {
   subject: string;
   history: ExamResult[];
@@ -29,6 +31,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
   history,
   onBack,
 }) => {
+  const { user, loading: authLoading } = useAuth();
   const [timeFilter, setTimeFilter] = useState<'all' | 'month' | 'week'>('all');
 
   // Async Data State (Simulating Supabase Fetch)
@@ -38,20 +41,13 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
   useEffect(() => {
     let isMounted = true;
 
+    if (authLoading || !user?.id) return;
+
     const fetchStats = async () => {
       setLoading(true);
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (user && isMounted) {
-          const analysis = await getSubjectAnalysis(
-            user.id,
-            subject,
-            timeFilter,
-          );
-          if (isMounted) setStats(analysis);
-        }
+        const analysis = await getSubjectAnalysis(user.id, subject, timeFilter);
+        if (isMounted) setStats(analysis);
       } catch (error) {
         console.error(error);
       } finally {
@@ -64,7 +60,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [subject, timeFilter]);
+  }, [subject, timeFilter, user?.id, authLoading]);
 
   // Chart Data Preparation
   const pieData = stats

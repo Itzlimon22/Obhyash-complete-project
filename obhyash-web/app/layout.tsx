@@ -6,6 +6,7 @@ import './globals.css';
 import { Toaster } from 'sonner';
 import AuthProvider from '@/components/auth/AuthProvider';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 // ✅ Configure Inter (English text)
 const inter = Inter({

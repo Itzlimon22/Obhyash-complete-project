@@ -17,6 +17,7 @@ import {
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import { supabase } from '@/services/core';
 import useSWR from 'swr';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 import { AnalysisSkeleton } from '@/components/student/ui/common/Skeletons';
 
@@ -31,22 +32,18 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
 }) => {
   const [timeFilter, setTimeFilter] = useState<'all' | 'month' | 'week'>('all');
 
+  const { user, loading: authLoading } = useAuth();
+
   const {
     data: analytics,
     error,
     isLoading,
   } = useSWR(
-    history && history.length > 0
-      ? ['overall_analytics', history[0].user_id, timeFilter]
-      : ['overall_analytics', 'guest', timeFilter],
+    !authLoading && (history?.length > 0 || user?.id)
+      ? ['overall_analytics', history?.[0]?.user_id || user?.id, timeFilter]
+      : null,
     async () => {
-      let userId = history?.[0]?.user_id;
-      if (!userId) {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        userId = user?.id || '';
-      }
+      let userId = history?.[0]?.user_id || user?.id;
       if (!userId) return null;
       return getOverallAnalytics(userId, timeFilter);
     },

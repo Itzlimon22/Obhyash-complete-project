@@ -10,6 +10,7 @@ import {
   getUserProfile,
 } from 'services/database';
 
+import { useAuth } from '@/components/auth/AuthProvider';
 import { LeaderboardSkeleton } from '@/components/student/ui/common/Skeletons';
 
 interface LeaderboardViewProps {
@@ -17,6 +18,8 @@ interface LeaderboardViewProps {
 }
 
 const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
+  const { loading: authLoading } = useAuth();
+
   const [currentUser, setCurrentUser] = useState<UserProfile | undefined>(
     undefined,
   );
@@ -26,6 +29,8 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (authLoading) return;
+
     const initData = async () => {
       const user = await getUserProfile('me');
       if (user) {
@@ -40,9 +45,11 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
       setLevelCounts(counts);
     };
     initData();
-  }, []);
+  }, [authLoading]);
 
   useEffect(() => {
+    if (authLoading) return;
+
     const fetchLevelData = async () => {
       setIsLoading(true);
       const users = await getLeaderboardUsers(selectedLevel);
@@ -51,7 +58,7 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
     };
 
     fetchLevelData();
-  }, [selectedLevel]);
+  }, [selectedLevel, authLoading]);
 
   const userRankInOwnLevel = useMemo(() => {
     if (!currentUser) return 0;
@@ -100,4 +107,3 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
 };
 
 export default LeaderboardView;
-

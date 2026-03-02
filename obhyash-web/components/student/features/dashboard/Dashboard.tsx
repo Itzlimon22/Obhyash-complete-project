@@ -38,6 +38,8 @@ interface DashboardProps {
   history: ExamResult[];
 }
 
+import { useAuth } from '@/components/auth/AuthProvider';
+
 const fetchSubjectsOnly = async ([
   _,
   userId,
@@ -76,8 +78,10 @@ const Dashboard: React.FC<DashboardProps> = ({
   onBlogClick,
   history,
 }) => {
+  const { loading: authLoading } = useAuth();
+
   const { data: subjects = [], isLoading: isLoadingStats } = useSWR(
-    user
+    user && !authLoading
       ? [
           'userSubjects',
           user.id,
@@ -139,7 +143,9 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   const { data: leaderboardUsers = [], isLoading: isLoadingLeaderboard } =
     useSWR(
-      user ? ['leaderboardUsers', user.level || 'Level 1'] : null,
+      user && !authLoading
+        ? ['leaderboardUsers', user.level || 'Level 1']
+        : null,
       fetchLeaderboardStats,
       { revalidateOnFocus: false, dedupingInterval: 60000 },
     );
