@@ -798,12 +798,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   <BookOpen className="w-3.5 h-3.5" />
                   ব্লগ থেকে সর্বশেষ
                 </div>
-                <h2 className="text-4xl lg:text-5xl font-extrabold text-neutral-900 dark:text-white leading-tight font-serif-exam">
-                  রিসোর্স ও <br />
-                  <span className="text-emerald-700 dark:text-emerald-500">
-                    স্টাডি গাইড
-                  </span>
-                </h2>
                 <p className="text-neutral-600 dark:text-neutral-400 text-lg leading-relaxed max-w-2xl">
                   আপনার পরীক্ষার প্রস্তুতির জন্য বিশেষজ্ঞ টিপস, MCQ টেকনিক এবং
                   কার্যকরী কৌশলগুলো জেনে নিন।
