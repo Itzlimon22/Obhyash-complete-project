@@ -12,6 +12,7 @@ import {
   resolveTaxonomyHierarchy,
 } from '@/lib/data/hsc-helpers';
 import { Trash2, Edit, Copy } from 'lucide-react';
+import { standardizeInstituteName } from '@/lib/data/institute-helpers';
 
 interface QuestionTableViewProps {
   questions: Question[];
@@ -55,7 +56,7 @@ const EditableRow = ({
 
   const updateField = (
     field: keyof Question,
-    value: Question[keyof Question]
+    value: Question[keyof Question],
   ) => {
     setLocalQ((prev) => ({ ...prev, [field]: value }));
   };
@@ -241,19 +242,37 @@ const EditableRow = ({
 
       <td className={`${tdClass} min-w-[100px]`}>
         <input
-          value={localQ.year || ''}
-          onChange={(e) => updateField('year', e.target.value)}
+          value={localQ.year || localQ.years?.join(', ') || ''}
+          onChange={(e) => {
+            const val = e.target.value;
+            const yearsArr = val
+              .split(',')
+              .map((s) => parseInt(s.trim()))
+              .filter((n) => !isNaN(n));
+            updateField('year', val);
+            updateField('years', yearsArr);
+          }}
           onBlur={handleBlur}
           className={inputClass}
+          placeholder="e.g. 2023"
         />
       </td>
 
       <td className={`${tdClass} min-w-[160px]`}>
         <input
-          value={localQ.institute || ''}
-          onChange={(e) => updateField('institute', e.target.value)}
+          value={localQ.institute || localQ.institutes?.join(', ') || ''}
+          onChange={(e) => {
+            const val = e.target.value;
+            const instArr = val
+              .split(',')
+              .map((s) => standardizeInstituteName(s.trim()))
+              .filter(Boolean);
+            updateField('institute', val);
+            updateField('institutes', instArr);
+          }}
           onBlur={handleBlur}
           className={inputClass}
+          placeholder="e.g. Buet, Dhaka University"
         />
       </td>
 
@@ -354,7 +373,14 @@ const EditableRow = ({
           value={localQ.status || 'Pending'}
           onChange={(e) => {
             updateField('status', e.target.value);
-            const newQ = { ...localQ, status: e.target.value as 'Pending' | 'Approved' | 'Rejected' | 'Draft' };
+            const newQ = {
+              ...localQ,
+              status: e.target.value as
+                | 'Pending'
+                | 'Approved'
+                | 'Rejected'
+                | 'Draft',
+            };
             setLocalQ(newQ);
             onSave(newQ);
           }}
