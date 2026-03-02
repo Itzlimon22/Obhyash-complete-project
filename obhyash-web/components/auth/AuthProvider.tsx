@@ -82,6 +82,19 @@ function isHardAuthError(error: unknown): boolean {
   return false;
 }
 
+/**
+ * Returns true when there is simply no stored session (clean logged-out state).
+ * Supabase raises AuthSessionMissingError for this — it is NOT a network error
+ * and should not produce any console warning.
+ */
+function isNoSessionError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const err = error as { name?: string; message?: string };
+  if (err.name === 'AuthSessionMissingError') return true;
+  if (err.message?.toLowerCase().includes('auth session missing')) return true;
+  return false;
+}
+
 // ─── Provider ───────────────────────────────────────────────────────────────
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
@@ -130,6 +143,9 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   // ── initializeAuth (runs once on mount) ───────────────────────────────────
   useEffect(() => {
     let isMounted = true;
+    // Tracks whether initializeAuth successfully confirmed the user server-side.
+    // Used by the INITIAL_SESSION handler to decide whether to recover.
+    let userSetByInit = false;
 
     const initializeAuth = async () => {
       try {
@@ -145,7 +161,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                   data: { user: null },
                   error: new Error('Auth timeout'),
                 }),
-              10000,
+              6000,
             ),
           ),
         ]);
@@ -155,7 +171,15 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         } = authResult as Awaited<ReturnType<typeof supabase.auth.getUser>>;
 
         if (authError || !currentUser) {
-          if (authError && isHardAuthError(authError)) {
+          if (authError && isNoSessionError(authError)) {
+            // No session stored at all (clean logged-out / first-visit state).
+            // AuthSessionMissingError is not a network failure — clear silently.
+            if (isMounted) {
+              setUser(null);
+              setProfile(null);
+              clearCachedProfile();
+            }
+          } else if (authError && isHardAuthError(authError)) {
             // Real auth failure (invalid/expired token) — check if we have
             // a stale profile in cache and show the re-login modal.
             if (readCachedProfile()) {
@@ -167,14 +191,14 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
               }
             }
           } else if (authError) {
-            // Soft failure (network glitch, Supabase cold-start) — don't
-            // destroy the session. The cached profile already shows in UI.
+            // Genuine soft failure (network glitch, Supabase cold-start) —
+            // don't destroy the session. Cached profile stays visible in UI.
             console.warn(
               'Soft auth check failure (network?):',
               authError.message,
             );
           } else {
-            // No user at all — clean state
+            // No user and no error — clean state
             if (isMounted) {
               setUser(null);
               setProfile(null);
@@ -183,6 +207,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           }
         } else {
           // ✅ Valid user confirmed by server
+          userSetByInit = true;
           if (isMounted) setUser(currentUser);
 
           // Validate cached profile belongs to this user
@@ -195,7 +220,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
           // Fetch fresh profile from DB (updates cache automatically)
           const fresh = await fetchProfile(currentUser.id);
-          if (fresh && isMounted) setProfile(fresh);
+          if (fresh && isMounted) {
+            setProfile(fresh);
+            // Invalidate all SWR caches so data hooks re-fetch with the
+            // confirmed user — critical for correct data after a hard refresh.
+            mutate(() => true, undefined, { revalidate: true });
+          }
         }
       } catch (error) {
         console.error('Auth initialization sequence failed:', error);
@@ -231,11 +261,19 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             const fresh = await fetchProfile(session.user.id);
             if (fresh && isMounted) setProfile(fresh);
           } else if (event === 'INITIAL_SESSION') {
-            // Only fetch profile if initializeAuth hasn't already done it
-            if (!initDoneRef.current) {
+            // Run the profile fetch if:
+            // (a) initializeAuth hasn't finished yet — normal fast-path, OR
+            // (b) initializeAuth finished but timed out (userSetByInit = false) —
+            //     the INITIAL_SESSION from the local cookie can still recover the session.
+            if (!initDoneRef.current || !userSetByInit) {
+              if (isMounted) setUser(session.user);
               mutate(() => true, undefined, { revalidate: true });
               const fresh = await fetchProfile(session.user.id);
-              if (fresh && isMounted) setProfile(fresh);
+              if (fresh && isMounted) {
+                setProfile(fresh);
+                // Unblock data hooks immediately once session is confirmed from cookie.
+                setLoading(false);
+              }
             }
           }
         } else if (event === 'SIGNED_OUT') {
