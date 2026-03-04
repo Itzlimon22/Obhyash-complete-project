@@ -142,7 +142,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
       }}
     >
       <DialogContent
-        className="sm:max-w-4xl max-h-[90vh] p-0 flex flex-col overflow-hidden"
+        className="sm:max-w-6xl w-[95vw] max-h-[95vh] p-0 flex flex-col overflow-hidden"
         showCloseButton={false}
       >
         <div className="p-5 border-b border-neutral-100 dark:border-neutral-800 flex justify-between items-center bg-white dark:bg-neutral-900 sticky top-0 z-10 shrink-0">
@@ -300,8 +300,8 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
           </div>
 
           {/* Core Content */}
-          <div className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-8">
+            <div className="flex flex-col gap-8">
               {/* Question */}
               <div className="space-y-2">
                 <div className="flex justify-between items-end">
@@ -316,6 +316,8 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                   value={data.question || ''}
                   onChange={(val) => setData({ ...data, question: val })}
                   placeholder="প্রশ্নের বিবরণ লেখো (LaTeX and formatting supported)..."
+                  showToolbar
+                  editorClassName="min-h-[250px]"
                 />
                 {!validateLatex(data.question || '').isValid && (
                   <p className="text-[10px] text-red-500 font-bold mt-1">
@@ -406,6 +408,8 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                               value={opt}
                               onChange={(val) => updateOption(i, val)}
                               placeholder={`Option ${String.fromCharCode(65 + i)}`}
+                              showToolbar
+                              editorClassName="min-h-[120px]"
                             />
                           </div>
 
@@ -508,6 +512,8 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                 value={data.explanation || ''}
                 onChange={(val) => setData({ ...data, explanation: val })}
                 placeholder="সঠিক উত্তরের ব্যাখ্যা লেখো (LaTeX and formatting supported)..."
+                showToolbar
+                editorClassName="min-h-[200px]"
               />
               {!validateLatex(data.explanation || '').isValid && (
                 <p className="text-[10px] text-red-500 font-bold mt-1">

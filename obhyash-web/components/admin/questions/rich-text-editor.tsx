@@ -38,12 +38,16 @@ interface RichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  showToolbar?: boolean;
+  editorClassName?: string;
 }
 
 export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   value,
   onChange,
   placeholder,
+  showToolbar = false,
+  editorClassName,
 }) => {
   const editor = useEditor({
     immediatelyRender: false,
@@ -72,8 +76,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     content: value,
     editorProps: {
       attributes: {
-        className:
-          'prose dark:prose-invert max-w-none w-full outline-none min-h-[150px] px-4 py-3',
+        className: `prose dark:prose-invert max-w-none w-full outline-none px-4 py-3 ${
+          editorClassName || 'min-h-[150px]'
+        }`,
       },
     },
     onUpdate: ({ editor }) => {
@@ -129,6 +134,104 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   return (
     <div className="border border-paper-200 dark:border-obsidian-800 rounded-xl overflow-hidden bg-white dark:bg-obsidian-950 focus-within:ring-2 focus-within:ring-brand-500/20 focus-within:border-brand-500 transition-all relative">
+      {/* Static Toolbar - always visible when showToolbar is true */}
+      {showToolbar && editor && (
+        <div className="flex flex-wrap gap-0.5 p-1.5 bg-neutral-50 dark:bg-obsidian-900 border-b border-paper-200 dark:border-obsidian-700">
+          {/* Text Formatting */}
+          <MenuButton
+            onClick={() => editor.chain().focus().toggleBold().run()}
+            isActive={editor.isActive('bold')}
+            icon={<Bold size={13} />}
+            label="Bold"
+          />
+          <MenuButton
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+            isActive={editor.isActive('italic')}
+            icon={<Italic size={13} />}
+            label="Italic"
+          />
+          <MenuButton
+            onClick={() => editor.chain().focus().toggleUnderline().run()}
+            isActive={editor.isActive('underline')}
+            icon={<UnderlineIcon size={13} />}
+            label="Underline"
+          />
+          <div className="w-px h-4 bg-paper-200 dark:bg-obsidian-700 mx-0.5 self-center" />
+          <MenuButton
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: 1 }).run()
+            }
+            isActive={editor.isActive('heading', { level: 1 })}
+            icon={<Heading1 size={13} />}
+            label="H1"
+          />
+          <MenuButton
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: 2 }).run()
+            }
+            isActive={editor.isActive('heading', { level: 2 })}
+            icon={<Heading2 size={13} />}
+            label="H2"
+          />
+          <div className="w-px h-4 bg-paper-200 dark:bg-obsidian-700 mx-0.5 self-center" />
+          <MenuButton
+            onClick={() => editor.chain().focus().toggleBulletList().run()}
+            isActive={editor.isActive('bulletList')}
+            icon={<List size={13} />}
+            label="Bullet List"
+          />
+          <MenuButton
+            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            isActive={editor.isActive('orderedList')}
+            icon={<ListOrdered size={13} />}
+            label="Ordered List"
+          />
+          <div className="w-px h-4 bg-paper-200 dark:bg-obsidian-700 mx-0.5 self-center" />
+          <MenuButton
+            onClick={() => editor.chain().focus().setTextAlign('left').run()}
+            isActive={editor.isActive({ textAlign: 'left' })}
+            icon={<AlignLeft size={13} />}
+            label="Align Left"
+          />
+          <MenuButton
+            onClick={() => editor.chain().focus().setTextAlign('center').run()}
+            isActive={editor.isActive({ textAlign: 'center' })}
+            icon={<AlignCenter size={13} />}
+            label="Align Center"
+          />
+          <MenuButton
+            onClick={() => editor.chain().focus().setTextAlign('right').run()}
+            isActive={editor.isActive({ textAlign: 'right' })}
+            icon={<AlignRight size={13} />}
+            label="Align Right"
+          />
+          <div className="w-px h-4 bg-paper-200 dark:bg-obsidian-700 mx-0.5 self-center" />
+          <MenuButton
+            onClick={() => insertMath(false)}
+            isActive={false}
+            icon={<Calculator size={13} />}
+            label="Inline Math ($...$)"
+          />
+          <MenuButton
+            onClick={() => insertMath(true)}
+            isActive={false}
+            icon={<SquareSigma size={13} />}
+            label="Math Block ($$...$$)"
+          />
+          <MenuButton
+            onClick={insertTable}
+            isActive={false}
+            icon={<TableIcon size={13} />}
+            label="Insert Table"
+          />
+          <MenuButton
+            onClick={() => editor.chain().focus().toggleCode().run()}
+            isActive={editor.isActive('code')}
+            icon={<Code2 size={13} />}
+            label="Code"
+          />
+        </div>
+      )}
       {/* Bubble Menu - Formatting & Table Controls */}
       {editor && (
         <BubbleMenu
