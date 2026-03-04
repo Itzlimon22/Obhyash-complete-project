@@ -33,6 +33,7 @@ import TableOfContents from '@/components/blog/TableOfContents';
 import CommentSection from '@/components/blog/CommentSection';
 import LikeButton from '@/components/blog/LikeButton';
 import NewsletterSubscribe from '@/components/blog/NewsletterSubscribe';
+import BackToTop from '@/components/blog/BackToTop';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -594,6 +595,7 @@ export default async function BlogPostPage({
           </article>
         </div>
       </div>
+      <BackToTop />
     </>
   );
 }
