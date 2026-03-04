@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { cookies } from 'next/headers';
+import { rateLimitResponse } from '@/lib/utils/rate-limit';
 
 export async function GET(request: NextRequest) {
   try {
@@ -70,6 +70,10 @@ export async function POST(request: NextRequest) {
         { status: 401 },
       );
     }
+
+    // Rate limit: 30 like toggles per minute per user
+    const rl = rateLimitResponse(`likes:${user.id}`, 30, 60_000);
+    if (rl.limited) return rl.response;
 
     const { slug } = await request.json();
 

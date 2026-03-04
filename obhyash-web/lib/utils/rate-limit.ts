@@ -76,3 +76,15 @@ export function rateLimitResponse(key: string, limit = 20, windowMs = 60_000) {
   }
   return { limited: false, response: null } as const;
 }
+
+/** IP-keyed rate limiter for public/unauthenticated routes. */
+export function rateLimitByIp(
+  req: { headers: { get(name: string): string | null } },
+  route: string,
+  limit = 60,
+  windowMs = 60_000,
+) {
+  const forwarded = req.headers.get('x-forwarded-for');
+  const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
+  return rateLimitResponse(`ip:${route}:${ip}`, limit, windowMs);
+}

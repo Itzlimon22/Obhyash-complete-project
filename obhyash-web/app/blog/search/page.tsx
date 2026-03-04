@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getAllPosts } from '@/lib/blog-data';
-import { getBlogPostCounts } from '@/lib/blog-recommendations';
 import BlogSearchPage from '@/components/blog/BlogSearchPage';
 
 export const metadata: Metadata = {
@@ -13,11 +12,13 @@ export const metadata: Metadata = {
 
 export default async function BlogSearchRoute() {
   const allPosts = await getAllPosts();
-  const postCounts = await getBlogPostCounts(allPosts.map((p) => p.slug));
+  const categories = Array.from(
+    new Set(allPosts.map((p) => p.category).filter(Boolean)),
+  ) as string[];
 
   return (
     <Suspense>
-      <BlogSearchPage posts={allPosts} postCounts={postCounts} />
+      <BlogSearchPage categories={categories} />
     </Suspense>
   );
 }
