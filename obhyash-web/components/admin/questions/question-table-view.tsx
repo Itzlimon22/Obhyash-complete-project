@@ -280,16 +280,24 @@ const EditableRow = ({
         <select
           value={canonicalSubject}
           onChange={(e) => {
-            updateField('subject', e.target.value);
+            const val = e.target.value;
+            const item = availableSubjects.find((s) => s.name === val);
+            updateField('subject', val);
+            updateField('subjectId', item?.id);
             updateField('chapter', '');
+            updateField('chapterId', undefined);
             updateField('topic', '');
+            updateField('topicId', undefined);
 
             // Auto save subject change immediately
             const newQ = {
               ...localQ,
-              subject: e.target.value,
+              subject: val,
+              subjectId: item?.id,
               chapter: '',
+              chapterId: undefined,
               topic: '',
+              topicId: undefined,
             };
             setLocalQ(newQ);
             onSave(newQ);
@@ -309,10 +317,20 @@ const EditableRow = ({
         <select
           value={canonicalChapter}
           onChange={(e) => {
-            updateField('chapter', e.target.value);
+            const val = e.target.value;
+            const item = availableChapters.find((c) => c.name === val);
+            updateField('chapter', val);
+            updateField('chapterId', item?.id);
             updateField('topic', '');
+            updateField('topicId', undefined);
 
-            const newQ = { ...localQ, chapter: e.target.value, topic: '' };
+            const newQ = {
+              ...localQ,
+              chapter: val,
+              chapterId: item?.id,
+              topic: '',
+              topicId: undefined,
+            };
             setLocalQ(newQ);
             onSave(newQ);
           }}
@@ -332,8 +350,12 @@ const EditableRow = ({
         <select
           value={canonicalTopic}
           onChange={(e) => {
-            updateField('topic', e.target.value);
-            const newQ = { ...localQ, topic: e.target.value };
+            const val = e.target.value;
+            const item = availableTopics.find((t) => t.name === val);
+            updateField('topic', val);
+            updateField('topicId', item?.id);
+
+            const newQ = { ...localQ, topic: val, topicId: item?.id };
             setLocalQ(newQ);
             onSave(newQ);
           }}
