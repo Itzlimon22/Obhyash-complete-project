@@ -2,6 +2,11 @@ import { Question } from '@/lib/types';
 import { supabase, isSupabaseConfigured } from './core';
 import { createNotification } from './notification-service';
 import { generateQuestionFingerprint } from '@/lib/crypto-utils';
+import {
+  findHscSubject,
+  findHscChapter,
+  findHscTopic,
+} from '@/lib/data/hsc-helpers';
 
 const isValidUUID = (id: unknown): boolean =>
   typeof id === 'string' &&
@@ -618,17 +623,6 @@ export const bulkCreateQuestions = async (
         internalJobId = jobRes.id || undefined;
       }
 
-      // Pre-fetch taxonomy to map names to UUIDs safely
-      const { data: allSubjects } = await supabase
-        .from('subjects')
-        .select('id, name, name_en');
-      const { data: allChapters } = await supabase
-        .from('chapters')
-        .select('id, name, subject_id');
-      const { data: allTopics } = await supabase
-        .from('topics')
-        .select('id, name, chapter_id');
-
       // Map Question objects to database format and generate fingerprints
       const payloadPromises = questions.map(async (q) => {
         const correctAnswerIndices =
@@ -642,42 +636,50 @@ export const bulkCreateQuestions = async (
           chapter: q.chapter,
         });
 
-        // Resolve IDs from pre-fetched taxonomy if missing
+        // Resolve IDs from hsc-helpers if missing
         let sId = q.subjectId;
         let cId = q.chapterId;
         let tId = q.topicId;
+        let finalSubject = q.subject;
+        let finalChapter = q.chapter;
+        let finalTopic = q.topic;
 
-        const normalize = (str: any) =>
-          typeof str === 'string' ? str.trim().toLowerCase() : '';
-
-        if (!sId && q.subject && allSubjects) {
-          const normSubj = normalize(q.subject);
-          const s = allSubjects.find(
-            (sub: any) =>
-              normalize(sub.name) === normSubj ||
-              normalize(sub.name_en) === normSubj ||
-              normalize(sub.id) === normSubj,
-          );
-          if (s) sId = s.id;
+        // 1. Resolve Subject
+        const matchedSub = findHscSubject(q.subjectId || q.subject || '');
+        if (matchedSub) {
+          sId = matchedSub.id;
+          finalSubject = matchedSub.name;
         }
 
-        if (!isValidUUID(cId) && q.chapter && allChapters) {
-          const normChap = normalize(q.chapter);
-          const c = allChapters.find(
-            (ch: any) =>
-              normalize(ch.name) === normChap &&
-              (!sId || ch.subject_id === sId),
-          );
-          if (c) cId = c.id;
+        // 2. Resolve Chapter
+        const matchedChap = findHscChapter(q.chapterId || q.chapter || '');
+        if (matchedChap) {
+          cId = matchedChap.chapter.id;
+          finalChapter = matchedChap.chapter.name;
+          // Sync subject if it was missing but chapter found
+          if (!sId) {
+            sId = matchedChap.subject.id;
+            finalSubject = matchedChap.subject.name;
+          }
         }
 
-        if (!isValidUUID(tId) && q.topic && allTopics) {
-          const normTop = normalize(q.topic);
-          const t = allTopics.find(
-            (tp: any) =>
-              normalize(tp.name) === normTop && (!cId || tp.chapter_id === cId),
-          );
-          if (t) tId = t.id;
+        // 3. Resolve Topic
+        const matchedTop = findHscTopic(
+          q.topicId || q.topic || '',
+          cId || q.chapter,
+        );
+        if (matchedTop) {
+          tId = matchedTop.topic.id;
+          finalTopic = matchedTop.topic.name;
+          // Sync hierarchy if missing
+          if (!cId) {
+            cId = matchedTop.chapter.id;
+            finalChapter = matchedTop.chapter.name;
+          }
+          if (!sId) {
+            sId = matchedTop.subject.id;
+            finalSubject = matchedTop.subject.name;
+          }
         }
 
         return {
@@ -687,12 +689,12 @@ export const bulkCreateQuestions = async (
           explanation: q.explanation,
           type: q.type || 'MCQ',
           difficulty: q.difficulty || 'Medium',
-          subject: q.subject,
-          subject_id: sId || null, // subject_id can be text
-          chapter: q.chapter,
-          chapter_id: isValidUUID(cId) ? cId : null,
-          topic: q.topic,
-          topic_id: isValidUUID(tId) ? tId : null,
+          subject: finalSubject,
+          subject_id: sId || null,
+          chapter: finalChapter,
+          chapter_id: cId || null,
+          topic: finalTopic,
+          topic_id: tId || null,
           stream: q.stream,
           division: q.division,
           section: q.section,
@@ -701,6 +703,7 @@ export const bulkCreateQuestions = async (
           years: q.years || [],
           status: q.status || 'Pending',
           author: q.author || 'Admin',
+          author_name: q.authorName || q.author || 'Admin',
           tags: q.tags || [],
           version: 1,
           image_url: q.imageUrl,

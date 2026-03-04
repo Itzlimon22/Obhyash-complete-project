@@ -14,6 +14,12 @@ import {
   BookOpen,
 } from 'lucide-react';
 import {
+  getHscSubjectList,
+  getHscChapterList,
+  getHscTopicList,
+  resolveTaxonomyHierarchy,
+} from '@/lib/data/hsc-helpers';
+import {
   createQuestion,
   getSubjects,
   getChapters,
@@ -70,70 +76,27 @@ export default function TeacherCreateQuestionPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
 
-  // Dropdown data
-  const [subjects, setSubjects] = useState<{ id: string; name: string }[]>([]);
-  const [chapters, setChapters] = useState<{ id: string; name: string }[]>([]);
-  const [topics, setTopics] = useState<{ id: string; name: string }[]>([]);
   const [examTypes, setExamTypes] = useState<{ id: string; name: string }[]>(
     [],
   );
-  const [isLoadingSubjects, setIsLoadingSubjects] = useState(true);
 
-  // Load subjects and exam types on mount
+  // Load exam types on mount
   useEffect(() => {
     const loadInitialData = async () => {
-      setIsLoadingSubjects(true);
       try {
-        const [subs, types] = await Promise.all([
-          getSubjects(),
-          getExamTypes(),
-        ]);
-        setSubjects(subs);
+        const types = await getExamTypes();
         setExamTypes(types);
       } catch (error) {
-        console.error('Failed to load subjects/exam types:', error);
-      } finally {
-        setIsLoadingSubjects(false);
+        console.error('Failed to load exam types:', error);
       }
     };
     loadInitialData();
   }, []);
 
-  // Load chapters when subject changes
-  useEffect(() => {
-    if (formData.subject) {
-      const loadChapters = async () => {
-        try {
-          const chaps = await getChapters(formData.subject);
-          setChapters(chaps);
-          setTopics([]); // Reset topics when subject changes
-        } catch (error) {
-          console.error('Failed to load chapters:', error);
-        }
-      };
-      loadChapters();
-    } else {
-      setChapters([]);
-      setTopics([]);
-    }
-  }, [formData.subject]);
-
-  // Load topics when chapter changes
-  useEffect(() => {
-    if (formData.chapter) {
-      const loadTopics = async () => {
-        try {
-          const tops = await getTopics(formData.chapter);
-          setTopics(tops);
-        } catch (error) {
-          console.error('Failed to load topics:', error);
-        }
-      };
-      loadTopics();
-    } else {
-      setTopics([]);
-    }
-  }, [formData.chapter]);
+  const subjects = getHscSubjectList();
+  const chapters = formData.subject ? getHscChapterList(formData.subject) : [];
+  const topics = formData.chapter ? getHscTopicList(formData.chapter) : [];
+  const isLoadingSubjects = false;
 
   const handleChange = (
     field: keyof QuestionFormData,
@@ -249,6 +212,17 @@ export default function TeacherCreateQuestionPage() {
 
     setIsSaving(true);
     try {
+      // Resolve canonical names and IDs
+      const {
+        subject: subjName,
+        chapter: chapName,
+        topic: topName,
+      } = resolveTaxonomyHierarchy(
+        formData.subject,
+        formData.chapter,
+        formData.topic,
+      );
+
       const questionData: Partial<Question> = {
         question: formData.question,
         options: finalOptions,
@@ -256,9 +230,12 @@ export default function TeacherCreateQuestionPage() {
         correctAnswer: finalOptions[finalIndices[0]] || '',
         correctAnswerIndex: finalIndices[0],
         explanation: formData.explanation,
-        subject: formData.subject,
-        chapter: formData.chapter,
-        topic: formData.topic,
+        subject: subjName,
+        subjectId: formData.subject,
+        chapter: chapName,
+        chapterId: formData.chapter,
+        topic: topName,
+        topicId: formData.topic,
         stream: formData.stream,
         division: formData.division,
         difficulty: formData.difficulty,
