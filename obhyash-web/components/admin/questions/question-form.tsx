@@ -165,14 +165,19 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
               <label className={labelCls}>বিষয়</label>
               <select
                 value={data.subject || ''}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const item = availableSubjects.find((s) => s.name === val);
                   setData({
                     ...data,
-                    subject: e.target.value,
+                    subject: val,
+                    subjectId: item ? item.id : undefined,
                     chapter: '',
+                    chapterId: undefined,
                     topic: '',
-                  })
-                }
+                    topicId: undefined,
+                  });
+                }}
                 className={fieldCls}
               >
                 <option value="">নির্বাচন করো</option>
@@ -189,9 +194,17 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
               <label className={labelCls}>অধ্যায়</label>
               <select
                 value={data.chapter || ''}
-                onChange={(e) =>
-                  setData({ ...data, chapter: e.target.value, topic: '' })
-                }
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const item = availableChapters.find((c) => c.name === val);
+                  setData({
+                    ...data,
+                    chapter: val,
+                    chapterId: item ? item.id : undefined,
+                    topic: '',
+                    topicId: undefined,
+                  });
+                }}
                 disabled={!data.subject}
                 className={`${fieldCls} disabled:opacity-50 disabled:cursor-not-allowed`}
               >
@@ -209,7 +222,15 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
               <label className={labelCls}>টপিক</label>
               <select
                 value={data.topic || ''}
-                onChange={(e) => setData({ ...data, topic: e.target.value })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const item = availableTopics.find((t) => t.name === val);
+                  setData({
+                    ...data,
+                    topic: val,
+                    topicId: item ? item.id : undefined,
+                  });
+                }}
                 disabled={!data.chapter}
                 className={`${fieldCls} disabled:opacity-50 disabled:cursor-not-allowed`}
               >
