@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { BlogPost } from '@/lib/blog-data';
 import BlogCard from '@/components/blog/BlogCard';
-import { BookOpen, Sparkles, TrendingUp, Search, X } from 'lucide-react';
+import { BookOpen, Sparkles, TrendingUp, Search, X, Rss } from 'lucide-react';
 
 const SUB_CATEGORIES = [
   'সব',
@@ -155,6 +155,19 @@ export default function BlogListingClient({
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-black/5 dark:border-white/5 bg-white shadow-sm dark:bg-[#111] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10 transition-all text-[15px] font-anek"
             />
+          </div>
+
+          {/* RSS subscribe link */}
+          <div className="mt-5">
+            <a
+              href="/blog/rss.xml"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors font-anek"
+            >
+              <Rss className="w-3.5 h-3.5" />
+              RSS ফিড সাবস্ক্রাইব করুন
+            </a>
           </div>
         </div>
       </section>

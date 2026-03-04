@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     'Discover expert study tips, MCQ solving techniques, SSC & HSC exam preparation guides, and time management strategies to help you score higher. Written by the Obhyash education team.',
   alternates: {
     canonical: 'https://obhyash.com/blog',
+    types: {
+      'application/rss+xml': 'https://obhyash.com/blog/rss.xml',
+    },
   },
   openGraph: {
     title: 'Obhyash Blog — Study Tips & Exam Strategies',
