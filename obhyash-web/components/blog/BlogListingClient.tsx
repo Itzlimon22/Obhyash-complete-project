@@ -77,6 +77,8 @@ export default function BlogListingClient({
   const [searchQuery, setSearchQuery] = useState('');
   const [showSaved, setShowSaved] = useState(false);
 
+  const readSlugs = useReadHistory();
+
   // ── Bookmarks ──────────────────────────────────────
   const { data: bookmarkData, mutate: mutateBookmarks } = useSWR<{
     slugs: string[];
