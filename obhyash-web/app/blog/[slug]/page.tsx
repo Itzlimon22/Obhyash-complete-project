@@ -35,6 +35,7 @@ import LikeButton from '@/components/blog/LikeButton';
 import NewsletterSubscribe from '@/components/blog/NewsletterSubscribe';
 import BackToTop from '@/components/blog/BackToTop';
 import BlogBookmarkButton from '@/components/blog/BlogBookmarkButton';
+import EmojiReactions from '@/components/blog/EmojiReactions';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -548,6 +549,9 @@ export default async function BlogPostPage({
                 ))}
               </div>
             </div>
+
+            {/* Emoji Reactions */}
+            <EmojiReactions slug={post.slug} />
 
             {/* Comments Section */}
             <div className="mt-12">

@@ -6,7 +6,15 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { BlogPost } from '@/lib/blog-data';
 import BlogCard from '@/components/blog/BlogCard';
-import { BookOpen, Sparkles, TrendingUp, Search, X, Rss, Bookmark } from 'lucide-react';
+import {
+  BookOpen,
+  Sparkles,
+  TrendingUp,
+  Search,
+  X,
+  Rss,
+  Bookmark,
+} from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -69,10 +77,9 @@ export default function BlogListingClient({
   const [showSaved, setShowSaved] = useState(false);
 
   // ── Bookmarks ──────────────────────────────────────
-  const { data: bookmarkData, mutate: mutateBookmarks } = useSWR<{ slugs: string[] }>(
-    '/api/blog/bookmarks',
-    fetcher,
-  );
+  const { data: bookmarkData, mutate: mutateBookmarks } = useSWR<{
+    slugs: string[];
+  }>('/api/blog/bookmarks', fetcher);
   const bookmarkedSlugs = useMemo(
     () => new Set(bookmarkData?.slugs ?? []),
     [bookmarkData],
@@ -98,7 +105,9 @@ export default function BlogListingClient({
       toast({ title: 'বুকমার্ক করতে লগইন করুন', variant: 'destructive' });
       return;
     }
-    toast({ title: already ? 'বুকমার্ক সরানো হয়েছে' : 'বুকমার্কে যোগ করা হয়েছে' });
+    toast({
+      title: already ? 'বুকমার্ক সরানো হয়েছে' : 'বুকমার্কে যোগ করা হয়েছে',
+    });
   };
 
   const filteredPosts = useMemo(() => {
@@ -136,7 +145,15 @@ export default function BlogListingClient({
     }
 
     return result;
-  }, [posts, activeCategory, activeSubCategory, searchQuery, activeTag, showSaved, bookmarkedSlugs]);
+  }, [
+    posts,
+    activeCategory,
+    activeSubCategory,
+    searchQuery,
+    activeTag,
+    showSaved,
+    bookmarkedSlugs,
+  ]);
 
   const nonFeaturedFiltered = filteredPosts.filter(
     (p) =>
@@ -188,16 +205,35 @@ export default function BlogListingClient({
             ))}
           </div>
 
-          {/* Search bar */}
+          {/* Search bar — navigates to /blog/search on Enter */}
           <div className="relative max-w-lg mx-auto">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 w-[18px] h-[18px] text-slate-400 pointer-events-none" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-slate-400 pointer-events-none" />
             <input
               type="text"
               placeholder="আর্টিকেল খুঁজুন…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-black/5 dark:border-white/5 bg-white shadow-sm dark:bg-[#111] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10 transition-all text-[15px] font-anek"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchQuery.trim()) {
+                  router.push(
+                    `/blog/search?q=${encodeURIComponent(searchQuery.trim())}`,
+                  );
+                }
+              }}
+              className="w-full pl-11 pr-28 py-3.5 rounded-2xl border border-black/5 dark:border-white/5 bg-white shadow-sm dark:bg-[#111] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-black/5 dark:focus:ring-white/10 transition-all text-[15px] font-anek"
             />
+            <button
+              onClick={() =>
+                router.push(
+                  searchQuery.trim()
+                    ? `/blog/search?q=${encodeURIComponent(searchQuery.trim())}`
+                    : '/blog/search',
+                )
+              }
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold rounded-xl hover:bg-slate-700 dark:hover:bg-slate-100 transition-colors font-anek whitespace-nowrap"
+            >
+              সার্চ করুন
+            </button>
           </div>
 
           {/* RSS subscribe link */}
@@ -232,7 +268,9 @@ export default function BlogListingClient({
                   : 'bg-transparent text-slate-600 dark:text-slate-400 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5'
               }`}
             >
-              <Bookmark className={`w-3 h-3 ${showSaved ? 'fill-white' : ''}`} />
+              <Bookmark
+                className={`w-3 h-3 ${showSaved ? 'fill-white' : ''}`}
+              />
               সংরক্ষিত
             </button>
 
