@@ -16,7 +16,7 @@ import {
   Rss,
   Bookmark,
 } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -88,7 +88,7 @@ export default function BlogListingClient({
 
   const toggleBookmark = async (slug: string) => {
     if (!bookmarkData) {
-      toast({ title: 'বুকমার্ক করতে লগইন করুন', variant: 'destructive' });
+      toast.error('বুকমার্ক করতে লগইন করুন');
       return;
     }
     const already = bookmarkedSlugs.has(slug);
@@ -103,12 +103,10 @@ export default function BlogListingClient({
     });
     if (res.status === 401) {
       mutateBookmarks();
-      toast({ title: 'বুকমার্ক করতে লগইন করুন', variant: 'destructive' });
+      toast.error('বুকমার্ক করতে লগইন করুন');
       return;
     }
-    toast({
-      title: already ? 'বুকমার্ক সরানো হয়েছে' : 'বুকমার্কে যোগ করা হয়েছে',
-    });
+    toast(already ? 'বুকমার্ক সরানো হয়েছে' : 'বুকমার্কে যোগ করা হয়েছে');
   };
 
   const filteredPosts = useMemo(() => {
