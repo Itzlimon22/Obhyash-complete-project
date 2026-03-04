@@ -94,10 +94,11 @@ export const getSubjects = async (
       return Array.from(uniqueSubjects.values()).map((s) => ({
         ...s,
         name: s.name || s.name_en || '', // Ensure 'name' is always a string
-        icon: s.icon 
-          || (s.name ? SUBJECT_ICONS[s.name] : undefined) 
-          || (s.id ? SUBJECT_ICONS[s.id] : undefined) 
-          || '📘',
+        icon:
+          s.icon ||
+          (s.name ? SUBJECT_ICONS[s.name] : undefined) ||
+          (s.id ? SUBJECT_ICONS[s.id] : undefined) ||
+          '📘',
       }));
     }
   }

@@ -180,8 +180,28 @@ export default function StudentRoot({
   };
 
   // Global User State
+  // Valid tabs matching our Next.js root routes
+  const validTabs = [
+    'dashboard',
+    'setup',
+    'history',
+    'practice',
+    'leaderboard',
+    'analysis',
+    'complaint',
+    'notifications',
+    'about',
+    'my-reports',
+    'subscription',
+    'profile',
+    'settings',
+  ];
+
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== 'undefined') {
+      // Allow loading initial tab based on the URL (e.g. /practice -> practice)
+      const path = window.location.pathname.replace(/^\//, '');
+      if (validTabs.includes(path)) return path;
       return sessionStorage.getItem('obhyash_active_tab') || 'dashboard';
     }
     return 'dashboard';
@@ -458,6 +478,9 @@ export default function StudentRoot({
 
       setActiveTab(tab);
       sessionStorage.setItem('obhyash_active_tab', tab);
+      if (typeof window !== 'undefined' && validTabs.includes(tab)) {
+        window.history.pushState(null, '', '/' + tab);
+      }
     }
   };
 
