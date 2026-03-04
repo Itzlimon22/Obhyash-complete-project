@@ -152,71 +152,59 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   // ── initializeAuth (runs once on mount) ───────────────────────────────────
   useEffect(() => {
     let isMounted = true;
-    // Tracks whether initializeAuth successfully confirmed the user server-side.
     // Used by the INITIAL_SESSION handler to decide whether to recover.
     let userSetByInit = false;
 
     const initializeAuth = async () => {
       try {
-        // Use getSession() instead of getUser() on the client.
-        // proxy.ts (middleware) ALREADY calls getUser() on the server to cryptographically
-        // verify the token and update cookies on every page load.
-        // Calling getUser() here creates a race condition with the global Supabase JS lock
-        // which causes all subsequent database queries like .from('users').select() to hang infinitely.
+        // WHY getSession() instead of getUser()?
+        // getUser() makes a round-trip to Supabase servers on every app load.
+        // This acquires an internal auth lock in the JS client, which can cause
+        // subsequent .from().select() queries to queue and appear to hang.
+        // getSession() reads from the local JS client cache synchronously — fast and lock-free.
+        // Security note: proxy.ts (middleware) already calls getUser() server-side on every
+        // request to validate the JWT and refresh the cookie. So the client can trust the session.
         const {
           data: { session },
           error: authError,
         } = await supabase.auth.getSession();
 
-        const currentUser = session?.user || null;
+        const currentUser = session?.user ?? null;
 
-        if (authError || !currentUser) {
-          if (authError && isNoSessionError(authError)) {
-            // No session stored at all (clean logged-out / first-visit state).
-            // AuthSessionMissingError is not a network failure — clear silently.
+        if (authError) {
+          if (isNoSessionError(authError)) {
+            // Clean logged-out state — no session stored at all. Safe to clear.
             if (isMounted) {
               setUser(null);
               setProfile(null);
               clearCachedProfile();
+              setLoading(false);
             }
-          } else if (authError && isHardAuthError(authError)) {
-            // Real auth failure (invalid/expired token) — check if we have
-            // a stale profile in cache and show the re-login modal.
-            if (readCachedProfile()) {
-              if (isMounted) {
-                console.warn(
-                  'Hard auth error detected, showing corruption modal',
-                  authError.message,
-                );
+          } else if (isHardAuthError(authError)) {
+            // Invalid/expired token — show re-login modal if we have a cached profile.
+            if (isMounted) {
+              if (readCachedProfile()) {
                 setShowCorruptionModal(true);
-              }
-            } else {
-              if (isMounted) {
+              } else {
                 setUser(null);
                 setProfile(null);
               }
+              setLoading(false);
             }
-          } else if (authError) {
-            // Genuine soft failure (network glitch, Supabase cold-start) —
-            // don't destroy the session. Cached profile stays visible in UI.
+          } else {
+            // Soft failure (network glitch) — keep cached state, let INITIAL_SESSION recover.
             console.warn(
               'Soft auth check failure (network?):',
               authError.message,
             );
-          } else {
-            // No user and no error — clean state
-            if (isMounted) {
-              setUser(null);
-              setProfile(null);
-              clearCachedProfile();
-            }
+            // Do NOT call setLoading(false) here — INITIAL_SESSION will handle it.
           }
-        } else {
-          // ✅ Valid user confirmed by server
+        } else if (currentUser) {
+          // ✅ Valid user found in the local JS client cache.
           userSetByInit = true;
           if (isMounted) setUser(currentUser);
 
-          // Validate cached profile belongs to this user
+          // Serve cached profile instantly to avoid layout flash.
           const cached = readCachedProfile();
           if (cached && cached.id === currentUser.id) {
             if (isMounted) setProfile(cached);
@@ -224,19 +212,36 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             clearCachedProfile();
           }
 
-          // Fetch fresh profile from DB (updates cache automatically)
+          // Fetch fresh profile from DB in background.
           const fresh = await fetchProfile(currentUser.id);
           if (fresh && isMounted) {
             setProfile(fresh);
-            // Invalidate all SWR caches so data hooks re-fetch with the
-            // confirmed user — critical for correct data after a hard refresh.
             mutate(() => true, undefined, { revalidate: true });
           }
+          // setLoading(false) will be called in the finally block below.
+        } else {
+          // getSession() returned null with NO error.
+          // WHY don't we clear state here?
+          // The Supabase JS client cache is empty, but this does NOT mean there is no session.
+          // proxy.ts validates the session server-side via cookies, and Supabase fires
+          // onAuthStateChange('INITIAL_SESSION') shortly after mount to sync the client cache.
+          // If we clear user/profile here, ClientLayout redirects to /login.
+          // proxy.ts bounces the admin back to /admin/dashboard → infinite reload loop.
+          // Solution: set a flag, leave state alone, and let INITIAL_SESSION handle everything.
+          // setLoading(false) will be called by the INITIAL_SESSION handler instead.
+          if (isMounted) {
+            // Signal to INITIAL_SESSION handler that initializeAuth did NOT find a user,
+            // so INITIAL_SESSION must resolve loading state regardless.
+            userSetByInit = false;
+          }
+          // Deliberately do NOT call setLoading(false) here.
+          // If INITIAL_SESSION never fires (truly no session), the handler below clears state.
+          return; // Exit early — INITIAL_SESSION takes over from here.
         }
       } catch (error) {
         console.error('Auth initialization sequence failed:', error);
       } finally {
-        if (isMounted) {
+        if (isMounted && !initDoneRef.current) {
           setLoading(false);
           initDoneRef.current = true;
         }
@@ -292,42 +297,59 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     // ── Heartbeat (Every 10 minutes) ─────────────────────────────────────────
     const heartbeat = setInterval(handleHealthCheck, 10 * 60 * 1000);
 
-    // ── onAuthStateChange — handles token refresh & sign-in/out events ──────
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
         if (process.env.NODE_ENV === 'development') {
-          console.log('[Auth] event:', event);
+          console.log(
+            '[Auth] event:',
+            event,
+            '| user:',
+            session?.user?.id ?? 'none',
+          );
         }
 
         if (session?.user) {
           if (isMounted) setUser(session.user);
 
           if (event === 'SIGNED_IN') {
-            // Fresh login — invalidate all SWR caches and load profile
+            // Fresh login — invalidate all SWR caches and load profile.
             mutate(() => true, undefined, { revalidate: true });
             const fresh = await fetchProfile(session.user.id);
             if (fresh && isMounted) setProfile(fresh);
           } else if (event === 'TOKEN_REFRESHED') {
-            // Silently refresh profile in background
+            // Silently refresh profile in background.
             const fresh = await fetchProfile(session.user.id);
             if (fresh && isMounted) setProfile(fresh);
           } else if (event === 'INITIAL_SESSION') {
-            // Run the profile fetch if:
-            // (a) initializeAuth hasn't finished yet — normal fast-path, OR
-            // (b) initializeAuth finished but timed out (userSetByInit = false) —
-            //     the INITIAL_SESSION from the local cookie can still recover the session.
+            // This fires when the Supabase JS client syncs the session from the server cookie.
+            // It recovers the session when initializeAuth's getSession() found nothing in cache.
             if (!initDoneRef.current || !userSetByInit) {
               if (isMounted) setUser(session.user);
               mutate(() => true, undefined, { revalidate: true });
               const fresh = await fetchProfile(session.user.id);
-              if (fresh && isMounted) {
-                setProfile(fresh);
-                // Unblock data hooks immediately once session is confirmed from cookie.
+              if (fresh && isMounted) setProfile(fresh);
+
+              // CRITICAL: always unblock loading here, regardless of whether fetchProfile
+              // succeeded. If we only call setLoading(false) inside `if (fresh)`, a failed
+              // DB query causes the spinner to hang forever.
+              if (isMounted) {
                 setLoading(false);
+                initDoneRef.current = true;
               }
             }
+          }
+        } else if (event === 'INITIAL_SESSION') {
+          // INITIAL_SESSION fired with NO session — the user is genuinely not logged in.
+          // initializeAuth exited early (returned before finally) waiting for this event.
+          // We must clear state and unblock loading here or the spinner hangs forever.
+          if (isMounted) {
+            setUser(null);
+            setProfile(null);
+            clearCachedProfile();
+            setLoading(false);
+            initDoneRef.current = true;
           }
         } else if (event === 'SIGNED_OUT') {
           if (isMounted) {
