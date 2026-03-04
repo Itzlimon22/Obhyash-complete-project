@@ -635,27 +635,35 @@ export const bulkCreateQuestions = async (
         let cId = q.chapterId;
         let tId = q.topicId;
 
+        const normalize = (str: any) =>
+          typeof str === 'string' ? str.trim().toLowerCase() : '';
+
         if (!sId && q.subject && allSubjects) {
+          const normSubj = normalize(q.subject);
           const s = allSubjects.find(
             (sub: any) =>
-              sub.name === q.subject ||
-              sub.name_en === q.subject ||
-              sub.id === q.subject,
+              normalize(sub.name) === normSubj ||
+              normalize(sub.name_en) === normSubj ||
+              normalize(sub.id) === normSubj,
           );
           if (s) sId = s.id;
         }
 
         if (!isValidUUID(cId) && q.chapter && allChapters) {
+          const normChap = normalize(q.chapter);
           const c = allChapters.find(
             (ch: any) =>
-              ch.name === q.chapter && (!sId || ch.subject_id === sId),
+              normalize(ch.name) === normChap &&
+              (!sId || ch.subject_id === sId),
           );
           if (c) cId = c.id;
         }
 
         if (!isValidUUID(tId) && q.topic && allTopics) {
+          const normTop = normalize(q.topic);
           const t = allTopics.find(
-            (tp: any) => tp.name === q.topic && (!cId || tp.chapter_id === cId),
+            (tp: any) =>
+              normalize(tp.name) === normTop && (!cId || tp.chapter_id === cId),
           );
           if (t) tId = t.id;
         }
