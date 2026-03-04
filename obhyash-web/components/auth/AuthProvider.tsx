@@ -166,6 +166,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     let isMounted = true;
     // Used by the INITIAL_SESSION handler to decide whether to recover.
     let userSetByInit = false;
+    // Set to true when getSession() returns null and we are waiting for
+    // INITIAL_SESSION to provide the real session. The finally block must
+    // NOT call setLoading(false) in this case — doing so triggers the
+    // ClientLayout redirect (!user → /login) BEFORE INITIAL_SESSION fires,
+    // then the middleware bounces the admin back → infinite reload loop.
+    let waitingForInitialSession = false;
 
     const initializeAuth = async () => {
       try {
@@ -248,12 +254,19 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           }
           // Deliberately do NOT call setLoading(false) here.
           // If INITIAL_SESSION never fires (truly no session), the handler below clears state.
+          // CRITICAL: mark this flag so the finally block below does NOT call setLoading(false).
+          // Without this, finally runs (return inside try still triggers finally in JS),
+          // setLoading(false) fires with user=null, ClientLayout redirects to /login,
+          // middleware bounces the admin back to /admin/dashboard → infinite reload loop.
+          waitingForInitialSession = true;
           return; // Exit early — INITIAL_SESSION takes over from here.
         }
       } catch (error) {
         console.error('Auth initialization sequence failed:', error);
       } finally {
-        if (isMounted && !initDoneRef.current) {
+        // Skip if we are waiting for INITIAL_SESSION to provide the real session.
+        // In that case INITIAL_SESSION handler is solely responsible for setLoading(false).
+        if (isMounted && !initDoneRef.current && !waitingForInitialSession) {
           setLoading(false);
           initDoneRef.current = true;
         }
@@ -261,6 +274,20 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     initializeAuth();
+
+    // Safety net: if waitingForInitialSession=true but INITIAL_SESSION never fires
+    // (e.g. Supabase Realtime is blocked), unblock loading after 8 seconds so the
+    // admin isn't stuck on a spinner forever. The redirect logic will then handle
+    // the unauthenticated state correctly.
+    const initialSessionTimeout = setTimeout(() => {
+      if (isMounted && !initDoneRef.current) {
+        console.warn(
+          '[Auth] INITIAL_SESSION never fired — unblocking loading as fallback',
+        );
+        setLoading(false);
+        initDoneRef.current = true;
+      }
+    }, 8000);
 
     // ── Resiliency Listeners (Network & Focus) ───────────────────────────────
     const handleHealthCheck = async () => {
@@ -409,6 +436,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('focus', onFocus);
       window.removeEventListener('visibilitychange', onVisibilityChange);
       clearInterval(heartbeat);
+      clearTimeout(initialSessionTimeout);
       if (healthCheckDebounceRef.current) {
         clearTimeout(healthCheckDebounceRef.current);
       }
