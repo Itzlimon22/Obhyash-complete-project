@@ -417,19 +417,21 @@ export default async function BlogPostPage({
           </p>
 
           {/* Author meta row */}
-          <div className="flex flex-wrap items-center gap-4 pb-12">
-            <div
-              className={`w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 text-sm font-semibold`}
-            >
-              {post.author.initials}
+          <div className="flex flex-wrap items-center gap-3 pb-12">
+            <div className="flex items-center gap-3">
+              <div
+                className={`w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 text-sm font-semibold shrink-0`}
+              >
+                {post.author.initials}
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                  {post.author.name}
+                </p>
+                <p className="text-xs text-slate-400">{post.author.role}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                {post.author.name}
-              </p>
-              <p className="text-xs text-slate-400">{post.author.role}</p>
-            </div>
-            <div className="flex items-center gap-4 ml-auto text-xs text-slate-400 dark:text-slate-500 flex-wrap font-anek">
+            <div className="flex items-center gap-4 sm:ml-auto text-xs text-slate-400 dark:text-slate-500 flex-wrap font-anek">
               <span className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />
                 {formatDate(post.publishedAt)}
@@ -514,41 +516,44 @@ export default async function BlogPostPage({
             </div>
 
             {/* Post body */}
-            <div
-              className="prose prose-slate dark:prose-invert max-w-none w-full
+            <div className="max-w-[72ch] mx-auto">
+              <div
+                className="prose prose-slate dark:prose-invert max-w-none w-full
                 prose-strong:text-slate-900 dark:prose-strong:text-slate-100 font-medium
               "
-            >
-              <ReactMarkdown
-                remarkPlugins={[remarkMath, remarkGfm]}
-                rehypePlugins={[
-                  rehypeKatex,
-                  rehypeRaw,
-                  rehypeSlug,
-                  rehypeHighlight,
-                ]}
-                components={MarkdownComponents}
               >
-                {post.content}
-              </ReactMarkdown>
-            </div>
-            {/* Tags */}
-            <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
-              <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 font-anek">
-                ট্যাগ
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag) => (
-                  <Link
-                    key={tag}
-                    href={`/blog?tag=${encodeURIComponent(tag)}`}
-                    className="px-3 py-1 text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-700 hover:border-rose-200 dark:hover:border-rose-900 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
-                  >
-                    #{tag}
-                  </Link>
-                ))}
+                <ReactMarkdown
+                  remarkPlugins={[remarkMath, remarkGfm]}
+                  rehypePlugins={[
+                    rehypeKatex,
+                    rehypeRaw,
+                    rehypeSlug,
+                    rehypeHighlight,
+                  ]}
+                  components={MarkdownComponents}
+                >
+                  {post.content}
+                </ReactMarkdown>
+              </div>
+              {/* Tags */}
+              <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
+                <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 font-anek">
+                  ট্যাগ
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {post.tags.map((tag) => (
+                    <Link
+                      key={tag}
+                      href={`/blog?tag=${encodeURIComponent(tag)}`}
+                      className="px-3 py-1 text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-700 hover:border-rose-200 dark:hover:border-rose-900 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+                    >
+                      #{tag}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
+            {/* end max-w readable */}
 
             {/* Emoji Reactions */}
             <EmojiReactions slug={post.slug} />

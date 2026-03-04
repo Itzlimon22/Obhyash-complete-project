@@ -252,7 +252,7 @@ export default function BlogCard({
                 key={tag}
                 href={`/blog?tag=${encodeURIComponent(tag)}`}
                 onClick={(e) => e.stopPropagation()}
-                className="px-2 py-0.5 text-[10px] font-medium text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800 rounded-md border border-slate-100 dark:border-slate-700 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-200 dark:hover:border-rose-900 transition-colors"
+                className="px-2.5 py-1 text-[11px] font-medium text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800 rounded-md border border-slate-100 dark:border-slate-700 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-200 dark:hover:border-rose-900 transition-colors"
               >
                 #{tag}
               </Link>
@@ -260,28 +260,31 @@ export default function BlogCard({
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-[#2b2b2b]">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 min-w-0">
               <div
-                className={`w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 text-[9px] font-bold`}
+                className={`w-6 h-6 shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 text-[9px] font-bold`}
               >
                 {post.author.initials}
               </div>
-              <div className="flex items-center gap-1.5 text-xs text-slate-400 font-anek">
+              <div className="min-w-0">
                 <Link
                   href={`/blog/author/${post.author.name}`}
                   onClick={(e) => e.stopPropagation()}
-                  className="font-medium text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+                  className="block text-[12px] font-medium text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 transition-colors truncate font-anek"
                 >
                   {post.author.name}
                 </Link>
-                <span className="opacity-50">•</span>
-                <Clock className="w-3 h-3" />
-                <span>{post.readTime} মিনিট</span>
-                <span className="opacity-50">•</span>
-                <span>{formatDate(post.publishedAt)}</span>
+                <div className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 font-anek mt-0.5">
+                  <Clock className="w-2.5 h-2.5 shrink-0" />
+                  <span>{post.readTime} মি.</span>
+                  <span className="mx-0.5 opacity-40">·</span>
+                  <span className="truncate">
+                    {formatDate(post.publishedAt)}
+                  </span>
+                </div>
               </div>
             </div>
-            <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-rose-500 group-hover:translate-x-1 transition-all duration-200" />
+            <ArrowRight className="w-4 h-4 shrink-0 text-slate-300 dark:text-slate-600 group-hover:text-rose-500 group-hover:translate-x-1 transition-all duration-200" />
           </div>
           {/* Engagement stats */}
           {stats?.likes || stats?.views ? (

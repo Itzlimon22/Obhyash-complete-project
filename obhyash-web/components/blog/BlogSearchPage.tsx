@@ -194,8 +194,32 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="h-64 rounded-2xl bg-slate-100 dark:bg-[#1e1e1e] animate-pulse"
-              />
+                className="rounded-2xl bg-white dark:bg-[#141414] border border-black/5 dark:border-white/5 overflow-hidden animate-pulse"
+              >
+                {/* Cover image strip */}
+                <div className="h-44 bg-slate-100 dark:bg-[#1e1e1e]" />
+                <div className="p-4 space-y-3">
+                  {/* Category badge */}
+                  <div className="h-5 w-20 rounded-full bg-slate-100 dark:bg-[#1e1e1e]" />
+                  {/* Title */}
+                  <div className="space-y-2">
+                    <div className="h-4 rounded bg-slate-100 dark:bg-[#1e1e1e] w-full" />
+                    <div className="h-4 rounded bg-slate-100 dark:bg-[#1e1e1e] w-4/5" />
+                  </div>
+                  {/* Excerpt */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="h-3 rounded bg-slate-100 dark:bg-[#1e1e1e] w-full" />
+                    <div className="h-3 rounded bg-slate-100 dark:bg-[#1e1e1e] w-full" />
+                    <div className="h-3 rounded bg-slate-100 dark:bg-[#1e1e1e] w-3/5" />
+                  </div>
+                  {/* Footer: avatar + name */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-[#1e1e1e] shrink-0" />
+                    <div className="h-3 w-24 rounded bg-slate-100 dark:bg-[#1e1e1e]" />
+                    <div className="h-3 w-16 rounded bg-slate-100 dark:bg-[#1e1e1e] ml-auto" />
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         )}

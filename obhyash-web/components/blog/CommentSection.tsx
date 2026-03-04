@@ -2,7 +2,14 @@
 
 import { useState, FormEvent } from 'react';
 import useSWR from 'swr';
-import { Send, User as UserIcon, Loader2, AlertCircle, Reply, X } from 'lucide-react';
+import {
+  Send,
+  User as UserIcon,
+  Loader2,
+  AlertCircle,
+  Reply,
+  X,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 import { BlogComment } from '@/lib/types';
@@ -15,12 +22,22 @@ interface CommentSectionProps {
 }
 
 // Build avatar letter/image element
-function Avatar({ user, size = 10 }: { user?: BlogComment['user']; size?: number }) {
+function Avatar({
+  user,
+  size = 10,
+}: {
+  user?: BlogComment['user'];
+  size?: number;
+}) {
   const cls = `w-${size} h-${size} shrink-0 rounded-full flex items-center justify-center text-white font-semibold text-sm ${user?.avatarColor || 'bg-slate-600'}`;
   return (
     <div className={cls}>
       {user?.avatarUrl ? (
-        <img src={user.avatarUrl} alt={user.name} className="w-full h-full rounded-full object-cover" />
+        <img
+          src={user.avatarUrl}
+          alt={user.name}
+          className="w-full h-full rounded-full object-cover"
+        />
       ) : user?.name ? (
         user.name.charAt(0).toUpperCase()
       ) : (
@@ -32,8 +49,11 @@ function Avatar({ user, size = 10 }: { user?: BlogComment['user']; size?: number
 
 function formatCommentDate(ds: string) {
   return new Date(ds).toLocaleDateString('bn-BD', {
-    year: 'numeric', month: 'long', day: 'numeric',
-    hour: '2-digit', minute: '2-digit',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 }
 
@@ -45,7 +65,13 @@ interface ReplyFormProps {
   mutate: () => void;
 }
 
-function ReplyForm({ postSlug, parentId, parentAuthor, onDone, mutate }: ReplyFormProps) {
+function ReplyForm({
+  postSlug,
+  parentId,
+  parentAuthor,
+  onDone,
+  mutate,
+}: ReplyFormProps) {
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -57,7 +83,11 @@ function ReplyForm({ postSlug, parentId, parentAuthor, onDone, mutate }: ReplyFo
       const res = await fetch('/api/blog/comments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: postSlug, content: content.trim(), parentId }),
+        body: JSON.stringify({
+          slug: postSlug,
+          content: content.trim(),
+          parentId,
+        }),
       });
       if (!res.ok) throw new Error();
       await mutate();
@@ -72,7 +102,7 @@ function ReplyForm({ postSlug, parentId, parentAuthor, onDone, mutate }: ReplyFo
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-3 ml-14">
+    <form onSubmit={handleSubmit} className="mt-3 ml-8 sm:ml-14">
       <div className="relative">
         <p className="text-[12px] text-slate-400 mb-1.5 font-anek">
           @{parentAuthor} কে রিপ্লাই করছেন
@@ -98,7 +128,13 @@ function ReplyForm({ postSlug, parentId, parentAuthor, onDone, mutate }: ReplyFo
             disabled={isSubmitting || !content.trim()}
             className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 flex items-center gap-1.5 font-anek"
           >
-            {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Send className="w-3 h-3" /> রিপ্লাই</>}
+            {isSubmitting ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <>
+                <Send className="w-3 h-3" /> রিপ্লাই
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -116,7 +152,15 @@ interface ThreadedCommentProps {
   mutate: () => void;
 }
 
-function ThreadedComment({ comment, replies, postSlug, currentUserId, replyingTo, onReply, mutate }: ThreadedCommentProps) {
+function ThreadedComment({
+  comment,
+  replies,
+  postSlug,
+  currentUserId,
+  replyingTo,
+  onReply,
+  mutate,
+}: ThreadedCommentProps) {
   return (
     <div className="flex gap-3">
       <Avatar user={comment.user} size={10} />
@@ -140,7 +184,9 @@ function ThreadedComment({ comment, replies, postSlug, currentUserId, replyingTo
         {currentUserId && (
           <div className="flex items-center gap-3 mt-1.5 ml-1">
             <button
-              onClick={() => onReply(replyingTo === comment.id ? '' : comment.id)}
+              onClick={() =>
+                onReply(replyingTo === comment.id ? '' : comment.id)
+              }
               className="inline-flex items-center gap-1 text-[12px] text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors font-anek"
             >
               <Reply className="w-3.5 h-3.5" />
@@ -196,15 +242,15 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
-  const { data, error, mutate, isLoading } = useSWR<{ comments: BlogComment[] }>(
-    `/api/blog/comments?slug=${postSlug}`,
-    fetcher,
-  );
+  const { data, error, mutate, isLoading } = useSWR<{
+    comments: BlogComment[];
+  }>(`/api/blog/comments?slug=${postSlug}`, fetcher);
 
   const allComments = data?.comments || [];
   // Separate top-level and replies
   const topLevel = allComments.filter((c) => !c.parent_id);
-  const getReplies = (id: string) => allComments.filter((c) => c.parent_id === id);
+  const getReplies = (id: string) =>
+    allComments.filter((c) => c.parent_id === id);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -228,7 +274,10 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
   };
 
   return (
-    <div className="mt-16 pt-10 border-t border-slate-100 dark:border-slate-800 font-anek" id="comments">
+    <div
+      className="mt-16 pt-10 border-t border-slate-100 dark:border-slate-800 font-anek"
+      id="comments"
+    >
       <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-8 flex items-center gap-2">
         <span className="bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400 w-8 h-8 rounded-full flex items-center justify-center text-sm">
           {topLevel.length}
@@ -248,7 +297,9 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
               maxLength={1000}
             />
             <div className="absolute right-3 bottom-3 flex items-center gap-3">
-              <span className="text-xs text-slate-400">{1000 - content.length} ক্যারেক্টার বাকি</span>
+              <span className="text-xs text-slate-400">
+                {1000 - content.length} ক্যারেক্টার বাকি
+              </span>
               <button
                 type="submit"
                 disabled={isSubmitting || !content.trim()}
@@ -257,7 +308,9 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
                 {isSubmitting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <>পোস্ট করুন <Send className="w-3.5 h-3.5" /></>
+                  <>
+                    পোস্ট করুন <Send className="w-3.5 h-3.5" />
+                  </>
                 )}
               </button>
             </div>
@@ -265,8 +318,12 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
         ) : (
           <div className="bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] p-6 rounded-xl flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-slate-800 dark:text-slate-200 font-semibold mb-1">মতামত জানাতে লগইন করুন</span>
-              <span className="text-sm text-slate-500 dark:text-slate-400">কমেন্ট সেকশনে যুক্ত হতে আপনার একাউন্টে প্রবেশ করুন।</span>
+              <span className="text-slate-800 dark:text-slate-200 font-semibold mb-1">
+                মতামত জানাতে লগইন করুন
+              </span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">
+                কমেন্ট সেকশনে যুক্ত হতে আপনার একাউন্টে প্রবেশ করুন।
+              </span>
             </div>
             <a
               href={`/login?redirect=/blog/${postSlug}#comments`}
@@ -313,7 +370,6 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
     </div>
   );
 }
-
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 

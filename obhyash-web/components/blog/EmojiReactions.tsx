@@ -92,7 +92,7 @@ export default function EmojiReactions({ slug }: EmojiReactionsProps) {
               onClick={() => toggle(emoji)}
               aria-label={label}
               title={label}
-              className={`group relative inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-sm font-medium transition-all duration-150 select-none
+              className={`group relative inline-flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl border text-sm font-medium transition-all duration-150 select-none
                 ${
                   active
                     ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-300 shadow-sm'
@@ -107,7 +107,9 @@ export default function EmojiReactions({ slug }: EmojiReactionsProps) {
               >
                 {emoji}
               </span>
-              <span className="font-anek text-[13px]">{label}</span>
+              <span className="hidden sm:inline font-anek text-[13px]">
+                {label}
+              </span>
               {count > 0 && (
                 <span
                   className={`ml-0.5 min-w-[18px] text-center text-[12px] font-bold rounded-full px-1 font-anek

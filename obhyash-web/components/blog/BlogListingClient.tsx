@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
@@ -253,62 +253,74 @@ export default function BlogListingClient({
       </section>
 
       {/* ─── Category Filter ─── */}
-      <div className="sticky top-16 z-40 bg-[#FAF6F3]/90 dark:bg-[#0a0a0a]/90 backdrop-blur-md pb-4 pt-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 overflow-x-auto">
-          <div className="flex items-center gap-2 min-w-max mx-auto justify-start sm:justify-center">
-            {/* Saved tab */}
-            <button
-              onClick={() => {
-                setShowSaved((v) => !v);
-                setActiveCategory('All');
-                setActiveSubCategory('সব');
-              }}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors border font-anek ${
-                showSaved
-                  ? 'bg-rose-500 text-white border-rose-500 shadow-sm'
-                  : 'bg-transparent text-slate-600 dark:text-slate-400 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5'
-              }`}
-            >
-              <Bookmark
-                className={`w-3 h-3 ${showSaved ? 'fill-white' : ''}`}
-              />
-              সংরক্ষিত
-            </button>
+      <div className="sticky top-16 z-40 bg-[#FAF6F3]/90 dark:bg-[#0a0a0a]/90 backdrop-blur-md border-b border-black/[0.04] dark:border-white/[0.04] pt-2 pb-3">
+        <div className="max-w-7xl mx-auto py-1.5">
+          <div className="relative">
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
+            <div className="overflow-x-auto no-scrollbar px-4 sm:px-6">
+              <div className="flex items-center gap-2 min-w-max mx-auto justify-start sm:justify-center">
+                {/* Saved tab */}
+                <button
+                  onClick={() => {
+                    setShowSaved((v) => !v);
+                    setActiveCategory('All');
+                    setActiveSubCategory('সব');
+                  }}
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors border font-anek ${
+                    showSaved
+                      ? 'bg-rose-500 text-white border-rose-500 shadow-sm'
+                      : 'bg-transparent text-slate-600 dark:text-slate-400 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5'
+                  }`}
+                >
+                  <Bookmark
+                    className={`w-3 h-3 ${showSaved ? 'fill-white' : ''}`}
+                  />
+                  সংরক্ষিত
+                </button>
 
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => {
-                  setShowSaved(false);
-                  setActiveCategory(cat);
-                  setActiveSubCategory('সব');
-                }}
-                className={`px-3.5 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors border font-anek ${
-                  !showSaved && activeCategory === cat
-                    ? 'bg-slate-900 text-white dark:bg-white dark:text-black shadow-sm'
-                    : 'bg-transparent text-slate-600 dark:text-slate-400 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5'
-                }`}
-              >
-                {cat === 'All' ? 'সব' : cat}
-              </button>
-            ))}
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      setShowSaved(false);
+                      setActiveCategory(cat);
+                      setActiveSubCategory('সব');
+                    }}
+                    className={`px-3.5 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors border font-anek ${
+                      !showSaved && activeCategory === cat
+                        ? 'bg-slate-900 text-white dark:bg-white dark:text-black shadow-sm'
+                        : 'bg-transparent text-slate-600 dark:text-slate-400 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    {cat === 'All' ? 'সব' : cat}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {activeCategory === 'বিষয়ভিত্তিক পড়াশোনা' && (
-            <div className="flex items-center gap-2 min-w-max mx-auto justify-start sm:justify-center mt-3 border-t border-slate-100 dark:border-[#2b2b2b] pt-3">
-              {SUB_CATEGORIES.map((subcat) => (
-                <button
-                  key={subcat}
-                  onClick={() => setActiveSubCategory(subcat)}
-                  className={`px-3 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors border font-anek ${
-                    activeSubCategory === subcat
-                      ? 'bg-slate-100 dark:bg-[#202020] text-slate-800 dark:text-slate-200 border-slate-300 dark:border-[#404040]'
-                      : 'bg-transparent text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-50 dark:hover:bg-[#1a1a1a]'
-                  }`}
-                >
-                  {subcat}
-                </button>
-              ))}
+            <div className="relative mt-2 pt-2 border-t border-slate-100 dark:border-[#2b2b2b]">
+              <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
+              <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />
+              <div className="overflow-x-auto no-scrollbar px-4 sm:px-6">
+                <div className="flex items-center gap-2 min-w-max mx-auto justify-start sm:justify-center">
+                  {SUB_CATEGORIES.map((subcat) => (
+                    <button
+                      key={subcat}
+                      onClick={() => setActiveSubCategory(subcat)}
+                      className={`px-3 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors border font-anek ${
+                        activeSubCategory === subcat
+                          ? 'bg-slate-100 dark:bg-[#202020] text-slate-800 dark:text-slate-200 border-slate-300 dark:border-[#404040]'
+                          : 'bg-transparent text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-50 dark:hover:bg-[#1a1a1a]'
+                      }`}
+                    >
+                      {subcat}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>
