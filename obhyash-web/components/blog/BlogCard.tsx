@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { BlogPost } from '@/lib/blog-data';
-import { Clock, ArrowRight, Tag, Heart, Eye } from 'lucide-react';
+import { Clock, ArrowRight, Tag, Heart, Eye, Bookmark } from 'lucide-react';
 
 function formatCount(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`;
@@ -24,9 +24,11 @@ interface BlogCardProps {
   post: BlogPost;
   featured?: boolean;
   stats?: { likes: number; views: number };
+  isBookmarked?: boolean;
+  onToggleBookmark?: (slug: string) => void;
 }
 
-export default function BlogCard({ post, featured = false, stats }: BlogCardProps) {
+export default function BlogCard({ post, featured = false, stats, isBookmarked, onToggleBookmark }: BlogCardProps) {
   const router = useRouter();
   const categoryStyle =
     'bg-slate-50 text-slate-600 dark:bg-[#1a1a1a] dark:text-slate-400 border border-slate-100 dark:border-white/5';
@@ -50,6 +52,17 @@ export default function BlogCard({ post, featured = false, stats }: BlogCardProp
             </div>
           ) : (
             <div className={`w-full h-2 bg-gradient-to-r ${post.coverColor}`} />
+          )}
+          {/* Bookmark button — featured card */}
+          {onToggleBookmark && (
+            <button
+              onClick={(e) => { e.preventDefault(); onToggleBookmark(post.slug); }}
+              aria-label={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করুন'}
+              className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow transition-all
+                ${isBookmarked ? 'bg-rose-500 text-white' : 'bg-white/80 dark:bg-black/60 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-black/80'}`}
+            >
+              <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-white' : ''}`} />
+            </button>
           )}
           <div className="p-6 sm:p-8 md:p-10">
             {/* Featured badge + Category */}
@@ -141,11 +154,33 @@ export default function BlogCard({ post, featured = false, stats }: BlogCardProp
               className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
+            {/* Bookmark overlay — regular card */}
+            {onToggleBookmark && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onToggleBookmark(post.slug); }}
+                aria-label={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করুন'}
+                className={`absolute top-2 right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center shadow transition-all
+                  ${isBookmarked ? 'bg-rose-500 text-white' : 'bg-white/80 dark:bg-black/60 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-black/80'}`}
+              >
+                <Bookmark className={`w-3 h-3 ${isBookmarked ? 'fill-white' : ''}`} />
+              </button>
+            )}
           </div>
         ) : (
-          <div
-            className={`w-full h-1.5 bg-gradient-to-r ${post.coverColor} shrink-0`}
-          />
+          <div className="relative">
+            <div className={`w-full h-1.5 bg-gradient-to-r ${post.coverColor} shrink-0`} />
+            {/* Bookmark for no-cover cards */}
+            {onToggleBookmark && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onToggleBookmark(post.slug); }}
+                aria-label={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করুন'}
+                className={`absolute top-2 right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center shadow transition-all
+                  ${isBookmarked ? 'bg-rose-500 text-white' : 'bg-slate-100 dark:bg-[#2b2b2b] text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#333]'}`}
+              >
+                <Bookmark className={`w-3 h-3 ${isBookmarked ? 'fill-white' : ''}`} />
+              </button>
+            )}
+          </div>
         )}
         <div className="flex flex-col flex-1 p-5 sm:p-6">
           {/* Category badge */}

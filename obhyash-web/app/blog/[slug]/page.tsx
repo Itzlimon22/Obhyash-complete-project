@@ -34,6 +34,7 @@ import CommentSection from '@/components/blog/CommentSection';
 import LikeButton from '@/components/blog/LikeButton';
 import NewsletterSubscribe from '@/components/blog/NewsletterSubscribe';
 import BackToTop from '@/components/blog/BackToTop';
+import BlogBookmarkButton from '@/components/blog/BlogBookmarkButton';
 
 // ─── SEO Metadata ──────────────────────────────────────────────────
 export async function generateMetadata({
@@ -553,7 +554,7 @@ export default async function BlogPostPage({
               <CommentSection postSlug={post.slug} />
             </div>
 
-            {/* Interaction Ribbon (Likes + Social Share) */}
+            {/* Interaction Ribbon (Likes + Bookmark + Social Share) */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mt-10 bg-slate-50 dark:bg-[#1a1a1a] p-4 rounded-2xl border border-slate-100 dark:border-[#2b2b2b]">
               <div className="flex items-center gap-3">
                 <span className="text-sm font-semibold text-slate-500 dark:text-slate-400 font-anek">
@@ -561,7 +562,10 @@ export default async function BlogPostPage({
                 </span>
                 <LikeButton postSlug={post.slug} />
               </div>
-              <SocialShare url={jsonLd.url} title={post.title} />
+              <div className="flex items-center gap-3">
+                <BlogBookmarkButton slug={post.slug} />
+                <SocialShare url={jsonLd.url} title={post.title} />
+              </div>
             </div>
 
             {/* Author Bio block */}

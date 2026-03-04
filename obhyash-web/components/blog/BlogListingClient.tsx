@@ -3,9 +3,13 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
+import useSWR from 'swr';
 import { BlogPost } from '@/lib/blog-data';
 import BlogCard from '@/components/blog/BlogCard';
-import { BookOpen, Sparkles, TrendingUp, Search, X, Rss } from 'lucide-react';
+import { BookOpen, Sparkles, TrendingUp, Search, X, Rss, Bookmark } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+
+const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 const SUB_CATEGORIES = [
   'সব',
@@ -62,9 +66,47 @@ export default function BlogListingClient({
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeSubCategory, setActiveSubCategory] = useState('সব');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSaved, setShowSaved] = useState(false);
+
+  // ── Bookmarks ──────────────────────────────────────
+  const { data: bookmarkData, mutate: mutateBookmarks } = useSWR<{ slugs: string[] }>(
+    '/api/blog/bookmarks',
+    fetcher,
+  );
+  const bookmarkedSlugs = useMemo(
+    () => new Set(bookmarkData?.slugs ?? []),
+    [bookmarkData],
+  );
+
+  const toggleBookmark = async (slug: string) => {
+    if (!bookmarkData) {
+      toast({ title: 'বুকমার্ক করতে লগইন করুন', variant: 'destructive' });
+      return;
+    }
+    const already = bookmarkedSlugs.has(slug);
+    const next = already
+      ? bookmarkData.slugs.filter((s) => s !== slug)
+      : [...bookmarkData.slugs, slug];
+    mutateBookmarks({ slugs: next }, false);
+    const res = await fetch('/api/blog/bookmarks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug }),
+    });
+    if (res.status === 401) {
+      mutateBookmarks();
+      toast({ title: 'বুকমার্ক করতে লগইন করুন', variant: 'destructive' });
+      return;
+    }
+    toast({ title: already ? 'বুকমার্ক সরানো হয়েছে' : 'বুকমার্কে যোগ করা হয়েছে' });
+  };
 
   const filteredPosts = useMemo(() => {
     let result = posts;
+
+    if (showSaved) {
+      return result.filter((p) => bookmarkedSlugs.has(p.slug));
+    }
 
     if (activeCategory !== 'All') {
       result = result.filter((p) => p.category === activeCategory);
@@ -94,7 +136,7 @@ export default function BlogListingClient({
     }
 
     return result;
-  }, [posts, activeCategory, activeSubCategory, searchQuery, activeTag]);
+  }, [posts, activeCategory, activeSubCategory, searchQuery, activeTag, showSaved, bookmarkedSlugs]);
 
   const nonFeaturedFiltered = filteredPosts.filter(
     (p) =>
@@ -107,6 +149,7 @@ export default function BlogListingClient({
   const showFeatured =
     !searchQuery &&
     !activeTag &&
+    !showSaved &&
     activeCategory === 'All' &&
     activeSubCategory === 'সব' &&
     featuredPost;
@@ -176,15 +219,33 @@ export default function BlogListingClient({
       <div className="sticky top-16 z-40 bg-[#FAF6F3]/90 dark:bg-[#0a0a0a]/90 backdrop-blur-md pb-4 pt-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 overflow-x-auto">
           <div className="flex items-center gap-2 min-w-max mx-auto justify-start sm:justify-center">
+            {/* Saved tab */}
+            <button
+              onClick={() => {
+                setShowSaved((v) => !v);
+                setActiveCategory('All');
+                setActiveSubCategory('সব');
+              }}
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors border font-anek ${
+                showSaved
+                  ? 'bg-rose-500 text-white border-rose-500 shadow-sm'
+                  : 'bg-transparent text-slate-600 dark:text-slate-400 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5'
+              }`}
+            >
+              <Bookmark className={`w-3 h-3 ${showSaved ? 'fill-white' : ''}`} />
+              সংরক্ষিত
+            </button>
+
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => {
+                  setShowSaved(false);
                   setActiveCategory(cat);
                   setActiveSubCategory('সব');
                 }}
                 className={`px-3.5 py-1.5 rounded-lg text-[13px] font-medium whitespace-nowrap transition-colors border font-anek ${
-                  activeCategory === cat
+                  !showSaved && activeCategory === cat
                     ? 'bg-slate-900 text-white dark:bg-white dark:text-black shadow-sm'
                     : 'bg-transparent text-slate-600 dark:text-slate-400 border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5'
                 }`}
@@ -241,6 +302,7 @@ export default function BlogListingClient({
         {/* Recommended Top Section (Only shown if no search/tag) */}
         {!searchQuery &&
           !activeTag &&
+          !showSaved &&
           activeCategory === 'All' &&
           activeSubCategory === 'সব' &&
           recommendedPosts.length > 0 && (
@@ -278,7 +340,13 @@ export default function BlogListingClient({
               )}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
                 {recommendedPosts.map((post) => (
-                  <BlogCard key={post.slug + '-rec'} post={post} stats={postCounts[post.slug]} />
+                  <BlogCard
+                    key={post.slug + '-rec'}
+                    post={post}
+                    stats={postCounts[post.slug]}
+                    isBookmarked={bookmarkedSlugs.has(post.slug)}
+                    onToggleBookmark={toggleBookmark}
+                  />
                 ))}
               </div>
             </div>
@@ -292,7 +360,13 @@ export default function BlogListingClient({
                 নির্বাচিত পোস্ট
               </h2>
             </div>
-            <BlogCard post={featuredPost!} featured stats={postCounts[featuredPost!.slug]} />
+            <BlogCard
+              post={featuredPost!}
+              featured
+              stats={postCounts[featuredPost!.slug]}
+              isBookmarked={bookmarkedSlugs.has(featuredPost!.slug)}
+              onToggleBookmark={toggleBookmark}
+            />
           </div>
         )}
 
@@ -313,7 +387,13 @@ export default function BlogListingClient({
                 ? nonFeaturedFiltered
                 : filteredPosts
               ).map((post) => (
-                <BlogCard key={post.slug} post={post} stats={postCounts[post.slug]} />
+                <BlogCard
+                  key={post.slug}
+                  post={post}
+                  stats={postCounts[post.slug]}
+                  isBookmarked={bookmarkedSlugs.has(post.slug)}
+                  onToggleBookmark={toggleBookmark}
+                />
               ))}
             </div>
           </>

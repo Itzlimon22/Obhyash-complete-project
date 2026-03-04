@@ -74,25 +74,28 @@ const fetchAllPostsFromNotion = async (): Promise<BlogPost[]> => {
   }
 
   try {
-    const response = await (notion.databases as any).query({
-      database_id: process.env.NOTION_DATABASE_ID,
-      page_size: 100, // Reasonable limit to prevent massive payload timeouts
-      filter: {
-        property: 'Status',
-        status: {
-          equals: 'Published',
+    // Notion caps page_size at 100 per request. Paginate with start_cursor
+    // to retrieve all published posts regardless of total count.
+    const allPages: any[] = [];
+    let cursor: string | undefined = undefined;
+
+    do {
+      const response = await (notion.databases as any).query({
+        database_id: process.env.NOTION_DATABASE_ID,
+        page_size: 100,
+        start_cursor: cursor,
+        filter: {
+          property: 'Status',
+          status: { equals: 'Published' },
         },
-      },
-      sorts: [
-        {
-          property: 'PublishedAt',
-          direction: 'descending',
-        },
-      ],
-    });
+        sorts: [{ property: 'PublishedAt', direction: 'descending' }],
+      });
+      allPages.push(...response.results);
+      cursor = response.has_more ? response.next_cursor : undefined;
+    } while (cursor);
 
     const posts: BlogPost[] = await Promise.all(
-      response.results.map(async (page: any) => {
+      allPages.map(async (page: any) => {
         const props = page.properties;
 
         const slug = getPropertyValue(props.Slug, 'rich_text') || page.id;
