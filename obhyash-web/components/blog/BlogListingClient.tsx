@@ -43,6 +43,7 @@ interface BlogListingClientProps {
   categories: string[];
   recommendedPosts: BlogPost[];
   isGuest: boolean;
+  postCounts?: Record<string, { likes: number; views: number }>;
 }
 
 export default function BlogListingClient({
@@ -51,6 +52,7 @@ export default function BlogListingClient({
   categories,
   recommendedPosts,
   isGuest,
+  postCounts = {},
 }: BlogListingClientProps) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeSubCategory, setActiveSubCategory] = useState('সব');
@@ -228,7 +230,7 @@ export default function BlogListingClient({
               )}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
                 {recommendedPosts.map((post) => (
-                  <BlogCard key={post.slug + '-rec'} post={post} />
+                  <BlogCard key={post.slug + '-rec'} post={post} stats={postCounts[post.slug]} />
                 ))}
               </div>
             </div>
@@ -242,7 +244,7 @@ export default function BlogListingClient({
                 নির্বাচিত পোস্ট
               </h2>
             </div>
-            <BlogCard post={featuredPost!} featured />
+            <BlogCard post={featuredPost!} featured stats={postCounts[featuredPost!.slug]} />
           </div>
         )}
 
@@ -263,7 +265,7 @@ export default function BlogListingClient({
                 ? nonFeaturedFiltered
                 : filteredPosts
               ).map((post) => (
-                <BlogCard key={post.slug} post={post} />
+                <BlogCard key={post.slug} post={post} stats={postCounts[post.slug]} />
               ))}
             </div>
           </>

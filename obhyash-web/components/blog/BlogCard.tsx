@@ -1,7 +1,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { BlogPost } from '@/lib/blog-data';
-import { Clock, ArrowRight, Tag } from 'lucide-react';
+import { Clock, ArrowRight, Tag, Heart, Eye } from 'lucide-react';
+
+function formatCount(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+  return String(n);
+}
 
 function formatDate(dateStr: string) {
   const date = new Date(dateStr);
@@ -15,9 +20,10 @@ function formatDate(dateStr: string) {
 interface BlogCardProps {
   post: BlogPost;
   featured?: boolean;
+  stats?: { likes: number; views: number };
 }
 
-export default function BlogCard({ post, featured = false }: BlogCardProps) {
+export default function BlogCard({ post, featured = false, stats }: BlogCardProps) {
   const categoryStyle =
     'bg-slate-50 text-slate-600 dark:bg-[#1a1a1a] dark:text-slate-400 border border-slate-100 dark:border-white/5';
 
@@ -91,6 +97,23 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
               </span>
             </div>
+            {/* Engagement stats */}
+            {(stats?.likes || stats?.views) ? (
+              <div className="flex items-center gap-3 mt-5 pt-4 border-t border-slate-100 dark:border-[#2b2b2b]">
+                {(stats.likes > 0) && (
+                  <span className="inline-flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500 font-anek">
+                    <Heart className="w-3.5 h-3.5" />
+                    {formatCount(stats.likes)}
+                  </span>
+                )}
+                {(stats.views > 0) && (
+                  <span className="inline-flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500 font-anek">
+                    <Eye className="w-3.5 h-3.5" />
+                    {formatCount(stats.views)}
+                  </span>
+                )}
+              </div>
+            ) : null}
           </div>
         </article>
       </Link>
@@ -170,6 +193,23 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
             </div>
             <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-rose-500 group-hover:translate-x-1 transition-all duration-200" />
           </div>
+          {/* Engagement stats */}
+          {(stats?.likes || stats?.views) ? (
+            <div className="flex items-center gap-3 pt-3 border-t border-slate-100 dark:border-[#2b2b2b] mt-1">
+              {(stats.likes > 0) && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 font-anek">
+                  <Heart className="w-3 h-3" />
+                  {formatCount(stats.likes)}
+                </span>
+              )}
+              {(stats.views > 0) && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 font-anek">
+                  <Eye className="w-3 h-3" />
+                  {formatCount(stats.views)}
+                </span>
+              )}
+            </div>
+          ) : null}
         </div>
       </article>
     </Link>

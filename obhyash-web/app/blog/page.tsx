@@ -11,6 +11,7 @@ import { createClient } from '@/utils/supabase/server';
 import {
   getAdvancedRecommendations,
   getMostViewedPosts,
+  getBlogPostCounts,
 } from '@/lib/blog-recommendations';
 
 export const metadata: Metadata = {
@@ -52,6 +53,9 @@ export default async function BlogPage() {
     console.error('Failed to load recommended posts:', error);
   }
 
+  const allSlugs = allPosts.map((p) => p.slug);
+  const postCounts = await getBlogPostCounts(allSlugs);
+
   return (
     <BlogListingClient
       posts={allPosts}
@@ -59,6 +63,7 @@ export default async function BlogPage() {
       categories={BLOG_CATEGORIES}
       recommendedPosts={recommendedPosts}
       isGuest={isGuest}
+      postCounts={postCounts}
     />
   );
 }

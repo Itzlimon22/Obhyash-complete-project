@@ -152,3 +152,32 @@ export async function getMostViewedPosts(): Promise<BlogPost[]> {
   // Fallback: return featured + latest
   return allPosts.slice(0, 3);
 }
+
+export async function getBlogPostCounts(
+  slugs: string[],
+): Promise<Record<string, { likes: number; views: number }>> {
+  if (!slugs.length) return {};
+
+  const result: Record<string, { likes: number; views: number }> = {};
+  slugs.forEach((s) => (result[s] = { likes: 0, views: 0 }));
+
+  try {
+    const supabase = await createClient();
+
+    const [{ data: likes }, { data: views }] = await Promise.all([
+      supabase.from('blog_likes').select('post_slug').in('post_slug', slugs),
+      supabase.from('blog_views').select('post_slug').in('post_slug', slugs),
+    ]);
+
+    likes?.forEach(({ post_slug }) => {
+      if (result[post_slug]) result[post_slug].likes++;
+    });
+    views?.forEach(({ post_slug }) => {
+      if (result[post_slug]) result[post_slug].views++;
+    });
+  } catch (error) {
+    console.error('Error fetching blog post counts:', error);
+  }
+
+  return result;
+}
