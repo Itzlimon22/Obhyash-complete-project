@@ -5,8 +5,8 @@
 -- Part A: Relational Taxonomy
 ALTER TABLE public.questions 
 ADD COLUMN IF NOT EXISTS subject_id TEXT, 
-ADD COLUMN IF NOT EXISTS chapter_id UUID, 
-ADD COLUMN IF NOT EXISTS topic_id UUID;
+ADD COLUMN IF NOT EXISTS chapter_id TEXT, 
+ADD COLUMN IF NOT EXISTS topic_id TEXT;
 
 -- Optional: Add Foreign Key constraints if tables exist and are clean
 -- ALTER TABLE public.questions ADD CONSTRAINT fk_questions_subject FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE SET NULL;
@@ -78,8 +78,8 @@ BEGIN
         v_question->>'chapter',
         v_question->>'topic',
         v_question->>'subject_id',
-        (v_question->>'chapter_id')::uuid,
-        (v_question->>'topic_id')::uuid,
+        v_question->>'chapter_id',
+        v_question->>'topic_id',
         v_question->>'stream',
         COALESCE(v_question->>'division', v_question->>'section'),
         v_question->>'section',
