@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { cookies } from 'next/headers';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,7 +13,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const cookieStore = cookies();
     const supabase = await createClient();
 
     // Fetch comments and join with the users table to get name and avatar info
@@ -24,7 +22,7 @@ export async function GET(request: NextRequest) {
         '*, user:user_id(name, avatarUrl:avatar_url, avatarColor:avatar_color)',
       )
       .eq('post_slug', slug)
-      .order('created_at', { ascending: false }); // Newest first
+      .order('created_at', { ascending: true }); // Chronological for threaded view
 
     if (error) throw error;
 
@@ -40,7 +38,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = cookies();
     const supabase = await createClient();
 
     // Verify authentication
@@ -56,7 +53,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { slug, content } = await request.json();
+    const { slug, content, parentId } = await request.json();
 
     if (!slug || !content || content.trim() === '') {
       return NextResponse.json(
@@ -72,6 +69,7 @@ export async function POST(request: NextRequest) {
         post_slug: slug,
         user_id: user.id,
         content: content.trim(),
+        ...(parentId ? { parent_id: parentId } : {}),
       })
       .select(
         '*, user:user_id(name, avatarUrl:avatar_url, avatarColor:avatar_color)',

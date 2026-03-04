@@ -605,6 +605,7 @@ export interface BlogComment {
   id: string;
   post_slug: string;
   user_id: string;
+  parent_id?: string | null;
   content: string;
   created_at: string;
   updated_at: string;
