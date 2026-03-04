@@ -137,7 +137,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       <div className="flex items-center gap-1 md:gap-3 ml-2">
         {/* Refresh Button */}
         <button
-          onClick={() => window.location.reload()}
+          onClick={() => router.refresh()}
           title="Refresh Page Data"
           className="p-2 text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors group"
         >
