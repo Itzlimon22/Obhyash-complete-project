@@ -271,7 +271,7 @@ export default function TeacherCreateQuestionPage() {
         type: 'MCQ',
         status: 'Pending', // Teachers always create pending questions
         author: user.email, // Associate validation
-        author_name: user.user_metadata?.name || 'Teacher',
+        authorName: user.user_metadata?.name || 'Teacher',
         createdAt: new Date().toISOString(),
       };
 

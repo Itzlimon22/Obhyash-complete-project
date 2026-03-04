@@ -88,7 +88,7 @@ export interface Question {
   // System Metadata
   status: QuestionStatus;
   author: string;
-  author_name?: string;
+  authorName?: string;
   createdAt: string;
   version: number;
   tags: string[];

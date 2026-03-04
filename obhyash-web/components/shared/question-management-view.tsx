@@ -73,8 +73,9 @@ export default function QuestionManagementView({
   const router = useRouter();
   const { user, profile } = useAuth();
 
-  const currentAuthorName =
-    profile?.name || user?.email || (baseFilters.author as string) || 'Admin';
+  const currentAuthorEmail =
+    user?.email || (baseFilters.author as string) || 'Admin';
+  const currentAuthorName = profile?.name || user?.email || 'Admin';
 
   // View state management
   const [viewMode, setViewMode] = useState<'list' | 'upload' | 'edit'>('list');
@@ -110,8 +111,8 @@ export default function QuestionManagementView({
       type: 'MCQ',
       options: ['', '', '', ''],
       difficulty: 'Medium',
-      author: currentAuthorName,
-      author_name: currentAuthorName,
+      author: currentAuthorEmail,
+      authorName: currentAuthorName,
     });
     setViewMode('edit');
   };
@@ -120,8 +121,8 @@ export default function QuestionManagementView({
     // Ensure author is preserved/set
     const questionToSave = {
       ...q,
-      author: q.author || currentAuthorName,
-      author_name: q.author_name || currentAuthorName,
+      author: q.author || currentAuthorEmail,
+      authorName: q.authorName || currentAuthorName,
     };
     const success = await saveQuestion(questionToSave);
     if (success) setViewMode('list');
@@ -131,8 +132,8 @@ export default function QuestionManagementView({
     // Ensure author is preserved/set for bulk import
     const dataToImport = data.map((q) => ({
       ...q,
-      author: currentAuthorName,
-      author_name: currentAuthorName,
+      author: currentAuthorEmail,
+      authorName: currentAuthorName,
     }));
     const success = await bulkImport(dataToImport);
     if (success) setViewMode('list');

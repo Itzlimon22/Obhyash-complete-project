@@ -113,6 +113,7 @@ export const getQuestionsPage = async (
             optionImages: q.option_images || [],
             explanationImageUrl: q.explanation_image_url,
             examType: q.exam_type,
+            authorName: q.author_name,
             institutes: q.institutes || [],
             years: q.years || [],
           }) as Question,
@@ -209,6 +210,7 @@ export const getQuestion = async (id: string): Promise<Question | null> => {
           optionImages: data.option_images || [],
           explanationImageUrl: data.explanation_image_url,
           examType: data.exam_type,
+          authorName: data.author_name,
           institutes: data.institutes || [],
           years: data.years || [],
         };
@@ -265,6 +267,7 @@ export const createQuestion = async (
         years: question.years || [],
         status: question.status || 'Pending',
         author: question.author || 'Admin',
+        author_name: question.authorName || question.author || 'Admin',
         tags: question.tags || [],
         version: 1,
         image_url: question.imageUrl,
@@ -353,6 +356,8 @@ export const updateQuestion = async (
       if (updates.chapterId !== undefined)
         payload.chapter_id = updates.chapterId;
       if (updates.topicId !== undefined) payload.topic_id = updates.topicId;
+      if (updates.authorName !== undefined)
+        payload.author_name = updates.authorName;
 
       // Remove fields that shouldn't be updated or are mapped
       delete payload.id;
@@ -368,6 +373,7 @@ export const updateQuestion = async (
       delete payload.subjectId;
       delete payload.chapterId;
       delete payload.topicId;
+      delete payload.authorName;
 
       const { error } = await supabase
         .from('questions')

@@ -111,6 +111,7 @@ export default function TeacherBulkUploadPage() {
           ...q,
           status: 'Pending' as QuestionStatus, // Enforce Pending status for teachers
           author: user.email, // Enforce current user as author
+          authorName: user.user_metadata?.name || user.email,
         }));
 
       const BATCH_SIZE = 50;
