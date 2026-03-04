@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { BlogPost } from '@/lib/blog-data';
 import { Clock, ArrowRight, Tag } from 'lucide-react';
 
@@ -24,6 +25,22 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
     return (
       <Link href={`/blog/${post.slug}`} className="group block">
         <article className="relative bg-white dark:bg-[#111] overflow-hidden rounded-2xl border border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300">
+          {/* Cover image or gradient strip */}
+          {post.coverImage ? (
+            <div className="relative w-full h-52 sm:h-64 md:h-72 overflow-hidden">
+              <Image
+                src={post.coverImage}
+                alt={post.title}
+                fill
+                className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                sizes="(max-width: 768px) 100vw, 80vw"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+            </div>
+          ) : (
+            <div className={`w-full h-2 bg-gradient-to-r ${post.coverColor}`} />
+          )}
           <div className="p-6 sm:p-8 md:p-10">
             {/* Featured badge + Category */}
             <div className="flex flex-wrap items-center gap-2.5 mb-5 font-anek">
@@ -83,6 +100,22 @@ export default function BlogCard({ post, featured = false }: BlogCardProps) {
   return (
     <Link href={`/blog/${post.slug}`} className="group block h-full">
       <article className="flex flex-col h-full bg-white dark:bg-[#111] overflow-hidden rounded-2xl border border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300">
+        {/* Cover image or gradient strip */}
+        {post.coverImage ? (
+          <div className="relative w-full h-44 overflow-hidden shrink-0">
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              fill
+              className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          </div>
+        ) : (
+          <div
+            className={`w-full h-1.5 bg-gradient-to-r ${post.coverColor} shrink-0`}
+          />
+        )}
         <div className="flex flex-col flex-1 p-5 sm:p-6">
           {/* Category badge */}
           <div className="mb-4">

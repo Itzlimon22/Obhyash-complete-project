@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getBlogPost } from '@/lib/blog-data';
 import ViewTracker from '@/components/blog/ViewTracker';
 import {
@@ -438,6 +439,22 @@ export default async function BlogPostPage({
           </div>
         </div>
       </section>
+
+      {/* Cover image */}
+      {post.coverImage && (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-8">
+          <div className="relative w-full h-64 sm:h-80 md:h-[420px] rounded-2xl overflow-hidden shadow-md border border-black/5 dark:border-white/5">
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 1280px) 100vw, 1152px"
+              priority
+            />
+          </div>
+        </div>
+      )}
 
       {/* ─── Single-column layout ─── */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">

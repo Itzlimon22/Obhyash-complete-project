@@ -20,7 +20,8 @@ export interface BlogPost {
   publishedAt: string;
   readTime: number;
   featured: boolean;
-  coverColor: string; // tailwind gradient classes
+  coverColor: string; // tailwind gradient classes — used as fallback when no image
+  coverImage?: string; // absolute URL to a cover image (Notion page cover, Unsplash, etc.)
 }
 
 export const BLOG_CATEGORIES = [
@@ -112,6 +113,18 @@ const fetchAllPostsFromNotion = async (): Promise<BlogPost[]> => {
           getPropertyValue(props.CoverColor, 'rich_text') ||
           'from-neutral-500 to-neutral-600';
 
+        // Cover image: prefer an explicit CoverImage property URL, then fall
+        // back to the Notion page's own cover (external URL or uploaded file).
+        const coverImageProp = getPropertyValue(props.CoverImage, 'rich_text');
+        let coverImage: string | undefined = coverImageProp || undefined;
+        if (!coverImage && page.cover) {
+          if (page.cover.type === 'external') {
+            coverImage = page.cover.external?.url;
+          } else if (page.cover.type === 'file') {
+            coverImage = page.cover.file?.url;
+          }
+        }
+
         // Fetch Markdown content blocks
         const mdblocks = await n2m.pageToMarkdown(page.id);
         const mdString = n2m.toMarkdownString(mdblocks);
@@ -131,6 +144,7 @@ const fetchAllPostsFromNotion = async (): Promise<BlogPost[]> => {
           readTime: readTime || 5,
           featured,
           coverColor,
+          coverImage,
           content: mdString.parent || '',
         };
       }),
@@ -175,6 +189,7 @@ const getLocalPosts = async (): Promise<BlogPost[]> => {
       readTime: data.readTime || 5,
       featured: data.featured || false,
       coverColor: data.coverColor || 'from-neutral-500 to-neutral-600',
+      coverImage: data.coverImage || undefined,
       content: content,
     } as BlogPost;
   });
