@@ -42,20 +42,39 @@ export const BLOG_CATEGORIES = [
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 const n2m = new NotionToMarkdown({ notionClient: notion });
 
+interface NotionPage {
+  id: string;
+  created_time: string;
+  cover: unknown;
+  properties: unknown;
+}
+
 // Helper to extract property values from Notion
-const getPropertyValue = (property: any, type: string): any => {
+const getPropertyValue = (
+  property: Record<string, unknown>,
+  type: string,
+): unknown => {
   if (!property) return null;
   switch (type) {
     case 'title':
-      return property.title?.[0]?.plain_text || '';
+      return (
+        (property.title as Array<{ plain_text: string }>)?.[0]?.plain_text || ''
+      );
     case 'rich_text':
-      return property.rich_text?.[0]?.plain_text || '';
+      return (
+        (property.rich_text as Array<{ plain_text: string }>)?.[0]
+          ?.plain_text || ''
+      );
     case 'select':
-      return property.select?.name || '';
+      return (property.select as { name: string } | null)?.name || '';
     case 'multi_select':
-      return property.multi_select?.map((s: any) => s.name) || [];
+      return (
+        (property.multi_select as Array<{ name: string }>)?.map(
+          (s) => s.name,
+        ) || []
+      );
     case 'date':
-      return property.date?.start || '';
+      return (property.date as { start: string } | null)?.start || '';
     case 'number':
       return property.number || 0;
     case 'checkbox':
@@ -76,11 +95,19 @@ const fetchAllPostsFromNotion = async (): Promise<BlogPost[]> => {
   try {
     // Notion caps page_size at 100 per request. Paginate with start_cursor
     // to retrieve all published posts regardless of total count.
-    const allPages: any[] = [];
+    const allPages: NotionPage[] = [];
     let cursor: string | undefined = undefined;
 
     do {
-      const response = await (notion.databases as any).query({
+      const response = await (
+        notion.databases as unknown as {
+          query: (...args: unknown[]) => Promise<{
+            results: unknown[];
+            has_more: boolean;
+            next_cursor: string | null;
+          }>;
+        }
+      ).query({
         database_id: process.env.NOTION_DATABASE_ID,
         page_size: 100,
         start_cursor: cursor,
@@ -90,46 +117,73 @@ const fetchAllPostsFromNotion = async (): Promise<BlogPost[]> => {
         },
         sorts: [{ property: 'PublishedAt', direction: 'descending' }],
       });
-      allPages.push(...response.results);
-      cursor = response.has_more ? response.next_cursor : undefined;
+      allPages.push(...(response.results as NotionPage[]));
+      cursor = response.has_more
+        ? (response.next_cursor ?? undefined)
+        : undefined;
     } while (cursor);
 
     const posts: BlogPost[] = await Promise.all(
-      allPages.map(async (page: any) => {
-        const props = page.properties;
+      allPages.map(async (page: NotionPage) => {
+        const props = page.properties as Record<
+          string,
+          Record<string, unknown>
+        >;
 
-        const slug = getPropertyValue(props.Slug, 'rich_text') || page.id;
-        const title = getPropertyValue(props.Title, 'title');
-        const excerpt = getPropertyValue(props.Excerpt, 'rich_text');
-        const category = getPropertyValue(props.Category, 'select');
-        const tags = getPropertyValue(props.Tags, 'multi_select');
-        const authorName = getPropertyValue(props.AuthorName, 'rich_text');
-        const authorRole = getPropertyValue(props.AuthorRole, 'rich_text');
+        const slug =
+          (getPropertyValue(props.Slug, 'rich_text') as string) ||
+          (page.id as string);
+        const title = getPropertyValue(props.Title, 'title') as string;
+        const excerpt = getPropertyValue(props.Excerpt, 'rich_text') as string;
+        const category = getPropertyValue(props.Category, 'select') as string;
+        const tags = getPropertyValue(props.Tags, 'multi_select') as string[];
+        const authorName = getPropertyValue(
+          props.AuthorName,
+          'rich_text',
+        ) as string;
+        const authorRole = getPropertyValue(
+          props.AuthorRole,
+          'rich_text',
+        ) as string;
         const authorInitials = getPropertyValue(
           props.AuthorInitials,
           'rich_text',
-        );
-        const publishedAt = getPropertyValue(props.PublishedAt, 'date');
-        const readTime = getPropertyValue(props.ReadTime, 'number');
-        const featured = getPropertyValue(props.Featured, 'checkbox');
+        ) as string;
+        const publishedAt = getPropertyValue(
+          props.PublishedAt,
+          'date',
+        ) as string;
+        const readTime = getPropertyValue(props.ReadTime, 'number') as number;
+        const featured = getPropertyValue(
+          props.Featured,
+          'checkbox',
+        ) as boolean;
         const coverColor =
-          getPropertyValue(props.CoverColor, 'rich_text') ||
+          (getPropertyValue(props.CoverColor, 'rich_text') as string) ||
           'from-neutral-500 to-neutral-600';
 
         // Cover image: prefer an explicit CoverImage property URL, then fall
         // back to the Notion page's own cover (external URL or uploaded file).
-        const coverImageProp = getPropertyValue(props.CoverImage, 'rich_text');
+        const coverImageProp = getPropertyValue(
+          props.CoverImage,
+          'rich_text',
+        ) as string | undefined;
         let coverImage: string | undefined = coverImageProp || undefined;
         if (!coverImage && page.cover) {
-          if (page.cover.type === 'external') {
-            coverImage = page.cover.external?.url;
-          } else if (page.cover.type === 'file') {
-            coverImage = page.cover.file?.url;
+          const cover = page.cover as {
+            type: string;
+            external?: { url: string };
+            file?: { url: string };
+          };
+          if (cover.type === 'external') {
+            coverImage = cover.external?.url;
+          } else if (cover.type === 'file') {
+            coverImage = cover.file?.url;
           }
         }
 
         // Fetch Markdown content blocks
-        const mdblocks = await n2m.pageToMarkdown(page.id);
+        const mdblocks = await n2m.pageToMarkdown(page.id as string);
         const mdString = n2m.toMarkdownString(mdblocks);
 
         return {
@@ -143,7 +197,8 @@ const fetchAllPostsFromNotion = async (): Promise<BlogPost[]> => {
             role: authorRole || 'Editor',
             initials: authorInitials || 'OT',
           },
-          publishedAt: publishedAt || new Date(page.created_time).toISOString(),
+          publishedAt:
+            publishedAt || new Date(page.created_time as string).toISOString(),
           readTime: readTime || 5,
           featured,
           coverColor,
