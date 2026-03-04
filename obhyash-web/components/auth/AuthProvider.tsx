@@ -122,6 +122,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   // right after initializeAuth has already loaded the profile.
   const initDoneRef = useRef(false);
 
+  // Guards for health-check: prevent concurrent calls and debounce rapid events.
+  const isHealthCheckingRef = useRef(false);
+  const lastHealthCheckRef = useRef(0);
+  const healthCheckDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
   // ── fetchProfile ──────────────────────────────────────────────────────────
   const fetchProfile = useCallback(
     async (userId: string): Promise<UserProfile | null> => {
@@ -257,37 +264,65 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       // If we are offline, don't ping (it will just fail and trigger errors)
       if (typeof navigator !== 'undefined' && !navigator.onLine) return;
 
+      // Guard: skip if a check is already in-flight
+      if (isHealthCheckingRef.current) return;
+
+      // Guard: skip if we checked less than 30 seconds ago
+      const now = Date.now();
+      if (now - lastHealthCheckRef.current < 30_000) return;
+
+      isHealthCheckingRef.current = true;
+      lastHealthCheckRef.current = now;
+
       try {
-        // getUser() is the authoritative way to verify the session with the server.
-        const { data, error } = await supabase.auth.getUser();
+        // IMPORTANT: Use getSession() here, NOT getUser().
+        // getUser() acquires the Supabase JS client's internal auth lock and makes
+        // a server round-trip. While the lock is held (1-3 seconds), ALL .from().select()
+        // queries queue up and appear to hang — this was causing the admin panel to stop
+        // fetching data after a focus/tab-switch event.
+        // getSession() reads from the local JS cache (lock-free, synchronous).
+        // The middleware (proxy.ts) already validates the JWT server-side on every request,
+        // so we can trust the local session here for client-side health checks.
+        const { data, error } = await supabase.auth.getSession();
         if (error && isHardAuthError(error)) {
           console.warn('[Auth] Health check failed - session may be corrupted');
           setShowCorruptionModal(true);
-        } else if (data.user) {
+        } else if (data.session?.user) {
           if (process.env.NODE_ENV === 'development') {
             console.log('[Auth] Health check: OK');
           }
-          setUser(data.user);
+          setUser(data.session.user);
         }
-      } catch (err) {
+      } catch {
         // Soft failure, ignore
+      } finally {
+        isHealthCheckingRef.current = false;
       }
+    };
+
+    // Debounced wrapper — prevents multiple rapid focus/visibility events from
+    // firing concurrent health checks (the old code had a comment about debounce
+    // but never actually implemented one).
+    const scheduleHealthCheck = (delayMs = 500) => {
+      if (healthCheckDebounceRef.current) {
+        clearTimeout(healthCheckDebounceRef.current);
+      }
+      healthCheckDebounceRef.current = setTimeout(handleHealthCheck, delayMs);
     };
 
     const onOnline = () => {
       if (process.env.NODE_ENV === 'development')
         console.log('[Auth] Back online - checking session');
-      handleHealthCheck();
+      scheduleHealthCheck(1000);
     };
 
     const onFocus = () => {
-      // Small debounce to avoid multiple pings if user clicks fast
-      handleHealthCheck();
+      scheduleHealthCheck(500);
     };
 
     // Store as a named function so it can be properly removed on cleanup
     const onVisibilityChange = () => {
-      if (document.visibilityState === 'visible') handleHealthCheck();
+      if (document.visibilityState === 'visible') scheduleHealthCheck(500);
     };
 
     window.addEventListener('online', onOnline);
@@ -369,6 +404,9 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('focus', onFocus);
       window.removeEventListener('visibilitychange', onVisibilityChange);
       clearInterval(heartbeat);
+      if (healthCheckDebounceRef.current) {
+        clearTimeout(healthCheckDebounceRef.current);
+      }
     };
   }, [supabase, router, fetchProfile]);
 
