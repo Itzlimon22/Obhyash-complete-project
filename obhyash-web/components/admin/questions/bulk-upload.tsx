@@ -46,6 +46,7 @@ import {
 import { standardizeInstituteName } from '@/lib/data/institute-helpers';
 import { validateLatex } from '@/lib/latex-utils';
 import { extractJsonObjects } from '@/lib/resilient-parse';
+import { RichTextEditor } from '@/components/admin/questions/rich-text-editor';
 
 // ─── Types ───────────────────────────────────────────────────────────
 interface BulkUploadProps {
@@ -446,8 +447,6 @@ const EditModal: React.FC<{
   onSave: () => void;
   onCancel: () => void;
 }> = ({ data, onChange, onSave, onCancel }) => {
-  // ── Normalize synchronously in useState initializer so dropdowns
-  //    are populated on the very first render (no useEffect delay). ──
   const [localData, setLocalData] = React.useState<Partial<Question>>(() => {
     const { subject, chapter, topic } = resolveTaxonomyHierarchy(
       data.subject || '',
@@ -457,7 +456,6 @@ const EditModal: React.FC<{
     return { ...data, subject, chapter, topic };
   });
 
-  // Sync local changes back to parent so Save works correctly.
   const update = (patch: Partial<Question>) => {
     const next = { ...localData, ...patch };
     setLocalData(next);
@@ -493,7 +491,7 @@ const EditModal: React.FC<{
       }}
     >
       <DialogContent
-        className="sm:max-w-4xl max-h-[90vh] p-0 flex flex-col overflow-hidden"
+        className="sm:max-w-3xl max-h-[92vh] p-0 flex flex-col overflow-hidden"
         showCloseButton={false}
       >
         {/* Header */}
@@ -515,23 +513,18 @@ const EditModal: React.FC<{
         </div>
 
         <div className="overflow-y-auto flex-1 custom-scrollbar">
-          {/* Section: Taxonomy */}
+          {/* ── Section: Taxonomy ── */}
           <div className="px-5 py-4 border-b border-neutral-100 dark:border-neutral-800">
             <p className="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-500 uppercase tracking-widest mb-3">
               বিষয় বিন্যাস
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {/* Subject */}
               <div>
                 <label className={labelCls}>বিষয়</label>
                 <select
                   value={localData.subject || ''}
                   onChange={(e) =>
-                    update({
-                      subject: e.target.value,
-                      chapter: '',
-                      topic: '',
-                    })
+                    update({ subject: e.target.value, chapter: '', topic: '' })
                   }
                   className={fieldCls}
                 >
@@ -543,8 +536,6 @@ const EditModal: React.FC<{
                   ))}
                 </select>
               </div>
-
-              {/* Chapter */}
               <div>
                 <label className={labelCls}>অধ্যায়</label>
                 <select
@@ -563,8 +554,6 @@ const EditModal: React.FC<{
                   ))}
                 </select>
               </div>
-
-              {/* Topic */}
               <div>
                 <label className={labelCls}>টপিক</label>
                 <select
@@ -581,8 +570,6 @@ const EditModal: React.FC<{
                   ))}
                 </select>
               </div>
-
-              {/* Difficulty */}
               <div>
                 <label className={labelCls}>কাঠিন্য</label>
                 <select
@@ -602,7 +589,7 @@ const EditModal: React.FC<{
             </div>
           </div>
 
-          {/* Section: Extra Metadata */}
+          {/* ── Section: Extra Metadata ── */}
           <div className="px-5 py-4 border-b border-neutral-100 dark:border-neutral-800">
             <p className="text-[10px] font-extrabold text-neutral-500 uppercase tracking-widest mb-3">
               অতিরিক্ত তথ্য
@@ -658,85 +645,87 @@ const EditModal: React.FC<{
             </div>
           </div>
 
-          {/* Section: Content */}
-          <div className="px-5 py-5 space-y-5">
-            <div className="grid md:grid-cols-2 gap-5">
-              {/* Question */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <label className="text-sm font-bold text-neutral-800 dark:text-white">
-                    প্রশ্ন
-                  </label>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-100 dark:border-emerald-800">
-                    LaTeX: $...$
-                  </span>
-                </div>
-                <textarea
-                  value={localData.question || ''}
-                  onChange={(e) => update({ question: e.target.value })}
-                  className={`${fieldCls} resize-none ${localData.question && !validateLatex(localData.question).isValid ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
-                  rows={4}
-                  placeholder="প্রশ্নের বিবরণ লেখো..."
+          {/* ── Section: Question (full width) ── */}
+          <div className="px-5 py-5 border-b border-neutral-100 dark:border-neutral-800 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-extrabold text-neutral-800 dark:text-white">
+                ✏️ প্রশ্ন
+              </label>
+              <div className="flex items-center gap-2">
+                <ImageUploader
+                  folder="questions"
+                  compact
+                  defaultValue={localData.imageUrl}
+                  onUploadComplete={(url) => update({ imageUrl: url })}
                 />
-                {!validateLatex(localData.question || '').isValid && (
-                  <p className="text-[10px] text-red-500 font-bold mt-1">
-                    ⚠ {validateLatex(localData.question || '').error}
-                  </p>
-                )}
-                {localData.question && (
-                  <div className="p-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 rounded-xl">
-                    <span className="text-[9px] text-neutral-400 uppercase tracking-widest font-bold mb-1 block">
-                      প্রিভিউ
-                    </span>
-                    <MathRenderer text={localData.question || ''} />
-                  </div>
-                )}
-                <div>
-                  <label className="text-xs font-bold text-neutral-600 dark:text-neutral-400 block mb-1.5">
-                    প্রশ্নের ছবি (ঐচ্ছিক)
-                  </label>
-                  <ImageUploader
-                    folder="questions"
-                    compact
-                    defaultValue={localData.imageUrl}
-                    onUploadComplete={(url) => update({ imageUrl: url })}
-                  />
-                  {localData.imageUrl && (
-                    <div className="relative mt-2 w-full h-28 border rounded-xl overflow-hidden bg-neutral-100 group">
-                      <img
-                        src={localData.imageUrl}
-                        alt="Question"
-                        className="w-full h-full object-contain"
-                      />
-                      <button
-                        onClick={() => update({ imageUrl: undefined })}
-                        className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  )}
-                </div>
               </div>
+            </div>
+            {localData.imageUrl && (
+              <div className="relative w-full h-32 border rounded-xl overflow-hidden bg-neutral-100 group">
+                <img
+                  src={localData.imageUrl}
+                  alt="Question"
+                  className="w-full h-full object-contain"
+                />
+                <button
+                  onClick={() => update({ imageUrl: undefined })}
+                  className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            )}
+            <RichTextEditor
+              value={localData.question || ''}
+              onChange={(val) => update({ question: val })}
+              placeholder="প্রশ্নের বিবরণ লেখো... LaTeX ব্যবহার করতে $...$ বা $$...$$ ব্যবহার করো"
+              showToolbar={true}
+              editorClassName="min-h-[160px]"
+            />
+            {localData.question &&
+              !validateLatex(localData.question).isValid && (
+                <p className="text-[11px] text-red-500 font-bold">
+                  ⚠ {validateLatex(localData.question).error}
+                </p>
+              )}
+            {localData.question && (
+              <div className="p-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 rounded-xl">
+                <span className="text-[9px] text-neutral-400 uppercase tracking-widest font-bold mb-1 block">
+                  প্রিভিউ
+                </span>
+                <MathRenderer text={localData.question} />
+              </div>
+            )}
+          </div>
 
-              {/* Options */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-bold text-neutral-800 dark:text-white">
-                    অপশনসমূহ
-                  </label>
-                  <span className="text-[10px] text-neutral-400 font-semibold">
-                    (সঠিক উত্তরে ক্লিক করুন)
-                  </span>
-                </div>
-                <div className="space-y-2">
-                  {(localData.options || []).map((opt, i) => (
+          {/* ── Section: Options (full width, stacked) ── */}
+          <div className="px-5 py-5 border-b border-neutral-100 dark:border-neutral-800 space-y-3">
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-extrabold text-neutral-800 dark:text-white">
+                🔘 অপশনসমূহ
+              </label>
+              <span className="text-[10px] text-neutral-400 font-semibold bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full">
+                সঠিক উত্তরের বাম বোতামে ক্লিক করুন
+              </span>
+            </div>
+            <div className="space-y-4">
+              {(localData.options || []).map((opt, i) => {
+                const isCorrect = localData.correctAnswerIndex === i;
+                return (
+                  <div
+                    key={i}
+                    className={`rounded-2xl border-2 transition-all overflow-hidden ${
+                      isCorrect
+                        ? 'border-emerald-400 dark:border-emerald-600 shadow-sm shadow-emerald-500/10'
+                        : 'border-neutral-200 dark:border-neutral-700'
+                    }`}
+                  >
+                    {/* Option Header */}
                     <div
-                      key={i}
-                      className={`flex items-center gap-2 p-2 rounded-xl border transition-all ${
-                        localData.correctAnswerIndex === i
-                          ? 'border-emerald-400 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20'
-                          : 'border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800'
+                      className={`flex items-center gap-3 px-3 py-2 ${
+                        isCorrect
+                          ? 'bg-emerald-50 dark:bg-emerald-900/20'
+                          : 'bg-neutral-50 dark:bg-neutral-800/60'
                       }`}
                     >
                       <button
@@ -749,90 +738,105 @@ const EditModal: React.FC<{
                           })
                         }
                         className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center font-mono text-sm font-extrabold transition-all ${
-                          localData.correctAnswerIndex === i
+                          isCorrect
                             ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20'
                             : 'bg-white dark:bg-neutral-700 text-neutral-500 border border-neutral-300 dark:border-neutral-600 hover:border-emerald-400'
                         }`}
+                        title={
+                          isCorrect
+                            ? 'সঠিক উত্তর (নির্বাচিত)'
+                            : 'সঠিক উত্তর হিসেবে নির্ধারণ করুন'
+                        }
                       >
                         {String.fromCharCode(65 + i)}
                       </button>
-                      <input
+                      <span
+                        className={`text-xs font-bold ${isCorrect ? 'text-emerald-700 dark:text-emerald-400' : 'text-neutral-500'}`}
+                      >
+                        {isCorrect
+                          ? '✓ সঠিক উত্তর'
+                          : `অপশন ${String.fromCharCode(65 + i)}`}
+                      </span>
+                      <div className="ml-auto">
+                        <ImageUploader
+                          folder="options"
+                          compact
+                          onUploadComplete={(url) => {
+                            const newOpts = [...(localData.optionImages || [])];
+                            while (newOpts.length <= i) newOpts.push('');
+                            newOpts[i] = url;
+                            update({ optionImages: newOpts });
+                          }}
+                        />
+                      </div>
+                    </div>
+                    {/* Option Editor */}
+                    <div
+                      className={`${isCorrect ? 'bg-emerald-50/30 dark:bg-emerald-900/10' : 'bg-white dark:bg-neutral-900'}`}
+                    >
+                      <RichTextEditor
                         value={opt}
-                        onChange={(e) => updateOption(i, e.target.value)}
-                        placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                        className={`flex-1 px-2.5 py-1.5 rounded-lg border text-sm transition-all outline-none ${
-                          localData.correctAnswerIndex === i
-                            ? 'border-emerald-300 dark:border-emerald-700 bg-white dark:bg-emerald-900/10 focus:ring-1 focus:ring-emerald-500'
-                            : 'border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-700 focus:ring-1 focus:ring-emerald-500'
-                        }`}
-                      />
-                      <ImageUploader
-                        folder="options"
-                        compact
-                        onUploadComplete={(url) => {
-                          const newOpts = [...(localData.optionImages || [])];
-                          while (newOpts.length <= i) newOpts.push('');
-                          newOpts[i] = url;
-                          update({ optionImages: newOpts });
-                        }}
+                        onChange={(val) => updateOption(i, val)}
+                        placeholder={`অপশন ${String.fromCharCode(65 + i)} এর বিবরণ লেখো...`}
+                        showToolbar={true}
+                        editorClassName="min-h-[80px]"
                       />
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
+                );
+              })}
             </div>
+          </div>
 
-            {/* Explanation */}
-            <div className="space-y-2 border-t border-neutral-100 dark:border-neutral-800 pt-4">
-              <div className="flex justify-between items-center">
-                <label className="text-sm font-bold text-neutral-800 dark:text-white">
-                  ব্যাখ্যা / সমাধান
-                </label>
-                <ImageUploader
-                  folder="explanations"
-                  compact
-                  defaultValue={localData.explanationImageUrl}
-                  onUploadComplete={(url) =>
-                    update({ explanationImageUrl: url })
-                  }
-                />
-              </div>
-              {localData.explanationImageUrl && (
-                <div className="relative w-full md:w-1/2 h-28 border rounded-xl overflow-hidden bg-neutral-100 group">
-                  <img
-                    src={localData.explanationImageUrl}
-                    alt="Explanation"
-                    className="w-full h-full object-contain"
-                  />
-                  <button
-                    onClick={() => update({ explanationImageUrl: undefined })}
-                    className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              )}
-              <textarea
-                value={localData.explanation || ''}
-                onChange={(e) => update({ explanation: e.target.value })}
-                className={`${fieldCls} resize-none ${localData.explanation && !validateLatex(localData.explanation).isValid ? 'border-red-500 ring-1 ring-red-500/20' : ''}`}
-                rows={3}
-                placeholder="সঠিক উত্তরের ব্যাখ্যা লেখো..."
+          {/* ── Section: Explanation (full width) ── */}
+          <div className="px-5 py-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-extrabold text-neutral-800 dark:text-white">
+                💡 ব্যাখ্যা / সমাধান
+              </label>
+              <ImageUploader
+                folder="explanations"
+                compact
+                defaultValue={localData.explanationImageUrl}
+                onUploadComplete={(url) => update({ explanationImageUrl: url })}
               />
-              {!validateLatex(localData.explanation || '').isValid && (
-                <p className="text-[10px] text-red-500 font-bold mt-1">
-                  ⚠ {validateLatex(localData.explanation || '').error}
+            </div>
+            {localData.explanationImageUrl && (
+              <div className="relative w-full h-32 border rounded-xl overflow-hidden bg-neutral-100 group">
+                <img
+                  src={localData.explanationImageUrl}
+                  alt="Explanation"
+                  className="w-full h-full object-contain"
+                />
+                <button
+                  onClick={() => update({ explanationImageUrl: undefined })}
+                  className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            )}
+            <RichTextEditor
+              value={localData.explanation || ''}
+              onChange={(val) => update({ explanation: val })}
+              placeholder="সঠিক উত্তরের ব্যাখ্যা লেখো... LaTeX ব্যবহার করতে $...$ বা $$...$$ ব্যবহার করো"
+              showToolbar={true}
+              editorClassName="min-h-[130px]"
+            />
+            {localData.explanation &&
+              !validateLatex(localData.explanation).isValid && (
+                <p className="text-[11px] text-red-500 font-bold">
+                  ⚠ {validateLatex(localData.explanation).error}
                 </p>
               )}
-              {localData.explanation && (
-                <div className="p-3 bg-red-50/60 dark:bg-red-900/10 border border-red-100 dark:border-red-800/50 rounded-xl">
-                  <span className="text-[9px] text-red-600 uppercase tracking-widest font-bold mb-1 block">
-                    সমাধান প্রিভিউ
-                  </span>
-                  <MathRenderer text={localData.explanation || ''} />
-                </div>
-              )}
-            </div>
+            {localData.explanation && (
+              <div className="p-3 bg-red-50/60 dark:bg-red-900/10 border border-red-100 dark:border-red-800/50 rounded-xl">
+                <span className="text-[9px] text-red-600 uppercase tracking-widest font-bold mb-1 block">
+                  সমাধান প্রিভিউ
+                </span>
+                <MathRenderer text={localData.explanation} />
+              </div>
+            )}
           </div>
         </div>
 
@@ -856,14 +860,13 @@ const EditModal: React.FC<{
   );
 };
 
-// ─── Template Data ───────────────────────────────────────────────────
-const TEMPLATE_ROWS = [
+const getTemplateRows = (subject?: string, chapter?: string, topic?: string) => [
   {
     stream: 'HSC',
     section: 'Science',
-    subject: 'রসায়ন ১ম পত্র',
-    chapter: 'ল্যাবরেটরীর নিরাপদ ব্যবহার',
-    topic: '1',
+    subject: subject || 'রসায়ন ১ম পত্র',
+    chapter: chapter || 'ল্যাবরেটরীর নিরাপদ ব্যবহার',
+    topic: topic || '1',
     question: 'কোন ধরনের পদার্থ চোখের বেশি ক্ষতি করে?',
     option1: 'গ্যাসীয়',
     option2: 'এসডিটিয়',
@@ -880,9 +883,9 @@ const TEMPLATE_ROWS = [
   {
     stream: 'HSC',
     section: 'Science',
-    subject: 'রসায়ন ১ম পত্র',
-    chapter: 'ল্যাবরেটরীর নিরাপদ ব্যবহার',
-    topic: '1',
+    subject: subject || 'রসায়ন ১ম পত্র',
+    chapter: chapter || 'ল্যাবরেটরীর নিরাপদ ব্যবহার',
+    topic: topic || '1',
     question: 'ল্যাবরেটরিতে নিচের কোন কাজটি বেশি বিপজ্জনক?',
     option1: 'নির্গত গ্যাসের গন্ধ নেওয়া',
     option2: 'খাবার গ্রহণ',
@@ -930,12 +933,27 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   const [uploadMethod, setUploadMethod] = useState<'file' | 'json'>('file');
   const jsonFixAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  // ── Bulk Action State ──
+  // ── Global Upload State (Step 1) ──
+  const [globalSubject, setGlobalSubject] = useState('');
+  const [globalChapter, setGlobalChapter] = useState('');
+  const [globalTopic, setGlobalTopic] = useState('');
+
+  const availableSubjects = React.useMemo(() => getHscSubjectList(), []);
+  const availableChapters = React.useMemo(
+    () => (globalSubject ? getHscChapterList(globalSubject) : []),
+    [globalSubject],
+  );
+  const availableTopics = React.useMemo(
+    () => (globalChapter ? getHscTopicList(globalChapter) : []),
+    [globalChapter],
+  );
+
+  // ── Bulk Action State (Step 2) ──
   const [bulkSubject, setBulkSubject] = useState('');
   const [bulkChapter, setBulkChapter] = useState('');
   const [bulkTopic, setBulkTopic] = useState('');
 
-  const bulkAvailableSubjects = React.useMemo(() => getHscSubjectList(), []);
+  const bulkAvailableSubjects = availableSubjects;
   const bulkAvailableChapters = React.useMemo(
     () => (bulkSubject ? getHscChapterList(bulkSubject) : []),
     [bulkSubject],
@@ -986,9 +1004,6 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
     setBulkSubject('');
     setBulkChapter('');
     setBulkTopic('');
-
-    // Optionally clear selection (or keep it selected)
-    // setSelectedIndices(new Set());
   };
 
   // ── Unified processor: raw rows -> Question[] with dedup ──
@@ -1034,12 +1049,17 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
   );
 
   // Resolve subject/chapter/topic to canonical names (including serial→name for topics)
+  // And apply global fallbacks if properties are missing
   const resolveTopicSerialsLocally = (questions: Partial<Question>[]) => {
+    const globalSubjectName = globalSubject ? resolveSubjectName(globalSubject) ?? globalSubject : '';
+    const globalChapterName = globalSubjectName && globalChapter ? resolveChapterName(globalSubjectName, globalChapter) ?? globalChapter : '';
+    const globalTopicName = globalChapterName && globalTopic ? resolveTopicName(globalChapterName, globalTopic) ?? globalTopic : '';
+
     return questions.map((q) => {
       const { subject, chapter, topic } = resolveTaxonomyHierarchy(
-        q.subject || '',
-        q.chapter || '',
-        q.topic || '',
+        q.subject || globalSubjectName,
+        q.chapter || (q.subject ? '' : globalChapterName),
+        q.topic || (q.subject || q.chapter ? '' : globalTopicName),
       );
       return { ...q, subject, chapter, topic };
     });
@@ -1181,9 +1201,10 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
       );
     } finally {
       setIsProcessing(false);
-      // Reset input so the same file can be re-uploaded
-      // Only reset if we didn't open the JSON editor (which resets early)
-      if (!showJsonEditor) e.target.value = '';
+      // Always reset input so the same file can be re-uploaded.
+      // (The early-return JSON-error path already resets at line above,
+      //  so this is a no-op for that branch but correct for all others.)
+      e.target.value = '';
     }
   };
 
@@ -1333,17 +1354,19 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
 
   // ── Download Templates ─────────────────────────────────────────────
   const downloadTemplate = (format: 'json' | 'csv' | 'xlsx') => {
+    const rows = getTemplateRows(globalSubject, globalChapter, globalTopic);
+    
     if (format === 'json') {
-      const blob = new Blob([JSON.stringify(TEMPLATE_ROWS, null, 2)], {
+      const blob = new Blob([JSON.stringify(rows, null, 2)], {
         type: 'application/json',
       });
       downloadBlob(blob, 'question_template.json');
     } else if (format === 'csv') {
-      const csv = Papa.unparse(TEMPLATE_ROWS);
+      const csv = Papa.unparse(rows);
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
       downloadBlob(blob, 'question_template.csv');
     } else {
-      const ws = XLSX.utils.json_to_sheet(TEMPLATE_ROWS);
+      const ws = XLSX.utils.json_to_sheet(rows);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Questions');
       XLSX.writeFile(wb, 'question_template.xlsx');
@@ -1501,6 +1524,57 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         </div>
 
         <div className="p-6 space-y-6">
+          {/* Global Subject & Chapter Selector */}
+          <div className="bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-5 mb-6">
+            <h3 className="text-sm font-extrabold text-emerald-800 dark:text-emerald-400 mb-3 block">
+              ডিফল্ট বিষয় ও অধ্যায় নির্বাচন করুন (ঐচ্ছিক)
+            </h3>
+            <p className="text-xs text-neutral-500 mb-4 font-medium">
+              আপলোড করা ফাইলে বিষয়/অধ্যায় উল্লেখ না থাকলে এখান থেকে নেওয়া হবে। টেম্পলেট ডাউনলোড করলেও এই মানগুলো বসানো থাকবে।
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <select
+                value={globalSubject}
+                onChange={(e) => {
+                  setGlobalSubject(e.target.value);
+                  setGlobalChapter('');
+                  setGlobalTopic('');
+                }}
+                className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+              >
+                <option value="">বিষয় নির্বাচন করুন</option>
+                {availableSubjects.map((s) => (
+                  <option key={s.id} value={s.name}>{s.name}</option>
+                ))}
+              </select>
+              <select
+                value={globalChapter}
+                onChange={(e) => {
+                  setGlobalChapter(e.target.value);
+                  setGlobalTopic('');
+                }}
+                disabled={!globalSubject}
+                className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-50"
+              >
+                <option value="">অধ্যায় নির্বাচন করুন</option>
+                {availableChapters.map((c) => (
+                  <option key={c.id} value={c.name}>{c.name}</option>
+                ))}
+              </select>
+              <select
+                value={globalTopic}
+                onChange={(e) => setGlobalTopic(e.target.value)}
+                disabled={!globalChapter}
+                className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-50"
+              >
+                <option value="">টপিক নির্বাচন করুন</option>
+                {availableTopics.map((t) => (
+                  <option key={t.id} value={t.name}>{t.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           {/* Tab Selection */}
           <div className="flex p-1 bg-neutral-100 dark:bg-neutral-900 rounded-xl max-w-sm mx-auto mb-2 border border-neutral-200 dark:border-neutral-800">
             <button
@@ -1656,6 +1730,83 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
             )}
           </div>
         </div>
+
+        {/* JSON Editor Modal — rendered here so it shows even on step 1 */}
+        {showJsonEditor && (
+          <Dialog
+            open={showJsonEditor}
+            onOpenChange={(open) => {
+              if (!open) setShowJsonEditor(false);
+            }}
+          >
+            <DialogContent
+              className="sm:max-w-5xl max-h-[90vh] flex flex-col p-0 overflow-hidden"
+              showCloseButton={false}
+            >
+              <div className="flex justify-between items-center px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 shrink-0">
+                <div className="flex items-center gap-2 text-red-600 dark:text-red-500">
+                  <FileJson size={20} />
+                  <h3 className="font-extrabold text-sm tracking-wide">
+                    JSON ফিক্সার
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setShowJsonEditor(false)}
+                  className="p-1.5 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg text-neutral-500 transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="p-4 flex flex-col gap-3 flex-1 overflow-hidden">
+                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 rounded-xl text-sm flex items-start gap-2 text-red-700 dark:text-red-400">
+                  <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                  <div>
+                    <p className="font-bold mb-1">
+                      JSON ফাইলটি পার্স করা যাচ্ছে না
+                    </p>
+                    <p className="opacity-90 leading-relaxed font-mono text-xs">
+                      {jsonErrorMsg}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xs text-neutral-500 font-medium">
+                  নিচের টেক্সট-এ উল্লেখিত লাইনে ভুলটি (যেমন কমা বা কোলন মিসিং)
+                  ঠিক করে পুনরায় চেষ্টা করো।
+                </p>
+
+                <textarea
+                  ref={jsonFixAreaRef}
+                  defaultValue={rawJsonText}
+                  className="w-full flex-1 p-4 font-mono text-sm leading-relaxed rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                  spellCheck={false}
+                />
+              </div>
+
+              <div className="p-4 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 flex justify-end gap-2">
+                <button
+                  onClick={() => setShowJsonEditor(false)}
+                  className="px-4 py-2 rounded-xl text-sm font-bold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
+                  disabled={isProcessing}
+                >
+                  বাতিল
+                </button>
+                <button
+                  onClick={handleJsonFix}
+                  disabled={isProcessing}
+                  className="px-6 py-2 rounded-xl text-sm font-bold bg-emerald-600 text-white shadow-lg hover:bg-emerald-500 transition-colors flex items-center gap-2"
+                >
+                  {isProcessing ? (
+                    <Loader2 className="animate-spin" size={16} />
+                  ) : (
+                    <Save size={16} />
+                  )}
+                  সংরক্ষণ ও চেষ্টা করো
+                </button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     );
   }
@@ -2045,82 +2196,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
         </button>
       </div>
 
-      {/* JSON Editor Modal */}
-      {showJsonEditor && (
-        <Dialog
-          open={showJsonEditor}
-          onOpenChange={(open) => {
-            if (!open) setShowJsonEditor(false);
-          }}
-        >
-          <DialogContent
-            className="sm:max-w-5xl max-h-[90vh] flex flex-col p-0 overflow-hidden"
-            showCloseButton={false}
-          >
-            <div className="flex justify-between items-center px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 shrink-0">
-              <div className="flex items-center gap-2 text-red-600 dark:text-red-500">
-                <FileJson size={20} />
-                <h3 className="font-extrabold text-sm tracking-wide">
-                  JSON ফিক্সার
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowJsonEditor(false)}
-                className="p-1.5 hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg text-neutral-500 transition-colors"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="p-4 flex flex-col gap-3 flex-1 overflow-hidden">
-              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 rounded-xl text-sm flex items-start gap-2 text-red-700 dark:text-red-400">
-                <AlertCircle size={16} className="mt-0.5 shrink-0" />
-                <div>
-                  <p className="font-bold mb-1">
-                    JSON ফাইলটি পার্স করা যাচ্ছে না
-                  </p>
-                  <p className="opacity-90 leading-relaxed font-mono text-xs">
-                    {jsonErrorMsg}
-                  </p>
-                </div>
-              </div>
-              <p className="text-xs text-neutral-500 font-medium">
-                নিচের টেক্সট-এ উল্লেখিত লাইনে ভুলটি (যেমন কমা বা কোলন মিসিং) ঠিক
-                করে পুনরায় চেষ্টা করো।
-              </p>
-
-              <textarea
-                ref={jsonFixAreaRef}
-                defaultValue={rawJsonText}
-                className="w-full flex-1 p-4 font-mono text-sm leading-relaxed rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
-                spellCheck={false}
-              />
-            </div>
-
-            <div className="p-4 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 flex justify-end gap-2">
-              <button
-                onClick={() => setShowJsonEditor(false)}
-                className="px-4 py-2 rounded-xl text-sm font-bold text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
-                disabled={isProcessing}
-              >
-                বাতিল
-              </button>
-              <button
-                onClick={handleJsonFix}
-                disabled={isProcessing}
-                className="px-6 py-2 rounded-xl text-sm font-bold bg-emerald-600 text-white shadow-lg hover:bg-emerald-500 transition-colors flex items-center gap-2"
-              >
-                {isProcessing ? (
-                  <Loader2 className="animate-spin" size={16} />
-                ) : (
-                  <Save size={16} />
-                )}
-                সংরক্ষণ ও চেষ্টা করো
-              </button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      {/* JSON Editor Modal is now rendered in step 1 so it always appears */}
     </div>
   );
 };

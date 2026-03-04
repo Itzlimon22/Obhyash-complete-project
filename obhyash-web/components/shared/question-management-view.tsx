@@ -46,6 +46,9 @@ export default function QuestionManagementView({
     questions,
     isLoading,
     totalCount,
+    approvedCount,
+    pendingCount,
+    rejectedCount,
     totalPages,
     page,
     pageSize,
@@ -89,11 +92,11 @@ export default function QuestionManagementView({
   const stats = useMemo(
     () => ({
       total: totalCount,
-      approved: questions.filter((q) => q.status === 'Approved').length,
-      pending: questions.filter((q) => q.status === 'Pending').length,
-      rejected: questions.filter((q) => q.status === 'Rejected').length,
+      approved: approvedCount,
+      pending: pendingCount,
+      rejected: rejectedCount,
     }),
-    [questions, totalCount],
+    [totalCount, approvedCount, pendingCount, rejectedCount],
   );
 
   // Initial load

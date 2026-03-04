@@ -26,6 +26,9 @@ export interface QuestionFilters {
 export interface PaginatedQuestionsResponse {
   questions: Question[];
   totalCount: number;
+  approvedCount: number;
+  pendingCount: number;
+  rejectedCount: number;
   totalPages: number;
   currentPage: number;
   pageSize: number;
@@ -95,12 +98,49 @@ export const getQuestionsPage = async (
       const to = from + pageSize - 1;
       query = query.range(from, to);
 
-      const { data, error, count } = await query;
+      // Concurrent count fetches for statuses (ignoring the 'status' filter to get global counts for the other active filters)
+      let approvedCount = 0;
+      let pendingCount = 0;
+      let rejectedCount = 0;
+
+      const buildBaseCountQuery = () => {
+        let q = supabase
+          .from('questions')
+          .select('*', { count: 'exact', head: true });
+        if (filters.subject) q = q.eq('subject', filters.subject);
+        if (filters.chapter) q = q.eq('chapter', filters.chapter);
+        if (filters.topic) q = q.eq('topic', filters.topic);
+        if (filters.difficulty)
+          q = q.ilike('difficulty', `%${filters.difficulty}%`);
+        if (filters.author) q = q.eq('author', filters.author);
+        if (filters.search && filters.search.trim()) {
+          const searchTerm = filters.search.trim();
+          q = q.or(
+            `question.ilike.%${searchTerm}%,exam_type.ilike.%${searchTerm}%,institute.ilike.%${searchTerm}%,institutes.cs.{${searchTerm}}`,
+          );
+        }
+        return q;
+      };
+
+      const [queryResult, approvedResult, pendingResult, rejectedResult] =
+        await Promise.all([
+          query,
+          buildBaseCountQuery().eq('status', 'Approved'),
+          buildBaseCountQuery().eq('status', 'Pending'),
+          buildBaseCountQuery().eq('status', 'Rejected'),
+        ]);
+
+      const { data, error, count } = queryResult;
 
       if (error) {
         console.error('Error fetching questions page:', error);
         throw error;
       }
+
+      const totalCount = count || 0;
+      approvedCount = approvedResult.count || 0;
+      pendingCount = pendingResult.count || 0;
+      rejectedCount = rejectedResult.count || 0;
 
       // Map snake_case to camelCase
       const mappedQuestions: Question[] = (data || []).map(
@@ -126,8 +166,11 @@ export const getQuestionsPage = async (
 
       return {
         questions: mappedQuestions,
-        totalCount: count || 0,
-        totalPages: Math.ceil((count || 0) / pageSize),
+        totalCount: totalCount,
+        approvedCount: approvedCount,
+        pendingCount: pendingCount,
+        rejectedCount: rejectedCount,
+        totalPages: Math.ceil((totalCount || 0) / pageSize),
         currentPage: page,
         pageSize,
       };
@@ -140,6 +183,9 @@ export const getQuestionsPage = async (
   return {
     questions: [],
     totalCount: 0,
+    approvedCount: 0,
+    pendingCount: 0,
+    rejectedCount: 0,
     totalPages: 0,
     currentPage: page,
     pageSize,

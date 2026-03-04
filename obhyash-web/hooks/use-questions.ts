@@ -34,6 +34,9 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
   const [page, setPage] = useState(initialPage);
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [totalCount, setTotalCount] = useState(0);
+  const [approvedCount, setApprovedCount] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [rejectedCount, setRejectedCount] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   // Initialize filters with baseFilters
   const [filters, setFilters] = useState<QuestionFilters>({
@@ -60,6 +63,9 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
 
       setQuestions(response.questions);
       setTotalCount(response.totalCount);
+      setApprovedCount(response.approvedCount);
+      setPendingCount(response.pendingCount);
+      setRejectedCount(response.rejectedCount);
       setTotalPages(response.totalPages);
     } catch (err) {
       console.error('Fetch error:', err);
@@ -450,6 +456,9 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
     questions,
     isLoading,
     totalCount,
+    approvedCount,
+    pendingCount,
+    rejectedCount,
     totalPages,
     page,
     pageSize,
