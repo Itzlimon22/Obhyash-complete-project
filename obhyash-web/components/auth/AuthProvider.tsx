@@ -141,7 +141,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
         if (error) {
           console.error('Error fetching profile:', error);
-          return null;
+          // Fall back to the cached profile if it belongs to the same user.
+          // This prevents the admin layout from returning null (blank screen)
+          // on a transient DB failure or Supabase cold-start slow query.
+          const cached = readCachedProfile();
+          return cached?.id === userId ? cached : null;
         }
         if (!data) return null;
 
@@ -150,7 +154,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         return userProfile;
       } catch (error) {
         console.error('Unexpected error fetching profile:', error);
-        return null;
+        const cached = readCachedProfile();
+        return cached?.id === userId ? cached : null;
       }
     },
     [supabase],

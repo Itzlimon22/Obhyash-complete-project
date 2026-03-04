@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import {
   Search,
   Menu,
@@ -13,9 +13,7 @@ import {
 } from 'lucide-react';
 import { NotificationDropdown } from '@/components/admin/notifications/notification-dropdown';
 import { usePathname, useRouter } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
-import { getUserProfile } from '@/services/database';
-import { UserProfile } from '@/lib/types';
+import { useAuth } from '@/components/auth/AuthProvider';
 import Link from 'next/link';
 import UserAvatar from '@/components/student/ui/common/UserAvatar';
 
@@ -29,12 +27,13 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
     const savedTheme = localStorage.getItem('theme');
     return savedTheme !== 'light';
   });
-  const [user, setUser] = useState<UserProfile | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = createClient();
+  // Use the already-fetched profile from AuthProvider — avoids calling getUser()
+  // which acquires the Supabase auth lock and blocks all concurrent .from() queries.
+  const { profile: user, signOut } = useAuth();
 
   // Load Theme Preference from LocalStorage
   useLayoutEffect(() => {
@@ -45,19 +44,6 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       document.documentElement.classList.add('dark');
     }
   }, [isDarkMode]);
-
-  // Fetch User Profile
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const profile = await getUserProfile('me');
-        setUser(profile);
-      } catch (error) {
-        console.error('Failed to fetch user profile:', error);
-      }
-    };
-    fetchUser();
-  }, []);
 
   const toggleTheme = () => {
     const newMode = !isDarkMode;
@@ -72,8 +58,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.replace('/');
+    await signOut();
   };
 
   // Generate Breadcrumbs

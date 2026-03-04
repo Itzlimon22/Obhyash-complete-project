@@ -71,8 +71,19 @@ export default function ClientLayout({
   // Wait for BOTH user AND profile to be confirmed before rendering children.
   // If only user is set but profile is still null (still being fetched), we wait —
   // this prevents data-fetching useEffects from firing before auth is complete.
+  // NOTE: return the spinner (not null) so the admin never sees a blank screen if
+  // the profile DB fetch failed or is still in-flight after loading resolves.
   if (!user || !profile || profile.role !== 'Admin') {
-    return null;
+    return (
+      <div className="min-h-screen bg-neutral-50 dark:bg-black flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
+          <p className="text-sm font-bold text-neutral-500 animate-pulse">
+            Restoring Admin Session...
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
