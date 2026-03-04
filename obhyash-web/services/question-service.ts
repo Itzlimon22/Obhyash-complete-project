@@ -3,6 +3,10 @@ import { supabase, isSupabaseConfigured } from './core';
 import { createNotification } from './notification-service';
 import { generateQuestionFingerprint } from '@/lib/crypto-utils';
 
+const isValidUUID = (id: unknown): boolean =>
+  typeof id === 'string' &&
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
 // --- TYPES ---
 export interface QuestionFilters {
   subject?: string | null;
@@ -242,8 +246,11 @@ export const createQuestion = async (
         type: question.type || 'MCQ',
         difficulty: question.difficulty || 'Medium',
         subject: question.subject,
+        subject_id: question.subjectId || null,
         chapter: question.chapter,
+        chapter_id: isValidUUID(question.chapterId) ? question.chapterId : null,
         topic: question.topic,
+        topic_id: isValidUUID(question.topicId) ? question.topicId : null,
         stream: question.stream,
         division: question.division,
         section: question.section,
@@ -335,6 +342,11 @@ export const updateQuestion = async (
         payload.correct_answer = updates.correctAnswer;
       if (updates.correctAnswerIndex !== undefined)
         payload.correct_answer_index = updates.correctAnswerIndex;
+      if (updates.subjectId !== undefined)
+        payload.subject_id = updates.subjectId;
+      if (updates.chapterId !== undefined)
+        payload.chapter_id = updates.chapterId;
+      if (updates.topicId !== undefined) payload.topic_id = updates.topicId;
 
       // Remove fields that shouldn't be updated or are mapped
       delete payload.id;
@@ -347,6 +359,9 @@ export const updateQuestion = async (
       delete payload.examType;
       delete payload.correctAnswer;
       delete payload.correctAnswerIndex;
+      delete payload.subjectId;
+      delete payload.chapterId;
+      delete payload.topicId;
 
       const { error } = await supabase
         .from('questions')
@@ -511,7 +526,9 @@ export const checkDuplicateQuestions = async (
       if (error) throw error;
 
       if (data && data.length > 0) {
-        const existingFingerprints = new Set(data.map((d: { fingerprint: string }) => d.fingerprint));
+        const existingFingerprints = new Set(
+          data.map((d: { fingerprint: string }) => d.fingerprint),
+        );
 
         batch.forEach((fp, batchIdx) => {
           if (existingFingerprints.has(fp)) {
@@ -589,6 +606,17 @@ export const bulkCreateQuestions = async (
         internalJobId = jobRes.id || undefined;
       }
 
+      // Pre-fetch taxonomy to map names to UUIDs safely
+      const { data: allSubjects } = await supabase
+        .from('subjects')
+        .select('id, name, name_en');
+      const { data: allChapters } = await supabase
+        .from('chapters')
+        .select('id, name, subject_id');
+      const { data: allTopics } = await supabase
+        .from('topics')
+        .select('id, name, chapter_id');
+
       // Map Question objects to database format and generate fingerprints
       const payloadPromises = questions.map(async (q) => {
         const correctAnswerIndices =
@@ -602,11 +630,35 @@ export const bulkCreateQuestions = async (
           chapter: q.chapter,
         });
 
-        const isValidUUID = (id: unknown) =>
-          typeof id === 'string' &&
-          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-            id,
+        // Resolve IDs from pre-fetched taxonomy if missing
+        let sId = q.subjectId;
+        let cId = q.chapterId;
+        let tId = q.topicId;
+
+        if (!sId && q.subject && allSubjects) {
+          const s = allSubjects.find(
+            (sub: any) =>
+              sub.name === q.subject ||
+              sub.name_en === q.subject ||
+              sub.id === q.subject,
           );
+          if (s) sId = s.id;
+        }
+
+        if (!isValidUUID(cId) && q.chapter && allChapters) {
+          const c = allChapters.find(
+            (ch: any) =>
+              ch.name === q.chapter && (!sId || ch.subject_id === sId),
+          );
+          if (c) cId = c.id;
+        }
+
+        if (!isValidUUID(tId) && q.topic && allTopics) {
+          const t = allTopics.find(
+            (tp: any) => tp.name === q.topic && (!cId || tp.chapter_id === cId),
+          );
+          if (t) tId = t.id;
+        }
 
         return {
           question: q.question,
@@ -616,11 +668,11 @@ export const bulkCreateQuestions = async (
           type: q.type || 'MCQ',
           difficulty: q.difficulty || 'Medium',
           subject: q.subject,
-          subject_id: isValidUUID(q.subjectId) ? q.subjectId : null,
+          subject_id: sId || null, // subject_id can be text
           chapter: q.chapter,
-          chapter_id: isValidUUID(q.chapterId) ? q.chapterId : null,
+          chapter_id: isValidUUID(cId) ? cId : null,
           topic: q.topic,
-          topic_id: isValidUUID(q.topicId) ? q.topicId : null,
+          topic_id: isValidUUID(tId) ? tId : null,
           stream: q.stream,
           division: q.division,
           section: q.section,

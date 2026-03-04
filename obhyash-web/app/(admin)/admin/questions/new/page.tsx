@@ -287,9 +287,17 @@ export default function NewQuestionPage() {
         correctAnswer: finalOptions[finalIndices[0]] || '', // Legacy
         correctAnswerIndex: finalIndices[0], // Legacy
         explanation: formData.explanation,
-        subject: formData.subject,
-        chapter: formData.chapter,
-        topic: formData.topic,
+        subject:
+          subjects.find((s) => s.id === formData.subject)?.name ||
+          formData.subject,
+        subjectId: formData.subject,
+        chapter:
+          chapters.find((c) => c.id === formData.chapter)?.name ||
+          formData.chapter,
+        chapterId: formData.chapter,
+        topic:
+          topics.find((t) => t.id === formData.topic)?.name || formData.topic,
+        topicId: formData.topic,
         stream: formData.stream,
         division: formData.division,
         difficulty: formData.difficulty,
