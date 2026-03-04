@@ -7,6 +7,7 @@ import { BlogPost } from '@/lib/blog-data';
 import BlogCard from '@/components/blog/BlogCard';
 import { Search, X, ArrowLeft, SlidersHorizontal } from 'lucide-react';
 import useSWR from 'swr';
+import { useReadHistory } from '@/hooks/use-read-history';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -54,6 +55,8 @@ export default function BlogSearchPage({
     () => new Set(bookmarkData?.slugs ?? []),
     [bookmarkData],
   );
+
+  const readSlugs = useReadHistory();
 
   const toggleBookmark = async (slug: string) => {
     if (!bookmarkData) return;
@@ -198,6 +201,7 @@ export default function BlogSearchPage({
                 stats={postCounts[post.slug]}
                 isBookmarked={bookmarkedSlugs.has(post.slug)}
                 onToggleBookmark={toggleBookmark}
+                isRead={readSlugs.has(post.slug)}
               />
             ))}
           </div>
@@ -242,6 +246,7 @@ export default function BlogSearchPage({
                   stats={postCounts[post.slug]}
                   isBookmarked={bookmarkedSlugs.has(post.slug)}
                   onToggleBookmark={toggleBookmark}
+                  isRead={readSlugs.has(post.slug)}
                 />
               ))}
             </div>

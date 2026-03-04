@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { BlogPost } from '@/lib/blog-data';
 import BlogCard from '@/components/blog/BlogCard';
+import { useReadHistory } from '@/hooks/use-read-history';
 import {
   BookOpen,
   Sparkles,
@@ -384,6 +385,7 @@ export default function BlogListingClient({
                     stats={postCounts[post.slug]}
                     isBookmarked={bookmarkedSlugs.has(post.slug)}
                     onToggleBookmark={toggleBookmark}
+                    isRead={readSlugs.has(post.slug)}
                   />
                 ))}
               </div>
@@ -404,6 +406,7 @@ export default function BlogListingClient({
               stats={postCounts[featuredPost!.slug]}
               isBookmarked={bookmarkedSlugs.has(featuredPost!.slug)}
               onToggleBookmark={toggleBookmark}
+              isRead={readSlugs.has(featuredPost!.slug)}
             />
           </div>
         )}
@@ -431,6 +434,7 @@ export default function BlogListingClient({
                   stats={postCounts[post.slug]}
                   isBookmarked={bookmarkedSlugs.has(post.slug)}
                   onToggleBookmark={toggleBookmark}
+                  isRead={readSlugs.has(post.slug)}
                 />
               ))}
             </div>

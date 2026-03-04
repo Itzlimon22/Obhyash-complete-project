@@ -4,7 +4,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { BlogPost } from '@/lib/blog-data';
-import { Clock, ArrowRight, Tag, Heart, Eye, Bookmark } from 'lucide-react';
+import {
+  Clock,
+  ArrowRight,
+  Tag,
+  Heart,
+  Eye,
+  Bookmark,
+  CheckCheck,
+} from 'lucide-react';
 
 function formatCount(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}k`;
@@ -26,9 +34,17 @@ interface BlogCardProps {
   stats?: { likes: number; views: number };
   isBookmarked?: boolean;
   onToggleBookmark?: (slug: string) => void;
+  isRead?: boolean;
 }
 
-export default function BlogCard({ post, featured = false, stats, isBookmarked, onToggleBookmark }: BlogCardProps) {
+export default function BlogCard({
+  post,
+  featured = false,
+  stats,
+  isBookmarked,
+  onToggleBookmark,
+  isRead,
+}: BlogCardProps) {
   const router = useRouter();
   const categoryStyle =
     'bg-slate-50 text-slate-600 dark:bg-[#1a1a1a] dark:text-slate-400 border border-slate-100 dark:border-white/5';
@@ -56,12 +72,17 @@ export default function BlogCard({ post, featured = false, stats, isBookmarked, 
           {/* Bookmark button — featured card */}
           {onToggleBookmark && (
             <button
-              onClick={(e) => { e.preventDefault(); onToggleBookmark(post.slug); }}
+              onClick={(e) => {
+                e.preventDefault();
+                onToggleBookmark(post.slug);
+              }}
               aria-label={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করুন'}
               className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow transition-all
                 ${isBookmarked ? 'bg-rose-500 text-white' : 'bg-white/80 dark:bg-black/60 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-black/80'}`}
             >
-              <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-white' : ''}`} />
+              <Bookmark
+                className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-white' : ''}`}
+              />
             </button>
           )}
           <div className="p-6 sm:p-8 md:p-10">
@@ -76,6 +97,12 @@ export default function BlogCard({ post, featured = false, stats, isBookmarked, 
                 <Tag className="w-3 h-3" />
                 {post.category}
               </span>
+              {isRead && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                  <CheckCheck className="w-3 h-3" />
+                  পড়েছেন
+                </span>
+              )}
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors duration-200 leading-[1.6] font-anek">
@@ -115,15 +142,15 @@ export default function BlogCard({ post, featured = false, stats, isBookmarked, 
               </span>
             </div>
             {/* Engagement stats */}
-            {(stats?.likes || stats?.views) ? (
+            {stats?.likes || stats?.views ? (
               <div className="flex items-center gap-3 mt-5 pt-4 border-t border-slate-100 dark:border-[#2b2b2b]">
-                {(stats.likes > 0) && (
+                {stats.likes > 0 && (
                   <span className="inline-flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500 font-anek">
                     <Heart className="w-3.5 h-3.5" />
                     {formatCount(stats.likes)}
                   </span>
                 )}
-                {(stats.views > 0) && (
+                {stats.views > 0 && (
                   <span className="inline-flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500 font-anek">
                     <Eye className="w-3.5 h-3.5" />
                     {formatCount(stats.views)}
@@ -157,40 +184,58 @@ export default function BlogCard({ post, featured = false, stats, isBookmarked, 
             {/* Bookmark overlay — regular card */}
             {onToggleBookmark && (
               <button
-                onClick={(e) => { e.stopPropagation(); onToggleBookmark(post.slug); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleBookmark(post.slug);
+                }}
                 aria-label={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করুন'}
                 className={`absolute top-2 right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center shadow transition-all
                   ${isBookmarked ? 'bg-rose-500 text-white' : 'bg-white/80 dark:bg-black/60 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-black/80'}`}
               >
-                <Bookmark className={`w-3 h-3 ${isBookmarked ? 'fill-white' : ''}`} />
+                <Bookmark
+                  className={`w-3 h-3 ${isBookmarked ? 'fill-white' : ''}`}
+                />
               </button>
             )}
           </div>
         ) : (
           <div className="relative">
-            <div className={`w-full h-1.5 bg-gradient-to-r ${post.coverColor} shrink-0`} />
+            <div
+              className={`w-full h-1.5 bg-gradient-to-r ${post.coverColor} shrink-0`}
+            />
             {/* Bookmark for no-cover cards */}
             {onToggleBookmark && (
               <button
-                onClick={(e) => { e.stopPropagation(); onToggleBookmark(post.slug); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleBookmark(post.slug);
+                }}
                 aria-label={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করুন'}
                 className={`absolute top-2 right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center shadow transition-all
                   ${isBookmarked ? 'bg-rose-500 text-white' : 'bg-slate-100 dark:bg-[#2b2b2b] text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#333]'}`}
               >
-                <Bookmark className={`w-3 h-3 ${isBookmarked ? 'fill-white' : ''}`} />
+                <Bookmark
+                  className={`w-3 h-3 ${isBookmarked ? 'fill-white' : ''}`}
+                />
               </button>
             )}
           </div>
         )}
         <div className="flex flex-col flex-1 p-5 sm:p-6">
           {/* Category badge */}
-          <div className="mb-4">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
             <span
               className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full border ${categoryStyle}`}
             >
               <Tag className="w-3 h-3" />
               {post.category}
             </span>
+            {isRead && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                <CheckCheck className="w-2.5 h-2.5" />
+                পড়েছেন
+              </span>
+            )}
           </div>
 
           <h3 className="text-[17px] font-bold text-slate-900 dark:text-slate-100 mb-2.5 line-clamp-2 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors duration-200 leading-[1.6] font-anek">
@@ -239,15 +284,15 @@ export default function BlogCard({ post, featured = false, stats, isBookmarked, 
             <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-rose-500 group-hover:translate-x-1 transition-all duration-200" />
           </div>
           {/* Engagement stats */}
-          {(stats?.likes || stats?.views) ? (
+          {stats?.likes || stats?.views ? (
             <div className="flex items-center gap-3 pt-3 border-t border-slate-100 dark:border-[#2b2b2b] mt-1">
-              {(stats.likes > 0) && (
+              {stats.likes > 0 && (
                 <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 font-anek">
                   <Heart className="w-3 h-3" />
                   {formatCount(stats.likes)}
                 </span>
               )}
-              {(stats.views > 0) && (
+              {stats.views > 0 && (
                 <span className="inline-flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 font-anek">
                   <Eye className="w-3 h-3" />
                   {formatCount(stats.views)}

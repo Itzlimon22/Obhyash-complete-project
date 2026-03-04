@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { rateLimitResponse } from '@/lib/utils/rate-limit';
 
 // GET /api/blog/bookmarks — returns array of bookmarked slugs for current user
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ slugs: [] });
@@ -29,11 +32,17 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Rate limit: 60 bookmark toggles per minute per user
+    const rl = rateLimitResponse(`bookmarks:${user.id}`, 60, 60_000);
+    if (rl.limited) return rl.response;
 
     const { slug } = await request.json();
     if (!slug) {
@@ -63,6 +72,9 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error('Error toggling bookmark:', error);
-    return NextResponse.json({ error: 'Failed to toggle bookmark' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to toggle bookmark' },
+      { status: 500 },
+    );
   }
 }

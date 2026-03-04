@@ -1,25 +1,15 @@
 import { NextResponse, connection } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { requireAdmin } from '@/lib/utils/admin-auth';
 
 export async function GET() {
   await connection();
+
+  const check = await requireAdmin();
+  if (!check.ok) return check.response;
+
   try {
     const supabase = await createClient();
-
-    // Determine admin access - verify user has right role if necessary
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    // Check if logged in. In a real scenario, you also verify if user.role === 'admin'
-    // if (!user || user.role !== 'admin') ...
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized Access' },
-        { status: 401 },
-      );
-    }
 
     // 1. Fetch Subscriber Count
     const { count: subscriberCount, error: subError } = await supabase

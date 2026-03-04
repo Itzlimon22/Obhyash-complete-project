@@ -164,17 +164,21 @@ export async function getBlogPostCounts(
   try {
     const supabase = await createClient();
 
-    const [{ data: likes }, { data: views }] = await Promise.all([
-      supabase.from('blog_likes').select('post_slug').in('post_slug', slugs),
-      supabase.from('blog_views').select('post_slug').in('post_slug', slugs),
-    ]);
+    // RPC aggregates server-side — no row scans sent over the wire
+    const { data, error } = await supabase.rpc('get_blog_post_counts', {
+      slug_list: slugs,
+    });
 
-    likes?.forEach(({ post_slug }) => {
-      if (result[post_slug]) result[post_slug].likes++;
-    });
-    views?.forEach(({ post_slug }) => {
-      if (result[post_slug]) result[post_slug].views++;
-    });
+    if (error) throw error;
+
+    (data ?? []).forEach(
+      (row: { post_slug: string; like_count: number; view_count: number }) => {
+        if (result[row.post_slug]) {
+          result[row.post_slug].likes = row.like_count;
+          result[row.post_slug].views = row.view_count;
+        }
+      },
+    );
   } catch (error) {
     console.error('Error fetching blog post counts:', error);
   }

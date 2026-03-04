@@ -1,25 +1,18 @@
 import { NextRequest, NextResponse, connection } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { requireAdmin } from '@/lib/utils/admin-auth';
 
 // Fetch all comments or subscribers securely
 export async function GET(request: NextRequest) {
   await connection();
+
+  const check = await requireAdmin();
+  if (!check.ok) return check.response;
+
   try {
     const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type'); // 'comments' or 'subscribers'
-
-    // Admin Verification
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized Access' },
-        { status: 401 },
-      );
-    }
 
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '20');
@@ -75,20 +68,12 @@ export async function GET(request: NextRequest) {
 // Delete an offensive comment
 export async function DELETE(request: NextRequest) {
   await connection();
+
+  const check = await requireAdmin();
+  if (!check.ok) return check.response;
+
   try {
     const supabase = await createClient();
-
-    // Admin Verification
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized Access' },
-        { status: 401 },
-      );
-    }
 
     const { id } = await request.json();
     if (!id)

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { rateLimitResponse } from '@/lib/utils/rate-limit';
+
+const MAX_COMMENT_LENGTH = 2000;
 
 export async function GET(request: NextRequest) {
   try {
@@ -61,6 +64,17 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
+
+    if (content.trim().length > MAX_COMMENT_LENGTH) {
+      return NextResponse.json(
+        { error: `Comment must be ${MAX_COMMENT_LENGTH} characters or fewer` },
+        { status: 400 },
+      );
+    }
+
+    // Rate limit: 5 comments per minute per user
+    const rl = rateLimitResponse(`comments:${user.id}`, 5, 60_000);
+    if (rl.limited) return rl.response;
 
     // Insert comment
     const { data: newComment, error: insertError } = await supabase

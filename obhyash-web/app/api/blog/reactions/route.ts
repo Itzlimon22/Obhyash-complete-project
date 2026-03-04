@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { rateLimitResponse } from '@/lib/utils/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,27 +12,32 @@ export async function GET(req: NextRequest) {
 
   const supabase = await createClient();
 
-  // Public counts — no auth needed
-  const { data: rows, error } = await supabase
-    .from('blog_reactions')
-    .select('emoji, user_id')
-    .eq('post_slug', slug);
+  // Aggregate counts via RPC — no full-table row scan
+  const { data: countRows, error } = await supabase.rpc('get_reaction_counts', {
+    p_slug: slug,
+  });
 
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
 
   const counts: Record<string, number> = {};
-  for (const row of rows ?? []) {
-    counts[row.emoji] = (counts[row.emoji] ?? 0) + 1;
+  for (const row of countRows ?? []) {
+    counts[row.emoji] = Number(row.reaction_count);
   }
 
-  // User's own reactions (if logged in)
+  // User's own reactions — only a few rows per user per post, fine to fetch
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const userReactions = user
-    ? (rows ?? []).filter((r) => r.user_id === user.id).map((r) => r.emoji)
-    : [];
+  let userReactions: string[] = [];
+  if (user) {
+    const { data: userRows } = await supabase
+      .from('blog_reactions')
+      .select('emoji')
+      .eq('post_slug', slug)
+      .eq('user_id', user.id);
+    userReactions = (userRows ?? []).map((r) => r.emoji);
+  }
 
   return NextResponse.json({ counts, userReactions });
 }
@@ -45,12 +51,21 @@ export async function POST(req: NextRequest) {
   if (!user)
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  // Rate limit: 30 reaction toggles per minute per user
+  const rl = rateLimitResponse(`reactions:${user.id}`, 30, 60_000);
+  if (rl.limited) return rl.response;
+
   const { slug, emoji } = await req.json();
   if (!slug || !emoji)
     return NextResponse.json(
       { error: 'slug and emoji required' },
       { status: 400 },
     );
+
+  // Whitelist allowed emojis
+  const ALLOWED = ['🔥', '💡', '❤️', '😮', '👏'];
+  if (!ALLOWED.includes(emoji))
+    return NextResponse.json({ error: 'Invalid emoji' }, { status: 400 });
 
   // Check if already reacted with this emoji
   const { data: existing } = await supabase
@@ -62,7 +77,6 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
 
   if (existing) {
-    // Toggle off
     await supabase
       .from('blog_reactions')
       .delete()
@@ -75,19 +89,22 @@ export async function POST(req: NextRequest) {
       .insert({ user_id: user.id, post_slug: slug, emoji });
   }
 
-  // Return fresh counts
-  const { data: rows } = await supabase
-    .from('blog_reactions')
-    .select('emoji, user_id')
-    .eq('post_slug', slug);
+  // Return fresh aggregate counts via RPC
+  const { data: countRows } = await supabase.rpc('get_reaction_counts', {
+    p_slug: slug,
+  });
 
   const counts: Record<string, number> = {};
-  for (const row of rows ?? []) {
-    counts[row.emoji] = (counts[row.emoji] ?? 0) + 1;
+  for (const row of countRows ?? []) {
+    counts[row.emoji] = Number(row.reaction_count);
   }
-  const userReactions = (rows ?? [])
-    .filter((r) => r.user_id === user.id)
-    .map((r) => r.emoji);
+
+  const { data: userRows } = await supabase
+    .from('blog_reactions')
+    .select('emoji')
+    .eq('post_slug', slug)
+    .eq('user_id', user.id);
+  const userReactions = (userRows ?? []).map((r) => r.emoji);
 
   return NextResponse.json({ counts, userReactions, reacted: !existing });
 }
