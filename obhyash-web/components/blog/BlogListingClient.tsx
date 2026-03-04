@@ -2,9 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { BlogPost } from '@/lib/blog-data';
 import BlogCard from '@/components/blog/BlogCard';
-import { BookOpen, Sparkles, TrendingUp, Search } from 'lucide-react';
+import { BookOpen, Sparkles, TrendingUp, Search, X } from 'lucide-react';
 
 const SUB_CATEGORIES = [
   'সব',
@@ -54,6 +55,10 @@ export default function BlogListingClient({
   isGuest,
   postCounts = {},
 }: BlogListingClientProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const activeTag = searchParams.get('tag') ?? '';
+
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeSubCategory, setActiveSubCategory] = useState('সব');
   const [searchQuery, setSearchQuery] = useState('');
@@ -82,8 +87,14 @@ export default function BlogListingClient({
       );
     }
 
+    if (activeTag) {
+      result = result.filter((p) =>
+        p.tags.some((t) => t.toLowerCase() === activeTag.toLowerCase()),
+      );
+    }
+
     return result;
-  }, [posts, activeCategory, activeSubCategory, searchQuery]);
+  }, [posts, activeCategory, activeSubCategory, searchQuery, activeTag]);
 
   const nonFeaturedFiltered = filteredPosts.filter(
     (p) =>
@@ -95,6 +106,7 @@ export default function BlogListingClient({
 
   const showFeatured =
     !searchQuery &&
+    !activeTag &&
     activeCategory === 'All' &&
     activeSubCategory === 'সব' &&
     featuredPost;
@@ -191,8 +203,31 @@ export default function BlogListingClient({
 
       {/* ─── Main Content ─── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        {/* Recommended Top Section (Only shown if no search) */}
+        {/* Active tag filter chip */}
+        {activeTag && (
+          <div className="flex items-center gap-2 mb-8">
+            <span className="text-sm text-slate-500 dark:text-slate-400 font-anek">
+              ট্যাগ ফিল্টার:
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-sm font-medium rounded-full border border-rose-200 dark:border-rose-900 font-anek">
+              #{activeTag}
+              <button
+                onClick={() => router.push('/blog')}
+                aria-label="ফিল্টার সরান"
+                className="hover:text-rose-800 dark:hover:text-rose-300 transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </span>
+            <span className="text-xs text-slate-400 font-anek">
+              {filteredPosts.length} টি আর্টিকেল পাওয়া গেছে
+            </span>
+          </div>
+        )}
+
+        {/* Recommended Top Section (Only shown if no search/tag) */}
         {!searchQuery &&
+          !activeTag &&
           activeCategory === 'All' &&
           activeSubCategory === 'সব' &&
           recommendedPosts.length > 0 && (

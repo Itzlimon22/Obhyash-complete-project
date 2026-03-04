@@ -537,12 +537,13 @@ export default async function BlogPostPage({
               </p>
               <div className="flex flex-wrap gap-2">
                 {post.tags.map((tag) => (
-                  <span
+                  <Link
                     key={tag}
-                    className="px-3 py-1 text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-700 hover:border-rose-200 dark:hover:border-rose-900 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-default"
+                    href={`/blog?tag=${encodeURIComponent(tag)}`}
+                    className="px-3 py-1 text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-700 hover:border-rose-200 dark:hover:border-rose-900 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
                   >
                     #{tag}
-                  </span>
+                  </Link>
                 ))}
               </div>
             </div>

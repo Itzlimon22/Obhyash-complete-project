@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 
 import {
   getAllPosts,
@@ -57,13 +58,15 @@ export default async function BlogPage() {
   const postCounts = await getBlogPostCounts(allSlugs);
 
   return (
-    <BlogListingClient
-      posts={allPosts}
-      featuredPost={featured}
-      categories={BLOG_CATEGORIES}
-      recommendedPosts={recommendedPosts}
-      isGuest={isGuest}
-      postCounts={postCounts}
-    />
+    <Suspense>
+      <BlogListingClient
+        posts={allPosts}
+        featuredPost={featured}
+        categories={BLOG_CATEGORIES}
+        recommendedPosts={recommendedPosts}
+        isGuest={isGuest}
+        postCounts={postCounts}
+      />
+    </Suspense>
   );
 }

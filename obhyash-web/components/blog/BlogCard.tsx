@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { BlogPost } from '@/lib/blog-data';
 import { Clock, ArrowRight, Tag, Heart, Eye } from 'lucide-react';
 
@@ -24,6 +27,7 @@ interface BlogCardProps {
 }
 
 export default function BlogCard({ post, featured = false, stats }: BlogCardProps) {
+  const router = useRouter();
   const categoryStyle =
     'bg-slate-50 text-slate-600 dark:bg-[#1a1a1a] dark:text-slate-400 border border-slate-100 dark:border-white/5';
 
@@ -121,8 +125,12 @@ export default function BlogCard({ post, featured = false, stats }: BlogCardProp
   }
 
   return (
-    <Link href={`/blog/${post.slug}`} className="group block h-full">
-      <article className="flex flex-col h-full bg-white dark:bg-[#111] overflow-hidden rounded-2xl border border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300">
+    <div
+      role="article"
+      onClick={() => router.push(`/blog/${post.slug}`)}
+      className="group block h-full cursor-pointer"
+    >
+      <div className="flex flex-col h-full bg-white dark:bg-[#111] overflow-hidden rounded-2xl border border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300">
         {/* Cover image or gradient strip */}
         {post.coverImage ? (
           <div className="relative w-full h-44 overflow-hidden shrink-0">
@@ -160,12 +168,14 @@ export default function BlogCard({ post, featured = false, stats }: BlogCardProp
           {/* Tags */}
           <div className="flex flex-wrap gap-1.5 mb-5">
             {post.tags.slice(0, 2).map((tag) => (
-              <span
+              <Link
                 key={tag}
-                className="px-2 py-0.5 text-[10px] font-medium text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800 rounded-md border border-slate-100 dark:border-slate-700"
+                href={`/blog?tag=${encodeURIComponent(tag)}`}
+                onClick={(e) => e.stopPropagation()}
+                className="px-2 py-0.5 text-[10px] font-medium text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800 rounded-md border border-slate-100 dark:border-slate-700 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-200 dark:hover:border-rose-900 transition-colors"
               >
                 #{tag}
-              </span>
+              </Link>
             ))}
           </div>
 
@@ -211,7 +221,7 @@ export default function BlogCard({ post, featured = false, stats }: BlogCardProp
             </div>
           ) : null}
         </div>
-      </article>
-    </Link>
+      </div>
+    </div>
   );
 }
