@@ -175,7 +175,7 @@ export default function ExamDebugPage() {
             <h1 className="text-2xl font-bold">Exam Fetch Debugger</h1>
           </div>
           <div className="text-sm text-gray-500">
-            Use this tool to diagnose "0 questions found" errors.
+            Use this tool to diagnose &quot;0 questions found&quot; errors.
           </div>
         </div>
 
@@ -342,7 +342,7 @@ export default function ExamDebugPage() {
           <div className="lg:col-span-2 space-y-6">
             {!result && !isFetching && (
               <div className="bg-gray-100 rounded-xl p-12 text-center text-gray-500 border-2 border-dashed border-gray-300">
-                Configure settings and click "Test Fetch" to see diagnostics.
+                Configure settings and click &quot;Test Fetch&quot; to see diagnostics.
               </div>
             )}
 

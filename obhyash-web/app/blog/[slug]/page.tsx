@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -9,7 +9,6 @@ import {
   Clock,
   Calendar,
   Tag,
-  ArrowRight,
   BookOpen,
   Info,
   AlertTriangle,
@@ -17,6 +16,7 @@ import {
   CheckCircle2,
   AlertOctagon,
 } from 'lucide-react';
+import { cloneElement } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
@@ -134,26 +134,28 @@ export default async function BlogPostPage({
 
   // Custom Markdown Callout components
   const MarkdownComponents = {
-    blockquote: ({ node, children, ...props }: any) => {
+    blockquote: ({
+      children,
+      ...props
+    }: React.ComponentPropsWithoutRef<'blockquote'> & { node?: unknown }) => {
       // Check if this is a custom callout
-      const text = children?.[1]?.props?.children;
-      let calloutType = null;
-      let cleanText = children;
+      const ch = children as React.ReactElement<{ children?: React.ReactNode }>[];
+      const text = (ch?.[1]?.props as { children?: string } | undefined)
+        ?.children;
+      let calloutType: string | null = null;
+      let cleanText: React.ReactNode = children;
 
       if (typeof text === 'string') {
         const match = text.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
         if (match) {
           calloutType = match[1].toUpperCase();
           // Remove the tag from the text when rendering
-          const updatedChild = { ...children[1] };
-          updatedChild.props = {
-            ...updatedChild.props,
-            children: text.replace(
-              /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/i,
-              '',
-            ),
-          };
-          cleanText = [children[0], updatedChild, ...children.slice(2)];
+          const updatedChild = cloneElement(
+            ch[1],
+            {},
+            text.replace(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/i, ''),
+          );
+          cleanText = [ch[0], updatedChild, ...ch.slice(2)];
         }
       }
 
@@ -169,7 +171,12 @@ export default async function BlogPostPage({
       }
 
       // Render custom gorgeous callout boxes
-      const config: any = {
+      interface CalloutConfig {
+        color: string;
+        icon: React.ReactNode;
+      }
+
+      const config: Record<string, CalloutConfig> = {
         NOTE: {
           color:
             'bg-blue-50/50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20 text-blue-900 dark:text-blue-200',
@@ -210,7 +217,10 @@ export default async function BlogPostPage({
         </div>
       );
     },
-    pre: ({ node, ...props }: any) => (
+    pre: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'pre'> & { node?: unknown }) => (
       <div className="relative group rounded-xl overflow-hidden my-6 sm:my-8 bg-[#0d1117] border border-slate-800 shadow-xl">
         <div className="flex items-center px-4 py-2 sm:py-2.5 bg-[#161b22] border-b border-slate-800">
           <div className="flex gap-1.5">
@@ -225,7 +235,16 @@ export default async function BlogPostPage({
         />
       </div>
     ),
-    code: ({ node, inline, className, children, ...props }: any) => {
+    code: ({
+      node: _,
+      inline,
+      className,
+      children,
+      ...props
+    }: React.ComponentPropsWithoutRef<'code'> & {
+      node?: unknown;
+      inline?: boolean;
+    }) => {
       if (inline) {
         return (
           <code
@@ -242,7 +261,10 @@ export default async function BlogPostPage({
         </code>
       );
     },
-    table: ({ node, ...props }: any) => (
+    table: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'table'> & { node?: unknown }) => (
       <div className="overflow-x-auto my-8 sm:my-10 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm custom-scrollbar">
         <table
           className="w-full text-left border-collapse m-0 min-w-[500px] text-[14px] sm:text-[15px]"
@@ -250,64 +272,99 @@ export default async function BlogPostPage({
         />
       </div>
     ),
-    thead: ({ node, ...props }: any) => (
+    thead: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'thead'> & { node?: unknown }) => (
       <thead
         className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold"
         {...props}
       />
     ),
-    th: ({ node, ...props }: any) => (
+    th: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'th'> & { node?: unknown }) => (
       <th
         className="p-3 sm:p-4 align-middle font-semibold border-slate-200 dark:border-slate-800 whitespace-nowrap"
         {...props}
       />
     ),
-    td: ({ node, ...props }: any) => (
+    td: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'td'> & { node?: unknown }) => (
       <td
         className="p-3 sm:p-4 align-middle border-t border-slate-100 dark:border-slate-800/50 text-slate-600 dark:text-slate-400"
         {...props}
       />
     ),
-    tr: ({ node, ...props }: any) => (
+    tr: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'tr'> & { node?: unknown }) => (
       <tr
         className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
         {...props}
       />
     ),
-    img: ({ node, ...props }: any) => (
+    img: ({
+      node: _,
+      alt,
+      src,
+      ...props
+    }: React.ComponentPropsWithoutRef<'img'> & { node?: unknown }) => (
       <span className="block my-8 sm:my-10 group relative rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
+          src={src}
+          alt={alt ?? ''}
           {...props}
           className="w-full h-auto object-contain max-h-[600px] md:group-hover:scale-[1.01] transition-transform duration-500 m-0"
           loading="lazy"
         />
-        {props.alt && (
+        {alt && (
           <span className="block text-center text-[13px] sm:text-sm text-slate-500 dark:text-slate-400 p-3 font-anek italic bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
-            {props.alt}
+            {alt}
           </span>
         )}
       </span>
     ),
-    ul: ({ node, ...props }: any) => (
+    ul: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'ul'> & { node?: unknown }) => (
       <ul
         className="list-none ml-2 sm:ml-4 space-y-2 sm:space-y-3 my-6 sm:my-8"
         {...props}
       />
     ),
-    ol: ({ node, ...props }: any) => (
+    ol: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'ol'> & { node?: unknown }) => (
       <ol
         className="list-decimal list-outside ml-5 sm:ml-6 space-y-2 sm:space-y-3 marker:text-rose-500/80 dark:marker:text-rose-400/80 marker:font-semibold my-6 font-anek"
         {...props}
       />
     ),
-    li: ({ node, ...props }: any) => {
+    li: ({
+      node,
+      children,
+      ...props
+    }: React.ComponentPropsWithoutRef<'li'> & {
+      node?: unknown;
+      children?: React.ReactNode;
+    }) => {
       // For unordered lists, add custom bullet icon
-      const isUnordered = node?.parent?.tagName === 'ul';
+      const isUnordered =
+        (node as { parent?: { tagName?: string } } | undefined)?.parent
+          ?.tagName === 'ul';
       if (isUnordered) {
         return (
           <li className="relative pl-6 sm:pl-7 text-slate-700 dark:text-slate-300 leading-[1.8] text-[16px] sm:text-[17px] md:text-[18px]">
             <span className="absolute left-1 sm:left-1.5 top-[10px] sm:top-2.5 w-1.5 h-1.5 rounded-full bg-rose-500 dark:bg-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.4)]"></span>
-            {props.children}
+            {children}
           </li>
         );
       }
@@ -315,10 +372,15 @@ export default async function BlogPostPage({
         <li
           className="pl-1 sm:pl-2 text-slate-700 dark:text-slate-300 leading-[1.8] text-[16px] sm:text-[17px] md:text-[18px]"
           {...props}
-        />
+        >
+          {children}
+        </li>
       );
     },
-    a: ({ node, ...props }: any) => (
+    a: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'a'> & { node?: unknown }) => (
       <a
         className="text-rose-600 dark:text-rose-400 font-semibold underline decoration-rose-200 dark:decoration-rose-900 underline-offset-4 hover:decoration-rose-500 dark:hover:decoration-rose-500 transition-colors inline-block"
         target="_blank"
@@ -326,49 +388,73 @@ export default async function BlogPostPage({
         {...props}
       />
     ),
-    hr: ({ node, ...props }: any) => (
+    hr: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'hr'> & { node?: unknown }) => (
       <hr
         className="my-10 sm:my-14 border-slate-200 dark:border-slate-800"
         {...props}
       />
     ),
-    h1: ({ node, ...props }: any) => (
+    h1: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'h1'> & { node?: unknown }) => (
       <h1
         className="text-3xl sm:text-4xl md:text-[40px] font-extrabold mt-12 sm:mt-16 mb-6 sm:mb-8 text-slate-900 dark:text-slate-50 font-anek tracking-tight leading-tight"
         {...props}
       />
     ),
-    h2: ({ node, ...props }: any) => (
+    h2: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'h2'> & { node?: unknown }) => (
       <h2
         className="text-2xl sm:text-3xl md:text-[32px] font-bold mt-12 sm:mt-14 mb-5 sm:mb-6 text-slate-900 dark:text-slate-50 border-b border-slate-100 dark:border-slate-800/80 pb-3 font-anek tracking-tight"
         {...props}
       />
     ),
-    h3: ({ node, ...props }: any) => (
+    h3: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'h3'> & { node?: unknown }) => (
       <h3
         className="text-xl sm:text-2xl md:text-[26px] font-bold mt-10 mb-4 sm:mb-5 text-slate-800 dark:text-slate-100 font-anek"
         {...props}
       />
     ),
-    h4: ({ node, ...props }: any) => (
+    h4: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'h4'> & { node?: unknown }) => (
       <h4
         className="text-lg sm:text-xl md:text-[22px] font-bold mt-8 mb-3 sm:mb-4 text-slate-800 dark:text-slate-200 font-anek"
         {...props}
       />
     ),
-    h5: ({ node, ...props }: any) => (
+    h5: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'h5'> & { node?: unknown }) => (
       <h5
         className="text-[17px] sm:text-[19px] font-bold mt-6 mb-3 text-slate-700 dark:text-slate-300 font-anek"
         {...props}
       />
     ),
-    h6: ({ node, ...props }: any) => (
+    h6: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'h6'> & { node?: unknown }) => (
       <h6
         className="text-[15px] sm:text-[17px] font-bold mt-6 mb-2 text-slate-600 dark:text-slate-400 font-anek uppercase tracking-wide"
         {...props}
       />
     ),
-    iframe: ({ node, ...props }: any) => (
+    iframe: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'iframe'> & { node?: unknown }) => (
       <div className="relative w-full aspect-video my-8 sm:my-10 rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800 bg-slate-900">
         <iframe
           className="absolute inset-0 w-full h-full border-0"
@@ -377,7 +463,10 @@ export default async function BlogPostPage({
         />
       </div>
     ),
-    p: ({ node, ...props }: any) => (
+    p: ({
+      node: _,
+      ...props
+    }: React.ComponentPropsWithoutRef<'p'> & { node?: unknown }) => (
       <p
         className="text-slate-700 dark:text-slate-300 leading-[1.8] sm:leading-[1.9] text-[16.5px] sm:text-[17px] md:text-[18px] mb-6 sm:mb-8 text-justify font-normal"
         {...props}
