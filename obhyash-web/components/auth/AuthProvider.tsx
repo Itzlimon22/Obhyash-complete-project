@@ -158,26 +158,17 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     const initializeAuth = async () => {
       try {
-        // getUser() validates the JWT against the Supabase server.
-        // Unlike getSession(), it never returns stale data.
-        // Wrapped in a timeout to prevent infinite loading if Supabase is unreachable.
-        const authResult = await Promise.race([
-          supabase.auth.getUser(),
-          new Promise<{ data: { user: null }; error: Error }>((resolve) =>
-            setTimeout(
-              () =>
-                resolve({
-                  data: { user: null },
-                  error: new Error('Auth timeout'),
-                }),
-              6000,
-            ),
-          ),
-        ]);
+        // Use getSession() instead of getUser() on the client.
+        // proxy.ts (middleware) ALREADY calls getUser() on the server to cryptographically
+        // verify the token and update cookies on every page load.
+        // Calling getUser() here creates a race condition with the global Supabase JS lock
+        // which causes all subsequent database queries like .from('users').select() to hang infinitely.
         const {
-          data: { user: currentUser },
+          data: { session },
           error: authError,
-        } = authResult as Awaited<ReturnType<typeof supabase.auth.getUser>>;
+        } = await supabase.auth.getSession();
+
+        const currentUser = session?.user || null;
 
         if (authError || !currentUser) {
           if (authError && isNoSessionError(authError)) {
@@ -192,7 +183,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             // Real auth failure (invalid/expired token) — check if we have
             // a stale profile in cache and show the re-login modal.
             if (readCachedProfile()) {
-              if (isMounted) setShowCorruptionModal(true);
+              if (isMounted) {
+                console.warn(
+                  'Hard auth error detected, showing corruption modal',
+                  authError.message,
+                );
+                setShowCorruptionModal(true);
+              }
             } else {
               if (isMounted) {
                 setUser(null);
@@ -283,11 +280,14 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       handleHealthCheck();
     };
 
+    // Store as a named function so it can be properly removed on cleanup
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') handleHealthCheck();
+    };
+
     window.addEventListener('online', onOnline);
     window.addEventListener('focus', onFocus);
-    window.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') onFocus();
-    });
+    window.addEventListener('visibilitychange', onVisibilityChange);
 
     // ── Heartbeat (Every 10 minutes) ─────────────────────────────────────────
     const heartbeat = setInterval(handleHealthCheck, 10 * 60 * 1000);
@@ -345,6 +345,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       subscription.unsubscribe();
       window.removeEventListener('online', onOnline);
       window.removeEventListener('focus', onFocus);
+      window.removeEventListener('visibilitychange', onVisibilityChange);
       clearInterval(heartbeat);
     };
   }, [supabase, router, fetchProfile]);

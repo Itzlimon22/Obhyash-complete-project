@@ -67,8 +67,11 @@ export default function ClientLayout({
     );
   }
 
-  // Prevent flash before redirect
-  if (!user || (profile && profile.role !== 'Admin')) {
+  // Prevent flash before redirect.
+  // Wait for BOTH user AND profile to be confirmed before rendering children.
+  // If only user is set but profile is still null (still being fetched), we wait —
+  // this prevents data-fetching useEffects from firing before auth is complete.
+  if (!user || !profile || profile.role !== 'Admin') {
     return null;
   }
 
