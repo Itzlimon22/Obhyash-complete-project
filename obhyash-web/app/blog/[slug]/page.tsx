@@ -225,13 +225,17 @@ export default async function BlogPostPage({
       children,
       ...props
     }: React.ComponentPropsWithoutRef<'pre'> & { node?: unknown }) => {
-      // Intercept Mermaid / diagram code blocks
-      const codeChild = children as React.ReactElement<{
+      // Intercept Mermaid / diagram code blocks.
+      // rehypeHighlight appends ' hljs' to the className even for unknown
+      // languages, so we must use includes() rather than exact equality.
+      const codeChild = (
+        Array.isArray(children) ? children[0] : children
+      ) as React.ReactElement<{
         className?: string;
         children?: string;
       }>;
       const lang = codeChild?.props?.className ?? '';
-      if (lang === 'language-mermaid') {
+      if (lang.includes('language-mermaid')) {
         const code = String(codeChild?.props?.children ?? '').replace(
           /\n$/,
           '',
@@ -639,7 +643,7 @@ export default async function BlogPostPage({
                     rehypeKatex,
                     rehypeRaw,
                     rehypeSlug,
-                    rehypeHighlight,
+                    [rehypeHighlight, { ignoreMissing: true }],
                   ]}
                   components={MarkdownComponents}
                 >

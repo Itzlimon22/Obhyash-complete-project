@@ -10,24 +10,48 @@ import katex from 'katex';
 
 // --- Helpers ---
 
+/**
+ * Renders a question/option/explanation string that may contain:
+ *  - Display LaTeX:  $$...$$
+ *  - Inline LaTeX:   $...$
+ *  - Markdown:       **bold**, *italic*, `code`, newlines
+ */
 const renderLatex = (text: string): string => {
   if (!text) return '';
-  const parts = text.split(/(\$[^$]+\$)/g);
-  return parts
-    .map((part) => {
-      if (part.startsWith('$') && part.endsWith('$')) {
-        try {
-          return katex.renderToString(part.slice(1, -1), {
-            throwOnError: false,
-            displayMode: false,
-          });
-        } catch (e) {
-          return part;
-        }
-      }
-      return part;
-    })
-    .join('');
+
+  // 1. Replace $$...$$ (display math) first so the inner $ don't confuse the inline pass
+  let result = text.replace(/\$\$([\s\S]+?)\$\$/g, (_, math) => {
+    try {
+      return `<div style="overflow-x:auto;margin:4px 0;text-align:left;">${katex.renderToString(math.trim(), { throwOnError: false, displayMode: true })}</div>`;
+    } catch {
+      return `$$${math}$$`;
+    }
+  });
+
+  // 2. Replace $...$ (inline math) – exclude newlines so multi-line text isn't swallowed
+  result = result.replace(/\$([^$\n]+?)\$/g, (_, math) => {
+    try {
+      return katex.renderToString(math.trim(), {
+        throwOnError: false,
+        displayMode: false,
+      });
+    } catch {
+      return `$${math}$`;
+    }
+  });
+
+  // 3. Basic markdown
+  result = result
+    .replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>') // **bold**
+    .replace(/\*([^*\n]+?)\*/g, '<em>$1</em>') // *italic*
+    .replace(
+      /`([^`\n]+?)`/g,
+      '<code style="background:#f1f5f9;padding:1px 4px;border-radius:3px;font-family:monospace;font-size:0.9em;">$1</code>',
+    ) // `code`
+    .replace(/\n\n+/g, '<br><br>') // blank lines → paragraph break
+    .replace(/\n/g, '<br>'); // single newline → <br>
+
+  return result;
 };
 
 // Restored Image Helper (Critical for questions with diagrams)
@@ -86,11 +110,13 @@ export const printQuestionPaper = (
           .meta-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
           .meta-table td { padding: 2px 0; font-weight: bold; font-size: 9.5pt; vertical-align: bottom; }
           .content-wrapper { column-count: 2; column-gap: 30px; column-rule: 0.5px solid #000; }
-          .question-item { break-inside: avoid; margin-bottom: 15px; padding-bottom: 5px; }
-          .q-header { display: flex; align-items: baseline; font-weight: bold; margin-bottom: 2px; }
+          .question-item { break-inside: avoid; margin-bottom: 15px; padding-bottom: 5px; overflow-wrap: break-word; word-break: break-word; }
+          .q-header { display: flex; align-items: flex-start; font-weight: bold; margin-bottom: 4px; }
+          .q-num { min-width: 22px; padding-top: 1px; flex-shrink: 0; }
           .options-list { list-style-type: none; padding: 0; margin: 0 0 0 22px; display: flex; flex-wrap: wrap; }
-          .option-item { width: 50%; padding-right: 4px; margin-bottom: 1px; font-size: 9.5pt; }
-          @media print { button { display: none; } }
+          .option-item { width: 50%; min-width: 120px; padding-right: 4px; margin-bottom: 2px; font-size: 9.5pt; overflow-wrap: break-word; }
+          .option-item:has(.katex-display) { width: 100%; }
+          @media print { button { display: none; } body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
         </style>
       </head>
       <body>
@@ -112,8 +138,8 @@ export const printQuestionPaper = (
               (q, idx) => `
             <div class="question-item">
               <div class="q-header">
-                <span style="min-width:22px">${idx + 1}.</span>
-                <span>${renderLatex(q.question || '')}</span>
+                <span class="q-num">${idx + 1}.</span>
+                <span style="flex:1">${renderLatex(q.question || '')}</span>
               </div>
               ${renderImage(q.imageUrl)}
               <div style="margin-left:22px">
@@ -124,8 +150,7 @@ export const printQuestionPaper = (
                   .map(
                     (opt, oIdx) => `
                   <li class="option-item">
-                    <span style="font-weight:bold;margin-right:4px">(${['ক', 'খ', 'গ', 'ঘ'][oIdx]})</span>
-                    <span>${renderLatex(opt)}</span>
+                    <span style="font-weight:bold;margin-right:4px">(${['ক', 'খ', 'গ', 'ঘ'][oIdx]})</span><span>${renderLatex(opt)}</span>
                   </li>
                 `,
                   )
@@ -397,18 +422,20 @@ export const printResultWithExplanations = (
           .meta-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
           .meta-table td { padding: 2px 0; font-weight: bold; font-size: 9pt; vertical-align: bottom; }
           .content-wrapper { column-count: 2; column-gap: 30px; column-rule: 0.5px solid #000; }
-          .question-item { break-inside: avoid; margin-bottom: 18px; border-bottom: 0.5px dashed #ccc; padding-bottom: 10px; }
-          .q-header { display: flex; align-items: baseline; font-weight: bold; margin-bottom: 2px; }
+          .question-item { break-inside: avoid; margin-bottom: 18px; border-bottom: 0.5px dashed #ccc; padding-bottom: 10px; overflow-wrap: break-word; word-break: break-word; }
+          .q-header { display: flex; align-items: flex-start; font-weight: bold; margin-bottom: 4px; }
+          .q-num { min-width: 22px; padding-top: 1px; flex-shrink: 0; }
           .options-list { list-style-type: none; padding: 0; margin: 4px 0 4px 22px; display: flex; flex-wrap: wrap; }
-          .option-item { width: 50%; padding-right: 4px; margin-bottom: 1px; font-size: 9pt; }
-          .solution-box { margin-top: 6px; padding: 6px; background-color: #f9f9f9; border-left: 2px solid #333; font-size: 8.5pt; }
-          .sol-row { margin-bottom: 2px; }
-          .label { font-weight: bold; font-size: 8pt; text-transform: uppercase; color: #444; }
+          .option-item { width: 50%; min-width: 120px; padding-right: 4px; margin-bottom: 2px; font-size: 9pt; overflow-wrap: break-word; }
+          .option-item:has(.katex-display) { width: 100%; }
+          .solution-box { break-inside: avoid; margin-top: 6px; padding: 8px 10px; background-color: #f9f9f9; border-left: 3px solid #555; font-size: 8.5pt; border-radius: 0 4px 4px 0; }
+          .sol-row { margin-bottom: 3px; }
+          .label { font-weight: bold; font-size: 8pt; text-transform: uppercase; color: #444; margin-right: 4px; }
           .correct { color: #15803d; font-weight: bold; }
           .wrong { color: #b91c1c; font-weight: bold; }
           .skipped { color: #d97706; font-style: italic; }
-          .exp-text { font-style: italic; color: #333; display: block; margin-top: 2px; line-height: 1.25; }
-          @media print { button { display: none; } body { -webkit-print-color-adjust: exact; } }
+          .exp-text { color: #333; display: block; margin-top: 4px; line-height: 1.4; }
+          @media print { button { display: none; } body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
         </style>
       </head>
       <body>
@@ -439,9 +466,7 @@ export const printResultWithExplanations = (
 
               return `
             <div class="question-item">
-              <div class="q-header">
-                <span style="min-width:22px">${idx + 1}.</span>
-                <span>${renderLatex(q.question || '')}</span>
+              <div class="q-header"><span class="q-num">${idx + 1}.</span><span style="flex:1">${renderLatex(q.question || '')}</span>
               </div>
               ${renderImage(q.imageUrl)}
               <div style="margin-left:22px">
@@ -452,8 +477,7 @@ export const printResultWithExplanations = (
                   .map(
                     (opt, oIdx) => `
                   <li class="option-item">
-                    <span style="font-weight:bold;margin-right:4px">(${['ক', 'খ', 'গ', 'ঘ'][oIdx]})</span>
-                    <span>${renderLatex(opt)}</span>
+                    <span style="font-weight:bold;margin-right:4px">(${['ক', 'খ', 'গ', 'ঘ'][oIdx]})</span><span>${renderLatex(opt)}</span>
                   </li>
                 `,
                   )
@@ -461,24 +485,18 @@ export const printResultWithExplanations = (
               </ul>
               <div class="solution-box">
                  <div class="sol-row">
-                    <span class="label">সঠিক উত্তর:</span> <span class="correct">(${correctAnsLabel}) ${renderLatex(q.options[q.correctAnswerIndex])}</span>
+                    <span class="label">সঠিক উত্তর:</span><span class="correct">(${correctAnsLabel}) ${renderLatex(q.options[q.correctAnswerIndex])}</span>
                  </div>
                  <div class="sol-row">
-                    <span class="label">তোমার উত্তর:</span> 
-                    <span class="${isSkipped ? 'skipped' : isCorrect ? 'correct' : 'wrong'}">
-                        ${isSkipped ? 'উত্তর নেই' : `(${userAnsLabel}) ${renderLatex(q.options[userAns])}`}
-                    </span>
+                    <span class="label">তোমার উত্তর:</span><span class="${isSkipped ? 'skipped' : isCorrect ? 'correct' : 'wrong'}">${isSkipped ? 'উত্তর নেই' : `(${userAnsLabel}) ${renderLatex(q.options[userAns])}`}</span>
                  </div>
-                 <div style="margin-top:4px;">
-                    <span class="label">ব্যাখ্যা:</span> 
-                    <span class="exp-text">${renderLatex(q.explanation || 'কোনো ব্যাখ্যা দেওয়া নেই।')}</span>
+                 <div style="margin-top:5px;border-top:0.5px solid #ddd;padding-top:4px;">
+                    <span class="label">ব্যাখ্যা:</span>
+                    <span class="exp-text">${renderLatex(q.explanation || 'কোনো ব্যাখ্যা দেওয়া নেই।')}</span>
                  </div>
               </div>
             </div>
           `;
-            })
-            .join('')}
-        </div>
         <script>setTimeout(() => { window.print(); }, 800);</script>
       </body>
     </html>
@@ -500,15 +518,24 @@ export const printSubjectReport = (subject: string, stats: SubjectAnalysis) => {
         <title>${subject} - Performance Report</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
         <style>
-          body { font-family: 'Times New Roman', sans-serif; padding: 40px; color: #333; }
-          h1 { color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
-          .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&display=swap');
+          @page { size: A4; margin: 1.5cm; }
+          body { font-family: 'Times New Roman', 'Noto Serif Bengali', serif; padding: 0; color: #1e293b; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          h1 { font-size: 18pt; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 20px; }
+          h2 { font-size: 13pt; color: #1e293b; margin-top: 30px; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+          .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
           .stat-card { border: 1px solid #cbd5e1; padding: 15px; border-radius: 8px; background: #f8fafc; text-align: center; }
           .stat-val { font-size: 24px; font-weight: bold; color: #0f172a; }
-          .stat-label { font-size: 12px; text-transform: uppercase; color: #64748b; margin-bottom: 5px; display: block; }
-          .mistake-list { margin-top: 30px; }
-          .mistake-item { margin-bottom: 20px; page-break-inside: avoid; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; }
-          .meta { font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
+          .stat-label { font-size: 11px; text-transform: uppercase; color: #64748b; margin-bottom: 5px; display: block; letter-spacing: 0.5px; }
+          .mistake-list { margin-top: 10px; }
+          .mistake-item { margin-bottom: 18px; page-break-inside: avoid; break-inside: avoid; border: 1px solid #e2e8f0; padding: 14px 16px; border-radius: 8px; overflow-wrap: break-word; word-break: break-word; }
+          .q-header { display: flex; align-items: flex-start; font-weight: bold; margin-bottom: 6px; }
+          .q-num { min-width: 22px; flex-shrink: 0; }
+          .meta { font-size: 11px; color: #94a3b8; margin-bottom: 8px; }
+          .ans-correct { color: #15803d; font-weight: 600; margin: 4px 0; }
+          .ans-wrong { color: #b91c1c; font-weight: 600; margin: 4px 0; }
+          .exp { font-size: 11px; font-style: italic; margin-top: 6px; color: #475569; padding-top: 6px; border-top: 0.5px solid #e2e8f0; }
+          @media print { button { display: none; } }
         </style>
       </head>
       <body>
@@ -529,20 +556,21 @@ export const printSubjectReport = (subject: string, stats: SubjectAnalysis) => {
            </div>
         </div>
 
-        <h2>Mistakes Log</h2>
+        <h2>ভুলের তালিকা (Mistakes Log)</h2>
         <div class="mistake-list">
            ${stats.mistakes
              .map(
-               (m) => `
+               (m, i) => `
               <div class="mistake-item">
-                 <div class="meta">${new Date(m.examDate).toLocaleDateString()} - ${m.examName}</div>
-                 <div class="q-content">
-                    <p><strong>Q:</strong> ${renderLatex(m.question.question || '')}</p>
-                    ${renderImage(m.question.imageUrl)}
+                 <div class="meta">${i + 1}. ${new Date(m.examDate).toLocaleDateString('bn-BD')} &mdash; ${m.examName}</div>
+                 <div class="q-header">
+                    <span class="q-num">প্র:</span>
+                    <span style="flex:1">${renderLatex(m.question.question || '')}</span>
                  </div>
-                 <p style="color:red">Your Answer: ${renderLatex(m.question.options[m.userAns])}</p>
-                 <p style="color:green">Correct Answer: ${renderLatex(m.question.options[m.correctAns])}</p>
-                 <p style="font-size:12px; font-style:italic; margin-top:5px; color:#475569">Exp: ${renderLatex(m.question.explanation || '')}</p>
+                 ${renderImage(m.question.imageUrl)}
+                 <div class="ans-wrong">তোমার উত্তর: (${['ক', 'খ', 'গ', 'ঘ'][m.userAns] || '?'}) ${renderLatex(m.question.options[m.userAns] || '')}</div>
+                 <div class="ans-correct">সঠিক উত্তর: (${['ক', 'খ', 'গ', 'ঘ'][m.correctAns] || '?'}) ${renderLatex(m.question.options[m.correctAns] || '')}</div>
+                 ${m.question.explanation ? `<div class="exp">ব্যাখ্যা: ${renderLatex(m.question.explanation)}</div>` : ''}
               </div>
            `,
              )
