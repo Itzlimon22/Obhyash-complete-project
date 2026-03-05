@@ -48,10 +48,10 @@ export default function NewsletterSubscribe() {
           </div>
           <div className="min-w-0">
             <h3 className="text-[15px] font-bold text-slate-900 dark:text-slate-100 leading-tight">
-              ?????????? ??? ???
+              নিউজলেটারে যোগ দিন
             </h3>
             <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">
-              ????? ??????? ???? ?????? ???? ?????? ????????
+              নতুন পোস্ট প্রকাশ হলে সরাসরি ইমেইলে পাবেন
             </p>
           </div>
         </div>
@@ -62,7 +62,7 @@ export default function NewsletterSubscribe() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="????? ??????..."
+            placeholder="ইমেইল ঠিকানা..."
             className="flex-1 sm:w-52 bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-rose-500/40 text-[14px]"
           />
           <button
@@ -73,7 +73,9 @@ export default function NewsletterSubscribe() {
             {isSubmitting ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <>??????????? <ArrowRight className="w-3.5 h-3.5" /></>
+              <>
+                সাবস্ক্রাইব <ArrowRight className="w-3.5 h-3.5" />
+              </>
             )}
           </button>
         </form>
