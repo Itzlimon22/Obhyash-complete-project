@@ -28,6 +28,7 @@ import 'highlight.js/styles/github-dark.css';
 import 'katex/dist/katex.min.css';
 
 import ProgressBar from '@/components/blog/ProgressBar';
+import MermaidRenderer from '@/components/blog/MermaidRenderer';
 import SocialShare from '@/components/blog/SocialShare';
 import TableOfContents from '@/components/blog/TableOfContents';
 import CommentSection from '@/components/blog/CommentSection';
@@ -139,7 +140,9 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'blockquote'> & { node?: unknown }) => {
       // Check if this is a custom callout
-      const ch = children as React.ReactElement<{ children?: React.ReactNode }>[];
+      const ch = children as React.ReactElement<{
+        children?: React.ReactNode;
+      }>[];
       const text = (ch?.[1]?.props as { children?: string } | undefined)
         ?.children;
       let calloutType: string | null = null;
@@ -219,22 +222,41 @@ export default async function BlogPostPage({
     },
     pre: ({
       node: _,
+      children,
       ...props
-    }: React.ComponentPropsWithoutRef<'pre'> & { node?: unknown }) => (
-      <div className="relative group rounded-xl overflow-hidden my-6 sm:my-8 bg-[#0d1117] border border-slate-800 shadow-xl">
-        <div className="flex items-center px-4 py-2 sm:py-2.5 bg-[#161b22] border-b border-slate-800">
-          <div className="flex gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-slate-700/80"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-slate-700/80"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-slate-700/80"></div>
+    }: React.ComponentPropsWithoutRef<'pre'> & { node?: unknown }) => {
+      // Intercept Mermaid / diagram code blocks
+      const codeChild = children as React.ReactElement<{
+        className?: string;
+        children?: string;
+      }>;
+      const lang = codeChild?.props?.className ?? '';
+      if (lang === 'language-mermaid') {
+        const code = String(codeChild?.props?.children ?? '').replace(
+          /\n$/,
+          '',
+        );
+        return <MermaidRenderer code={code} />;
+      }
+
+      return (
+        <div className="relative group rounded-xl overflow-hidden my-6 sm:my-8 bg-[#0d1117] border border-slate-800 shadow-xl">
+          <div className="flex items-center px-4 py-2 sm:py-2.5 bg-[#161b22] border-b border-slate-800">
+            <div className="flex gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-slate-700/80"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-slate-700/80"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-slate-700/80"></div>
+            </div>
           </div>
+          <pre
+            {...props}
+            className="p-4 sm:p-5 overflow-x-auto text-[13px] sm:text-[14px] leading-relaxed font-mono m-0 bg-transparent text-slate-300 custom-scrollbar"
+          >
+            {children}
+          </pre>
         </div>
-        <pre
-          {...props}
-          className="p-4 sm:p-5 overflow-x-auto text-[13px] sm:text-[14px] leading-relaxed font-mono m-0 bg-transparent text-slate-300 custom-scrollbar"
-        />
-      </div>
-    ),
+      );
+    },
     code: ({
       node: _,
       inline,
