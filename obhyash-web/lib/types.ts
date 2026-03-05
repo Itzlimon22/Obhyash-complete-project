@@ -609,6 +609,8 @@ export interface BlogComment {
   content: string;
   created_at: string;
   updated_at: string;
+  upvote_count?: number;
+  user_upvoted?: boolean;
   // Joined relation from the users table
   user?: {
     name: string;

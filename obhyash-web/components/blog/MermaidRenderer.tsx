@@ -143,15 +143,15 @@ export default function MermaidRenderer({ code }: { code: string }) {
           theme: isDark ? 'dark' : 'neutral',
           securityLevel: 'loose',
           fontFamily: "'Inter', 'system-ui', '-apple-system', sans-serif",
-          fontSize: 13,
+          fontSize: 16,
           flowchart: {
             curve: 'basis',
-            padding: 24,
+            padding: 36,
             useMaxWidth: true,
             htmlLabels: true,
           },
-          mindmap: { useMaxWidth: true, padding: 20 },
-          sequence: { useMaxWidth: true, boxMargin: 10 },
+          mindmap: { useMaxWidth: true, padding: 36 },
+          sequence: { useMaxWidth: true, boxMargin: 20, messageMargin: 50 },
         });
 
         if (containerRef.current) containerRef.current.innerHTML = '';
@@ -164,9 +164,11 @@ export default function MermaidRenderer({ code }: { code: string }) {
           if (svgEl) {
             svgRef.current = svgEl;
             svgEl.removeAttribute('height');
+            svgEl.setAttribute('width', '100%');
             svgEl.style.width = '100%';
             svgEl.style.maxWidth = '100%';
             svgEl.style.height = 'auto';
+            svgEl.style.minHeight = '320px';
             svgEl.style.display = 'block';
           }
           setRendered(true);
@@ -279,7 +281,7 @@ export default function MermaidRenderer({ code }: { code: string }) {
 
       {/* ── Diagram canvas ── */}
       <div
-        className="overflow-x-auto p-4 sm:p-6 md:p-8 bg-white dark:bg-slate-900"
+        className="overflow-x-auto px-4 py-6 sm:px-8 sm:py-8 md:px-12 md:py-10 bg-white dark:bg-slate-900 min-h-[340px] sm:min-h-[420px] flex items-center"
         style={{
           touchAction: 'pan-x pan-y',
           display: rendered ? undefined : 'none',
@@ -287,7 +289,7 @@ export default function MermaidRenderer({ code }: { code: string }) {
       >
         <div
           ref={containerRef}
-          className="min-w-full"
+          className="w-full"
           style={{ transition: 'all 0.15s ease' }}
         />
       </div>

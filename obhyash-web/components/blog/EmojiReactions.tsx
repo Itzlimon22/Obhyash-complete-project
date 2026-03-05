@@ -10,7 +10,6 @@ const REACTIONS = [
   { emoji: '💡', label: 'শিক্ষণীয়' },
   { emoji: '❤️', label: 'ভালো লাগলো' },
   { emoji: '😮', label: 'অবাক করলো' },
-  { emoji: '👏', label: 'অসাধারণ' },
 ];
 
 interface EmojiReactionsProps {
@@ -36,18 +35,24 @@ export default function EmojiReactions({ slug }: EmojiReactionsProps) {
     if (!data) return;
 
     const alreadyOn = userReacted.has(emoji);
-
-    // Optimistic update
     const nextCounts = { ...counts };
-    const nextUser = new Set(userReacted);
-    if (alreadyOn) {
-      nextCounts[emoji] = Math.max(0, (nextCounts[emoji] ?? 1) - 1);
-      if (nextCounts[emoji] === 0) delete nextCounts[emoji];
-      nextUser.delete(emoji);
-    } else {
+    const nextUser = new Set<string>();
+
+    if (!alreadyOn) {
+      // Remove any previously active reaction (single-reaction enforcement)
+      userReacted.forEach((oldEmoji) => {
+        nextCounts[oldEmoji] = Math.max(0, (nextCounts[oldEmoji] ?? 1) - 1);
+        if (nextCounts[oldEmoji] === 0) delete nextCounts[oldEmoji];
+      });
+      // Add new reaction
       nextCounts[emoji] = (nextCounts[emoji] ?? 0) + 1;
       nextUser.add(emoji);
+    } else {
+      // Toggling off
+      nextCounts[emoji] = Math.max(0, (nextCounts[emoji] ?? 1) - 1);
+      if (nextCounts[emoji] === 0) delete nextCounts[emoji];
     }
+
     mutate({ counts: nextCounts, userReactions: Array.from(nextUser) }, false);
 
     const res = await fetch('/api/blog/reactions', {

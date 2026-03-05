@@ -62,12 +62,20 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
 
-  // Whitelist allowed emojis
-  const ALLOWED = ['🔥', '💡', '❤️', '😮', '👏'];
+  // Whitelist allowed emojis (no clap)
+  const ALLOWED = ['🔥', '💡', '❤️', '😮'];
   if (!ALLOWED.includes(emoji))
     return NextResponse.json({ error: 'Invalid emoji' }, { status: 400 });
 
-  // Check if already reacted with this emoji
+  // Enforce single reaction: delete any existing reaction for this user+post first
+  await supabase
+    .from('blog_reactions')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('post_slug', slug)
+    .neq('emoji', emoji);
+
+  // Check if already reacted with this exact emoji (toggle off)
   const { data: existing } = await supabase
     .from('blog_reactions')
     .select('id')

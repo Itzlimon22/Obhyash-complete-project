@@ -32,7 +32,6 @@ import MermaidRenderer from '@/components/blog/MermaidRenderer';
 import SocialShare from '@/components/blog/SocialShare';
 import TableOfContents from '@/components/blog/TableOfContents';
 import CommentSection from '@/components/blog/CommentSection';
-import LikeButton from '@/components/blog/LikeButton';
 import NewsletterSubscribe from '@/components/blog/NewsletterSubscribe';
 import BackToTop from '@/components/blog/BackToTop';
 import BlogBookmarkButton from '@/components/blog/BlogBookmarkButton';
@@ -291,19 +290,21 @@ export default async function BlogPostPage({
       node: _,
       ...props
     }: React.ComponentPropsWithoutRef<'table'> & { node?: unknown }) => (
-      <div className="overflow-x-auto my-8 sm:my-10 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm custom-scrollbar">
-        <table
-          className="w-full text-left border-collapse m-0 min-w-[500px] text-[14px] sm:text-[15px]"
-          {...props}
-        />
-      </div>
+      <figure className="not-prose my-6 sm:my-8 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-[0_2px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.25)] overflow-hidden">
+        <div className="overflow-x-auto">
+          <table
+            className="w-full text-left border-collapse m-0 min-w-[480px] text-[13.5px] sm:text-[14.5px]"
+            {...props}
+          />
+        </div>
+      </figure>
     ),
     thead: ({
       node: _,
       ...props
     }: React.ComponentPropsWithoutRef<'thead'> & { node?: unknown }) => (
       <thead
-        className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-semibold"
+        className="bg-gradient-to-r from-indigo-50 to-slate-50 dark:from-indigo-950/40 dark:to-slate-800/60 border-b-2 border-indigo-100 dark:border-indigo-900/50"
         {...props}
       />
     ),
@@ -312,7 +313,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'th'> & { node?: unknown }) => (
       <th
-        className="p-3 sm:p-4 align-middle font-semibold border-slate-200 dark:border-slate-800 whitespace-nowrap"
+        className="px-4 py-3 align-middle font-semibold text-indigo-900 dark:text-indigo-200 whitespace-nowrap tracking-wide text-[12px] sm:text-[13px] uppercase first:rounded-tl-2xl last:rounded-tr-2xl"
         {...props}
       />
     ),
@@ -321,7 +322,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'td'> & { node?: unknown }) => (
       <td
-        className="p-3 sm:p-4 align-middle border-t border-slate-100 dark:border-slate-800/50 text-slate-600 dark:text-slate-400"
+        className="px-4 py-3 align-middle text-slate-700 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800/60 first:font-medium first:text-slate-900 dark:first:text-slate-100"
         {...props}
       />
     ),
@@ -330,7 +331,7 @@ export default async function BlogPostPage({
       ...props
     }: React.ComponentPropsWithoutRef<'tr'> & { node?: unknown }) => (
       <tr
-        className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors"
+        className="odd:bg-white even:bg-slate-50/60 dark:odd:bg-slate-900 dark:even:bg-slate-800/25 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/20 transition-colors duration-150"
         {...props}
       />
     ),
@@ -651,18 +652,31 @@ export default async function BlogPostPage({
                 </ReactMarkdown>
               </div>
               {/* Tags */}
-              <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
-                <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 font-anek">
+              <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2.5 font-anek flex items-center gap-1.5">
+                  <svg
+                    className="w-3 h-3"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
+                    <line x1="7" y1="7" x2="7.01" y2="7" />
+                  </svg>
                   ট্যাগ
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {post.tags.map((tag) => (
                     <Link
                       key={tag}
                       href={`/blog?tag=${encodeURIComponent(tag)}`}
-                      className="px-3 py-1 text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-700 hover:border-rose-200 dark:hover:border-rose-900 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-[12px] font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 rounded-full border border-indigo-100 dark:border-indigo-900/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 hover:border-indigo-200 dark:hover:border-indigo-800 transition-all"
                     >
-                      #{tag}
+                      <span className="opacity-60">#</span>
+                      {tag}
                     </Link>
                   ))}
                 </div>
@@ -674,43 +688,37 @@ export default async function BlogPostPage({
             <EmojiReactions slug={post.slug} />
 
             {/* Comments Section */}
-            <div className="mt-12">
-              <CommentSection postSlug={post.slug} />
-            </div>
+            <CommentSection postSlug={post.slug} />
 
-            {/* Interaction Ribbon (Likes + Bookmark + Social Share) */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mt-10 bg-slate-50 dark:bg-[#1a1a1a] p-4 rounded-2xl border border-slate-100 dark:border-[#2b2b2b]">
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-slate-500 dark:text-slate-400 font-anek">
-                  পোস্টটি কেমন লাগলো?
-                </span>
-                <LikeButton postSlug={post.slug} />
-              </div>
-              <div className="flex items-center gap-3">
-                <BlogBookmarkButton slug={post.slug} />
-                <SocialShare url={jsonLd.url} title={post.title} />
+            {/* Share + Save Bar */}
+            <div className="flex flex-wrap items-center gap-2.5 mt-5 px-4 py-3 rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-100 dark:border-[#2b2b2b]">
+              <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest font-anek">
+                শেয়ার ও সেভ
+              </span>
+              <div className="flex items-center gap-2 ml-auto">
+                <SocialShare url={jsonLd.url} title={post.title} compact />
+                <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1" />
+                <BlogBookmarkButton slug={post.slug} iconOnly />
               </div>
             </div>
 
             {/* Author Bio block */}
-            <div className="mt-10 mb-8 p-6 rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b]">
+            <div className="mt-5 mb-4 p-5 rounded-2xl bg-white dark:bg-[#121212] border border-slate-200 dark:border-[#2b2b2b]">
               <div className="flex items-start gap-4">
-                <div
-                  className={`w-12 h-12 shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-semibold text-lg`}
-                >
+                <div className="w-11 h-11 shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-semibold text-lg">
                   {post.author.initials}
                 </div>
                 <div>
                   <Link
                     href={`/blog/author/${post.author.name}`}
-                    className="font-bold text-lg text-slate-900 dark:text-slate-100 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+                    className="font-bold text-[15px] text-slate-900 dark:text-slate-100 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
                   >
                     {post.author.name}
                   </Link>
                   <p className="text-sm font-medium text-rose-600 dark:text-rose-400 mt-0.5">
                     {post.author.role}
                   </p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed font-anek">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed font-anek">
                     অভ্যাস টিম স্মার্ট প্রযুক্তি এবং পরীক্ষিত শিক্ষার কৌশলগুলির
                     মাধ্যমে বাংলাদেশী শিক্ষার্থীদের তাদের একাডেমিক লক্ষ্য অর্জনে
                     সহায়তা করতে অঙ্গীকারবদ্ধ।

@@ -18,18 +18,41 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Fetch comments and join with the users table to get name and avatar info
+    // Fetch comments with upvote_count
     const { data: comments, error } = await supabase
       .from('blog_comments')
       .select(
-        '*, user:user_id(name, avatarUrl:avatar_url, avatarColor:avatar_color)',
+        'id, post_slug, user_id, parent_id, content, created_at, updated_at, upvote_count, user:user_id(name, avatarUrl:avatar_url, avatarColor:avatar_color)',
       )
       .eq('post_slug', slug)
-      .order('created_at', { ascending: true }); // Chronological for threaded view
+      .order('created_at', { ascending: true });
 
     if (error) throw error;
 
-    return NextResponse.json({ comments });
+    // Merge user_upvoted flag for the current session user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    let userUpvotedIds: string[] = [];
+    if (user && comments && comments.length > 0) {
+      const { data: upvoteRows } = await supabase
+        .from('blog_comment_upvotes')
+        .select('comment_id')
+        .eq('user_id', user.id)
+        .in(
+          'comment_id',
+          comments.map((c) => c.id),
+        );
+      userUpvotedIds = (upvoteRows ?? []).map((r) => r.comment_id);
+    }
+
+    const enriched = (comments ?? []).map((c) => ({
+      ...c,
+      upvote_count: c.upvote_count ?? 0,
+      user_upvoted: userUpvotedIds.includes(c.id),
+    }));
+
+    return NextResponse.json({ comments: enriched });
   } catch (error: any) {
     console.error('Error fetching comments:', error);
     return NextResponse.json(
