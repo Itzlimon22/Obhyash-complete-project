@@ -42,7 +42,7 @@ const renderLatex = (text: string): string => {
 
   // 3. Basic markdown
   result = result
-    .replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>') // **bold**
+    .replace(/\*\*([\s\S]+?)\*\*/g, '<strong>$1</strong>') // **bold**
     .replace(/\*([^*\n]+?)\*/g, '<em>$1</em>') // *italic*
     .replace(
       /`([^`\n]+?)`/g,
