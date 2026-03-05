@@ -497,10 +497,13 @@ export const printResultWithExplanations = (
               </div>
             </div>
           `;
+            })
+            .join('')}
+        </div>
         <script>setTimeout(() => { window.print(); }, 800);</script>
       </body>
     </html>
-   `;
+  `;
 
   printWindow.document.write(htmlContent);
   printWindow.document.close();
