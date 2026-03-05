@@ -11,6 +11,8 @@ import '../features/profile/presentation/profile_route_view.dart';
 import '../features/subscription/presentation/subscription_view.dart';
 import '../features/complaint/presentation/complaint_view.dart';
 import '../features/reports/presentation/student_report_view.dart';
+import '../features/user_profile/presentation/user_profile_view.dart';
+import '../features/subject_report/presentation/subject_report_view.dart';
 import '../features/profile/presentation/about_us_view.dart';
 import '../features/leaderboard/presentation/leaderboard_view.dart';
 import '../features/analysis/presentation/analysis_view.dart';
@@ -132,6 +134,20 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/about',
             pageBuilder: (context, state) =>
                 _fadeRoute(const AboutUsView(), state),
+          ),
+          GoRoute(
+            path: '/user-profile/:userId',
+            pageBuilder: (context, state) {
+              final userId = state.pathParameters['userId']!;
+              return _fadeRoute(UserProfileView(userId: userId), state);
+            },
+          ),
+          GoRoute(
+            path: '/subject/:subject',
+            pageBuilder: (context, state) {
+              final subject = state.pathParameters['subject']!;
+              return _fadeRoute(SubjectReportView(subject: subject), state);
+            },
           ),
         ],
       ),

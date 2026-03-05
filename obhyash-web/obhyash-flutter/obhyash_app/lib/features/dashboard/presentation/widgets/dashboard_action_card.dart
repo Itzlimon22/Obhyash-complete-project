@@ -127,32 +127,32 @@ class _DashboardActionCardState extends State<DashboardActionCard>
                 ),
                 // Main Content
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Icon Box
+                      // Icon Box — matches web w-9 h-9 (36px) rounded-xl
                       AnimatedScale(
                         scale: _isHovered ? 1.05 : 1.0,
                         duration: const Duration(milliseconds: 200),
                         child: Container(
-                          width: 48,
-                          height: 48,
+                          width: 36,
+                          height: 36,
                           decoration: BoxDecoration(
                             color: isDark
                                 ? const Color(0xFF262626)
                                 : Colors.white,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isDark
-                                  ? const Color(0xFF404040) // neutral 700
+                                  ? const Color(0xFF404040)
                                   : widget.lightColor,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 4,
+                                color: Colors.black.withOpacity(0.04),
+                                blurRadius: 3,
                                 offset: const Offset(0, 1),
                               ),
                             ],
@@ -161,24 +161,25 @@ class _DashboardActionCardState extends State<DashboardActionCard>
                             child: Icon(
                               widget.icon,
                               color: widget.primaryColor,
-                              size: 24,
+                              size: 18,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      // Title Text
+                      const SizedBox(height: 8),
+                      // Title — matches web text-[11px] font-extrabold
                       AnimatedDefaultTextStyle(
                         duration: const Duration(milliseconds: 200),
                         style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
                           color: _isHovered
                               ? widget.primaryColor
                               : (isDark
-                                    ? const Color(0xFFE5E5E5) // neutral 200
-                                    : const Color(0xFF404040)), // neutral 700
+                                    ? const Color(0xFFE5E5E5)
+                                    : const Color(0xFF262626)),
                           fontFamily: 'HindSiliguri',
+                          height: 1.2,
                         ),
                         child: Text(widget.title, textAlign: TextAlign.center),
                       ),

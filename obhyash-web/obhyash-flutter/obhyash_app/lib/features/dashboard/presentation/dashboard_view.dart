@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'widgets/dashboard_action_card.dart';
 import 'widgets/dashboard_leaderboard_card.dart';
@@ -59,20 +60,28 @@ class DashboardView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. Actions Grid (Mock Exam, History, Leaderboard, Analysis)
+          // 1. Actions Grid — 6 cards, 3-column (matches web)
           GridView.count(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
+            crossAxisCount: 3,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 0.88,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             children: [
               DashboardActionCard(
                 title: 'মক পরীক্ষা',
                 icon: LucideIcons.fileEdit,
-                primaryColor: const Color(0xFFE11D48), // rose-600
-                lightColor: const Color(0xFFFFE4E6), // rose-100
+                primaryColor: const Color(0xFF059669), // emerald-600
+                lightColor: const Color(0xFFD1FAE5), // emerald-100
                 onTap: () => context.go('/setup'),
+              ),
+              DashboardActionCard(
+                title: 'অনুশীলন',
+                icon: LucideIcons.bookOpen,
+                primaryColor: const Color(0xFF059669), // emerald-600
+                lightColor: const Color(0xFFD1FAE5), // emerald-100
+                onTap: () => context.go('/practice'),
               ),
               DashboardActionCard(
                 title: 'ইতিহাস',
@@ -84,8 +93,8 @@ class DashboardView extends ConsumerWidget {
               DashboardActionCard(
                 title: 'লিডারবোর্ড',
                 icon: LucideIcons.trophy,
-                primaryColor: const Color(0xFFD97706), // amber-600
-                lightColor: const Color(0xFFFEF3C7), // amber-100
+                primaryColor: const Color(0xFF059669), // emerald-600
+                lightColor: const Color(0xFFD1FAE5), // emerald-100
                 onTap: () => context.go('/leaderboard'),
               ),
               DashboardActionCard(
@@ -95,27 +104,37 @@ class DashboardView extends ConsumerWidget {
                 lightColor: const Color(0xFFD1FAE5), // emerald-100
                 onTap: () => context.go('/analysis'),
               ),
+              DashboardActionCard(
+                title: 'ব্লগ',
+                icon: LucideIcons.newspaper,
+                primaryColor: const Color(0xFF059669),
+                lightColor: const Color(0xFFD1FAE5),
+                onTap: () => launchUrl(
+                  Uri.parse('https://obhyash.com/blog'),
+                  mode: LaunchMode.externalApplication,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 24),
 
-          // 2. Leaderboard Card
-          DashboardLeaderboardCard(
-            currentUser: currentUser,
-            userRank: userRank,
-            topUser: topUser,
-            xpDiff: xpDiff,
-            onLeaderboardClick: () => context.go('/leaderboard'),
-          ),
-          const SizedBox(height: 24),
-
-          // 3. Subject Stats List
+          // 2. Subject Stats List
           SubjectStatCard(
             data: subjects,
             isLoading: isLoading,
             onSubjectClick: (subjectId) {
               context.go('/analysis');
             },
+          ),
+          const SizedBox(height: 24),
+
+          // 3. Leaderboard Card
+          DashboardLeaderboardCard(
+            currentUser: currentUser,
+            userRank: userRank,
+            topUser: topUser,
+            xpDiff: xpDiff,
+            onLeaderboardClick: () => context.go('/leaderboard'),
           ),
 
           const SizedBox(height: 40),

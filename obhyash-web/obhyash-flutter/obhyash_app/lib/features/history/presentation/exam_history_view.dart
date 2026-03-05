@@ -245,7 +245,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                   ),
               ],
             ),
-            labelColor: const Color(0xFF6366F1), // indigo-500
+            labelColor: const Color(0xFF059669), // emerald-600
             unselectedLabelColor: const Color(0xFFA3A3A3),
             labelStyle: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -331,12 +331,12 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
                     color: _filterDate != null
-                        ? const Color(0xFF6366F1).withOpacity(0.1)
+                        ? const Color(0xFF059669).withValues(alpha: 0.1)
                         : (isDark ? const Color(0xFF171717) : Colors.white),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: _filterDate != null
-                          ? const Color(0xFF6366F1)
+                          ? const Color(0xFF059669)
                           : (isDark
                                 ? const Color(0xFF262626)
                                 : const Color(0xFFE5E5E5)),
@@ -349,7 +349,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                         LucideIcons.calendar,
                         size: 14,
                         color: _filterDate != null
-                            ? const Color(0xFF6366F1)
+                            ? const Color(0xFF059669)
                             : const Color(0xFFA3A3A3),
                       ),
                       const SizedBox(width: 6),
@@ -361,7 +361,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: _filterDate != null
-                              ? const Color(0xFF6366F1)
+                              ? const Color(0xFF059669)
                               : const Color(0xFFA3A3A3),
                         ),
                       ),
@@ -372,7 +372,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                           child: const Icon(
                             LucideIcons.x,
                             size: 12,
-                            color: Color(0xFF6366F1),
+                            color: Color(0xFF059669),
                           ),
                         ),
                       ],
@@ -443,17 +443,17 @@ class _ExamsTab extends StatelessWidget {
         // Stats Row
         Row(
           children: [
-            // Total exams — indigo
+            // Total exams — emerald
             _StatCard(
-              label: 'মোট পরীক্ষা',
+              label: 'মোট',
               value: '${records.length}',
               isDark: isDark,
-              gradient: const [Color(0xFF6366F1), Color(0xFF4F46E5)],
+              gradient: const [Color(0xFF047857), Color(0xFF059669)],
               white: true,
             ),
             const SizedBox(width: 8),
             _StatCard(
-              label: 'গড় স্কোর',
+              label: 'গড়',
               value: '${avgScore.round()}%',
               isDark: isDark,
             ),
@@ -516,10 +516,10 @@ class _ExamCard extends StatelessWidget {
         : _subjectDisplay(record.subject);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -532,10 +532,10 @@ class _ExamCard extends StatelessWidget {
         children: [
           // Score circle
           Container(
-            width: 56,
-            height: 56,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
               border: Border.all(color: color, width: 2),
             ),
@@ -543,7 +543,7 @@ class _ExamCard extends StatelessWidget {
               child: Text(
                 '${record.score.round()}%',
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 10,
                   fontWeight: FontWeight.w900,
                   color: color,
                 ),
@@ -784,7 +784,7 @@ class _BookmarksTabState extends State<_BookmarksTab> {
             children: [
               Icon(
                 LucideIcons.bookmark,
-                color: const Color(0xFF6366F1),
+                color: const Color(0xFF059669),
                 size: 18,
               ),
               const SizedBox(width: 12),

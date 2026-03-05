@@ -39,17 +39,7 @@ class MainSidebar extends StatelessWidget {
         'label': 'আমার রিপোর্ট',
         'icon': LucideIcons.clipboardList,
       },
-      {
-        'id': 'subscription',
-        'label': 'সাবস্ক্রিপশন',
-        'icon': LucideIcons.creditCard,
-      },
-      {
-        'id': 'complaint',
-        'label': 'অভিযোগ ও পরামর্শ',
-        'icon': LucideIcons.messageSquare,
-      },
-      {'id': 'about', 'label': 'আমাদের সম্পর্কে', 'icon': LucideIcons.info},
+      {'id': 'blog', 'label': 'ব্লগ', 'icon': LucideIcons.newspaper},
     ];
 
     return Drawer(
@@ -98,7 +88,7 @@ class MainSidebar extends StatelessWidget {
                       ),
                       child: const Center(
                         child: Icon(
-                          LucideIcons.target,
+                          LucideIcons.bookOpen,
                           color: Colors.white,
                           size: 20,
                         ),
@@ -372,10 +362,11 @@ class MainSidebar extends StatelessWidget {
                               foregroundColor: WidgetStateProperty.resolveWith((
                                 states,
                               ) {
-                                if (states.contains(WidgetState.hovered))
+                                if (states.contains(WidgetState.hovered)) {
                                   return const Color(
                                     0xFFE11D48,
                                   ); // hover:text-rose-600
+                                }
                                 return null;
                               }),
                             ),

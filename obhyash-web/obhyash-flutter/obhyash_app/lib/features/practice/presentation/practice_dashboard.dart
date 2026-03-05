@@ -1,9 +1,14 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'flashcard_mode.dart';
+import 'practice_summary.dart';
 
-// --- Domain Models ---
+// ─── Domain Model ────────────────────────────────────────────────────────────
+
 class PracticeQuestion {
   final String id;
   final String subject;
@@ -11,6 +16,8 @@ class PracticeQuestion {
   final String questionText;
   final List<String> options;
   final int correctAnswerIndex;
+  final String? explanation;
+  final int points;
 
   const PracticeQuestion({
     required this.id,
@@ -19,12 +26,14 @@ class PracticeQuestion {
     required this.questionText,
     required this.options,
     required this.correctAnswerIndex,
+    this.explanation,
+    this.points = 1,
   });
 
   factory PracticeQuestion.fromJson(Map<String, dynamic> j) {
-    List<String> validOptions = [];
+    List<String> opts = [];
     if (j['options'] is List) {
-      validOptions = (j['options'] as List).map((e) => e.toString()).toList();
+      opts = (j['options'] as List).map((e) => e.toString()).toList();
     }
     return PracticeQuestion(
       id: j['id']?.toString() ?? '',
@@ -34,13 +43,20 @@ class PracticeQuestion {
           j['subject']?.toString() ??
           'General',
       questionText: j['question']?.toString() ?? '',
-      options: validOptions,
+      options: opts,
       correctAnswerIndex: (j['correct_answer_index'] as num?)?.toInt() ?? 0,
+      explanation: j['explanation']?.toString(),
+      points: (j['points'] as num?)?.toInt() ?? 1,
     );
   }
 }
 
-// --- View ---
+// ─── View State ───────────────────────────────────────────────────────────────
+
+enum _PracticeView { list, flashcard, summary }
+
+// ─── View ─────────────────────────────────────────────────────────────────────
+
 class PracticeDashboard extends ConsumerStatefulWidget {
   const PracticeDashboard({super.key});
 
@@ -49,7 +65,10 @@ class PracticeDashboard extends ConsumerStatefulWidget {
 }
 
 class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
-  String _activeTab = 'mistakes'; // 'mistakes' or 'bookmarks'
+  _PracticeView _view = _PracticeView.list;
+
+  // List state
+  String _activeTab = 'mistakes';
   String _subjectFilter = 'all';
 
   List<PracticeQuestion> _mistakes = [];
@@ -61,11 +80,17 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
   bool _isLoading = true;
   bool _shuffle = false;
 
+  // Flashcard / summary state
+  List<PracticeQuestion> _flashcardQuestions = [];
+  List<FlashcardResult> _flashcardResults = [];
+
   @override
   void initState() {
     super.initState();
     _fetchData();
   }
+
+  // ── Data fetching ───────────────────────────────────────────────────────────
 
   Future<void> _fetchData() async {
     setState(() => _isLoading = true);
@@ -77,7 +102,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
         return;
       }
 
-      // 1. Fetch Bookmarks
+      // 1. Bookmarks via bookmarks table -> questions join
       final bData = await sb
           .from('bookmarks')
           .select('question_id, questions(*)')
@@ -93,29 +118,39 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
         }
       }
 
-      // 2. Fetch Mistakes (User answers where incorrect)
+      // 2. Mistakes derived from exam_results JSONB
+      //    questions  = List of question objects stored at exam time
+      //    user_answers = Map<questionId, answerIndex>
       final mData = await sb
-          .from('user_answers')
-          .select('question_id, questions(*)')
+          .from('exam_results')
+          .select('questions, user_answers')
           .eq('user_id', uid)
-          .not(
-            'user_answer',
-            'is',
-            null,
-          ); // Ideally we need to check if user_answer != correct_answer, simplified here
+          .not('questions', 'is', null)
+          .not('user_answers', 'is', null);
 
       final mListMap = <String, PracticeQuestion>{};
       final mFreq = <String, int>{};
 
-      for (final row in (mData as List)) {
-        final qRow = row['questions'] as Map<String, dynamic>?;
-        if (qRow != null) {
-          final q = PracticeQuestion.fromJson(qRow);
-          // Only add if it was actually wrong - for now we just add all answers.
-          // In real app, we need to compare user_answer with correct_answer.
-          // Assuming user_answers table has 'is_correct' or similar, but using basic logic:
-          mListMap[q.id] = q;
-          mFreq[q.id] = (mFreq[q.id] ?? 0) + 1;
+      for (final result in (mData as List)) {
+        final questionsRaw = result['questions'];
+        final userAnswersRaw = result['user_answers'];
+        if (questionsRaw is! List || userAnswersRaw is! Map) continue;
+
+        final userAnswers = Map<String, dynamic>.from(userAnswersRaw);
+
+        for (final qData in questionsRaw) {
+          if (qData is! Map<String, dynamic>) continue;
+          final q = PracticeQuestion.fromJson(qData);
+          if (q.id.isEmpty) continue;
+
+          final raw = userAnswers[q.id];
+          if (raw == null) continue;
+          final userAnswer = (raw as num).toInt();
+          if (userAnswer == -1) continue; // skipped
+          if (userAnswer != q.correctAnswerIndex) {
+            mListMap[q.id] = q;
+            mFreq[q.id] = (mFreq[q.id] ?? 0) + 1;
+          }
         }
       }
 
@@ -136,13 +171,14 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     }
   }
 
+  // ── Bookmark toggle ─────────────────────────────────────────────────────────
+
   Future<void> _toggleBookmark(String qid) async {
     final sb = Supabase.instance.client;
     final uid = sb.auth.currentUser?.id;
     if (uid == null) return;
 
     final isMarked = _bookmarkedIds.contains(qid);
-
     setState(() {
       if (isMarked) {
         _bookmarkedIds.remove(qid);
@@ -151,7 +187,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
         _bookmarkedIds.add(qid);
         final q = _mistakes.firstWhere(
           (q) => q.id == qid,
-          orElse: () => _bookmarks.first,
+          orElse: () => _bookmarks.firstWhere((b) => b.id == qid),
         );
         if (!_bookmarks.any((b) => b.id == qid)) _bookmarks.add(q);
       }
@@ -168,9 +204,11 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
         await sb.from('bookmarks').insert({'user_id': uid, 'question_id': qid});
       }
     } catch (_) {
-      // Revert on error
+      // Revert silently
     }
   }
+
+  // ── Derived getters ─────────────────────────────────────────────────────────
 
   List<PracticeQuestion> get _currentList {
     final base = _activeTab == 'mistakes' ? _mistakes : _bookmarks;
@@ -204,23 +242,67 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
   }
 
   void _launchFlashcard() {
-    if (_selectedIds.isEmpty) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('ফ্ল্যাশকার্ড শুরু হচ্ছে...'),
-        backgroundColor: Color(0xFF059669),
-      ),
-    );
+    final list = _currentList;
+    var qs = list.where((q) => _selectedIds.contains(q.id)).toList();
+    if (qs.isEmpty) return;
+    if (_shuffle) qs = (qs..shuffle());
+
+    HapticFeedback.mediumImpact();
+    setState(() {
+      _flashcardQuestions = qs;
+      _flashcardResults = [];
+      _view = _PracticeView.flashcard;
+    });
   }
+
+  void _onFlashcardComplete(List<FlashcardResult> results) {
+    setState(() {
+      _flashcardResults = results;
+      _view = _PracticeView.summary;
+    });
+  }
+
+  void _onPracticeStruggling(List<PracticeQuestion> qs) {
+    setState(() {
+      _flashcardQuestions = qs;
+      _flashcardResults = [];
+      _view = _PracticeView.flashcard;
+    });
+  }
+
+  void _onSummaryBack() {
+    setState(() => _view = _PracticeView.list);
+  }
+
+  // ── Build ───────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
+    if (_view == _PracticeView.flashcard) {
+      return FlashcardMode(
+        questions: _flashcardQuestions,
+        onComplete: _onFlashcardComplete,
+        onExit: () => setState(() => _view = _PracticeView.list),
+      );
+    }
+    if (_view == _PracticeView.summary) {
+      return PracticeSummary(
+        results: _flashcardResults,
+        onPracticeStruggling: _onPracticeStruggling,
+        onBack: _onSummaryBack,
+      );
+    }
+
+    return _buildListView();
+  }
+
+  Widget _buildListView() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final list = _currentList;
 
     return Column(
       children: [
-        // Mobile Header
+        // ── Header ─────────────────────────────────────────────────────────
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
@@ -235,22 +317,40 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
           ),
           child: Row(
             children: [
-              IconButton(
-                icon: const Icon(LucideIcons.arrowLeft),
-                onPressed: () {
-                  if (Navigator.canPop(context)) Navigator.pop(context);
+              GestureDetector(
+                onTap: () {
+                  if (Navigator.canPop(context)) {
+                    Navigator.pop(context);
+                  } else {
+                    context.go('/');
+                  }
                 },
-                color: isDark
-                    ? const Color(0xFFA3A3A3)
-                    : const Color(0xFF737373),
+                child: Icon(
+                  LucideIcons.arrowLeft,
+                  size: 20,
+                  color: isDark
+                      ? const Color(0xFFA3A3A3)
+                      : const Color(0xFF737373),
+                ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               Text(
-                'অনুশীলন (Practice)',
+                'অনুশীলন',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : const Color(0xFF171717),
+                ),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: _fetchData,
+                child: Icon(
+                  LucideIcons.refreshCw,
+                  size: 18,
+                  color: isDark
+                      ? const Color(0xFF737373)
+                      : const Color(0xFFA3A3A3),
                 ),
               ),
             ],
@@ -262,7 +362,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               ? const Center(child: CircularProgressIndicator())
               : Column(
                   children: [
-                    // Stat Bar
+                    // ── Stats bar ─────────────────────────────────────────
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                       child: Row(
@@ -282,8 +382,8 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                           ),
                           const SizedBox(width: 12),
                           _StatBox(
-                            label: 'রিভিউ বাকি',
-                            value: 0,
+                            label: 'নির্বাচিত',
+                            value: _selectedIds.length,
                             color: const Color(0xFF818CF8),
                             isDark: isDark,
                           ),
@@ -291,7 +391,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                       ),
                     ),
 
-                    // Tabs
+                    // ── Tab switcher ──────────────────────────────────────
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -341,7 +441,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                       ),
                     ),
 
-                    // Subject Pills
+                    // ── Subject filter pills ──────────────────────────────
                     if (_availableSubjects.isNotEmpty)
                       SizedBox(
                         height: 48,
@@ -372,7 +472,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                         ),
                       ),
 
-                    // Main Content
+                    // ── Main content card ─────────────────────────────────
                     Expanded(
                       child: Container(
                         margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -399,401 +499,19 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                             ? _emptyState(isDark)
                             : Column(
                                 children: [
-                                  // Toolbar
-                                  Container(
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: isDark
-                                          ? const Color(
-                                              0xFF262626,
-                                            ).withOpacity(0.5)
-                                          : const Color(0xFFFAFAFA),
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          color: isDark
-                                              ? const Color(0xFF262626)
-                                              : const Color(0xFFE5E5E5),
-                                        ),
-                                      ),
-                                      borderRadius: const BorderRadius.vertical(
-                                        top: Radius.circular(20),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Checkbox(
-                                          value:
-                                              list.isNotEmpty &&
-                                              list.every(
-                                                (q) =>
-                                                    _selectedIds.contains(q.id),
-                                              ),
-                                          onChanged: (_) => _toggleSelectAll(),
-                                          activeColor: const Color(0xFFE11D48),
-                                        ),
-                                        Text(
-                                          '${_selectedIds.length} নির্বাচিত',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                            color: isDark
-                                                ? const Color(0xFFA3A3A3)
-                                                : const Color(0xFF525252),
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        // Shuffle
-                                        GestureDetector(
-                                          onTap: () => setState(
-                                            () => _shuffle = !_shuffle,
-                                          ),
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 10,
-                                              vertical: 6,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: _shuffle
-                                                  ? const Color(
-                                                      0xFF4F46E5,
-                                                    ).withOpacity(0.1)
-                                                  : (isDark
-                                                        ? const Color(
-                                                            0xFF262626,
-                                                          )
-                                                        : Colors.white),
-                                              border: Border.all(
-                                                color: _shuffle
-                                                    ? const Color(
-                                                        0xFF4F46E5,
-                                                      ).withOpacity(0.3)
-                                                    : (isDark
-                                                          ? const Color(
-                                                              0xFF404040,
-                                                            )
-                                                          : const Color(
-                                                              0xFFE5E5E5,
-                                                            )),
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  LucideIcons.shuffle,
-                                                  size: 14,
-                                                  color: _shuffle
-                                                      ? const Color(0xFF4F46E5)
-                                                      : const Color(0xFFA3A3A3),
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  'র‍্যান্ডম',
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: _shuffle
-                                                        ? const Color(
-                                                            0xFF4F46E5,
-                                                          )
-                                                        : const Color(
-                                                            0xFFA3A3A3,
-                                                          ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        // Start
-                                        ElevatedButton.icon(
-                                          onPressed: _selectedIds.isEmpty
-                                              ? null
-                                              : _launchFlashcard,
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(
-                                              0xFF047857,
-                                            ),
-                                            disabledBackgroundColor: isDark
-                                                ? const Color(0xFF262626)
-                                                : const Color(0xFFE5E5E5),
-                                            elevation: 0,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 14,
-                                              vertical: 0,
-                                            ),
-                                            minimumSize: const Size(0, 36),
-                                          ),
-                                          icon: const Icon(
-                                            LucideIcons.playCircle,
-                                            size: 16,
-                                            color: Colors.white,
-                                          ),
-                                          label: const Text(
-                                            'শুরু',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  // List
+                                  _buildToolbar(list, isDark),
                                   Expanded(
                                     child: ListView.separated(
                                       padding: const EdgeInsets.all(12),
                                       itemCount: list.length,
-                                      separatorBuilder: (_, __) =>
-                                          const SizedBox(height: 12),
-                                      itemBuilder: (ctx, i) {
-                                        final q = list[i];
-                                        final isSel = _selectedIds.contains(
-                                          q.id,
-                                        );
-                                        final freq = _mistakeFreq[q.id];
-                                        final isBookmarked = _bookmarkedIds
-                                            .contains(q.id);
-
-                                        return GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              if (isSel)
-                                                _selectedIds.remove(q.id);
-                                              else
-                                                _selectedIds.add(q.id);
-                                            });
-                                          },
-                                          child: Container(
-                                            padding: const EdgeInsets.all(12),
-                                            decoration: BoxDecoration(
-                                              color: isDark
-                                                  ? const Color(0xFF171717)
-                                                  : Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              border: Border.all(
-                                                color: isSel
-                                                    ? const Color(0xFFE11D48)
-                                                    : (isDark
-                                                          ? const Color(
-                                                              0xFF262626,
-                                                            )
-                                                          : const Color(
-                                                              0xFFE5E5E5,
-                                                            )),
-                                              ),
-                                            ),
-                                            child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  margin: const EdgeInsets.only(
-                                                    top: 2,
-                                                    right: 12,
-                                                  ),
-                                                  width: 20,
-                                                  height: 20,
-                                                  decoration: BoxDecoration(
-                                                    color: isSel
-                                                        ? const Color(
-                                                            0xFFE11D48,
-                                                          )
-                                                        : Colors.transparent,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          4,
-                                                        ),
-                                                    border: Border.all(
-                                                      color: isSel
-                                                          ? const Color(
-                                                              0xFFE11D48,
-                                                            )
-                                                          : const Color(
-                                                              0xFFA3A3A3,
-                                                            ),
-                                                    ),
-                                                  ),
-                                                  child: isSel
-                                                      ? const Icon(
-                                                          Icons.check,
-                                                          size: 14,
-                                                          color: Colors.white,
-                                                        )
-                                                      : null,
-                                                ),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Row(
-                                                        children: [
-                                                          Container(
-                                                            padding:
-                                                                const EdgeInsets.symmetric(
-                                                                  horizontal: 6,
-                                                                  vertical: 2,
-                                                                ),
-                                                            decoration: BoxDecoration(
-                                                              color: isDark
-                                                                  ? const Color(
-                                                                      0xFF262626,
-                                                                    )
-                                                                  : const Color(
-                                                                      0xFFF5F5F5,
-                                                                    ),
-                                                              borderRadius:
-                                                                  BorderRadius.circular(
-                                                                    100,
-                                                                  ),
-                                                            ),
-                                                            child: Text(
-                                                              q.subjectLabel
-                                                                  .toUpperCase(),
-                                                              style: const TextStyle(
-                                                                fontSize: 9,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Color(
-                                                                  0xFFA3A3A3,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          if (freq != null &&
-                                                              freq > 0 &&
-                                                              _activeTab ==
-                                                                  'mistakes') ...[
-                                                            const SizedBox(
-                                                              width: 6,
-                                                            ),
-                                                            Container(
-                                                              padding:
-                                                                  const EdgeInsets.symmetric(
-                                                                    horizontal:
-                                                                        6,
-                                                                    vertical: 2,
-                                                                  ),
-                                                              decoration: BoxDecoration(
-                                                                color:
-                                                                    const Color(
-                                                                      0xFF4C1D95,
-                                                                    ).withOpacity(
-                                                                      0.2,
-                                                                    ),
-                                                                border: Border.all(
-                                                                  color:
-                                                                      const Color(
-                                                                        0xFF4C1D95,
-                                                                      ).withOpacity(
-                                                                        0.5,
-                                                                      ),
-                                                                ),
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      100,
-                                                                    ),
-                                                              ),
-                                                              child: Text(
-                                                                '${freq}x ভুল',
-                                                                style: const TextStyle(
-                                                                  fontSize: 9,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color: Color(
-                                                                    0xFFA78BFA,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                          const Spacer(),
-                                                          GestureDetector(
-                                                            onTap: () =>
-                                                                _toggleBookmark(
-                                                                  q.id,
-                                                                ),
-                                                            child: Icon(
-                                                              isBookmarked
-                                                                  ? LucideIcons
-                                                                        .bookmarkMinus
-                                                                  : LucideIcons
-                                                                        .bookmark,
-                                                              size: 16,
-                                                              color:
-                                                                  isBookmarked
-                                                                  ? const Color(
-                                                                      0xFF10B981,
-                                                                    )
-                                                                  : const Color(
-                                                                      0xFFA3A3A3,
-                                                                    ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      const SizedBox(height: 6),
-                                                      Text(
-                                                        '${i + 1}. ${q.questionText}',
-                                                        style: TextStyle(
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: isDark
-                                                              ? Colors.white
-                                                              : const Color(
-                                                                  0xFF171717,
-                                                                ),
-                                                        ),
-                                                        maxLines: 2,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      if (q
-                                                              .options
-                                                              .isNotEmpty &&
-                                                          q.correctAnswerIndex <
-                                                              q
-                                                                  .options
-                                                                  .length) ...[
-                                                        const SizedBox(
-                                                          height: 6,
-                                                        ),
-                                                        Text(
-                                                          '✓ ${q.options[q.correctAnswerIndex]}',
-                                                          style:
-                                                              const TextStyle(
-                                                                fontSize: 11,
-                                                                color: Color(
-                                                                  0xFF059669,
-                                                                ),
-                                                              ),
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                      ],
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                      separatorBuilder: (_, _) =>
+                                          const SizedBox(height: 10),
+                                      itemBuilder: (ctx, i) =>
+                                          _buildQuestionCard(
+                                            list[i],
+                                            i,
+                                            isDark,
                                           ),
-                                        );
-                                      },
                                     ),
                                   ),
                                 ],
@@ -806,6 +524,269 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
       ],
     );
   }
+
+  // ── Toolbar ──────────────────────────────────────────────────────────────────
+
+  Widget _buildToolbar(List<PracticeQuestion> list, bool isDark) {
+    final allSelected =
+        list.isNotEmpty && list.every((q) => _selectedIds.contains(q.id));
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF262626).withValues(alpha: 0.5)
+            : const Color(0xFFFAFAFA),
+        border: Border(
+          bottom: BorderSide(
+            color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          ),
+        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: _toggleSelectAll,
+            child: Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: allSelected
+                    ? const Color(0xFFE11D48)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: allSelected
+                      ? const Color(0xFFE11D48)
+                      : const Color(0xFFA3A3A3),
+                ),
+              ),
+              child: allSelected
+                  ? const Icon(Icons.check, size: 14, color: Colors.white)
+                  : null,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            '${_selectedIds.length} নির্বাচিত',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF525252),
+            ),
+          ),
+          const Spacer(),
+          // Shuffle toggle
+          GestureDetector(
+            onTap: () => setState(() => _shuffle = !_shuffle),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: _shuffle
+                    ? const Color(0xFF059669).withValues(alpha: 0.1)
+                    : (isDark ? const Color(0xFF262626) : Colors.white),
+                border: Border.all(
+                  color: _shuffle
+                      ? const Color(0xFF059669).withValues(alpha: 0.3)
+                      : (isDark
+                            ? const Color(0xFF404040)
+                            : const Color(0xFFE5E5E5)),
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    LucideIcons.shuffle,
+                    size: 14,
+                    color: _shuffle
+                        ? const Color(0xFF059669)
+                        : const Color(0xFFA3A3A3),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    _shuffle
+                        ? 'র\u200d\u09cd\u09af\u09be\u09a8\u09cd\u09a1\u09ae \u0985\u09a8'
+                        : '\u09b0\u09cd\u200d\u09af\u09be\u09a8\u09cd\u09a1\u09ae',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: _shuffle
+                          ? const Color(0xFF059669)
+                          : const Color(0xFFA3A3A3),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Start button
+          ElevatedButton.icon(
+            onPressed: _selectedIds.isEmpty ? null : _launchFlashcard,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF047857),
+              disabledBackgroundColor: isDark
+                  ? const Color(0xFF262626)
+                  : const Color(0xFFE5E5E5),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 0),
+              minimumSize: const Size(0, 36),
+            ),
+            icon: const Icon(
+              LucideIcons.playCircle,
+              size: 16,
+              color: Colors.white,
+            ),
+            label: const Text(
+              '\u09b6\u09c1\u09b0\u09c1',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Question card ─────────────────────────────────────────────────────────
+
+  Widget _buildQuestionCard(PracticeQuestion q, int i, bool isDark) {
+    final isSel = _selectedIds.contains(q.id);
+    final freq = _mistakeFreq[q.id];
+    final isBookmarked = _bookmarkedIds.contains(q.id);
+
+    return GestureDetector(
+      onTap: () => setState(() {
+        if (isSel) {
+          _selectedIds.remove(q.id);
+        } else {
+          _selectedIds.add(q.id);
+        }
+      }),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSel
+                ? const Color(0xFFE11D48)
+                : (isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 2, right: 12),
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: isSel ? const Color(0xFFE11D48) : Colors.transparent,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: isSel
+                      ? const Color(0xFFE11D48)
+                      : const Color(0xFFA3A3A3),
+                ),
+              ),
+              child: isSel
+                  ? const Icon(Icons.check, size: 14, color: Colors.white)
+                  : null,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF262626)
+                              : const Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Text(
+                          q.subjectLabel.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFA3A3A3),
+                          ),
+                        ),
+                      ),
+                      if (freq != null &&
+                          freq > 0 &&
+                          _activeTab == 'mistakes') ...[
+                        const SizedBox(width: 6),
+                        _FreqBadge(count: freq),
+                      ],
+                      const Spacer(),
+                      GestureDetector(
+                        onTap: () => _toggleBookmark(q.id),
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Icon(
+                            isBookmarked
+                                ? LucideIcons.bookmarkMinus
+                                : LucideIcons.bookmark,
+                            size: 16,
+                            color: isBookmarked
+                                ? const Color(0xFF10B981)
+                                : const Color(0xFFA3A3A3),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '${i + 1}. ${q.questionText}',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? Colors.white : const Color(0xFF171717),
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (q.options.isNotEmpty &&
+                      q.correctAnswerIndex < q.options.length) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      '\u2713 ${q.options[q.correctAnswerIndex]}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF059669),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ── Empty state ───────────────────────────────────────────────────────────
 
   Widget _emptyState(bool isDark) {
     return Center(
@@ -831,7 +812,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             ),
             const SizedBox(height: 16),
             Text(
-              'কোনো তথ্য পাওয়া যায়নি',
+              '\u06a4\u09cb\u09a8\u09cb \u09a4\u09a5\u09cd\u09af \u09aa\u09be\u0993\u09af\u09bc\u09be \u09af\u09be\u09af\u09bc\u09a8\u09bf',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -841,9 +822,32 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             const SizedBox(height: 8),
             Text(
               _activeTab == 'mistakes'
-                  ? 'আপনি এখনো কোনো পরীক্ষায় ভুল করেননি।'
-                  : 'আপনি এখনো কোনো প্রশ্ন বুকমার্ক করেননি।',
+                  ? '\u0986\u09aa\u09a8\u09bf \u098f\u0996\u09a8\u09cb \u06a4\u09cb\u09a8\u09cb \u09aa\u09b0\u09c0\u0995\u09cd\u09b7\u09be\u09af\u09bc \u09ad\u09c1\u09b2 \u06a4\u09b0\u09c7\u09a8\u09a8\u09bf\u0964'
+                  : '\u0986\u09aa\u09a8\u09bf \u098f\u0996\u09a8\u09cb \u06a4\u09cb\u09a8\u09cb \u09aa\u09cd\u09b0\u09b6\u09cd\u09a8 \u09ac\u09c1\u06a4\u09ae\u09be\u09b0\u09cd\u06a4 \u06a4\u09b0\u09c7\u09a8\u09a8\u09bf\u0964',
+              textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 13, color: Color(0xFFA3A3A3)),
+            ),
+            const SizedBox(height: 24),
+            GestureDetector(
+              onTap: () => context.go('/setup'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDC2626),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Text(
+                  '\u09a8\u09a4\u09c1\u09a8 \u09aa\u09b0\u09c0\u0995\u09cd\u09b7\u09be \u09a6\u09be\u0993',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -851,6 +855,8 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     );
   }
 }
+
+// ─── Reusable widgets ─────────────────────────────────────────────────────────
 
 class _StatBox extends StatelessWidget {
   final String label;
@@ -991,6 +997,45 @@ class _Pill extends StatelessWidget {
                 : (isDark ? const Color(0xFFA3A3A3) : const Color(0xFF525252)),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _FreqBadge extends StatelessWidget {
+  final int count;
+  const _FreqBadge({required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    final (bg, border, text) = count >= 3
+        ? (
+            const Color(0xFF059669).withValues(alpha: 0.15),
+            const Color(0xFF059669).withValues(alpha: 0.4),
+            const Color(0xFF059669),
+          )
+        : count == 2
+        ? (
+            const Color(0xFFDC2626).withValues(alpha: 0.15),
+            const Color(0xFFDC2626).withValues(alpha: 0.4),
+            const Color(0xFFDC2626),
+          )
+        : (
+            const Color(0xFF404040).withValues(alpha: 0.3),
+            const Color(0xFF525252).withValues(alpha: 0.4),
+            const Color(0xFFA3A3A3),
+          );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: bg,
+        border: Border.all(color: border),
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Text(
+        '${count}x \u09ad\u09c1\u09b2',
+        style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: text),
       ),
     );
   }

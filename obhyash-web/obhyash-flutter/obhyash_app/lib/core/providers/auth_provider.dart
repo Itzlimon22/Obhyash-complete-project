@@ -35,7 +35,7 @@ class AuthNotifier extends Notifier<User?> {
           state = session?.user;
 
           // Keep secure storage up to date whenever tokens rotate
-          if (session != null && session.user != null) {
+          if (session != null) {
             final sessionId =
                 '${session.user.id}:${session.accessToken.hashCode}';
             SecureStorageService.saveSession(

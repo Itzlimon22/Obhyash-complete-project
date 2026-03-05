@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../core/presentation/widgets/latex_text.dart';
 import '../../domain/exam_models.dart';
 import 'question_card.dart';
 

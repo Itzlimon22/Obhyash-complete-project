@@ -424,16 +424,16 @@ class _ComplaintViewState extends State<ComplaintView> {
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
-                      Color(0xFF4F46E5),
-                      Color(0xFF6D28D9),
-                    ], // indigo-600 to violet-700
+                      Color(0xFF059669),
+                      Color(0xFF047857),
+                    ], // emerald-600 to emerald-700
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: const [
                     BoxShadow(
-                      color: Color(0x334F46E5),
+                      color: Color(0x33059669),
                       blurRadius: 20,
                       offset: Offset(0, 10),
                     ),

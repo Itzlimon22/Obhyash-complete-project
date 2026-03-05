@@ -244,7 +244,7 @@ class _ResultViewState extends State<ResultView> {
                     icon: const Icon(Icons.download_rounded, size: 16),
                     label: const Text('প্রশ্নপত্র'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF4F46E5), // indigo-600
+                      foregroundColor: const Color(0xFF047857), // emerald-700
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
@@ -256,8 +256,8 @@ class _ResultViewState extends State<ResultView> {
                     icon: const Icon(Icons.download_done_rounded, size: 16),
                     label: const Text('ফলাফল ও ব্যাখ্যা'),
                     style: OutlinedButton.styleFrom(
-                      backgroundColor: const Color(0xFFEEF2FF), // indigo-50
-                      foregroundColor: const Color(0xFF4338CA), // indigo-700
+                      backgroundColor: const Color(0xFFECFDF5), // emerald-50
+                      foregroundColor: const Color(0xFF059669), // emerald-600
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       side: const BorderSide(color: Color(0xFFE0E7FF)),
                     ),

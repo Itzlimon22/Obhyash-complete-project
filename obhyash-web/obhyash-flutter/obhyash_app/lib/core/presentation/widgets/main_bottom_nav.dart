@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 class MainBottomNav extends StatelessWidget {
@@ -17,6 +18,7 @@ class MainBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    // 5 items: dashboard, history, [center FAB: setup], leaderboard, menu
     final items = [
       {'id': 'dashboard', 'label': 'হোম', 'icon': LucideIcons.layoutDashboard},
       {'id': 'history', 'label': 'ইতিহাস', 'icon': LucideIcons.history},
@@ -40,9 +42,7 @@ class MainBottomNav extends StatelessWidget {
         color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
         border: Border(
           top: BorderSide(
-            color: isDark
-                ? const Color(0xCC262626)
-                : const Color(0xCCE5E5E5), // neutral-800/80 : neutral-200/80
+            color: isDark ? const Color(0xCC262626) : const Color(0xCCE5E5E5),
             width: 1,
           ),
         ),
@@ -53,68 +53,136 @@ class MainBottomNav extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 4.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
+            // Bottom-align so center FAB naturally rises above others
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: items.map((item) {
               final id = item['id'] as String;
               final icon = item['icon'] as IconData;
+              final label = item['label'] as String;
               final action = item['action'] as String?;
+              final isCenter = item['isCenter'] as bool? ?? false;
               final isActive = activeTab == id;
 
-              return Expanded(
-                child: InkWell(
-                  onTap: () {
-                    if (action == 'menu') {
-                      onMenuClick();
-                    } else {
-                      onTabChange(id);
-                    }
-                  },
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      clipBehavior: Clip.none,
+              void handleTap() {
+                HapticFeedback.lightImpact();
+                if (action == 'menu') {
+                  onMenuClick();
+                } else {
+                  onTabChange(id);
+                }
+              }
+
+              /* ── Center FAB (পরীক্ষা) ─────────────────────────── */
+              if (isCenter) {
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: handleTap,
+                    behavior: HitTestBehavior.opaque,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (isActive && action != 'menu')
-                          Positioned(
-                            top:
-                                -16, // to touch the top border like in React mapping
-                            child: Container(
-                              width: 32,
-                              height: 2.5,
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? const Color(0xFFFB7185)
-                                    : const Color(
-                                        0xFFF43F5E,
-                                      ), // rose-400 : rose-500
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                            ),
-                          ),
-                        AnimatedScale(
-                          scale: isActive ? 1.05 : 1.0,
+                        // Raised FAB — extra top space lifts it above the bar
+                        const SizedBox(height: 4),
+                        AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          curve: Curves.easeOutBack,
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: isActive
+                                ? const Color(0xFF047857) // emerald-700
+                                : (isDark
+                                      ? Colors.white
+                                      : const Color(
+                                          0xFF171717,
+                                        )), // white dark / neutral-900 light
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: isActive
+                                    ? const Color(0x4D047857)
+                                    : (isDark
+                                          ? const Color(0x18FFFFFF)
+                                          : const Color(0x22171717)),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
                           child: Icon(
                             icon,
-                            size: 24,
+                            size: 22,
                             color: isActive
-                                ? (isDark
-                                      ? const Color(0xFFFB7185)
-                                      : const Color(
-                                          0xFFE11D48,
-                                        )) // rose-400 : rose-600
+                                ? Colors.white
                                 : (isDark
-                                      ? const Color(0xFF737373)
-                                      : const Color(
-                                          0xFFA3A3A3,
-                                        )), // neutral-500 : neutral-400
+                                      ? const Color(0xFF171717)
+                                      : Colors.white),
                           ),
                         ),
+                        const SizedBox(height: 4),
+                        Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontFamily: 'HindSiliguri',
+                            fontWeight: FontWeight.bold,
+                            color: isActive
+                                ? const Color(0xFF047857)
+                                : (isDark
+                                      ? const Color(0xFF737373)
+                                      : const Color(0xFFA3A3A3)),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
                       ],
                     ),
+                  ),
+                );
+              }
+
+              /* ── Regular Tab ──────────────────────────────────── */
+              final activeColor = isDark
+                  ? const Color(0xFF10B981) // emerald-500
+                  : const Color(0xFF047857); // emerald-700
+              final inactiveColor = isDark
+                  ? const Color(0xFF737373) // neutral-500
+                  : const Color(0xFFA3A3A3); // neutral-400
+              final itemColor = (isActive && action != 'menu')
+                  ? activeColor
+                  : inactiveColor;
+
+              return Expanded(
+                child: GestureDetector(
+                  onTap: handleTap,
+                  behavior: HitTestBehavior.opaque,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Active top indicator pill
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: (isActive && action != 'menu') ? 32 : 0,
+                        height: 2.5,
+                        decoration: BoxDecoration(
+                          color: activeColor,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Icon(icon, size: 22, color: itemColor),
+                      const SizedBox(height: 4),
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontFamily: 'HindSiliguri',
+                          fontWeight: (isActive && action != 'menu')
+                              ? FontWeight.bold
+                              : FontWeight.w500,
+                          color: itemColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
                   ),
                 ),
               );
