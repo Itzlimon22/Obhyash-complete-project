@@ -78,6 +78,17 @@ Color _scoreColor(double s) {
   return const Color(0xFFEF4444);
 }
 
+String _examTypeLabel(String type) {
+  return switch (type.toLowerCase()) {
+    'chapter' => 'অধ্যায়',
+    'subject' => 'বিষয়',
+    'custom' => 'কাস্টম',
+    _ => type,
+  };
+}
+
+enum _SortMode { date, scoreDesc, scoreAsc }
+
 // ─── Main View ─────────────────────────────────────────────────────────────────
 class ExamHistoryView extends ConsumerStatefulWidget {
   const ExamHistoryView({super.key});
@@ -92,6 +103,8 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   List<_ExamRecord> _history = [];
   bool _isLoading = true;
   bool _isClearing = false;
+  bool _hasError = false;
+  _SortMode _sortBy = _SortMode.date;
 
   String _filterSubject = '';
   DateTime? _filterDate;
@@ -110,7 +123,10 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   }
 
   Future<void> _fetch() async {
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+    });
     try {
       final sb = Supabase.instance.client;
       final uid = sb.auth.currentUser?.id;
@@ -136,8 +152,13 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           _isLoading = false;
         });
       }
-    } catch (_) {
-      if (mounted) setState(() => _isLoading = false);
+    } catch (e) {
+      debugPrint('[ExamHistoryView] _fetch error: $e');
+      if (mounted)
+        setState(() {
+          _isLoading = false;
+          _hasError = true;
+        });
     }
   }
 
@@ -154,6 +175,19 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       }
       return true;
     }).toList();
+  }
+
+  List<_ExamRecord> get _sortedFiltered {
+    final list = List<_ExamRecord>.from(_filtered);
+    switch (_sortBy) {
+      case _SortMode.scoreDesc:
+        list.sort((a, b) => b.score.compareTo(a.score));
+      case _SortMode.scoreAsc:
+        list.sort((a, b) => a.score.compareTo(b.score));
+      case _SortMode.date:
+        break;
+    }
+    return list;
   }
 
   List<MapEntry<String, String>> get _uniqueSubjects {
@@ -208,7 +242,8 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           );
         }
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[ExamHistoryView] _clearHistory error: $e');
     } finally {
       if (mounted) setState(() => _isClearing = false);
     }
@@ -388,14 +423,19 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         Expanded(
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
+              : _hasError
+              ? _errorState(isDark, _fetch)
               : TabBarView(
                   controller: _tab,
                   children: [
                     _ExamsTab(
-                      records: _filtered,
+                      records: _sortedFiltered,
                       isDark: isDark,
                       onClear: _history.isEmpty ? null : _clearHistory,
                       isClearing: _isClearing,
+                      sortBy: _sortBy,
+                      onSortChange: (s) => setState(() => _sortBy = s),
+                      onRefresh: _fetch,
                     ),
                     _MistakesTab(isDark: isDark),
                     _BookmarksTab(isDark: isDark),
@@ -413,21 +453,38 @@ class _ExamsTab extends StatelessWidget {
   final bool isDark;
   final VoidCallback? onClear;
   final bool isClearing;
+  final _SortMode sortBy;
+  final void Function(_SortMode) onSortChange;
+  final Future<void> Function() onRefresh;
 
   const _ExamsTab({
     required this.records,
     required this.isDark,
     this.onClear,
     required this.isClearing,
+    required this.sortBy,
+    required this.onSortChange,
+    required this.onRefresh,
   });
 
   @override
   Widget build(BuildContext context) {
     if (records.isEmpty) {
-      return _emptyState(
-        isDark,
-        'কোনো পরীক্ষার ইতিহাস নেই',
-        'একটি মক পরীক্ষা দিন এবং ফলাফল এখানে দেখুন।',
+      return RefreshIndicator(
+        onRefresh: onRefresh,
+        color: const Color(0xFF047857),
+        child: ListView(
+          children: [
+            SizedBox(
+              height: 400,
+              child: _emptyState(
+                isDark,
+                'কোনো পরীক্ষার ইতিহাস নেই',
+                'একটি মক পরীক্ষা দিন এবং ফলাফল এখানে দেখুন।',
+              ),
+            ),
+          ],
+        ),
       );
     }
 
@@ -437,66 +494,104 @@ class _ExamsTab extends StatelessWidget {
         .map((r) => r.score)
         .reduce((a, b) => a > b ? a : b);
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        // Stats Row
-        Row(
-          children: [
-            // Total exams — emerald
-            _StatCard(
-              label: 'মোট',
-              value: '${records.length}',
-              isDark: isDark,
-              gradient: const [Color(0xFF047857), Color(0xFF059669)],
-              white: true,
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      color: const Color(0xFF047857),
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // ── Sort chips
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _SortChip(
+                  label: 'সাম্প্রতিক',
+                  active: sortBy == _SortMode.date,
+                  isDark: isDark,
+                  onTap: () => onSortChange(_SortMode.date),
+                ),
+                const SizedBox(width: 6),
+                _SortChip(
+                  label: 'স্কোর: বেশি',
+                  active: sortBy == _SortMode.scoreDesc,
+                  isDark: isDark,
+                  onTap: () => onSortChange(_SortMode.scoreDesc),
+                ),
+                const SizedBox(width: 6),
+                _SortChip(
+                  label: 'স্কোর: কম',
+                  active: sortBy == _SortMode.scoreAsc,
+                  isDark: isDark,
+                  onTap: () => onSortChange(_SortMode.scoreAsc),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            _StatCard(
-              label: 'গড়',
-              value: '${avgScore.round()}%',
-              isDark: isDark,
-            ),
-            const SizedBox(width: 8),
-            _StatCard(
-              label: 'সর্বোচ্চ',
-              value: '${highestScore.round()}%',
-              isDark: isDark,
-              valueColor: const Color(0xFF059669),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
+          ),
+          const SizedBox(height: 12),
 
-        // Clear history
-        if (onClear != null)
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton.icon(
-              onPressed: isClearing ? null : onClear,
-              icon: isClearing
-                  ? const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(LucideIcons.trash2, size: 14, color: Colors.red),
-              label: const Text(
-                'ইতিহাস মুছুন',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
+          // Stats Row
+          Row(
+            children: [
+              // Total exams — emerald
+              _StatCard(
+                label: 'মোট',
+                value: '${records.length}',
+                isDark: isDark,
+                gradient: const [Color(0xFF047857), Color(0xFF059669)],
+                white: true,
+              ),
+              const SizedBox(width: 8),
+              _StatCard(
+                label: 'গড়',
+                value: '${avgScore.round()}%',
+                isDark: isDark,
+              ),
+              const SizedBox(width: 8),
+              _StatCard(
+                label: 'সর্বোচ্চ',
+                value: '${highestScore.round()}%',
+                isDark: isDark,
+                valueColor: const Color(0xFF059669),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Clear history
+          if (onClear != null)
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: isClearing ? null : onClear,
+                icon: isClearing
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(
+                        LucideIcons.trash2,
+                        size: 14,
+                        color: Colors.red,
+                      ),
+                label: const Text(
+                  'ইতিহাস মুছুন',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ),
-          ),
 
-        const SizedBox(height: 8),
+          const SizedBox(height: 8),
 
-        // Exam cards
-        ...records.map((r) => _ExamCard(record: r, isDark: isDark)),
-      ],
+          // Exam cards
+          ...records.map((r) => _ExamCard(record: r, isDark: isDark)),
+        ],
+      ),
     );
   }
 }
@@ -586,6 +681,12 @@ class _ExamCard extends StatelessWidget {
                         label: _formatDur(record.timeTaken!),
                         isDark: isDark,
                       ),
+                    if (record.examType.isNotEmpty && record.examType != 'mock')
+                      _Chip(
+                        label: _examTypeLabel(record.examType),
+                        isDark: isDark,
+                        color: const Color(0xFF8B5CF6),
+                      ),
                   ],
                 ),
               ],
@@ -630,6 +731,7 @@ class _MistakesTab extends StatefulWidget {
 class _MistakesTabState extends State<_MistakesTab> {
   List<_HistoryMistake> _mistakes = [];
   bool _isLoading = true;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -714,14 +816,21 @@ class _MistakesTabState extends State<_MistakesTab> {
           _isLoading = false;
         });
       }
-    } catch (_) {
-      if (mounted) setState(() => _isLoading = false);
+    } catch (e) {
+      debugPrint('[MistakesTab] _fetch error: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _hasError = true;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_hasError) return _errorState(widget.isDark, _fetch);
     if (_mistakes.isEmpty) {
       return _emptyState(
         widget.isDark,
@@ -729,11 +838,15 @@ class _MistakesTabState extends State<_MistakesTab> {
         'পরীক্ষা দিন এবং ভুল উত্তরগুলো এখানে দেখুন।',
       );
     }
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _mistakes.length,
-      itemBuilder: (ctx, i) =>
-          _MistakeCard(m: _mistakes[i], isDark: widget.isDark),
+    return RefreshIndicator(
+      onRefresh: () async => _fetch(),
+      color: const Color(0xFF047857),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: _mistakes.length,
+        itemBuilder: (ctx, i) =>
+            _MistakeCard(m: _mistakes[i], isDark: widget.isDark),
+      ),
     );
   }
 }
@@ -944,6 +1057,7 @@ class _BookmarksTab extends StatefulWidget {
 class _BookmarksTabState extends State<_BookmarksTab> {
   List<Map<String, dynamic>> _bookmarks = [];
   bool _isLoading = true;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -963,7 +1077,7 @@ class _BookmarksTabState extends State<_BookmarksTab> {
       final data = await sb
           .from('bookmarks')
           .select(
-            'question_id, questions(id, question, options, correct_answer_index, subject)',
+            'question_id, questions(id, question, options, correct_answer_index, subject, subject_label)',
           )
           .eq('user_id', uid)
           .order('created_at', ascending: false)
@@ -973,14 +1087,21 @@ class _BookmarksTabState extends State<_BookmarksTab> {
         _bookmarks = (data as List).cast<Map<String, dynamic>>();
         _isLoading = false;
       });
-    } catch (_) {
-      setState(() => _isLoading = false);
+    } catch (e) {
+      debugPrint('[BookmarksTab] _fetchBookmarks error: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _hasError = true;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_hasError) return _errorState(widget.isDark, _fetchBookmarks);
     if (_bookmarks.isEmpty) {
       return _emptyState(
         widget.isDark,
@@ -1033,7 +1154,8 @@ class _BookmarksTabState extends State<_BookmarksTab> {
                     color: const Color(0xFF047857),
                   ),
                   const SizedBox(width: 6),
-                  if ((q['subject'] as String?)?.isNotEmpty == true)
+                  if ((q['subject_label'] as String?)?.isNotEmpty == true ||
+                      (q['subject'] as String?)?.isNotEmpty == true)
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -1046,7 +1168,10 @@ class _BookmarksTabState extends State<_BookmarksTab> {
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: Text(
-                        (q['subject'] as String).toUpperCase(),
+                        ((q['subject_label'] as String?) ??
+                                (q['subject'] as String?) ??
+                                '')
+                            .toUpperCase(),
                         style: const TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
@@ -1299,4 +1424,107 @@ Widget _emptyState(bool isDark, String title, String subtitle) {
       ),
     ),
   );
+}
+
+Widget _errorState(bool isDark, VoidCallback onRetry) {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              LucideIcons.wifiOff,
+              size: 36,
+              color: Color(0xFFEF4444),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'ডেটা লোড হয়নি',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : const Color(0xFF171717),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'ইন্টারনেট সংযোগ পরীক্ষা করুন এবং আবার চেষ্টা করুন।',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: Color(0xFFA3A3A3)),
+          ),
+          const SizedBox(height: 24),
+          GestureDetector(
+            onTap: onRetry,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF047857),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                'আবার চেষ্টা করুন',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class _SortChip extends StatelessWidget {
+  final String label;
+  final bool active;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _SortChip({
+    required this.label,
+    required this.active,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: active
+              ? const Color(0xFF047857)
+              : (isDark ? const Color(0xFF1C1C1C) : Colors.white),
+          borderRadius: BorderRadius.circular(100),
+          border: Border.all(
+            color: active
+                ? const Color(0xFF047857)
+                : (isDark ? const Color(0xFF333333) : const Color(0xFFE5E5E5)),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: active ? Colors.white : const Color(0xFFA3A3A3),
+          ),
+        ),
+      ),
+    );
+  }
 }
