@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/exam_models.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
 
 enum AppState {
   idle,
@@ -99,25 +101,73 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
     );
     try {
       final supabase = Supabase.instance.client;
-      final data = await supabase.rpc(
-        'get_random_questions',
-        params: {
-          'p_subject': config.subject,
-          'p_chapters': config.chapters == 'All'
-              ? null
-              : config.chapters.split(','),
-          'p_limit': config.questionCount,
-        },
-      );
 
-      final List<dynamic> qList = data as List<dynamic>;
+      final chaptersList = (config.chapters == 'All' || config.chapters.isEmpty)
+          ? null
+          : config.chapters.split(',').map((c) => c.trim()).toList();
+
+      // 1. Try RPC with p_* param names (current live DB convention)
+      List<dynamic> qList = [];
+      try {
+        final data = await supabase.rpc(
+          'get_random_questions',
+          params: {
+            'p_subject': config.subject,
+            'p_chapters': chaptersList,
+            'p_limit': config.questionCount,
+          },
+        );
+        qList = (data as List<dynamic>?) ?? [];
+      } catch (rpcErr) {
+        debugPrint(
+          '[ExamProvider] RPC get_random_questions (p_* params) error: $rpcErr',
+        );
+      }
+
+      // 2. Fallback: Try RPC with legacy param names (subject_param, limit_param, chapter_params)
+      if (qList.isEmpty) {
+        try {
+          final data = await supabase.rpc(
+            'get_random_questions',
+            params: {
+              'subject_param': config.subject,
+              'chapter_params': chaptersList,
+              'limit_param': config.questionCount,
+            },
+          );
+          qList = (data as List<dynamic>?) ?? [];
+        } catch (rpcErr2) {
+          debugPrint(
+            '[ExamProvider] RPC get_random_questions (legacy params) error: $rpcErr2',
+          );
+        }
+      }
+
+      // 3. Fallback: Direct query from questions table
+      if (qList.isEmpty) {
+        debugPrint(
+          '[ExamProvider] RPC failed, falling back to direct questions query',
+        );
+        var query = supabase
+            .from('questions')
+            .select('*')
+            .eq('subject', config.subject);
+        if (chaptersList != null && chaptersList.isNotEmpty) {
+          query = query.inFilter('chapter', chaptersList);
+        }
+        final fallbackData = await query.limit(config.questionCount * 3);
+        final allRows = List<dynamic>.from(fallbackData as List);
+        allRows.shuffle();
+        qList = allRows.take(config.questionCount).toList();
+      }
+
       if (qList.isEmpty) {
         state = state.copyWith(appState: AppState.idle);
         throw Exception('No questions found for the selected criteria.');
       }
 
       final generatedQuestions = qList
-          .map((e) => Question.fromJson(e))
+          .map((e) => Question.fromJson(e as Map<String, dynamic>))
           .toList();
 
       final details = ExamDetails(
@@ -132,20 +182,26 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
         negativeMarking: config.negativeMarking,
       );
 
-      // Create session in DB
+      // Create session in DB (non-fatal — exam continues even if this fails)
       final authId = supabase.auth.currentUser?.id;
       String? sessionId;
       if (authId != null) {
-        final sessionRes = await supabase
-            .from('exam_sessions')
-            .insert({
-              'user_id': authId,
-              'status': 'active',
-              'subject': config.subject,
-            })
-            .select('id')
-            .maybeSingle();
-        if (sessionRes != null) sessionId = sessionRes['id'].toString();
+        try {
+          final sessionRes = await supabase
+              .from('exam_sessions')
+              .insert({
+                'user_id': authId,
+                'status': 'active',
+                'subject': config.subject,
+              })
+              .select('id')
+              .maybeSingle();
+          if (sessionRes != null) sessionId = sessionRes['id'].toString();
+        } catch (sessionErr) {
+          debugPrint(
+            '[ExamProvider] exam_sessions insert error (non-fatal): $sessionErr',
+          );
+        }
       }
 
       state = state.copyWith(
@@ -282,6 +338,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           'subject': result.subject,
           'subject_label': result.subjectLabel,
           'exam_type': result.examType,
+          'date': DateTime.now().toUtc().toIso8601String(),
           'score': result.score,
           'total_marks': result.totalMarks,
           'correct_count': result.correctCount,
@@ -290,6 +347,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           'total_questions': result.totalQuestions,
           'questions': questionsJson,
           'user_answers': userAnswersJson,
+          'negative_marking': result.negativeMarking,
           'status': 'evaluated',
         });
 
@@ -297,17 +355,56 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
         final xpEarned = (result.correctCount * 10 - result.wrongCount * 2)
             .clamp(0, 9999);
         if (xpEarned > 0) {
-          await supabase.rpc(
-            'increment_user_xp',
-            params: {'uid': authId, 'amount': xpEarned},
-          );
+          try {
+            await supabase.rpc(
+              'increment_user_xp',
+              params: {'uid': authId, 'amount': xpEarned},
+            );
+          } catch (xpRpcErr) {
+            debugPrint(
+              '[ExamProvider] increment_user_xp RPC failed, trying direct update: $xpRpcErr',
+            );
+            try {
+              // Fallback: read current XP then update
+              final profile = await supabase
+                  .from('users')
+                  .select('xp')
+                  .eq('id', authId)
+                  .maybeSingle();
+              final currentXp = (profile?['xp'] as num?)?.toInt() ?? 0;
+              await supabase
+                  .from('users')
+                  .update({'xp': currentXp + xpEarned})
+                  .eq('id', authId);
+            } catch (xpUpdateErr) {
+              debugPrint(
+                '[ExamProvider] XP direct update also failed: $xpUpdateErr',
+              );
+            }
+          }
         }
 
         // Increment streak
-        await supabase.rpc('increment_user_streak', params: {'uid': authId});
+        try {
+          await supabase.rpc('increment_user_streak', params: {'uid': authId});
+        } catch (streakRpcErr) {
+          debugPrint(
+            '[ExamProvider] increment_user_streak RPC failed: $streakRpcErr',
+          );
+        }
       } catch (e) {
         debugPrint('[ExamProvider] submitExam DB error: $e');
       }
+
+      // Invalidate dashboard cache so updated stats show immediately
+      ref.invalidate(dashboardSubjectStatsProvider);
+      ref.invalidate(userProfileProvider);
+      // Clear SharedPreferences stats cache so next build() re-fetches from DB
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('subject_stats_$authId');
+        await prefs.remove('profile_$authId');
+      } catch (_) {}
     }
 
     state = state.copyWith(

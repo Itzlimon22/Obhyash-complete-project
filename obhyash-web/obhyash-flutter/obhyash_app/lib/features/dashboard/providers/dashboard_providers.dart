@@ -33,8 +33,11 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
     if (cached != null) {
       try {
         final decoded = jsonDecode(cached) as Map<String, dynamic>;
-        // Invalidate old cache entries from public_profiles that lack stream/optional_subject
-        if (decoded.containsKey('stream') ||
+        // Only use cache if it came from the 'users' table (has users-specific fields)
+        // Old cache from public_profiles lacks 'email', 'phone', etc.
+        if (decoded.containsKey('email') ||
+            decoded.containsKey('phone') ||
+            decoded.containsKey('stream') ||
             decoded.containsKey('optional_subject')) {
           return UserProfile.fromJson(decoded);
         }
@@ -77,7 +80,12 @@ class LeaderboardNotifier extends AsyncNotifier<List<LeaderboardUser>> {
     if (cached != null) {
       try {
         final List list = jsonDecode(cached);
-        return list.map((e) => LeaderboardUser.fromJson(e)).toList();
+        final cachedUsers = list
+            .map((e) => LeaderboardUser.fromJson(e))
+            .toList();
+        if (cachedUsers.isNotEmpty) {
+          return cachedUsers;
+        }
       } catch (_) {}
     }
 
@@ -112,10 +120,14 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
     if (cached != null) {
       try {
         final List list = jsonDecode(cached);
-        return list
+        final cachedStats = list
             .map((e) => SubjectStats.fromJson(e))
             .where((s) => s.total > 0)
             .toList();
+        // Only use cache if it has data; empty cache forces a re-fetch
+        if (cachedStats.isNotEmpty) {
+          return cachedStats;
+        }
       } catch (_) {}
     }
 
