@@ -18,7 +18,6 @@ class MainBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // 5 items: dashboard, history, [center FAB: setup], leaderboard, menu
     final items = [
       {'id': 'dashboard', 'label': 'হোম', 'icon': LucideIcons.layoutDashboard},
       {'id': 'history', 'label': 'ইতিহাস', 'icon': LucideIcons.history},
@@ -39,28 +38,30 @@ class MainBottomNav extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F0F0F) : Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: isDark ? const Color(0x40000000) : const Color(0x18000000),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
-          ),
-        ],
+        color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
         border: Border(
           top: BorderSide(
-            color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+            color: isDark
+                ? const Color(0xFF262626)
+                : const Color(0xFFE5E5E5).withValues(alpha: 0.8),
             width: 1,
           ),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? const Color(0x40000000) : const Color(0x10000000),
+            blurRadius: 16,
+            offset: const Offset(0, -2),
+          ),
+        ],
       ),
       child: SafeArea(
         top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+        child: SizedBox(
+          height: 58,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: items.map((item) {
               final id = item['id'] as String;
               final icon = item['icon'] as IconData;
@@ -68,6 +69,7 @@ class MainBottomNav extends StatelessWidget {
               final action = item['action'] as String?;
               final isCenter = item['isCenter'] as bool? ?? false;
               final isActive = activeTab == id;
+              final isRealActive = isActive && action != 'menu';
 
               void handleTap() {
                 HapticFeedback.lightImpact();
@@ -78,136 +80,97 @@ class MainBottomNav extends StatelessWidget {
                 }
               }
 
-              /* ── Center FAB (পরীক্ষা) ─────────────────────────── */
+              final activeColor = isDark
+                  ? const Color(0xFF10B981)
+                  : const Color(0xFF047857);
+              final inactiveColor = isDark
+                  ? const Color(0xFF525252)
+                  : const Color(0xFF9CA3AF);
+
+              /* ── Center "Exam" button — small filled box, same height ── */
               if (isCenter) {
                 return Expanded(
                   child: GestureDetector(
                     onTap: handleTap,
                     behavior: HitTestBehavior.opaque,
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 2),
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          width: 62,
-                          height: 62,
+                          width: 40,
+                          height: 32,
                           decoration: BoxDecoration(
-                            gradient: isActive
-                                ? const LinearGradient(
-                                    colors: [
-                                      Color(0xFF059669),
-                                      Color(0xFF047857),
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  )
-                                : null,
-                            color: isActive
-                                ? null
-                                : (isDark
-                                      ? const Color(0xFF1A1A1A)
-                                      : const Color(0xFF171717)),
-                            borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                color: isActive
-                                    ? const Color(0x5D047857)
-                                    : (isDark
-                                          ? const Color(0x25FFFFFF)
-                                          : const Color(0x30171717)),
-                                blurRadius: isActive ? 16 : 8,
-                                spreadRadius: isActive ? 2 : 0,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Icon(icon, size: 26, color: Colors.white),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          label,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontFamily: 'HindSiliguri',
-                            fontWeight: FontWeight.bold,
                             color: isActive
                                 ? const Color(0xFF047857)
                                 : (isDark
-                                      ? const Color(0xFF737373)
-                                      : const Color(0xFFA3A3A3)),
+                                      ? const Color(0xFF1F1F1F)
+                                      : const Color(0xFF171717)),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: isActive
+                                ? [
+                                    const BoxShadow(
+                                      color: Color(0x4D047857),
+                                      blurRadius: 8,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ]
+                                : [],
+                          ),
+                          child: Icon(icon, size: 18, color: Colors.white),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontFamily: 'HindSiliguri',
+                            fontWeight: FontWeight.bold,
+                            color: isActive ? activeColor : inactiveColor,
                           ),
                         ),
-                        const SizedBox(height: 6),
                       ],
                     ),
                   ),
                 );
               }
 
-              /* ── Regular Tab ──────────────────────────────────── */
-              final activeColor = isDark
-                  ? const Color(0xFF10B981)
-                  : const Color(0xFF047857);
-              final inactiveColor = isDark
-                  ? const Color(0xFF737373)
-                  : const Color(0xFFA3A3A3);
-              final isRealActive = isActive && action != 'menu';
-              final itemColor = isRealActive ? activeColor : inactiveColor;
-
+              /* ── Regular Tab ──────────────────────────────────────── */
               return Expanded(
                 child: GestureDetector(
                   onTap: handleTap,
                   behavior: HitTestBehavior.opaque,
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Active pill indicator
+                      // Active indicator pill at top
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        width: isRealActive ? 36 : 0,
-                        height: 3,
+                        width: isRealActive ? 28 : 0,
+                        height: 2,
+                        margin: const EdgeInsets.only(bottom: 2),
                         decoration: BoxDecoration(
-                          gradient: isRealActive
-                              ? LinearGradient(
-                                  colors: [
-                                    activeColor.withValues(alpha: 0.5),
-                                    activeColor,
-                                  ],
-                                )
-                              : null,
+                          color: activeColor,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      // Icon with active background pill
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        width: isRealActive ? 44 : 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: isRealActive
-                              ? activeColor.withValues(
-                                  alpha: isDark ? 0.2 : 0.12,
-                                )
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(icon, size: 22, color: itemColor),
+                      Icon(
+                        icon,
+                        size: 21,
+                        color: isRealActive ? activeColor : inactiveColor,
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 3),
                       Text(
                         label,
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 10,
                           fontFamily: 'HindSiliguri',
                           fontWeight: isRealActive
                               ? FontWeight.bold
                               : FontWeight.w500,
-                          color: itemColor,
+                          color: isRealActive ? activeColor : inactiveColor,
                         ),
                       ),
-                      const SizedBox(height: 6),
                     ],
                   ),
                 ),

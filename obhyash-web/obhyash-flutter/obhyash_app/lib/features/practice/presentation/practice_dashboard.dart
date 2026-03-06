@@ -1,8 +1,11 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'flashcard_mode.dart';
 import 'practice_summary.dart';
@@ -80,6 +83,11 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
   bool _isLoading = true;
   bool _shuffle = false;
 
+  // Spaced repetition
+  static const int _reviewIntervalDays = 3;
+  Map<String, DateTime> _reviewedAt = {};
+  int _dueCount = 0;
+
   // Flashcard / summary state
   List<PracticeQuestion> _flashcardQuestions = [];
   List<FlashcardResult> _flashcardResults = [];
@@ -87,7 +95,50 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
   @override
   void initState() {
     super.initState();
-    _fetchData();
+    _loadReviewedDates().then((_) => _fetchData());
+  }
+
+  // ── Spaced repetition helpers ───────────────────────────────────────────────
+
+  Future<void> _loadReviewedDates() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString('practice_reviewed_at') ?? '{}';
+      final map = jsonDecode(raw) as Map<String, dynamic>;
+      _reviewedAt = {
+        for (final e in map.entries)
+          e.key: DateTime.tryParse(e.value.toString()) ?? DateTime(2000),
+      };
+    } catch (e) {
+      debugPrint('[PracticeDashboard] _loadReviewedDates error: $e');
+    }
+  }
+
+  bool _isDue(String qid) {
+    final last = _reviewedAt[qid];
+    if (last == null) return true;
+    return DateTime.now().difference(last).inDays >= _reviewIntervalDays;
+  }
+
+  int _computeDueCount() {
+    return _mistakes.where((q) => _isDue(q.id)).length;
+  }
+
+  Future<void> _markReviewed(List<String> qids) async {
+    final now = DateTime.now();
+    for (final qid in qids) {
+      _reviewedAt[qid] = now;
+    }
+    if (mounted) setState(() => _dueCount = _computeDueCount());
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final payload = jsonEncode({
+        for (final e in _reviewedAt.entries) e.key: e.value.toIso8601String(),
+      });
+      await prefs.setString('practice_reviewed_at', payload);
+    } catch (e) {
+      debugPrint('[PracticeDashboard] _markReviewed error: $e');
+    }
   }
 
   // ── Data fetching ───────────────────────────────────────────────────────────
@@ -163,10 +214,12 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
           _bookmarkedIds = bIds;
           _mistakes = sortedMistakes;
           _mistakeFreq = mFreq;
+          _dueCount = sortedMistakes.where((q) => _isDue(q.id)).length;
           _isLoading = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[PracticeDashboard] _fetchData error: $e');
       if (mounted) setState(() => _isLoading = false);
     }
   }
@@ -247,6 +300,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     if (qs.isEmpty) return;
     if (_shuffle) qs = (qs..shuffle());
 
+    _markReviewed(qs.map((q) => q.id).toList());
     HapticFeedback.mediumImpact();
     setState(() {
       _flashcardQuestions = qs;
@@ -302,61 +356,6 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
 
     return Column(
       children: [
-        // ── Header ─────────────────────────────────────────────────────────
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF171717) : Colors.white,
-            border: Border(
-              bottom: BorderSide(
-                color: isDark
-                    ? const Color(0xFF262626)
-                    : const Color(0xFFE5E5E5),
-              ),
-            ),
-          ),
-          child: Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  if (Navigator.canPop(context)) {
-                    Navigator.pop(context);
-                  } else {
-                    context.go('/');
-                  }
-                },
-                child: Icon(
-                  LucideIcons.arrowLeft,
-                  size: 20,
-                  color: isDark
-                      ? const Color(0xFFA3A3A3)
-                      : const Color(0xFF737373),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'অনুশীলন',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF171717),
-                ),
-              ),
-              const Spacer(),
-              GestureDetector(
-                onTap: _fetchData,
-                child: Icon(
-                  LucideIcons.refreshCw,
-                  size: 18,
-                  color: isDark
-                      ? const Color(0xFF737373)
-                      : const Color(0xFFA3A3A3),
-                ),
-              ),
-            ],
-          ),
-        ),
-
         Expanded(
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -364,7 +363,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                   children: [
                     // ── Stats bar ─────────────────────────────────────────
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
                       child: Row(
                         children: [
                           _StatBox(
@@ -373,19 +372,45 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                             color: const Color(0xFFF43F5E),
                             isDark: isDark,
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
                           _StatBox(
                             label: 'বুকমার্ক',
                             value: _bookmarks.length,
                             color: const Color(0xFF10B981),
                             isDark: isDark,
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
                           _StatBox(
-                            label: 'নির্বাচিত',
-                            value: _selectedIds.length,
+                            label: 'রিভিউ বাকি',
+                            value: _dueCount,
                             color: const Color(0xFF818CF8),
                             isDark: isDark,
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: _fetchData,
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? const Color(0xFF1C1C1C)
+                                    : const Color(0xFFF5F5F5),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: isDark
+                                      ? const Color(0xFF333333)
+                                      : const Color(0xFFE5E5E5),
+                                ),
+                              ),
+                              child: Icon(
+                                LucideIcons.refreshCw,
+                                size: 16,
+                                color: isDark
+                                    ? const Color(0xFF737373)
+                                    : const Color(0xFFA3A3A3),
+                              ),
+                            ),
                           ),
                         ],
                       ),

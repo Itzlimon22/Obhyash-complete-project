@@ -1,4 +1,6 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:ui';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -151,132 +153,44 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
           : const Color(0xFFFAFAF9),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(56),
-        child: Container(
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xCC0C0A09) : const Color(0xCCFFFFFF),
-            border: Border(
-              bottom: BorderSide(
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0x99262626)
-                    : const Color(0x99E5E5E5),
-                width: 1,
-              ),
-            ),
-          ),
-          child: SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (activeTab == 'user_profile' ||
-                          activeTab == 'subject_report') ...[
-                        GestureDetector(
-                          onTap: () => context.pop(),
-                          child: Container(
-                            width: 32,
-                            height: 32,
-                            margin: const EdgeInsets.only(right: 8),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? const Color(0xFF262626)
-                                  : const Color(0xFFF5F5F5),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Icon(
-                              LucideIcons.chevronLeft,
-                              size: 18,
-                              color: isDark
-                                  ? const Color(0xFFD4D4D4)
-                                  : const Color(0xFF404040),
-                            ),
-                          ),
-                        ),
-                      ],
-                      Text(
-                        _getTitle(activeTab),
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
-                          color: isDark
-                              ? Colors.white
-                              : const Color(0xFF262626),
-                        ),
-                      ),
-                    ],
+                    ? const Color(0xFF0C0A09).withValues(alpha: 0.85)
+                    : Colors.white.withValues(alpha: 0.85),
+                border: Border(
+                  bottom: BorderSide(
+                    color: isDark
+                        ? const Color(0xFF262626).withValues(alpha: 0.6)
+                        : const Color(0xFFE5E5E5).withValues(alpha: 0.6),
+                    width: 1,
                   ),
-                  Row(
-                    children: [
-                      // Streak Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0x1A7C2D12)
-                              : const Color(0xFFFFF7ED),
-                          border: Border.all(
-                            color: isDark
-                                ? const Color(0x337C2D12)
-                                : const Color(0xFFFFEDD5),
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
+                ),
+              ),
+              child: SafeArea(
+                bottom: false,
+                child: SizedBox(
+                  height: 56,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Left: Logo + back button + title
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
-                              Icons.local_fire_department_rounded,
-                              color: Color(0xFFF97316),
-                              size: 18,
-                            ),
-                            const SizedBox(width: 4),
-                            isLoading
-                                ? Container(
-                                    width: 16,
-                                    height: 12,
-                                    decoration: BoxDecoration(
-                                      color: isDark
-                                          ? const Color(0xFF3F3F46)
-                                          : const Color(0xFFE5E7EB),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                  )
-                                : Text(
-                                    streak.toString(),
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFFEA580C),
-                                    ),
-                                  ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-
-                      // Notification Bell
-                      Builder(
-                        builder: (context) {
-                          final unreadAsync = ref.watch(
-                            _unreadNotifCountProvider,
-                          );
-                          final unread =
-                              unreadAsync.whenOrNull(data: (c) => c) ?? 0;
-                          return GestureDetector(
-                            onTap: () => context.push('/notifications'),
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Container(
-                                  width: 36,
-                                  height: 36,
+                            if (activeTab == 'user_profile' ||
+                                activeTab == 'subject_report') ...[
+                              GestureDetector(
+                                onTap: () => context.pop(),
+                                child: Container(
+                                  width: 32,
+                                  height: 32,
+                                  margin: const EdgeInsets.only(right: 8),
                                   decoration: BoxDecoration(
                                     color: isDark
                                         ? const Color(0xFF262626)
@@ -284,72 +198,249 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Icon(
-                                    LucideIcons.bell,
+                                    LucideIcons.chevronLeft,
                                     size: 18,
                                     color: isDark
-                                        ? const Color(0xFFA3A3A3)
-                                        : const Color(0xFF525252),
+                                        ? const Color(0xFFD4D4D4)
+                                        : const Color(0xFF404040),
                                   ),
                                 ),
-                                if (unread > 0)
-                                  Positioned(
-                                    top: -4,
-                                    right: -4,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(2),
-                                      constraints: const BoxConstraints(
-                                        minWidth: 16,
-                                        minHeight: 16,
-                                      ),
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFFF43F5E),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Text(
-                                        unread > 99 ? '99+' : unread.toString(),
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.2,
-                                        ),
-                                      ),
+                              ),
+                            ] else ...[
+                              // Brand logo — always shown except sub-pages
+                              Container(
+                                width: 30,
+                                height: 30,
+                                margin: const EdgeInsets.only(right: 8),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFFDC2626),
+                                      Color(0xFFB91C1C),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(9),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFFDC2626,
+                                      ).withValues(alpha: 0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'O',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w900,
+                                      height: 1,
                                     ),
                                   ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-
-                      // Profile Avatar
-                      GestureDetector(
-                        onTap: () => _showProfileSheet(context, user),
-                        child: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFE11D48),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Text(
-                              userName.isNotEmpty
-                                  ? userName[0].toUpperCase()
-                                  : 'U',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                            Text(
+                              _getTitle(activeTab),
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w800,
+                                fontFamily: 'HindSiliguri',
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF171717),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ),
-                    ],
+
+                        // Right: Streak + Bell + divider + Avatar
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Streak Badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 9,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? const Color(
+                                        0xFF7C2D12,
+                                      ).withValues(alpha: 0.15)
+                                    : const Color(0xFFFFF7ED),
+                                border: Border.all(
+                                  color: isDark
+                                      ? const Color(
+                                          0xFF7C2D12,
+                                        ).withValues(alpha: 0.3)
+                                      : const Color(0xFFFFEDD5),
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.local_fire_department_rounded,
+                                    color: Color(0xFFF97316),
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 3),
+                                  isLoading
+                                      ? Container(
+                                          width: 14,
+                                          height: 10,
+                                          decoration: BoxDecoration(
+                                            color: isDark
+                                                ? const Color(0xFF3F3F46)
+                                                : const Color(0xFFE5E7EB),
+                                            borderRadius: BorderRadius.circular(
+                                              3,
+                                            ),
+                                          ),
+                                        )
+                                      : Text(
+                                          streak.toString(),
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFFEA580C),
+                                          ),
+                                        ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+
+                            // Notification Bell
+                            Builder(
+                              builder: (context) {
+                                final unreadAsync = ref.watch(
+                                  _unreadNotifCountProvider,
+                                );
+                                final unread =
+                                    unreadAsync.whenOrNull(data: (c) => c) ?? 0;
+                                return GestureDetector(
+                                  onTap: () => context.push('/notifications'),
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      Container(
+                                        width: 34,
+                                        height: 34,
+                                        decoration: BoxDecoration(
+                                          color: isDark
+                                              ? const Color(0xFF262626)
+                                              : const Color(0xFFF5F5F5),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          LucideIcons.bell,
+                                          size: 16,
+                                          color: isDark
+                                              ? const Color(0xFFA3A3A3)
+                                              : const Color(0xFF525252),
+                                        ),
+                                      ),
+                                      if (unread > 0)
+                                        Positioned(
+                                          top: -3,
+                                          right: -3,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(2),
+                                            constraints: const BoxConstraints(
+                                              minWidth: 14,
+                                              minHeight: 14,
+                                            ),
+                                            decoration: const BoxDecoration(
+                                              color: Color(0xFFF43F5E),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Text(
+                                              unread > 99
+                                                  ? '99+'
+                                                  : unread.toString(),
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 8,
+                                                fontWeight: FontWeight.bold,
+                                                height: 1.2,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+
+                            // Divider
+                            Container(
+                              width: 1,
+                              height: 20,
+                              margin: const EdgeInsets.symmetric(horizontal: 8),
+                              color: isDark
+                                  ? const Color(0xFF404040)
+                                  : const Color(0xFFE5E5E5),
+                            ),
+
+                            // Profile Avatar
+                            GestureDetector(
+                              onTap: () => _showProfileSheet(context, user),
+                              child: Container(
+                                width: 34,
+                                height: 34,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFFF43F5E),
+                                      Color(0xFFE11D48),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFFE11D48,
+                                      ).withValues(alpha: 0.3),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    userName.isNotEmpty
+                                        ? userName[0].toUpperCase()
+                                        : 'U',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ],
+                ),
               ),
             ),
           ),
