@@ -39,10 +39,17 @@ class MainBottomNav extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
+        color: isDark ? const Color(0xFF0F0F0F) : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? const Color(0x40000000) : const Color(0x18000000),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
+        ],
         border: Border(
           top: BorderSide(
-            color: isDark ? const Color(0xCC262626) : const Color(0xCCE5E5E5),
+            color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
             width: 1,
           ),
         ),
@@ -50,10 +57,9 @@ class MainBottomNav extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            // Bottom-align so center FAB naturally rises above others
             crossAxisAlignment: CrossAxisAlignment.end,
             children: items.map((item) {
               final id = item['id'] as String;
@@ -81,48 +87,48 @@ class MainBottomNav extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Raised FAB — extra top space lifts it above the bar
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          width: 56,
-                          height: 56,
+                          width: 62,
+                          height: 62,
                           decoration: BoxDecoration(
+                            gradient: isActive
+                                ? const LinearGradient(
+                                    colors: [
+                                      Color(0xFF059669),
+                                      Color(0xFF047857),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  )
+                                : null,
                             color: isActive
-                                ? const Color(0xFF047857) // emerald-700
+                                ? null
                                 : (isDark
-                                      ? Colors.white
-                                      : const Color(
-                                          0xFF171717,
-                                        )), // white dark / neutral-900 light
-                            borderRadius: BorderRadius.circular(14),
+                                      ? const Color(0xFF1A1A1A)
+                                      : const Color(0xFF171717)),
+                            borderRadius: BorderRadius.circular(18),
                             boxShadow: [
                               BoxShadow(
                                 color: isActive
-                                    ? const Color(0x4D047857)
+                                    ? const Color(0x5D047857)
                                     : (isDark
-                                          ? const Color(0x18FFFFFF)
-                                          : const Color(0x22171717)),
-                                blurRadius: 12,
+                                          ? const Color(0x25FFFFFF)
+                                          : const Color(0x30171717)),
+                                blurRadius: isActive ? 16 : 8,
+                                spreadRadius: isActive ? 2 : 0,
                                 offset: const Offset(0, 4),
                               ),
                             ],
                           ),
-                          child: Icon(
-                            icon,
-                            size: 22,
-                            color: isActive
-                                ? Colors.white
-                                : (isDark
-                                      ? const Color(0xFF171717)
-                                      : Colors.white),
-                          ),
+                          child: Icon(icon, size: 26, color: Colors.white),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 5),
                         Text(
                           label,
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 11,
                             fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.bold,
                             color: isActive
@@ -132,7 +138,7 @@ class MainBottomNav extends StatelessWidget {
                                       : const Color(0xFFA3A3A3)),
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 6),
                       ],
                     ),
                   ),
@@ -141,14 +147,13 @@ class MainBottomNav extends StatelessWidget {
 
               /* ── Regular Tab ──────────────────────────────────── */
               final activeColor = isDark
-                  ? const Color(0xFF10B981) // emerald-500
-                  : const Color(0xFF047857); // emerald-700
+                  ? const Color(0xFF10B981)
+                  : const Color(0xFF047857);
               final inactiveColor = isDark
-                  ? const Color(0xFF737373) // neutral-500
-                  : const Color(0xFFA3A3A3); // neutral-400
-              final itemColor = (isActive && action != 'menu')
-                  ? activeColor
-                  : inactiveColor;
+                  ? const Color(0xFF737373)
+                  : const Color(0xFFA3A3A3);
+              final isRealActive = isActive && action != 'menu';
+              final itemColor = isRealActive ? activeColor : inactiveColor;
 
               return Expanded(
                 child: GestureDetector(
@@ -157,31 +162,52 @@ class MainBottomNav extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Active top indicator pill
+                      // Active pill indicator
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        width: (isActive && action != 'menu') ? 32 : 0,
-                        height: 2.5,
+                        width: isRealActive ? 36 : 0,
+                        height: 3,
                         decoration: BoxDecoration(
-                          color: activeColor,
+                          gradient: isRealActive
+                              ? LinearGradient(
+                                  colors: [
+                                    activeColor.withValues(alpha: 0.5),
+                                    activeColor,
+                                  ],
+                                )
+                              : null,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Icon(icon, size: 22, color: itemColor),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 10),
+                      // Icon with active background pill
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: isRealActive ? 44 : 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: isRealActive
+                              ? activeColor.withValues(
+                                  alpha: isDark ? 0.2 : 0.12,
+                                )
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(icon, size: 22, color: itemColor),
+                      ),
+                      const SizedBox(height: 5),
                       Text(
                         label,
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 11,
                           fontFamily: 'HindSiliguri',
-                          fontWeight: (isActive && action != 'menu')
+                          fontWeight: isRealActive
                               ? FontWeight.bold
                               : FontWeight.w500,
                           color: itemColor,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                     ],
                   ),
                 ),

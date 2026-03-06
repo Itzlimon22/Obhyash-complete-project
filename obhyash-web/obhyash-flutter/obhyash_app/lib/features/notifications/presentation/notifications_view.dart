@@ -252,10 +252,22 @@ class _NotificationsViewState extends State<NotificationsView> {
       appBar: AppBar(
         title: const Text(
           'নোটিফিকেশন',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontFamily: 'HindSiliguri',
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        backgroundColor: Colors.transparent,
+        backgroundColor: isDark
+            ? const Color(0xFF0A0A0A)
+            : const Color(0xFFFAFAFA),
         elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            LucideIcons.chevronLeft,
+            color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF404040),
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: _isLoading
           ? const Center(

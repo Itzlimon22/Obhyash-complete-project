@@ -274,20 +274,6 @@ class _LevelSelector extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            child: Text(
-              'লেভেল',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.2,
-                color: isDark
-                    ? const Color(0xFF4A4A4A)
-                    : const Color(0xFFBBBBBB),
-              ),
-            ),
-          ),
           SizedBox(
             height: 96,
             child: ListView.builder(

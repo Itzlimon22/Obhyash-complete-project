@@ -2,13 +2,28 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'widgets/main_sidebar.dart';
 import 'widgets/main_bottom_nav.dart';
 import '../../features/dashboard/providers/dashboard_providers.dart';
 import '../../features/auth/providers/auth_controller.dart';
 import '../providers/theme_provider.dart';
+
+final _unreadNotifCountProvider = FutureProvider.autoDispose<int>((ref) async {
+  final user = Supabase.instance.client.auth.currentUser;
+  if (user == null) return 0;
+  try {
+    final result = await Supabase.instance.client
+        .from('notifications')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+    return (result as List).length;
+  } catch (_) {
+    return 0;
+  }
+});
 
 class MainLayout extends ConsumerStatefulWidget {
   final Widget child;
@@ -247,13 +262,64 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                       const SizedBox(width: 8),
 
                       // Notification Bell
-                      IconButton(
-                        icon: const Icon(LucideIcons.bell, size: 22),
-                        color: isDark
-                            ? const Color(0xFFA3A3A3)
-                            : const Color(0xFF525252),
-                        onPressed: () {
-                          context.push('/notifications');
+                      Builder(
+                        builder: (context) {
+                          final unreadAsync = ref.watch(
+                            _unreadNotifCountProvider,
+                          );
+                          final unread =
+                              unreadAsync.whenOrNull(data: (c) => c) ?? 0;
+                          return GestureDetector(
+                            onTap: () => context.push('/notifications'),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? const Color(0xFF262626)
+                                        : const Color(0xFFF5F5F5),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    LucideIcons.bell,
+                                    size: 18,
+                                    color: isDark
+                                        ? const Color(0xFFA3A3A3)
+                                        : const Color(0xFF525252),
+                                  ),
+                                ),
+                                if (unread > 0)
+                                  Positioned(
+                                    top: -4,
+                                    right: -4,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(2),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 16,
+                                        minHeight: 16,
+                                      ),
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFF43F5E),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Text(
+                                        unread > 99 ? '99+' : unread.toString(),
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                          height: 1.2,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
                         },
                       ),
 

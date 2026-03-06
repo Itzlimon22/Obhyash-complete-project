@@ -77,6 +77,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) =>
             _fadeRoute(const ExamRunnerView(), state),
       ),
+      GoRoute(
+        path: '/notifications',
+        pageBuilder: (context, state) =>
+            _fadeRoute(const NotificationsView(), state),
+      ),
       ShellRoute(
         navigatorKey: shellNavigatorKey,
         builder: (context, state, child) {
@@ -151,11 +156,6 @@ final routerProvider = Provider<GoRouter>((ref) {
               final subject = state.pathParameters['subject']!;
               return _fadeRoute(SubjectReportView(subject: subject), state);
             },
-          ),
-          GoRoute(
-            path: '/notifications',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const NotificationsView(), state),
           ),
           GoRoute(
             path: '/blog',
