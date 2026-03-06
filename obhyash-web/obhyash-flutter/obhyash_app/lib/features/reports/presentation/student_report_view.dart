@@ -28,9 +28,11 @@ class ReportQuestionData {
         subject: j['subject'] as String? ?? '',
         question: j['question'] as String? ?? '',
         options: List<String>.from(j['options'] ?? []),
-        correctAnswerIndices: j['correct_answer_indices'] != null
-            ? List<int>.from(j['correct_answer_indices'])
-            : null,
+        correctAnswerIndices: j['correct_answer_index'] != null
+            ? [(j['correct_answer_index'] as num).toInt()]
+            : (j['correct_answer_indices'] != null
+                  ? List<int>.from(j['correct_answer_indices'])
+                  : null),
         explanation: j['explanation'] as String?,
       );
 }
@@ -101,6 +103,8 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
   int _page = 0;
   final int _pageSize = 10;
   String? _expandedId;
+  bool _hasError = false;
+  String _statusFilter = '';
 
   @override
   void initState() {
@@ -114,6 +118,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
     } else {
       setState(() {
         _isLoading = true;
+        _hasError = false;
         _page = 0;
         _reports = [];
         _hasMore = true;
@@ -147,11 +152,8 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
         });
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-        );
-      }
+      debugPrint('[StudentReportView] fetch error: $e');
+      if (mounted) setState(() => _hasError = true);
     } finally {
       if (mounted) {
         setState(() {
@@ -162,204 +164,377 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
     }
   }
 
+  List<AppReport> get _filteredReports {
+    if (_statusFilter.isEmpty) return _reports;
+    if (_statusFilter == 'pending') {
+      return _reports
+          .where((r) => r.status != 'Resolved' && r.status != 'Ignored')
+          .toList();
+    }
+    return _reports.where((r) => r.status == _statusFilter).toList();
+  }
+
+  Widget _errorState(bool isDark) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF3F0F17)
+                    : const Color(0xFFFFF1F2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                LucideIcons.alertCircle,
+                size: 36,
+                color: Color(0xFFE11D48),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'ডেটা লোড করতে সমস্যা হয়েছে',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : const Color(0xFF171717),
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'ইন্টারনেট সংযোগ পরীক্ষা করুন এবং আবার চেষ্টা করুন।',
+              style: TextStyle(fontSize: 13, color: Color(0xFFA3A3A3)),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: _fetchReports,
+              icon: const Icon(LucideIcons.refreshCw, size: 16),
+              label: const Text(
+                'আবার চেষ্টা করুন',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFE11D48),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final pendingCount = _reports
+        .where((r) => r.status != 'Resolved' && r.status != 'Ignored')
+        .length;
+    final resolvedCount = _reports.where((r) => r.status == 'Resolved').length;
+    final ignoredCount = _reports.where((r) => r.status == 'Ignored').length;
 
     return Column(
       children: [
         Expanded(
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // ── Page header ───────────────────────────────────
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? const Color(0xFF3F0F17)
-                                  : const Color(0xFFFFF1F2),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
+              : _hasError
+              ? _errorState(isDark)
+              : RefreshIndicator(
+                  onRefresh: () => _fetchReports(),
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // ── Page header ─────────────────────────────
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
                                 color: isDark
+                                    ? const Color(0xFF3F0F17)
+                                    : const Color(0xFFFFF1F2),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: isDark
+                                      ? const Color(0xFF7F1D2A)
+                                      : const Color(0xFFFFE4E6),
+                                ),
+                              ),
+                              child: const Icon(
+                                LucideIcons.alertTriangle,
+                                size: 18,
+                                color: Color(0xFFE11D48),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'আমার রিপোর্টসমূহ',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? Colors.white
+                                        : const Color(0xFF171717),
+                                  ),
+                                ),
+                                const Text(
+                                  'রিপোর্ট ও অ্যাডমিন ফিডব্যাক',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFFA3A3A3),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+
+                        // ── Stats summary ────────────────────────────
+                        if (_reports.isNotEmpty) ...[
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: [
+                              _StatChip(
+                                label: '$pendingCount অপেক্ষমান',
+                                color: const Color(0xFFE11D48),
+                                bg: isDark
+                                    ? const Color(0xFF3F0F17)
+                                    : const Color(0xFFFFF1F2),
+                                border: isDark
                                     ? const Color(0xFF7F1D2A)
                                     : const Color(0xFFFFE4E6),
+                                icon: LucideIcons.clock,
                               ),
-                            ),
-                            child: const Icon(
-                              LucideIcons.alertTriangle,
-                              size: 18,
-                              color: Color(0xFFE11D48),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'আমার রিপোর্টসমূহ',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? Colors.white
-                                      : const Color(0xFF171717),
-                                ),
+                              _StatChip(
+                                label: '$resolvedCount গৃহীত',
+                                color: const Color(0xFF059669),
+                                bg: isDark
+                                    ? const Color(0xFF052E16)
+                                    : const Color(0xFFECFDF5),
+                                border: isDark
+                                    ? const Color(0xFF064E3B)
+                                    : const Color(0xFFD1FAE5),
+                                icon: LucideIcons.checkCircle2,
                               ),
-                              Text(
-                                'আপনার দাখিলকৃত প্রশ্নের রিপোর্ট ও অ্যাডমিন ফিডব্যাক',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: Color(0xFFA3A3A3),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // ── Empty state ──────────────────────────────────
-                      if (_reports.isEmpty)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 48,
-                            horizontal: 24,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF171717)
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: isDark
-                                  ? const Color(0xFF262626)
-                                  : const Color(0xFFE5E5E5),
-                            ),
-                          ),
-                          child: Column(
-                            children: [
-                              Container(
-                                width: 72,
-                                height: 72,
-                                decoration: BoxDecoration(
-                                  color: isDark
+                              if (ignoredCount > 0)
+                                _StatChip(
+                                  label: '$ignoredCount বাতিল',
+                                  color: const Color(0xFF737373),
+                                  bg: isDark
                                       ? const Color(0xFF262626)
                                       : const Color(0xFFF5F5F5),
-                                  shape: BoxShape.circle,
+                                  border: isDark
+                                      ? const Color(0xFF404040)
+                                      : const Color(0xFFE5E5E5),
+                                  icon: LucideIcons.xCircle,
                                 ),
-                                child: const Icon(
-                                  LucideIcons.alertTriangle,
-                                  size: 32,
-                                  color: Color(0xFFA3A3A3),
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                'কোনো রিপোর্ট পাওয়া যায়নি',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? Colors.white
-                                      : const Color(0xFF171717),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                'আপনি এখন পর্যন্ত কোনো প্রশ্ন রিপোর্ট করেননি।',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Color(0xFFA3A3A3),
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
                             ],
                           ),
-                        )
-                      else ...[
-                        // ── Report list ──────────────────────────────────
-                        ...List.generate(_reports.length, (i) {
-                          final report = _reports[i];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: _ReportCard(
-                              report: report,
-                              isDark: isDark,
-                              isExpanded: _expandedId == report.id,
-                              onToggle: () => setState(() {
-                                _expandedId = _expandedId == report.id
-                                    ? null
-                                    : report.id;
-                              }),
-                            ),
-                          );
-                        }),
+                          const SizedBox(height: 12),
 
-                        // ── Load more ─────────────────────────────────────
-                        if (_hasMore)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: OutlinedButton(
-                              onPressed: _isLoadingMore
-                                  ? null
-                                  : () => _fetchReports(loadMore: true),
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 12,
+                          // ── Status filter chips ──────────────────────
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                _FilterChip(
+                                  label: 'সব',
+                                  isSelected: _statusFilter.isEmpty,
+                                  isDark: isDark,
+                                  onTap: () =>
+                                      setState(() => _statusFilter = ''),
                                 ),
-                                backgroundColor: isDark
-                                    ? const Color(0xFF171717)
-                                    : Colors.white,
-                                foregroundColor: isDark
-                                    ? const Color(0xFFA3A3A3)
-                                    : const Color(0xFF525252),
-                                side: BorderSide(
-                                  color: isDark
-                                      ? const Color(0xFF262626)
-                                      : const Color(0xFFE5E5E5),
+                                const SizedBox(width: 8),
+                                _FilterChip(
+                                  label: 'অপেক্ষমান',
+                                  isSelected: _statusFilter == 'pending',
+                                  isDark: isDark,
+                                  onTap: () =>
+                                      setState(() => _statusFilter = 'pending'),
                                 ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
+                                const SizedBox(width: 8),
+                                _FilterChip(
+                                  label: 'গৃহীত',
+                                  isSelected: _statusFilter == 'Resolved',
+                                  isDark: isDark,
+                                  onTap: () => setState(
+                                    () => _statusFilter = 'Resolved',
+                                  ),
                                 ),
-                              ),
-                              child: _isLoadingMore
-                                  ? const Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        SizedBox(
-                                          width: 14,
-                                          height: 14,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                          ),
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'লোড হচ্ছে...',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  : const Text(
-                                      'আরো দেখুন',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                                const SizedBox(width: 8),
+                                _FilterChip(
+                                  label: 'বাতিল',
+                                  isSelected: _statusFilter == 'Ignored',
+                                  isDark: isDark,
+                                  onTap: () =>
+                                      setState(() => _statusFilter = 'Ignored'),
+                                ),
+                              ],
                             ),
                           ),
+                          const SizedBox(height: 16),
+                        ],
+
+                        // ── Empty state ──────────────────────────────
+                        if (_filteredReports.isEmpty)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 48,
+                              horizontal: 24,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF171717)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: isDark
+                                    ? const Color(0xFF262626)
+                                    : const Color(0xFFE5E5E5),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: 72,
+                                  height: 72,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? const Color(0xFF262626)
+                                        : const Color(0xFFF5F5F5),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    LucideIcons.alertTriangle,
+                                    size: 32,
+                                    color: Color(0xFFA3A3A3),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Text(
+                                  'কোনো রিপোর্ট পাওয়া যায়নি',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? Colors.white
+                                        : const Color(0xFF171717),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  _reports.isEmpty
+                                      ? 'আপনি এখন পর্যন্ত কোনো প্রশ্ন রিপোর্ট করেননি।'
+                                      : 'এই ফিল্টারে কোনো রিপোর্ট পাওয়া যায়নি।',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFFA3A3A3),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          )
+                        else ...[
+                          // ── Report list ──────────────────────────────
+                          ...List.generate(_filteredReports.length, (i) {
+                            final report = _filteredReports[i];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _ReportCard(
+                                report: report,
+                                isDark: isDark,
+                                isExpanded: _expandedId == report.id,
+                                onToggle: () => setState(() {
+                                  _expandedId = _expandedId == report.id
+                                      ? null
+                                      : report.id;
+                                }),
+                              ),
+                            );
+                          }),
+
+                          // ── Load more ────────────────────────────────
+                          if (_hasMore && _statusFilter.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: OutlinedButton(
+                                onPressed: _isLoadingMore
+                                    ? null
+                                    : () => _fetchReports(loadMore: true),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 12,
+                                  ),
+                                  backgroundColor: isDark
+                                      ? const Color(0xFF171717)
+                                      : Colors.white,
+                                  foregroundColor: isDark
+                                      ? const Color(0xFFA3A3A3)
+                                      : const Color(0xFF525252),
+                                  side: BorderSide(
+                                    color: isDark
+                                        ? const Color(0xFF262626)
+                                        : const Color(0xFFE5E5E5),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: _isLoadingMore
+                                    ? const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          SizedBox(
+                                            width: 14,
+                                            height: 14,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            'লোড হচ্ছে...',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : const Text(
+                                        'আরো দেখুন',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
         ),
@@ -666,7 +841,6 @@ class _ReportCard extends StatelessWidget {
                                         ? const Color(0xFF404040)
                                         : const Color(0xFFE5E5E5),
                                     width: 1.5,
-                                    style: BorderStyle.none,
                                   ),
                                 ),
                                 clipBehavior: Clip.antiAlias,
@@ -722,7 +896,6 @@ class _ReportCard extends StatelessWidget {
                                     color: isDark
                                         ? const Color(0xFF404040)
                                         : const Color(0xFFE5E5E5),
-                                    style: BorderStyle.none,
                                   ),
                                 ),
                                 child: const Row(
@@ -1090,6 +1263,95 @@ class _AccentPanel extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Stat Chip ────────────────────────────────────────────────────────────────────
+class _StatChip extends StatelessWidget {
+  final String label;
+  final Color color, bg, border;
+  final IconData icon;
+
+  const _StatChip({
+    required this.label,
+    required this.color,
+    required this.bg,
+    required this.border,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: color),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Filter Chip ──────────────────────────────────────────────────────────────────
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool isSelected, isDark;
+  final VoidCallback onTap;
+
+  const _FilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final activeColor = const Color(0xFFE11D48);
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isDark ? const Color(0xFF3F0F17) : const Color(0xFFFFF1F2))
+              : (isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5)),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? (isDark ? const Color(0xFF7F1D2A) : const Color(0xFFFFCDD2))
+                : (isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5)),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            color: isSelected
+                ? activeColor
+                : (isDark ? const Color(0xFFA3A3A3) : const Color(0xFF525252)),
+          ),
         ),
       ),
     );
