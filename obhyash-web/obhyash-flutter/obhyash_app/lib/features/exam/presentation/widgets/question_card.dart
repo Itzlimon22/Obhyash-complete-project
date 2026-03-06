@@ -76,9 +76,11 @@ class QuestionCard extends StatelessWidget {
         ? const Color(0xFF262626)
         : const Color(0xFFE5E5E5);
     if (isFlagged) {
-      borderColor = const Color(0xFFFBBF24).withOpacity(0.5); // amber-400
+      borderColor = const Color(0xFFFBBF24).withValues(alpha: 0.5); // amber-400
     } else if (isAnswered) {
-      borderColor = const Color(0xFF10B981).withOpacity(0.3); // emerald-500
+      borderColor = const Color(
+        0xFF10B981,
+      ).withValues(alpha: 0.3); // emerald-500
     }
 
     return Container(
@@ -257,7 +259,7 @@ class QuestionCard extends StatelessWidget {
                         (isDark
                                 ? const Color(0x66262626)
                                 : const Color(0xFFFAFAFA))
-                            .withOpacity(0.7);
+                            .withValues(alpha: 0.7);
                   }
                 } else if (showAnswer && isCorrect) {
                   bgClass = isDark

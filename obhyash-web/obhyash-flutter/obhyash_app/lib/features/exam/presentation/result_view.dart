@@ -238,7 +238,9 @@ class _ResultViewState extends State<ResultView> {
                             'যান্ত্রিক ত্রুটির কারণে ফলাফল ভুল হতে পারে।',
                             style: TextStyle(
                               fontSize: 12,
-                              color: const Color(0xFFB45309).withOpacity(0.8),
+                              color: const Color(
+                                0xFFB45309,
+                              ).withValues(alpha: 0.8),
                             ),
                           ),
                         ],

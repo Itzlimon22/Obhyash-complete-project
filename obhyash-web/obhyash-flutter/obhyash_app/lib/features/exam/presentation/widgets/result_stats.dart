@@ -99,7 +99,7 @@ class ResultStats extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF262626).withOpacity(0.5)
+                      ? const Color(0xFF262626).withValues(alpha: 0.5)
                       : const Color(0xFFF9FAFB),
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(16),
@@ -165,7 +165,7 @@ class ResultStats extends StatelessWidget {
                       value: '-${negativeMarksDeduction.toStringAsFixed(2)}',
                       isDark: isDark,
                       valueColor: Colors.red,
-                      bgColor: Colors.red.withOpacity(0.05),
+                      bgColor: Colors.red.withValues(alpha: 0.05),
                     ),
                   ],
                 ),
@@ -174,7 +174,7 @@ class ResultStats extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF262626).withOpacity(0.5)
+                      ? const Color(0xFF262626).withValues(alpha: 0.5)
                       : const Color(0xFFF9FAFB),
                   borderRadius: const BorderRadius.vertical(
                     bottom: Radius.circular(16),
@@ -250,7 +250,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 24),

@@ -38,10 +38,11 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              final nav = Navigator.of(context);
+              nav.pop();
               // Submit exam then pop
               ref.read(examEngineProvider.notifier).submitExam().then((_) {
-                Navigator.pop(context);
+                if (mounted) nav.pop();
               });
             },
             child: const Text(
@@ -131,10 +132,10 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
     final answeredCount = state.userAnswers.length;
     final totalCount = state.questions.length;
 
-    return WillPopScope(
-      onWillPop: () async {
-        _showNavigationWarning();
-        return false;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _showNavigationWarning();
       },
       child: Scaffold(
         backgroundColor: isDark ? Colors.black : const Color(0xFFF8FAFC),
@@ -264,8 +265,8 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isDark
-                  ? const Color(0xFF171717).withOpacity(0.9)
-                  : Colors.white.withOpacity(0.9),
+                  ? const Color(0xFF171717).withValues(alpha: 0.9)
+                  : Colors.white.withValues(alpha: 0.9),
               border: Border(
                 top: BorderSide(
                   color: isDark

@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -56,10 +55,10 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
 
   // Form State
   String? _selectedSubject;
-  Set<String> _selectedChapters = {};
-  Set<String> _selectedTopics = {};
-  Set<String> _examTypes = {'Academic'};
-  Set<String> _difficulties = {'Medium'};
+  final Set<String> _selectedChapters = {};
+  final Set<String> _selectedTopics = {};
+  final Set<String> _examTypes = {'Academic'};
+  final Set<String> _difficulties = {'Medium'};
   int _questionCount = 25;
   int _durationMinutes = 25;
   double _negativeMarking = 0.25;
@@ -136,11 +135,12 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
 
   Future<void> _fetchTopics() async {
     if (_selectedChapters.isEmpty) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _topics = [];
           _selectedTopics.clear();
         });
+      }
       return;
     }
     try {
@@ -175,20 +175,22 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
 
   void _toggleChapter(String id) {
     setState(() {
-      if (_selectedChapters.contains(id))
+      if (_selectedChapters.contains(id)) {
         _selectedChapters.remove(id);
-      else
+      } else {
         _selectedChapters.add(id);
+      }
     });
     _fetchTopics();
   }
 
   void _toggleTopic(String id) {
     setState(() {
-      if (_selectedTopics.contains(id))
+      if (_selectedTopics.contains(id)) {
         _selectedTopics.remove(id);
-      else
+      } else {
         _selectedTopics.add(id);
+      }
     });
   }
 
@@ -257,7 +259,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                   decoration: BoxDecoration(
                     color: const Color(
                       0xFF059669,
-                    ).withOpacity(isDark ? 0.2 : 0.1),
+                    ).withValues(alpha: isDark ? 0.2 : 0.1),
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Text(
@@ -456,10 +458,11 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                       selected: _examTypes.contains(t),
                       isDark: isDark,
                       onTap: () => setState(() {
-                        if (_examTypes.contains(t) && _examTypes.length > 1)
+                        if (_examTypes.contains(t) && _examTypes.length > 1) {
                           _examTypes.remove(t);
-                        else if (!_examTypes.contains(t))
+                        } else if (!_examTypes.contains(t)) {
                           _examTypes.add(t);
+                        }
                       }),
                     ),
                   )
@@ -483,10 +486,11 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                       isDark: isDark,
                       onTap: () => setState(() {
                         if (_difficulties.contains(d) &&
-                            _difficulties.length > 1)
+                            _difficulties.length > 1) {
                           _difficulties.remove(d);
-                        else if (!_difficulties.contains(d))
+                        } else if (!_difficulties.contains(d)) {
                           _difficulties.add(d);
+                        }
                       }),
                     ),
                   )
@@ -498,7 +502,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
           // 4. Sliders (Questions & Time)
           _CardContainer(
             isDark: isDark,
-            title: 'প্রশ্নের সংখ্যা ($max 100)',
+            title: 'প্রশ্নের সংখ্যা (সর্বোচ্চ ১০০)',
             icon: LucideIcons.helpCircle,
             child: Column(
               children: [
@@ -542,7 +546,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
 
           _CardContainer(
             isDark: isDark,
-            title: 'সময় ($max 180 min)',
+            title: 'সময় (সর্বোচ্চ ১৮০ মি)',
             icon: LucideIcons.clock,
             child: Column(
               children: [
@@ -733,7 +737,7 @@ class _ChipBtn extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: selected
-              ? const Color(0xFF10B981).withOpacity(isDark ? 0.2 : 0.1)
+              ? const Color(0xFF10B981).withValues(alpha: isDark ? 0.2 : 0.1)
               : (isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5)),
           border: Border.all(
             color: selected
@@ -778,7 +782,7 @@ class _ToggleBox extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: selected
-              ? const Color(0xFF059669).withOpacity(isDark ? 0.2 : 0.1)
+              ? const Color(0xFF059669).withValues(alpha: isDark ? 0.2 : 0.1)
               : (isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5)),
           border: Border.all(
             color: selected
