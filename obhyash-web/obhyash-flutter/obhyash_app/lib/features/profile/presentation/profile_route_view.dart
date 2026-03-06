@@ -31,6 +31,9 @@ final _profileExamHistoryProvider = FutureProvider<List<ExamResult>>((
       correctCount: (m['correct_count'] as num?)?.toInt() ?? 0,
       wrongCount: (m['wrong_count'] as num?)?.toInt() ?? 0,
       subjectLabel: m['subject_label'] as String?,
+      createdAt: m['created_at'] != null
+          ? DateTime.tryParse(m['created_at'] as String)
+          : null,
     );
   }).toList();
 });
@@ -67,23 +70,28 @@ class _SubjectAccum {
 }
 
 List<MonthCalendarDay> _buildCalendarData(List<ExamResult> history) {
-  // Build calendar for current month
   final now = DateTime.now();
   final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
 
-  final days = <MonthCalendarDay>[];
-  for (int d = 1; d <= daysInMonth; d++) {
-    final date = DateTime(now.year, now.month, d);
-    days.add(
-      MonthCalendarDay(
-        date: date,
-        dayOfMonth: d,
-        examCount: 0,
-        isCurrentMonth: true,
-      ),
-    );
+  // Count exams per day of current month
+  final examCounts = <int, int>{};
+  for (final e in history) {
+    if (e.createdAt != null &&
+        e.createdAt!.year == now.year &&
+        e.createdAt!.month == now.month) {
+      examCounts[e.createdAt!.day] = (examCounts[e.createdAt!.day] ?? 0) + 1;
+    }
   }
-  return days;
+
+  return List.generate(daysInMonth, (i) {
+    final d = i + 1;
+    return MonthCalendarDay(
+      date: DateTime(now.year, now.month, d),
+      dayOfMonth: d,
+      examCount: examCounts[d] ?? 0,
+      isCurrentMonth: true,
+    );
+  });
 }
 
 class ProfileRouteView extends ConsumerWidget {

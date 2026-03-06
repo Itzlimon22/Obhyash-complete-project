@@ -55,6 +55,7 @@ class ExamResult {
   final int correctCount;
   final int wrongCount;
   final String? subjectLabel;
+  final DateTime? createdAt;
 
   ExamResult({
     required this.id,
@@ -63,6 +64,7 @@ class ExamResult {
     required this.correctCount,
     required this.wrongCount,
     this.subjectLabel,
+    this.createdAt,
   });
 
   factory ExamResult.fromJson(Map<String, dynamic> json) {
@@ -73,6 +75,9 @@ class ExamResult {
       correctCount: json['correct_count'] as int? ?? 0,
       wrongCount: json['wrong_count'] as int? ?? 0,
       subjectLabel: json['subject_label'] as String?,
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'] as String)
+          : null,
     );
   }
 }
@@ -173,7 +178,7 @@ class UserProfile {
       stream: json['stream'] as String?,
       optionalSubject: json['optional_subject'] as String?,
       institute: json['institute'] as String?,
-      streakCount: json['streak_count'] as int? ?? 0,
+      streakCount: json['streak'] as int? ?? json['streak_count'] as int? ?? 0,
       phone: json['phone'] as String?,
       dob: json['dob'] as String?,
       gender: json['gender'] as String?,

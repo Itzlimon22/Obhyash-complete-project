@@ -118,23 +118,23 @@ class DashboardView extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // 2. Subject Stats List
-          SubjectStatCard(
-            data: subjects,
-            isLoading: isLoading,
-            onSubjectClick: (subjectId) {
-              context.go('/analysis');
-            },
-          ),
-          const SizedBox(height: 24),
-
-          // 3. Leaderboard Card
+          // 2. Leaderboard Card
           DashboardLeaderboardCard(
             currentUser: currentUser,
             userRank: userRank,
             topUser: topUser,
             xpDiff: xpDiff,
             onLeaderboardClick: () => context.go('/leaderboard'),
+          ),
+          const SizedBox(height: 24),
+
+          // 3. Subject Stats List
+          SubjectStatCard(
+            data: subjects,
+            isLoading: isLoading,
+            onSubjectClick: (subjectId) {
+              context.go('/analysis');
+            },
           ),
 
           const SizedBox(height: 40),

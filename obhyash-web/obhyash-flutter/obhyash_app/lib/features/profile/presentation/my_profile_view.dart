@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../dashboard/domain/models.dart';
 import 'widgets/stats_grid.dart';
@@ -66,87 +67,124 @@ class MyProfileView extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'প্রোফাইল',
-                style: TextStyle(
-                  fontSize: 32, // text-4xl
-                  fontWeight: FontWeight.w900, // font-extrabold
-                  color: isDark
-                      ? Colors.white
-                      : const Color(0xFF171717), // neutral-900
-                  fontFamily: 'HindSiliguri',
-                  letterSpacing: -0.5, // tracking-tight
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'প্রোফাইল',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w900,
+                      color: isDark ? Colors.white : const Color(0xFF171717),
+                      fontFamily: 'HindSiliguri',
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: onEditProfile,
+                    icon: Icon(LucideIcons.pencil, size: 16),
+                    label: const Text(
+                      'এডিট করুন',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'HindSiliguri',
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      backgroundColor: isDark
+                          ? const Color(0xFF262626)
+                          : const Color(0xFFF5F5F5),
+                      foregroundColor: isDark
+                          ? Colors.white
+                          : const Color(0xFF171717),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
               ),
+              const SizedBox(height: 10),
               Row(
                 children: [
-                  if (onViewNotifications != null)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 12), // gap-3
-                      child: OutlinedButton(
+                  if (onViewNotifications != null) ...[
+                    Expanded(
+                      child: OutlinedButton.icon(
                         onPressed: onViewNotifications,
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ), // px-6 py-3
-                          side: BorderSide(
-                            color: isDark
-                                ? const Color(0xFF262626)
-                                : const Color(0xFFE5E5E5),
-                          ), // neutral-800 : neutral-200
-                          backgroundColor: isDark
-                              ? const Color(0xFF171717)
-                              : Colors.white, // neutral-900 : white
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ), // rounded-xl
-                          foregroundColor: isDark
-                              ? const Color(0xFFD4D4D4)
-                              : const Color(
-                                  0xFF404040,
-                                ), // neutral-300 : neutral-700
-                        ),
-                        child: const Text(
+                        icon: Icon(LucideIcons.bell, size: 16),
+                        label: const Text(
                           'নোটিফিকেশন',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 13,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'HindSiliguri',
                           ),
                         ),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          side: BorderSide(
+                            color: isDark
+                                ? const Color(0xFF262626)
+                                : const Color(0xFFE5E5E5),
+                          ),
+                          backgroundColor: isDark
+                              ? const Color(0xFF171717)
+                              : Colors.white,
+                          foregroundColor: isDark
+                              ? const Color(0xFFD4D4D4)
+                              : const Color(0xFF404040),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                       ),
                     ),
-                  ElevatedButton(
-                    onPressed: onEditProfile,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ), // px-6 py-3
-                      backgroundColor: isDark
-                          ? const Color(0xFF262626)
-                          : const Color(
-                              0xFFF5F5F5,
-                            ), // neutral-800 : neutral-100
-                      foregroundColor: isDark
-                          ? Colors.white
-                          : const Color(0xFF171717), // white : neutral-900
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ), // rounded-xl
-                    ),
-                    child: const Text(
-                      'এডিট করুন',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'HindSiliguri',
+                    const SizedBox(width: 8),
+                  ],
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {},
+                      icon: Icon(LucideIcons.gift, size: 16),
+                      label: const Text(
+                        'রেফার করুন',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'HindSiliguri',
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        side: BorderSide(
+                          color: isDark
+                              ? const Color(0x887f1d1d)
+                              : const Color(0xFFfecdd3),
+                        ),
+                        backgroundColor: isDark
+                            ? const Color(0x33881337)
+                            : const Color(0xFFFFF1F2),
+                        foregroundColor: isDark
+                            ? const Color(0xFFFB7185)
+                            : const Color(0xFFE11D48),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),
@@ -154,6 +192,10 @@ class MyProfileView extends ConsumerWidget {
               ),
             ],
           ),
+          const SizedBox(height: 20),
+
+          // User Profile Card
+          _UserProfileCard(user: user, isDark: isDark),
           const SizedBox(height: 24), // mb-6
           // Level Progress Bar
           Container(
@@ -337,6 +379,7 @@ class MyProfileView extends ConsumerWidget {
             xp: user.xp,
             streak: user.streakCount,
           ),
+          const SizedBox(height: 24),
 
           // Main Content Layout (Left Column & Right Column mimic from Web)
           LayoutBuilder(
@@ -382,6 +425,147 @@ class MyProfileView extends ConsumerWidget {
           ),
           const SizedBox(height: 40),
         ],
+      ),
+    );
+  }
+}
+
+// ── User Profile Card ─────────────────────────────────────────────────────────
+
+class _UserProfileCard extends StatelessWidget {
+  final UserProfile user;
+  final bool isDark;
+
+  const _UserProfileCard({required this.user, required this.isDark});
+
+  String get _initials {
+    final parts = user.name.trim().split(' ');
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return parts[0].isNotEmpty ? parts[0][0].toUpperCase() : '?';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF171717) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x05000000),
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Avatar
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFFE11D48),
+              image: user.avatarUrl != null
+                  ? DecorationImage(
+                      image: NetworkImage(user.avatarUrl!),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
+            ),
+            child: user.avatarUrl == null
+                ? Center(
+                    child: Text(
+                      _initials,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  )
+                : null,
+          ),
+          const SizedBox(width: 16),
+          // Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user.name,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    color: isDark ? Colors.white : const Color(0xFF171717),
+                    fontFamily: 'HindSiliguri',
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (user.email != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    user.email!,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark
+                          ? const Color(0xFFA3A3A3)
+                          : const Color(0xFF737373),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: [
+                    if (user.institute != null && user.institute!.isNotEmpty)
+                      _InfoChip(label: user.institute!, isDark: isDark),
+                    if (user.stream != null && user.stream!.isNotEmpty)
+                      _InfoChip(label: user.stream!, isDark: isDark),
+                    if (user.batch != null && user.batch!.isNotEmpty)
+                      _InfoChip(label: 'ব্যাচ: ${user.batch!}', isDark: isDark),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  final String label;
+  final bool isDark;
+
+  const _InfoChip({required this.label, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+          fontFamily: 'HindSiliguri',
+        ),
       ),
     );
   }
