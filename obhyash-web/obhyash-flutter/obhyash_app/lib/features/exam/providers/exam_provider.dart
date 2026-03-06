@@ -28,6 +28,7 @@ class ExamEngineState {
   final bool isOmrMode;
   final String? dbSessionId;
   final String? selectedScriptPath;
+  final ExamResult? completedResult;
 
   const ExamEngineState({
     this.appState = AppState.idle,
@@ -42,6 +43,7 @@ class ExamEngineState {
     this.isOmrMode = false,
     this.dbSessionId,
     this.selectedScriptPath,
+    this.completedResult,
   });
 
   ExamEngineState copyWith({
@@ -57,6 +59,7 @@ class ExamEngineState {
     bool? isOmrMode,
     String? dbSessionId,
     String? selectedScriptPath,
+    ExamResult? completedResult,
   }) {
     return ExamEngineState(
       appState: appState ?? this.appState,
@@ -71,6 +74,7 @@ class ExamEngineState {
       isOmrMode: isOmrMode ?? this.isOmrMode,
       dbSessionId: dbSessionId ?? this.dbSessionId,
       selectedScriptPath: selectedScriptPath ?? this.selectedScriptPath,
+      completedResult: completedResult ?? this.completedResult,
     );
   }
 }
@@ -253,24 +257,62 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
     final authId = supabase.auth.currentUser?.id;
     if (authId != null) {
       try {
-        await supabase.from('exam_history').insert({
+        // Build JSONB payloads for practice dashboard (mistakes tab)
+        final questionsJson = state.questions
+            .map(
+              (q) => {
+                'id': q.id,
+                'question': q.question,
+                'options': q.options,
+                'correct_answer_index': q.correctAnswerIndex,
+                'subject': q.subject,
+                'subject_label': q.subjectLabel,
+                'explanation': q.explanation,
+                'points': q.points,
+              },
+            )
+            .toList();
+        final userAnswersJson = Map<String, dynamic>.fromEntries(
+          state.userAnswers.entries.map((e) => MapEntry(e.key, e.value)),
+        );
+
+        await supabase.from('exam_results').insert({
           'user_id': authId,
           'subject': result.subject,
           'subject_label': result.subjectLabel,
-          'exam_group': result.examType,
+          'exam_type': result.examType,
           'score': result.score,
           'total_marks': result.totalMarks,
           'correct_count': result.correctCount,
           'wrong_count': result.wrongCount,
           'time_taken': result.timeTaken,
           'total_questions': result.totalQuestions,
+          'questions': questionsJson,
+          'user_answers': userAnswersJson,
+          'status': 'evaluated',
         });
+
+        // Award XP: 10 per correct, -2 per wrong (min 0)
+        final xpEarned = (result.correctCount * 10 - result.wrongCount * 2)
+            .clamp(0, 9999);
+        if (xpEarned > 0) {
+          await supabase.rpc(
+            'increment_user_xp',
+            params: {'uid': authId, 'amount': xpEarned},
+          );
+        }
+
+        // Increment streak
+        await supabase.rpc('increment_user_streak', params: {'uid': authId});
       } catch (e) {
-        // ignore save errors
+        // ignore save errors — result is still shown to user
       }
     }
 
-    state = state.copyWith(appState: AppState.completed);
+    state = state.copyWith(
+      appState: AppState.completed,
+      completedResult: result,
+    );
   }
 }
 

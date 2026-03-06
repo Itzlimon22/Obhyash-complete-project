@@ -19,7 +19,7 @@ class PricingCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Assuming higher priced plan or specific ones are "Best Value"
-    final isBestValue = plan.price == 299 || plan.billingCycle.contains('3');
+    final isBestValue = plan.durationDays >= 90;
 
     return Container(
       decoration: BoxDecoration(

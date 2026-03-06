@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/exam_models.dart';
 import 'widgets/result_stats.dart';
 import 'widgets/review_list.dart';
@@ -49,14 +50,34 @@ class _ResultViewState extends State<ResultView> {
   }
 
   void _toggleBookmark(String id) {
+    final wasBookmarked = _bookmarkedIds.contains(id);
     setState(() {
-      if (_bookmarkedIds.contains(id)) {
+      if (wasBookmarked) {
         _bookmarkedIds.remove(id);
       } else {
         _bookmarkedIds.add(id);
       }
     });
-    // In a real app we'd also sync this to Supabase bookmarks table here
+    // Persist to Supabase bookmarks table
+    final supabase = Supabase.instance.client;
+    final uid = supabase.auth.currentUser?.id;
+    if (uid != null) {
+      if (wasBookmarked) {
+        supabase
+            .from('bookmarks')
+            .delete()
+            .eq('user_id', uid)
+            .eq('question_id', id)
+            .then((_) {})
+            .catchError((_) {});
+      } else {
+        supabase
+            .from('bookmarks')
+            .insert({'user_id': uid, 'question_id': id})
+            .then((_) {})
+            .catchError((_) {});
+      }
+    }
   }
 
   void _showReportModal(String questionId) {

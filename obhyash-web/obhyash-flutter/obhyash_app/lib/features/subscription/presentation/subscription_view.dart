@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../domain/models.dart';
 import 'widgets/pricing_card.dart';
@@ -21,85 +22,264 @@ class _SubscriptionViewState extends State<SubscriptionView> {
   String _currentPlanId = '';
   SubscriptionPlan? _activeSubscription;
 
-  // Mock initial fetch
+  DateTime? _expiresAt;
+
+  int get _daysRemaining {
+    if (_expiresAt == null) return 0;
+    return _expiresAt!.difference(DateTime.now()).inDays.clamp(0, 9999);
+  }
+
   @override
   void initState() {
     super.initState();
-    _loadMockData();
+    _loadData();
   }
 
-  Future<void> _loadMockData() async {
-    await Future.delayed(const Duration(milliseconds: 800));
-    setState(() {
-      _plans = [
-        SubscriptionPlan(
-          id: 'free',
-          name: 'ফ্রি প্ল্যান',
-          price: 0,
-          billingCycle: 'Lifetime',
-          currency: '৳',
-          features: ['লিমিটেড মক টেস্ট', 'বেসিক এনালাইসিস'],
-          colorTheme: 'neutral',
-        ),
-        SubscriptionPlan(
-          id: 'monthly',
-          name: 'মাসিক প্ল্যান',
-          price: 149,
-          billingCycle: 'Monthly',
-          currency: '৳',
-          features: ['আনলিমিটেড মক টেস্ট', 'বিস্তারিত এনালাইসিস', 'সাপোর্ট'],
-          colorTheme: 'emerald',
-        ),
-        SubscriptionPlan(
-          id: 'quarterly',
-          name: '৩ মাসের প্ল্যান',
-          price: 299,
-          billingCycle: 'Quarterly',
-          currency: '৳',
-          features: [
-            'আনলিমিটেড মক টেস্ট',
-            'বিস্তারিত এনালাইসিস',
-            'প্রায়োরিটি সাপোর্ট',
-            'প্রো ব্যাজ',
-          ],
-          colorTheme: 'rose',
-        ),
-      ];
-      _invoices = [
-        Invoice(
-          id: 'inv_1',
-          date: '১২ ফেব্রুয়ারি, ২০২৬',
-          amount: 299,
-          currency: '৳',
-          status: 'paid',
-          planName: '৩ মাসের প্ল্যান',
-        ),
-      ];
-      _paymentMethods = [
-        PaymentMethod(
-          id: 'pm_1',
-          type: 'bkash',
-          number: '017•••••••99',
-          isDefault: true,
-        ),
-      ];
-      _activeSubscription = _plans[2]; // Active quarterly
-      _currentPlanId = 'quarterly';
-      _isLoading = false;
-    });
+  Future<void> _loadData() async {
+    setState(() => _isLoading = true);
+    try {
+      final supabase = Supabase.instance.client;
+      final userId = supabase.auth.currentUser?.id;
+
+      // Load active subscription plans
+      final plansData = await supabase
+          .from('subscription_plans')
+          .select()
+          .eq('is_active', true)
+          .order('price');
+      final plans = (plansData as List)
+          .map((p) => SubscriptionPlan.fromJson(p as Map<String, dynamic>))
+          .toList();
+
+      // Load user's active subscription
+      SubscriptionPlan? activeSub;
+      String currentPlanId = '';
+      DateTime? expiresAt;
+      if (userId != null) {
+        final histData = await supabase
+            .from('subscription_history')
+            .select('*, subscription_plans(*)')
+            .eq('user_id', userId)
+            .eq('is_active', true)
+            .order('started_at', ascending: false)
+            .limit(1);
+        final hist = histData as List;
+        if (hist.isNotEmpty) {
+          final h = hist.first as Map<String, dynamic>;
+          final planJson = h['subscription_plans'] as Map<String, dynamic>?;
+          final rawExpires = h['expires_at'] as String?;
+          if (planJson != null) {
+            activeSub = SubscriptionPlan.fromJson(
+              planJson,
+              expiresAt: rawExpires?.substring(0, 10),
+            );
+            currentPlanId = activeSub.id;
+            if (rawExpires != null) {
+              expiresAt = DateTime.tryParse(rawExpires);
+            }
+          }
+        }
+      }
+
+      // Load payment history
+      List<Invoice> invoices = [];
+      if (userId != null) {
+        final reqData = await supabase
+            .from('payment_requests')
+            .select('id, plan_name, amount, currency, status, requested_at')
+            .eq('user_id', userId)
+            .order('requested_at', ascending: false)
+            .limit(20);
+        invoices = (reqData as List)
+            .map((r) => Invoice.fromJson(r as Map<String, dynamic>))
+            .toList();
+      }
+
+      if (mounted) {
+        setState(() {
+          _plans = plans;
+          _invoices = invoices;
+          _paymentMethods = [];
+          _activeSubscription = activeSub;
+          _currentPlanId = currentPlanId;
+          _expiresAt = expiresAt;
+          _isLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   void _handlePlanSelect(SubscriptionPlan plan) {
-    if (plan.id == 'free' || plan.id == _currentPlanId) return;
-    // Show manual payment modal (mocked)
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${plan.name} এর জন্য পেমেন্ট মডাল খোলা হবে।')),
+    if (plan.id == _currentPlanId) return;
+    _showPaymentDialog(plan);
+  }
+
+  void _showPaymentDialog(SubscriptionPlan plan) {
+    final senderController = TextEditingController();
+    final txController = TextEditingController();
+    String selectedMethod = 'bkash';
+    bool isSubmitting = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            return AlertDialog(
+              title: Text(
+                '${plan.name} \u09aa\u09c7\u09ae\u09c7\u09a8\u09cd\u099f',
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '\u09ae\u09cb\u099f: ${plan.currency}${plan.price}',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      '\u09aa\u09c7\u09ae\u09c7\u09a8\u09cd\u099f \u09aa\u09a6\u09cd\u09a7\u09a4\u09bf',
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: ['bkash', 'nagad'].map((method) {
+                        final selected = selectedMethod == method;
+                        return Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: OutlinedButton(
+                              onPressed: () =>
+                                  setDialogState(() => selectedMethod = method),
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: selected
+                                    ? Theme.of(ctx).colorScheme.primaryContainer
+                                    : null,
+                              ),
+                              child: Text(
+                                method == 'bkash' ? 'bKash' : 'Nagad',
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: senderController,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(
+                        labelText:
+                            '\u09aa\u09cd\u09b0\u09c7\u09b0\u0995\u09c7\u09b0 \u09a8\u09ae\u09cd\u09ac\u09b0',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: txController,
+                      decoration: const InputDecoration(
+                        labelText:
+                            '\u099f\u09cd\u09b0\u09be\u09a8\u099c\u09c7\u0995\u09b6\u09a8 \u0986\u0987\u09a1\u09bf',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '$selectedMethod-\u098f \u09aa\u09c7\u09ae\u09c7\u09a8\u09cd\u099f \u0995\u09b0\u09c1\u09a8 \u098f\u09ac\u0982 \u099f\u09cd\u09b0\u09be\u09a8\u099c\u09c7\u0995\u09b6\u09a8 \u0986\u0987\u09a1\u09bf \u09a6\u09bf\u09a8\u0964 \u0985\u09cd\u09af\u09be\u09a1\u09ae\u09bf\u09a8 \u0985\u09cd\u09af\u09be\u09aa\u09cd\u09b0\u09c1\u09ad \u0995\u09b0\u09b2\u09c7 \u0985\u09cd\u09af\u09be\u0995\u09cd\u09b8\u09c7\u09b8 \u099a\u09be\u09b2\u09c1 \u09b9\u09ac\u09c7\u0964',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('\u09ac\u09be\u09a4\u09bf\u09b2'),
+                ),
+                FilledButton(
+                  onPressed: isSubmitting
+                      ? null
+                      : () async {
+                          final sender = senderController.text.trim();
+                          final txId = txController.text.trim();
+                          if (sender.isEmpty || txId.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  '\u09b8\u0995\u09b2 \u09a4\u09a5\u09cd\u09af \u09aa\u09c2\u09b0\u09a3 \u0995\u09b0\u09c1\u09a8',
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+                          setDialogState(() => isSubmitting = true);
+                          try {
+                            final supabase = Supabase.instance.client;
+                            final userId = supabase.auth.currentUser?.id;
+                            if (userId != null) {
+                              await supabase.from('payment_requests').insert({
+                                'user_id': userId,
+                                'plan_name': plan.name,
+                                'amount': plan.price,
+                                'currency': 'BDT',
+                                'payment_method': selectedMethod,
+                                'transaction_id': txId,
+                                'sender_number': sender,
+                                'status': 'Pending',
+                              });
+                            }
+                            if (ctx.mounted) Navigator.pop(ctx);
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    '\u09aa\u09c7\u09ae\u09c7\u09a8\u09cd\u099f \u0985\u09a8\u09c1\u09b0\u09cb\u09a7 \u09aa\u09be\u09a0\u09be\u09a8\u09cb \u09b9\u09af\u09bc\u09c7\u099b\u09c7\u0964 \u0985\u09cd\u09af\u09be\u09a1\u09ae\u09bf\u09a8 \u0985\u09cd\u09af\u09be\u09aa\u09cd\u09b0\u09c1\u09ad \u0995\u09b0\u09b2\u09c7 \u0985\u09cd\u09af\u09be\u0995\u09cd\u09b8\u09c7\u09b8 \u099a\u09be\u09b2\u09c1 \u09b9\u09ac\u09c7\u0964',
+                                  ),
+                                ),
+                              );
+                              _loadData();
+                            }
+                          } catch (_) {
+                            setDialogState(() => isSubmitting = false);
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    '\u09aa\u09c7\u09ae\u09c7\u09a8\u09cd\u099f \u09aa\u09be\u09a0\u09be\u09a4\u09c7 \u09b8\u09ae\u09b8\u09cd\u09af\u09be \u09b9\u09af\u09bc\u09c7\u099b\u09c7',
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                  child: isSubmitting
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text(
+                          '\u09aa\u09c7\u09ae\u09c7\u09a8\u09cd\u099f \u09aa\u09be\u09a0\u09be\u09a8',
+                        ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
-  void _handleAddPaymentMethod() {
-    // Show add payment method modal
-  }
+  void _handleAddPaymentMethod() {}
 
   void _handleDeletePaymentMethod(String id) {
     setState(() {
@@ -108,9 +288,12 @@ class _SubscriptionViewState extends State<SubscriptionView> {
   }
 
   void _handleDownloadInvoice(Invoice invoice) {
-    // Show download action
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('ইনভয়েস ডাউনলোড শুরু হচ্ছে: ${invoice.id}')),
+      SnackBar(
+        content: Text(
+          '\u0987\u09a8\u09ad\u09af\u09bc\u09c7\u09b8: ${invoice.planName} \u2014 ${invoice.status}',
+        ),
+      ),
     );
   }
 
@@ -304,7 +487,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                                 ), // emerald-400 : emerald-600
                                 const SizedBox(width: 4),
                                 Text(
-                                  'বাকি আছে: 57 দিন', // MOCK DATA
+                                  'বাকি আছে: $_daysRemaining দিন',
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w500,
@@ -357,18 +540,8 @@ class _SubscriptionViewState extends State<SubscriptionView> {
             LayoutBuilder(
               builder: (context, constraints) {
                 final isDesktop = constraints.maxWidth > 768;
-                final premiumPlans =
-                    _plans
-                        .where(
-                          (p) =>
-                              p.price > 0 &&
-                              (p.billingCycle.contains('মাস') ||
-                                  p.billingCycle == 'Monthly' ||
-                                  p.price == 149 ||
-                                  p.price == 299),
-                        )
-                        .toList()
-                      ..sort((a, b) => a.price.compareTo(b.price));
+                final premiumPlans = _plans.where((p) => p.price > 0).toList()
+                  ..sort((a, b) => a.price.compareTo(b.price));
 
                 if (isDesktop) {
                   return IntrinsicHeight(

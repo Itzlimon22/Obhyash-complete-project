@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   // Brand
@@ -36,7 +37,7 @@ class AppTheme {
       brightness: Brightness.light,
       primaryColor: AppColors.emerald700,
       scaffoldBackgroundColor: AppColors.neutral50,
-      fontFamily: 'HindSiliguri', // Assuming we add this later
+      textTheme: GoogleFonts.hindSiliguriTextTheme(ThemeData.light().textTheme),
       colorScheme: const ColorScheme.light(
         primary: AppColors.emerald700,
         secondary: AppColors.amber400,
@@ -67,7 +68,7 @@ class AppTheme {
       brightness: Brightness.dark,
       primaryColor: AppColors.emerald600,
       scaffoldBackgroundColor: AppColors.neutral950,
-      fontFamily: 'HindSiliguri',
+      textTheme: GoogleFonts.hindSiliguriTextTheme(ThemeData.dark().textTheme),
       colorScheme: const ColorScheme.dark(
         primary: AppColors.emerald600,
         secondary: AppColors.amber400,

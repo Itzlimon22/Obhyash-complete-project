@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/exam_provider.dart';
+import 'result_view.dart';
 import 'widgets/question_card.dart';
 import 'widgets/exam_grid_sheet.dart';
 
@@ -94,38 +95,25 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
     final state = ref.watch(examEngineProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Redirect mapping for graceful finish
+    // Navigate to ResultView when exam is completed
     if (state.appState == AppState.completed ||
         state.appState == AppState.submitted) {
-      // Typically we use go_router but here we can just show a completed screen or pop
-      // I'll show a simple placeholder or pop directly to results
-      return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.check_circle_outline,
-                color: Colors.green,
-                size: 80,
+      final result = state.completedResult;
+      if (result != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => ResultView(
+                  result: result,
+                  onRestart: () => Navigator.of(context).pop(),
+                ),
               ),
-              const SizedBox(height: 16),
-              const Text(
-                'পরীক্ষা সম্পন্ন হয়েছে!',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  // navigate out or view result
-                  Navigator.pop(context); // Go back out of Exam Shell
-                },
-                child: const Text('ড্যাশবোর্ডে ফিরে যান'),
-              ),
-            ],
-          ),
-        ),
-      );
+            );
+          }
+        });
+      }
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     // Safety checks

@@ -250,19 +250,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                             ? const Color(0xFFA3A3A3)
                             : const Color(0xFF525252),
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                '\u0995\u09cb\u09a8\u09cb \u09a8\u09a4\u09c1\u09a8 \u09a8\u09cb\u099f\u09bf\u09ab\u09bf\u0995\u09c7\u09b6\u09a8 \u09a8\u09c7\u0987',
-                                style: TextStyle(fontFamily: 'HindSiliguri'),
-                              ),
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
+                          context.push('/notifications');
                         },
                       ),
 

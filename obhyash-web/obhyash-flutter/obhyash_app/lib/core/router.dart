@@ -20,6 +20,7 @@ import '../features/history/presentation/exam_history_view.dart';
 import '../features/practice/presentation/practice_dashboard.dart';
 import '../features/exam/presentation/exam_setup_view.dart';
 import '../features/exam/presentation/exam_runner_view.dart';
+import '../features/notifications/presentation/notifications_view.dart';
 import 'presentation/main_layout.dart';
 
 CustomTransitionPage _fadeRoute(Widget child, GoRouterState state) {
@@ -148,6 +149,11 @@ final routerProvider = Provider<GoRouter>((ref) {
               final subject = state.pathParameters['subject']!;
               return _fadeRoute(SubjectReportView(subject: subject), state);
             },
+          ),
+          GoRoute(
+            path: '/notifications',
+            pageBuilder: (context, state) =>
+                _fadeRoute(const NotificationsView(), state),
           ),
         ],
       ),

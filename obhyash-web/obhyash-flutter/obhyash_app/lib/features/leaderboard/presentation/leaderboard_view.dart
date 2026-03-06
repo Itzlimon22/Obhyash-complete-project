@@ -132,7 +132,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       final supabase = Supabase.instance.client;
       final futures = _levels.map((lvl) async {
         final data = await supabase
-            .from('profiles')
+            .from('public_profiles')
             .select('id')
             .eq('level', lvl.id)
             .limit(9999);
@@ -151,7 +151,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       final supabase = Supabase.instance.client;
       final me = supabase.auth.currentUser?.id;
       final data = await supabase
-          .from('profiles')
+          .from('public_profiles')
           .select('id, name, institute, xp, level, exams_taken')
           .eq('level', _selectedLevel)
           .order('xp', ascending: false)
