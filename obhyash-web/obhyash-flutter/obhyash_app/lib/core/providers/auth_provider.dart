@@ -32,6 +32,7 @@ class AuthNotifier extends Notifier<User?> {
       switch (event) {
         case AuthChangeEvent.signedIn:
         case AuthChangeEvent.tokenRefreshed:
+        case AuthChangeEvent.initialSession:
           state = session?.user;
 
           // Keep secure storage up to date whenever tokens rotate
