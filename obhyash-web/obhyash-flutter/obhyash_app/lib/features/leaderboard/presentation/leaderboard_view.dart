@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -80,6 +81,7 @@ _LevelInfo? _nextLevel(String id) {
 // ─── User Model ────────────────────────────────────────────────────────────────
 class _LBUser {
   final String id, name, institute, level;
+  final String? avatarUrl;
   final int xp, examsTaken;
   final bool isCurrentUser;
 
@@ -88,6 +90,7 @@ class _LBUser {
     required this.name,
     required this.institute,
     required this.level,
+    this.avatarUrl,
     required this.xp,
     required this.examsTaken,
     this.isCurrentUser = false,
@@ -98,6 +101,7 @@ class _LBUser {
     name: j['name'] ?? 'অজানা',
     institute: j['institute'] ?? '',
     level: j['level'] ?? 'Rookie',
+    avatarUrl: j['avatar_url'] as String?,
     xp: (j['xp'] as num?)?.toInt() ?? 0,
     examsTaken: (j['exams_taken'] as num?)?.toInt() ?? 0,
     isCurrentUser: j['id'] == me,
@@ -152,7 +156,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       final me = supabase.auth.currentUser?.id;
       final data = await supabase
           .from('public_profiles')
-          .select('id, name, institute, xp, level, exams_taken')
+          .select('id, name, institute, xp, level, exams_taken, avatar_url')
           .eq('level', _selectedLevel)
           .order('xp', ascending: false)
           .limit(50);
@@ -212,6 +216,14 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                         xp: myProfile.xp,
                         rank: myRank,
                         isDark: isDark,
+                      ),
+
+                    // Top 3 podium
+                    if (!_isLoading && _users.length >= 3)
+                      _PodiumSection(
+                        users: _users.take(3).toList(),
+                        isDark: isDark,
+                        onTap: (id) => context.push('/user-profile/$id'),
                       ),
 
                     // Leaderboard table
@@ -692,10 +704,11 @@ class _LeaderboardTable extends StatelessWidget {
             ),
             child: const Row(
               children: [
-                SizedBox(width: 40, child: Text('RANK', style: _hdr)),
-                SizedBox(width: 12),
+                SizedBox(width: 36, child: Text('RANK', style: _hdr)),
+                SizedBox(width: 62),
                 Expanded(child: Text('STUDENT', style: _hdr)),
                 Text('TOTAL XP', style: _hdr),
+                SizedBox(width: 20),
               ],
             ),
           ),
@@ -710,7 +723,13 @@ class _LeaderboardTable extends StatelessWidget {
               final i = e.key;
               final u = e.value;
               final isMe = u.isCurrentUser;
+              final isTop3 = i < 3;
               final isLast = i == users.length - 1;
+              final top3Color = i == 0
+                  ? const Color(0xFFE11D48)
+                  : i == 1
+                  ? const Color(0xFFF59E0B)
+                  : const Color(0xFF94A3B8);
 
               return GestureDetector(
                 behavior: HitTestBehavior.opaque,
@@ -718,19 +737,25 @@ class _LeaderboardTable extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: isMe
-                        ? const Color(
-                            0xFFFFF1F2,
-                          ).withValues(alpha: isDark ? 0.04 : 1.0)
+                        ? (isDark
+                              ? const Color(0xFFE11D48).withValues(alpha: 0.04)
+                              : const Color(0xFFFFF1F2))
                         : Colors.transparent,
-                    border: !isLast
-                        ? Border(
-                            bottom: BorderSide(
+                    border: Border(
+                      left: isTop3
+                          ? BorderSide(
+                              color: top3Color.withValues(alpha: 0.5),
+                              width: 3,
+                            )
+                          : BorderSide.none,
+                      bottom: !isLast
+                          ? BorderSide(
                               color: isDark
                                   ? const Color(0xFF262626)
                                   : const Color(0xFFF5F5F5),
-                            ),
-                          )
-                        : null,
+                            )
+                          : BorderSide.none,
+                    ),
                     borderRadius: isLast
                         ? const BorderRadius.vertical(
                             bottom: Radius.circular(20),
@@ -739,29 +764,24 @@ class _LeaderboardTable extends StatelessWidget {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
+                      horizontal: 14,
+                      vertical: 10,
                     ),
                     child: Row(
                       children: [
-                        SizedBox(width: 40, child: _rankBadge(i + 1)),
-                        const SizedBox(width: 12),
-                        _avatar(
-                          u.name,
-                          ring: isMe
-                              ? const Color(0xFFFECDD3)
-                              : Colors.transparent,
-                          bg: isDark
-                              ? const Color(0xFF404040)
-                              : const Color(0xFFE5E5E5),
-                          textColor: isDark
-                              ? Colors.white
-                              : const Color(0xFF171717),
+                        SizedBox(width: 36, child: _rankBadge(i + 1)),
+                        const SizedBox(width: 10),
+                        _ColorAvatar(
+                          name: u.name,
+                          avatarUrl: u.avatarUrl,
+                          size: 42,
+                          highlighted: isMe,
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Row(
                                 children: [
@@ -771,6 +791,7 @@ class _LeaderboardTable extends StatelessWidget {
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14,
+                                        fontFamily: 'HindSiliguri',
                                         color: isMe
                                             ? (isDark
                                                   ? const Color(0xFFFB7185)
@@ -783,11 +804,11 @@ class _LeaderboardTable extends StatelessWidget {
                                     ),
                                   ),
                                   if (isMe) ...[
-                                    const SizedBox(width: 6),
+                                    const SizedBox(width: 5),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
+                                        horizontal: 5,
+                                        vertical: 1,
                                       ),
                                       decoration: BoxDecoration(
                                         color: const Color(0xFFFFE4E6),
@@ -807,37 +828,86 @@ class _LeaderboardTable extends StatelessWidget {
                                   ],
                                 ],
                               ),
-                              if (u.institute.isNotEmpty)
-                                Text(
-                                  u.institute,
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: Color(0xFFA3A3A3),
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                              const SizedBox(height: 2),
+                              Row(
+                                children: [
+                                  if (u.institute.isNotEmpty) ...[
+                                    Flexible(
+                                      child: Text(
+                                        u.institute,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: Color(0xFFA3A3A3),
+                                          fontFamily: 'HindSiliguri',
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    if (u.examsTaken > 0)
+                                      const SizedBox(width: 6),
+                                  ],
+                                  if (u.examsTaken > 0)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 5,
+                                        vertical: 1,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: isDark
+                                            ? const Color(0xFF262626)
+                                            : const Color(0xFFF5F5F5),
+                                        borderRadius: BorderRadius.circular(
+                                          100,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        '${u.examsTaken} পরীক্ষা',
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'HindSiliguri',
+                                          color: isDark
+                                              ? const Color(0xFF737373)
+                                              : const Color(0xFFA3A3A3),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
-                        Text(
-                          _numFmt.format(u.xp),
-                          style: const TextStyle(
-                            fontFamily: 'monospace',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: Color(0xFF059669),
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              _numFmt.format(u.xp),
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontWeight: FontWeight.w900,
+                                fontSize: 14,
+                                color: Color(0xFF059669),
+                              ),
+                            ),
+                            const Text(
+                              'XP',
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFA3A3A3),
+                              ),
+                            ),
+                          ],
                         ),
-                        if (onUserTap != null) ...[
-                          const SizedBox(width: 6),
-                          Icon(
-                            LucideIcons.externalLink,
-                            size: 14,
-                            color: isDark
-                                ? const Color(0xFF737373)
-                                : const Color(0xFFA3A3A3),
-                          ),
-                        ],
+                        const SizedBox(width: 4),
+                        Icon(
+                          LucideIcons.chevronRight,
+                          size: 14,
+                          color: isDark
+                              ? const Color(0xFF404040)
+                              : const Color(0xFFD4D4D4),
+                        ),
                       ],
                     ),
                   ),
@@ -879,23 +949,27 @@ class _LeaderboardTable extends StatelessWidget {
     children: List.generate(
       5,
       (i) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         child: Row(
           children: [
             Container(
               width: 28,
               height: 28,
-              decoration: const BoxDecoration(
-                color: Color(0xFFE5E5E5),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF404040)
+                    : const Color(0xFFE5E5E5),
                 shape: BoxShape.circle,
               ),
             ),
-            const SizedBox(width: 24),
+            const SizedBox(width: 18),
             Container(
-              width: 36,
-              height: 36,
-              decoration: const BoxDecoration(
-                color: Color(0xFFE5E5E5),
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF404040)
+                    : const Color(0xFFE5E5E5),
                 shape: BoxShape.circle,
               ),
             ),
@@ -907,50 +981,42 @@ class _LeaderboardTable extends StatelessWidget {
                   Container(
                     height: 12,
                     width: 120,
-                    color: const Color(0xFFE5E5E5),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF404040)
+                          : const Color(0xFFE5E5E5),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Container(
                     height: 10,
                     width: 80,
-                    color: const Color(0xFFE5E5E5),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF404040)
+                          : const Color(0xFFE5E5E5),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                   ),
                 ],
               ),
             ),
-            Container(height: 12, width: 60, color: const Color(0xFFE5E5E5)),
+            Container(
+              height: 14,
+              width: 56,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF404040)
+                    : const Color(0xFFE5E5E5),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
           ],
         ),
       ),
     ),
   );
-
-  Widget _avatar(
-    String name, {
-    required Color ring,
-    required Color bg,
-    required Color textColor,
-  }) {
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        color: bg,
-        shape: BoxShape.circle,
-        border: Border.all(color: ring, width: 2),
-      ),
-      child: Center(
-        child: Text(
-          name.isNotEmpty ? name[0].toUpperCase() : '?',
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            color: textColor,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _rankBadge(int rank) {
     if (rank == 1) return const Text('🥇', style: TextStyle(fontSize: 20));
@@ -973,3 +1039,298 @@ const _hdr = TextStyle(
   color: Color(0xFFA3A3A3),
   letterSpacing: 1.0,
 );
+
+// ─── Avatar Color ─────────────────────────────────────────────────────────────────────────
+Color _avatarColor(String name) {
+  const colors = <Color>[
+    Color(0xFFE11D48),
+    Color(0xFF3B82F6),
+    Color(0xFF10B981),
+    Color(0xFFF59E0B),
+    Color(0xFF8B5CF6),
+    Color(0xFFF97316),
+    Color(0xFF06B6D4),
+    Color(0xFFEC4899),
+  ];
+  if (name.isEmpty) return colors[0];
+  int code = 0;
+  for (final c in name.runes) {
+    code += c;
+  }
+  return colors[code % colors.length];
+}
+
+// ─── Color Avatar ──────────────────────────────────────────────────────────────────────────
+class _ColorAvatar extends StatelessWidget {
+  final String name;
+  final String? avatarUrl;
+  final double size;
+  final bool highlighted;
+
+  const _ColorAvatar({
+    required this.name,
+    required this.size,
+    this.avatarUrl,
+    this.highlighted = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _avatarColor(name);
+    final darker = Color.lerp(color, Colors.black, 0.28) ?? color;
+    final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [color, darker],
+        ),
+        border: highlighted
+            ? Border.all(color: const Color(0xFFFECDD3), width: 2.5)
+            : null,
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.35),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: ClipOval(
+        child: avatarUrl != null && avatarUrl!.isNotEmpty
+            ? CachedNetworkImage(
+                imageUrl: avatarUrl!,
+                fit: BoxFit.cover,
+                errorWidget: (_, _, _) => Center(
+                  child: Text(
+                    initial,
+                    style: TextStyle(
+                      fontSize: size * 0.4,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              )
+            : Center(
+                child: Text(
+                  initial,
+                  style: TextStyle(
+                    fontSize: size * 0.4,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+      ),
+    );
+  }
+}
+
+// ─── Podium Section ──────────────────────────────────────────────────────────────────────
+class _PodiumSection extends StatelessWidget {
+  final List<_LBUser> users;
+  final bool isDark;
+  final void Function(String)? onTap;
+
+  const _PodiumSection({required this.users, required this.isDark, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    if (users.isEmpty) return const SizedBox();
+
+    final slots =
+        <
+          ({
+            _LBUser user,
+            int rank,
+            double avatarSize,
+            double platformH,
+            Color accentColor,
+            String medal,
+          })
+        >[
+          if (users.length >= 2)
+            (
+              user: users[1],
+              rank: 2,
+              avatarSize: 52.0,
+              platformH: 60.0,
+              accentColor: const Color(0xFFF59E0B),
+              medal: '🥈',
+            ),
+          (
+            user: users[0],
+            rank: 1,
+            avatarSize: 64.0,
+            platformH: 80.0,
+            accentColor: const Color(0xFFE11D48),
+            medal: '🏆',
+          ),
+          if (users.length >= 3)
+            (
+              user: users[2],
+              rank: 3,
+              avatarSize: 48.0,
+              platformH: 44.0,
+              accentColor: const Color(0xFF94A3B8),
+              medal: '🥉',
+            ),
+        ];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF171717) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+        ),
+        boxShadow: isDark
+            ? []
+            : [const BoxShadow(color: Color(0x08000000), blurRadius: 4)],
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+            child: Row(
+              children: [
+                const Text('🏆', style: TextStyle(fontSize: 16)),
+                const SizedBox(width: 8),
+                Text(
+                  'শীর্ষ ৩',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'HindSiliguri',
+                    color: isDark ? Colors.white : const Color(0xFF171717),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: slots.map((slot) {
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: onTap != null ? () => onTap!(slot.user.id) : null,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.topCenter,
+                          children: [
+                            if (slot.rank == 1)
+                              const Positioned(
+                                top: -12,
+                                child: Text(
+                                  '👑',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                top: slot.rank == 1 ? 8 : 0,
+                              ),
+                              child: _ColorAvatar(
+                                name: slot.user.name,
+                                avatarUrl: slot.user.avatarUrl,
+                                size: slot.avatarSize,
+                                highlighted: slot.rank == 1,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Text(
+                            slot.user.name.split(' ').first,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: slot.rank == 1 ? 13 : 12,
+                              fontFamily: 'HindSiliguri',
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF171717),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${_numFmt.format(slot.user.xp)} XP',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: slot.accentColor,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          height: slot.platformH,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                slot.accentColor.withValues(
+                                  alpha: isDark ? 0.2 : 0.12,
+                                ),
+                                slot.accentColor.withValues(
+                                  alpha: isDark ? 0.08 : 0.05,
+                                ),
+                              ],
+                            ),
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(10),
+                            ),
+                            border: Border(
+                              top: BorderSide(
+                                color: slot.accentColor.withValues(alpha: 0.4),
+                                width: 1.5,
+                              ),
+                              left: BorderSide(
+                                color: slot.accentColor.withValues(alpha: 0.2),
+                                width: 1,
+                              ),
+                              right: BorderSide(
+                                color: slot.accentColor.withValues(alpha: 0.2),
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              slot.medal,
+                              style: TextStyle(
+                                fontSize: slot.rank == 1 ? 24 : 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
