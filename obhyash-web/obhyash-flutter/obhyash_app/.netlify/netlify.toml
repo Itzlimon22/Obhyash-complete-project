@@ -1,0 +1,46 @@
+redirectsOrigin = "config"
+headers = []
+
+[functions]
+
+[functions."*"]
+
+[[plugins]]
+origin = "default"
+package = "@netlify/plugin-nextjs"
+
+[plugins.inputs]
+
+[build]
+publish = "D:\\Obyash App\\obhyash-web\\obhyash-flutter\\obhyash_app\\build\\web"
+publishOrigin = "config"
+commandOrigin = "config"
+base = "D:\\Obyash App\\obhyash-web\\obhyash-flutter\\obhyash_app"
+command = "bash build-web.sh"
+
+[build.environment]
+FLUTTER_CHANNEL = "stable"
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
