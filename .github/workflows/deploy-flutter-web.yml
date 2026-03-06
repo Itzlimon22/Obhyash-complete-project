@@ -1,0 +1,17 @@
+name: Deploy Flutter Web to Netlify
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'obhyash-web/obhyash-flutter/obhyash_app/**'
+
+jobs:
+  trigger-netlify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Netlify build for obhyash Flutter web
+        run: |
+          curl -s -X POST "https://api.netlify.com/build_hooks/69aaf84596f30a484af39919"
+          echo "Build triggered on obhyash.netlify.app"
