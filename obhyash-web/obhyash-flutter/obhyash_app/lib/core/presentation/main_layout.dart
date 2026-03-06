@@ -35,6 +35,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/about')) return 'about';
     if (location.startsWith('/user-profile')) return 'user_profile';
     if (location.startsWith('/subject')) return 'subject_report';
+    if (location.startsWith('/blog')) return 'blog';
     return 'dashboard';
   }
 
@@ -66,6 +67,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         return '\u09aa\u09cd\u09b0\u09cb\u09ab\u09be\u0987\u09b2';
       case 'subject_report':
         return '\u09ac\u09bf\u09b7\u09af\u09bc \u09b0\u09bf\u09aa\u09cb\u09b0\u09cd\u099f';
+      case 'blog':
+        return '\u09ac\u09cd\u09b2\u0997';
       default:
         return '\u09a1\u09cd\u09af\u09be\u09b6\u09ac\u09cb\u09b0\u09cd\u09a1';
     }
@@ -73,10 +76,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
 
   void _onTabChange(String tab) {
     if (tab == 'blog') {
-      launchUrl(
-        Uri.parse('https://obhyash.com/blog'),
-        mode: LaunchMode.externalApplication,
-      );
+      context.go('/blog');
       return;
     }
     if (tab == 'dashboard') {
