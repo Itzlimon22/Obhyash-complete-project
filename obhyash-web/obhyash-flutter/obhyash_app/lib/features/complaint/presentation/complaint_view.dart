@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
+import '../../../core/providers/auth_provider.dart';
 
 // --- Domain Models ---
 enum ComplaintType { technical, ux, bug, featureRequest }
@@ -121,14 +123,14 @@ final statusConfig = {
   },
 };
 
-class ComplaintView extends StatefulWidget {
+class ComplaintView extends ConsumerStatefulWidget {
   const ComplaintView({super.key});
 
   @override
-  State<ComplaintView> createState() => _ComplaintViewState();
+  ConsumerState<ComplaintView> createState() => _ComplaintViewState();
 }
 
-class _ComplaintViewState extends State<ComplaintView> {
+class _ComplaintViewState extends ConsumerState<ComplaintView> {
   String _activeTab = 'new';
   String? _selectedType;
   final TextEditingController _descriptionController = TextEditingController();
@@ -358,6 +360,10 @@ class _ComplaintViewState extends State<ComplaintView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Retry when auth becomes available after cold-start session restore
+    ref.listen(authProvider, (prev, next) {
+      if (next != null && prev == null) _fetchMyComplaints();
+    });
 
     if (_isSuccess) {
       return Scaffold(

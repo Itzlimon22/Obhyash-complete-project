@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../services/secure_storage_service.dart';
 import '../../../services/session_monitor_service.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
 
 final authControllerProvider = AsyncNotifierProvider<AuthController, void>(
   () => AuthController(),
@@ -76,6 +77,12 @@ class AuthController extends AsyncNotifier<void> {
             userId: user.id,
             onForcedSignOut: () async => logout(forced: true),
           );
+
+          // Force userProfileProvider to re-fetch now that the users row
+          // is guaranteed to exist.  Avoids the race where the router
+          // navigates to '/' (triggered by signedIn) before the upsert
+          // above has completed, causing userProfileProvider to cache null.
+          ref.invalidate(userProfileProvider);
         }
       } catch (e) {
         String errorMessage =

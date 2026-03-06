@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import '../../../core/providers/auth_provider.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 
 // ─── Models ──────────────────────────────────────────────────────────────────────
@@ -126,13 +126,13 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
     }
     try {
       final supabase = Supabase.instance.client;
-      final user = ref.read(userProfileProvider).value;
-      if (user == null) return;
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) return;
 
       final data = await supabase
           .from('reports')
           .select('*, question:questions(*)')
-          .eq('user_id', user.id)
+          .eq('user_id', userId)
           .order('created_at', ascending: false)
           .range(_page * _pageSize, (_page + 1) * _pageSize - 1);
 
@@ -239,6 +239,10 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Retry fetch when auth becomes available after cold-start session restore
+    ref.listen(authProvider, (prev, next) {
+      if (next != null && prev == null) _fetchReports();
+    });
 
     final pendingCount = _reports
         .where((r) => r.status != 'Resolved' && r.status != 'Ignored')

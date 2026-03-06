@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import '../../../core/providers/auth_provider.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
@@ -244,6 +244,10 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Retry fetch when auth becomes available after cold-start session restore
+    ref.listen(authProvider, (prev, next) {
+      if (next != null && prev == null) _fetch();
+    });
     final myId = Supabase.instance.client.auth.currentUser?.id;
     final isViewingSelf = widget.userId == myId;
     final myProfile = ref.watch(userProfileProvider).whenOrNull(data: (u) => u);

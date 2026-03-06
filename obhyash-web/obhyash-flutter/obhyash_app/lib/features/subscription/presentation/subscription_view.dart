@@ -1,22 +1,23 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import '../../../core/providers/auth_provider.dart';
 import '../domain/models.dart';
 import 'payment_view.dart';
 import 'widgets/pricing_card.dart';
 import 'widgets/billing_history_card.dart';
 import 'widgets/payment_methods_card.dart';
 
-class SubscriptionView extends StatefulWidget {
+class SubscriptionView extends ConsumerStatefulWidget {
   const SubscriptionView({super.key});
 
   @override
-  State<SubscriptionView> createState() => _SubscriptionViewState();
+  ConsumerState<SubscriptionView> createState() => _SubscriptionViewState();
 }
 
-class _SubscriptionViewState extends State<SubscriptionView> {
+class _SubscriptionViewState extends ConsumerState<SubscriptionView> {
   bool _isLoading = true;
   List<SubscriptionPlan> _plans = [];
   List<Invoice> _invoices = [];
@@ -541,6 +542,10 @@ class _SubscriptionViewState extends State<SubscriptionView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Retry when auth becomes available after cold-start session restore
+    ref.listen(authProvider, (prev, next) {
+      if (next != null && prev == null) _loadData();
+    });
     final isFreeUser = _currentPlanId == 'free' || _currentPlanId.isEmpty;
 
     final currentPlan =

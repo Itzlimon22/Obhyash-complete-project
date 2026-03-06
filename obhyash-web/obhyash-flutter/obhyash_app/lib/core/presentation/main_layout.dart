@@ -10,10 +10,11 @@ import 'widgets/main_sidebar.dart';
 import 'widgets/main_bottom_nav.dart';
 import '../../features/dashboard/providers/dashboard_providers.dart';
 import '../../features/auth/providers/auth_controller.dart';
+import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
 
 final _unreadNotifCountProvider = FutureProvider.autoDispose<int>((ref) async {
-  final user = Supabase.instance.client.auth.currentUser;
+  final user = ref.watch(authProvider);
   if (user == null) return 0;
   try {
     final result = await Supabase.instance.client

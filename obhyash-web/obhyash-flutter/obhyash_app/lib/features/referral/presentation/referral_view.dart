@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/providers/auth_provider.dart';
 
-class ReferralView extends StatefulWidget {
+class ReferralView extends ConsumerStatefulWidget {
   const ReferralView({super.key});
 
   @override
-  State<ReferralView> createState() => _ReferralViewState();
+  ConsumerState<ReferralView> createState() => _ReferralViewState();
 }
 
-class _ReferralViewState extends State<ReferralView> {
+class _ReferralViewState extends ConsumerState<ReferralView> {
   String? _code;
   bool _isLoading = true;
   bool _isCopied = false;
@@ -143,6 +145,10 @@ class _ReferralViewState extends State<ReferralView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Retry when auth becomes available after cold-start session restore
+    ref.listen(authProvider, (prev, next) {
+      if (next != null && prev == null) _loadReferral();
+    });
     final bg = isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9);
     final card = isDark ? const Color(0xFF171717) : Colors.white;
     final border = isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5);
