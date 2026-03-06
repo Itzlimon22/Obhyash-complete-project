@@ -72,15 +72,15 @@ class DashboardView extends ConsumerWidget {
               DashboardActionCard(
                 title: 'মক পরীক্ষা',
                 icon: LucideIcons.fileEdit,
-                primaryColor: const Color(0xFF059669), // emerald-600
-                lightColor: const Color(0xFFD1FAE5), // emerald-100
+                primaryColor: const Color(0xFF047857), // emerald-700
+                lightColor: const Color(0xFFECFDF5), // emerald-50
                 onTap: () => context.go('/setup'),
               ),
               DashboardActionCard(
                 title: 'অনুশীলন',
                 icon: LucideIcons.bookOpen,
-                primaryColor: const Color(0xFF059669), // emerald-600
-                lightColor: const Color(0xFFD1FAE5), // emerald-100
+                primaryColor: const Color(0xFF047857), // emerald-700
+                lightColor: const Color(0xFFECFDF5), // emerald-50
                 onTap: () => context.go('/practice'),
               ),
               DashboardActionCard(
@@ -93,22 +93,22 @@ class DashboardView extends ConsumerWidget {
               DashboardActionCard(
                 title: 'লিডারবোর্ড',
                 icon: LucideIcons.trophy,
-                primaryColor: const Color(0xFF059669), // emerald-600
-                lightColor: const Color(0xFFD1FAE5), // emerald-100
+                primaryColor: const Color(0xFF047857), // emerald-700
+                lightColor: const Color(0xFFECFDF5), // emerald-50
                 onTap: () => context.go('/leaderboard'),
               ),
               DashboardActionCard(
                 title: 'এনালাইসিস',
                 icon: LucideIcons.pieChart,
-                primaryColor: const Color(0xFF059669), // emerald-600
-                lightColor: const Color(0xFFD1FAE5), // emerald-100
+                primaryColor: const Color(0xFF047857), // emerald-700
+                lightColor: const Color(0xFFECFDF5), // emerald-50
                 onTap: () => context.go('/analysis'),
               ),
               DashboardActionCard(
                 title: 'ব্লগ',
                 icon: LucideIcons.newspaper,
-                primaryColor: const Color(0xFF059669),
-                lightColor: const Color(0xFFD1FAE5),
+                primaryColor: const Color(0xFF047857), // emerald-700
+                lightColor: const Color(0xFFECFDF5), // emerald-50
                 onTap: () => launchUrl(
                   Uri.parse('https://obhyash.com/blog'),
                   mode: LaunchMode.externalApplication,

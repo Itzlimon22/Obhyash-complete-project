@@ -598,6 +598,27 @@ class _ExamCard extends StatelessWidget {
 }
 
 // ─── Mistakes Tab ──────────────────────────────────────────────────────────────
+
+class _HistoryMistake {
+  final String id;
+  final String questionText;
+  final List<String> options;
+  final int correctAnswerIndex;
+  final int userAnswerIndex;
+  final String subjectLabel;
+  final int frequency;
+
+  const _HistoryMistake({
+    required this.id,
+    required this.questionText,
+    required this.options,
+    required this.correctAnswerIndex,
+    required this.userAnswerIndex,
+    required this.subjectLabel,
+    required this.frequency,
+  });
+}
+
 class _MistakesTab extends StatefulWidget {
   final bool isDark;
   const _MistakesTab({required this.isDark});
@@ -607,16 +628,16 @@ class _MistakesTab extends StatefulWidget {
 }
 
 class _MistakesTabState extends State<_MistakesTab> {
-  List<Map<String, dynamic>> _mistakes = [];
+  List<_HistoryMistake> _mistakes = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchMistakes();
+    _fetch();
   }
 
-  Future<void> _fetchMistakes() async {
+  Future<void> _fetch() async {
     try {
       final sb = Supabase.instance.client;
       final uid = sb.auth.currentUser?.id;
@@ -625,22 +646,76 @@ class _MistakesTabState extends State<_MistakesTab> {
         return;
       }
 
-      // Fetch wrong answers from user_answers table if it exists
+      // Derive mistakes from exam_results JSONB — same approach as practice_dashboard.dart
       final data = await sb
-          .from('user_answers')
-          .select(
-            'question_id, user_answer, correct_answer, question_text, subject, created_at',
-          )
+          .from('exam_results')
+          .select('questions, user_answers, subject_label')
           .eq('user_id', uid)
-          .not('user_answer', 'is', null)
-          .limit(100);
+          .not('questions', 'is', null)
+          .not('user_answers', 'is', null);
 
-      setState(() {
-        _mistakes = (data as List).cast<Map<String, dynamic>>();
-        _isLoading = false;
-      });
+      final Map<String, Map<String, dynamic>> mistakeMap = {};
+      final Map<String, int> freqMap = {};
+
+      for (final row in (data as List)) {
+        final questionsRaw = row['questions'];
+        final answersRaw = row['user_answers'];
+        if (questionsRaw is! List || answersRaw is! Map) continue;
+
+        final answers = Map<String, dynamic>.from(answersRaw);
+        final subjectLabel = (row['subject_label'] as String?) ?? '';
+
+        for (final qData in questionsRaw) {
+          if (qData is! Map<String, dynamic>) continue;
+          final id = qData['id']?.toString() ?? '';
+          if (id.isEmpty) continue;
+
+          final correctIdx =
+              (qData['correct_answer_index'] as num?)?.toInt() ?? 0;
+          final raw = answers[id];
+          if (raw == null) continue;
+          final userAnswer = (raw as num).toInt();
+          if (userAnswer == -1) continue; // skipped
+          if (userAnswer != correctIdx) {
+            freqMap[id] = (freqMap[id] ?? 0) + 1;
+            if (!mistakeMap.containsKey(id)) {
+              mistakeMap[id] = {
+                ...qData,
+                '_user_answer': userAnswer,
+                '_subject_label': subjectLabel,
+              };
+            }
+          }
+        }
+      }
+
+      final sorted = mistakeMap.entries.toList()
+        ..sort((a, b) => (freqMap[b.key] ?? 0).compareTo(freqMap[a.key] ?? 0));
+
+      if (mounted) {
+        setState(() {
+          _mistakes = sorted.map((e) {
+            final d = e.value;
+            final opts = <String>[];
+            if (d['options'] is List) {
+              opts.addAll((d['options'] as List).map((o) => o.toString()));
+            }
+            return _HistoryMistake(
+              id: e.key,
+              questionText: d['question']?.toString() ?? '',
+              options: opts,
+              correctAnswerIndex:
+                  (d['correct_answer_index'] as num?)?.toInt() ?? 0,
+              userAnswerIndex: d['_user_answer'] as int,
+              subjectLabel: d['_subject_label']?.toString() ?? '',
+              frequency: freqMap[e.key] ?? 1,
+            );
+          }).toList();
+          _isLoading = false;
+        });
+      }
     } catch (_) {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -657,51 +732,202 @@ class _MistakesTabState extends State<_MistakesTab> {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: _mistakes.length,
-      itemBuilder: (ctx, i) {
-        final m = _mistakes[i];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: widget.isDark ? const Color(0xFF171717) : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: widget.isDark
-                  ? const Color(0xFF262626)
-                  : const Color(0xFFE5E5E5),
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                m['question_text'] ?? 'প্রশ্ন',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: widget.isDark ? Colors.white : const Color(0xFF171717),
+      itemBuilder: (ctx, i) =>
+          _MistakeCard(m: _mistakes[i], isDark: widget.isDark),
+    );
+  }
+}
+
+class _MistakeCard extends StatelessWidget {
+  final _HistoryMistake m;
+  final bool isDark;
+
+  const _MistakeCard({required this.m, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF171717) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+        ),
+        boxShadow: isDark
+            ? []
+            : [
+                const BoxShadow(
+                  color: Color(0x06000000),
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _Chip(
-                    label: 'আপনার উত্তর: ${m['user_answer'] ?? '-'}',
-                    isDark: widget.isDark,
-                    color: const Color(0xFFEF4444),
+              ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Subject badge + frequency
+          Row(
+            children: [
+              if (m.subjectLabel.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
                   ),
-                  const SizedBox(width: 6),
-                  _Chip(
-                    label: 'সঠিক: ${m['correct_answer'] ?? '-'}',
-                    isDark: widget.isDark,
-                    color: const Color(0xFF059669),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF262626)
+                        : const Color(0xFFF5F5F5),
+                    borderRadius: BorderRadius.circular(100),
                   ),
-                ],
-              ),
+                  child: Text(
+                    m.subjectLabel.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFA3A3A3),
+                    ),
+                  ),
+                ),
+              if (m.frequency > 1) ...[
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF450A0A).withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(
+                      color: const Color(0xFF7F1D1D).withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Text(
+                    '${m.frequency}× ভুল',
+                    style: const TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFF87171),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
-        );
-      },
+          const SizedBox(height: 8),
+          // Question text
+          Text(
+            m.questionText,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white : const Color(0xFF171717),
+            ),
+          ),
+          if (m.options.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            // Options
+            ...m.options.asMap().entries.map((e) {
+              final idx = e.key;
+              final opt = e.value;
+              final isCorrect = idx == m.correctAnswerIndex;
+              final isUserWrong =
+                  idx == m.userAnswerIndex && idx != m.correctAnswerIndex;
+
+              Color? bg;
+              Color? border;
+              Color textColor = isDark
+                  ? const Color(0xFFD4D4D4)
+                  : const Color(0xFF404040);
+
+              if (isCorrect) {
+                bg = const Color(
+                  0xFF064E3B,
+                ).withValues(alpha: isDark ? 0.3 : 0.08);
+                border = const Color(0xFF059669).withValues(alpha: 0.5);
+                textColor = isDark
+                    ? const Color(0xFF34D399)
+                    : const Color(0xFF047857);
+              } else if (isUserWrong) {
+                bg = const Color(
+                  0xFF7F1D1D,
+                ).withValues(alpha: isDark ? 0.3 : 0.08);
+                border = const Color(0xFFEF4444).withValues(alpha: 0.5);
+                textColor = isDark
+                    ? const Color(0xFFF87171)
+                    : const Color(0xFFDC2626);
+              }
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color:
+                      bg ??
+                      (isDark
+                          ? const Color(0xFF262626).withValues(alpha: 0.3)
+                          : const Color(0xFFFAFAFA)),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color:
+                        border ??
+                        (isDark
+                            ? const Color(0xFF404040)
+                            : const Color(0xFFE5E5E5)),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      '${['ক', 'খ', 'গ', 'ঘ'][idx < 4 ? idx : 0]}. ',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        opt,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: isCorrect || isUserWrong
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: textColor,
+                        ),
+                      ),
+                    ),
+                    if (isCorrect)
+                      Icon(
+                        Icons.check_circle_outline_rounded,
+                        size: 14,
+                        color: isDark
+                            ? const Color(0xFF34D399)
+                            : const Color(0xFF047857),
+                      ),
+                    if (isUserWrong)
+                      Icon(
+                        Icons.cancel_outlined,
+                        size: 14,
+                        color: isDark
+                            ? const Color(0xFFF87171)
+                            : const Color(0xFFDC2626),
+                      ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ],
+      ),
     );
   }
 }
@@ -768,8 +994,14 @@ class _BookmarksTabState extends State<_BookmarksTab> {
       itemBuilder: (ctx, i) {
         final b = _bookmarks[i];
         final q = b['questions'] as Map<String, dynamic>? ?? {};
+        final options = q['options'] is List
+            ? (q['options'] as List).map((o) => o.toString()).toList()
+            : <String>[];
+        final correctIdx = (q['correct_answer_index'] as num?)?.toInt() ?? 0;
+        final labels = ['ক', 'খ', 'গ', 'ঘ'];
+
         return Container(
-          margin: const EdgeInsets.only(bottom: 10),
+          margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: widget.isDark ? const Color(0xFF171717) : Colors.white,
@@ -779,29 +1011,138 @@ class _BookmarksTabState extends State<_BookmarksTab> {
                   ? const Color(0xFF262626)
                   : const Color(0xFFE5E5E5),
             ),
+            boxShadow: widget.isDark
+                ? []
+                : [
+                    const BoxShadow(
+                      color: Color(0x06000000),
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                LucideIcons.bookmark,
-                color: const Color(0xFF059669),
-                size: 18,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  q['question'] ?? 'প্রশ্ন',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: widget.isDark
-                        ? Colors.white
-                        : const Color(0xFF171717),
+              // Header: bookmark icon + subject
+              Row(
+                children: [
+                  Icon(
+                    LucideIcons.bookmark,
+                    size: 13,
+                    color: const Color(0xFF047857),
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                  const SizedBox(width: 6),
+                  if ((q['subject'] as String?)?.isNotEmpty == true)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: widget.isDark
+                            ? const Color(0xFF262626)
+                            : const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Text(
+                        (q['subject'] as String).toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFA3A3A3),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              // Question text
+              Text(
+                q['question']?.toString() ?? 'প্রশ্ন',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: widget.isDark ? Colors.white : const Color(0xFF171717),
                 ),
               ),
+              if (options.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                ...options.asMap().entries.map((e) {
+                  final idx = e.key;
+                  final opt = e.value;
+                  final isCorrect = idx == correctIdx;
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isCorrect
+                          ? const Color(
+                              0xFF064E3B,
+                            ).withValues(alpha: widget.isDark ? 0.3 : 0.08)
+                          : (widget.isDark
+                                ? const Color(0xFF262626).withValues(alpha: 0.3)
+                                : const Color(0xFFFAFAFA)),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isCorrect
+                            ? const Color(0xFF059669).withValues(alpha: 0.5)
+                            : (widget.isDark
+                                  ? const Color(0xFF404040)
+                                  : const Color(0xFFE5E5E5)),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          '${labels[idx < 4 ? idx : 0]}. ',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: isCorrect
+                                ? (widget.isDark
+                                      ? const Color(0xFF34D399)
+                                      : const Color(0xFF047857))
+                                : (widget.isDark
+                                      ? const Color(0xFFD4D4D4)
+                                      : const Color(0xFF404040)),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            opt,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: isCorrect
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: isCorrect
+                                  ? (widget.isDark
+                                        ? const Color(0xFF34D399)
+                                        : const Color(0xFF047857))
+                                  : (widget.isDark
+                                        ? const Color(0xFFD4D4D4)
+                                        : const Color(0xFF404040)),
+                            ),
+                          ),
+                        ),
+                        if (isCorrect)
+                          Icon(
+                            Icons.check_circle_outline_rounded,
+                            size: 14,
+                            color: widget.isDark
+                                ? const Color(0xFF34D399)
+                                : const Color(0xFF047857),
+                          ),
+                      ],
+                    ),
+                  );
+                }),
+              ],
             ],
           ),
         );

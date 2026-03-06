@@ -36,6 +36,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/user-profile')) return 'user_profile';
     if (location.startsWith('/subject')) return 'subject_report';
     if (location.startsWith('/blog')) return 'blog';
+    if (location.startsWith('/referral')) return 'referral';
     return 'dashboard';
   }
 
@@ -69,6 +70,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         return '\u09ac\u09bf\u09b7\u09af\u09bc \u09b0\u09bf\u09aa\u09cb\u09b0\u09cd\u099f';
       case 'blog':
         return '\u09ac\u09cd\u09b2\u0997';
+      case 'referral':
+        return '\u09b0\u09c7\u09ab\u09be\u09b0\u09c7\u09b2 \u09aa\u09cd\u09b0\u09cb\u0997\u09cd\u09b0\u09be\u09ae';
       default:
         return '\u09a1\u09cd\u09af\u09be\u09b6\u09ac\u09cb\u09b0\u09cd\u09a1';
     }
@@ -366,6 +369,12 @@ class _ProfileSheet extends StatelessWidget {
             '\u0986\u09ae\u09be\u09a6\u09c7\u09b0 \u09b8\u09ae\u09cd\u09aa\u09b0\u09cd\u0995\u09c7',
         'icon': LucideIcons.info,
         'route': '/about',
+      },
+      {
+        'label':
+            '\u09b0\u09c7\u09ab\u09be\u09b0\u09c7\u09b2 \u09aa\u09cd\u09b0\u09cb\u0997\u09cd\u09b0\u09be\u09ae',
+        'icon': LucideIcons.gift,
+        'route': '/referral',
       },
       {
         'label':
