@@ -168,9 +168,8 @@ class DashboardLeaderboardCard extends StatelessWidget {
                   children: [
                     SizedBox(width: 36, child: Text('#', style: _headerStyle)),
                     const SizedBox(width: 8),
-                    const SizedBox(width: 36),
+                    const SizedBox(width: 28),
                     const Expanded(child: Text('নাম', style: _headerStyle)),
-                    Text('XP', style: _headerStyle),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -225,34 +224,11 @@ class DashboardLeaderboardCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF064E3B).withOpacity(0.4)
-                                : const Color(0xFFD1FAE5),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            '${topUser!.xp} XP',
-                            style: TextStyle(
-                              fontFamily: 'HindSiliguri',
-                              fontWeight: FontWeight.w800,
-                              fontSize: 11,
-                              color: isDark
-                                  ? const Color(0xFF34D399)
-                                  : const Color(0xFF059669),
-                            ),
-                          ),
-                        ),
                       ] else ...[
                         // Skeleton
                         Container(
-                          width: 34,
-                          height: 34,
+                          width: 28,
+                          height: 28,
                           decoration: BoxDecoration(
                             color: isDark
                                 ? const Color(0xFF404040)
@@ -367,29 +343,6 @@ class DashboardLeaderboardCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF064E3B).withOpacity(0.4)
-                              : const Color(0xFFD1FAE5),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          '${currentUser.xp} XP',
-                          style: TextStyle(
-                            fontFamily: 'HindSiliguri',
-                            fontWeight: FontWeight.w800,
-                            fontSize: 11,
-                            color: isDark
-                                ? const Color(0xFF34D399)
-                                : const Color(0xFF059669),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -452,34 +405,21 @@ class DashboardLeaderboardCard extends StatelessWidget {
 
   Widget _buildMiniAvatar(String name, bool isDark) {
     return Container(
-      width: 34,
-      height: 34,
+      width: 28,
+      height: 28,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [const Color(0xFF064E3B), const Color(0xFF065F46)]
-              : [const Color(0xFFD1FAE5), const Color(0xFFA7F3D0)],
-        ),
+        color: isDark ? const Color(0xFF064E3B) : const Color(0xFFD1FAE5),
         shape: BoxShape.circle,
         border: Border.all(
           color: isDark ? const Color(0xFF059669) : const Color(0xFF6EE7B7),
           width: 2,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF059669).withOpacity(isDark ? 0.3 : 0.2),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Center(
         child: Text(
           name.isNotEmpty ? name[0].toUpperCase() : '?',
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 11,
             fontWeight: FontWeight.w900,
             color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
           ),

@@ -87,23 +87,6 @@ class _DashboardActionCardState extends State<DashboardActionCard>
                           ? widget.primaryColor.withOpacity(0.4)
                           : widget.lightColor.withOpacity(0.8)),
               ),
-              boxShadow: [
-                if (!isDark)
-                  BoxShadow(
-                    color: widget.primaryColor.withOpacity(
-                      _isHovered ? 0.18 : 0.08,
-                    ),
-                    blurRadius: _isHovered ? 16 : 10,
-                    offset: const Offset(0, 4),
-                    spreadRadius: -2,
-                  ),
-                if (isDark)
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-              ],
             ),
             clipBehavior: Clip.antiAlias,
             child: Stack(
@@ -158,40 +141,30 @@ class _DashboardActionCardState extends State<DashboardActionCard>
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Icon Box with colored gradient background
+                      // Icon Box with white background and border
                       AnimatedScale(
                         scale: _isHovered ? 1.08 : 1.0,
                         duration: const Duration(milliseconds: 200),
                         child: Container(
-                          width: 46,
-                          height: 46,
+                          width: 44,
+                          height: 44,
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: isDark
-                                  ? [
-                                      widget.primaryColor.withOpacity(0.2),
-                                      widget.primaryColor.withOpacity(0.08),
-                                    ]
-                                  : [
-                                      widget.lightColor,
-                                      widget.lightColor.withOpacity(0.6),
-                                    ],
-                            ),
-                            borderRadius: BorderRadius.circular(14),
+                            color: isDark
+                                ? const Color(0xFF262626)
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isDark
-                                  ? widget.primaryColor.withOpacity(0.25)
-                                  : widget.primaryColor.withOpacity(0.15),
+                                  ? widget.primaryColor.withOpacity(0.2)
+                                  : const Color(0xFFD1FAE5),
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: widget.primaryColor.withOpacity(
-                                  isDark ? 0.15 : 0.12,
+                                color: Colors.black.withOpacity(
+                                  isDark ? 0.0 : 0.04,
                                 ),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
                               ),
                             ],
                           ),
