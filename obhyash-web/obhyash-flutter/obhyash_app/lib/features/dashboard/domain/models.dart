@@ -172,13 +172,16 @@ class UserProfile {
       id: json['id'] as String,
       name: json['name'] as String? ?? 'Unknown User',
       email: json['email'] as String?,
-      xp: json['xp'] as int? ?? 0,
+      xp: (json['xp'] as num?)?.toInt() ?? 0,
       level: json['level'] as String?,
       division: json['division'] as String?,
       stream: json['stream'] as String?,
       optionalSubject: json['optional_subject'] as String?,
       institute: json['institute'] as String?,
-      streakCount: json['streak'] as int? ?? json['streak_count'] as int? ?? 0,
+      streakCount:
+          (json['streak'] as num?)?.toInt() ??
+          (json['streak_count'] as num?)?.toInt() ??
+          0,
       phone: json['phone'] as String?,
       dob: json['dob'] as String?,
       gender: json['gender'] as String?,

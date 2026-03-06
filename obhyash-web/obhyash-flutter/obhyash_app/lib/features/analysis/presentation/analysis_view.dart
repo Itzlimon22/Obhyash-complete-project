@@ -207,7 +207,8 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
           _isLoading = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[AnalysisView] _fetchAnalytics error: $e');
       if (mounted) setState(() => _isLoading = false);
     }
   }

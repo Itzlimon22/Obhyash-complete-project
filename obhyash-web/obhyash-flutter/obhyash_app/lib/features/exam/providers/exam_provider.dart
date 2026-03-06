@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/exam_models.dart';
@@ -140,7 +141,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
             .insert({
               'user_id': authId,
               'status': 'active',
-              'subject': config.subjectLabel,
+              'subject': config.subject,
             })
             .select('id')
             .maybeSingle();
@@ -305,7 +306,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
         // Increment streak
         await supabase.rpc('increment_user_streak', params: {'uid': authId});
       } catch (e) {
-        // ignore save errors — result is still shown to user
+        debugPrint('[ExamProvider] submitExam DB error: $e');
       }
     }
 

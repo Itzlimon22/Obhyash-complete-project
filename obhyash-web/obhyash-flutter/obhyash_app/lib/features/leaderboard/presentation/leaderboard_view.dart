@@ -146,7 +146,9 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       if (mounted) {
         setState(() => _levelCounts = Map.fromEntries(results));
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[LeaderboardView] _fetchCounts error: $e');
+    }
   }
 
   Future<void> _fetch() async {
@@ -169,7 +171,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
           _isLoading = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[LeaderboardView] _fetch error: $e');
       if (mounted) setState(() => _isLoading = false);
     }
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as supa;
 import 'models.dart';
 
@@ -21,7 +22,7 @@ class DashboardRepository {
           .map((json) => LeaderboardUser.fromJson(json))
           .toList();
     } catch (e) {
-      print('DashboardRepository: getLeaderboardUsers Error: $e');
+      debugPrint('DashboardRepository: getLeaderboardUsers Error: $e');
       return [];
     }
   }
@@ -68,7 +69,7 @@ class DashboardRepository {
         return true;
       }).toList();
     } catch (e) {
-      print('DashboardRepository: getSubjects Error: $e');
+      debugPrint('DashboardRepository: getSubjects Error: $e');
       return [];
     }
   }
@@ -88,7 +89,7 @@ class DashboardRepository {
           .map((json) => ExamResult.fromJson(json))
           .toList();
     } catch (e) {
-      print('DashboardRepository: getUserHistory Error: $e');
+      debugPrint('DashboardRepository: getUserHistory Error: $e');
       return [];
     }
   }
