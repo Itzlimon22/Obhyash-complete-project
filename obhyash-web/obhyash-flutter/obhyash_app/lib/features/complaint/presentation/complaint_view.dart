@@ -159,7 +159,7 @@ class _ComplaintViewState extends State<ComplaintView> {
       if (user == null) return;
 
       final response = await supabase
-          .from('complaints')
+          .from('app_complaints')
           .select()
           .eq('user_id', user.id)
           .order('created_at', ascending: false);
@@ -208,7 +208,7 @@ class _ComplaintViewState extends State<ComplaintView> {
       final user = supabase.auth.currentUser;
       if (user == null) throw Exception('No user logged in');
 
-      await supabase.from('complaints').insert({
+      await supabase.from('app_complaints').insert({
         'user_id': user.id,
         'type': _selectedType,
         'description': _descriptionController.text.trim(),

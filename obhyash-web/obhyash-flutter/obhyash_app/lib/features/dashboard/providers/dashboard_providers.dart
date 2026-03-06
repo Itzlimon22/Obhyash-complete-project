@@ -32,14 +32,20 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
     final cached = prefs.getString(cacheKey);
     if (cached != null) {
       try {
-        return UserProfile.fromJson(jsonDecode(cached));
+        final decoded = jsonDecode(cached) as Map<String, dynamic>;
+        // Invalidate old cache entries from public_profiles that lack stream/optional_subject
+        if (decoded.containsKey('stream') ||
+            decoded.containsKey('optional_subject')) {
+          return UserProfile.fromJson(decoded);
+        }
+        // Else fall through to re-fetch from users table
       } catch (_) {}
     }
 
-    // 2. Network Fetch (only runs if no cache)
+    // 2. Network Fetch — use 'users' table to get stream, optional_subject, etc.
     final supabase = ref.watch(supabaseClientProvider);
     final response = await supabase
-        .from('public_profiles')
+        .from('users')
         .select('*')
         .eq('id', user.id)
         .maybeSingle();
@@ -106,7 +112,10 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
     if (cached != null) {
       try {
         final List list = jsonDecode(cached);
-        return list.map((e) => SubjectStats.fromJson(e)).toList();
+        return list
+            .map((e) => SubjectStats.fromJson(e))
+            .where((s) => s.total > 0)
+            .toList();
       } catch (_) {}
     }
 
@@ -121,50 +130,54 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
 
     final history = await repository.getUserHistory(profile.id);
 
-    final fresh = subjects.map((sub) {
-      final subName = sub.name.toLowerCase();
-      final subId = sub.id.toLowerCase();
+    final fresh = subjects
+        .map((sub) {
+          final subName = sub.name.toLowerCase();
+          final subId = sub.id.toLowerCase();
 
-      int correct = 0;
-      int wrong = 0;
-      int skipped = 0;
-      int total = 0;
+          int correct = 0;
+          int wrong = 0;
+          int skipped = 0;
+          int total = 0;
 
-      for (var exam in history) {
-        final hSub = (exam.subjectLabel ?? exam.subject).toLowerCase();
-        final hSubId = exam.subject.toLowerCase();
+          for (var exam in history) {
+            final hSub = (exam.subjectLabel ?? exam.subject).toLowerCase();
+            final hSubId = exam.subject.toLowerCase();
 
-        final isMatch =
-            hSubId == subId ||
-            hSub.contains(subName) ||
-            hSub.contains(subId) ||
-            (subName == 'পদার্থবিজ্ঞান' && hSub.contains('physics')) ||
-            (subName == 'রসায়ন' && hSub.contains('chemistry')) ||
-            (subName == 'গণিত' && hSub.contains('math')) ||
-            (subName == 'জীববিজ্ঞান' && hSub.contains('biology')) ||
-            (subName == 'বাংলা' && hSub.contains('bangla')) ||
-            (subName == 'ইংরেজি' && hSub.contains('english')) ||
-            (subName == 'সাধারণ জ্ঞান' && hSub.contains('gk')) ||
-            (subName == 'আইসিটি' && hSub.contains('ict'));
+            final isMatch =
+                hSubId == subId ||
+                hSub.contains(subName) ||
+                hSub.contains(subId) ||
+                (subName == 'পদার্থবিজ্ঞান' && hSub.contains('physics')) ||
+                (subName == 'রসায়ন' && hSub.contains('chemistry')) ||
+                (subName == 'গণিত' && hSub.contains('math')) ||
+                (subName == 'জীববিজ্ঞান' && hSub.contains('biology')) ||
+                (subName == 'বাংলা' && hSub.contains('bangla')) ||
+                (subName == 'ইংরেজি' && hSub.contains('english')) ||
+                (subName == 'সাধারণ জ্ঞান' && hSub.contains('gk')) ||
+                (subName == 'আইসিটি' && hSub.contains('ict'));
 
-        if (isMatch) {
-          correct += exam.correctCount;
-          wrong += exam.wrongCount;
-          total += exam.totalQuestions;
-          skipped += (exam.totalQuestions - exam.correctCount - exam.wrongCount)
-              .clamp(0, 9999);
-        }
-      }
+            if (isMatch) {
+              correct += exam.correctCount;
+              wrong += exam.wrongCount;
+              total += exam.totalQuestions;
+              skipped +=
+                  (exam.totalQuestions - exam.correctCount - exam.wrongCount)
+                      .clamp(0, 9999);
+            }
+          }
 
-      return SubjectStats(
-        id: sub.id,
-        name: sub.name,
-        correct: correct,
-        wrong: wrong,
-        skipped: skipped,
-        total: total,
-      );
-    }).toList();
+          return SubjectStats(
+            id: sub.id,
+            name: sub.name,
+            correct: correct,
+            wrong: wrong,
+            skipped: skipped,
+            total: total,
+          );
+        })
+        .where((s) => s.total > 0)
+        .toList();
 
     prefs.setString(
       cacheKey,

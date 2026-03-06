@@ -31,7 +31,7 @@ class _OtherUser {
     level: j['level'] as String? ?? 'Rookie',
     xp: (j['xp'] as num?)?.toInt() ?? 0,
     examsTaken: (j['exams_taken'] as num?)?.toInt() ?? 0,
-    streakCount: (j['streak_count'] as num?)?.toInt() ?? 0,
+    streakCount: (j['streak'] as num?)?.toInt() ?? 0,
     avatarUrl: j['avatar_url'] as String?,
   );
 }
@@ -185,6 +185,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
   int _rank = 0;
   bool _isLoading = true;
   String? _expanded;
+  String? _error;
 
   @override
   void initState() {
@@ -199,9 +200,9 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
       final myId = supabase.auth.currentUser?.id;
 
       final profileData = await supabase
-          .from('profiles')
+          .from('public_profiles')
           .select(
-            'id, name, institute, level, xp, exams_taken, streak_count, avatar_url',
+            'id, name, institute, level, xp, exams_taken, streak, avatar_url',
           )
           .eq('id', widget.userId)
           .single();
@@ -209,7 +210,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
       final user = _OtherUser.fromJson(profileData);
 
       final rankData = await supabase
-          .from('profiles')
+          .from('public_profiles')
           .select('id')
           .eq('level', user.level)
           .gt('xp', user.xp);
@@ -230,9 +231,12 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
           _isLoading = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
-        setState(() => _isLoading = false);
+        setState(() {
+          _isLoading = false;
+          _error = e.toString();
+        });
       }
     }
   }
@@ -249,11 +253,36 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
     }
     if (_user == null) {
       return Center(
-        child: Text(
-          'প্রোফাইল পাওয়া যায়নি',
-          style: TextStyle(
-            fontSize: 16,
-            color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'প্রোফাইল পাওয়া যায়নি',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDark
+                      ? const Color(0xFFA3A3A3)
+                      : const Color(0xFF737373),
+                ),
+              ),
+              if (_error != null) ...[
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: _fetch,
+                  child: Text(
+                    'আবার চেষ্টা করুন',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDark
+                          ? const Color(0xFF60A5FA)
+                          : const Color(0xFF2563EB),
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
       );

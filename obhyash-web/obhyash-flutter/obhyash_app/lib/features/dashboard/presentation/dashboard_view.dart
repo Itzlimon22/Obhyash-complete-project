@@ -133,7 +133,7 @@ class DashboardView extends ConsumerWidget {
             data: subjects,
             isLoading: isLoading,
             onSubjectClick: (subjectId) {
-              context.go('/analysis');
+              context.go('/subject/$subjectId');
             },
           ),
 

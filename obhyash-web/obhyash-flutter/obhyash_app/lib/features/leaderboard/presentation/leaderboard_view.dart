@@ -712,130 +712,134 @@ class _LeaderboardTable extends StatelessWidget {
               final isMe = u.isCurrentUser;
               final isLast = i == users.length - 1;
 
-              return Container(
-                decoration: BoxDecoration(
-                  color: isMe
-                      ? const Color(
-                          0xFFFFF1F2,
-                        ).withValues(alpha: isDark ? 0.04 : 1.0)
-                      : Colors.transparent,
-                  border: !isLast
-                      ? Border(
-                          bottom: BorderSide(
-                            color: isDark
-                                ? const Color(0xFF262626)
-                                : const Color(0xFFF5F5F5),
-                          ),
-                        )
-                      : null,
-                  borderRadius: isLast
-                      ? const BorderRadius.vertical(bottom: Radius.circular(20))
-                      : null,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: onUserTap != null ? () => onUserTap!(u.id) : null,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isMe
+                        ? const Color(
+                            0xFFFFF1F2,
+                          ).withValues(alpha: isDark ? 0.04 : 1.0)
+                        : Colors.transparent,
+                    border: !isLast
+                        ? Border(
+                            bottom: BorderSide(
+                              color: isDark
+                                  ? const Color(0xFF262626)
+                                  : const Color(0xFFF5F5F5),
+                            ),
+                          )
+                        : null,
+                    borderRadius: isLast
+                        ? const BorderRadius.vertical(
+                            bottom: Radius.circular(20),
+                          )
+                        : null,
                   ),
-                  child: Row(
-                    children: [
-                      SizedBox(width: 40, child: _rankBadge(i + 1)),
-                      const SizedBox(width: 12),
-                      _avatar(
-                        u.name,
-                        ring: isMe
-                            ? const Color(0xFFFECDD3)
-                            : Colors.transparent,
-                        bg: isDark
-                            ? const Color(0xFF404040)
-                            : const Color(0xFFE5E5E5),
-                        textColor: isDark
-                            ? Colors.white
-                            : const Color(0xFF171717),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    u.name,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: isMe
-                                          ? (isDark
-                                                ? const Color(0xFFFB7185)
-                                                : const Color(0xFFE11D48))
-                                          : (isDark
-                                                ? Colors.white
-                                                : const Color(0xFF171717)),
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                if (isMe) ...[
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFFE4E6),
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    child: const Text(
-                                      'তুমি',
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(width: 40, child: _rankBadge(i + 1)),
+                        const SizedBox(width: 12),
+                        _avatar(
+                          u.name,
+                          ring: isMe
+                              ? const Color(0xFFFECDD3)
+                              : Colors.transparent,
+                          bg: isDark
+                              ? const Color(0xFF404040)
+                              : const Color(0xFFE5E5E5),
+                          textColor: isDark
+                              ? Colors.white
+                              : const Color(0xFF171717),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      u.name,
                                       style: TextStyle(
-                                        fontSize: 9,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFFE11D48),
+                                        fontSize: 14,
+                                        color: isMe
+                                            ? (isDark
+                                                  ? const Color(0xFFFB7185)
+                                                  : const Color(0xFFE11D48))
+                                            : (isDark
+                                                  ? Colors.white
+                                                  : const Color(0xFF171717)),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (isMe) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFE4E6),
+                                        borderRadius: BorderRadius.circular(
+                                          100,
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'তুমি',
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFFE11D48),
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ],
-                              ],
-                            ),
-                            if (u.institute.isNotEmpty)
-                              Text(
-                                u.institute,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: Color(0xFFA3A3A3),
-                                ),
-                                overflow: TextOverflow.ellipsis,
                               ),
-                          ],
+                              if (u.institute.isNotEmpty)
+                                Text(
+                                  u.institute,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFFA3A3A3),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                      Text(
-                        _numFmt.format(u.xp),
-                        style: const TextStyle(
-                          fontFamily: 'monospace',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: Color(0xFF059669),
+                        Text(
+                          _numFmt.format(u.xp),
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Color(0xFF059669),
+                          ),
                         ),
-                      ),
-                      if (onUserTap != null) ...[
-                        const SizedBox(width: 6),
-                        GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () => onUserTap!(u.id),
-                          child: Icon(
+                        if (onUserTap != null) ...[
+                          const SizedBox(width: 6),
+                          Icon(
                             LucideIcons.externalLink,
                             size: 14,
                             color: isDark
                                 ? const Color(0xFF737373)
                                 : const Color(0xFFA3A3A3),
                           ),
-                        ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               );

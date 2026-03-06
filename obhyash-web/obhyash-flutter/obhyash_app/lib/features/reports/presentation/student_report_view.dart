@@ -125,7 +125,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
       if (user == null) return;
 
       final data = await supabase
-          .from('user_reports')
+          .from('reports')
           .select('*, question:questions(*)')
           .eq('user_id', user.id)
           .order('created_at', ascending: false)
