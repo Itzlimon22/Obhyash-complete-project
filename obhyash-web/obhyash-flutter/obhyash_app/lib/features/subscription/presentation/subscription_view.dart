@@ -3,6 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../domain/models.dart';
+import 'payment_view.dart';
 import 'widgets/pricing_card.dart';
 import 'widgets/billing_history_card.dart';
 import 'widgets/payment_methods_card.dart';
@@ -113,170 +114,20 @@ class _SubscriptionViewState extends State<SubscriptionView> {
 
   void _handlePlanSelect(SubscriptionPlan plan) {
     if (plan.id == _currentPlanId) return;
-    _showPaymentDialog(plan);
+    _openPaymentPage(plan);
   }
 
-  void _showPaymentDialog(SubscriptionPlan plan) {
-    final senderController = TextEditingController();
-    final txController = TextEditingController();
-    String selectedMethod = 'bkash';
-    bool isSubmitting = false;
-
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setDialogState) {
-            return AlertDialog(
-              title: Text(
-                '${plan.name} \u09aa\u09c7\u09ae\u09c7\u09a8\u09cd\u099f',
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '\u09ae\u09cb\u099f: ${plan.currency}${plan.price}',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      '\u09aa\u09c7\u09ae\u09c7\u09a8\u09cd\u099f \u09aa\u09a6\u09cd\u09a7\u09a4\u09bf',
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: ['bkash', 'nagad'].map((method) {
-                        final selected = selectedMethod == method;
-                        return Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: OutlinedButton(
-                              onPressed: () =>
-                                  setDialogState(() => selectedMethod = method),
-                              style: OutlinedButton.styleFrom(
-                                backgroundColor: selected
-                                    ? Theme.of(ctx).colorScheme.primaryContainer
-                                    : null,
-                              ),
-                              child: Text(
-                                method == 'bkash' ? 'bKash' : 'Nagad',
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: senderController,
-                      keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(
-                        labelText:
-                            '\u09aa\u09cd\u09b0\u09c7\u09b0\u0995\u09c7\u09b0 \u09a8\u09ae\u09cd\u09ac\u09b0',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: txController,
-                      decoration: const InputDecoration(
-                        labelText:
-                            '\u099f\u09cd\u09b0\u09be\u09a8\u099c\u09c7\u0995\u09b6\u09a8 \u0986\u0987\u09a1\u09bf',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '$selectedMethod-\u098f \u09aa\u09c7\u09ae\u09c7\u09a8\u09cd\u099f \u0995\u09b0\u09c1\u09a8 \u098f\u09ac\u0982 \u099f\u09cd\u09b0\u09be\u09a8\u099c\u09c7\u0995\u09b6\u09a8 \u0986\u0987\u09a1\u09bf \u09a6\u09bf\u09a8\u0964 \u0985\u09cd\u09af\u09be\u09a1\u09ae\u09bf\u09a8 \u0985\u09cd\u09af\u09be\u09aa\u09cd\u09b0\u09c1\u09ad \u0995\u09b0\u09b2\u09c7 \u0985\u09cd\u09af\u09be\u0995\u09cd\u09b8\u09c7\u09b8 \u099a\u09be\u09b2\u09c1 \u09b9\u09ac\u09c7\u0964',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(ctx).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: const Text('\u09ac\u09be\u09a4\u09bf\u09b2'),
-                ),
-                FilledButton(
-                  onPressed: isSubmitting
-                      ? null
-                      : () async {
-                          final sender = senderController.text.trim();
-                          final txId = txController.text.trim();
-                          if (sender.isEmpty || txId.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  '\u09b8\u0995\u09b2 \u09a4\u09a5\u09cd\u09af \u09aa\u09c2\u09b0\u09a3 \u0995\u09b0\u09c1\u09a8',
-                                ),
-                              ),
-                            );
-                            return;
-                          }
-                          setDialogState(() => isSubmitting = true);
-                          try {
-                            final supabase = Supabase.instance.client;
-                            final userId = supabase.auth.currentUser?.id;
-                            if (userId != null) {
-                              await supabase.from('payment_requests').insert({
-                                'user_id': userId,
-                                'plan_name': plan.name,
-                                'amount': plan.price,
-                                'currency': 'BDT',
-                                'payment_method': selectedMethod,
-                                'transaction_id': txId,
-                                'sender_number': sender,
-                                'status': 'Pending',
-                              });
-                            }
-                            if (ctx.mounted) Navigator.pop(ctx);
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    '\u09aa\u09c7\u09ae\u09c7\u09a8\u09cd\u099f \u0985\u09a8\u09c1\u09b0\u09cb\u09a7 \u09aa\u09be\u09a0\u09be\u09a8\u09cb \u09b9\u09af\u09bc\u09c7\u099b\u09c7\u0964 \u0985\u09cd\u09af\u09be\u09a1\u09ae\u09bf\u09a8 \u0985\u09cd\u09af\u09be\u09aa\u09cd\u09b0\u09c1\u09ad \u0995\u09b0\u09b2\u09c7 \u0985\u09cd\u09af\u09be\u0995\u09cd\u09b8\u09c7\u09b8 \u099a\u09be\u09b2\u09c1 \u09b9\u09ac\u09c7\u0964',
-                                  ),
-                                ),
-                              );
-                              _loadData();
-                            }
-                          } catch (_) {
-                            setDialogState(() => isSubmitting = false);
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    '\u09aa\u09c7\u09ae\u09c7\u09a8\u09cd\u099f \u09aa\u09be\u09a0\u09be\u09a4\u09c7 \u09b8\u09ae\u09b8\u09cd\u09af\u09be \u09b9\u09af\u09bc\u09c7\u099b\u09c7',
-                                  ),
-                                ),
-                              );
-                            }
-                          }
-                        },
-                  child: isSubmitting
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text(
-                          '\u09aa\u09c7\u09ae\u09c7\u09a8\u09cd\u099f \u09aa\u09be\u09a0\u09be\u09a8',
-                        ),
-                ),
-              ],
-            );
-          },
-        );
-      },
+  Future<void> _openPaymentPage(SubscriptionPlan plan) async {
+    final submitted = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => PaymentView(plan: plan),
+      ),
     );
+    if (submitted == true && mounted) {
+      _loadData(); // refresh billing history
+    }
   }
 
   void _handleAddPaymentMethod() {}
