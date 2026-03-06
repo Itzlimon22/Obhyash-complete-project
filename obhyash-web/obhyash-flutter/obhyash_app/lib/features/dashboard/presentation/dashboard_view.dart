@@ -65,7 +65,7 @@ class DashboardView extends ConsumerWidget {
             crossAxisCount: 3,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
-            childAspectRatio: 0.88,
+            childAspectRatio: 0.92,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             children: [

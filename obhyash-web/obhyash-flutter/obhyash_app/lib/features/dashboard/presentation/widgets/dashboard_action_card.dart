@@ -66,33 +66,42 @@ class _DashboardActionCardState extends State<DashboardActionCard>
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: isDark
-                    ? [
-                        const Color(0xFF171717), // neutral 900
-                        const Color(0xFF262626).withOpacity(0.5), // neutral 800
-                      ]
-                    : [Colors.white, widget.lightColor.withOpacity(0.5)],
+                    ? [const Color(0xFF1A1A1A), const Color(0xFF262626)]
+                    : [
+                        Colors.white,
+                        widget.lightColor.withOpacity(_isHovered ? 0.7 : 0.4),
+                      ],
               ),
               border: Border.all(
+                width: 1.5,
                 color: isDark
                     ? (_isHovered
-                          ? widget.primaryColor.withOpacity(0.5)
-                          : const Color(0xFF262626)) // neutral 800
+                          ? widget.primaryColor.withOpacity(0.6)
+                          : const Color(0xFF303030))
                     : (_isHovered
-                          ? widget.primaryColor.withOpacity(0.3)
-                          : widget.lightColor.withOpacity(0.5)),
+                          ? widget.primaryColor.withOpacity(0.4)
+                          : widget.lightColor.withOpacity(0.8)),
               ),
               boxShadow: [
                 if (!isDark)
                   BoxShadow(
-                    color: widget.primaryColor.withOpacity(0.1),
+                    color: widget.primaryColor.withOpacity(
+                      _isHovered ? 0.18 : 0.08,
+                    ),
+                    blurRadius: _isHovered ? 16 : 10,
+                    offset: const Offset(0, 4),
+                    spreadRadius: -2,
+                  ),
+                if (isDark)
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
-                    spreadRadius: -2,
                   ),
               ],
             ),
@@ -101,59 +110,88 @@ class _DashboardActionCardState extends State<DashboardActionCard>
               children: [
                 // Top Right Decor Blob
                 Positioned(
-                  top: -16,
-                  right: -16,
+                  top: -20,
+                  right: -20,
                   child: AnimatedScale(
-                    scale: _isHovered ? 1.1 : 1.0,
-                    duration: const Duration(milliseconds: 200),
+                    scale: _isHovered ? 1.2 : 1.0,
+                    duration: const Duration(milliseconds: 250),
                     child: Container(
-                      width: 64,
-                      height: 64,
+                      width: 72,
+                      height: 72,
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                        gradient: RadialGradient(
                           colors: [
-                            widget.lightColor.withOpacity(0.3),
+                            widget.primaryColor.withOpacity(
+                              isDark ? 0.12 : 0.15,
+                            ),
                             Colors.transparent,
                           ],
                         ),
                         borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(24),
+                          bottomLeft: Radius.circular(36),
                         ),
+                      ),
+                    ),
+                  ),
+                ),
+                // Bottom Left Accent Dot
+                Positioned(
+                  bottom: 8,
+                  left: 10,
+                  child: AnimatedOpacity(
+                    opacity: _isHovered ? 0.9 : 0.4,
+                    duration: const Duration(milliseconds: 200),
+                    child: Container(
+                      width: 5,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: widget.primaryColor,
+                        shape: BoxShape.circle,
                       ),
                     ),
                   ),
                 ),
                 // Main Content
                 Padding(
-                  padding: const EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.fromLTRB(10, 14, 10, 14),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Icon Box — matches web w-9 h-9 (36px) rounded-xl
+                      // Icon Box with colored gradient background
                       AnimatedScale(
-                        scale: _isHovered ? 1.05 : 1.0,
+                        scale: _isHovered ? 1.08 : 1.0,
                         duration: const Duration(milliseconds: 200),
                         child: Container(
-                          width: 36,
-                          height: 36,
+                          width: 46,
+                          height: 46,
                           decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF262626)
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(12),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: isDark
+                                  ? [
+                                      widget.primaryColor.withOpacity(0.2),
+                                      widget.primaryColor.withOpacity(0.08),
+                                    ]
+                                  : [
+                                      widget.lightColor,
+                                      widget.lightColor.withOpacity(0.6),
+                                    ],
+                            ),
+                            borderRadius: BorderRadius.circular(14),
                             border: Border.all(
                               color: isDark
-                                  ? const Color(0xFF404040)
-                                  : widget.lightColor,
+                                  ? widget.primaryColor.withOpacity(0.25)
+                                  : widget.primaryColor.withOpacity(0.15),
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.04),
-                                blurRadius: 3,
-                                offset: const Offset(0, 1),
+                                color: widget.primaryColor.withOpacity(
+                                  isDark ? 0.15 : 0.12,
+                                ),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
@@ -161,23 +199,23 @@ class _DashboardActionCardState extends State<DashboardActionCard>
                             child: Icon(
                               widget.icon,
                               color: widget.primaryColor,
-                              size: 18,
+                              size: 22,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      // Title — matches web text-[11px] font-extrabold
+                      const SizedBox(height: 10),
+                      // Title
                       AnimatedDefaultTextStyle(
                         duration: const Duration(milliseconds: 200),
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: FontWeight.w800,
                           color: _isHovered
                               ? widget.primaryColor
                               : (isDark
                                     ? const Color(0xFFE5E5E5)
-                                    : const Color(0xFF262626)),
+                                    : const Color(0xFF1A1A1A)),
                           fontFamily: 'HindSiliguri',
                           height: 1.2,
                         ),

@@ -21,28 +21,61 @@ class SubjectStatCard extends StatelessWidget {
       return _buildSkeleton(context);
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
+        color: isDark ? const Color(0xFF171717) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF262626) // neutral-800
-              : const Color(0xFFF5F5F5), // neutral-100
+          color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEEEEEE),
         ),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+              spreadRadius: -2,
+            ),
+          if (isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF064E3B).withOpacity(0.25)
+                      : const Color(0xFFECFDF5),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  LucideIcons.barChart2,
+                  size: 16,
+                  color: isDark
+                      ? const Color(0xFF34D399)
+                      : const Color(0xFF059669),
+                ),
+              ),
+              const SizedBox(width: 10),
               Text(
                 'সাবজেক্ট ভিত্তিক রিপোর্ট',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
+                style: TextStyle(
                   fontFamily: 'HindSiliguri',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: isDark ? Colors.white : const Color(0xFF1A1A1A),
                 ),
               ),
             ],
@@ -53,12 +86,12 @@ class SubjectStatCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 32),
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
+                color: isDark
                     ? const Color(0xFF262626).withOpacity(0.5)
                     : const Color(0xFFFAFAFA),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Theme.of(context).brightness == Brightness.dark
+                  color: isDark
                       ? const Color(0xFF404040)
                       : const Color(0xFFE5E5E5),
                   style: BorderStyle.solid,
@@ -338,41 +371,47 @@ class _SubjectItemState extends State<_SubjectItem> {
           ),
           const SizedBox(height: 16),
           // Progress Bar Component
-          Container(
-            height: 10,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: widget.subject.correct,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Color(0xFF34D399), Color(0xFF059669)],
-                      ), // emerald 400->600
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(5),
-                        bottomLeft: Radius.circular(5),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Container(
+              height: 12,
+              width: double.infinity,
+              color: isDark ? const Color(0xFF333333) : const Color(0xFFF0F0F0),
+              child: Row(
+                children: [
+                  if (widget.subject.correct > 0)
+                    Expanded(
+                      flex: widget.subject.correct,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF34D399), Color(0xFF059669)],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                Expanded(
-                  flex: widget.subject.wrong,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Color(0xFFFB7185), Color(0xFFE11D48)],
-                      ), // rose 400->600
+                  if (widget.subject.wrong > 0)
+                    Expanded(
+                      flex: widget.subject.wrong,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFFFB7185), Color(0xFFE11D48)],
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                Expanded(flex: widget.subject.skipped, child: const SizedBox()),
-              ],
+                  if (widget.subject.skipped > 0)
+                    Expanded(
+                      flex: widget.subject.skipped,
+                      child: Container(
+                        color: isDark
+                            ? const Color(0xFF4B4B20)
+                            : const Color(0xFFFEF3C7),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -381,20 +420,27 @@ class _SubjectItemState extends State<_SubjectItem> {
               alignment: Alignment.centerRight,
               child: InkWell(
                 onTap: widget.onClick,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(10),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                    horizontal: 14,
+                    vertical: 7,
                   ),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF262626) : Colors.white,
+                    gradient: LinearGradient(
+                      colors: isDark
+                          ? [
+                              const Color(0xFF064E3B).withOpacity(0.4),
+                              const Color(0xFF065F46).withOpacity(0.3),
+                            ]
+                          : [const Color(0xFFECFDF5), const Color(0xFFD1FAE5)],
+                    ),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF404040)
-                          : const Color(0xFFE5E5E5),
+                          ? const Color(0xFF059669).withOpacity(0.4)
+                          : const Color(0xFFA7F3D0),
                     ),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -406,17 +452,17 @@ class _SubjectItemState extends State<_SubjectItem> {
                           fontWeight: FontWeight.bold,
                           fontFamily: 'HindSiliguri',
                           color: isDark
-                              ? const Color(0xFFA3A3A3)
-                              : const Color(0xFF737373),
+                              ? const Color(0xFF34D399)
+                              : const Color(0xFF059669),
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 5),
                       Icon(
                         LucideIcons.arrowRight,
-                        size: 12,
+                        size: 13,
                         color: isDark
-                            ? const Color(0xFFA3A3A3)
-                            : const Color(0xFF737373),
+                            ? const Color(0xFF34D399)
+                            : const Color(0xFF059669),
                       ),
                     ],
                   ),
@@ -446,19 +492,28 @@ class _StatBox extends StatelessWidget {
 
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF171717) : Colors.white,
+          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+          border: Border(
+            top: BorderSide(color: color, width: 2.5),
+            left: BorderSide(
+              color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF0F0F0),
+            ),
+            right: BorderSide(
+              color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF0F0F0),
+            ),
+            bottom: BorderSide(
+              color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF0F0F0),
+            ),
           ),
           boxShadow: [
             if (!isDark)
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
-                blurRadius: 2,
-                offset: const Offset(0, 1),
+                color: color.withOpacity(0.08),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
               ),
           ],
         ),
@@ -475,11 +530,11 @@ class _StatBox extends StatelessWidget {
                 letterSpacing: 0.5,
               ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             Text(
               value,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.w900,
                 color: color,
               ),

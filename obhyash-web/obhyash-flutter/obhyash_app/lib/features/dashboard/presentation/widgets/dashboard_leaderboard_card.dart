@@ -30,14 +30,27 @@ class DashboardLeaderboardCard extends StatelessWidget {
           color: isDark ? const Color(0xFF171717) : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+            color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFE5E5E5),
           ),
           boxShadow: [
-            if (!isDark)
+            if (!isDark) ...[
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
-                blurRadius: 4,
-                spreadRadius: 0,
+                color: const Color(0xFF059669).withOpacity(0.06),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+                spreadRadius: -4,
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+            if (isDark)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
           ],
         ),
@@ -153,12 +166,11 @@ class DashboardLeaderboardCard extends StatelessWidget {
                 // Table Header
                 Row(
                   children: [
-                    const SizedBox(
-                      width: 32,
-                      child: Text('#', style: _headerStyle),
-                    ),
-                    const SizedBox(width: 32),
+                    SizedBox(width: 36, child: Text('#', style: _headerStyle)),
+                    const SizedBox(width: 8),
+                    const SizedBox(width: 36),
                     const Expanded(child: Text('নাম', style: _headerStyle)),
+                    Text('XP', style: _headerStyle),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -173,30 +185,31 @@ class DashboardLeaderboardCard extends StatelessWidget {
                     gradient: LinearGradient(
                       colors: isDark
                           ? [
-                              const Color(0xFF064E3B).withOpacity(0.2),
-                              const Color(0xFF064E3B).withOpacity(0.05),
+                              const Color(0xFF064E3B).withOpacity(0.25),
+                              const Color(0xFF064E3B).withOpacity(0.08),
                             ]
                           : [
                               const Color(0xFFECFDF5),
-                              const Color(0xFFECFDF5).withOpacity(0.3),
+                              const Color(0xFFECFDF5).withOpacity(0.4),
                             ],
                     ),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF059669).withOpacity(0.3)
-                          : const Color(0xFFD1FAE5).withOpacity(0.6),
+                          ? const Color(0xFF059669).withOpacity(0.35)
+                          : const Color(0xFFA7F3D0).withOpacity(0.8),
                     ),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
                     children: [
-                      const SizedBox(
-                        width: 32,
-                        child: Text('🥇', style: TextStyle(fontSize: 14)),
+                      SizedBox(
+                        width: 36,
+                        child: const Text('🥇', style: TextStyle(fontSize: 16)),
                       ),
+                      const SizedBox(width: 8),
                       if (topUser != null) ...[
                         _buildMiniAvatar(topUser!.name, isDark),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             topUser!.name,
@@ -208,15 +221,38 @@ class DashboardLeaderboardCard extends StatelessWidget {
                               fontSize: 14,
                               color: isDark
                                   ? const Color(0xFFE5E5E5)
-                                  : const Color(0xFF262626),
+                                  : const Color(0xFF1A1A1A),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF064E3B).withOpacity(0.4)
+                                : const Color(0xFFD1FAE5),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '${topUser!.xp} XP',
+                            style: TextStyle(
+                              fontFamily: 'HindSiliguri',
+                              fontWeight: FontWeight.w800,
+                              fontSize: 11,
+                              color: isDark
+                                  ? const Color(0xFF34D399)
+                                  : const Color(0xFF059669),
                             ),
                           ),
                         ),
                       ] else ...[
                         // Skeleton
                         Container(
-                          width: 28,
-                          height: 28,
+                          width: 34,
+                          height: 34,
                           decoration: BoxDecoration(
                             color: isDark
                                 ? const Color(0xFF404040)
@@ -224,7 +260,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                             shape: BoxShape.circle,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         Container(
                           width: 96,
                           height: 14,
@@ -252,25 +288,25 @@ class DashboardLeaderboardCard extends StatelessWidget {
                     gradient: LinearGradient(
                       colors: isDark
                           ? [
-                              const Color(0xFF064E3B).withOpacity(0.15),
-                              const Color(0xFF064E3B).withOpacity(0.05),
+                              const Color(0xFF064E3B).withOpacity(0.18),
+                              const Color(0xFF064E3B).withOpacity(0.06),
                             ]
                           : [
                               const Color(0xFFECFDF5),
-                              const Color(0xFFECFDF5).withOpacity(0.3),
+                              const Color(0xFFECFDF5).withOpacity(0.4),
                             ],
                     ),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF059669).withOpacity(0.3)
-                          : const Color(0xFFD1FAE5).withOpacity(0.6),
+                          ? const Color(0xFF059669).withOpacity(0.35)
+                          : const Color(0xFFA7F3D0).withOpacity(0.8),
                     ),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
                     children: [
                       SizedBox(
-                        width: 32,
+                        width: 36,
                         child: Text(
                           '#$userRank',
                           style: TextStyle(
@@ -283,8 +319,9 @@ class DashboardLeaderboardCard extends StatelessWidget {
                           ),
                         ),
                       ),
+                      const SizedBox(width: 8),
                       _buildMiniAvatar(currentUser.name, isDark),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Row(
                           children: [
@@ -299,7 +336,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                                   fontSize: 14,
                                   color: isDark
                                       ? const Color(0xFFE5E5E5)
-                                      : const Color(0xFF262626),
+                                      : const Color(0xFF1A1A1A),
                                 ),
                               ),
                             ),
@@ -311,7 +348,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: isDark
-                                    ? const Color(0xFF064E3B).withOpacity(0.3)
+                                    ? const Color(0xFF064E3B).withOpacity(0.4)
                                     : const Color(0xFFD1FAE5),
                                 borderRadius: BorderRadius.circular(100),
                               ),
@@ -328,6 +365,29 @@ class DashboardLeaderboardCard extends StatelessWidget {
                               ),
                             ),
                           ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF064E3B).withOpacity(0.4)
+                              : const Color(0xFFD1FAE5),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '${currentUser.xp} XP',
+                          style: TextStyle(
+                            fontFamily: 'HindSiliguri',
+                            fontWeight: FontWeight.w800,
+                            fontSize: 11,
+                            color: isDark
+                                ? const Color(0xFF34D399)
+                                : const Color(0xFF059669),
+                          ),
                         ),
                       ),
                     ],
@@ -392,23 +452,36 @@ class DashboardLeaderboardCard extends StatelessWidget {
 
   Widget _buildMiniAvatar(String name, bool isDark) {
     return Container(
-      width: 28,
-      height: 28,
+      width: 34,
+      height: 34,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [const Color(0xFF064E3B), const Color(0xFF065F46)]
+              : [const Color(0xFFD1FAE5), const Color(0xFFA7F3D0)],
+        ),
         shape: BoxShape.circle,
         border: Border.all(
-          color: isDark ? const Color(0xFF059669) : const Color(0xFFA7F3D0),
+          color: isDark ? const Color(0xFF059669) : const Color(0xFF6EE7B7),
           width: 2,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF059669).withOpacity(isDark ? 0.3 : 0.2),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Center(
         child: Text(
           name.isNotEmpty ? name[0].toUpperCase() : '?',
           style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            color: isDark ? const Color(0xFFE5E5E5) : const Color(0xFF262626),
+            fontSize: 13,
+            fontWeight: FontWeight.w900,
+            color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
           ),
         ),
       ),
