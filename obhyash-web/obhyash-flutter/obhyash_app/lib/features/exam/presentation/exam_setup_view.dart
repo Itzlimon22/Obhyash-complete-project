@@ -75,25 +75,23 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     setState(() => _isLoadingData = true);
     try {
       final supabase = Supabase.instance.client;
-      // Fetching all distinct subjects grouped by division temporarily
       final data = await supabase
           .from('subjects')
-          .select('id, name, name_en, name_bn')
+          .select('id, name, name_en, icon, division, stream')
           .limit(100);
 
-      final list = (data as List).map((e) {
-        final nameBn = e['name_bn'] ?? e['name'];
-        final nameEn = e['name'] ?? e['name_en'];
-        final label =
-            (nameEn != null && nameBn != null && !nameBn.contains(nameEn))
-            ? '$nameBn ($nameEn)'
-            : nameBn ?? 'Unknown';
-        return SubjectItem(
-          id: e['id'].toString(),
-          name: nameBn ?? '',
-          label: label,
-        );
-      }).toList();
+      final seen = <String>{};
+      final list = <SubjectItem>[];
+      for (final e in (data as List)) {
+        final name = (e['name'] ?? e['name_en'] ?? '').toString();
+        if (name.isEmpty || seen.contains(name)) continue;
+        seen.add(name);
+        final nameEn = (e['name_en'] ?? '').toString();
+        final label = nameEn.isNotEmpty && nameEn != name
+            ? '$name ($nameEn)'
+            : name;
+        list.add(SubjectItem(id: e['id'].toString(), name: name, label: label));
+      }
 
       if (mounted) {
         setState(() {
@@ -101,7 +99,8 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
           _isLoadingData = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Failed to fetch subjects: $e');
       if (mounted) setState(() => _isLoadingData = false);
     }
   }
@@ -130,7 +129,9 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               .toList();
         });
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Failed to fetch chapters: $e');
+    }
   }
 
   Future<void> _fetchTopics() async {
@@ -165,7 +166,9 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
           _selectedTopics.removeWhere((id) => !_topics.any((t) => t.id == id));
         });
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Failed to fetch topics: $e');
+    }
   }
 
   void _onSubjectChanged(String? id) {
