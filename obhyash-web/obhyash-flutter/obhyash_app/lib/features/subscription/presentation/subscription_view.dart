@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -96,11 +97,32 @@ class _SubscriptionViewState extends State<SubscriptionView> {
             .toList();
       }
 
+      // Load payment methods
+      List<PaymentMethod> methods = [];
+      if (userId != null) {
+        try {
+          final reqMethods = await supabase
+              .from('user_payment_methods')
+              .select('id, type, number, is_default')
+              .eq('user_id', userId);
+          methods = (reqMethods as List)
+              .map(
+                (m) => PaymentMethod(
+                  id: m['id'].toString(),
+                  type: (m['type'] as String?) ?? 'bkash',
+                  number: m['number'] as String?,
+                  isDefault: (m['is_default'] as bool?) ?? false,
+                ),
+              )
+              .toList();
+        } catch (_) {}
+      }
+
       if (mounted) {
         setState(() {
           _plans = plans;
           _invoices = invoices;
-          _paymentMethods = [];
+          _paymentMethods = methods;
           _activeSubscription = activeSub;
           _currentPlanId = currentPlanId;
           _expiresAt = expiresAt;
@@ -130,7 +152,204 @@ class _SubscriptionViewState extends State<SubscriptionView> {
     }
   }
 
-  void _handleAddPaymentMethod() {}
+  void _handleAddPaymentMethod() {
+    String selectedType = 'bkash';
+    final numberCtrl = TextEditingController();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setInnerState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+          ),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF171717) : Colors.white,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 12),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF525252)
+                            : const Color(0xFFD4D4D4),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'পেমেন্ট মেথড যুক্ত করুন',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF171717),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'আপনার মোবাইল ব্যাংকিং নম্বর যুক্ত করুন',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark
+                          ? const Color(0xFFA3A3A3)
+                          : const Color(0xFF737373),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: ['bkash', 'nagad', 'rocket'].asMap().entries.map((
+                      e,
+                    ) {
+                      final type = e.value;
+                      final isLast = e.key == 2;
+                      final isSelected = selectedType == type;
+                      const labels = {
+                        'bkash': 'bKash',
+                        'nagad': 'Nagad',
+                        'rocket': 'Rocket',
+                      };
+                      return Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(right: isLast ? 0 : 8),
+                          child: GestureDetector(
+                            onTap: () =>
+                                setInnerState(() => selectedType = type),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 150),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? (isDark
+                                          ? const Color(0xFF052E16)
+                                          : const Color(0xFFD1FAE5))
+                                    : (isDark
+                                          ? const Color(0xFF262626)
+                                          : const Color(0xFFF5F5F5)),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? const Color(0xFF059669)
+                                      : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  labels[type] ?? type,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: isSelected
+                                        ? const Color(0xFF059669)
+                                        : (isDark
+                                              ? const Color(0xFFA3A3A3)
+                                              : const Color(0xFF737373)),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: numberCtrl,
+                    keyboardType: TextInputType.phone,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : const Color(0xFF171717),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'মোবাইল নম্বর (01xxxxxxxxx)',
+                      hintStyle: TextStyle(
+                        color: isDark
+                            ? const Color(0xFF525252)
+                            : const Color(0xFFA3A3A3),
+                      ),
+                      filled: true,
+                      fillColor: isDark
+                          ? const Color(0xFF262626)
+                          : const Color(0xFFF5F5F5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF059669),
+                          width: 1.5,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      final number = numberCtrl.text.trim();
+                      if (number.isEmpty) return;
+                      final phoneRegex = RegExp(r'^01\d{9}$');
+                      if (!phoneRegex.hasMatch(number)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('সঠিক মোবাইল নম্বর দিন (১১ ডিজিট)'),
+                          ),
+                        );
+                        return;
+                      }
+                      Navigator.pop(ctx);
+                      _savePaymentMethod(selectedType, number);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF059669),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'সেভ করুন',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    ).whenComplete(() => numberCtrl.dispose());
+  }
 
   void _handleDeletePaymentMethod(String id) {
     setState(() {
@@ -139,10 +358,181 @@ class _SubscriptionViewState extends State<SubscriptionView> {
   }
 
   void _handleDownloadInvoice(Invoice invoice) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '\u0987\u09a8\u09ad\u09af\u09bc\u09c7\u09b8: ${invoice.planName} \u2014 ${invoice.status}',
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final shortId = invoice.id.length > 8
+        ? invoice.id.substring(0, 8)
+        : invoice.id;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF171717) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 12),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF525252)
+                        : const Color(0xFFD4D4D4),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF0A0A0A)
+                      : const Color(0xFFFAFAFA),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark
+                        ? const Color(0xFF262626)
+                        : const Color(0xFFE5E5E5),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF059669),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'O',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'অভ্যাস',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: isDark ? Colors.white : const Color(0xFF171717),
+                      ),
+                    ),
+                    Text(
+                      'পেমেন্ট রিসিট',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark
+                            ? const Color(0xFFA3A3A3)
+                            : const Color(0xFF737373),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Divider(
+                      color: isDark
+                          ? const Color(0xFF262626)
+                          : const Color(0xFFE5E5E5),
+                    ),
+                    const SizedBox(height: 16),
+                    _receiptRow(
+                      isDark,
+                      label: 'ইনভয়েস আইডি',
+                      value: '#${shortId.toUpperCase()}',
+                    ),
+                    const SizedBox(height: 12),
+                    _receiptRow(
+                      isDark,
+                      label: 'প্ল্যান',
+                      value: invoice.planName,
+                    ),
+                    const SizedBox(height: 12),
+                    _receiptRow(isDark, label: 'তারিখ', value: invoice.date),
+                    const SizedBox(height: 12),
+                    _receiptRow(
+                      isDark,
+                      label: 'স্ট্যাটাস',
+                      value: 'পরিশোধিত',
+                      valueColor: const Color(0xFF059669),
+                    ),
+                    const SizedBox(height: 16),
+                    Divider(
+                      color: isDark
+                          ? const Color(0xFF262626)
+                          : const Color(0xFFE5E5E5),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'মোট পরিশোধ',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF171717),
+                          ),
+                        ),
+                        Text(
+                          '${invoice.currency} ${invoice.amount}.00',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF059669),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: () {
+                  final text =
+                      'অভ্যাস পেমেন্ট রিসিট\n'
+                      'ইনভয়েস: #${invoice.id}\n'
+                      'প্ল্যান: ${invoice.planName}\n'
+                      'তারিখ: ${invoice.date}\n'
+                      'পরিমাণ: ${invoice.currency} ${invoice.amount}.00\n'
+                      'স্ট্যাটাস: পরিশোধিত';
+                  Clipboard.setData(ClipboardData(text: text));
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('রিসিট কপি করা হয়েছে!')),
+                  );
+                },
+                icon: const Icon(LucideIcons.copy, size: 16),
+                label: const Text(
+                  'রিসিট কপি করুন',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );
@@ -569,6 +959,56 @@ class _SubscriptionViewState extends State<SubscriptionView> {
           const SizedBox(height: 48), // Bottom padding
         ],
       ),
+    );
+  }
+
+  Future<void> _savePaymentMethod(String type, String number) async {
+    try {
+      final supabase = Supabase.instance.client;
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) return;
+      await supabase.from('user_payment_methods').insert({
+        'user_id': userId,
+        'type': type,
+        'number': number,
+        'is_default': _paymentMethods.isEmpty,
+      });
+      if (mounted) _loadData();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('ত্রুটি: ${e.toString()}')));
+      }
+    }
+  }
+
+  Widget _receiptRow(
+    bool isDark, {
+    required String label,
+    required String value,
+    Color? valueColor,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color:
+                valueColor ?? (isDark ? Colors.white : const Color(0xFF171717)),
+          ),
+        ),
+      ],
     );
   }
 }

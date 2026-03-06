@@ -134,51 +134,6 @@ class _PaymentViewState extends State<PaymentView>
       body: SafeArea(
         child: Column(
           children: [
-            // ── Header ──────────────────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
-                border: Border(
-                  bottom: BorderSide(
-                    color: isDark
-                        ? const Color(0xFF262626)
-                        : const Color(0xFFF5F5F5),
-                  ),
-                ),
-              ),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF171717)
-                            : const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        LucideIcons.arrowLeft,
-                        size: 20,
-                        color: isDark ? Colors.white : const Color(0xFF171717),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'পেমেন্ট প্রসেসিং',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF171717),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
             // ── Tab Bar ─────────────────────────────────────────────────
             Container(
               color: isDark ? const Color(0xFF0A0A0A) : Colors.white,

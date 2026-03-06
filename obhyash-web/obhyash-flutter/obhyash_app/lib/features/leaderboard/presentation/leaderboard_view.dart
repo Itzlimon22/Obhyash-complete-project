@@ -262,162 +262,199 @@ class _LevelSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 134,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-        itemCount: levels.length,
-        itemBuilder: (ctx, i) {
-          final l = levels[i];
-          final isActive = l.id == selectedLevel;
-          final isMyLevel = l.id == myLevel;
-          final count = levelCounts[l.id];
-
-          return Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: GestureDetector(
-              onTap: () => onSelect(l.id),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                width: 106,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: isActive
-                      ? (isDark ? const Color(0xFF262626) : Colors.white)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: isActive
-                        ? (isDark
-                              ? const Color(0xFF404040)
-                              : const Color(0xFFE5E5E5))
-                        : Colors.transparent,
-                    width: 1.5,
-                  ),
-                  boxShadow: isActive && !isDark
-                      ? [
-                          const BoxShadow(
-                            color: Color(0x14000000),
-                            blurRadius: 20,
-                            offset: Offset(0, 8),
-                          ),
-                        ]
-                      : [],
-                ),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Icon circle
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          width: 46,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: isActive
-                                ? LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [l.start, l.end],
-                                  )
-                                : null,
-                            color: isActive
-                                ? null
-                                : (isDark
-                                      ? const Color(0xFF1F1F1F)
-                                      : const Color(0xFFF5F5F5)),
-                            boxShadow: isActive
-                                ? [
-                                    BoxShadow(
-                                      color: l.start.withValues(alpha: 0.4),
-                                      blurRadius: 12,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ]
-                                : [],
-                          ),
-                          child: Icon(
-                            l.icon,
-                            size: 20,
-                            color: isActive
-                                ? Colors.white
-                                : (isDark
-                                      ? const Color(0xFF525252)
-                                      : const Color(0xFFBBBBBB)),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        // Label
-                        Text(
-                          l.label.split(' ').first,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 12,
-                            color: isActive
-                                ? (isDark
-                                      ? Colors.white
-                                      : const Color(0xFF171717))
-                                : (isDark
-                                      ? const Color(0xFF525252)
-                                      : const Color(0xFFA3A3A3)),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        if (count != null) ...[
-                          const SizedBox(height: 2),
-                          Text(
-                            '$count জন',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: isDark
-                                  ? const Color(0xFF737373)
-                                  : const Color(0xFFA3A3A3),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    // "তোমার লেভেল" badge
-                    if (isMyLevel)
-                      Positioned(
-                        top: -8,
-                        left: 0,
-                        right: 0,
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFEF4444),
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: const Text(
-                              'তোমার',
-                              style: TextStyle(
-                                fontSize: 8,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F0F0),
+          ),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: Text(
+              'লেভেল',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.2,
+                color: isDark
+                    ? const Color(0xFF4A4A4A)
+                    : const Color(0xFFBBBBBB),
               ),
             ),
-          );
-        },
+          ),
+          SizedBox(
+            height: 96,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+              itemCount: levels.length,
+              itemBuilder: (ctx, i) {
+                final l = levels[i];
+                final isActive = l.id == selectedLevel;
+                final isMyLevel = l.id == myLevel;
+                final count = levelCounts[l.id];
+
+                return Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: GestureDetector(
+                    onTap: () => onSelect(l.id),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      width: 80,
+                      decoration: BoxDecoration(
+                        gradient: isActive
+                            ? LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [l.start, l.end],
+                              )
+                            : null,
+                        color: isActive
+                            ? null
+                            : (isDark
+                                  ? const Color(0xFF1A1A1A)
+                                  : const Color(0xFFF5F5F5)),
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: isActive
+                              ? Colors.transparent
+                              : (isDark
+                                    ? const Color(0xFF2A2A2A)
+                                    : const Color(0xFFEAEAEA)),
+                          width: 1.5,
+                        ),
+                        boxShadow: isActive
+                            ? [
+                                BoxShadow(
+                                  color: l.start.withValues(alpha: 0.5),
+                                  blurRadius: 18,
+                                  offset: const Offset(0, 6),
+                                  spreadRadius: -4,
+                                ),
+                              ]
+                            : [],
+                      ),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 4,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  l.icon,
+                                  size: 20,
+                                  color: isActive
+                                      ? Colors.white
+                                      : (isDark
+                                            ? const Color(0xFF4A4A4A)
+                                            : const Color(0xFFBBBBBB)),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  l.label.split(' ').first,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 11,
+                                    color: isActive
+                                        ? Colors.white
+                                        : (isDark
+                                              ? const Color(0xFF737373)
+                                              : const Color(0xFF9E9E9E)),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                if (count != null) ...[
+                                  const SizedBox(height: 3),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 1,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isActive
+                                          ? Colors.white.withValues(alpha: 0.22)
+                                          : (isDark
+                                                ? const Color(0xFF262626)
+                                                : const Color(0xFFECECEC)),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      '$count',
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w900,
+                                        color: isActive
+                                            ? Colors.white
+                                            : (isDark
+                                                  ? const Color(0xFF737373)
+                                                  : const Color(0xFF9E9E9E)),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          if (isMyLevel)
+                            Positioned(
+                              top: -6,
+                              left: 0,
+                              right: 0,
+                              child: Center(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isActive
+                                        ? Colors.white
+                                        : const Color(0xFFEF4444),
+                                    borderRadius: BorderRadius.circular(100),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.15,
+                                        ),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Text(
+                                    'তোমার',
+                                    style: TextStyle(
+                                      fontSize: 7,
+                                      fontWeight: FontWeight.w900,
+                                      color: isActive ? l.start : Colors.white,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -492,7 +529,7 @@ class _UserProgressCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '#$rank',
+                    '$rank',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -831,7 +868,7 @@ class _LeaderboardTable extends StatelessWidget {
                               const SizedBox(height: 2),
                               Row(
                                 children: [
-                                  if (u.institute.isNotEmpty) ...[
+                                  if (u.institute.isNotEmpty)
                                     Flexible(
                                       child: Text(
                                         u.institute,
@@ -843,62 +880,19 @@ class _LeaderboardTable extends StatelessWidget {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    if (u.examsTaken > 0)
-                                      const SizedBox(width: 6),
-                                  ],
-                                  if (u.examsTaken > 0)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 5,
-                                        vertical: 1,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: isDark
-                                            ? const Color(0xFF262626)
-                                            : const Color(0xFFF5F5F5),
-                                        borderRadius: BorderRadius.circular(
-                                          100,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        '${u.examsTaken} পরীক্ষা',
-                                        style: TextStyle(
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'HindSiliguri',
-                                          color: isDark
-                                              ? const Color(0xFF737373)
-                                              : const Color(0xFFA3A3A3),
-                                        ),
-                                      ),
-                                    ),
                                 ],
                               ),
                             ],
                           ),
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              _numFmt.format(u.xp),
-                              style: const TextStyle(
-                                fontFamily: 'monospace',
-                                fontWeight: FontWeight.w900,
-                                fontSize: 14,
-                                color: Color(0xFF059669),
-                              ),
-                            ),
-                            const Text(
-                              'XP',
-                              style: TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFA3A3A3),
-                              ),
-                            ),
-                          ],
+                        Text(
+                          _numFmt.format(u.xp),
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontWeight: FontWeight.w900,
+                            fontSize: 14,
+                            color: Color(0xFF059669),
+                          ),
                         ),
                         const SizedBox(width: 4),
                         Icon(
@@ -1023,7 +1017,7 @@ class _LeaderboardTable extends StatelessWidget {
     if (rank == 2) return const Text('🥈', style: TextStyle(fontSize: 20));
     if (rank == 3) return const Text('🥉', style: TextStyle(fontSize: 20));
     return Text(
-      '#$rank',
+      '$rank',
       style: const TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 14,
