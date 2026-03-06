@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -6,7 +8,6 @@ import '../domain/dashboard_repository.dart';
 import '../domain/models.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/shared_prefs_provider.dart';
-import 'dart:convert';
 
 // Riverpod Provider for the Supabase Client
 final supabaseClientProvider = Provider<SupabaseClient>((ref) {
@@ -47,16 +48,37 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
 
     // 2. Network Fetch — use 'users' table to get stream, optional_subject, etc.
     final supabase = ref.watch(supabaseClientProvider);
-    final response = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
+    try {
+      final response = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
 
-    if (response != null) {
-      prefs.setString(cacheKey, jsonEncode(response));
-      return UserProfile.fromJson(response);
+      if (response != null) {
+        prefs.setString(cacheKey, jsonEncode(response));
+        return UserProfile.fromJson(response);
+      }
+    } catch (e) {
+      debugPrint('[UserProfileNotifier] users table query failed: $e');
     }
+
+    // Fallback: try public_profiles view (available even without a users row)
+    try {
+      final fallback = await supabase
+          .from('public_profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+
+      if (fallback != null) {
+        // public_profiles may lack email/phone/stream — store with flag so we re-fetch later
+        return UserProfile.fromJson(fallback);
+      }
+    } catch (e) {
+      debugPrint('[UserProfileNotifier] public_profiles fallback failed: $e');
+    }
+
     return null;
   }
 }

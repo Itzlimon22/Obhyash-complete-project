@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../services/secure_storage_service.dart';
@@ -46,6 +47,29 @@ class AuthController extends AsyncNotifier<void> {
             'name': user.userMetadata?['full_name'] ?? '',
             'email': user.email ?? '',
           });
+
+          // Ensure a `users` row exists — handles users who registered via
+          // the web app or other platforms.  We upsert only the identity
+          // fields; all other columns keep their existing values.
+          try {
+            await _supabase.from('users').upsert({
+              'id': user.id,
+              'email': user.email ?? '',
+              'name':
+                  user.userMetadata?['full_name'] ??
+                  user.userMetadata?['name'] ??
+                  'Student',
+              'role':
+                  user.userMetadata?['role'] ??
+                  user.appMetadata['role'] ??
+                  'Student',
+              'last_active': DateTime.now().toIso8601String(),
+            }, onConflict: 'id');
+          } catch (upsertErr) {
+            debugPrint(
+              '[AuthController] users row upsert error (non-fatal): $upsertErr',
+            );
+          }
 
           // Start monitoring for logins on other devices
           await SessionMonitorService.start(

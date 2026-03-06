@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/providers/auth_provider.dart';
 import 'flashcard_mode.dart';
 import 'practice_summary.dart';
 
@@ -149,6 +150,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
       final sb = Supabase.instance.client;
       final uid = sb.auth.currentUser?.id;
       if (uid == null) {
+        debugPrint('[PracticeDashboard] userId is null — skipping fetch');
         if (mounted) setState(() => _isLoading = false);
         return;
       }
@@ -332,6 +334,11 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    // Re-fetch if auth becomes available after cold-start session restoration
+    ref.listen(authProvider, (prev, next) {
+      if (next != null && prev == null) _fetchData();
+    });
+
     if (_view == _PracticeView.flashcard) {
       return FlashcardMode(
         questions: _flashcardQuestions,

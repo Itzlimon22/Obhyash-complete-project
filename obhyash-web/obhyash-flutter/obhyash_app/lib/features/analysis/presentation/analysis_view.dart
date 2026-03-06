@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/providers/auth_provider.dart';
 
 // ─── Domain Models ──────────────────────────────────────────────────────────────
 class OverallAnalytics {
@@ -99,6 +100,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
       final supabase = Supabase.instance.client;
       final userId = supabase.auth.currentUser?.id;
       if (userId == null) {
+        debugPrint('[AnalysisView] userId is null — skipping fetch');
         setState(() => _isLoading = false);
         return;
       }
@@ -215,6 +217,11 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
 
   @override
   Widget build(BuildContext context) {
+    // Re-fetch if auth becomes available after cold-start session restoration
+    ref.listen(authProvider, (prev, next) {
+      if (next != null && prev == null) _fetchAnalytics();
+    });
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../dashboard/domain/models.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
+import '../../../core/providers/auth_provider.dart';
 import '../../notifications/presentation/notifications_view.dart';
 import 'my_profile_view.dart';
 import 'settings_view.dart';
@@ -12,8 +13,10 @@ import 'widgets/streak_calendar.dart';
 final _profileExamHistoryProvider = FutureProvider<List<ExamResult>>((
   ref,
 ) async {
-  final uid = Supabase.instance.client.auth.currentUser?.id;
-  if (uid == null) return [];
+  // Watch authProvider so this re-runs whenever auth state changes
+  final user = ref.watch(authProvider);
+  if (user == null) return [];
+  final uid = user.id;
   final data = await Supabase.instance.client
       .from('exam_results')
       .select(

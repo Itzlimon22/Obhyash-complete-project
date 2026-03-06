@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
+import '../../../core/providers/auth_provider.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
 class _ExamRecord {
@@ -251,6 +252,11 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
   @override
   Widget build(BuildContext context) {
+    // Re-fetch if auth becomes available after cold-start session restoration
+    ref.listen(authProvider, (prev, next) {
+      if (next != null && prev == null) _fetch();
+    });
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
