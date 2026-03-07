@@ -7,7 +7,13 @@ export async function GET() {
     // Return the latest 6 posts for the marquee
     const latestPosts = allPosts.slice(0, 6);
 
-    return NextResponse.json(latestPosts);
+    // Data is already deduplicated via unstable_cache (revalidate: 3600)
+    // Mirror that TTL in the HTTP layer so CDNs/browsers respect it
+    return NextResponse.json(latestPosts, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=600',
+      },
+    });
   } catch (error) {
     console.error('Failed to fetch latest blog posts:', error);
     return NextResponse.json(

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import ExcelJS from 'exceljs';
+import * as XLSX from 'xlsx';
 import { createClient } from '@supabase/supabase-js';
 import {
   Upload,
@@ -399,28 +399,13 @@ export default function BulkUploadDialog({
     }
 
     try {
-      const workbook = new ExcelJS.Workbook();
-      await workbook.xlsx.load(await file.arrayBuffer());
-      const worksheet = workbook.getWorksheet(1);
-      const raw: Array<Record<string, unknown>> = [];
-
-      // ✅ Improved Excel Parsing: Get headers from Row 1 to use as keys
-      const headers: string[] = [];
-      worksheet?.getRow(1).eachCell((cell, colNumber) => {
-        headers[colNumber] = cell.text;
-      });
-
-      worksheet?.eachRow((row, rowNumber) => {
-        if (rowNumber === 1) return;
-
-        // Construct an object where keys are the headers from row 1
-        const rowData: Record<string, unknown> = {};
-        row.eachCell((cell, colNumber) => {
-          if (headers[colNumber]) {
-            rowData[headers[colNumber]] = cell.text; // map "Option A" -> value
-          }
-        });
-        raw.push(rowData);
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, {
+        raw: false,
+        defval: '',
       });
 
       setParsedData(processParsedData(raw));

@@ -67,6 +67,7 @@ export async function updateSession(request: NextRequest) {
 
   // Define route types
   const { pathname } = request.nextUrl;
+  const isRootRoute = pathname === '/';
   const isAdminRoute = pathname.startsWith('/admin');
   const isStudentRoute = pathname.startsWith('/dashboard');
   const isTeacherRoute = pathname.startsWith('/teacher');
@@ -86,7 +87,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // SCENARIO B: Logged in — fetch profile once for all role/status checks
-  if (user && (isProtectedRoute || isAuthRoute)) {
+  if (user && (isProtectedRoute || isAuthRoute || isRootRoute)) {
     let profile: { role?: string | null; status?: string | null } | null = null;
 
     try {
@@ -118,8 +119,8 @@ export async function updateSession(request: NextRequest) {
       return response;
     }
 
-    // Logged-in users visiting auth pages get redirected to their dashboard
-    if (isAuthRoute) {
+    // Logged-in users visiting auth pages or the root get redirected to their dashboard
+    if (isAuthRoute || isRootRoute) {
       const url = request.nextUrl.clone();
 
       if (role === 'admin') {

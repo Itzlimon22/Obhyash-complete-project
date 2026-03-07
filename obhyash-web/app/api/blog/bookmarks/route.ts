@@ -21,10 +21,16 @@ export async function GET() {
 
     if (error) throw error;
 
-    return NextResponse.json({ slugs: data.map((r) => r.post_slug) });
+    return NextResponse.json(
+      { slugs: data.map((r) => r.post_slug) },
+      { headers: { 'Cache-Control': 'private, no-store' } },
+    );
   } catch (error) {
     console.error('Error fetching bookmarks:', error);
-    return NextResponse.json({ slugs: [] });
+    return NextResponse.json(
+      { slugs: [] },
+      { headers: { 'Cache-Control': 'private, no-store' } },
+    );
   }
 }
 

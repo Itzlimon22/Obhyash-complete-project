@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 // ✅ Import the specific fonts you requested
 import { Inter } from 'next/font/google';
 import './globals.css';
+import 'katex/dist/katex.min.css';
 import { Toaster } from 'sonner';
 import AuthProvider from '@/components/auth/AuthProvider';
 import { Analytics } from '@vercel/analytics/next';
@@ -12,6 +13,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 const inter = Inter({
   variable: '--font-inter',
   subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -43,12 +45,6 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable}`} suppressHydrationWarning>
       <head>
         <link rel="apple-touch-icon" href="/icon-512.png" />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
-          integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
-          crossOrigin="anonymous"
-        />
       </head>
       <body className="antialiased overflow-x-hidden selection:bg-brand-500/30 bg-paper-50 text-paper-900 dark:bg-paper-900 dark:text-paper-50 font-sans">
         <Suspense fallback={null}>

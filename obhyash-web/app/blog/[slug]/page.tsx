@@ -2,7 +2,17 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getBlogPost } from '@/lib/blog-data';
+import { getBlogPost, getAllPosts } from '@/lib/blog-data';
+
+// ISR: serve cached HTML, revalidate in background every hour
+// Aligned with the unstable_cache revalidate: 3600 in lib/blog-data.ts
+export const revalidate = 3600;
+
+// Pre-render all known slugs at build time; unknown slugs render on demand
+export async function generateStaticParams() {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({ slug: post.slug }));
+}
 import ViewTracker from '@/components/blog/ViewTracker';
 import {
   ArrowLeft,

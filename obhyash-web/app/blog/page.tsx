@@ -15,6 +15,9 @@ import {
   getBlogPostCounts,
 } from '@/lib/blog-recommendations';
 
+// Personalised per user (recommendations differ for known vs. guest users)
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Obhyash Blog — Study Tips, Exam Strategies & More for Students',
   description:
