@@ -128,16 +128,28 @@ export function findHscSubject(idOrName: string) {
 
   const targetLower = targetName.toLowerCase();
 
-  const exactMatch = hscSubjects.find((s) => {
-    const sNameLower = s.name.toLowerCase();
-    return (
-      sNameLower === targetLower ||
-      sNameLower.includes(targetLower) ||
-      targetLower.includes(sNameLower)
-    );
-  });
+  // 1. Exact name match (highest priority — avoids substring false positives)
+  const exactByName = hscSubjects.find(
+    (s) => s.name.toLowerCase() === targetLower,
+  );
+  if (exactByName) return exactByName;
 
-  if (exactMatch) return exactMatch;
+  // 2. Stored name contains search term (e.g. "পদার্থবিজ্ঞান" matching "পদার্থবিজ্ঞান ১ম পত্র")
+  const storedContains = hscSubjects.find((s) =>
+    s.name.toLowerCase().includes(targetLower),
+  );
+  if (storedContains) return storedContains;
+
+  // 3. Search term contains stored name — pick the LONGEST stored name
+  //    (prevents short names like "ইতিহাস" from stealing "ইসলামের ইতিহাস ও সংস্কৃতি")
+  const termContainsCandidates = hscSubjects.filter((s) =>
+    targetLower.includes(s.name.toLowerCase()),
+  );
+  if (termContainsCandidates.length > 0) {
+    return termContainsCandidates.reduce((best, s) =>
+      s.name.length > best.name.length ? s : best,
+    );
+  }
 
   // Fallback to Fuzzy Search (80% similarity threshold)
   let bestMatch: any = undefined;
@@ -168,25 +180,46 @@ export function getHscChapterList(
 ): { id: string; name: string }[] {
   const subject = findHscSubject(subjectIdOrName);
   if (!subject) return [];
-  return subject.chapters.map((c: { id: string; name: string }) => ({ id: c.id, name: c.name }));
+  return subject.chapters.map((c: { id: string; name: string }) => ({
+    id: c.id,
+    name: c.name,
+  }));
 }
 
 export function findHscChapter(idOrName: string) {
   const norm = normalizeForMatch(idOrName);
 
-  // Exact/Include Match
+  // 1. Exact/ID match across all subjects
   for (const subject of hscSubjects) {
-    const chapter = subject.chapters.find((c) => {
-      const cNameLower = c.name.toLowerCase();
-      return (
-        c.id === idOrName ||
-        cNameLower === norm ||
-        cNameLower.includes(norm) ||
-        norm.includes(cNameLower)
-      );
-    });
+    const chapter = subject.chapters.find(
+      (c) => c.id === idOrName || c.name.toLowerCase() === norm,
+    );
     if (chapter) return { chapter, subject };
   }
+
+  // 2. Stored chapter name contains search term
+  for (const subject of hscSubjects) {
+    const chapter = subject.chapters.find((c) =>
+      c.name.toLowerCase().includes(norm),
+    );
+    if (chapter) return { chapter, subject };
+  }
+
+  // 3. Search term contains stored chapter name — pick LONGEST stored name
+  let bestChapterCandidate: { chapter: any; subject: any } | undefined;
+  for (const subject of hscSubjects) {
+    for (const c of subject.chapters) {
+      if (norm.includes(c.name.toLowerCase())) {
+        if (
+          !bestChapterCandidate ||
+          c.name.length > bestChapterCandidate.chapter.name.length
+        ) {
+          bestChapterCandidate = { chapter: c, subject };
+        }
+      }
+    }
+  }
+  if (bestChapterCandidate) return bestChapterCandidate;
 
   // Fuzzy Match (80% similarity threshold)
   let bestMatch: any = undefined;
@@ -220,7 +253,10 @@ export function getHscTopicList(
 ): { id: string; name: string }[] {
   const chapterInfo = findHscChapter(chapterIdOrName);
   if (!chapterInfo) return [];
-  return chapterInfo.chapter.topics.map((t: { id: any; name: any; }) => ({ id: t.id, name: t.name }));
+  return chapterInfo.chapter.topics.map((t: { id: any; name: any }) => ({
+    id: t.id,
+    name: t.name,
+  }));
 }
 
 export function findHscTopic(idOrName: string, chapterIdOrName?: string) {
@@ -232,7 +268,7 @@ export function findHscTopic(idOrName: string, chapterIdOrName?: string) {
     if (chapterInfo) {
       // Exact/Include Match
       let topic = chapterInfo.chapter.topics.find(
-        (t: { id: string; name: string; }) =>
+        (t: { id: string; name: string }) =>
           t.id === idOrName ||
           normalizeForMatch(t.name) === norm ||
           normalizeForMatch(t.name).includes(norm) ||
@@ -277,7 +313,7 @@ export function findHscTopic(idOrName: string, chapterIdOrName?: string) {
     }
   }
 
-  // Global Exact/Include search
+  // Global exact/ID/serial match
   for (const subject of hscSubjects) {
     for (const chapter of subject.chapters) {
       const topic = chapter.topics.find((t) => {
@@ -285,14 +321,40 @@ export function findHscTopic(idOrName: string, chapterIdOrName?: string) {
         return (
           t.id === idOrName ||
           tNameNorm === norm ||
-          tNameNorm.includes(norm) ||
-          norm.includes(tNameNorm) ||
           (t as any).serial?.toString() === norm
         );
       });
       if (topic) return { topic, chapter, subject };
     }
   }
+
+  // Global stored-name-contains-search-term match
+  for (const subject of hscSubjects) {
+    for (const chapter of subject.chapters) {
+      const topic = chapter.topics.find((t) =>
+        normalizeForMatch(t.name).includes(norm),
+      );
+      if (topic) return { topic, chapter, subject };
+    }
+  }
+
+  // Global search-term-contains-stored-name match — pick LONGEST
+  let bestTermContains: { topic: any; chapter: any; subject: any } | undefined;
+  for (const subject of hscSubjects) {
+    for (const chapter of subject.chapters) {
+      for (const t of chapter.topics) {
+        if (norm.includes(normalizeForMatch(t.name))) {
+          if (
+            !bestTermContains ||
+            t.name.length > bestTermContains.topic.name.length
+          ) {
+            bestTermContains = { topic: t, chapter, subject };
+          }
+        }
+      }
+    }
+  }
+  if (bestTermContains) return bestTermContains;
 
   // Global Fuzzy search (80% similarity threshold)
   let bestGlobalMatch: any = undefined;
@@ -339,16 +401,32 @@ export function resolveChapterName(
   const subject = findHscSubject(subjectInput);
   if (subject) {
     const norm = normalizeForMatch(chapterInput);
-    const chapter = subject.chapters.find((c: { name: string; id: string; }) => {
-      const cNameNorm = normalizeForMatch(c.name);
-      return (
-        c.id === chapterInput ||
-        cNameNorm === norm ||
-        cNameNorm.includes(norm) ||
-        norm.includes(cNameNorm)
-      );
+
+    // 1. Exact/ID match
+    let chapter = subject.chapters.find((c: { name: string; id: string }) => {
+      return c.id === chapterInput || normalizeForMatch(c.name) === norm;
     });
     if (chapter) return chapter.name;
+
+    // 2. Stored name contains search term
+    chapter = subject.chapters.find((c: { name: string; id: string }) =>
+      normalizeForMatch(c.name).includes(norm),
+    );
+    if (chapter) return chapter.name;
+
+    // 3. Search term contains stored name — pick LONGEST
+    const candidates = subject.chapters.filter(
+      (c: { name: string; id: string }) =>
+        norm.includes(normalizeForMatch(c.name)),
+    );
+    if (candidates.length > 0) {
+      const best = candidates.reduce(
+        (a: { name: string }, b: { name: string }) =>
+          b.name.length > a.name.length ? b : a,
+      );
+      return best.name;
+    }
+
     // Do not fall back to global search if subject was explicitly provided
     return undefined;
   }
@@ -368,17 +446,39 @@ export function resolveTopicName(
     const chapterInfo = findHscChapter(chapterInput);
     if (chapterInfo) {
       const norm = normalizeForMatch(topicInput);
-      const topic = chapterInfo.chapter.topics.find((t: { name: string; id: string; }) => {
-        const tNameNorm = normalizeForMatch(t.name);
-        return (
-          t.id === topicInput ||
-          tNameNorm === norm ||
-          tNameNorm.includes(norm) ||
-          norm.includes(tNameNorm) ||
-          (t as any).serial?.toString() === norm
-        );
-      });
+
+      // 1. Exact/ID/serial match
+      let topic = chapterInfo.chapter.topics.find(
+        (t: { name: string; id: string }) => {
+          const tNameNorm = normalizeForMatch(t.name);
+          return (
+            t.id === topicInput ||
+            tNameNorm === norm ||
+            (t as any).serial?.toString() === norm
+          );
+        },
+      );
       if (topic) return topic.name;
+
+      // 2. Stored name contains search term
+      topic = chapterInfo.chapter.topics.find(
+        (t: { name: string; id: string }) =>
+          normalizeForMatch(t.name).includes(norm),
+      );
+      if (topic) return topic.name;
+
+      // 3. Search term contains stored name — pick LONGEST
+      const candidates = chapterInfo.chapter.topics.filter(
+        (t: { name: string; id: string }) =>
+          norm.includes(normalizeForMatch(t.name)),
+      );
+      if (candidates.length > 0) {
+        const best = candidates.reduce(
+          (a: { name: string }, b: { name: string }) =>
+            b.name.length > a.name.length ? b : a,
+        );
+        return best.name;
+      }
     }
     // Do not fall back to global search if chapter was explicitly provided
     return undefined;
