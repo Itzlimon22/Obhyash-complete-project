@@ -224,6 +224,8 @@ export interface User {
   optional_subject?: string;
   target?: string; // Medical, Engineering, etc.
   stream?: string; // HSC, Admission
+  exam_target?: string; // e.g. 'hsc_2026', 'mbbs_2026', 'buet_2026', 'ssc_2026', 'hsc_2027'
+  daily_exams_goal?: number; // default 3
 
   // Gamification & Stats
   xp?: number;

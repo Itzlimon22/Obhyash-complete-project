@@ -26,6 +26,7 @@ class _SignupViewState extends ConsumerState<SignupView>
   String _stream = 'HSC';
   String _group = 'Science';
   String _batch = 'HSC 2026';
+  String _examTarget = '';
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -135,6 +136,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           stream: _stream,
           group: _group,
           batch: _batch,
+          examTarget: _examTarget.isEmpty ? null : _examTarget,
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
@@ -663,7 +665,144 @@ class _SignupViewState extends ConsumerState<SignupView>
             ),
           ],
         ),
+        const SizedBox(height: 20),
+
+        // Exam Target
+        _buildLabel('তোমার লক্ষ্য পরীক্ষা কোনটি?', isDark),
+        const SizedBox(height: 8),
+        GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: 3.2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            _examTargetOption('hsc_2026', '📚', 'এইচএসসি ২০২৬', isDark),
+            _examTargetOption('hsc_2027', '📚', 'এইচএসসি ২০২৭', isDark),
+            _examTargetOption('mbbs_2026', '🏥', 'মেডিকেল ২০২৬', isDark),
+            _examTargetOption('mbbs_2027', '🏥', 'মেডিকেল ২০২৭', isDark),
+            _examTargetOption('buet_2026', '⚙️', 'বুয়েট ২০২৬', isDark),
+            _examTargetOption('buet_2027', '⚙️', 'বুয়েট ২০২৭', isDark),
+            _examTargetOption('ssc_2026', '✏️', 'এসএসসি ২০২৬', isDark),
+            _examTargetOption('ssc_2027', '✏️', 'এসএসসি ২০২৭', isDark),
+          ],
+        ),
+        // Other — full width
+        const SizedBox(height: 8),
+        _examTargetOptionWide('other', '🎯', 'অন্যান্য', isDark),
+        if (_examTarget.isEmpty) ...[
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Text(
+              'পরেও ড্যাশবোর্ড থেকে সেট করতে পারবে',
+              style: TextStyle(
+                fontSize: 11,
+                color: isDark
+                    ? const Color(0xFF525252)
+                    : const Color(0xFFA3A3A3),
+              ),
+            ),
+          ),
+        ],
       ],
+    );
+  }
+
+  Widget _examTargetOption(String id, String emoji, String label, bool isDark) {
+    final isSelected = _examTarget == id;
+    return GestureDetector(
+      onTap: () => setState(() => _examTarget = id),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isDark ? const Color(0xFF0A1F17) : const Color(0xFFF0FDF4))
+              : (isDark ? const Color(0xFF171717) : const Color(0xFFFAFAFA)),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF059669)
+                : (isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Row(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 14)),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'HindSiliguri',
+                  color: isSelected
+                      ? (isDark
+                            ? const Color(0xFF34D399)
+                            : const Color(0xFF047857))
+                      : (isDark
+                            ? const Color(0xFFD4D4D4)
+                            : const Color(0xFF404040)),
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _examTargetOptionWide(
+    String id,
+    String emoji,
+    String label,
+    bool isDark,
+  ) {
+    final isSelected = _examTarget == id;
+    return GestureDetector(
+      onTap: () => setState(() => _examTarget = id),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isDark ? const Color(0xFF0A1F17) : const Color(0xFFF0FDF4))
+              : (isDark ? const Color(0xFF171717) : const Color(0xFFFAFAFA)),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF059669)
+                : (isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 14)),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'HindSiliguri',
+                color: isSelected
+                    ? (isDark
+                          ? const Color(0xFF34D399)
+                          : const Color(0xFF047857))
+                    : (isDark
+                          ? const Color(0xFFD4D4D4)
+                          : const Color(0xFF404040)),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

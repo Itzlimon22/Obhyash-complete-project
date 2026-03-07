@@ -142,6 +142,8 @@ class UserProfile {
   final String? sscBoard;
   final String? sscYear;
   final String? avatarUrl;
+  final String? examTarget;
+  final int dailyExamsGoal;
 
   UserProfile({
     required this.id,
@@ -165,6 +167,8 @@ class UserProfile {
     this.sscBoard,
     this.sscYear,
     this.avatarUrl,
+    this.examTarget,
+    this.dailyExamsGoal = 3,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -193,6 +197,8 @@ class UserProfile {
       sscBoard: json['ssc_board'] as String?,
       sscYear: json['ssc_passing_year'] as String?,
       avatarUrl: json['avatar_url'] as String?,
+      examTarget: json['exam_target'] as String?,
+      dailyExamsGoal: (json['daily_exams_goal'] as num?)?.toInt() ?? 3,
     );
   }
 }

@@ -108,6 +108,7 @@ class AuthController extends AsyncNotifier<void> {
     required String stream,
     required String group,
     required String batch,
+    String? examTarget,
     required String email,
     required String password,
   }) async {
@@ -134,6 +135,8 @@ class AuthController extends AsyncNotifier<void> {
             'role': 'Student',
             'status': 'Active',
             'xp': 0,
+            if (examTarget != null && examTarget.isNotEmpty)
+              'exam_target': examTarget,
             'level': 'Beginner',
             'exams_taken': 0,
             'enrolled_exams': 0,

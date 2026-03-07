@@ -7,17 +7,60 @@ import 'package:url_launcher/url_launcher.dart';
 import 'widgets/dashboard_action_card.dart';
 import 'widgets/dashboard_leaderboard_card.dart';
 import 'widgets/subject_stat_card.dart';
+import 'widgets/countdown_banner.dart';
+import 'widgets/daily_goal_card.dart';
+import 'widgets/exam_target_modal.dart';
 import '../providers/dashboard_providers.dart';
 import '../domain/models.dart';
 
-class DashboardView extends ConsumerWidget {
+class DashboardView extends ConsumerStatefulWidget {
   const DashboardView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DashboardView> createState() => _DashboardViewState();
+}
+
+class _DashboardViewState extends ConsumerState<DashboardView> {
+  int _dailyCompletions = 0;
+  bool _hasCheckedExamTarget = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDailyCompletions();
+  }
+
+  Future<void> _loadDailyCompletions() async {
+    final userAsync = ref.read(userProfileProvider);
+    final userId = userAsync.valueOrNull?.id;
+    if (userId != null) {
+      final count = await getDailyCompletions(userId);
+      if (mounted) setState(() => _dailyCompletions = count);
+    }
+  }
+
+  void _checkExamTarget(UserProfile? user) {
+    if (_hasCheckedExamTarget || user == null) return;
+    _hasCheckedExamTarget = true;
+    if (user.examTarget == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        final result = await showExamTargetModal(context);
+        if (result != null && mounted) {
+          ref.invalidate(userProfileProvider);
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final subjectStatsAsync = ref.watch(dashboardSubjectStatsProvider);
     final leaderboardAsync = ref.watch(leaderboardProvider);
     final userProfileAsync = ref.watch(userProfileProvider);
+
+    final userProfile = userProfileAsync.valueOrNull;
+    _checkExamTarget(userProfile);
 
     final subjects = subjectStatsAsync.when(
       data: (data) => data,
@@ -60,6 +103,28 @@ class DashboardView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // 0. Countdown Banner (if exam target set)
+          if (userProfile?.examTarget != null) ...[
+            CountdownBanner(
+              examTarget: userProfile!.examTarget!,
+              onChangeTarget: () async {
+                final result = await showExamTargetModal(context);
+                if (result != null && mounted) {
+                  ref.invalidate(userProfileProvider);
+                }
+              },
+            ),
+            const SizedBox(height: 10),
+          ],
+
+          // 0b. Daily Goal Card
+          DailyGoalCard(
+            completedToday: _dailyCompletions,
+            goal: userProfile?.dailyExamsGoal ?? 3,
+            onStartExam: () => context.go('/setup'),
+          ),
+          const SizedBox(height: 16),
+
           // 1. Actions Grid — 6 cards, 3-column (matches web)
           GridView.count(
             crossAxisCount: 3,

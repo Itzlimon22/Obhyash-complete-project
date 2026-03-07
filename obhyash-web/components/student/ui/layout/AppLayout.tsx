@@ -29,6 +29,10 @@ import {
 import NotificationBell from '../notifications/NotificationBell';
 import NotificationDropdown from '../notifications/NotificationDropdown';
 import UserAvatar from '../common/UserAvatar';
+import {
+  EXAM_DATES,
+  EXAM_LABELS,
+} from '@/components/student/features/dashboard/CountdownBanner';
 import { supabase } from '@/services/database';
 import { toast } from 'sonner';
 
@@ -247,6 +251,39 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               >
                 {title}
               </h1>
+              {(() => {
+                if (
+                  activeTab !== 'dashboard' ||
+                  !user?.exam_target ||
+                  user.exam_target === 'other'
+                )
+                  return null;
+                const examDate = EXAM_DATES[user.exam_target];
+                if (!examDate) return null;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const days = Math.ceil(
+                  (examDate.getTime() - today.getTime()) / 86400000,
+                );
+                if (days < 0) return null;
+                const label = EXAM_LABELS[user.exam_target] ?? '';
+                const colorClass =
+                  days <= 30
+                    ? 'bg-red-50 border-red-200 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400'
+                    : days <= 90
+                      ? 'bg-amber-50 border-amber-200 text-amber-600 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-400'
+                      : 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-400';
+                return (
+                  <div
+                    className={`hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-bold shrink-0 ${colorClass}`}
+                  >
+                    <span>🎯</span>
+                    <span className="whitespace-nowrap">
+                      {label}: {days} দিন বাকি
+                    </span>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Right: Actions */}

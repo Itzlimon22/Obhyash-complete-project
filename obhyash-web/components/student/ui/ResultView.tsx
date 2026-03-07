@@ -31,6 +31,8 @@ interface ResultViewProps {
     subjectLabel?: string;
     // Add other expected properties here if needed
   };
+  /** Called with wrong questions to start a retry session */
+  onRetryWrongAnswers?: (wrongQuestions: Question[]) => void;
 }
 
 const ResultView: React.FC<ResultViewProps> = ({
@@ -50,6 +52,7 @@ const ResultView: React.FC<ResultViewProps> = ({
   bookmarkedIds,
   onToggleBookmark,
   examDetails,
+  onRetryWrongAnswers,
 }) => {
   // State for Report Modal
   const [reportModalOpen, setReportModalOpen] = useState(false);
@@ -538,7 +541,40 @@ const ResultView: React.FC<ResultViewProps> = ({
       </div>
 
       {/* Restart/Back Button */}
-      <div className="mt-12 flex justify-center">
+      <div className="mt-12 flex flex-col sm:flex-row justify-center gap-3">
+        {!isHistoryMode && wrongCount > 0 && onRetryWrongAnswers && (
+          <button
+            onClick={() => {
+              const wrongQuestions = questions.filter((q) => {
+                const ua = userAnswers[q.id];
+                if (ua === undefined) return false;
+                const isCorrect =
+                  ua === q.correctAnswerIndex ||
+                  (q.correctAnswerIndices != null &&
+                    q.correctAnswerIndices.includes(ua));
+                return !isCorrect;
+              });
+              onRetryWrongAnswers(wrongQuestions);
+            }}
+            className="w-full sm:w-auto px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-lg shadow-lg shadow-red-500/20 hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+              />
+            </svg>
+            ভুলগুলো আবার দেখো ({wrongCount}টি)
+          </button>
+        )}
         <button
           onClick={onRestart}
           className="w-full sm:w-auto px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold text-lg shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-2"

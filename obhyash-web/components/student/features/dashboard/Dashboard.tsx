@@ -7,6 +7,8 @@ import { ExamResult, UserProfile } from '@/lib/types';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import { DashboardSkeleton } from '@/components/student/ui/common/Skeletons';
 import UserAvatar from '@/components/student/ui/common/UserAvatar';
+import CountdownBanner from './CountdownBanner';
+import DailyGoalCard from './DailyGoalCard';
 
 interface SubjectStats {
   id: string;
@@ -36,6 +38,9 @@ interface DashboardProps {
   onPracticeClick: () => void;
   onBlogClick: () => void;
   history: ExamResult[];
+  examTarget?: string;
+  completedToday?: number;
+  onChangeTarget?: () => void;
 }
 
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -77,6 +82,9 @@ const Dashboard: React.FC<DashboardProps> = ({
   onPracticeClick,
   onBlogClick,
   history,
+  examTarget,
+  completedToday = 0,
+  onChangeTarget,
 }) => {
   const { loading: authLoading } = useAuth();
 
@@ -184,6 +192,21 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 px-1">
+      {/* Countdown + Daily Goal — full width above cards */}
+      {(examTarget || true) && (
+        <div className="lg:col-span-3 space-y-2">
+          {examTarget && (
+            <CountdownBanner
+              examTarget={examTarget}
+              onChangeTarget={onChangeTarget}
+            />
+          )}
+          <DailyGoalCard
+            completedToday={completedToday}
+            onStartExam={onMockExamClick}
+          />
+        </div>
+      )}
       {/* Cards Section - Order 1 on Mobile, Top Left on Desktop */}
       <div className="lg:col-span-2 grid grid-cols-3 gap-2 md:gap-4 h-fit">
         <button

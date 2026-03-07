@@ -27,6 +27,11 @@ import StreakCelebration from '@/components/student/ui/common/StreakCelebration'
 
 // Features
 import Dashboard from '@/components/student/features/dashboard/Dashboard';
+import ExamTargetModal from '@/components/student/features/dashboard/ExamTargetModal';
+import {
+  getDailyCompletions,
+  incrementDailyCompletions,
+} from '@/components/student/features/dashboard/DailyGoalCard';
 import SubjectReportView from '@/components/student/features/dashboard/SubjectReportView';
 import LeaderboardView from '@/components/student/features/dashboard/LeaderboardView';
 import UserProfileView from '@/components/student/features/dashboard/UserProfileView';
@@ -228,6 +233,11 @@ export default function StudentRoot({
   const [showStreakCelebration, setShowStreakCelebration] = useState(false);
   const [newStreakCount, setNewStreakCount] = useState(0);
 
+  // Exam Target Modal + Daily Goal
+  const [showTargetModal, setShowTargetModal] = useState(false);
+  const [dailyCompletions, setDailyCompletions] = useState(0);
+  const hasCheckedExamTarget = useRef(false);
+
   // Sync with AuthProvider updates
   useEffect(() => {
     if (authProfile) {
@@ -236,6 +246,23 @@ export default function StudentRoot({
       setCurrentUser(initialUser);
     }
   }, [authProfile, initialUser]);
+
+  // Show exam target modal once per session if not set
+  useEffect(() => {
+    if (!authLoading && currentUser && !hasCheckedExamTarget.current) {
+      hasCheckedExamTarget.current = true;
+      if (!currentUser.exam_target) {
+        setShowTargetModal(true);
+      }
+    }
+  }, [authLoading, currentUser?.id]);
+
+  // Load daily completions from localStorage
+  useEffect(() => {
+    if (currentUser?.id) {
+      setDailyCompletions(getDailyCompletions(currentUser.id));
+    }
+  }, [currentUser?.id]);
 
   // Streak System Check - Uses localStorage guard to run ONCE per calendar day
   useEffect(() => {
@@ -346,6 +373,17 @@ export default function StudentRoot({
     }
   }, []);
 
+  // Wrong answer retry handler
+  const handleRetryWrongAnswers = useCallback(
+    (wrongQuestions: import('@/lib/types').Question[]) => {
+      setQuestions(wrongQuestions);
+      setUserAnswers({});
+      setFlaggedQuestions(new Set());
+      beginTimer(wrongQuestions.length * 60); // 1 min per question
+    },
+    [setQuestions, setUserAnswers, setFlaggedQuestions, beginTimer],
+  );
+
   // Navigation State
   const [isReviewingHistory, setIsReviewingHistory] = useState(false);
   const [selectedSubjectReport, setSelectedSubjectReport] = useState<
@@ -392,6 +430,10 @@ export default function StudentRoot({
 
     setCurrentUser(updatedUser);
     await updateUserProfile(updatedUser);
+
+    // Update daily completions
+    const newCount = incrementDailyCompletions(currentUser.id);
+    setDailyCompletions(newCount);
 
     // Provide feedback & Celebrations
     if (newLevel !== oldLevel) {
@@ -539,6 +581,9 @@ export default function StudentRoot({
               onPracticeClick={() => handleTabChange('practice')}
               onBlogClick={() => router.push('/blog')}
               history={examHistory}
+              examTarget={currentUser.exam_target}
+              completedToday={dailyCompletions}
+              onChangeTarget={() => setShowTargetModal(true)}
             />
           </AppLayout>
         );
@@ -927,6 +972,9 @@ export default function StudentRoot({
             bookmarkedIds={bookmarkedIds}
             onToggleBookmark={toggleBookmark}
             examDetails={examDetails ?? undefined}
+            onRetryWrongAnswers={
+              isReviewingHistory ? undefined : handleRetryWrongAnswers
+            }
           />
         </AppLayout>
       );
@@ -963,6 +1011,19 @@ export default function StudentRoot({
         <StreakCelebration
           count={newStreakCount}
           onComplete={() => setShowStreakCelebration(false)}
+        />
+      )}
+      {showTargetModal && currentUser && (
+        <ExamTargetModal
+          user={currentUser}
+          onClose={(updatedTarget) => {
+            if (updatedTarget) {
+              setCurrentUser((u) =>
+                u ? { ...u, exam_target: updatedTarget } : u,
+              );
+            }
+            setShowTargetModal(false);
+          }}
         />
       )}
     </>

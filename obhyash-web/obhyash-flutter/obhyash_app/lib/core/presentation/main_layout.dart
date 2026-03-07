@@ -12,6 +12,7 @@ import '../../features/dashboard/providers/dashboard_providers.dart';
 import '../../features/auth/providers/auth_controller.dart';
 import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
+import '../../features/dashboard/presentation/widgets/countdown_banner.dart';
 
 final _unreadNotifCountProvider = FutureProvider.autoDispose<int>((ref) async {
   final user = ref.watch(authProvider);
@@ -107,6 +108,68 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     }
   }
 
+  Widget _buildCountdownBadge(String examTarget, bool isDark) {
+    final examDate = examDates[examTarget];
+    if (examDate == null) return const SizedBox.shrink();
+    final now = DateTime.now();
+    final days = examDate
+        .difference(DateTime(now.year, now.month, now.day))
+        .inDays;
+    if (days < 0) return const SizedBox.shrink();
+
+    final Color bg, border, textColor;
+    if (days <= 30) {
+      bg = isDark
+          ? const Color(0xFFDC2626).withValues(alpha: 0.15)
+          : const Color(0xFFFEF2F2);
+      border = isDark
+          ? const Color(0xFFDC2626).withValues(alpha: 0.3)
+          : const Color(0xFFFECACA);
+      textColor = isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626);
+    } else if (days <= 90) {
+      bg = isDark
+          ? const Color(0xFFD97706).withValues(alpha: 0.15)
+          : const Color(0xFFFFFBEB);
+      border = isDark
+          ? const Color(0xFFD97706).withValues(alpha: 0.3)
+          : const Color(0xFFFDE68A);
+      textColor = isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706);
+    } else {
+      bg = isDark
+          ? const Color(0xFF059669).withValues(alpha: 0.15)
+          : const Color(0xFFF0FDF4);
+      border = isDark
+          ? const Color(0xFF059669).withValues(alpha: 0.3)
+          : const Color(0xFFBBF7D0);
+      textColor = isDark ? const Color(0xFF34D399) : const Color(0xFF059669);
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: bg,
+        border: Border.all(color: border),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('🎯', style: TextStyle(fontSize: 10)),
+          const SizedBox(width: 3),
+          Text(
+            '$days দিন',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+              fontFamily: 'HindSiliguri',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showProfileSheet(BuildContext ctx, dynamic user) {
     final isDark = Theme.of(ctx).brightness == Brightness.dark;
     showModalBottomSheet(
@@ -181,83 +244,91 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Left: Logo + back button + title
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (activeTab == 'user_profile' ||
-                                activeTab == 'subject_report') ...[
-                              GestureDetector(
-                                onTap: () => context.pop(),
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
+                        Flexible(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (activeTab == 'user_profile' ||
+                                  activeTab == 'subject_report') ...[
+                                GestureDetector(
+                                  onTap: () => context.pop(),
+                                  child: Container(
+                                    width: 32,
+                                    height: 32,
+                                    margin: const EdgeInsets.only(right: 8),
+                                    decoration: BoxDecoration(
+                                      color: isDark
+                                          ? const Color(0xFF262626)
+                                          : const Color(0xFFF5F5F5),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Icon(
+                                      LucideIcons.chevronLeft,
+                                      size: 18,
+                                      color: isDark
+                                          ? const Color(0xFFD4D4D4)
+                                          : const Color(0xFF404040),
+                                    ),
+                                  ),
+                                ),
+                              ] else ...[
+                                // Brand logo — always shown except sub-pages
+                                Container(
+                                  width: 30,
+                                  height: 30,
                                   margin: const EdgeInsets.only(right: 8),
                                   decoration: BoxDecoration(
-                                    color: isDark
-                                        ? const Color(0xFF262626)
-                                        : const Color(0xFFF5F5F5),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Icon(
-                                    LucideIcons.chevronLeft,
-                                    size: 18,
-                                    color: isDark
-                                        ? const Color(0xFFD4D4D4)
-                                        : const Color(0xFF404040),
-                                  ),
-                                ),
-                              ),
-                            ] else ...[
-                              // Brand logo — always shown except sub-pages
-                              Container(
-                                width: 30,
-                                height: 30,
-                                margin: const EdgeInsets.only(right: 8),
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xFFDC2626),
-                                      Color(0xFFB91C1C),
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFFDC2626),
+                                        Color(0xFFB91C1C),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    borderRadius: BorderRadius.circular(9),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFFDC2626,
+                                        ).withValues(alpha: 0.3),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
                                     ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
                                   ),
-                                  borderRadius: BorderRadius.circular(9),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(
-                                        0xFFDC2626,
-                                      ).withValues(alpha: 0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
+                                  child: const Center(
+                                    child: Text(
+                                      'O',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w900,
+                                        height: 1,
+                                      ),
                                     ),
-                                  ],
+                                  ),
                                 ),
-                                child: const Center(
-                                  child: Text(
-                                    'O',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w900,
-                                      height: 1,
-                                    ),
-                                  ),
+                              ],
+                              Text(
+                                _getTitle(activeTab),
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w800,
+                                  fontFamily: 'HindSiliguri',
+                                  color: isDark
+                                      ? Colors.white
+                                      : const Color(0xFF171717),
                                 ),
                               ),
+                              if (activeTab == 'dashboard' &&
+                                  user?.examTarget != null &&
+                                  user!.examTarget != 'other') ...[
+                                const SizedBox(width: 8),
+                                _buildCountdownBadge(user.examTarget!, isDark),
+                              ],
                             ],
-                            Text(
-                              _getTitle(activeTab),
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
-                                fontFamily: 'HindSiliguri',
-                                color: isDark
-                                    ? Colors.white
-                                    : const Color(0xFF171717),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
 
                         // Right: Streak + Bell + divider + Avatar

@@ -23,6 +23,7 @@ import {
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/error-utils';
 import { getRandomAvatar } from '@/lib/avatar-utils';
+import { EXAM_TARGETS } from '@/components/student/features/dashboard/ExamTargetModal';
 
 const AUTH_TIMEOUT_MS = 30000;
 
@@ -68,6 +69,7 @@ function SignupForm() {
     stream: 'HSC',
     group: 'Science',
     batch: 'HSC 2026',
+    examTarget: '', // exam_target in DB
 
     // Step 3: Credentials (Was Step 1)
     email: '',
@@ -203,6 +205,7 @@ function SignupForm() {
               stream: formData.stream,
               division: formData.group, // Mapping group -> division
               batch: formData.batch,
+              exam_target: formData.examTarget || null,
               role: 'Student',
               status: 'Active',
               avatar_url: getRandomAvatar(formData.gender, data.user.id),
@@ -495,6 +498,70 @@ function SignupForm() {
                       </select>
                     </div>
                   </div>
+                </div>
+
+                {/* Exam Target */}
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                    তোমার লক্ষ্য পরীক্ষা কোনটি?
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {EXAM_TARGETS.filter((t) => t.id !== 'other').map((t) => (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() =>
+                          setFormData({ ...formData, examTarget: t.id })
+                        }
+                        className={`flex items-center gap-2 p-2.5 rounded-xl border-2 text-left transition-all active:scale-95 ${
+                          formData.examTarget === t.id
+                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-600'
+                            : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 bg-neutral-50 dark:bg-neutral-900'
+                        }`}
+                      >
+                        <span className="text-base flex-shrink-0">
+                          {t.emoji}
+                        </span>
+                        <span
+                          className={`text-xs font-bold leading-tight ${
+                            formData.examTarget === t.id
+                              ? 'text-emerald-700 dark:text-emerald-400'
+                              : 'text-neutral-700 dark:text-neutral-300'
+                          }`}
+                        >
+                          {t.label}
+                        </span>
+                      </button>
+                    ))}
+                    {/* Other option — full width */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormData({ ...formData, examTarget: 'other' })
+                      }
+                      className={`col-span-2 flex items-center gap-2 p-2.5 rounded-xl border-2 text-left transition-all active:scale-95 ${
+                        formData.examTarget === 'other'
+                          ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-600'
+                          : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 bg-neutral-50 dark:bg-neutral-900'
+                      }`}
+                    >
+                      <span className="text-base">🎯</span>
+                      <span
+                        className={`text-xs font-bold ${
+                          formData.examTarget === 'other'
+                            ? 'text-emerald-700 dark:text-emerald-400'
+                            : 'text-neutral-700 dark:text-neutral-300'
+                        }`}
+                      >
+                        অন্যান্য
+                      </span>
+                    </button>
+                  </div>
+                  {!formData.examTarget && (
+                    <p className="text-[11px] text-neutral-400 dark:text-neutral-500 ml-1">
+                      পরেও ড্যাশবোর্ড থেকে সেট করতে পারবে
+                    </p>
+                  )}
                 </div>
               </div>
             )}
