@@ -41,36 +41,24 @@ export const uploadFile = async (
     }
 
     // B: Cloudflare R2 for heavy/large assets (Zero egress cost)
-    // 1. Request Signed URL from unified R2 API
+    // Proxy upload through Next.js API to avoid CORS issues with direct browser → R2 PUT
+    const form = new FormData();
+    form.append('file', file);
+    form.append('folder', bucket);
+
     const response = await fetch('/api/r2-upload', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fileName: file.name,
-        fileType: file.type,
-        folder: bucket,
-      }),
+      body: form,
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to get upload URL: ${response.statusText}`);
+      const body = await response.json().catch(() => ({}));
+      throw new Error(
+        `R2 upload failed (${response.status}): ${body?.error ?? response.statusText}`,
+      );
     }
 
-    const { uploadUrl, publicUrl } = await response.json();
-
-    // 2. Upload directly to R2 using the signed URL
-    const uploadResponse = await fetch(uploadUrl, {
-      method: 'PUT',
-      body: file,
-      headers: {
-        'Content-Type': file.type,
-      },
-    });
-
-    if (!uploadResponse.ok) {
-      throw new Error(`Upload failed with status ${uploadResponse.status}`);
-    }
-
+    const { publicUrl } = await response.json();
     console.log('✅ Uploaded to R2:', publicUrl);
 
     return {

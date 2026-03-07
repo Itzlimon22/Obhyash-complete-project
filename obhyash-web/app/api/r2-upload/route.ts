@@ -13,12 +13,61 @@ const r2 = new S3Client({
   },
 });
 
+function getR2Domain() {
+  const raw =
+    process.env.NEXT_PUBLIC_R2_DOMAIN ||
+    process.env.R2_PUBLIC_DOMAIN ||
+    'pub-6560195307b14ca49f6f183b13bfa841.r2.dev';
+  return raw.replace(/^https?:\/\//, '').replace(/\/$/, '');
+}
+
+/**
+ * POST /api/r2-upload
+ *
+ * Two modes:
+ *  1. JSON body { fileName, fileType, folder }  → returns presigned PUT URL (legacy)
+ *  2. FormData with `file` field (+ optional `folder`)  → proxies upload to R2 and returns publicUrl
+ */
 export async function POST(request: Request) {
   try {
+    const contentType = request.headers.get('content-type') ?? '';
+
+    // ── Mode 2: direct proxy upload (avoids browser CORS requirement on R2) ──
+    if (contentType.startsWith('multipart/form-data')) {
+      const form = await request.formData();
+      const file = form.get('file') as File | null;
+      const folder = (form.get('folder') as string) || 'uploads';
+
+      if (!file) {
+        return NextResponse.json(
+          { error: 'No file provided' },
+          { status: 400 },
+        );
+      }
+
+      const ext = file.name.split('.').pop() || 'bin';
+      const objectKey = `${folder}/${Date.now()}-${randomUUID()}.${ext}`;
+      const buffer = Buffer.from(await file.arrayBuffer());
+
+      await r2.send(
+        new PutObjectCommand({
+          Bucket: process.env.R2_BUCKET_NAME,
+          Key: objectKey,
+          ContentType: file.type || 'application/octet-stream',
+          ContentLength: buffer.length,
+          Body: buffer,
+        }),
+      );
+
+      const r2Domain = getR2Domain();
+      return NextResponse.json({
+        publicUrl: `https://${r2Domain}/${objectKey}`,
+      });
+    }
+
+    // ── Mode 1: return presigned URL (kept for backward-compat) ──
     const { fileName, fileType, folder = 'uploads' } = await request.json();
 
-    // Create a unique file path
-    // Sanitize filename to remove spaces and special chars
     const sanitizedFileName = fileName
       .replace(/\s+/g, '-')
       .replace(/[^a-zA-Z0-9.-]/g, '');
@@ -30,16 +79,8 @@ export async function POST(request: Request) {
       ContentType: fileType,
     });
 
-    // Generate a secure upload URL valid for 5 minutes
     const signedUrl = await getSignedUrl(r2, command, { expiresIn: 300 });
-
-    const rawDomain =
-      process.env.NEXT_PUBLIC_R2_DOMAIN ||
-      process.env.R2_PUBLIC_DOMAIN ||
-      'pub-6560195307b14ca49f6f183b13bfa841.r2.dev';
-
-    // Strip "http://", "https://" and any trailing slashes to prevent "https://https://"
-    const r2Domain = rawDomain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    const r2Domain = getR2Domain();
 
     if (r2Domain.includes('.r2.cloudflarestorage.com')) {
       console.warn(
@@ -53,7 +94,7 @@ export async function POST(request: Request) {
       publicUrl: `https://${r2Domain}/${objectKey}`,
     });
   } catch (error) {
-    console.error('R2 Signing Error:', error);
-    return NextResponse.json({ error: 'Failed to sign URL' }, { status: 500 });
+    console.error('R2 Upload Error:', error);
+    return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }
 }
