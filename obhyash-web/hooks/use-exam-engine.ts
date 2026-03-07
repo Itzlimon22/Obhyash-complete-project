@@ -72,6 +72,9 @@ export const useExamEngine = () => {
   const timerRef = useRef<number | null>(null);
   // Absolute epoch ms at which the exam timer expires — used to self-correct drift on each tick
   const targetEndTimeRef = useRef<number | null>(null);
+  // Synchronous mutex — prevents double-submit when a user taps Submit twice rapidly.
+  // useRef is intentional: it updates synchronously unlike React state.
+  const isSubmittingRef = useRef(false);
 
   // --- OMR State ---
   const [isOmrMode, setIsOmrMode] = useState(false);
@@ -332,12 +335,19 @@ export const useExamEngine = () => {
       //   stateRef.current,
       // );
 
+      // stateRef is updated asynchronously (via useEffect after render), so it
+      // cannot guard against two near-simultaneous clicks on its own.
+      // isSubmittingRef is a synchronous mutex that closes that gap.
+      if (isSubmittingRef.current) {
+        return { success: false, error: 'Already submitting' };
+      }
       if (
         stateRef.current === AppState.COMPLETED ||
         stateRef.current === AppState.SUBMITTED
       ) {
         return { success: false, error: 'Already submitted' };
       }
+      isSubmittingRef.current = true;
 
       // OMR Check
       if (
@@ -422,6 +432,7 @@ export const useExamEngine = () => {
         return { success: false, error: errorMsg };
       } finally {
         setIsEvaluating(false);
+        isSubmittingRef.current = false;
       }
     },
     [

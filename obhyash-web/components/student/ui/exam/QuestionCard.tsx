@@ -319,6 +319,17 @@ export default function QuestionCard({
                         className="text-[14px] md:text-[15px]"
                       />
                     </div>
+                    {question.explanationImageUrl && (
+                      <div className="mt-3">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={question.explanationImageUrl}
+                          alt="ব্যাখ্যার চিত্র"
+                          className="max-w-full h-auto rounded-lg border border-emerald-200/60 dark:border-emerald-800/40 object-contain max-h-[400px]"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}

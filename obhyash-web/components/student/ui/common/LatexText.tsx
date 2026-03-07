@@ -4,11 +4,26 @@ import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import remarkBreaks from 'remark-breaks';
 import 'katex/dist/katex.min.css';
 import type { Components } from 'react-markdown';
 import Image from 'next/image';
 import type { StaticImport } from 'next/dist/shared/lib/get-img-props';
+
+// Allow all attributes KaTeX injects (className, style on span/div) while
+// blocking everything actually dangerous (script, event handlers, etc.).
+const sanitizeSchema = {
+  ...defaultSchema,
+  attributes: {
+    ...defaultSchema.attributes,
+    span: [...(defaultSchema.attributes?.span ?? []), 'className', 'style'],
+    div: [...(defaultSchema.attributes?.div ?? []), 'className', 'style'],
+    // sup/sub used for footnotes / chemistry notation
+    sup: ['className'],
+    sub: ['className'],
+  },
+};
 
 interface LatexTextProps {
   text: string;
@@ -23,14 +38,16 @@ const LatexText: React.FC<LatexTextProps> = ({ text, className = '' }) => {
   const content = useMemo(() => {
     let formattedText = text || '';
 
-    // Normalize literal \n (two-char escape sequence) to actual newlines.
-    formattedText = formattedText.replace(/\\n/g, '\n');
-
-    // Un-escape \\command → \command in math blocks (tiptap-markdown over-escaping).
+    // ── Step 1: Un-escape over-escaped LaTeX FIRST (before \n expansion) ──────
+    // TipTap-Markdown serialises \frac as \\frac inside $…$ blocks.
+    // We fix that before any other transformation so the math block is valid.
     formattedText = formattedText.replace(
       /(\$\$[\s\S]*?\$\$|\$(?!\$)[^\n]*?\$)/g,
       (match) => match.replace(/\\\\([a-zA-Z{])/g, '\\$1'),
     );
+
+    // ── Step 2: Normalize literal \n escape sequences to real newlines ────────
+    formattedText = formattedText.replace(/\\n/g, '\n');
 
     // Format i., ii., iii. etc into newlines
     formattedText = formattedText.replace(
@@ -54,7 +71,9 @@ const LatexText: React.FC<LatexTextProps> = ({ text, className = '' }) => {
 
   const MarkdownComponents: Components = {
     p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
-      <span {...props} className="block mb-1" />
+      // Use div instead of span so block-level children (tables, images) inside
+      // a <p> remain valid HTML and don't cause hydration mismatches.
+      <div {...props} className="mb-1" />
     ),
     table: (props: React.TableHTMLAttributes<HTMLTableElement>) => (
       <div className="overflow-x-auto my-3 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-sm custom-scrollbar max-w-full">
@@ -182,7 +201,11 @@ const LatexText: React.FC<LatexTextProps> = ({ text, className = '' }) => {
     >
       <ReactMarkdown
         remarkPlugins={[remarkMath, remarkGfm, remarkBreaks]}
-        rehypePlugins={[rehypeKatex, rehypeRaw]}
+        rehypePlugins={[
+          rehypeKatex,
+          rehypeRaw,
+          [rehypeSanitize, sanitizeSchema],
+        ]}
         components={MarkdownComponents}
       >
         {content}
