@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { ExamDetails, AppState } from '@/lib/types';
 import Logo from '@/components/student/ui/Logo';
+import {
+  Clock,
+  Download,
+  FileText,
+  ClipboardList,
+  LogOut,
+  CheckCircle2,
+  AlertTriangle,
+} from 'lucide-react';
 
 interface ExamHeaderProps {
   details: ExamDetails;
@@ -36,192 +45,205 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
   const [showDownloads, setShowDownloads] = useState(false);
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if (h > 0) {
+      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
   const isGracePeriod = appState === AppState.GRACE_PERIOD;
   const displayTime = isGracePeriod ? graceTimeLeft : timeLeft;
+  const progressPct =
+    totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
 
-  const getTimerStyles = () => {
-    if (isGracePeriod) {
-      return 'text-white bg-red-600 border-red-700 animate-pulse shadow-lg shadow-red-500/30';
-    }
-    if (timeLeft < 60) {
-      return 'text-white bg-red-600 border-red-700 animate-[pulse_0.8s_ease-in-out_infinite] shadow-lg shadow-red-500/50 scale-105';
-    }
-    return 'text-neutral-900 bg-neutral-100/50 border-neutral-200 dark:bg-neutral-800/50 dark:border-neutral-700 dark:text-neutral-200';
-  };
+  const isCritical = !isGracePeriod && timeLeft < 60;
+  const isWarning = !isGracePeriod && !isCritical && timeLeft < 300;
+
+  const timerCls = isGracePeriod
+    ? 'text-white bg-red-600 border-red-700 shadow-lg shadow-red-500/25 animate-pulse'
+    : isCritical
+      ? 'text-white bg-red-600 border-red-600 shadow-lg shadow-red-500/30 animate-[pulse_0.8s_ease-in-out_infinite]'
+      : isWarning
+        ? 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700'
+        : 'text-neutral-800 dark:text-neutral-100 bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700';
 
   return (
-    <header className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 h-16 flex items-center justify-between px-3 md:px-6 shadow-sm z-50 sticky top-0">
-      {/* ── Left Section: Logo & Mobile Progress ── */}
-      <div className="flex items-center gap-2 md:gap-3">
-        {/* Mobile: Progress Indicator (12/30) */}
-        <div className="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs font-black font-mono text-emerald-700 dark:text-emerald-400 tabular-nums">
-            {answeredCount}/{totalQuestions}
-          </span>
+    <header className="sticky top-0 z-50 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-xl border-b border-neutral-200/80 dark:border-neutral-800/80 shadow-sm">
+      {/* ── Grace period urgency bar ── */}
+      {isGracePeriod && <div className="h-1 w-full bg-red-600 animate-pulse" />}
+
+      <div className="h-14 md:h-16 flex items-center justify-between px-3 md:px-6 gap-2">
+        {/* ────────────── LEFT ────────────── */}
+        <div className="flex items-center gap-2.5">
+          {/* Logo — desktop only */}
+          <div className="hidden md:flex items-center gap-2.5 mr-1">
+            <Logo variant="icon" size="sm" />
+            <div>
+              <p className="text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-[0.2em] leading-none">
+                লাইভ
+              </p>
+              <p className="text-sm font-black text-neutral-900 dark:text-white leading-tight">
+                পরীক্ষা
+              </p>
+            </div>
+            <div className="h-6 w-px bg-neutral-200 dark:bg-neutral-700 mx-1" />
+          </div>
+
+          {/* Progress pill — always visible */}
+          <div className="flex items-center gap-2">
+            {/* Ring / pill */}
+            <div
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-xs font-black tabular-nums transition-colors ${
+                progressPct === 100
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400'
+                  : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300'
+              }`}
+            >
+              {progressPct === 100 ? (
+                <CheckCircle2 size={12} className="text-emerald-500 shrink-0" />
+              ) : (
+                <span
+                  className="w-2 h-2 rounded-full shrink-0 bg-emerald-500"
+                  style={{
+                    opacity: answeredCount > 0 ? 1 : 0.3,
+                  }}
+                />
+              )}
+              <span>
+                {answeredCount}
+                <span className="font-normal text-neutral-400 dark:text-neutral-500">
+                  /{totalQuestions}
+                </span>
+              </span>
+            </div>
+
+            {/* Progress bar — desktop */}
+            <div className="hidden md:flex flex-col gap-0.5 min-w-[80px]">
+              <div className="h-1.5 w-full rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    progressPct === 100 ? 'bg-emerald-500' : 'bg-blue-500'
+                  }`}
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
+              <p className="text-[9px] font-bold text-neutral-400 dark:text-neutral-600 tabular-nums">
+                {progressPct}% উত্তর দেওয়া হয়েছে
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="hidden md:flex items-center gap-3">
-          <Logo variant="icon" size="sm" />
-          <h1 className="text-sm font-black text-neutral-900 dark:text-white uppercase tracking-wider">
-            Live Exam
-          </h1>
-        </div>
-      </div>
-
-      {/* ── Right Section: Controls ── */}
-      <div className="flex items-center gap-1.5 md:gap-4">
-        {/* Desktop: Progress (Answered: 12/30) */}
-        <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700">
-          <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-            Answered:
-          </span>
-          <span className="text-sm font-black font-mono text-neutral-700 dark:text-neutral-300">
-            {answeredCount}/{totalQuestions}
-          </span>
-        </div>
-
-        {/* OMR Toggle */}
-        <div
-          className={`flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 px-2.5 py-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700 transition-all ${isGracePeriod ? 'opacity-50 pointer-events-none' : ''}`}
-        >
-          <span className="text-[10px] font-black text-neutral-500 dark:text-neutral-400 uppercase tracking-tighter">
-            OMR
-          </span>
+        {/* ────────────── RIGHT ────────────── */}
+        <div className="flex items-center gap-1 md:gap-2">
+          {/* OMR Toggle */}
           <button
             onClick={onToggleOmr}
             disabled={isGracePeriod}
-            className={`relative w-8 h-4 rounded-full transition-colors ${isOmrMode ? 'bg-emerald-500' : 'bg-neutral-300 dark:bg-neutral-600'}`}
+            title="OMR মোড টগল করো"
+            className={`flex items-center gap-1.5 px-2 md:px-3 py-1.5 rounded-xl border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+              isOmrMode
+                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400'
+                : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700'
+            }`}
           >
             <span
-              className={`absolute top-0.5 left-0.5 bg-white w-3 h-3 rounded-full shadow-sm transition-transform ${isOmrMode ? 'translate-x-4' : 'translate-x-0'}`}
-            />
-          </button>
-        </div>
-
-        {/* Downloads */}
-        <div className="relative">
-          <button
-            onClick={() => setShowDownloads(!showDownloads)}
-            className="p-2 rounded-xl md:p-2.5 text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800 transition-all border border-transparent hover:border-neutral-200 dark:hover:border-neutral-700"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-5 h-5"
+              className={`relative w-6 h-3 rounded-full transition-colors shrink-0 ${isOmrMode ? 'bg-emerald-500' : 'bg-neutral-300 dark:bg-neutral-600'}`}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M12 12.75l-3-3m0 0 3-3m-3 3h7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              <span
+                className={`absolute top-0.5 w-2 h-2 rounded-full bg-white shadow-sm transition-transform ${isOmrMode ? 'left-[14px]' : 'left-0.5'}`}
               />
-            </svg>
+            </span>
+            <span className="hidden md:inline">OMR</span>
           </button>
 
-          {showDownloads && (
-            <>
-              <div
-                className="fixed inset-0 z-[-1]"
-                onClick={() => setShowDownloads(false)}
-              ></div>
-              <div className="absolute top-12 right-0 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-2xl py-2 w-56 z-[60] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                <div className="px-4 py-2 border-b border-neutral-100 dark:border-neutral-800 mb-1">
-                  <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                    সংগ্রহ করুন
-                  </p>
+          {/* Downloads dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowDownloads((v) => !v)}
+              title="ডাউনলোড করো"
+              className="flex items-center gap-1.5 p-2 md:px-3 md:py-2 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-all"
+            >
+              <Download size={15} />
+              <span className="hidden md:inline text-xs font-bold">
+                ডাউনলোড
+              </span>
+            </button>
+
+            {showDownloads && (
+              <>
+                <div
+                  className="fixed inset-0 z-[55]"
+                  onClick={() => setShowDownloads(false)}
+                />
+                <div className="absolute top-full mt-2 right-0 z-[60] w-52 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-4 pt-3 pb-2">
+                    <p className="text-[9px] font-black text-neutral-400 uppercase tracking-[0.2em]">
+                      সংগ্রহ করো
+                    </p>
+                  </div>
+                  <div className="px-2 pb-2 space-y-0.5">
+                    <button
+                      onClick={() => {
+                        onDownloadQuestionPaper();
+                        setShowDownloads(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                    >
+                      <span className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-950/40 flex items-center justify-center text-red-500 shrink-0">
+                        <FileText size={15} />
+                      </span>
+                      প্রশ্নপত্র
+                    </button>
+                    <button
+                      onClick={() => {
+                        onDownloadOMR();
+                        setShowDownloads(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                    >
+                      <span className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-600 shrink-0">
+                        <ClipboardList size={15} />
+                      </span>
+                      OMR শিট
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={() => {
-                    onDownloadQuestionPaper();
-                    setShowDownloads(false);
-                  }}
-                  className="w-full text-left px-4 py-3 text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-red-600">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                  </div>
-                  প্রশ্নপত্র
-                </button>
-                <button
-                  onClick={() => {
-                    onDownloadOMR();
-                    setShowDownloads(false);
-                  }}
-                  className="w-full text-left px-4 py-3 text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-emerald-600">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                  </div>
-                  OMR শিট
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+              </>
+            )}
+          </div>
 
-        {/* Timer */}
-        <div
-          className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 md:px-5 md:py-2.5 rounded-xl border transition-all duration-300 ${getTimerStyles()}`}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            stroke="currentColor"
-            className="w-3.5 h-3.5 md:w-4 md:h-4"
+          {/* Timer */}
+          <div
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl border transition-all duration-300 ${timerCls}`}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-            />
-          </svg>
-          <span className="text-sm md:text-xl font-black font-mono leading-none tracking-tight">
-            {formatTime(displayTime)}
-          </span>
-        </div>
+            {isGracePeriod ? (
+              <AlertTriangle size={14} className="shrink-0 md:w-4 md:h-4" />
+            ) : (
+              <Clock size={14} className="shrink-0 md:w-4 md:h-4" />
+            )}
+            <span className="text-sm md:text-lg font-black font-mono leading-none tracking-tight">
+              {formatTime(displayTime)}
+            </span>
+            {isGracePeriod && (
+              <span className="hidden md:inline text-[10px] font-black uppercase tracking-wider opacity-80">
+                গ্রেস
+              </span>
+            )}
+          </div>
 
-        {/* Exit (Desktop Only) */}
-        <div className="hidden md:block">
+          {/* Exit — desktop only */}
           {onExit && (
             <button
               onClick={onExit}
-              className="px-4 py-2.5 rounded-xl text-neutral-600 dark:text-neutral-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 dark:hover:text-red-400 transition-all font-black text-[11px] uppercase tracking-widest border border-transparent hover:border-red-100 dark:hover:border-red-900/50"
+              title="পরীক্ষা ছেড়ে যাও"
+              className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl border border-transparent text-neutral-500 dark:text-neutral-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-400 hover:border-red-100 dark:hover:border-red-900/40 transition-all text-xs font-bold"
             >
-              Exit
+              <LogOut size={15} />
+              <span>বের হও</span>
             </button>
           )}
         </div>

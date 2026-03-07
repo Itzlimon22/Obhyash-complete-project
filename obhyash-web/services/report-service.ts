@@ -9,6 +9,8 @@ export interface SubmitReportData {
   type: string; // ReportReason
   comment: string;
   imageFile?: File;
+  /** Pass a pre-uploaded R2 URL to skip the upload step inside submitReport. */
+  imageUrl?: string;
   reporterId: string;
   reporterName: string;
 }
@@ -19,10 +21,10 @@ export const submitReport = async (data: SubmitReportData) => {
   }
 
   try {
-    let imageUrl = null;
+    // 1. Resolve image URL — use pre-uploaded URL if provided, otherwise upload now
+    let imageUrl: string | null = data.imageUrl ?? null;
 
-    // 1. Upload Image if exists
-    if (data.imageFile) {
+    if (!imageUrl && data.imageFile) {
       const { url } = await uploadReportImage(data.imageFile);
       imageUrl = url;
     }

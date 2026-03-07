@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Portal from '@/components/ui/portal';
 import {
   AlertCircle,
@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { submitReport } from '@/services/report-service';
+import { uploadReportImage } from '@/services/storage-service';
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -106,6 +107,8 @@ const COLOR_MAP: Record<string, { card: string; icon: string; dot: string }> = {
 
 const CHAR_LIMIT = 500;
 
+type UploadPhase = 'idle' | 'uploading_image' | 'saving';
+
 const ReportModal: React.FC<ReportModalProps> = ({
   isOpen,
   onClose,
@@ -117,47 +120,71 @@ const ReportModal: React.FC<ReportModalProps> = ({
   const [comment, setComment] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadPhase, setUploadPhase] = useState<UploadPhase>('idle');
   const [submitted, setSubmitted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Keep a ref to the current blob URL so we can revoke it on cleanup
+  const previewUrlRef = useRef<string | null>(null);
 
-  // Reset state when dialog opens
+  const revokePreview = useCallback(() => {
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+      previewUrlRef.current = null;
+    }
+  }, []);
+
+  // Reset state when dialog opens; revoke any stale blob URL first
   useEffect(() => {
     if (isOpen) {
+      revokePreview();
       setSelectedType('ভুল উত্তর');
       setComment('');
       setImageFile(null);
       setImagePreview(null);
-      setIsSubmitting(false);
+      setUploadPhase('idle');
       setSubmitted(false);
     }
-  }, [isOpen]);
+  }, [isOpen, revokePreview]);
+
+  // Revoke blob URL when modal is unmounted
+  useEffect(() => () => revokePreview(), [revokePreview]);
 
   // Close on Escape key
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !isSubmitting) onClose();
+      if (e.key === 'Escape' && uploadPhase === 'idle') onClose();
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [isOpen, isSubmitting, onClose]);
+  }, [isOpen, uploadPhase, onClose]);
 
   if (!isOpen || questionId === null) return null;
+
+  const isSubmitting = uploadPhase !== 'idle';
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error(
+        'শুধুমাত্র ছবি ফাইল (.jpg, .png, .webp ...) সংযুক্ত করা যাবে',
+      );
+      return;
+    }
     if (file.size > 5 * 1024 * 1024) {
       toast.error('ফাইলের সাইজ ৫ মেগাবাইটের বেশি হতে পারবে না');
       return;
     }
+    revokePreview();
+    const blobUrl = URL.createObjectURL(file);
+    previewUrlRef.current = blobUrl;
     setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
+    setImagePreview(blobUrl);
   };
 
   const clearImage = () => {
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    revokePreview();
     setImageFile(null);
     setImagePreview(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -169,25 +196,39 @@ const ReportModal: React.FC<ReportModalProps> = ({
       toast.error(`মন্তব্য ${CHAR_LIMIT} অক্ষরের মধ্যে হতে হবে`);
       return;
     }
-    setIsSubmitting(true);
+
+    let resolvedImageUrl: string | undefined;
+
     try {
+      // ── Phase 1: Upload image to R2 ───────────────────────────────────────
+      if (imageFile) {
+        setUploadPhase('uploading_image');
+        const { url } = await uploadReportImage(imageFile);
+        resolvedImageUrl = url;
+      }
+
+      // ── Phase 2: Save report to Supabase ──────────────────────────────────
+      setUploadPhase('saving');
       await submitReport({
         questionId,
         type: selectedType,
         comment,
-        imageFile: imageFile || undefined,
+        imageUrl: resolvedImageUrl,
         reporterId,
         reporterName,
       });
+
       setSubmitted(true);
-      setTimeout(() => {
-        onClose();
-      }, 1800);
+      setTimeout(() => onClose(), 1800);
     } catch (error) {
       console.error(error);
-      toast.error('রিপোর্ট জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করো।');
+      if (resolvedImageUrl === undefined && imageFile) {
+        toast.error('ছবি আপলোড ব্যর্থ হয়েছে। আবার চেষ্টা করো।');
+      } else {
+        toast.error('রিপোর্ট জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করো।');
+      }
     } finally {
-      setIsSubmitting(false);
+      setUploadPhase('idle');
     }
   };
 
@@ -449,7 +490,11 @@ const ReportModal: React.FC<ReportModalProps> = ({
                 {isSubmitting ? (
                   <>
                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>পাঠানো হচ্ছে...</span>
+                    <span>
+                      {uploadPhase === 'uploading_image'
+                        ? 'ছবি আপলোড হচ্ছে...'
+                        : 'সংরক্ষণ হচ্ছে...'}
+                    </span>
                   </>
                 ) : (
                   <>
