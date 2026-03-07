@@ -79,13 +79,20 @@ const ResultView: React.FC<ResultViewProps> = ({
       const points = q.points ?? 1;
       if (ua === undefined) {
         skippedCount++;
-      } else if (ua === q.correctAnswerIndex) {
-        rawScore += points;
-        correctCount++;
       } else {
-        wrongCount++;
-        // Negative marking calculation based on prop
-        negativeMarksDeduction += points * negativeMarking;
+        // Check both singular index and multi-answer indices array (matches engine logic)
+        const isCorrect =
+          ua === q.correctAnswerIndex ||
+          (q.correctAnswerIndices != null &&
+            q.correctAnswerIndices.includes(ua));
+        if (isCorrect) {
+          rawScore += points;
+          correctCount++;
+        } else {
+          wrongCount++;
+          // Negative marking calculation based on prop
+          negativeMarksDeduction += points * negativeMarking;
+        }
       }
     });
 

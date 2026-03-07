@@ -60,6 +60,38 @@ export interface ExamDebugInfo {
   diagnosis: string[];
 }
 
+// ─── Fisher-Yates Shuffle (unbiased) ─────────────────────────────────────────
+function fisherYatesShuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ─── Map a DB row to the Question type ───────────────────────────────────────
+function mapDbRow(q: QuestionDbRow): Question {
+  const indices = q.correct_answer_indices || [];
+  const rawIndex =
+    q.correct_answer_index !== undefined && q.correct_answer_index !== null
+      ? q.correct_answer_index
+      : indices.length > 0
+        ? indices[0]
+        : 0;
+  return {
+    ...q,
+    createdAt: q.created_at,
+    correctAnswer: q.correct_answer,
+    correctAnswerIndex: rawIndex,
+    correctAnswerIndices: indices.length > 0 ? indices : [rawIndex],
+    imageUrl: q.image_url,
+    optionImages: q.option_images || [],
+    explanationImageUrl: q.explanation_image_url,
+    examType: q.exam_type,
+  } as unknown as Question;
+}
+
 export const fetchQuestionsWithDiagnostics = async (
   config: ExamConfig,
 ): Promise<{ questions: Question[]; debug: ExamDebugInfo }> => {
@@ -140,28 +172,22 @@ export const fetchQuestionsWithDiagnostics = async (
     const allCollectedQuestions: Question[] = [];
     const seenIds = new Set<string | number>();
 
-    // 4. Fetch per bucket
-    for (let i = 0; i < combinations.length; i++) {
-      const bucket = combinations[i];
-      const neededForThisBucket = bucketSize + (i < remainder ? 1 : 0);
-
-      debug.diagnosis.push(
-        `📦 Bucket ${i + 1}: Difficulty=${bucket.difficulty || 'All'}, ExamType=${bucket.examType || 'All'}, Target=${neededForThisBucket}`,
-      );
-
-      // --- FETCH LOGIC FOR ONE BUCKET ---
-      let bucketQuestions: Question[] = [];
+    // ─── Helper: fetch one bucket (RPC → legacy fallback) ────────────────────
+    const fetchBucket = async (
+      bucket: { difficulty: string | null; examType: string | null },
+      needed: number,
+      idx: number,
+    ): Promise<{ questions: Question[]; method: string }> => {
+      const fetchLimit = needed * 2;
 
       if (user) {
-        // Try RPC Smart Fetch
-        let rpcSuccess = false;
         for (const formName of nameForms) {
           const { data, error } = await supabase.rpc(
             'get_smart_exam_questions',
             {
               p_user_id: user.id,
               p_subject: config.subject,
-              p_limit: neededForThisBucket * 2, // Fetch extra for deduplication margin
+              p_limit: fetchLimit,
               p_chapters: resolvedChapters,
               p_topics: resolvedTopics,
               p_difficulty: bucket.difficulty,
@@ -169,128 +195,98 @@ export const fetchQuestionsWithDiagnostics = async (
               p_subject_name: formName,
             },
           );
-
           if (error) {
             debug.rpcError = error.message;
             continue;
           }
-
           if (data && data.length > 0) {
-            bucketQuestions = (data as unknown as QuestionDbRow[]).map((q) => {
-              const indices = q.correct_answer_indices || [];
-              const rawIndex =
-                q.correct_answer_index !== undefined &&
-                q.correct_answer_index !== null
-                  ? q.correct_answer_index
-                  : indices.length > 0
-                    ? indices[0]
-                    : 0;
-
-              return {
-                ...q,
-                createdAt: q.created_at,
-                correctAnswer: q.correct_answer,
-                correctAnswerIndex: rawIndex,
-                correctAnswerIndices: indices.length > 0 ? indices : [rawIndex],
-                imageUrl: q.image_url,
-                optionImages: q.option_images || [],
-                explanationImageUrl: q.explanation_image_url,
-                examType: q.exam_type,
-              } as unknown as Question;
-            });
-            rpcSuccess = true;
-            break;
-          }
-        }
-
-        if (rpcSuccess) {
-          debug.fetchMethod = 'SMART_RPC_MULTI';
-        } else {
-          debug.diagnosis.push(
-            `⚠️ Bucket ${i + 1} RPC returned 0, falling back`,
-          );
-        }
-      }
-
-      // Fallback to Legacy Fetch for bucket
-      if (bucketQuestions.length === 0) {
-        let query = supabase.from('questions').select('*');
-
-        // Subject filter
-        const matchConditions = [`subject.eq.${config.subject}`];
-        if (config.subject !== config.subjectLabel && config.subjectLabel) {
-          matchConditions.push(`subject.eq.${config.subjectLabel}`);
-        }
-        nameForms.forEach((form) => {
-          if (form !== config.subject && form !== config.subjectLabel) {
-            matchConditions.push(`subject.eq.${form}`);
-          }
-        });
-        query = query.or(matchConditions.join(','));
-
-        if (resolvedChapters) query = query.in('chapter', resolvedChapters);
-        if (resolvedTopics) query = query.in('topic', resolvedTopics);
-        if (bucket.difficulty)
-          query = query.ilike('difficulty', `%${bucket.difficulty}%`);
-        if (bucket.examType)
-          query = query.ilike('exam_type', `%${bucket.examType}%`);
-
-        query = query.limit(neededForThisBucket * 3); // Overfetch for random selection
-
-        const { data, error } = await query;
-        if (error) {
-          debug.queryError = error.message;
-          debug.diagnosis.push(
-            `❌ Bucket ${i + 1} Legacy Error: ${error.message}`,
-          );
-        } else if (data && data.length > 0) {
-          bucketQuestions = (data as unknown as QuestionDbRow[]).map((q) => {
-            const indices = q.correct_answer_indices || [];
-            const rawIndex =
-              q.correct_answer_index !== undefined &&
-              q.correct_answer_index !== null
-                ? q.correct_answer_index
-                : indices.length > 0
-                  ? indices[0]
-                  : 0;
-
             return {
-              ...q,
-              createdAt: q.created_at,
-              correctAnswer: q.correct_answer,
-              correctAnswerIndex: rawIndex,
-              correctAnswerIndices: indices.length > 0 ? indices : [rawIndex],
-              imageUrl: q.image_url,
-              optionImages: q.option_images || [],
-              explanationImageUrl: q.explanation_image_url,
-              examType: q.exam_type,
-            } as unknown as Question;
-          });
-          if (debug.fetchMethod === 'none') debug.fetchMethod = 'LEGACY_MULTI';
+              questions: (data as unknown as QuestionDbRow[]).map(mapDbRow),
+              method: 'SMART_RPC_MULTI',
+            };
+          }
         }
+        debug.diagnosis.push(
+          `⚠️ Bucket ${idx + 1} RPC returned 0, falling back`,
+        );
       }
 
-      // Add unique questions from this bucket
-      let addedFromThisBucket = 0;
-      const shuffledBucket = bucketQuestions.sort(() => 0.5 - Math.random());
-      for (const q of shuffledBucket) {
+      // Legacy fallback
+      let query = supabase.from('questions').select('*');
+      const matchConditions = [`subject.eq.${config.subject}`];
+      if (config.subject !== config.subjectLabel && config.subjectLabel) {
+        matchConditions.push(`subject.eq.${config.subjectLabel}`);
+      }
+      nameForms.forEach((form) => {
+        if (form !== config.subject && form !== config.subjectLabel) {
+          matchConditions.push(`subject.eq.${form}`);
+        }
+      });
+      query = query.or(matchConditions.join(','));
+      query = query.eq('status', 'Approved'); // Only approved questions
+      if (resolvedChapters) query = query.in('chapter', resolvedChapters);
+      if (resolvedTopics) query = query.in('topic', resolvedTopics);
+      if (bucket.difficulty)
+        query = query.ilike('difficulty', `%${bucket.difficulty}%`);
+      if (bucket.examType)
+        query = query.ilike('exam_type', `%${bucket.examType}%`);
+      query = query.limit(needed * 3);
+
+      const { data, error } = await query;
+      if (error) {
+        debug.queryError = error.message;
+        debug.diagnosis.push(
+          `❌ Bucket ${idx + 1} Legacy Error: ${error.message}`,
+        );
+        return { questions: [], method: 'ERROR' };
+      }
+      return {
+        questions: data
+          ? (data as unknown as QuestionDbRow[]).map(mapDbRow)
+          : [],
+        method: 'LEGACY_MULTI',
+      };
+    };
+
+    // 4. Fetch all buckets in PARALLEL
+    debug.diagnosis.push(
+      `🎯 Fetching ${combinations.length} bucket(s) in parallel`,
+    );
+    const bucketResults = await Promise.all(
+      combinations.map((bucket, i) =>
+        fetchBucket(bucket, bucketSize + (i < remainder ? 1 : 0), i),
+      ),
+    );
+
+    // 5. Deduplicate and assemble from parallel results
+    const fetchMethods = new Set<string>();
+    for (let i = 0; i < bucketResults.length; i++) {
+      const needed = bucketSize + (i < remainder ? 1 : 0);
+      const { questions: bucketQuestions, method } = bucketResults[i];
+      fetchMethods.add(method);
+
+      const shuffled = fisherYatesShuffle(bucketQuestions);
+      let added = 0;
+      for (const q of shuffled) {
         if (!seenIds.has(q.id)) {
           allCollectedQuestions.push(q);
           seenIds.add(q.id);
-          addedFromThisBucket++;
-          if (addedFromThisBucket >= neededForThisBucket) break;
+          added++;
+          if (added >= needed) break;
         }
       }
-
-      debug.diagnosis.push(
-        `✅ Bucket ${i + 1} added: ${addedFromThisBucket}/${neededForThisBucket}`,
-      );
+      debug.diagnosis.push(`✅ Bucket ${i + 1} added: ${added}/${needed}`);
+    }
+    if (fetchMethods.size > 0) {
+      debug.fetchMethod =
+        [...fetchMethods].filter((m) => m !== 'ERROR').join('+') || 'none';
     }
 
-    // 5. Final Shuffle and Truncate
-    const finalQuestions = allCollectedQuestions
-      .sort(() => 0.5 - Math.random())
-      .slice(0, totalNeeded);
+    // 6. Final Fisher-Yates shuffle and truncate
+    const finalQuestions = fisherYatesShuffle(allCollectedQuestions).slice(
+      0,
+      totalNeeded,
+    );
 
     debug.resultCount = finalQuestions.length;
     debug.diagnosis.push(`🏁 Final total questions: ${finalQuestions.length}`);
@@ -340,7 +336,8 @@ export const getAvailableQuestionCount = async (
     let query = supabase
       .from('questions')
       .select('id', { count: 'exact', head: true })
-      .or(matchConditions.join(','));
+      .or(matchConditions.join(','))
+      .eq('status', 'Approved'); // Only count approved questions
 
     if (chapters && chapters.length > 0) {
       query = query.in('chapter', chapters);
@@ -370,32 +367,47 @@ export const updateQuestionAnalytics = async (
   isCorrect: boolean,
 ) => {
   try {
-    // We use upsert to handle both insert (first time) and update (subsequent times)
-    // Logic:
-    // - If it exists, increment times_attempted, and increment times_correct IF correct
-    // - If it doesn't exist, insert with initial values
-
-    // Note: Standard upsert with computed columns can be tricky.
-    // We can use a stored procedure OR basic rpc, but simple upsert might work if we read first.
-    // For efficiency, let's call an RPC for the update if possible, or use raw SQL.
-    // Since we created the table, let's try a direct RPC approach for atomicity,
-    // OR just use client-side logic reading is slower.
-
-    // Better approach: Call a specific RPC for updating stats to avoid concurrency issues.
-    // For now, we'll try a simple RPC call.
-
     const { error } = await supabase.rpc('update_user_question_stats', {
       p_user_id: userId,
       p_question_id: questionId,
       p_is_correct: isCorrect,
     });
-
     if (error) {
-      // Fallback: If RPC doesn't exist yet, we can try manual check-update (slower)
       console.warn('Analytics update error (RPC might be missing):', error);
     }
   } catch (e) {
     console.error('Failed to update analytics for question:', questionId, e);
+  }
+};
+
+// Bulk-update analytics for all answered questions in one RPC call.
+// Replaces the N-individual-call pattern after exam submission.
+const bulkUpdateQuestionAnalytics = async (
+  userId: string,
+  questions: Question[],
+  userAnswers: UserAnswers,
+) => {
+  const answered = questions.filter((q) => userAnswers[q.id] !== undefined);
+  if (!answered.length) return;
+  try {
+    const questionIds = answered.map((q) => String(q.id));
+    const areCorrect = answered.map((q) => {
+      const ua = userAnswers[q.id];
+      return (
+        ua === q.correctAnswerIndex ||
+        (q.correctAnswerIndices != null && q.correctAnswerIndices.includes(ua))
+      );
+    });
+    const { error } = await supabase.rpc('bulk_update_user_question_stats', {
+      p_user_id: userId,
+      p_question_ids: questionIds,
+      p_are_correct: areCorrect,
+    });
+    if (error) {
+      console.warn('Bulk analytics update error:', error);
+    }
+  } catch (e) {
+    console.error('Failed to bulk update question analytics:', e);
   }
 };
 
@@ -414,8 +426,17 @@ export const initiateExamSession = async (
 
     if (!user) return null;
 
-    // Insert new row with 'started' status (implicit via 0 score/null completion data)
-    // We store the question IDs or full questions to ensure history matches what was taken
+    // Clean up dangling 'started' rows for this user+subject to prevent row accumulation
+    await supabase
+      .from('exam_results')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('subject', config.subject)
+      .eq('submission_type', 'started');
+
+    // Insert a lightweight session row — questions are NOT stored here to avoid
+    // writing large JSON before the student even answers anything.
+    // Full questions are written when the exam is submitted (updateExamResult).
     const { data, error } = await supabase
       .from('exam_results')
       .insert({
@@ -423,16 +444,15 @@ export const initiateExamSession = async (
         subject: config.subject,
         exam_type: config.examType,
         date: new Date().toISOString(),
-        score: 0, // Placeholder
+        score: 0,
         total_marks: questions.reduce((acc, q) => acc + (q.points || 1), 0),
         total_questions: questions.length,
         correct_count: 0,
         wrong_count: 0,
         time_taken: 0,
         negative_marking: config.negativeMarking,
-        questions: questions, // Store full questions to preserve context
         chapters: config.chapters || 'General',
-        submission_type: 'started', // Use this to denote in-progress if allowed, else 'digital'
+        submission_type: 'started',
       })
       .select('id')
       .single();
@@ -464,10 +484,12 @@ export const updateExamResult = async (
         wrong_count: result.wrongCount,
         time_taken: result.timeTaken,
         user_answers: result.userAnswers,
-        status: 'evaluated', // Mark as complete so analytics can pick it up
+        questions: result.questions, // Store full questions only on completion
+        flagged_questions: result.flaggedQuestions,
+        subject_label: result.subjectLabel,
+        status: 'evaluated',
         submission_type: result.submissionType || 'digital',
         script_image_data: result.scriptImageData,
-        // Update total marks/questions just in case they changed (unlikely)
       })
       .eq('id', examId);
 
@@ -495,24 +517,22 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
         result.id,
       );
 
+    // Resolve user once — reused across both update and fallback-insert paths
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     if (isUuid) {
       // Update existing session
       const success = await updateExamResult(result.id, result);
 
-      // Update Question Analytics (Best Effort)
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      // Bulk-update analytics in a single RPC call (best effort)
       if (user && result.questions && result.userAnswers) {
-        result.questions.forEach((q) => {
-          const userAnswer = result.userAnswers![q.id];
-          if (userAnswer !== undefined) {
-            const isCorrect = userAnswer === q.correctAnswerIndex;
-            const qId = String(q.id);
-            // Fire and forget
-            updateQuestionAnalytics(user.id, qId, isCorrect);
-          }
-        });
+        bulkUpdateQuestionAnalytics(
+          user.id,
+          result.questions,
+          result.userAnswers,
+        );
       }
 
       if (success) {
@@ -524,10 +544,6 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
     }
 
     // Fallback: Insert new row (Legacy behavior or if init failed)
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     if (user) {
       const { error } = await supabase.from('exam_results').insert({
         user_id: user.id,
@@ -544,7 +560,7 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
         questions: result.questions,
         user_answers: result.userAnswers,
         status: 'evaluated', // Mark as complete so analytics can pick it up
-        flagged_questions: result.flaggedQuestions, // If db supports it
+        flagged_questions: result.flaggedQuestions,
         chapters: result.chapters || 'General',
         submission_type: result.submissionType || 'digital',
         script_image_data: result.scriptImageData,
@@ -556,16 +572,13 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
       } else {
         console.log('✅ Exam result saved successfully (New Insert)');
 
-        // Update Question Analytics (Best Effort)
+        // Bulk-update analytics in a single RPC call (best effort)
         if (result.questions && result.userAnswers) {
-          result.questions.forEach((q) => {
-            const userAnswer = result.userAnswers![q.id];
-            if (userAnswer !== undefined) {
-              const isCorrect = userAnswer === q.correctAnswerIndex;
-              const qId = String(q.id);
-              updateQuestionAnalytics(user.id, qId, isCorrect);
-            }
-          });
+          bulkUpdateQuestionAnalytics(
+            user.id,
+            result.questions,
+            result.userAnswers,
+          );
         }
       }
     } else {
@@ -598,6 +611,10 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
       existingHistory[index] = result;
     } else {
       existingHistory.push(result);
+      // Cap at 100 most recent entries to prevent localStorage quota overflow
+      if (existingHistory.length > 100) {
+        existingHistory = existingHistory.slice(-100);
+      }
     }
 
     localStorage.setItem(
@@ -666,6 +683,7 @@ export const getExamHistory = async (): Promise<ExamResult[]> => {
       .from('exam_results')
       .select('*')
       .eq('user_id', user.id)
+      .neq('submission_type', 'started') // Exclude incomplete/abandoned sessions
       .order('date', { ascending: false });
 
     if (error) {

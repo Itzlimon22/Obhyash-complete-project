@@ -70,6 +70,8 @@ export const useExamEngine = () => {
   const [graceTimeLeft, setGraceTimeLeft] = useState<number>(0);
   const [timeTaken, setTimeTaken] = useState<number>(0);
   const timerRef = useRef<number | null>(null);
+  // Absolute epoch ms at which the exam timer expires — used to self-correct drift on each tick
+  const targetEndTimeRef = useRef<number | null>(null);
 
   // --- OMR State ---
   const [isOmrMode, setIsOmrMode] = useState(false);
@@ -302,6 +304,7 @@ export const useExamEngine = () => {
 
     if (duration > 0) {
       console.log('⏱️ [ExamEngine] Starting timer with duration:', duration);
+      targetEndTimeRef.current = Date.now() + duration * 1000;
       setTimeLeft(duration);
       setAppState(AppState.ACTIVE);
     } else {
@@ -542,6 +545,10 @@ export const useExamEngine = () => {
           setFlaggedQuestions(new Set(parsed.flaggedQuestions || []));
           setDbSessionId(parsed.dbSessionId || null);
           setTimeLeft(restoredTimeLeft);
+          if (parsed.targetEndTime && restoredTimeLeft > 0) {
+            // Restore absolute epoch so the live timer can self-correct drift
+            targetEndTimeRef.current = parsed.targetEndTime;
+          }
           setGraceTimeLeft(parsed.graceTimeLeft || 0);
           setIsOmrMode(parsed.isOmrMode || false);
 
@@ -572,12 +579,20 @@ export const useExamEngine = () => {
     if (appState === AppState.ACTIVE) {
       if (timeLeft > 0) {
         timerRef.current = window.setInterval(() => {
-          setTimeLeft((prev) => {
-            if (prev <= 1) {
+          setTimeLeft(() => {
+            // Epoch-corrected tick: derive remaining time from the absolute target
+            // instead of decrementing, eliminating drift from throttled/sleeping tabs.
+            const remaining = targetEndTimeRef.current
+              ? Math.max(
+                  0,
+                  Math.round((targetEndTimeRef.current - Date.now()) / 1000),
+                )
+              : 0;
+            if (remaining <= 0) {
               submitExam(false);
               return 0;
             }
-            return prev - 1;
+            return remaining;
           });
         }, 1000);
       } else {
@@ -587,7 +602,10 @@ export const useExamEngine = () => {
     } else if (appState === AppState.GRACE_PERIOD && graceTimeLeft > 0) {
       timerRef.current = window.setInterval(() => {
         setGraceTimeLeft((prev) => {
-          if (prev <= 1) return 0;
+          if (prev <= 1) {
+            submitExam(false); // Auto-submit when grace period expires
+            return 0;
+          }
           return prev - 1;
         });
       }, 1000);
