@@ -115,32 +115,32 @@ export const fetchQuestionsWithDiagnostics = async (
       data: { user },
     } = await supabase.auth.getUser();
 
-    // 1. Resolve multi-select parameters
-    const difficultyList =
+    // Build filter arrays — null means "no restriction / all"
+    const difficulties =
       config.difficulty &&
       config.difficulty !== 'Mixed' &&
       config.difficulty !== 'All'
         ? config.difficulty.split('+').map((d) => d.trim())
-        : [null];
+        : null;
 
-    const examTypeList =
+    const examTypes =
       config.examType &&
       config.examType !== 'Mixed' &&
       config.examType !== 'All'
         ? config.examType.split('+').map((t) => t.trim())
-        : [null];
+        : null;
 
-    const resolvedChapters =
+    const chapters =
       config.chapters && config.chapters !== 'All'
         ? config.chapters.split(',').map((c) => c.trim())
         : null;
 
-    const resolvedTopics =
+    const topics =
       config.topics && config.topics !== 'General' && config.topics !== 'All'
         ? config.topics.split(',').map((t) => t.trim())
         : null;
 
-    // 2. Normalize subject name for Dual-Match robustness
+    // Normalize subject name for NFC/NFD dual-match
     const subjectName = config.subjectLabel || '';
     const nameForms = [subjectName];
     const nfd = subjectName.normalize('NFD');
@@ -148,149 +148,96 @@ export const fetchQuestionsWithDiagnostics = async (
     const nfc = subjectName.normalize('NFC');
     if (nfc !== subjectName && !nameForms.includes(nfc)) nameForms.push(nfc);
 
-    debug.diagnosis.push(`🔍 Subject Name Forms: ${nameForms.join(', ')}`);
+    debug.diagnosis.push(`🔍 Subject forms: ${nameForms.join(', ')}`);
+    debug.diagnosis.push(
+      `🎯 Filters — chapters: ${chapters?.length ?? 'all'}, ` +
+        `difficulties: ${difficulties?.join('+') ?? 'all'}, ` +
+        `examTypes: ${examTypes?.join('+') ?? 'all'}`,
+    );
 
-    // 3. Bucket Strategy: Calculate combinations and distribution
-    const combinations: {
-      difficulty: string | null;
-      examType: string | null;
-    }[] = [];
-    difficultyList.forEach((d) => {
-      examTypeList.forEach((t) => {
-        combinations.push({ difficulty: d, examType: t });
-      });
+    // ── Primary: single distributed RPC — one round-trip handles all cells ───
+    // The SQL function distributes questions evenly across every
+    // (chapter × difficulty × exam_type) combination, respects smart priority
+    // (unused → mistaken → random), and self-tops-up any shortfall.
+    for (const formName of nameForms) {
+      const { data, error } = await supabase.rpc(
+        'get_distributed_exam_questions',
+        {
+          p_user_id: user?.id ?? null,
+          p_subject: config.subject,
+          p_subject_name: formName,
+          p_total: config.questionCount,
+          p_chapters: chapters,
+          p_topics: topics,
+          p_difficulties: difficulties,
+          p_exam_types: examTypes,
+        },
+      );
+
+      if (error) {
+        debug.rpcError = error.message;
+        debug.diagnosis.push(
+          `⚠️ Distributed RPC error (form "${formName}"): ${error.message}`,
+        );
+        continue;
+      }
+
+      if (data && data.length > 0) {
+        const questions = fisherYatesShuffle(
+          (data as unknown as QuestionDbRow[]).map(mapDbRow),
+        );
+        debug.fetchMethod = 'DISTRIBUTED_RPC';
+        debug.resultCount = questions.length;
+        debug.diagnosis.push(
+          `✅ Distributed RPC returned ${questions.length}/${config.questionCount}`,
+        );
+        return { questions, debug };
+      }
+    }
+
+    // ── Fallback: direct query (RPC not yet deployed, or returned 0) ─────────
+    debug.diagnosis.push(
+      '⚠️ Distributed RPC returned 0 — falling back to direct query',
+    );
+    const matchConditions = [`subject.eq.${config.subject}`];
+    if (config.subject !== config.subjectLabel && config.subjectLabel) {
+      matchConditions.push(`subject.eq.${config.subjectLabel}`);
+    }
+    nameForms.forEach((form) => {
+      if (form !== config.subject && form !== config.subjectLabel) {
+        matchConditions.push(`subject.eq.${form}`);
+      }
     });
 
-    const totalNeeded = config.questionCount;
-    const bucketSize = Math.floor(totalNeeded / combinations.length);
-    const remainder = totalNeeded % combinations.length;
+    let query = supabase
+      .from('questions')
+      .select('*')
+      .or(matchConditions.join(','))
+      .eq('status', 'Approved');
+    if (chapters) query = query.in('chapter', chapters);
+    if (topics) query = query.in('topic', topics);
+    if (difficulties && difficulties.length === 1)
+      query = query.ilike('difficulty', `%${difficulties[0]}%`);
+    if (examTypes && examTypes.length === 1)
+      query = query.ilike('exam_type', `%${examTypes[0]}%`);
+    query = query.limit(config.questionCount * 3);
 
-    debug.diagnosis.push(
-      `🎯 Multi-bucket strategy: ${combinations.length} combinations, ~${bucketSize} per bucket`,
-    );
-
-    const allCollectedQuestions: Question[] = [];
-    const seenIds = new Set<string | number>();
-
-    // ─── Helper: fetch one bucket (RPC → legacy fallback) ────────────────────
-    const fetchBucket = async (
-      bucket: { difficulty: string | null; examType: string | null },
-      needed: number,
-      idx: number,
-    ): Promise<{ questions: Question[]; method: string }> => {
-      const fetchLimit = needed * 2;
-
-      if (user) {
-        for (const formName of nameForms) {
-          const { data, error } = await supabase.rpc(
-            'get_smart_exam_questions',
-            {
-              p_user_id: user.id,
-              p_subject: config.subject,
-              p_limit: fetchLimit,
-              p_chapters: resolvedChapters,
-              p_topics: resolvedTopics,
-              p_difficulty: bucket.difficulty,
-              p_exam_types: bucket.examType ? [bucket.examType] : null,
-              p_subject_name: formName,
-            },
-          );
-          if (error) {
-            debug.rpcError = error.message;
-            continue;
-          }
-          if (data && data.length > 0) {
-            return {
-              questions: (data as unknown as QuestionDbRow[]).map(mapDbRow),
-              method: 'SMART_RPC_MULTI',
-            };
-          }
-        }
-        debug.diagnosis.push(
-          `⚠️ Bucket ${idx + 1} RPC returned 0, falling back`,
-        );
-      }
-
-      // Legacy fallback
-      let query = supabase.from('questions').select('*');
-      const matchConditions = [`subject.eq.${config.subject}`];
-      if (config.subject !== config.subjectLabel && config.subjectLabel) {
-        matchConditions.push(`subject.eq.${config.subjectLabel}`);
-      }
-      nameForms.forEach((form) => {
-        if (form !== config.subject && form !== config.subjectLabel) {
-          matchConditions.push(`subject.eq.${form}`);
-        }
-      });
-      query = query.or(matchConditions.join(','));
-      query = query.eq('status', 'Approved'); // Only approved questions
-      if (resolvedChapters) query = query.in('chapter', resolvedChapters);
-      if (resolvedTopics) query = query.in('topic', resolvedTopics);
-      if (bucket.difficulty)
-        query = query.ilike('difficulty', `%${bucket.difficulty}%`);
-      if (bucket.examType)
-        query = query.ilike('exam_type', `%${bucket.examType}%`);
-      query = query.limit(needed * 3);
-
-      const { data, error } = await query;
-      if (error) {
-        debug.queryError = error.message;
-        debug.diagnosis.push(
-          `❌ Bucket ${idx + 1} Legacy Error: ${error.message}`,
-        );
-        return { questions: [], method: 'ERROR' };
-      }
-      return {
-        questions: data
-          ? (data as unknown as QuestionDbRow[]).map(mapDbRow)
-          : [],
-        method: 'LEGACY_MULTI',
-      };
-    };
-
-    // 4. Fetch all buckets in PARALLEL
-    debug.diagnosis.push(
-      `🎯 Fetching ${combinations.length} bucket(s) in parallel`,
-    );
-    const bucketResults = await Promise.all(
-      combinations.map((bucket, i) =>
-        fetchBucket(bucket, bucketSize + (i < remainder ? 1 : 0), i),
-      ),
-    );
-
-    // 5. Deduplicate and assemble from parallel results
-    const fetchMethods = new Set<string>();
-    for (let i = 0; i < bucketResults.length; i++) {
-      const needed = bucketSize + (i < remainder ? 1 : 0);
-      const { questions: bucketQuestions, method } = bucketResults[i];
-      fetchMethods.add(method);
-
-      const shuffled = fisherYatesShuffle(bucketQuestions);
-      let added = 0;
-      for (const q of shuffled) {
-        if (!seenIds.has(q.id)) {
-          allCollectedQuestions.push(q);
-          seenIds.add(q.id);
-          added++;
-          if (added >= needed) break;
-        }
-      }
-      debug.diagnosis.push(`✅ Bucket ${i + 1} added: ${added}/${needed}`);
-    }
-    if (fetchMethods.size > 0) {
-      debug.fetchMethod =
-        [...fetchMethods].filter((m) => m !== 'ERROR').join('+') || 'none';
+    const { data: fallbackData, error: fallbackError } = await query;
+    if (fallbackError) {
+      debug.queryError = fallbackError.message;
+      debug.diagnosis.push(`❌ Fallback query error: ${fallbackError.message}`);
+      return { questions: [], debug };
     }
 
-    // 6. Final Fisher-Yates shuffle and truncate
-    const finalQuestions = fisherYatesShuffle(allCollectedQuestions).slice(
-      0,
-      totalNeeded,
-    );
+    const finalQuestions = fisherYatesShuffle(
+      ((fallbackData ?? []) as unknown as QuestionDbRow[]).map(mapDbRow),
+    ).slice(0, config.questionCount);
 
+    debug.fetchMethod = 'LEGACY_FALLBACK';
     debug.resultCount = finalQuestions.length;
-    debug.diagnosis.push(`🏁 Final total questions: ${finalQuestions.length}`);
-
+    debug.diagnosis.push(
+      `🏁 Fallback returned ${finalQuestions.length}/${config.questionCount}`,
+    );
     return { questions: finalQuestions, debug };
   } catch (err) {
     debug.diagnosis.push(`💥 Exception: ${err}`);
