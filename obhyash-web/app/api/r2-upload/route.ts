@@ -59,10 +59,10 @@ export async function POST(request: Request) {
         }),
       );
 
-      const r2Domain = getR2Domain();
-      return NextResponse.json({
-        publicUrl: `https://${r2Domain}/${objectKey}`,
-      });
+      // Return a proxy URL so images are served through Next.js.
+      // This avoids the need to enable public access on the R2 bucket.
+      const proxyUrl = `/api/r2-image?key=${encodeURIComponent(objectKey)}`;
+      return NextResponse.json({ publicUrl: proxyUrl });
     }
 
     // ── Mode 1: return presigned URL (kept for backward-compat) ──

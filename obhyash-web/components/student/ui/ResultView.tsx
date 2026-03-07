@@ -5,6 +5,7 @@ import { useCountUp } from '@/hooks/use-count-up';
 import { celebration } from '@/lib/confetti';
 import QuestionCard from '@/components/student/ui/exam/QuestionCard';
 import ReportModal from '@/components/student/ui/common/ReportModal';
+import { ResultShareStrip } from '@/components/student/ui/results/ResultShareCard';
 
 interface ResultViewProps {
   questions: Question[];
@@ -392,6 +393,21 @@ const ResultView: React.FC<ResultViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* SHARE / DOWNLOAD CARD — shown only after live exam */}
+      <ResultShareStrip
+        percentage={percentage}
+        correctCount={correctCount}
+        wrongCount={wrongCount}
+        skippedCount={skippedCount}
+        finalScore={finalScore}
+        totalPoints={totalPoints}
+        timeTaken={timeTaken}
+        subjectLabel={examDetails?.subjectLabel}
+        feedbackTitle={feedback.title}
+        userName={currentUser?.name}
+        isHistoryMode={isHistoryMode}
+      />
 
       {/* SUMMARY TABLE */}
       <div className="mb-8 bg-white dark:bg-neutral-900 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden">

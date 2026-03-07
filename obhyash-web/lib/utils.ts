@@ -5,6 +5,24 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Converts a direct Cloudflare R2 public URL (pub-*.r2.dev/...) to a
+ * server-side proxy URL (/api/r2-image?key=...) so images are served
+ * through Next.js without requiring public bucket access on R2.
+ * Passes through all other URLs unchanged.
+ */
+export function resolveImageUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  // Already a proxy URL
+  if (url.startsWith('/api/r2-image')) return url;
+  // Match direct R2 public domain: https://pub-xxx.r2.dev/key or https://custom-domain/key
+  const r2Match = url.match(/^https?:\/\/[^/]+\.r2\.dev\/(.+)$/);
+  if (r2Match) {
+    return `/api/r2-image?key=${encodeURIComponent(r2Match[1])}`;
+  }
+  return url;
+}
+
 // Utility functions for formatting and calculations
 
 export const formatTime = (seconds: number): string => {

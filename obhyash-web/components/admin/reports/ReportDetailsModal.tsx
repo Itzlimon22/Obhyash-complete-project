@@ -12,6 +12,7 @@ import {
 import Portal from '@/components/ui/portal';
 import { resolveReport } from '@/services/report-service';
 import { Report, UserProfile } from '@/lib/types';
+import { resolveImageUrl } from '@/lib/utils';
 import { getUserProfile } from '@/services/user-service';
 
 interface ReportDetailsModalProps {
@@ -209,7 +210,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
                 </h4>
                 <div className="relative group rounded-xl overflow-hidden border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 min-h-[100px] flex items-center justify-center">
                   <img
-                    src={report.image_url}
+                    src={resolveImageUrl(report.image_url) ?? ''}
                     alt="Reference"
                     loading="lazy"
                     onError={(e) => {
@@ -224,7 +225,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
                     </span>
                   </div>
                   <a
-                    href={report.image_url}
+                    href={resolveImageUrl(report.image_url) ?? '#'}
                     target="_blank"
                     rel="noreferrer"
                     className="absolute top-2 right-2 p-2 bg-black/80 text-white rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition-opacity"

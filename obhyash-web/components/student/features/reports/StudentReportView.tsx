@@ -13,6 +13,7 @@ import { UserProfile } from '@/lib/types';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import { Eye, ChevronRight, RefreshCw } from 'lucide-react';
 import { ReportSkeleton } from '@/components/student/ui/common/Skeletons';
+import { resolveImageUrl } from '@/lib/utils';
 import LatexText from '@/components/student/ui/common/LatexText';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
@@ -317,13 +318,13 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                               রেফারেন্স ছবি
                             </h4>
                             <a
-                              href={report.image_url}
+                              href={resolveImageUrl(report.image_url) ?? '#'}
                               target="_blank"
                               rel="noreferrer"
                               className="block group relative rounded-xl md:rounded-2xl overflow-hidden border-2 border-dashed border-neutral-200 dark:border-neutral-700 p-1 hover:border-neutral-300 transition-colors"
                             >
                               <img
-                                src={report.image_url}
+                                src={resolveImageUrl(report.image_url) ?? ''}
                                 alt="Reference"
                                 className="w-full h-36 object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
                               />
