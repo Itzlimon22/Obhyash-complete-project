@@ -409,7 +409,7 @@ export default function OmrCheckPage() {
                           d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
                         />
                       </svg>
-                      স্ক্রিপ্ট দেখুন
+                      স্ক্রিপ্ট দেখো
                     </button>
 
                     <div className="flex-1 text-right">
@@ -528,7 +528,7 @@ export default function OmrCheckPage() {
                                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                               />
                             </svg>
-                            <span>স্ক্রিপ্ট দেখুন</span>
+                            <span>স্ক্রিপ্ট দেখো</span>
                           </button>
                         </td>
                         <td className="px-8 py-6">
@@ -657,13 +657,13 @@ export default function OmrCheckPage() {
                         onClick={() => setShowRejectInput(false)}
                         className="flex-1 py-3.5 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-500 font-bold hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all active:scale-95"
                       >
-                        ফিরে যান
+                        ফিরে যাও
                       </button>
                       <button
                         onClick={confirmReject}
                         className="flex-1 py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-bold shadow-lg shadow-red-500/20 transition-all active:scale-95"
                       >
-                        বাতিল নিশ্চিত করুন
+                        বাতিল নিশ্চিত করো
                       </button>
                     </div>
                   </div>
@@ -680,7 +680,7 @@ export default function OmrCheckPage() {
                       }
                       className="flex-1 py-3.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:bg-red-50 dark:hover:bg-red-900/10 hover:text-red-600 disabled:opacity-30 active:scale-95"
                     >
-                      স্ক্রিপ্ট বাতিল করুন
+                      স্ক্রিপ্ট বাতিল করো
                     </button>
                     <button
                       onClick={() => handleEvaluate(viewingScript)}
@@ -697,7 +697,7 @@ export default function OmrCheckPage() {
                       )}
                       {processingId === viewingScript.id
                         ? 'মূল্যায়ন চলছে...'
-                        : 'AI মূল্যায়ন শুরু করুন'}
+                        : 'AI মূল্যায়ন শুরু করো'}
                     </button>
                   </div>
                 )}

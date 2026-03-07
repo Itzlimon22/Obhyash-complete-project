@@ -242,7 +242,7 @@ export const MOCK_PLANS: SubscriptionPlan[] = [
     currency: '৳',
     features: [
       'আনলিমিটেড মক এক্সাম',
-      'আনলিমিটেড OMR স্ক্যানিং',
+      'আনলিমিটেড OMR স্ক্যাওিং',
       'ব্যাখ্যাসহ সমাধান (AI)',
       'বিজ্ঞাপনমুক্ত অভিজ্ঞতা',
     ],
@@ -255,7 +255,7 @@ export const MOCK_PLANS: SubscriptionPlan[] = [
     billingCycle: 'Quarterly',
     currency: '৳',
     features: [
-      'মাসিক প্ল্যানের সব সুবিধা',
+      'মাসিক প্ল্যাওের সব সুবিধা',
       '৩৩% সাশ্রয় (বিশাল ছাড়)',
       'অগ্রাধিকার সাপোর্ট',
     ],

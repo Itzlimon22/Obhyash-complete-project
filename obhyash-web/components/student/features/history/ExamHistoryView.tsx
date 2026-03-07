@@ -761,7 +761,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                           disabled={isPending}
                           className="mt-auto w-full py-2.5 rounded-xl bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-sm font-bold hover:bg-emerald-700 dark:hover:bg-emerald-500 dark:hover:text-white transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
                         >
-                          {isRejected ? 'রিচেক করুন' : 'ফলাফল দেখুন →'}
+                          {isRejected ? 'রিচেক করো' : 'ফলাফল দেখো →'}
                         </button>
                       </div>
                     );
@@ -776,7 +776,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                   onClick={() => setVisibleCount((p) => p + 9)}
                   className="px-6 py-2.5 bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl font-semibold text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
                 >
-                  আরও দেখুন
+                  আরও দেখো
                 </button>
               </div>
             )}
@@ -848,7 +848,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                       onClick={() => setVisibleCount((p) => p + 9)}
                       className="px-6 py-2.5 bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl font-semibold text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
                     >
-                      আরও দেখুন
+                      আরও দেখো
                     </button>
                   </div>
                 )}
@@ -902,7 +902,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
                       onClick={() => setVisibleCount((p) => p + 9)}
                       className="px-6 py-2.5 bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl font-semibold text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
                     >
-                      আরও দেখুন
+                      আরও দেখো
                     </button>
                   </div>
                 )}

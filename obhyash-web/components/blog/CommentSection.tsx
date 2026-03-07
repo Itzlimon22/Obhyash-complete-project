@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, FormEvent } from 'react';
 import Image from 'next/image';
@@ -108,7 +108,7 @@ function ReplyForm({
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="আপনার রিপ্লাই লিখুন..."
+        placeholder="আপনার রিপ্লাই লেখো..."
         autoFocus
         className="w-full min-h-[80px] p-3 rounded-xl border border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/30 dark:bg-[#1a1a1a] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 resize-none text-[14px] leading-relaxed font-anek"
         maxLength={1000}
@@ -288,7 +288,7 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="আপনার মতামত লিখুন..."
+              placeholder="আপনার মতামত লেখো..."
               className="w-full min-h-[100px] p-4 rounded-xl border border-slate-200 dark:border-[#333] bg-slate-50 dark:bg-[#1a1a1a] text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 dark:focus:ring-indigo-500/30 resize-none text-[14px] leading-relaxed"
               maxLength={1000}
             />
@@ -305,7 +305,7 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <>
-                    <Send className="w-3.5 h-3.5" /> পোস্ট করুন
+                    <Send className="w-3.5 h-3.5" /> পোস্ট করো
                   </>
                 )}
               </button>
@@ -315,10 +315,10 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
           <div className="bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] p-5 rounded-xl flex items-center justify-between gap-4">
             <div>
               <span className="text-slate-800 dark:text-slate-200 font-semibold block mb-0.5">
-                মতামত জানাতে লগইন করুন
+                মতামত জানাতে লগইন করো
               </span>
               <span className="text-sm text-slate-500 dark:text-slate-400">
-                কমেন্ট করতে আপনার একাউন্টে প্রবেশ করুন।
+                কমেন্ট করতে আপনার একাউন্টে প্রবেশ করো।
               </span>
             </div>
             <a
@@ -340,7 +340,7 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
         ) : error ? (
           <div className="p-4 rounded-xl bg-red-50 dark:bg-red-500/10 text-red-600 flex items-center gap-2 text-sm">
             <AlertCircle className="w-4 h-4" />
-            কমেন্ট লোড করতে সমস্যা হয়েছে। দয়া করে পেজটি রিফ্রেশ করুন।
+            কমেন্ট লোড করতে সমস্যা হয়েছে। দয়া করে পেজটি রিফ্রেশ করো।
           </div>
         ) : topLevel.length === 0 ? (
           <div className="text-center py-10 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">

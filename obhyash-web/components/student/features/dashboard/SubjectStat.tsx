@@ -127,7 +127,7 @@ const SubjectItem: React.FC<{
                   }}
                   className="text-xs font-bold text-neutral-600 hover:text-red-600 dark:text-neutral-400 dark:hover:text-red-400 flex items-center justify-center gap-1.5 transition-colors px-6 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 w-full md:w-auto"
                 >
-                  বিস্তারিত রিপোর্ট দেখুন
+                  বিস্তারিত রিপোর্ট দেখো
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"

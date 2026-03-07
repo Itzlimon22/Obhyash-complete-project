@@ -120,7 +120,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
                   : 'bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white shadow-emerald-500/25 hover:shadow-emerald-500/40',
               )}
             >
-              {isCurrent ? 'বর্তমান প্ল্যান' : 'পেমেন্ট করো'}
+              {isCurrent ? 'বর্তমান প্ল্যাও' : 'পেমেন্ট করো'}
             </button>
           </div>
         </div>

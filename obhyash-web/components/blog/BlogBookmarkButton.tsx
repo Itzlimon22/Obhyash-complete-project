@@ -24,7 +24,7 @@ export default function BlogBookmarkButton({
     // Not logged in
     if (!data) return;
     if (data.slugs === undefined) {
-      toast.error('বুকমার্ক করতে লগইন করুন');
+      toast.error('বুকমার্ক করতে লগইন করো');
       return;
     }
 
@@ -43,7 +43,7 @@ export default function BlogBookmarkButton({
       });
       if (res.status === 401) {
         mutate(); // revert
-        toast.error('বুকমার্ক করতে লগইন করুন');
+        toast.error('বুকমার্ক করতে লগইন করো');
         return;
       }
       const json = await res.json();
@@ -62,7 +62,7 @@ export default function BlogBookmarkButton({
       );
     } catch {
       mutate(); // revert on error
-      toast.error('সমস্যা হয়েছে, আবার চেষ্টা করুন');
+      toast.error('সমস্যা হয়েছে, আবার চেষ্টা করো');
     } finally {
       setPending(false);
     }
@@ -72,8 +72,8 @@ export default function BlogBookmarkButton({
     <button
       onClick={toggle}
       disabled={pending}
-      aria-label={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করুন'}
-      title={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করুন'}
+      aria-label={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করো'}
+      title={isBookmarked ? 'বুকমার্ক সরান' : 'বুকমার্ক করো'}
       className={`inline-flex items-center gap-2 rounded-full border transition-all font-anek
         ${iconOnly ? 'w-9 h-9 justify-center' : 'px-4 py-2 text-sm font-semibold'}
         ${
@@ -84,7 +84,7 @@ export default function BlogBookmarkButton({
         disabled:opacity-60`}
     >
       <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-rose-500' : ''}`} />
-      {!iconOnly && (isBookmarked ? 'সংরক্ষিত' : 'সংরক্ষণ করুন')}
+      {!iconOnly && (isBookmarked ? 'সংরক্ষিত' : 'সংরক্ষণ করো')}
     </button>
   );
 }

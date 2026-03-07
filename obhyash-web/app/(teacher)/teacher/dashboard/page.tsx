@@ -211,14 +211,14 @@ export default function TeacherDashboard() {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-800/50 border border-emerald-700/50 text-emerald-100 text-xs font-bold mb-3 backdrop-blur-sm">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                শিক্ষক প্যানেল
+                শিক্ষক প্যাওেল
               </div>
               <h1 className="text-3xl md:text-5xl font-black mb-2 tracking-tight">
                 স্বাগতম, {userName}! 👋
               </h1>
               <p className="text-emerald-100 text-lg md:text-xl font-medium max-w-2xl leading-relaxed">
-                আপনার ড্যাশবোর্ডে আপনাকে স্বাগতম। প্রশ্ন তৈরি করুন এবং
-                শিক্ষার্থীদের অগ্রগতি পর্যবেক্ষণ করুন।
+                আপনার ড্যাশবোর্ডে আপনাকে স্বাগতম। প্রশ্ন তৈরি করো এবং
+                শিক্ষার্থীদের অগ্রগতি পর্যবেক্ষণ করো।
               </p>
             </div>
             <Link
@@ -226,7 +226,7 @@ export default function TeacherDashboard() {
               className="group flex items-center gap-3 px-6 py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-bold shadow-lg shadow-red-600/20 active:scale-95 transition-all text-sm md:text-base mr-auto md:mr-0"
             >
               <PlusCircle className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-              নতুন প্রশ্ন তৈরি করুন
+              নতুন প্রশ্ন তৈরি করো
             </Link>
           </div>
 
@@ -300,7 +300,7 @@ export default function TeacherDashboard() {
             প্রশ্ন ব্যাংক
           </h3>
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            সকল প্রশ্ন দেখুন ও ম্যানেজ করুন
+            সকল প্রশ্ন দেখো ও ম্যাওেজ করো
           </p>
           <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full -mr-4 -mt-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none" />
         </Link>
@@ -316,7 +316,7 @@ export default function TeacherDashboard() {
             নতুন প্রশ্ন
           </h3>
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            নতুন একটি প্রশ্ন যোগ করুন
+            নতুন একটি প্রশ্ন যোগ করো
           </p>
           <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-bl-full -mr-4 -mt-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none" />
         </Link>
@@ -332,7 +332,7 @@ export default function TeacherDashboard() {
             বাল্ক আপলোড
           </h3>
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            একসাথে অনেক প্রশ্ন আপলোড করুন (CSV/JSON)
+            একসাথে অনেক প্রশ্ন আপলোড করো (CSV/JSON)
           </p>
           <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full -mr-4 -mt-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none" />
         </Link>
@@ -348,7 +348,7 @@ export default function TeacherDashboard() {
             প্রোফাইল
           </h3>
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            আপনার তথ্য আপডেট করুন
+            আপনার তথ্য আপডেট করো
           </p>
           <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full -mr-4 -mt-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none" />
         </Link>
@@ -369,11 +369,11 @@ export default function TeacherDashboard() {
             </div>
             <div>
               <p className="text-sm font-bold text-red-800 dark:text-red-400 mb-0.5">
-                সঠিক অধ্যায় নির্বাচন করুন
+                সঠিক অধ্যায় নির্বাচন করো
               </p>
               <p className="text-xs text-red-700/80 dark:text-red-400/70 leading-relaxed">
                 প্রশ্ন আপলোড করার সময় সঠিক বিষয়, অধ্যায় এবং টপিক নির্বাচন
-                করুন যাতে শিক্ষার্থীরা সহজে খুঁজে পায়।
+                করো যাতে শিক্ষার্থীরা সহজে খুঁজে পায়।
               </p>
             </div>
           </div>
@@ -383,7 +383,7 @@ export default function TeacherDashboard() {
             </div>
             <div>
               <p className="text-sm font-bold text-emerald-800 dark:text-emerald-400 mb-0.5">
-                ব্যাখ্যা যোগ করুন
+                ব্যাখ্যা যোগ করো
               </p>
               <p className="text-xs text-emerald-700/80 dark:text-emerald-400/70 leading-relaxed">
                 প্রতিটি প্রশ্নের সাথে বিস্তারিত ব্যাখ্যা এবং ছবি যুক্ত করলে
@@ -397,11 +397,11 @@ export default function TeacherDashboard() {
             </div>
             <div>
               <p className="text-sm font-bold text-red-800 dark:text-red-400 mb-0.5">
-                বাল্ক আপলোড ব্যবহার করুন
+                বাল্ক আপলোড ব্যবহার করো
               </p>
               <p className="text-xs text-red-700/80 dark:text-red-400/70 leading-relaxed">
-                একসাথে অনেক প্রশ্ন আপলোড করতে JSON/CSV ফাইল ব্যবহার করুন।
-                টেমপ্লেট ডাউনলোড করে কাজ শুরু করুন।
+                একসাথে অনেক প্রশ্ন আপলোড করতে JSON/CSV ফাইল ব্যবহার করো।
+                টেমপ্লেট ডাউনলোড করে কাজ শুরু করো।
               </p>
             </div>
           </div>
@@ -411,11 +411,11 @@ export default function TeacherDashboard() {
             </div>
             <div>
               <p className="text-sm font-bold text-emerald-800 dark:text-emerald-400 mb-0.5">
-                গুণগত মান বজায় রাখুন
+                গুণগত মান বজায় রাখো
               </p>
               <p className="text-xs text-emerald-700/80 dark:text-emerald-400/70 leading-relaxed">
-                প্রশ্নের ভাষা পরিষ্কার রাখুন, সঠিক উত্তর যাচাই করুন এবং
-                প্রাসঙ্গিক ট্যাগ যোগ করুন।
+                প্রশ্নের ভাষা পরিষ্কার রাখো, সঠিক উত্তর যাচাই করো এবং
+                প্রাসঙ্গিক ট্যাগ যোগ করো।
               </p>
             </div>
           </div>

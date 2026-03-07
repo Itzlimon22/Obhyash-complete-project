@@ -98,7 +98,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
           কোনো ডাটা পাওয়া যায়নি
         </h2>
         <p className="text-neutral-500 dark:text-neutral-400 mt-2 text-sm">
-          বিশ্লেষণ দেখতে অন্তত একটি পরীক্ষা সম্পন্ন করুন অথবা সময়সীমা পরিবর্তন
+          বিশ্লেষণ দেখতে অন্তত একটি পরীক্ষা সম্পন্ন করো অথবা সময়সীমা পরিবর্তন
           করো।
         </p>
 

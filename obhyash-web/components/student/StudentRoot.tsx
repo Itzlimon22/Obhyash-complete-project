@@ -319,7 +319,7 @@ export default function StudentRoot({
         {
           duration: 15000,
           action: {
-            label: '↩ চালিয়ে যান',
+            label: '↩ চালিয়ে যাও',
             onClick: () => {
               try {
                 setQuestions(draft.questions || []);
@@ -946,7 +946,7 @@ export default function StudentRoot({
               onClick={() => setAppState(AppState.IDLE)}
               className="px-6 py-2 bg-red-600 text-white rounded-lg"
             >
-              ফিরে যান
+              ফিরে যাও
             </button>
           </div>
         </AppLayout>

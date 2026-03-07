@@ -339,7 +339,7 @@ export const hscSubjects: Subject[] = [
           { id: 'hsc_ict_ch01_t9', name: 'ক্রায়োসার্জারি', serial: 9 },
           {
             id: 'hsc_ict_ch01_t10',
-            name: 'মহাকাশ অভিযান ও প্রতিকার',
+            name: 'মহাকাশ অভিযাও ও প্রতিকার',
             serial: 10,
           },
         ],
@@ -423,7 +423,7 @@ export const hscSubjects: Subject[] = [
           { id: 'hsc_ict_ch03_t10', name: 'কোড', serial: 10 },
           {
             id: 'hsc_ict_ch03_t11',
-            name: 'সংখ্যা পদ্ধতির অন্যান্য',
+            name: 'সংখ্যা পদ্ধতির অন্যাও্য',
             serial: 11,
           },
         ],
@@ -489,7 +489,7 @@ export const hscSubjects: Subject[] = [
       },
       {
         id: 'hsc_ict_ch06',
-        name: 'ডেটাবেস ম্যানেজমেন্ট সিস্টেম',
+        name: 'ডেটাবেস ম্যাওেজমেন্ট সিস্টেম',
         topics: [
           {
             id: 'hsc_ict_ch06_t1',
@@ -509,7 +509,7 @@ export const hscSubjects: Subject[] = [
           },
           {
             id: 'hsc_ict_ch06_t5',
-            name: 'ডেটাবেস টেবিল ও ডেটাবেস ম্যানেজমেন্ট সিস্টেম',
+            name: 'ডেটাবেস টেবিল ও ডেটাবেস ম্যাওেজমেন্ট সিস্টেম',
             serial: 5,
           },
           {
@@ -1013,7 +1013,7 @@ export const hscSubjects: Subject[] = [
         topics: [
           {
             id: 'chem1_ch01_t1',
-            name: '১.১ - পোশাক,নিরাপদ গ্লাস,মাস্ক ও হ্যান্ড গ্লাভস',
+            name: '১.১ - পোশাক,নিরাপদ গ্লাস,মাস্ক ও হ্যাও্ড গ্লাভস',
             serial: 1,
           },
           {
@@ -1112,7 +1112,7 @@ export const hscSubjects: Subject[] = [
           },
           { id: 'chem1_ch02_t15', name: '২.১২ দ্রাবক নিষ্কাশন', serial: 15 },
           { id: 'chem1_ch02_t16', name: '২.১৩ CHROMATOGRAPHY', serial: 16 },
-          { id: 'chem1_ch02_t17', name: 'গুণগত রসায়নের অন্যান্য', serial: 17 },
+          { id: 'chem1_ch02_t17', name: 'গুণগত রসায়নের অন্যাও্য', serial: 17 },
         ],
       },
       {
@@ -1169,7 +1169,7 @@ export const hscSubjects: Subject[] = [
           },
           {
             id: 'chem1_ch03_t13',
-            name: '৩.১৩ নিঃসঙ্গ ইলেকট্রন জোড় ও লিগ্যান্ড',
+            name: '৩.১৩ নিঃসঙ্গ ইলেকট্রন জোড় ও লিগ্যাও্ড',
             serial: 13,
           },
           {
@@ -1377,7 +1377,7 @@ export const hscSubjects: Subject[] = [
           },
           {
             id: 'chem2_ch01_t8',
-            name: '১.৮ গ্যাস এর আণবিক গতিতত্ত্ব: বর্গমূল গড় বর্গ বেগ ও অন্যান্য গতিবেগ, গ্যাস কনার গতিশক্তির হিসাব',
+            name: '১.৮ গ্যাস এর আণবিক গতিতত্ত্ব: বর্গমূল গড় বর্গ বেগ ও অন্যাও্য গতিবেগ, গ্যাস কনার গতিশক্তির হিসাব',
             serial: 8,
           },
           { id: 'chem2_ch01_t9', name: '১.৯ আদর্শ ও বাস্তব গ্যাস', serial: 9 },
@@ -1641,7 +1641,7 @@ export const hscSubjects: Subject[] = [
             name: '৫.৫ ইউরিয়া, কাঁচ, সিরামিক, pulp পেপার সিমেন্ট উৎপাদন',
             serial: 5,
           },
-          { id: 'chem2_ch05_t6', name: '৫.৬ চামড়া ট্যানিং', serial: 6 },
+          { id: 'chem2_ch05_t6', name: '৫.৬ চামড়া ট্যাওিং', serial: 6 },
           {
             id: 'chem2_ch05_t7',
             name: '৫.৭ সিমেন্ট,ইউরিয়া,চামড়া, টেক্সটাইল ও ডাইং শিল্পের দূষক',
@@ -1657,7 +1657,7 @@ export const hscSubjects: Subject[] = [
             name: '৫.৯ আয়রন,অ্যালুমিনিয়াম, কপার, কাঁচ, গ্লাস এর রিসাইক্লিং প্রণালী',
             serial: 9,
           },
-          { id: 'chem2_ch05_t10', name: '৫.১০ ন্যানো পার্টিক্যাল', serial: 10 },
+          { id: 'chem2_ch05_t10', name: '৫.১০ ন্যাওো পার্টিক্যাল', serial: 10 },
           {
             id: 'chem2_ch05_t11',
             name: '৫.১১ শিল্প ক্ষেত্রে nano পার্টিক্যাল',
@@ -1780,7 +1780,7 @@ export const hscSubjects: Subject[] = [
           },
           {
             id: 'math1_ch06_t2',
-            name: 'ত্রিকোণমিতিক অনুপাত অন্যান্য',
+            name: 'ত্রিকোণমিতিক অনুপাত অন্যাও্য',
             serial: 2,
           },
           { id: 'math1_ch06_t3', name: 'ঘড়ির কাটা সম্পর্কিত', serial: 3 },
@@ -1796,7 +1796,7 @@ export const hscSubjects: Subject[] = [
             name: 'ত্রিকোণমিতিক সূত্রাবলি ও ত্রিভুজের সূত্রাবলি',
             serial: 2,
           },
-          { id: 'math1_ch07_t3', name: 'ত্রিকোণমিতির অন্যান্য', serial: 3 },
+          { id: 'math1_ch07_t3', name: 'ত্রিকোণমিতির অন্যাও্য', serial: 3 },
         ],
       },
       {
@@ -1832,7 +1832,7 @@ export const hscSubjects: Subject[] = [
           },
           { id: 'math1_ch09_t8', name: 'স্পর্শক ও অভিলম্ব বিষয়ক', serial: 8 },
           { id: 'math1_ch09_t9', name: 'লঘুমান গুরুমান বিষয়ক', serial: 9 },
-          { id: 'math1_ch09_t10', name: 'অন্তরীকরণ এর অন্যান্য', serial: 10 },
+          { id: 'math1_ch09_t10', name: 'অন্তরীকরণ এর অন্যাও্য', serial: 10 },
         ],
       },
       {
@@ -1867,7 +1867,7 @@ export const hscSubjects: Subject[] = [
           { id: 'math1_ch10_t6', name: 'নির্দিষ্ট যোগজ', serial: 6 },
           { id: 'math1_ch10_t7', name: 'পরমমান সংক্রান্ত', serial: 7 },
           { id: 'math1_ch10_t8', name: 'ক্ষেত্রফল নির্ণয়', serial: 8 },
-          { id: 'math1_ch10_t9', name: 'যোগজীকরণ এর অন্যান্য', serial: 9 },
+          { id: 'math1_ch10_t9', name: 'যোগজীকরণ এর অন্যাও্য', serial: 9 },
         ],
       },
     ],
@@ -1912,7 +1912,7 @@ export const hscSubjects: Subject[] = [
           { id: 'math2_ch03_t6', name: 'i বিষয়ক', serial: 6 },
           { id: 'math2_ch03_t7', name: 'Omega বিষয়ক', serial: 7 },
           { id: 'math2_ch03_t8', name: 'সঞ্চারপথ ও সমীকরণ সমাধান', serial: 8 },
-          { id: 'math2_ch03_t9', name: 'জটিল সংখ্যার অন্যান্য', serial: 9 },
+          { id: 'math2_ch03_t9', name: 'জটিল সংখ্যার অন্যাও্য', serial: 9 },
         ],
       },
       {
@@ -2324,7 +2324,7 @@ export const hscSubjects: Subject[] = [
           },
           {
             id: 'bio1_ch11_t3',
-            name: 'রিকম্বিন্যান্ট ডিএনএ প্রযুক্তি',
+            name: 'রিকম্বিন্যাও্ট ডিএনএ প্রযুক্তি',
             serial: 3,
           },
           {
@@ -2389,7 +2389,7 @@ export const hscSubjects: Subject[] = [
           },
           { id: 'bio2_ch01_t2', name: 'পরিফেরা ও নিডারিয়া', serial: 2 },
           { id: 'bio2_ch01_t3', name: 'প্লাটিহেলমিনথিস ও নেমাটোডা', serial: 3 },
-          { id: 'bio2_ch01_t4', name: 'অ্যানিলিডা ও মলাস্কা', serial: 4 },
+          { id: 'bio2_ch01_t4', name: 'অ্যাওিলিডা ও মলাস্কা', serial: 4 },
           {
             id: 'bio2_ch01_t5',
             name: 'আর্থ্রোপোডা, একাইনোডার্মাটা ও কর্ডাটা',
@@ -2624,7 +2624,7 @@ export const hscSubjects: Subject[] = [
             name: 'মানবদেহের সহজাত ও অর্জিত প্রতিরক্ষা',
             serial: 3,
           },
-          { id: 'bio2_ch10_t4', name: 'অ্যান্টিবডি ও টিকা', serial: 4 },
+          { id: 'bio2_ch10_t4', name: 'অ্যাও্টিবডি ও টিকা', serial: 4 },
         ],
       },
       {
@@ -2633,12 +2633,12 @@ export const hscSubjects: Subject[] = [
         topics: [
           {
             id: 'bio2_ch11_t1',
-            name: 'মেন্ডেলিয়ান ইনহেরিট্যান্স সূত্রাবলী ব্যাখ্যা ও ক্রোমোজোম তত্ত্ব',
+            name: 'মেন্ডেলিয়ান ইনহেরিট্যাও্স সূত্রাবলী ব্যাখ্যা ও ক্রোমোজোম তত্ত্ব',
             serial: 1,
           },
           {
             id: 'bio2_ch11_t2',
-            name: 'মেন্ডেলের সূত্রের ব্যতিক্রমসমূহ ও পলিজেনিক ইনহেরিট্যান্স',
+            name: 'মেন্ডেলের সূত্রের ব্যতিক্রমসমূহ ও পলিজেনিক ইনহেরিট্যাও্স',
             serial: 2,
           },
           {
@@ -3093,7 +3093,7 @@ export const hscSubjects: Subject[] = [
   },
   {
     id: 'hsc_finance',
-    name: 'ফিন্যান্স, ব্যাংকিং ও বিমা',
+    name: 'ফিন্যাও্স, ব্যাংকিং ও বিমা',
     icon: Banknote,
     group: 'Business Studies',
     chapters: [
@@ -3173,13 +3173,13 @@ export const hscSubjects: Subject[] = [
   },
   {
     id: 'hsc_statistics',
-    name: 'পরিসংখ্যান',
+    name: 'পরিসংখ্যাও',
     icon: BarChart3,
     group: 'Humanities',
     chapters: [
       {
         id: 'stat_1_ch1',
-        name: 'পরিসংখ্যান, চলক ও বিভিন্ন প্রতীক',
+        name: 'পরিসংখ্যাও, চলক ও বিভিন্ন প্রতীক',
         topics: [],
       },
     ],

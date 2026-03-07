@@ -110,7 +110,7 @@ function SignupForm() {
         return 'মোবাইল নম্বর উল্লেখ করা আবশ্যক';
       }
       if (!/^01\d{9}$/.test(formData.phone)) {
-        return 'সঠিক মোবাইল নম্বর দিন (যেমন: 01712345678)';
+        return 'সঠিক মোবাইল নম্বর দাও (যেমন: 01712345678)';
       }
       if (!formData.gender) {
         return 'লিঙ্গ নির্বাচন করা আবশ্যক';
@@ -122,7 +122,7 @@ function SignupForm() {
         return 'ব্যাচ সিলেক্ট করা আবশ্যক';
       }
       if (!formData.institute) {
-        return 'আপনার শিক্ষা প্রতিষ্ঠানের নাম লিখুন';
+        return 'আপনার শিক্ষা প্রতিষ্ঠানের নাম লেখো';
       }
     }
     if (currentStep === 3) {
@@ -132,7 +132,7 @@ function SignupForm() {
       }
       // Strict Email Validation (Gmail included in standard format)
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-        return 'সঠিক ইমেইল এড্রেস দিন (যেমন: example@gmail.com)';
+        return 'সঠিক ইমেইল এড্রেস দাও (যেমন: example@gmail.com)';
       }
       if (formData.password.length < 6) {
         return 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে';
@@ -182,7 +182,7 @@ function SignupForm() {
             },
           },
         }),
-        'রেজিস্ট্রেশন অনুরোধের সময়সীমা শেষ হয়েছে। আবার চেষ্টা করুন।',
+        'রেজিস্ট্রেশন অনুরোধের সময়সীমা শেষ হয়েছে। আবার চেষ্টা করো।',
       );
 
       if (signUpError) throw signUpError;
@@ -221,7 +221,7 @@ function SignupForm() {
             },
             { onConflict: 'id' },
           ),
-          'প্রোফাইল তৈরি করতে দেরি হচ্ছে। আবার চেষ্টা করুন।',
+          'প্রোফাইল তৈরি করতে দেরি হচ্ছে। আবার চেষ্টা করো।',
         );
 
         if (profileError) {
@@ -241,7 +241,7 @@ function SignupForm() {
                   newUserId: data.user.id,
                 }),
               }),
-              'রেফারেল যাচাই করতে দেরি হচ্ছে। পরে আবার চেষ্টা করুন।',
+              'রেফারেল যাচাই করতে দেরি হচ্ছে। পরে আবার চেষ্টা করো।',
               10000,
             );
             const json = await withTimeout(
@@ -287,13 +287,13 @@ function SignupForm() {
             অ্যাকাউন্ট তৈরি সফল!
           </h2>
           <p className="text-slate-600 dark:text-slate-400 mb-8">
-            আপনার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। এখন লগইন করুন।
+            আপনার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। এখন লগইন করো।
           </p>
           <Link
             href="/login"
             className="inline-flex items-center justify-center w-full py-3.5 px-6 font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-lg shadow-emerald-500/20"
           >
-            লগইন পেজে যান
+            লগইন পেজে যাও
           </Link>
         </div>
       </div>
@@ -337,7 +337,7 @@ function SignupForm() {
         <div className="p-5 md:p-10">
           <div className="text-center mb-4 md:mb-8">
             <p className="text-slate-500 dark:text-slate-400 text-sm">
-              মাত্র ৩টি ধাপে সম্পন্ন করুন আপনার রেজিস্ট্রেশন
+              মাত্র ৩টি ধাপে সম্পন্ন করো আপনার রেজিস্ট্রেশন
             </p>
           </div>
 
@@ -550,7 +550,7 @@ function SignupForm() {
 
                   <div className="space-y-1.5">
                     <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                      পাসওয়ার্ড নিশ্চিত করুন
+                      পাসওয়ার্ড নিশ্চিত করো
                     </label>
                     <div className="relative group">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
@@ -559,7 +559,7 @@ function SignupForm() {
                         name="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        placeholder="পাসওয়ার্ডটি আবার লিখুন"
+                        placeholder="পাসওয়ার্ডটি আবার লেখো"
                         className="w-full pl-12 pr-4 py-2.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200 md:py-3.5"
                       />
                     </div>
@@ -578,7 +578,7 @@ function SignupForm() {
                           value={formData.referralCode}
                           onChange={handleChange}
                           readOnly={isReferralLocked}
-                          placeholder="কোড থাকলে এখানে লিখুন"
+                          placeholder="কোড থাকলে এখানে লেখো"
                           className={`w-full px-4 text-center tracking-[0.2em] font-bold py-2.5 uppercase border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all md:py-3.5 ${
                             isReferralLocked
                               ? 'bg-neutral-100 dark:bg-neutral-900 border-neutral-300 dark:border-neutral-700 text-neutral-500 cursor-not-allowed'
@@ -617,10 +617,10 @@ function SignupForm() {
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    অপেক্ষা করুন...
+                    অপেক্ষা করো...
                   </>
                 ) : step === 3 ? (
-                  'অ্যাকাউন্ট তৈরি করুন'
+                  'অ্যাকাউন্ট তৈরি করো'
                 ) : (
                   <>
                     পরবর্তী ধাপ <ChevronRight className="w-5 h-5" />
@@ -637,7 +637,7 @@ function SignupForm() {
                 href="/login"
                 className="text-red-600 hover:text-red-700 font-bold hover:underline"
               >
-                লগইন করুন
+                লগইন করো
               </Link>
             </p>
           </div>

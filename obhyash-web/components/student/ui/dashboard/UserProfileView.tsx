@@ -138,7 +138,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
               d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
             />
           </svg>
-          <span>ফিরে যান</span>
+          <span>ফিরে যাও</span>
         </button>
 
         {/* Profile Header Card */}

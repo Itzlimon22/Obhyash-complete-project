@@ -163,7 +163,7 @@ export default function TeacherSidebar() {
                 className="flex items-center justify-center gap-2.5 w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-emerald-600 hover:from-emerald-700 hover:to-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 <Upload size={16} />
-                প্রশ্ন আপলোড করুন
+                প্রশ্ন আপলোড করো
               </Link>
             </div>
           )}

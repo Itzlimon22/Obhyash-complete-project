@@ -205,7 +205,7 @@ export default function EditProfileModal({
               ) : (
                 <Save size={18} strokeWidth={3} />
               )}
-              পরিবর্তন সংরক্ষণ করুন
+              পরিবর্তন সংরক্ষণ করো
             </button>
             <button
               type="button"

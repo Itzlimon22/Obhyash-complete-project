@@ -91,7 +91,7 @@ const StreakCelebration: React.FC<StreakCelebrationProps> = ({
                 {count} দিন টানা!
               </h2>
               <p className="text-neutral-500 dark:text-neutral-400 font-bold mb-6">
-                আপনার স্ট্রাইক বাড়ছে, পড়া চালিয়ে যান!
+                আপনার স্ট্রাইক বাড়ছে, পড়া চালিয়ে যাও!
               </p>
 
               <div className="flex items-center justify-center gap-4 py-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl border border-neutral-100 dark:border-neutral-800">

@@ -75,7 +75,7 @@ export const ReferralDashboard: React.FC = () => {
               {copySuccess ? 'কপি হয়েছে' : 'কপি'}
             </button>
             <button className={styles.shareBtn} onClick={shareReferral}>
-              শেয়ার করুন
+              শেয়ার করো
             </button>
           </div>
         </div>

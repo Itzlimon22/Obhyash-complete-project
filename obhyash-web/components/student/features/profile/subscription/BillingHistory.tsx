@@ -24,7 +24,7 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ invoices, onDownload })
             <h3 className="text-lg font-bold text-slate-800 dark:text-white">বিলিং ইতিহাস</h3>
             {/* SUPABASE: This could trigger a PDF export of all invoices */}
             <button className="text-sm text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
-                সব ডাউনলোড করুন
+                সব ডাউনলোড করো
             </button>
         </div>
         <div className="overflow-x-auto">
@@ -32,7 +32,7 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ invoices, onDownload })
                 <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                     <tr>
                         <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">ইনভয়েস #</th>
-                        <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">প্ল্যান</th>
+                        <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">প্ল্যাও</th>
                         <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">তারিখ</th>
                         <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">অ্যামাউন্ট</th>
                         <th className="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">স্ট্যাটাস</th>

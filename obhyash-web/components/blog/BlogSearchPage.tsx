@@ -111,7 +111,7 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
             className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors mb-6 font-anek"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            ব্লগে ফিরে যান
+            ব্লগে ফিরে যাও
           </Link>
 
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-anek mb-5">
@@ -253,7 +253,7 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
               </p>
               <div className="flex flex-wrap gap-2 justify-center text-sm text-slate-500 dark:text-slate-400 font-anek">
                 <span>পরামর্শ:</span>
-                <span>ভিন্ন বানান বা ছোট শব্দ ব্যবহার করুন</span>
+                <span>ভিন্ন বানান বা ছোট শব্দ ব্যবহার করো</span>
               </div>
               <button
                 onClick={() => {
@@ -269,7 +269,7 @@ export default function BlogSearchPage({ categories }: BlogSearchPageProps) {
             /* Empty state — no query yet */
             <div className="text-center py-20">
               <p className="text-slate-400 dark:text-slate-500 font-anek text-[15px]">
-                উপরের বাক্সে কিছু টাইপ করুন এবং সব আর্টিকেল থেকে ফলাফল দেখুন।
+                উপরের বাক্সে কিছু টাইপ করো এবং সব আর্টিকেল থেকে ফলাফল দেখো।
               </p>
             </div>
           ))}

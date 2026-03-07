@@ -198,7 +198,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     {
       name: 'তানভীর আহমেদ',
       role: 'HSC পরীক্ষার্থী (Science)',
-      text: 'Obhyash-এর AI জেনারেটেড প্রশ্নগুলো বইয়ের টপিক অনুযায়ী হয়, যা আমার রিভিশনের জন্য খুব উপকারে এসেছে। এক্সপ্ল্যানেশনগুলোও খুব স্পষ্ট।',
+      text: 'Obhyash-এর AI জেনারেটেড প্রশ্নগুলো বইয়ের টপিক অনুযায়ী হয়, যা আমার রিভিশনের জন্য খুব উপকারে এসেছে। এক্সপ্ল্যাওেশনগুলোও খুব স্পষ্ট।',
       initial: 'T',
       color: 'bg-red-500',
     },
@@ -233,7 +233,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       period: '/১ মাস',
       features: [
         'আনলিমিটেড এক্সাম',
-        'আনলিমিটেড OMR স্ক্যান',
+        'আনলিমিটেড OMR স্ক্যাও',
         'বুকমার্ক করার সুবিধা',
         'অ্যাডভান্সড এনালাইসিস',
         'বিজ্ঞাপনমুক্ত অভিজ্ঞতা',
@@ -249,12 +249,12 @@ const LandingPage: React.FC<LandingPageProps> = ({
       price: '২৯৯',
       period: '/৩ মাস',
       features: [
-        'মাসিক প্ল্যানের সব সুবিধা',
+        'মাসিক প্ল্যাওের সব সুবিধা',
         '৩৩% সাশ্রয় (বিশাল ছাড়)',
         'অগ্রাধিকার সাপোর্ট',
         'নতুন ফিচারে আর্লি এক্সেস',
       ],
-      cta: 'ব্যান্ডেল কিনুন',
+      cta: 'ব্যাও্ডেল কিনো',
       color: 'border-red-500',
       buttonColor:
         'bg-gradient-to-r from-red-600 to-red-600 text-white hover:from-red-700 hover:to-red-700 shadow-lg shadow-red-500/30',
@@ -264,10 +264,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
   const faqs = [
     {
       q: 'Obhyash অ্যাপটি কি সম্পূর্ণ ফ্রি?',
-      a: "আমাদের একটি 'বেসিক' প্ল্যান আছে যা আজীবন ফ্রি। এতে প্রতিদিন ১টি ফ্রি এক্সাম এবং লিমিটেড ফিচার ব্যবহারের সুযোগ রয়েছে। তবে আনলিমিটেড এক্সাম এবং অ্যাডভান্সড এনালাইসিস ব্যবহারের জন্য আপনাকে মাসিক বা ত্রৈমাসিক সাবস্ক্রিপশন নিতে হবে।",
+      a: "আমাদের একটি 'বেসিক' প্ল্যাও আছে যা আজীবন ফ্রি। এতে প্রতিদিন ১টি ফ্রি এক্সাম এবং লিমিটেড ফিচার ব্যবহারের সুযোগ রয়েছে। তবে আনলিমিটেড এক্সাম এবং অ্যাডভান্সড এনালাইসিস ব্যবহারের জন্য আপনাকে মাসিক বা ত্রৈমাসিক সাবস্ক্রিপশন নিতে হবে।",
     },
     {
-      q: 'OMR স্ক্যান ফিচারটি কিভাবে কাজ করে?',
+      q: 'OMR স্ক্যাও ফিচারটি কিভাবে কাজ করে?',
       a: 'বাসায় বসে সাধারণ কাগজে পরীক্ষা দাও এবং আমাদের অ্যাপের ক্যামেরা দিয়ে ওএমআর শিটটির ছবি তোলো। আমাদের উন্নত প্রযুক্তি ২০ সেকেন্ডের মধ্যে আপনার খাতা মূল্যায়ন করে নির্ভুল স্কোর দেখাবে। এটি কোচিং সেন্টারের ওএমআর রিডারের মতোই কার্যকর।',
     },
     {
@@ -371,7 +371,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               onClick={onGetStarted}
               className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-sm transition-all shadow-lg shadow-emerald-500/20"
             >
-              শুরু করুন
+              শুরু করো
             </button>
           </div>
         </div>
@@ -681,7 +681,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
               কাস্টম এক্সাম মেকার
             </h3>
-            আপনার প্রয়োজন অনুযায়ী তৈরি করুন প্রশ্নপত্র। বিষয়, অধ্যায়, টপিক এবং
+            আপনার প্রয়োজন অনুযায়ী তৈরি করো প্রশ্নপত্র। বিষয়, অধ্যায়, টপিক এবং
             কঠিনতার লেভেল সেট করে আনলিমিটেড মক টেস্ট দাও।
             <ul className="grid grid-cols-2 gap-2 text-xs md:text-sm text-neutral-500 font-medium">
               <li className="flex items-center gap-2">
@@ -698,7 +698,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                ইনস্ট্যান্ট রেজাল্ট
+                ইনস্ট্যাও্ট রেজাল্ট
               </li>
             </ul>
           </div>
@@ -725,10 +725,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </svg>
             </div>
             <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-              OMR স্ক্যানার
+              OMR স্ক্যাওার
             </h3>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-              খাতায় পরীক্ষা দিয়ে ছবি তুলুন। আমাদের কম্পিউটার ভিশন টেকনোলজি
+              খাতায় পরীক্ষা দিয়ে ছবি তোলো। আমাদের কম্পিউটার ভিশন টেকনোলজি
               মুহূর্তের মধ্যে খাতা মূল্যায়ন করে নির্ভুল ফলাফল প্রদান করবে।
             </p>
           </div>
@@ -759,7 +759,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </h3>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
               সাবজেক্ট ভিত্তিক দুর্বলতা চিহ্নিত করো। গ্রাফ এবং চার্টের মাধ্যমে
-              নিজের অগ্রগতি ট্র্যাক করুন এবং সময়ের সঠিক ব্যবহার শিখুন।
+              নিজের অগ্রগতি ট্র্যাক করো এবং সময়ের সঠিক ব্যবহার শিখুন।
             </p>
           </div>
 
@@ -788,7 +788,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               লিডারবোর্ড ও XP
             </h3>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-              প্রতিটি সঠিক উত্তরে অর্জন করুন XP পয়েন্ট। লেভেল আনলক করুন এবং সারা
+              প্রতিটি সঠিক উত্তরে অর্জন করো XP পয়েন্ট। লেভেল আনলক করো এবং সারা
               দেশের শিক্ষার্থীদের সাথে প্রতিযোগিতায় নিজেকে যাচাই করো।
             </p>
           </div>
@@ -944,7 +944,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   href="/blog"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-neutral-900 dark:bg-white text-white dark:text-black rounded-xl font-bold hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-all active:scale-95 group shadow-xl"
                 >
-                  সব ব্লগ দেখুন
+                  সব ব্লগ দেখো
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
@@ -1006,11 +1006,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto px-4 lg:px-6 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mt-2">
-              আপনার পছন্দের প্ল্যানটি বেছে নাও
+              আপনার পছন্দের প্ল্যাওটি বেছে নাও
             </h2>
             <p className="text-neutral-600 dark:text-neutral-400 mt-4 max-w-2xl mx-auto">
-              আমাদের সাশ্রয়ী সাবস্ক্রিপশন প্ল্যানগুলোর মাধ্যমে আপনার প্রস্তুতিকে
-              নিয়ে যান অনন্য উচ্চতায়।
+              আমাদের সাশ্রয়ী সাবস্ক্রিপশন প্ল্যাওগুলোর মাধ্যমে আপনার প্রস্তুতিকে
+              নিয়ে যাও অনন্য উচ্চতায়।
             </p>
           </div>
 
@@ -1318,7 +1318,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     href="#"
                     className="hover:text-red-600 transition-colors flex items-center gap-2"
                   >
-                    পারফরম্যান্স এনালাইসিস
+                    পারফরম্যাও্স এনালাইসিস
                   </a>
                 </li>
               </ul>

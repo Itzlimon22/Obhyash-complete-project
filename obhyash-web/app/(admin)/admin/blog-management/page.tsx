@@ -31,11 +31,11 @@ export default async function BlogManagementPage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              ব্লগ ম্যানেজমেন্ট
+              ব্লগ ম্যাওেজমেন্ট
             </h1>
             <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-              ব্লগের সমস্ত কমেন্ট মডারেট করুন এবং নিউজলেটার সাবস্ক্রাইবারদের
-              পরিচালনা করুন।
+              ব্লগের সমস্ত কমেন্ট মডারেট করো এবং নিউজলেটার সাবস্ক্রাইবারদের
+              পরিচালনা করো।
             </p>
           </div>
         </div>

@@ -501,7 +501,7 @@ const EditModal: React.FC<{
               প্রশ্ন সম্পাদনা
             </h3>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
-              সঠিক তথ্য পূরণ করে সংরক্ষণ করুন
+              সঠিক তথ্য পূরণ করে সংরক্ষণ করো
             </p>
           </div>
           <button
@@ -546,7 +546,7 @@ const EditModal: React.FC<{
                   disabled={!localData.subject}
                   className={`${fieldCls} disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
-                  <option value="">নির্বাচন করুন</option>
+                  <option value="">নির্বাচন করো</option>
                   {availableChapters.map((c) => (
                     <option key={c.id} value={c.name}>
                       {c.name}
@@ -562,7 +562,7 @@ const EditModal: React.FC<{
                   disabled={!localData.chapter}
                   className={`${fieldCls} disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
-                  <option value="">নির্বাচন করুন</option>
+                  <option value="">নির্বাচন করো</option>
                   {availableTopics.map((t) => (
                     <option key={t.id} value={t.name}>
                       {t.name}
@@ -705,7 +705,7 @@ const EditModal: React.FC<{
                 🔘 অপশনসমূহ
               </label>
               <span className="text-[10px] text-neutral-400 font-semibold bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full">
-                সঠিক উত্তরের বাম বোতামে ক্লিক করুন
+                সঠিক উত্তরের বাম বোতামে ক্লিক করো
               </span>
             </div>
             <div className="space-y-4">
@@ -745,7 +745,7 @@ const EditModal: React.FC<{
                         title={
                           isCorrect
                             ? 'সঠিক উত্তর (নির্বাচিত)'
-                            : 'সঠিক উত্তর হিসেবে নির্ধারণ করুন'
+                            : 'সঠিক উত্তর হিসেবে নির্ধারণ করো'
                         }
                       >
                         {String.fromCharCode(65 + i)}
@@ -852,7 +852,7 @@ const EditModal: React.FC<{
             onClick={onSave}
             className="flex-1 py-3 text-sm font-extrabold bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-700/20 hover:bg-emerald-800 border border-emerald-600 transition-all active:scale-[0.98]"
           >
-            সংরক্ষণ করুন
+            সংরক্ষণ করো
           </button>
         </div>
       </DialogContent>
@@ -1197,7 +1197,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
       alert(
         error instanceof Error
           ? error.message
-          : 'ফাইল পার্স করতে ব্যর্থ। ফরম্যাট চেক করুন।',
+          : 'ফাইল পার্স করতে ব্যর্থ। ফরম্যাট চেক করো।',
       );
     } finally {
       setIsProcessing(false);
@@ -1512,7 +1512,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
               বাল্ক আপলোড
             </h2>
             <p className="text-xs text-neutral-500 mt-0.5">
-              JSON, CSV, অথবা Excel ফাইল আপলোড করুন
+              JSON, CSV, অথবা Excel ফাইল আপলোড করো
             </p>
           </div>
           <button
@@ -1527,7 +1527,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           {/* Global Subject & Chapter Selector */}
           <div className="bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-5 mb-6">
             <h3 className="text-sm font-extrabold text-emerald-800 dark:text-emerald-400 mb-3 block">
-              ডিফল্ট বিষয় ও অধ্যায় নির্বাচন করুন (ঐচ্ছিক)
+              ডিফল্ট বিষয় ও অধ্যায় নির্বাচন করো (ঐচ্ছিক)
             </h3>
             <p className="text-xs text-neutral-500 mb-4 font-medium">
               আপলোড করা ফাইলে বিষয়/অধ্যায় উল্লেখ না থাকলে এখান থেকে নেওয়া হবে। টেম্পলেট ডাউনলোড করলেও এই মানগুলো বসানো থাকবে।
@@ -1542,7 +1542,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                 }}
                 className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
               >
-                <option value="">বিষয় নির্বাচন করুন</option>
+                <option value="">বিষয় নির্বাচন করো</option>
                 {availableSubjects.map((s) => (
                   <option key={s.id} value={s.name}>{s.name}</option>
                 ))}
@@ -1556,7 +1556,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                 disabled={!globalSubject}
                 className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-50"
               >
-                <option value="">অধ্যায় নির্বাচন করুন</option>
+                <option value="">অধ্যায় নির্বাচন করো</option>
                 {availableChapters.map((c) => (
                   <option key={c.id} value={c.name}>{c.name}</option>
                 ))}
@@ -1567,7 +1567,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                 disabled={!globalChapter}
                 className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-50"
               >
-                <option value="">টপিক নির্বাচন করুন</option>
+                <option value="">টপিক নির্বাচন করো</option>
                 {availableTopics.map((t) => (
                   <option key={t.id} value={t.name}>{t.name}</option>
                 ))}
@@ -1607,7 +1607,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                 {/* Templates */}
                 <div>
                   <h4 className="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    টেম্পলেট ডাউনলোড করুন
+                    টেম্পলেট ডাউনলোড করো
                   </h4>
                   <div className="grid grid-cols-3 gap-3">
                     {[
@@ -1666,7 +1666,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                     <FileUp size={28} />
                   </div>
                   <h3 className="text-base font-bold text-neutral-900 dark:text-white mb-1">
-                    ফাইল সিলেক্ট অথবা ড্র্যাগ করুন
+                    ফাইল সিলেক্ট অথবা ড্র্যাগ করো
                   </h3>
                   <p className="text-xs text-neutral-500 mb-5">
                     JSON, CSV, Excel (.xlsx) — সর্বোচ্চ ৫MB
@@ -1678,7 +1678,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                         পার্স করা হচ্ছে...
                       </span>
                     ) : (
-                      'ফাইল আপলোড করুন'
+                      'ফাইল আপলোড করো'
                     )}
                   </div>
                 </label>
@@ -1690,7 +1690,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                   <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
                     <FileJson size={18} className="text-emerald-600" />
                     <h3 className="text-sm font-bold">
-                      JSON টেক্সট পেস্ট করুন
+                      JSON টেক্সট পেস্ট করো
                     </h3>
                   </div>
                   <span className="text-[10px] font-mono text-neutral-400">
@@ -1722,7 +1722,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
                   ) : (
                     <>
                       <Save size={18} />
-                      টেক্সট ইম্পোর্ট করুন
+                      টেক্সট ইম্পোর্ট করো
                     </>
                   )}
                 </button>
@@ -1982,7 +1982,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
               disabled={!bulkSubject && !bulkChapter && !bulkTopic}
               className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm ml-auto sm:ml-0 whitespace-nowrap"
             >
-              এপ্লাই করুন
+              এপ্লাই করো
             </button>
           </div>
         </div>
@@ -2170,7 +2170,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           disabled={isProcessing}
           className="px-6 py-3 rounded-xl border-2 border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 font-extrabold hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:border-neutral-300 transition-all w-full sm:w-auto active:scale-[0.98] disabled:opacity-50"
         >
-          পিছে যান
+          পিছে যাও
         </button>
         <button
           onClick={handleImport}
@@ -2190,7 +2190,7 @@ export const BulkUpload: React.FC<BulkUploadProps> = ({
           ) : (
             <>
               <Save size={18} />
-              ইমপোর্ট করুন ({selectedIndices.size})
+              ইমপোর্ট করো ({selectedIndices.size})
             </>
           )}
         </button>

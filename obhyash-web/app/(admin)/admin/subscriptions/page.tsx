@@ -721,7 +721,7 @@ export default function SubscriptionsPage() {
           {[
             { id: 'requests', label: 'পেমেন্ট রিকোয়েস্ট', icon: FileText },
             { id: 'subscriptions', label: 'এক্টিভ ইউজার', icon: Crown },
-            { id: 'plans', label: 'প্লান ম্যানেজমেন্ট', icon: CreditCard },
+            { id: 'plans', label: 'প্লান ম্যাওেজমেন্ট', icon: CreditCard },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -1412,8 +1412,8 @@ export default function SubscriptionsPage() {
                       <XCircle className="w-6 h-6" />
                     )}
                     {reviewAction === 'approve'
-                      ? 'অ্যাপ্রুভ করুন'
-                      : 'রিজেক্ট করুন'}
+                      ? 'অ্যাপ্রুভ করো'
+                      : 'রিজেক্ট করো'}
                   </h3>
                   <button
                     onClick={() => {
@@ -1428,7 +1428,7 @@ export default function SubscriptionsPage() {
                 </div>
                 <p className="text-white/80 text-xs sm:text-sm">
                   {reviewingRequest.user?.name} এর পেমেন্ট রিকোয়েস্টটি রিভিউ
-                  করুন
+                  করো
                 </p>
               </div>
 
@@ -1466,8 +1466,8 @@ export default function SubscriptionsPage() {
                     onChange={(e) => setAdminNotes(e.target.value)}
                     placeholder={
                       reviewAction === 'approve'
-                        ? 'অতিরিক্ত কোনো তথ্য থাকলে লিখুন...'
-                        : 'রিজেক্ট করার কারণ অবশ্যই লিখুন...'
+                        ? 'অতিরিক্ত কোনো তথ্য থাকলে লেখো...'
+                        : 'রিজেক্ট করার কারণ অবশ্যই লেখো...'
                     }
                     rows={3}
                     className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-2xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all resize-none text-sm"
@@ -1496,8 +1496,8 @@ export default function SubscriptionsPage() {
                   }`}
                 >
                   {reviewAction === 'approve'
-                    ? 'অ্যাপ্রুভ করুন'
-                    : 'রিজেক্ট করুন'}
+                    ? 'অ্যাপ্রুভ করো'
+                    : 'রিজেক্ট করো'}
                 </button>
               </div>
             </div>
@@ -1513,10 +1513,10 @@ export default function SubscriptionsPage() {
                   <div>
                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
                       <CreditCard className="w-6 h-6" />
-                      {editingPlan.id ? 'প্লান এডিট করুন' : 'নতুন প্লান তৈরি'}
+                      {editingPlan.id ? 'প্লান এডিট করো' : 'নতুন প্লান তৈরি'}
                     </h3>
                     <p className="text-emerald-100 text-xs sm:text-sm mt-1">
-                      সাবস্ক্রিপশন প্লানের সকল তথ্য এখানে প্রদান করুন
+                      সাবস্ক্রিপশন প্লানের সকল তথ্য এখানে প্রদান করো
                     </p>
                   </div>
                   <button
@@ -1631,7 +1631,7 @@ export default function SubscriptionsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-neutral-50 dark:bg-neutral-950 rounded-3xl border border-neutral-100 dark:border-neutral-800">
                   <div>
                     <label className="block text-[10px] font-bold text-neutral-400 uppercase mb-2">
-                      থিম কালার সিলেক্ট করুন
+                      থিম কালার সিলেক্ট করো
                     </label>
                     <select
                       value={editingPlan.color_theme || 'border-neutral-200'}
@@ -1667,7 +1667,7 @@ export default function SubscriptionsPage() {
                         />
                       </div>
                       <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300 group-hover:text-emerald-600 transition-colors">
-                        প্লানটি এক্টিভ রাখুন
+                        প্লানটি এক্টিভ রাখো
                       </span>
                     </label>
 
@@ -1709,7 +1709,7 @@ export default function SubscriptionsPage() {
                   onClick={handleCreatePlan}
                   className="flex-1 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
                 >
-                  {editingPlan.id ? 'আপডেট করুন' : 'তৈরি করুন'}
+                  {editingPlan.id ? 'আপডেট করো' : 'তৈরি করো'}
                 </button>
               </div>
             </div>
@@ -1803,7 +1803,7 @@ export default function SubscriptionsPage() {
                   onClick={handleExtendSubscription}
                   className="flex-1 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg shadow-red-500/20 transition-all active:scale-95"
                 >
-                  নিশ্চিত করুন
+                  নিশ্চিত করো
                 </button>
               </div>
             </div>

@@ -138,7 +138,7 @@ export default function BlogFooter() {
                   href="/login"
                   className="hover:text-slate-900 dark:hover:text-white transition-colors"
                 >
-                  লগইন করুন
+                  লগইন করো
                 </Link>
               </li>
               <li>

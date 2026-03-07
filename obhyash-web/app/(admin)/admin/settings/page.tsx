@@ -66,7 +66,7 @@ export default function AdminSettingsPage() {
           ) : (
             <Save size={18} strokeWidth={3} />
           )}
-          সেভ করুন
+          সেভ করো
         </button>
       </div>
 
@@ -128,7 +128,7 @@ export default function AdminSettingsPage() {
                         ডার্ক মোড
                       </p>
                       <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-bold uppercase tracking-widest mt-1">
-                        চোখের আরামের জন্য ব্যবহার করুন
+                        চোখের আরামের জন্য ব্যবহার করো
                       </p>
                     </div>
                   </div>
@@ -217,7 +217,7 @@ export default function AdminSettingsPage() {
                     </div>
                     <div className="space-y-3">
                       <label className="text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest ml-1">
-                        নিশ্চিত করুন
+                        নিশ্চিত করো
                       </label>
                       <div className="relative group">
                         <Lock
@@ -252,7 +252,7 @@ export default function AdminSettingsPage() {
                         অথেনটিকেটর অ্যাপ
                       </p>
                       <p className="text-[10px] text-neutral-500 dark:text-neutral-400 font-bold uppercase tracking-widest mt-1">
-                        TOTP (Google Auth, Authy) ব্যবহার করুন
+                        TOTP (Google Auth, Authy) ব্যবহার করো
                       </p>
                     </div>
                   </div>
@@ -286,7 +286,7 @@ export default function AdminSettingsPage() {
                     },
                     {
                       label: 'সিস্টেম আপডেট',
-                      desc: 'সিস্টেমের গুরুত্বপূর্ণ পরিবর্তন এবং মেইনটেন্যান্স অ্যালার্ট।',
+                      desc: 'সিস্টেমের গুরুত্বপূর্ণ পরিবর্তন এবং মেইনটেন্যাও্স অ্যালার্ট।',
                     },
                     {
                       label: 'সাপ্তাহিক রিপোর্ট',

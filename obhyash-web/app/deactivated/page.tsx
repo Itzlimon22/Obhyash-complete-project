@@ -46,7 +46,7 @@ export default function DeactivatedPage() {
 
           <p className="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
             আপনার অ্যাকাউন্ট সাময়িকভাবে নিষ্ক্রিয় করা হয়েছে অথবা সাসপেন্ড করা
-            হয়েছে। বিস্তারিত জানতে অনুগ্রহ করে কর্তৃপক্ষের সাথে যোগাযোগ করুন।
+            হয়েছে। বিস্তারিত জানতে অনুগ্রহ করে কর্তৃপক্ষের সাথে যোগাযোগ করো।
           </p>
 
           <div className="space-y-4">
@@ -62,7 +62,7 @@ export default function DeactivatedPage() {
               ) : (
                 <>
                   <LogOut className="w-5 h-5" />
-                  লগইন পেজে ফিরে যান
+                  লগইন পেজে ফিরে যাও
                 </>
               )}
             </Link>

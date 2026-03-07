@@ -137,7 +137,7 @@ export const sscSubjects: Subject[] = [
         topics: [],
       },
       { id: 'ssc-math-ch16', name: 'পরিমিতি', topics: [] },
-      { id: 'ssc-math-ch17', name: 'পরিসংখ্যান', topics: [] },
+      { id: 'ssc-math-ch17', name: 'পরিসংখ্যাও', topics: [] },
     ],
   },
   {
@@ -392,7 +392,7 @@ export const sscSubjects: Subject[] = [
   },
   {
     id: 'ssc-finance-banking',
-    name: 'SSC ফিন্যান্স ও ব্যাংকিং',
+    name: 'SSC ফিন্যাও্স ও ব্যাংকিং',
     icon: Landmark,
     group: 'Business Studies',
     chapters: [

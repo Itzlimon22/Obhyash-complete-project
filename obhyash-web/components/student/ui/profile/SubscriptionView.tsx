@@ -151,7 +151,7 @@ const SubscriptionView: React.FC = () => {
       const success = await submitManualPayment(submission);
       if (success) {
         toast.success(
-          `আপনার পেমেন্ট তথ্য জমা নেওয়া হয়েছে। যাচাই করার পর ${selectedPlan?.name} প্ল্যানটি চালু হবে।`,
+          `আপনার পেমেন্ট তথ্য জমা নেওয়া হয়েছে। যাচাই করার পর ${selectedPlan?.name} প্ল্যাওটি চালু হবে।`,
         );
         setIsPaymentModalOpen(false);
         setSelectedPlan(null);
@@ -296,7 +296,7 @@ const SubscriptionView: React.FC = () => {
       <div id="pricing-plans" className="scroll-mt-24">
         <div className="text-center mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-2">
-            আপনার প্ল্যান বেছে নাও
+            আপনার প্ল্যাও বেছে নাও
           </h2>
         </div>
 

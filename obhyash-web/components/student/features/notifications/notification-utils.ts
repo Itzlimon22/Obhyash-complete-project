@@ -43,7 +43,7 @@ export const FUNNY_EMPTY_STATES = [
   // --- Relaxation & Chill ---
   {
     message: 'নোটিফিকেশন নেই, টেনশন নেই! 😎',
-    subtext: 'চিল মুডে পড়াশোনা চালিয়ে যান।',
+    subtext: 'চিল মুডে পড়াশোনা চালিয়ে যাও।',
     icon: '🧘',
   },
   {

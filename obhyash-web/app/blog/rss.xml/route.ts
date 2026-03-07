@@ -47,7 +47,7 @@ export async function GET() {
   <channel>
     <title>Obhyash Blog — স্মার্ট প্রস্তুতি, সেরা ফলাফল</title>
     <link>${SITE_URL}/blog</link>
-    <description>বাংলাদেশের শিক্ষার্থীদের SSC, HSC এবং অন্যান্য পরীক্ষায় সফল হতে সাহায্য করার জন্য বিশেষজ্ঞ টিপস, পরীক্ষিত কৌশল এবং দিকনির্দেশনা।</description>
+    <description>বাংলাদেশের শিক্ষার্থীদের SSC, HSC এবং অন্যাও্য পরীক্ষায় সফল হতে সাহায্য করার জন্য বিশেষজ্ঞ টিপস, পরীক্ষিত কৌশল এবং দিকনির্দেশনা।</description>
     <language>bn</language>
     <copyright>Copyright ${new Date().getFullYear()} Obhyash</copyright>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>

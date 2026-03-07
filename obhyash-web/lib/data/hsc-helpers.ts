@@ -25,7 +25,7 @@ const SUBJECT_ALIASES: Record<string, string> = {
   psychology: 'মনোবিজ্ঞান',
   // Commerce
   accounting: 'হিসাববিজ্ঞান',
-  finance: 'ফিন্যান্স',
+  finance: 'ফিন্যাও্স',
   management: 'ব্যবস্থাপনা',
   marketing: 'মার্কেটিং',
   // General

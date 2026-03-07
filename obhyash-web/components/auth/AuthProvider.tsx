@@ -488,13 +488,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             </h3>
             <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-8 leading-relaxed">
               আপনার লগইন সেশনটি মেয়াদোত্তীর্ণ বা ত্রুটিপূর্ণ হয়েছে।
-              নিরবচ্ছিন্ন অভিজ্ঞতার জন্য দয়া করে আবার লগইন করুন।
+              নিরবচ্ছিন্ন অভিজ্ঞতার জন্য দয়া করে আবার লগইন করো।
             </p>
             <button
               onClick={handleForceLogout}
               className="w-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-bold py-3.5 rounded-2xl shadow-lg active:scale-95 transition-all text-sm mb-3"
             >
-              আবার লগইন করুন
+              আবার লগইন করো
             </button>
           </div>
         </div>

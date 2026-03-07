@@ -27,7 +27,7 @@ export default function GlobalError({
       </h2>
       <p className="text-neutral-500 dark:text-neutral-400 max-w-md mx-auto mb-8 leading-relaxed font-medium">
         আমাদের সিস্টেমে সাময়িক সমস্যা হয়েছে অথবা আপনার ইন্টারনেট সংযোগ
-        বিচ্ছিন্ন হতে পারে। দয়া করে আবার চেষ্টা করুন।
+        বিচ্ছিন্ন হতে পারে। দয়া করে আবার চেষ্টা করো।
       </p>
 
       <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
@@ -37,14 +37,14 @@ export default function GlobalError({
           className="w-full sm:w-auto px-8 rounded-xl font-bold flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-600/20 transition-all active:scale-95"
         >
           <RefreshCw size={18} />
-          আবার চেষ্টা করুন
+          আবার চেষ্টা করো
         </Button>
         <Link
           href="/"
           className="w-full sm:w-auto px-8 py-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 h-11"
         >
           <Home size={18} />
-          হোমপেজে যান
+          হোমপেজে যাও
         </Link>
       </div>
 

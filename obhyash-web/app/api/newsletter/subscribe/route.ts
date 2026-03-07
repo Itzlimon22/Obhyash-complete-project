@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     if (!email || !email.includes('@')) {
       return NextResponse.json(
-        { error: 'দয়া করে একটি সঠিক ইমেইল এড্রেস প্রদান করুন।' },
+        { error: 'দয়া করে একটি সঠিক ইমেইল এড্রেস প্রদান করো।' },
         { status: 400 },
       );
     }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('Error subscribing to newsletter:', error);
     return NextResponse.json(
-      { error: 'সাবস্ক্রাইব করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।' },
+      { error: 'সাবস্ক্রাইব করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করো।' },
       { status: 500 },
     );
   }

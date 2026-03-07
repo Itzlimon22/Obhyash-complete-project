@@ -66,7 +66,7 @@ const REPORT_TYPES = [
   {
     id: 'Other',
     icon: AlertCircle,
-    label: 'অন্যান্য',
+    label: 'অন্যাও্য',
     desc: 'অন্য কোনো সমস্যা',
     color: 'neutral',
   },
@@ -253,7 +253,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="প্রশ্ন রিপোর্ট করুন"
+        aria-label="প্রশ্ন রিপোর্ট করো"
         className={[
           'fixed z-[9999] w-full',
           // Mobile: bottom sheet
@@ -290,7 +290,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
               <div className="flex items-center gap-2 mb-0.5">
                 <Flag size={15} className="text-red-500 shrink-0" />
                 <h2 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white leading-tight">
-                  সমস্যা রিপোর্ট করুন
+                  সমস্যা রিপোর্ট করো
                 </h2>
               </div>
               <p className="text-[11px] text-neutral-400 dark:text-neutral-500">
@@ -298,14 +298,14 @@ const ReportModal: React.FC<ReportModalProps> = ({
                 <span className="font-semibold text-neutral-500 dark:text-neutral-400">
                   #{String(questionId).slice(0, 8)}
                 </span>
-                &nbsp;— সমস্যার ধরন বেছে নিন
+                &nbsp;— সমস্যার ধরন বেছে নাও
               </p>
             </div>
             <button
               onClick={() => !isSubmitting && onClose()}
               disabled={isSubmitting}
               className="shrink-0 p-2 -mr-1 rounded-xl text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all active:scale-95"
-              aria-label="বন্ধ করুন"
+              aria-label="বন্ধ করো"
             >
               <X size={18} />
             </button>
@@ -410,7 +410,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
                     onChange={(e) =>
                       setComment(e.target.value.slice(0, CHAR_LIMIT))
                     }
-                    placeholder="সমস্যার বিস্তারিত বিবরণ এখানে লিখুন..."
+                    placeholder="সমস্যার বিস্তারিত বিবরণ এখানে লেখো..."
                     rows={3}
                     className="w-full px-4 py-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 text-sm text-neutral-800 dark:text-neutral-100 placeholder:text-neutral-300 dark:placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-red-400/40 focus:border-red-400/50 dark:focus:ring-red-500/30 dark:focus:border-red-500/40 transition-all resize-none leading-relaxed"
                   />
@@ -459,7 +459,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
                     >
                       <ImagePlus size={18} className="shrink-0" />
                       <span className="text-xs font-medium">
-                        ছবি যুক্ত করুন
+                        ছবি যুক্ত করো
                       </span>
                       <ChevronRight
                         size={14}
@@ -499,7 +499,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
                 ) : (
                   <>
                     <Flag size={14} />
-                    <span>রিপোর্ট পাঠান</span>
+                    <span>রিপোর্ট পাঠাও</span>
                   </>
                 )}
               </button>

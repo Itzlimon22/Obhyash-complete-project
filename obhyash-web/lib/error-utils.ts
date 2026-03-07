@@ -30,7 +30,7 @@ export const getErrorMessage = (error: unknown): string => {
     return 'ফাইলের সাইজ অনেক বড় (সর্বোচ্চ ২ এমবি)।';
   }
   if (message.includes('Upload failed') || message.includes('uploading')) {
-    return 'আপলোড ব্যর্থ হয়েছে, আবার চেষ্টা করুন।';
+    return 'আপলোড ব্যর্থ হয়েছে, আবার চেষ্টা করো।';
   }
 
   // General Database/API Errors
@@ -50,11 +50,11 @@ export const getErrorMessage = (error: unknown): string => {
     message.includes('Operation failed') ||
     message.includes('Something went wrong')
   ) {
-    return 'দুঃখিত, কোনো একটি সমস্যা হয়েছে। আবার চেষ্টা করুন।';
+    return 'দুঃখিত, কোনো একটি সমস্যা হয়েছে। আবার চেষ্টা করো।';
   }
 
   // Default fallback - clean up raw message if possible or use a safe wrapper
   return message.length < 50
     ? message
-    : 'প্রক্রিয়াটি সম্পন্ন করা যায়নি। পুনরায় চেষ্টা করুন।';
+    : 'প্রক্রিয়াটি সম্পন্ন করা যায়নি। পুনরায় চেষ্টা করো।';
 };

@@ -22,7 +22,7 @@ const AddPaymentMethodModal: React.FC<AddPaymentMethodModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (number.length < 11 || number.length > 15) {
-      toast.error('সঠিক ফোন নম্বর দিন');
+      toast.error('সঠিক ফোন নম্বর দাও');
       return;
     }
     onSubmit(type, number);

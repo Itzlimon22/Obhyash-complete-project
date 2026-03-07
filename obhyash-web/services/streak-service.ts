@@ -116,7 +116,7 @@ export const checkAndUpdateStreak = async (
       const message =
         diff === 1
           ? `আজকের লগইন এর জন্য আপনি +${xpGained} XP অর্জন করেছেন।`
-          : `ফিরে আসার জন্য +${xpGained} XP! প্রতিদিন লগইন করে স্ট্রিক বজায় রাখুন।`;
+          : `ফিরে আসার জন্য +${xpGained} XP! প্রতিদিন লগইন করে স্ট্রিক বজায় রাখো।`;
 
       await createNotification(
         freshUser.id,
@@ -154,7 +154,7 @@ export const checkAndUpdateStreak = async (
       await createNotification(
         freshUser.id,
         'লগইন বোনাস!',
-        `আপনি স্ট্রিক শুরু করার জন্য +${xpGained} XP অর্জন করেছেন। চালিয়ে যান!`,
+        `আপনি স্ট্রিক শুরু করার জন্য +${xpGained} XP অর্জন করেছেন। চালিয়ে যাও!`,
         'system',
         { icon: '🔥' },
       );

@@ -115,7 +115,7 @@ export default function ReferralPage() {
         setIsEditing(false);
       }
     } catch (err: any) {
-      toast.error(err.message || 'নেটওয়ার্ক সমস্যা। আবার চেষ্টা করুন।');
+      toast.error(err.message || 'নেটওয়ার্ক সমস্যা। আবার চেষ্টা করো।');
     } finally {
       setGenerating(false);
     }
@@ -299,7 +299,7 @@ export default function ReferralPage() {
                             setIsEditing(true);
                           }}
                           className="p-3 text-neutral-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl transition-colors"
-                          title="কোড এডিট করুন"
+                          title="কোড এডিট করো"
                         >
                           <Edit2 size={18} />
                         </button>
@@ -367,7 +367,7 @@ export default function ReferralPage() {
                       {generating ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
-                        'সেভ করুন'
+                        'সেভ করো'
                       )}
                     </motion.button>
                     {!customCodeInput && (

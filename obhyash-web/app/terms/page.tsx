@@ -32,7 +32,7 @@ export default function TermsPage() {
             className="flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            হোম-এ ফিরে যান
+            হোম-এ ফিরে যাও
           </Link>
         </div>
       </header>

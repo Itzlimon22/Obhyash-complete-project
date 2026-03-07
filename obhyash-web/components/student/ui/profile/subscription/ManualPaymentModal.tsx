@@ -42,13 +42,13 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
 
     const phoneRegex = /^01\d{9}$/;
     if (!phoneRegex.test(senderNumber)) {
-      toast.error('সঠিক মোবাইল নম্বর দিন (১১ ডিজিট, শুরু হতে হবে ০১ দিয়ে)');
+      toast.error('সঠিক মোবাইল নম্বর দাও (১১ ডিজিট, শুরু হতে হবে ০১ দিয়ে)');
       return;
     }
 
     const trxIdRegex = /^[A-Z0-9]{5,20}$/; // Relaxed slightly from 10 but kept safe
     if (!trxIdRegex.test(trxId.toUpperCase())) {
-      toast.error('সঠিক ট্রানজেকশন আইডি দিন');
+      toast.error('সঠিক ট্রানজেকশন আইডি দাও');
       return;
     }
 

@@ -75,7 +75,7 @@ export const QuestionList: React.FC<QuestionListProps> = ({
             কোন প্রশ্ন পাওয়া যায়নি
           </h3>
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            ফিল্টার পরিবর্তন করুন বা নতুন প্রশ্ন যোগ করুন
+            ফিল্টার পরিবর্তন করো বা নতুন প্রশ্ন যোগ করো
           </p>
         </div>
       </div>

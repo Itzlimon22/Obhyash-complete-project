@@ -71,7 +71,7 @@ export function extractJsonObjects(text: string): {
   }
 
   if (foundObjects === 0 && lineSuccessCount === 0) {
-    errors.push('ফাইলটি পার্স করা সম্ভব নয়। JSON ফরম্যাট চেক করুন।');
+    errors.push('ফাইলটি পার্স করা সম্ভব নয়। JSON ফরম্যাট চেক করো।');
   } else if (foundObjects > 0 || lineSuccessCount > 0) {
     // If we recovered some, check if we missed binary-like junk or major errors
     const recoveredData =

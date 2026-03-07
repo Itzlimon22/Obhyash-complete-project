@@ -29,7 +29,7 @@ export default function ReferralProgramPage() {
           className="text-sm font-semibold flex items-center gap-2 bg-white dark:bg-[#121212] border border-neutral-200 dark:border-[#2b2b2b] px-4 py-2 rounded-full text-neutral-600 dark:text-neutral-300 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-200 dark:hover:border-rose-900/50 shadow-sm transition-all"
         >
           <Home className="w-4 h-4" />
-          <span className="hidden sm:inline">হোমে ফিরে যান</span>
+          <span className="hidden sm:inline">হোমে ফিরে যাও</span>
         </Link>
       </nav>
 
@@ -152,7 +152,7 @@ export default function ReferralProgramPage() {
               href="/login"
               className="inline-flex items-center justify-center gap-3 w-full sm:w-auto px-10 py-4 sm:py-5 rounded-2xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold text-lg shadow-xl shadow-rose-600/20 transition-all hover:-translate-y-1 active:scale-[0.98]"
             >
-              এখুনি শুরু করুন
+              এখুনি শুরু করো
               <ArrowRight className="w-5 h-5" />
             </Link>
             <p className="text-sm font-medium text-slate-400 dark:text-slate-500 mt-6">
@@ -161,7 +161,7 @@ export default function ReferralProgramPage() {
                 href="/signup"
                 className="text-rose-600 dark:text-rose-400 hover:underline font-bold"
               >
-                এখানে অ্যাকাউন্ট তৈরি করুন
+                এখানে অ্যাকাউন্ট তৈরি করো
               </Link>
             </p>
           </section>

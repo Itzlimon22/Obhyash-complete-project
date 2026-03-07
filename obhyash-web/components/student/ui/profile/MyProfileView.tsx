@@ -167,7 +167,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
             className="flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 rounded-xl font-bold text-base sm:text-lg hover:bg-red-100 dark:hover:bg-red-900/40 transition-all active:scale-95 shadow-sm w-full sm:w-fit"
           >
             <Gift className="w-5 h-5" />
-            রেফার করুন
+            রেফার করো
           </Link>
         </div>
       </div>
@@ -237,7 +237,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
                 সর্বশেষ কার্যক্রম
               </h3>
               <button className="text-sm font-bold text-red-500 hover:text-red-600 dark:hover:text-red-400 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 px-4 py-2 rounded-xl transition-colors active:scale-95">
-                সব দেখুন
+                সব দেখো
               </button>
             </div>
 

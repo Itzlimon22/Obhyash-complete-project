@@ -101,8 +101,8 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
           কোনো ডাটা পাওয়া যায়নি
         </h2>
         <p className="text-neutral-500 dark:text-neutral-400 mt-2 text-sm">
-          বিশ্লেষণ দেখতে অন্তত একটি পরীক্ষা সম্পন্ন করুন অথবা সময়সীমা পরিবর্তন
-          করুন।
+          বিশ্লেষণ দেখতে অন্তত একটি পরীক্ষা সম্পন্ন করো অথবা সময়সীমা পরিবর্তন
+          করো।
         </p>
 
         <div className="mt-6">
@@ -128,7 +128,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
         <div>
           <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">
-            পারফরম্যান্স এনালাইসিস
+            পারফরম্যাও্স এনালাইসিস
           </h1>
           <p className="text-neutral-500 dark:text-neutral-400 text-sm">
             আপনার অগ্রগতির সামগ্রিক চিত্র

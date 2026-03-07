@@ -64,7 +64,7 @@ export default function AdminProfilePage() {
           <div className="absolute top-4 right-4">
             <button className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white p-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2">
               <Edit2 size={14} />
-              <span className="hidden sm:inline">ব্যানার পরিবর্তন</span>
+              <span className="hidden sm:inline">ব্যাওার পরিবর্তন</span>
             </button>
           </div>
         </div>
@@ -211,7 +211,7 @@ export default function AdminProfilePage() {
               </h4>
               <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed font-medium bg-neutral-50 dark:bg-black/20 p-4 rounded-2xl border border-neutral-100 dark:border-neutral-800/50 italic">
                 {user?.bio ||
-                  'আপনার সম্পর্কে আরও তথ্য দিতে প্রোফাইল এডিট করুন।'}
+                  'আপনার সম্পর্কে আরও তথ্য দিতে প্রোফাইল এডিট করো।'}
               </p>
             </div>
           </div>
@@ -274,7 +274,7 @@ export default function AdminProfilePage() {
                 </h3>
               </div>
               <button className="text-[10px] font-black text-red-600 uppercase tracking-[0.2em] hover:text-red-700">
-                সব দেখুন
+                সব দেখো
               </button>
             </div>
             <div className="p-6 sm:p-10">
@@ -282,7 +282,7 @@ export default function AdminProfilePage() {
               <div className="relative pl-8 border-l-4 border-neutral-100 dark:border-neutral-800 space-y-10 ml-2">
                 {[
                   {
-                    title: '৫টি ম্যানুয়াল পেমেন্ট অ্যাপ্রুভ করেছেন',
+                    title: '৫টি ম্যাওুয়াল পেমেন্ট অ্যাপ্রুভ করেছেন',
                     time: '২ ঘণ্টা আগে',
                     type: 'payment',
                     desc: 'শিক্ষার্থীদের সাবস্ক্রিপশন ট্রানজ্যাকশন ভেরিফাই করা হয়েছে।',

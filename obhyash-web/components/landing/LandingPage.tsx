@@ -246,7 +246,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     {
       name: 'তানভীর আহমেদ',
       role: 'HSC পরীক্ষার্থী (Science)',
-      text: 'Obhyash-এর AI জেনারেটেড প্রশ্নগুলো বইয়ের টপিক অনুযায়ী হয়, যা আমার রিভিশনের জন্য খুব উপকারে এসেছে। এক্সপ্ল্যানেশনগুলোও খুব স্পষ্ট।',
+      text: 'Obhyash-এর AI জেনারেটেড প্রশ্নগুলো বইয়ের টপিক অনুযায়ী হয়, যা আমার রিভিশনের জন্য খুব উপকারে এসেছে। এক্সপ্ল্যাওেশনগুলোও খুব স্পষ্ট।',
       initial: 'T',
       color: 'bg-red-500',
     },
@@ -262,10 +262,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
   const faqs = [
     {
       q: 'Obhyash অ্যাপটি কি সম্পূর্ণ ফ্রি?',
-      a: "আমাদের একটি 'বেসিক' প্ল্যান আছে যা সম্পূর্ণ ফ্রি। তবে আনলিমিটেড এক্সাম এবং অ্যাডভান্সড ফিচারগুলোর জন্য প্রিমিয়াম সাবস্ক্রিপশন প্রয়োজন।",
+      a: "আমাদের একটি 'বেসিক' প্ল্যাও আছে যা সম্পূর্ণ ফ্রি। তবে আনলিমিটেড এক্সাম এবং অ্যাডভান্সড ফিচারগুলোর জন্য প্রিমিয়াম সাবস্ক্রিপশন প্রয়োজন।",
     },
     {
-      q: 'OMR স্ক্যান ফিচারটি কিভাবে কাজ করে?',
+      q: 'OMR স্ক্যাও ফিচারটি কিভাবে কাজ করে?',
       a: 'আপনি যেকোনো সাধারণ কাগজে পরীক্ষা দিয়ে আমাদের অ্যাপের মাধ্যমে ছবি তুললেই আমাদের AI সিস্টেম তা যাচাই করে ফলাফল জানিয়ে দিবে।',
     },
     {
@@ -361,7 +361,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               onClick={onGetStarted}
               className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-bold text-sm transition-all shadow-lg shadow-emerald-500/20"
             >
-              শুরু করুন
+              শুরু করো
             </button>
           </div>
 
@@ -638,7 +638,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
         <div className="relative">
           {/* Mobile Scroll Hint */}
           <div className="md:hidden flex justify-end mb-2 text-xs text-neutral-400 font-medium animate-pulse">
-            ডানে স্ক্রল করুন <ArrowRight className="w-3 h-3 ml-1" />
+            ডানে স্ক্রল করো <ArrowRight className="w-3 h-3 ml-1" />
           </div>
 
           <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-8 -mx-4 px-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:pb-0 md:mx-0 md:px-0 no-scrollbar">
@@ -662,10 +662,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <ScanLine className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
               </div>
               <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-                OMR স্ক্যানিং
+                OMR স্ক্যাওিং
               </h3>
               <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                বাসায় বসে খাতায় পরীক্ষা দিয়ে অ্যাপ দিয়ে ছবি তুলুন। নিমিষেই পেয়ে
+                বাসায় বসে খাতায় পরীক্ষা দিয়ে অ্যাপ দিয়ে ছবি তোলো। নিমিষেই পেয়ে
                 যাবেন নির্ভুল ফলাফল ও বিস্তারিত সমাধান।
               </p>
             </div>
@@ -680,7 +680,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </h3>
               <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
                 আপনার সিলেবাস অনুযায়ী যেকোনো বিষয়ের উপর আনলিমিটেড কাস্টম
-                প্রশ্নপত্র তৈরি করুন এক ক্লিকেই।
+                প্রশ্নপত্র তৈরি করো এক ক্লিকেই।
               </p>
             </div>
 
@@ -694,7 +694,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </h3>
               <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
                 সারা দেশের শিক্ষার্থীদের সাথে মেধা তালিকায় নিজের অবস্থান যাচাই
-                করুন এবং নিজেকে এগিয়ে রাখুন।
+                করো এবং নিজেকে এগিয়ে রাখো।
               </p>
             </div>
 
@@ -800,7 +800,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <p className="text-neutral-600 dark:text-neutral-400 text-lg leading-relaxed max-w-2xl">
                   আপনার পরীক্ষার প্রস্তুতির জন্য বিশেষজ্ঞ টিপস, MCQ টেকনিক এবং
-                  কার্যকরী কৌশলগুলো জেনে নিন।
+                  কার্যকরী কৌশলগুলো জেনে নাও।
                 </p>
               </div>
               <div className="lg:w-1/3 flex justify-start lg:justify-end">
@@ -808,7 +808,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   href="/blog"
                   className="inline-flex items-center gap-3 px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold transition-all active:scale-95 group shadow-xl shadow-emerald-700/20"
                 >
-                  ব্লগ দেখুন
+                  ব্লগ দেখো
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
@@ -818,7 +818,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <div className="relative group">
               {/* Mobile Scroll Hint */}
               <div className="md:hidden flex justify-end mb-4 text-[10px] text-neutral-400 font-bold uppercase tracking-widest animate-pulse gap-1 items-center">
-                বামে স্ক্রল করুন <ArrowRight className="w-3 h-3" />
+                বামে স্ক্রল করো <ArrowRight className="w-3 h-3" />
               </div>
 
               <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
@@ -899,7 +899,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <span className="text-3xl font-bold text-emerald-600">১</span>
               </div>
               <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
-                অ্যাকাউন্ট খুলুন
+                অ্যাকাউন্ট খোলো
               </h3>
               <p className="text-neutral-500 text-sm max-w-xs px-4">
                 গুগল বা ইমেইল দিয়ে মাত্র ১০ সেকেন্ডে ফ্রি রেজিস্ট্রেশন করো।
@@ -943,10 +943,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mb-4">
-              আপনার পছন্দের প্ল্যানটি বেছে নাও
+              আপনার পছন্দের প্ল্যাওটি বেছে নাও
             </h2>
             <p className="text-neutral-600 dark:text-neutral-400">
-              সাশ্রয়ী সাবস্ক্রিপশন প্ল্যান।
+              সাশ্রয়ী সাবস্ক্রিপশন প্ল্যাও।
             </p>
           </div>
 

@@ -241,7 +241,7 @@ const NotificationsView: React.FC = () => {
                         লোড হচ্ছে...
                       </span>
                     ) : (
-                      'আরও দেখুন'
+                      'আরও দেখো'
                     )}
                   </button>
                 </div>

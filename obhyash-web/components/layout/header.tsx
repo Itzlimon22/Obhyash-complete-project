@@ -112,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           />
           <input
             type="text"
-            placeholder="সার্চ করুন..."
+            placeholder="সার্চ করো..."
             className="bg-neutral-100 dark:bg-neutral-900 border border-transparent dark:border-neutral-800 text-neutral-900 dark:text-neutral-200 text-xs font-black rounded-2xl pl-11 pr-4 py-2.5 w-32 md:w-56 outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500/50 transition-all placeholder:text-neutral-400"
           />
         </div>

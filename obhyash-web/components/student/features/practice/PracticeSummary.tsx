@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
@@ -219,14 +219,14 @@ export const PracticeSummary: React.FC<PracticeSummaryProps> = ({
                   clipRule="evenodd"
                 />
               </svg>
-              কঠিনগুলো আবার পড়ুন ({struggling.length}টি)
+              কঠিনগুলো আবার পড়ো ({struggling.length}টি)
             </button>
           )}
           <button
             onClick={onBack}
             className="w-full px-6 py-3.5 bg-white dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-700 rounded-xl font-bold text-sm active:scale-[0.98] transition-all"
           >
-            অনুশীলনে ফিরে যান
+            অনুশীলনে ফিরে যাও
           </button>
         </motion.div>
       </motion.div>

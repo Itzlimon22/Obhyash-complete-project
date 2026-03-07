@@ -106,7 +106,7 @@ export const QuestionFiltersPanel: React.FC<QuestionFiltersProps> = ({
         {/* Search */}
         <div className="lg:col-span-2">
           <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5">
-            সার্চ করুন
+            সার্চ করো
           </label>
           <input
             type="text"

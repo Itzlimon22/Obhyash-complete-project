@@ -6,7 +6,7 @@ import BlogSearchPage from '@/components/blog/BlogSearchPage';
 export const metadata: Metadata = {
   title: 'আর্টিকেল খুঁজুন — Obhyash Blog',
   description:
-    'সকল ব্লগ আর্টিকেলে শিরোনাম, ট্যাগ, বিষয় বা লেখকের নাম দিয়ে অনুসন্ধান করুন।',
+    'সকল ব্লগ আর্টিকেলে শিরোনাম, ট্যাগ, বিষয় বা লেখকের নাম দিয়ে অনুসন্ধান করো।',
   robots: { index: false },
 };
 

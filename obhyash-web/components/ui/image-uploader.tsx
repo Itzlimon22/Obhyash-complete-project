@@ -92,7 +92,7 @@ export function ImageUploader({
                 }
               />
               {compact ? (
-                <span>ছবি যুক্ত করুন</span>
+                <span>ছবি যুক্ত করো</span>
               ) : (
                 <span className="text-xs text-neutral-500">
                   Click to upload image/PDF

@@ -91,7 +91,7 @@ export default function NotificationManagementPage() {
           <div className="bg-white dark:bg-neutral-900 rounded-2xl md:rounded-[2.5rem] border border-neutral-200 dark:border-neutral-800 shadow-sm p-4 md:p-8">
             <h2 className="text-lg font-bold text-neutral-900 dark:text-white mb-4 md:mb-6 flex items-center gap-2">
               <Send size={20} className="text-red-600" />
-              নতুন নোটিফিকেশন পাঠান
+              নতুন নোটিফিকেশন পাঠাও
             </h2>
 
             <form onSubmit={handleSend} className="space-y-4 md:space-y-6">
@@ -108,7 +108,7 @@ export default function NotificationManagementPage() {
                       setFormData({ ...formData, title: e.target.value })
                     }
                     className="w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none transition-all text-sm"
-                    placeholder="নোটিফিকেশনের শিরোনাম দিন"
+                    placeholder="নোটিফিকেশনের শিরোনাম দাও"
                   />
                 </div>
                 <div>
@@ -146,7 +146,7 @@ export default function NotificationManagementPage() {
                     setFormData({ ...formData, message: e.target.value })
                   }
                   className="w-full px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none transition-all resize-none text-sm leading-relaxed"
-                  placeholder="বিস্তারিত বার্তাটি এখানে লিখুন..."
+                  placeholder="বিস্তারিত বার্তাটি এখানে লেখো..."
                 />
               </div>
 
@@ -212,7 +212,7 @@ export default function NotificationManagementPage() {
                     <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-200">
                       <input
                         type="text"
-                        placeholder="User ID লিখুন (UUID)"
+                        placeholder="User ID লেখো (UUID)"
                         value={formData.specificUserId}
                         onChange={(e) =>
                           setFormData({
@@ -240,7 +240,7 @@ export default function NotificationManagementPage() {
                     </>
                   ) : (
                     <>
-                      <Send size={20} /> পাঠান
+                      <Send size={20} /> পাঠাও
                     </>
                   )}
                 </button>
@@ -263,7 +263,7 @@ export default function NotificationManagementPage() {
                 </div>
                 <span>
                   <strong>Announcement:</strong> সাধারণ নোটিশ বা সবার জন্য
-                  ঘোষণার জন্য এটি ব্যবহার করুন।
+                  ঘোষণার জন্য এটি ব্যবহার করো।
                 </span>
               </li>
               <li className="flex gap-3">
@@ -272,7 +272,7 @@ export default function NotificationManagementPage() {
                 </div>
                 <span>
                   <strong>System:</strong> অ্যাপ আপডেট বা গুরুত্বপূর্ণ সিস্টেম
-                  মেসেজের জন্য ব্যবহার করুন।
+                  মেসেজের জন্য ব্যবহার করো।
                 </span>
               </li>
               <li className="flex gap-3">
@@ -281,7 +281,7 @@ export default function NotificationManagementPage() {
                 </div>
                 <span>
                   <strong>Warning:</strong> অত্যন্ত গুরুত্বপূর্ণ নির্দেশনার জন্য
-                  Priority High দিয়ে পাঠান।
+                  Priority High দিয়ে পাঠাও।
                 </span>
               </li>
             </ul>

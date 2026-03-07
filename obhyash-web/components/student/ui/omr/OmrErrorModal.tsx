@@ -101,7 +101,7 @@ const OmrErrorModal: React.FC<OmrErrorModalProps> = ({
               onClick={onSendToExaminer}
               className="w-full py-3.5 rounded-2xl bg-white dark:bg-black hover:bg-neutral-100 dark:hover:bg-neutral-900 active:scale-[0.98] text-black dark:text-white font-semibold text-sm transition-all duration-150 border border-neutral-300 dark:border-neutral-700"
             >
-              ম্যানুয়ালি পাঠাও
+              ম্যাওুয়ালি পাঠাও
             </button>
 
             {/* Ghost: Cancel */}

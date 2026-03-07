@@ -138,7 +138,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
               {getSubjectDisplayName(subject)}
             </h1>
             <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5 font-medium">
-              বিস্তারিত পারফরম্যান্স রিপোর্ট
+              বিস্তারিত পারফরম্যাও্স রিপোর্ট
             </p>
           </div>
         </div>
@@ -577,11 +577,11 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                   </svg>
                 </div>
                 <h4 className="font-bold text-neutral-900 dark:text-white text-lg mb-1">
-                  চমৎকার পারফরম্যান্স!
+                  চমৎকার পারফরম্যাও্স!
                 </h4>
                 <p className="text-neutral-500 dark:text-neutral-400 text-sm max-w-xs mx-auto">
                   নির্বাচিত ফিল্টারে আপনার কোনো ভুল উত্তর পাওয়া যায়নি। অনুশীলন
-                  চালিয়ে যান।
+                  চালিয়ে যাও।
                 </p>
               </div>
             )}

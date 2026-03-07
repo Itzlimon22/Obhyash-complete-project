@@ -47,7 +47,7 @@ export default function LoginPage() {
           email,
           password,
         }),
-        'লগইন অনুরোধের সময়সীমা শেষ হয়েছে। আবার চেষ্টা করুন।',
+        'লগইন অনুরোধের সময়সীমা শেষ হয়েছে। আবার চেষ্টা করো।',
       );
 
       const user = data?.user;
@@ -55,10 +55,10 @@ export default function LoginPage() {
       if (signInError) {
         if (signInError.message.includes('Email not confirmed')) {
           setError(
-            'দয়া করে আপনার ইমেইল চেক করুন এবং ভেরিফাই লিংক এ ক্লিক করুন।',
+            'দয়া করে আপনার ইমেইল চেক করো এবং ভেরিফাই লিংক এ ক্লিক করো।',
           );
         } else {
-          setError('ইমেইল বা পাসওয়ার্ড ভুল হয়েছে। আবার চেষ্টা করুন।');
+          setError('ইমেইল বা পাসওয়ার্ড ভুল হয়েছে। আবার চেষ্টা করো।');
         }
         setLoading(false);
         return;
@@ -76,8 +76,8 @@ export default function LoginPage() {
       const message = err instanceof Error ? err.message : '';
       setError(
         message.includes('সময়') || message.toLowerCase().includes('timeout')
-          ? 'সার্ভার রেসপন্স দিতে দেরি করছে। একটু পরে আবার চেষ্টা করুন।'
-          : 'একটি সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।',
+          ? 'সার্ভার রেসপন্স দিতে দেরি করছে। একটু পরে আবার চেষ্টা করো।'
+          : 'একটি সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করো।',
       );
       setLoading(false);
     }
@@ -99,7 +99,7 @@ export default function LoginPage() {
               স্বাগতম!
             </h4>
             <p className="text-slate-500 dark:text-slate-400 text-sm">
-              আপনার অ্যাকাউন্টে লগইন করুন
+              আপনার অ্যাকাউন্টে লগইন করো
             </p>
           </div>
 
@@ -192,7 +192,7 @@ export default function LoginPage() {
                 href="/signup"
                 className="text-red-600 hover:text-red-700 font-bold hover:underline transition-all"
               >
-                নতুন অ্যাকাউন্ট খুলুন
+                নতুন অ্যাকাউন্ট খোলো
               </Link>
             </p>
             {/* Optional: Forgot Password Link */}

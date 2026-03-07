@@ -138,7 +138,7 @@ const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
               {/* Instructions Box */}
               <div className="w-full bg-white dark:bg-black border-2 border-dashed border-emerald-200 dark:border-emerald-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 p-5 text-center">
                 <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">
-                  অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করুন
+                  অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করো
                 </h4>
 
                 <div

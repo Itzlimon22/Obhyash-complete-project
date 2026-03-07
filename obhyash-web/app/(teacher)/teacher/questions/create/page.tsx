@@ -197,7 +197,7 @@ export default function TeacherCreateQuestionPage() {
     if (finalIndices.length === 0) {
       setNotification({
         type: 'error',
-        message: 'কমপক্ষে ১টি সঠিক উত্তর নির্বাচন করুন।',
+        message: 'কমপক্ষে ১টি সঠিক উত্তর নির্বাচন করো।',
       });
       return;
     }
@@ -205,7 +205,7 @@ export default function TeacherCreateQuestionPage() {
     if (!user?.email) {
       setNotification({
         type: 'error',
-        message: 'ব্যবহারকারী সনাক্ত করা যায়নি। লগইন করুন।',
+        message: 'ব্যবহারকারী সনাক্ত করা যায়নি। লগইন করো।',
       });
       return;
     }
@@ -258,7 +258,7 @@ export default function TeacherCreateQuestionPage() {
         setNotification({
           type: 'success',
           message:
-            'প্রশ্নটি সফলভাবে তৈরি করা হয়েছে! এটি অনুমোদনের জন পাঠানো হয়েছে।',
+            'প্রশ্নটি সফলভাবে তৈরি করা হয়েছে! এটি অনুমোদনের জন পাঠাওো হয়েছে।',
         });
 
         // Reset form but keep context
@@ -306,10 +306,10 @@ export default function TeacherCreateQuestionPage() {
             >
               <ArrowLeft className="w-5 h-5 text-emerald-100" />
             </button>
-            <h1 className="text-2xl font-black">নতুন প্রশ্ন তৈরি করুন</h1>
+            <h1 className="text-2xl font-black">নতুন প্রশ্ন তৈরি করো</h1>
           </div>
           <p className="text-emerald-100 text-sm ml-1">
-            শিক্ষার্থীদের জন্য একটি নতুন প্রশ্ন যোগ করুন।
+            শিক্ষার্থীদের জন্য একটি নতুন প্রশ্ন যোগ করো।
           </p>
         </div>
 
@@ -319,7 +319,7 @@ export default function TeacherCreateQuestionPage() {
             className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-800/50 hover:bg-emerald-700/50 text-emerald-100 rounded-xl text-sm font-bold border border-emerald-700/50 transition-all"
           >
             <Eye className="w-4 h-4" />{' '}
-            {showPreview ? 'প্রিভিউ বন্ধ' : 'প্রিভিউ দেখুন'}
+            {showPreview ? 'প্রিভিউ বন্ধ' : 'প্রিভিউ দেখো'}
           </button>
           <button
             onClick={handleSubmit}
@@ -331,7 +331,7 @@ export default function TeacherCreateQuestionPage() {
             ) : (
               <Save className="w-4 h-4" />
             )}
-            সাবমিট করুন
+            সাবমিট করো
           </button>
         </div>
       </div>
@@ -367,7 +367,7 @@ export default function TeacherCreateQuestionPage() {
             <RichTextEditor
               value={formData.question}
               onChange={(val) => handleChange('question', val)}
-              placeholder="আপনার প্রশ্নটি এখানে লিখুন (supports LaTeX and formatting)..."
+              placeholder="আপনার প্রশ্নটি এখানে লেখো (supports LaTeX and formatting)..."
             />
           </div>
 
@@ -381,7 +381,7 @@ export default function TeacherCreateQuestionPage() {
                 onClick={addOption}
                 className="flex items-center gap-1 text-sm font-bold text-emerald-600 hover:text-emerald-700 transition-colors"
               >
-                <Plus className="w-4 h-4" /> অপশন যোগ করুন
+                <Plus className="w-4 h-4" /> অপশন যোগ করো
               </button>
             </div>
 
@@ -398,7 +398,7 @@ export default function TeacherCreateQuestionPage() {
                             : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:border-emerald-400'
                         }
                       `}
-                    title="সঠিক উত্তর হিসেবে মার্ক করুন"
+                    title="সঠিক উত্তর হিসেবে মার্ক করো"
                   >
                     <CheckCircle className="w-5 h-5" />
                   </button>
@@ -421,7 +421,7 @@ export default function TeacherCreateQuestionPage() {
               ))}
             </div>
             <p className="mt-3 text-xs text-neutral-500 font-medium">
-              * সঠিক উত্তরের বাম পাশের টিক চিহ্নে ক্লিক করুন। একাধিক সঠিক উত্তর
+              * সঠিক উত্তরের বাম পাশের টিক চিহ্নে ক্লিক করো। একাধিক সঠিক উত্তর
               নির্বাচন করা যাবে।
             </p>
           </div>
@@ -447,7 +447,7 @@ export default function TeacherCreateQuestionPage() {
                   className={selectClassName}
                   disabled={isLoadingSubjects}
                 >
-                  <option value="">বিষয় নির্বাচন করুন</option>
+                  <option value="">বিষয় নির্বাচন করো</option>
                   {subjects.map((sub) => (
                     <option key={sub.id} value={sub.id}>
                       {sub.name}
@@ -467,7 +467,7 @@ export default function TeacherCreateQuestionPage() {
                   className={selectClassName}
                   disabled={!formData.subject || chapters.length === 0}
                 >
-                  <option value="">অধ্যায় নির্বাচন করুন</option>
+                  <option value="">অধ্যায় নির্বাচন করো</option>
                   {chapters.map((chap) => (
                     <option key={chap.id} value={chap.id}>
                       {chap.name}
@@ -487,7 +487,7 @@ export default function TeacherCreateQuestionPage() {
                   className={selectClassName}
                   disabled={!formData.chapter || topics.length === 0}
                 >
-                  <option value="">টপিক নির্বাচন করুন</option>
+                  <option value="">টপিক নির্বাচন করো</option>
                   {topics.map((topic) => (
                     <option key={topic.id} value={topic.id}>
                       {topic.name}
@@ -545,7 +545,7 @@ export default function TeacherCreateQuestionPage() {
             <RichTextEditor
               value={formData.explanation}
               onChange={(val) => handleChange('explanation', val)}
-              placeholder="সঠিক উত্তরের ব্যাখ্যা লিখুন (supports LaTeX and formatting)..."
+              placeholder="সঠিক উত্তরের ব্যাখ্যা লেখো (supports LaTeX and formatting)..."
             />
           </div>
         </div>

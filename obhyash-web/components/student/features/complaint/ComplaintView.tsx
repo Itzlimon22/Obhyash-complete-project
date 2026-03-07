@@ -193,7 +193,7 @@ export const ComplaintView: React.FC = () => {
               onClick={handleReset}
               className="flex-1 py-4 rounded-xl bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white font-bold transition-colors"
             >
-              আরেকটি অভিযোগ করুন
+              আরেকটি অভিযোগ করো
             </button>
             <button
               onClick={() => {
@@ -359,7 +359,7 @@ export const ComplaintView: React.FC = () => {
                       {isLoading ? (
                         <>
                           <Loader2 className="animate-spin" size={20} />
-                          <span>পাঠানো হচ্ছে...</span>
+                          <span>পাঠাওো হচ্ছে...</span>
                         </>
                       ) : (
                         <>
@@ -436,7 +436,7 @@ export const ComplaintView: React.FC = () => {
                 onClick={() => setActiveTab('new')}
                 className="mt-6 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-colors"
               >
-                নতুন অভিযোগ করুন
+                নতুন অভিযোগ করো
               </button>
             </div>
           ) : (

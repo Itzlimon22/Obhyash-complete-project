@@ -89,7 +89,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
     }
     const phoneRegex = /^01\d{9}$/;
     if (formData.phone && !phoneRegex.test(formData.phone)) {
-      toast.error('সঠিক 11 ডিজিটের ফোন নম্বর দিন');
+      toast.error('সঠিক 11 ডিজিটের ফোন নম্বর দাও');
       return false;
     }
     if (

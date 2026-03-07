@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
@@ -29,7 +29,7 @@ const SUB_CATEGORIES = [
   'আইসিটি',
   'হিসাববিজ্ঞান',
   'ব্যবসায় সংগঠন ও ব্যবস্থাপনা',
-  'ফিন্যান্স/ব্যাংকিং',
+  'ফিন্যাও্স/ব্যাংকিং',
   'উৎপাদন ব্যবস্থাপনা ও বিপণন',
   'বাংলাদেশ ও বিশ্বপরিচয়',
   'ভূগোল',
@@ -90,7 +90,7 @@ export default function BlogListingClient({
 
   const toggleBookmark = async (slug: string) => {
     if (!bookmarkData) {
-      toast.error('বুকমার্ক করতে লগইন করুন');
+      toast.error('বুকমার্ক করতে লগইন করো');
       return;
     }
     const already = bookmarkedSlugs.has(slug);
@@ -105,7 +105,7 @@ export default function BlogListingClient({
     });
     if (res.status === 401) {
       mutateBookmarks();
-      toast.error('বুকমার্ক করতে লগইন করুন');
+      toast.error('বুকমার্ক করতে লগইন করো');
       return;
     }
     toast(already ? 'বুকমার্ক সরানো হয়েছে' : 'বুকমার্কে যোগ করা হয়েছে');
@@ -185,7 +185,7 @@ export default function BlogListingClient({
           </h1>
 
           <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10 font-anek font-light">
-            বাংলাদেশের শিক্ষার্থীদের SSC, HSC এবং অন্যান্য পরীক্ষায় সফল হতে
+            বাংলাদেশের শিক্ষার্থীদের SSC, HSC এবং অন্যাও্য পরীক্ষায় সফল হতে
             সাহায্য করার জন্য বিশেষজ্ঞ টিপস, পরীক্ষিত কৌশল এবং দিকনির্দেশনা।
           </p>
 
@@ -233,7 +233,7 @@ export default function BlogListingClient({
               }
               className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold rounded-xl hover:bg-slate-700 dark:hover:bg-slate-100 transition-colors font-anek whitespace-nowrap"
             >
-              সার্চ করুন
+              সার্চ করো
             </button>
           </div>
 
@@ -246,7 +246,7 @@ export default function BlogListingClient({
               className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors font-anek"
             >
               <Rss className="w-3.5 h-3.5" />
-              RSS ফিড সাবস্ক্রাইব করুন
+              RSS ফিড সাবস্ক্রাইব করো
             </a>
           </div>
         </div>
@@ -377,7 +377,7 @@ export default function BlogListingClient({
                       href="/login"
                       className="shrink-0 px-5 py-2.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-medium rounded-lg transition-colors text-sm hover:bg-slate-800 dark:hover:bg-slate-200 whitespace-nowrap font-anek"
                     >
-                      ফ্রি অ্যাকাউন্ট খুলুন
+                      ফ্রি অ্যাকাউন্ট খোলো
                     </a>
                   </div>
                 </>
@@ -488,14 +488,14 @@ export default function BlogListingClient({
               যা শিখেছেন তা অনুশীলনের জন্য প্রস্তুত?
             </h2>
             <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-lg mx-auto text-[15px] leading-[1.6] font-anek">
-              বোর্ড স্ট্যান্ডার্ড MCQ মডেল টেস্ট দিন, আপনার অগ্রগতি ট্র্যাক করুন
-              এবং দুর্বল বিষয়গুলো চিহ্নিত করুন — সবই এক জায়গায়।
+              বোর্ড স্ট্যাও্ডার্ড MCQ মডেল টেস্ট দিন, আপনার অগ্রগতি ট্র্যাক করো
+              এবং দুর্বল বিষয়গুলো চিহ্নিত করো — সবই এক জায়গায়।
             </p>
             <Link
               href="/"
               className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-semibold rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors text-sm font-anek"
             >
-              স্টুডেন্ট ড্যাশবোর্ডে যান
+              স্টুডেন্ট ড্যাশবোর্ডে যাও
             </Link>
           </div>
         </div>

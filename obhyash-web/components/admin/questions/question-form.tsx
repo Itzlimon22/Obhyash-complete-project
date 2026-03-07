@@ -208,7 +208,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                 disabled={!data.subject}
                 className={`${fieldCls} disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                <option value="">নির্বাচন করুন</option>
+                <option value="">নির্বাচন করো</option>
                 {availableChapters.map((c) => (
                   <option key={c.id} value={c.name}>
                     {c.name}
@@ -234,7 +234,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                 disabled={!data.chapter}
                 className={`${fieldCls} disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                <option value="">নির্বাচন করুন</option>
+                <option value="">নির্বাচন করো</option>
                 {availableTopics.map((t) => (
                   <option key={t.id} value={t.name}>
                     {t.name}
@@ -394,7 +394,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
                 <label className="text-sm font-bold text-neutral-700 block mb-3">
                   অপশনসমূহ
                   <span className="text-xs font-normal text-neutral-500 ml-2">
-                    (সঠিক উত্তরে ক্লিক করুন)
+                    (সঠিক উত্তরে ক্লিক করো)
                   </span>
                 </label>
                 <div className="grid grid-cols-1 gap-3">
@@ -560,13 +560,13 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
             onClick={onCancel}
             className="px-6 py-2.5 text-sm font-bold text-neutral-600 hover:bg-neutral-200 rounded-xl transition-colors"
           >
-            বাতিল করুন
+            বাতিল করো
           </button>
           <button
             onClick={handleSave}
             className="px-6 py-2.5 text-sm font-bold bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 transition-all active:scale-95 flex items-center gap-2"
           >
-            <Save size={16} /> সংরক্ষণ করুন
+            <Save size={16} /> সংরক্ষণ করো
           </button>
         </div>
       </DialogContent>

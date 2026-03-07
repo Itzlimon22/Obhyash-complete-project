@@ -92,7 +92,7 @@ export default function ReferralPage() {
                     onClick={() => generateCode(customCodeInput)}
                     disabled={generating || !customCodeInput}
                     className="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded"
-                    title="সেভ করুন"
+                    title="সেভ করো"
                   >
                     <Check size={16} />
                   </button>
@@ -153,7 +153,7 @@ export default function ReferralPage() {
                   )
                 }
                 className="px-3 py-2 text-sm border rounded dark:bg-neutral-800 dark:border-neutral-700 outline-none w-40"
-                placeholder="নিজের কোড দিন"
+                placeholder="নিজের কোড দাও"
                 maxLength={20}
               />
               <button
@@ -167,13 +167,13 @@ export default function ReferralPage() {
                 disabled={generating || customCodeInput.length < 4}
                 className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition disabled:opacity-50"
               >
-                সেভ করুন
+                সেভ করো
               </button>
               <button
                 onClick={() => generateCode()}
                 disabled={generating}
                 className="px-4 py-2 bg-neutral-200 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200 rounded hover:bg-neutral-300 dark:hover:bg-neutral-700 transition disabled:opacity-50"
-                title="অটো জেনারেট করুন"
+                title="অটো জেনারেট করো"
               >
                 অটো
               </button>
@@ -228,7 +228,7 @@ export default function ReferralPage() {
         href="/profile"
         className="inline-block mt-4 text-emerald-600 dark:text-emerald-400 hover:underline"
       >
-        ← প্রোফাইলে ফিরে যান
+        ← প্রোফাইলে ফিরে যাও
       </Link>
     </div>
   );

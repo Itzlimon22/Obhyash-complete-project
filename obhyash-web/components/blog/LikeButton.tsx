@@ -37,7 +37,7 @@ export default function LikeButton({ postSlug }: LikeButtonProps) {
   const toggleLike = async () => {
     if (!user) {
       toast('লগইন প্রয়োজন', {
-        description: 'পোস্ট লাইক করতে অনুগ্রহ করে আপনার একাউন্টে প্রবেশ করুন।',
+        description: 'পোস্ট লাইক করতে অনুগ্রহ করে আপনার একাউন্টে প্রবেশ করো।',
       });
       return;
     }
@@ -74,7 +74,7 @@ export default function LikeButton({ postSlug }: LikeButtonProps) {
       // Revert to previous state if API call failed
       setLocalHasLiked(previousHasLiked);
       setLocalLikes(previousLikes);
-      toast.error('সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+      toast.error('সমস্যা হয়েছে। আবার চেষ্টা করো।');
     } finally {
       setIsLiking(false);
     }

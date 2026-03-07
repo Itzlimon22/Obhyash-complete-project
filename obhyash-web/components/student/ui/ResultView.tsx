@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Question, UserAnswers, UserProfile } from '@/lib/types';
 
 import { useCountUp } from '@/hooks/use-count-up';
@@ -137,7 +137,7 @@ const ResultView: React.FC<ResultViewProps> = ({
         text: 'আপনি এই বিষয়টি খুব ভালো আয়ত্ত করেছেন।',
       };
     if (percentage >= 70)
-      return { title: 'খুব ভালো!', text: 'ভালো ধারণা আছে, চালিয়ে যান।' };
+      return { title: 'খুব ভালো!', text: 'ভালো ধারণা আছে, চালিয়ে যাও।' };
     if (percentage >= 50)
       return { title: 'ভালো প্রচেষ্টা', text: 'আপনি সঠিক পথে আছেন।' };
     return {
@@ -183,7 +183,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                   OMR মূল্যায়ন নিয়ে সন্তুষ্ট নন?
                 </h4>
                 <p className="text-xs text-red-700 dark:text-red-300">
-                  যান্ত্রিক ত্রুটির কারণে ফলাফল ভুল হতে পারে।
+                  যাও্ত্রিক ত্রুটির কারণে ফলাফল ভুল হতে পারে।
                 </p>
               </div>
               <button
@@ -543,7 +543,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                   d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
                 />
               </svg>
-              ইতিহাসে ফিরে যান
+              ইতিহাসে ফিরে যাও
             </>
           ) : (
             <>

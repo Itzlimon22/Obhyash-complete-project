@@ -54,18 +54,18 @@ const SIDEBAR_NAVIGATION: { title?: string; items: NavItem[] }[] = [
       },
       {
         id: 'analytics',
-        label: 'অ্যানালিটিক্স',
+        label: 'অ্যাওালিটিক্স',
         icon: BarChart3,
         href: '/admin/analytics',
       },
     ],
   },
   {
-    title: 'ম্যানেজমেন্ট',
+    title: 'ম্যাওেজমেন্ট',
     items: [
       {
         id: 'users',
-        label: 'ইউজার ম্যানেজমেন্ট',
+        label: 'ইউজার ম্যাওেজমেন্ট',
         icon: Users,
         href: '/admin/user-management',
         count: 23,
@@ -110,7 +110,7 @@ const SIDEBAR_NAVIGATION: { title?: string; items: NavItem[] }[] = [
       },
       {
         id: 'blog-management',
-        label: 'ব্লগ ম্যানেজমেন্ট',
+        label: 'ব্লগ ম্যাওেজমেন্ট',
         icon: MessageSquare,
         href: '/admin/blog-management',
       },
@@ -276,7 +276,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 href={`${item.href}/create`}
                 className="block w-full text-left px-3 py-2 text-xs font-black text-neutral-500 hover:text-red-600 dark:text-neutral-500 dark:hover:text-red-400 transition-colors rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
               >
-                নতুন যুক্ত করুন
+                নতুন যুক্ত করো
               </Link>
               <Link
                 href={`${item.href}/archive`}

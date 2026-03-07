@@ -20,7 +20,7 @@ export default function TeacherQuestionManagementPage() {
     return (
       <div className="flex h-[50vh] w-full flex-col items-center justify-center gap-4 text-center">
         <p className="text-lg font-semibold text-neutral-600 dark:text-neutral-400">
-          অনুগ্রহ করে লগ ইন করুন (Please log in to manage questions)
+          অনুগ্রহ করে লগ ইন করো (Please log in to manage questions)
         </p>
       </div>
     );

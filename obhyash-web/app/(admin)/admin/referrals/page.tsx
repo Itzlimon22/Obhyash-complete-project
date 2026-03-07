@@ -139,10 +139,10 @@ export default function AdminReferralsPage() {
           <div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white tracking-tight flex items-center gap-3">
               <Gift className="w-8 h-8 text-red-600" />
-              রেফারেল ম্যানেজমেন্ট
+              রেফারেল ম্যাওেজমেন্ট
             </h1>
             <p className="text-neutral-500 mt-2">
-              সকল ব্যবহারকারীর রেফারেল হিস্ট্রি এবং স্ট্যাটাস দেখুন
+              সকল ব্যবহারকারীর রেফারেল হিস্ট্রি এবং স্ট্যাটাস দেখো
             </p>
           </div>
 
@@ -210,7 +210,7 @@ export default function AdminReferralsPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
               <input
                 type="text"
-                placeholder="রিসার্চ করুন (নাম, ইমেইল, কোড)..."
+                placeholder="রিসার্চ করো (নাম, ইমেইল, কোড)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm"
