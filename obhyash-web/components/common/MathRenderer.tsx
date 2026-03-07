@@ -19,6 +19,18 @@ export function MathRenderer({ text, block = false }: MathRendererProps) {
   // Enhance formatting for list items that are often pasted inline
   let formattedText = text;
 
+  // Normalize literal \n (two-char escape sequence) to actual newlines.
+  // Handles content pasted from JSON or bulk-uploaded with \n as newline placeholder.
+  formattedText = formattedText.replace(/\\n/g, '\n');
+
+  // In math blocks, un-escape \\command → \command.
+  // tiptap-markdown escapes backslashes in math content (e.g. \text → \\text),
+  // which breaks KaTeX: \\rightarrow → \\ (line-break) + unknown 'rightarrow'.
+  formattedText = formattedText.replace(
+    /(\$\$[\s\S]*?\$\$|\$(?!\$)[^\n]*?\$)/g,
+    (match) => match.replace(/\\\\([a-zA-Z{])/g, '\\$1'),
+  );
+
   // Format i., ii., iii. etc
   // Use (?:\s+|^|-) to match space, start of string, or a dash before the numeral
   formattedText = formattedText.replace(

@@ -83,11 +83,17 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     },
     onUpdate: ({ editor }) => {
       try {
-        const markdown = (
+        let markdown = (
           editor.storage as unknown as {
             markdown: { getMarkdown: () => string };
           }
         ).markdown.getMarkdown();
+        // tiptap-markdown escapes backslashes inside math blocks (\text → \\text).
+        // Restore single backslashes so LaTeX commands are saved and rendered correctly.
+        markdown = markdown.replace(
+          /(\$\$[\s\S]*?\$\$|\$(?!\$)[^\n]*?\$)/g,
+          (match) => match.replace(/\\\\([a-zA-Z{])/g, '\\$1'),
+        );
         onChange(markdown);
       } catch (e) {
         console.warn('Markdown serialization failed, falling back to text', e);

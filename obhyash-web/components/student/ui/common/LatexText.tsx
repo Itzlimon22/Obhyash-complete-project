@@ -23,6 +23,15 @@ const LatexText: React.FC<LatexTextProps> = ({ text, className = '' }) => {
   const content = useMemo(() => {
     let formattedText = text || '';
 
+    // Normalize literal \n (two-char escape sequence) to actual newlines.
+    formattedText = formattedText.replace(/\\n/g, '\n');
+
+    // Un-escape \\command → \command in math blocks (tiptap-markdown over-escaping).
+    formattedText = formattedText.replace(
+      /(\$\$[\s\S]*?\$\$|\$(?!\$)[^\n]*?\$)/g,
+      (match) => match.replace(/\\\\([a-zA-Z{])/g, '\\$1'),
+    );
+
     // Format i., ii., iii. etc into newlines
     formattedText = formattedText.replace(
       /(?:\s+|^|-)(i|ii|iii|iv|v)\.\s+/gi,
@@ -44,7 +53,9 @@ const LatexText: React.FC<LatexTextProps> = ({ text, className = '' }) => {
   // import type { Components } from 'react-markdown'; // Moved to top-level
 
   const MarkdownComponents: Components = {
-    p: (props: React.HTMLAttributes<HTMLParagraphElement>) => <span {...props} className="block mb-1" />,
+    p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
+      <span {...props} className="block mb-1" />
+    ),
     table: (props: React.TableHTMLAttributes<HTMLTableElement>) => (
       <div className="overflow-x-auto my-3 rounded-lg border border-neutral-200 dark:border-neutral-800 shadow-sm custom-scrollbar max-w-full">
         <table
