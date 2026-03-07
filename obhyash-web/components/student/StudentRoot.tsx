@@ -52,6 +52,7 @@ import ExamRunner from '@/components/student/features/exam/ExamRunner';
 import ExamHistoryView from '@/components/student/features/history/ExamHistoryView';
 import ResultView from '@/components/student/ui/ResultView';
 import ResultSkeleton from '@/components/student/ui/results/ResultSkeleton';
+import ExamLoadingSkeleton from '@/components/student/ui/exam/ExamLoadingSkeleton';
 
 interface StudentRootProps {
   user: UserProfile;
@@ -861,7 +862,19 @@ export default function StudentRoot({
       );
     }
 
-    if (isEvaluating || appState === AppState.LOADING) {
+    if (appState === AppState.LOADING) {
+      return (
+        <AppLayout
+          activeTab="dashboard"
+          {...commonLayoutProps}
+          title="লোড হচ্ছে..."
+        >
+          <ExamLoadingSkeleton />
+        </AppLayout>
+      );
+    }
+
+    if (isEvaluating) {
       return (
         <AppLayout
           activeTab="dashboard"

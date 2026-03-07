@@ -380,6 +380,7 @@ export const useExamEngine = () => {
           subject: examDetailsRef.current?.subject || 'Unknown',
           subjectLabel: examDetailsRef.current?.subjectLabel,
           examType: examDetailsRef.current?.examType,
+          chapters: examDetailsRef.current?.chapters,
           date: new Date().toISOString(),
           score: 0,
           totalMarks: examDetailsRef.current?.totalMarks || 0,

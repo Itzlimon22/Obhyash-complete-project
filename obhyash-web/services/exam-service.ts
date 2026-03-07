@@ -427,14 +427,18 @@ export const updateExamResult = async (
       .from('exam_results')
       .update({
         score: result.score,
+        total_marks: result.totalMarks,
+        total_questions: result.totalQuestions,
         correct_count: result.correctCount,
         wrong_count: result.wrongCount,
         time_taken: result.timeTaken,
+        negative_marking: result.negativeMarking,
         user_answers: result.userAnswers,
-        questions: result.questions, // Store full questions only on completion
+        questions: result.questions,
         flagged_questions: result.flaggedQuestions,
         subject_label: result.subjectLabel,
-        status: 'evaluated',
+        chapters: result.chapters,
+        status: result.status || 'evaluated',
         submission_type: result.submissionType || 'digital',
         script_image_data: result.scriptImageData,
       })
@@ -495,6 +499,7 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
       const { error } = await supabase.from('exam_results').insert({
         user_id: user.id,
         subject: result.subject,
+        subject_label: result.subjectLabel,
         exam_type: result.examType,
         date: result.date || new Date().toISOString(),
         score: result.score,
@@ -506,7 +511,7 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
         negative_marking: result.negativeMarking,
         questions: result.questions,
         user_answers: result.userAnswers,
-        status: 'evaluated', // Mark as complete so analytics can pick it up
+        status: result.status || 'evaluated',
         flagged_questions: result.flaggedQuestions,
         chapters: result.chapters || 'General',
         submission_type: result.submissionType || 'digital',
