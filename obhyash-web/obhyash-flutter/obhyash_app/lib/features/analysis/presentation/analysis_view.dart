@@ -224,6 +224,32 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    // ── computed secondary stats ──────────────────────────────────────────────
+    final a = _analytics;
+    final totalQ = a?.subjectData.fold(0, (s, e) => s + e.total) ?? 0;
+    final totalC = a?.subjectData.fold(0, (s, e) => s + e.correct) ?? 0;
+    final totalW = a?.subjectData.fold(0, (s, e) => s + e.wrong) ?? 0;
+    final bScore = (a?.timelineData.isNotEmpty ?? false)
+        ? a!.timelineData.map((t) => t.score).reduce((x, y) => x > y ? x : y)
+        : null;
+    SubjectAnalytics? bestSubj;
+    SubjectAnalytics? worstSubj;
+    if (a != null) {
+      final filtered = a.subjectData.where((s) => s.total >= 5).toList();
+      if (filtered.isNotEmpty) {
+        bestSubj = filtered.reduce(
+          (best, s) => s.accuracy > best.accuracy ? s : best,
+        );
+        if (filtered.length >= 2) {
+          final candidate = filtered.reduce(
+            (worst, s) => s.accuracy < worst.accuracy ? s : worst,
+          );
+          if (candidate.name != bestSubj.name) worstSubj = candidate;
+        }
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     return Column(
       children: [
         Expanded(
@@ -290,6 +316,73 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 16),
+
+                      // ── Secondary Stats ───────────────────────────────
+                      Row(
+                        children: [
+                          _SecondaryStatChip(
+                            label: 'মোট প্রশ্ন',
+                            value: '$totalQ',
+                            isDark: isDark,
+                          ),
+                          const SizedBox(width: 10),
+                          _SecondaryStatChip(
+                            label: 'সঠিক',
+                            value: '$totalC',
+                            color: const Color(0xFF059669),
+                            isDark: isDark,
+                          ),
+                          const SizedBox(width: 10),
+                          _SecondaryStatChip(
+                            label: 'ভুল',
+                            value: '$totalW',
+                            color: const Color(0xFFE11D48),
+                            isDark: isDark,
+                          ),
+                        ],
+                      ),
+
+                      // ── Insight Banner ────────────────────────────────
+                      if (bestSubj != null || worstSubj != null) ...[
+                        const SizedBox(height: 16),
+                        if (bestSubj != null && worstSubj != null)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _InsightCard(
+                                  emoji: '🏆',
+                                  label: 'সেরা বিষয়',
+                                  name: _subjectDisplayName(bestSubj!.name),
+                                  pct: bestSubj!.accuracy.round(),
+                                  isGood: true,
+                                  isDark: isDark,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _InsightCard(
+                                  emoji: '📈',
+                                  label: 'উন্নতির সুযোগ',
+                                  name: _subjectDisplayName(worstSubj!.name),
+                                  pct: worstSubj!.accuracy.round(),
+                                  isGood: false,
+                                  isDark: isDark,
+                                ),
+                              ),
+                            ],
+                          )
+                        else if (bestSubj != null)
+                          _InsightCard(
+                            emoji: '🏆',
+                            label: 'সেরা বিষয়',
+                            name: _subjectDisplayName(bestSubj!.name),
+                            pct: bestSubj!.accuracy.round(),
+                            isGood: true,
+                            isDark: isDark,
+                          ),
+                      ],
+
                       const SizedBox(height: 20),
 
                       // ── Score Chart ──────────────────────────────────
@@ -297,6 +390,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                         _ScoreChart(
                           timeline: _analytics!.timelineData,
                           isDark: isDark,
+                          bestScore: bScore,
                         ),
                       if (_analytics!.timelineData.isNotEmpty)
                         const SizedBox(height: 20),
@@ -487,8 +581,13 @@ class _StatCard extends StatelessWidget {
 class _ScoreChart extends StatelessWidget {
   final List<TimelinePoint> timeline;
   final bool isDark;
+  final double? bestScore;
 
-  const _ScoreChart({required this.timeline, required this.isDark});
+  const _ScoreChart({
+    required this.timeline,
+    required this.isDark,
+    this.bestScore,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -529,22 +628,40 @@ class _ScoreChart extends StatelessWidget {
                   color: isDark ? Colors.white : const Color(0xFF171717),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF064E3B)
-                      : const Color(0xFFECFDF5),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  'Score %',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF059669),
+              Row(
+                children: [
+                  if (bestScore != null) ...[
+                    Text(
+                      'সর্বোচ্চ: ${bestScore!.round()}%',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF059669),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF064E3B)
+                          : const Color(0xFFECFDF5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'Score %',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF059669),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
@@ -1064,6 +1181,159 @@ class _MiniStat extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ─── Secondary Stat Chip ────────────────────────────────────────────────────────
+class _SecondaryStatChip extends StatelessWidget {
+  final String label, value;
+  final bool isDark;
+  final Color? color;
+
+  const _SecondaryStatChip({
+    required this.label,
+    required this.value,
+    required this.isDark,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF171717) : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          ),
+          boxShadow: isDark
+              ? []
+              : [
+                  const BoxShadow(
+                    color: Color(0x0A000000),
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFA3A3A3),
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+                color:
+                    color ?? (isDark ? Colors.white : const Color(0xFF171717)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Insight Card ────────────────────────────────────────────────────────────────
+class _InsightCard extends StatelessWidget {
+  final String emoji, label, name;
+  final int pct;
+  final bool isGood, isDark;
+
+  const _InsightCard({
+    required this.emoji,
+    required this.label,
+    required this.name,
+    required this.pct,
+    required this.isGood,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final baseColor = isGood
+        ? const Color(0xFF059669)
+        : const Color(0xFFE11D48);
+    final bgColor = isGood
+        ? (isDark ? const Color(0xFF022C22) : const Color(0xFFECFDF5))
+        : (isDark ? const Color(0xFF2D0A0D) : const Color(0xFFFFF1F2));
+    final borderColor = isGood
+        ? (isDark ? const Color(0xFF064E3B) : const Color(0xFFBBF7D0))
+        : (isDark ? const Color(0xFF4C0519) : const Color(0xFFFECDD3));
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.white.withValues(alpha: 0.7),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(emoji, style: const TextStyle(fontSize: 18)),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    color: baseColor,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900,
+                    color: isDark ? Colors.white : const Color(0xFF171717),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  '$pct% সঠিকতা',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: baseColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -70,6 +70,42 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
     }));
   }, [analytics && analytics.subjectData]);
 
+  // Secondary computed stats
+  const totalQuestions = useMemo(
+    () => (analytics?.subjectData || []).reduce((sum, s) => sum + s.total, 0),
+    [analytics],
+  );
+  const totalCorrect = useMemo(
+    () => (analytics?.subjectData || []).reduce((sum, s) => sum + s.correct, 0),
+    [analytics],
+  );
+  const totalWrong = useMemo(
+    () => (analytics?.subjectData || []).reduce((sum, s) => sum + s.wrong, 0),
+    [analytics],
+  );
+  const bestSubject = useMemo(() => {
+    const filtered = (analytics?.subjectData || []).filter((s) => s.total >= 5);
+    if (!filtered.length) return null;
+    return filtered.reduce((best, s) =>
+      s.correct / s.total > best.correct / best.total ? s : best,
+    );
+  }, [analytics]);
+  const worstSubject = useMemo(() => {
+    const filtered = (analytics?.subjectData || []).filter((s) => s.total >= 5);
+    if (filtered.length < 2) return null;
+    const worst = filtered.reduce((w, s) =>
+      s.correct / s.total < w.correct / w.total ? s : w,
+    );
+    return worst?.name === bestSubject?.name ? null : worst;
+  }, [analytics, bestSubject]);
+  const bestScore = useMemo(
+    () =>
+      analytics?.timelineData?.length
+        ? Math.max(...analytics.timelineData.map((t) => t.score))
+        : null,
+    [analytics],
+  );
+
   // Check if we have no data
   if (isLoading) {
     return <AnalysisSkeleton />;
@@ -174,6 +210,80 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
         </div>
       </div>
 
+      {/* Secondary Stats */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+          <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">
+            মোট প্রশ্ন
+          </p>
+          <p className="text-xl md:text-2xl font-extrabold text-neutral-800 dark:text-white">
+            {totalQuestions.toLocaleString()}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+          <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">
+            সঠিক উত্তর
+          </p>
+          <p className="text-xl md:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">
+            {totalCorrect.toLocaleString()}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+          <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">
+            ভুল উত্তর
+          </p>
+          <p className="text-xl md:text-2xl font-extrabold text-red-500 dark:text-red-400">
+            {totalWrong.toLocaleString()}
+          </p>
+        </div>
+      </div>
+
+      {/* Insight Banner: Best & Worst Subject */}
+      {(bestSubject || worstSubject) && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {bestSubject && (
+            <div className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-4">
+              <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center flex-shrink-0 text-xl">
+                🏆
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                  সেরা বিষয়
+                </p>
+                <p className="font-extrabold text-neutral-800 dark:text-white text-sm truncate">
+                  {getSubjectDisplayName(bestSubject.name)}
+                </p>
+                <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                  {Math.round((bestSubject.correct / bestSubject.total) * 100)}%
+                  সঠিকতা
+                </p>
+              </div>
+            </div>
+          )}
+          {worstSubject && (
+            <div className="flex items-center gap-3 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/20 rounded-2xl p-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0 text-xl">
+                📈
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold text-red-500 dark:text-red-400 uppercase tracking-wider">
+                  উন্নতির সুযোগ
+                </p>
+                <p className="font-extrabold text-neutral-800 dark:text-white text-sm truncate">
+                  {getSubjectDisplayName(worstSubject.name)}
+                </p>
+                <p className="text-xs font-bold text-red-500 dark:text-red-400">
+                  {Math.round(
+                    (worstSubject.correct / worstSubject.total) * 100,
+                  )}
+                  % সঠিকতা
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chart */}
         <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
@@ -181,8 +291,18 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
             <h3 className="font-bold text-lg text-neutral-800 dark:text-white">
               ফলাফলের গ্রাফ
             </h3>
-            <div className="text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded">
-              Score %
+            <div className="flex items-center gap-2">
+              {bestScore !== null && (
+                <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400">
+                  সর্বোচ্চ:{' '}
+                  <span className="text-emerald-600 dark:text-emerald-400">
+                    {bestScore}%
+                  </span>
+                </span>
+              )}
+              <div className="text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded">
+                Score %
+              </div>
             </div>
           </div>
 
