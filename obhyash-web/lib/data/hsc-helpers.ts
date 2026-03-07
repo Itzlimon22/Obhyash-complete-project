@@ -130,20 +130,20 @@ export function findHscSubject(idOrName: string) {
 
   // 1. Exact name match (highest priority — avoids substring false positives)
   const exactByName = hscSubjects.find(
-    (s) => s.name.toLowerCase() === targetLower,
+    (s) => normalizeForMatch(s.name) === targetLower,
   );
   if (exactByName) return exactByName;
 
   // 2. Stored name contains search term (e.g. "পদার্থবিজ্ঞান" matching "পদার্থবিজ্ঞান ১ম পত্র")
   const storedContains = hscSubjects.find((s) =>
-    s.name.toLowerCase().includes(targetLower),
+    normalizeForMatch(s.name).includes(targetLower),
   );
   if (storedContains) return storedContains;
 
   // 3. Search term contains stored name — pick the LONGEST stored name
   //    (prevents short names like "ইতিহাস" from stealing "ইসলামের ইতিহাস ও সংস্কৃতি")
   const termContainsCandidates = hscSubjects.filter((s) =>
-    targetLower.includes(s.name.toLowerCase()),
+    targetLower.includes(normalizeForMatch(s.name)),
   );
   if (termContainsCandidates.length > 0) {
     return termContainsCandidates.reduce((best, s) =>
@@ -156,13 +156,13 @@ export function findHscSubject(idOrName: string) {
   let highestScore = 0;
 
   for (const s of hscSubjects) {
-    const sNameLower = s.name.toLowerCase();
-    const score = getSimilarity(targetLower, sNameLower);
+    const sNameNorm = normalizeForMatch(s.name);
+    const score = getSimilarity(targetLower, sNameNorm);
 
     if (
       score > highestScore &&
       score >= 0.8 &&
-      hasSafeNumberMatch(targetLower, sNameLower)
+      hasSafeNumberMatch(targetLower, sNameNorm)
     ) {
       highestScore = score;
       bestMatch = s;
@@ -192,7 +192,7 @@ export function findHscChapter(idOrName: string) {
   // 1. Exact/ID match across all subjects
   for (const subject of hscSubjects) {
     const chapter = subject.chapters.find(
-      (c) => c.id === idOrName || c.name.toLowerCase() === norm,
+      (c) => c.id === idOrName || normalizeForMatch(c.name) === norm,
     );
     if (chapter) return { chapter, subject };
   }
@@ -200,7 +200,7 @@ export function findHscChapter(idOrName: string) {
   // 2. Stored chapter name contains search term
   for (const subject of hscSubjects) {
     const chapter = subject.chapters.find((c) =>
-      c.name.toLowerCase().includes(norm),
+      normalizeForMatch(c.name).includes(norm),
     );
     if (chapter) return { chapter, subject };
   }
@@ -209,7 +209,7 @@ export function findHscChapter(idOrName: string) {
   let bestChapterCandidate: { chapter: any; subject: any } | undefined;
   for (const subject of hscSubjects) {
     for (const c of subject.chapters) {
-      if (norm.includes(c.name.toLowerCase())) {
+      if (norm.includes(normalizeForMatch(c.name))) {
         if (
           !bestChapterCandidate ||
           c.name.length > bestChapterCandidate.chapter.name.length
@@ -228,13 +228,13 @@ export function findHscChapter(idOrName: string) {
   for (const subject of hscSubjects) {
     for (const c of subject.chapters) {
       if (c.id === idOrName) continue; // Already checked
-      const cNameLower = c.name.toLowerCase();
-      const score = getSimilarity(norm, cNameLower);
+      const cNameNorm = normalizeForMatch(c.name);
+      const score = getSimilarity(norm, cNameNorm);
 
       if (
         score > highestScore &&
         score >= 0.8 &&
-        hasSafeNumberMatch(norm, cNameLower)
+        hasSafeNumberMatch(norm, cNameNorm)
       ) {
         highestScore = score;
         bestMatch = { chapter: c, subject };
