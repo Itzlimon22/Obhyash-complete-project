@@ -139,7 +139,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       final data = await sb
           .from('exam_results')
           .select(
-            'id, subject, subject_label, correct_count, wrong_count, total_questions, time_taken, created_at, exam_type',
+            'id, subject, correct_count, wrong_count, total_questions, time_taken, created_at, exam_type',
           )
           .eq('user_id', uid)
           .order('created_at', ascending: false)
@@ -757,7 +757,7 @@ class _MistakesTabState extends State<_MistakesTab> {
       // Derive mistakes from exam_results JSONB — same approach as practice_dashboard.dart
       final data = await sb
           .from('exam_results')
-          .select('questions, user_answers, subject_label')
+          .select('questions, user_answers')
           .eq('user_id', uid)
           .not('questions', 'is', null)
           .not('user_answers', 'is', null);

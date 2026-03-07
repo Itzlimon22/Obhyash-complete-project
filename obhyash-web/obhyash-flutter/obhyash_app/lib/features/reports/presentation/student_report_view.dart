@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
-import '../../dashboard/providers/dashboard_providers.dart';
 
 // ─── Models ──────────────────────────────────────────────────────────────────────
 class ReportQuestionData {
@@ -57,7 +56,7 @@ class AppReport {
 
   factory AppReport.fromJson(Map<String, dynamic> j) => AppReport(
     id: j['id'],
-    userId: j['user_id'],
+    userId: j['reporter_id'] as String? ?? j['user_id'] as String? ?? '',
     status: j['status'],
     reason: j['reason'],
     description: j['description'],
@@ -131,12 +130,44 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
 
       final data = await supabase
           .from('reports')
-          .select('*, question:questions(*)')
-          .eq('user_id', userId)
+          .select('*')
+          .eq('reporter_id', userId)
           .order('created_at', ascending: false)
           .range(_page * _pageSize, (_page + 1) * _pageSize - 1);
 
-      final newReports = (data as List)
+      final rawList = data as List;
+
+      // Fetch associated question data (same approach as web getUserReports)
+      final questionIds = rawList
+          .map((e) => (e as Map<String, dynamic>)['question_id'])
+          .where((id) => id != null)
+          .toSet()
+          .toList();
+
+      Map<String, Map<String, dynamic>> questionMap = {};
+      if (questionIds.isNotEmpty) {
+        final qData = await supabase
+            .from('questions')
+            .select(
+              'id, question, options, correct_answer_indices, explanation, subject',
+            )
+            .inFilter('id', questionIds);
+        for (final q in qData as List) {
+          questionMap[(q as Map<String, dynamic>)['id'].toString()] = q;
+        }
+      }
+
+      // Enrich each report row with its question data before parsing
+      final enrichedList = rawList.map((e) {
+        final row = Map<String, dynamic>.from(e as Map<String, dynamic>);
+        final qId = row['question_id']?.toString();
+        if (qId != null && questionMap.containsKey(qId)) {
+          row['question'] = questionMap[qId];
+        }
+        return row;
+      }).toList();
+
+      final newReports = enrichedList
           .map((e) => AppReport.fromJson(e))
           .toList();
 

@@ -105,17 +105,17 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
       var query = supabase
           .from('exam_results')
           .select(
-            'total_questions, correct_count, wrong_count, time_taken, subject, chapters, questions, user_answers',
+            'total_questions, correct_count, wrong_count, time_taken, subject, date, chapters, questions, user_answers',
           )
           .eq('user_id', userId)
           .eq('status', 'evaluated');
 
       if (_filter == 'week') {
         final ago = DateTime.now().subtract(const Duration(days: 7));
-        query = query.gte('created_at', ago.toIso8601String());
+        query = query.gte('date', ago.toIso8601String());
       } else if (_filter == 'month') {
         final ago = DateTime.now().subtract(const Duration(days: 30));
-        query = query.gte('created_at', ago.toIso8601String());
+        query = query.gte('date', ago.toIso8601String());
       }
 
       final raw = (await query) as List;
@@ -177,6 +177,7 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
             );
           }
         } else {
+          // Fallback: derive chapter breakdown from the 'chapters' text column (legacy exams)
           final chapText = (row['chapters'] as String?) ?? 'General';
           for (final ch
               in chapText
@@ -225,7 +226,8 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
           _isLoading = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[SubjectReportView] _fetch error: $e');
       if (mounted) {
         setState(() {
           _stats = _SRStats.empty;

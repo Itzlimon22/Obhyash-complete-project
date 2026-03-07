@@ -79,9 +79,7 @@ class DashboardRepository {
     try {
       final response = await _supabase
           .from('exam_results')
-          .select(
-            'id, subject, total_questions, correct_count, wrong_count, subject_label',
-          )
+          .select('id, subject, total_questions, correct_count, wrong_count')
           .eq('user_id', userId)
           .eq('status', 'evaluated');
 

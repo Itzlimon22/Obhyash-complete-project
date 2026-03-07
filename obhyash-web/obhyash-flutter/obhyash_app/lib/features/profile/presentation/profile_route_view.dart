@@ -20,7 +20,7 @@ final _profileExamHistoryProvider = FutureProvider<List<ExamResult>>((
   final data = await Supabase.instance.client
       .from('exam_results')
       .select(
-        'id, subject, subject_label, correct_count, wrong_count, total_questions, created_at',
+        'id, subject, correct_count, wrong_count, total_questions, created_at',
       )
       .eq('user_id', uid)
       .order('created_at', ascending: false)

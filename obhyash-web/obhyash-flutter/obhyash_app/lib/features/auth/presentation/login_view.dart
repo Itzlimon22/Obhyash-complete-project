@@ -50,12 +50,11 @@ class _LoginViewState extends ConsumerState<LoginView>
     await ref
         .read(authControllerProvider.notifier)
         .login(_emailController.text.trim(), _passwordController.text);
-    // Routing is usually handled globally in GoRouter redirect based on auth state,
-    // but the web code uses router.push('/dashboard')
+    // GoRouter may have already navigated away via the signedIn event
+    if (!mounted) return;
     final authState = ref.read(authControllerProvider);
     if (!authState.hasError && !authState.isLoading) {
-      if (mounted)
-        context.go('/'); // assuming '/' is dashboard based on our router setup
+      context.go('/');
     }
   }
 

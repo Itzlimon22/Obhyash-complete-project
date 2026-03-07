@@ -108,19 +108,19 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
       var query = supabase
           .from('exam_results')
           .select(
-            'score, total_questions, correct_count, wrong_count, time_taken, subject, created_at',
+            'score, total_questions, correct_count, wrong_count, time_taken, subject, date, created_at',
           )
           .eq('user_id', userId);
 
       if (_timeFilter == 'week') {
         final weekAgo = DateTime.now().subtract(const Duration(days: 7));
-        query = query.gte('created_at', weekAgo.toIso8601String());
+        query = query.gte('date', weekAgo.toIso8601String());
       } else if (_timeFilter == 'month') {
         final monthAgo = DateTime.now().subtract(const Duration(days: 30));
-        query = query.gte('created_at', monthAgo.toIso8601String());
+        query = query.gte('date', monthAgo.toIso8601String());
       }
 
-      final data = await query.order('created_at', ascending: true);
+      final data = await query.order('date', ascending: true);
       final rows = data as List;
 
       if (rows.isEmpty) {
