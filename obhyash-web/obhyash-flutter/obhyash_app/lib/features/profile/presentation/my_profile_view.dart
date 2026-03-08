@@ -7,6 +7,7 @@ import 'widgets/stats_grid.dart';
 import 'widgets/subjects_progress_section.dart';
 import 'widgets/recent_activity_section.dart';
 import 'widgets/streak_calendar.dart';
+import '../../dashboard/presentation/widgets/exam_target_modal.dart';
 
 class MyProfileView extends ConsumerWidget {
   final UserProfile user;
@@ -399,6 +400,11 @@ class MyProfileView extends ConsumerWidget {
 
               final rightColumn = Column(
                 children: [
+                  _ExamTargetCard(
+                    initialTarget: user.examTarget,
+                    isDark: isDark,
+                  ),
+                  const SizedBox(height: 24),
                   StreakCalendar(
                     calendarData: calendarData,
                     streakCount: user.streakCount,
@@ -424,6 +430,184 @@ class MyProfileView extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Exam Target Card ──────────────────────────────────────────────────────────
+
+class _ExamTargetCard extends StatefulWidget {
+  final String? initialTarget;
+  final bool isDark;
+
+  const _ExamTargetCard({this.initialTarget, required this.isDark});
+
+  @override
+  State<_ExamTargetCard> createState() => _ExamTargetCardState();
+}
+
+class _ExamTargetCardState extends State<_ExamTargetCard> {
+  String? _localTarget;
+
+  @override
+  void initState() {
+    super.initState();
+    _localTarget = widget.initialTarget;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = widget.isDark;
+    final Map<String, String>? targetData = _localTarget != null
+        ? kExamTargets.cast<Map<String, String>>().firstWhere(
+            (t) => t['value'] == _localTarget,
+            orElse: () => {},
+          )
+        : null;
+    final hasTarget = targetData != null && targetData.isNotEmpty;
+
+    Future<void> openModal() async {
+      final result = await showExamTargetModal(
+        context,
+        initialTarget: _localTarget,
+      );
+      if (result != null && mounted) setState(() => _localTarget = result);
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF171717) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x05000000),
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Text('🎯', style: TextStyle(fontSize: 18)),
+                  const SizedBox(width: 8),
+                  Text(
+                    'তোমার লক্ষ্য কী?',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'HindSiliguri',
+                      color: isDark ? Colors.white : const Color(0xFF171717),
+                    ),
+                  ),
+                ],
+              ),
+              TextButton(
+                onPressed: openModal,
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF059669),
+                  backgroundColor: isDark
+                      ? const Color(0x1A059669)
+                      : const Color(0xFFECFDF5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'পরিবর্তন করো',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'HindSiliguri',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (hasTarget)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF0A1F17)
+                    : const Color(0xFFECFDF5),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF059669), width: 2),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    targetData['icon']!,
+                    style: const TextStyle(fontSize: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    targetData['label']!,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'HindSiliguri',
+                      color: isDark
+                          ? const Color(0xFF34D399)
+                          : const Color(0xFF047857),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            GestureDetector(
+              onTap: openModal,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark
+                        ? const Color(0xFF404040)
+                        : const Color(0xFFD4D4D4),
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '+ লক্ষ্য নির্ধারণ করো',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: 'HindSiliguri',
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? const Color(0xFF737373)
+                        : const Color(0xFF525252),
+                  ),
+                ),
+              ),
+            ),
+          const SizedBox(height: 8),
+          Text(
+            'তোমার পরীক্ষার লক্ষ্য নির্বাচন করো — আমরা সেই অনুযায়ী তোমাকে সাহায্য করব',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 11,
+              fontFamily: 'HindSiliguri',
+              color: isDark ? const Color(0xFF525252) : const Color(0xFFA3A3A3),
+            ),
+          ),
         ],
       ),
     );

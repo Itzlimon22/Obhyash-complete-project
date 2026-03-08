@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-const _examTargets = [
+const kExamTargets = [
   {'value': 'hsc_2026', 'label': 'এইচএসসি ২০২৬', 'icon': '📚'},
   {'value': 'hsc_2027', 'label': 'এইচএসসি ২০২৭', 'icon': '📚'},
   {'value': 'mbbs_2026', 'label': 'মেডিকেল ভর্তি ২০২৬', 'icon': '🏥'},
@@ -15,17 +15,21 @@ const _examTargets = [
 
 /// Shows a bottom sheet to select exam target.
 /// [onSaved] is called with the selected target string, or null if dismissed.
-Future<String?> showExamTargetModal(BuildContext context) {
+Future<String?> showExamTargetModal(
+  BuildContext context, {
+  String? initialTarget,
+}) {
   return showModalBottomSheet<String>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (ctx) => const _ExamTargetSheet(),
+    builder: (ctx) => _ExamTargetSheet(initialTarget: initialTarget),
   );
 }
 
 class _ExamTargetSheet extends StatefulWidget {
-  const _ExamTargetSheet();
+  final String? initialTarget;
+  const _ExamTargetSheet({this.initialTarget});
 
   @override
   State<_ExamTargetSheet> createState() => _ExamTargetSheetState();
@@ -34,6 +38,14 @@ class _ExamTargetSheet extends StatefulWidget {
 class _ExamTargetSheetState extends State<_ExamTargetSheet> {
   String? _selected;
   bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialTarget != null && widget.initialTarget!.isNotEmpty) {
+      _selected = widget.initialTarget;
+    }
+  }
 
   Future<void> _save() async {
     if (_selected == null) return;
@@ -132,9 +144,9 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                   mainAxisSpacing: 10,
                   childAspectRatio: 2.8,
                 ),
-                itemCount: _examTargets.length,
+                itemCount: kExamTargets.length,
                 itemBuilder: (_, i) {
-                  final t = _examTargets[i];
+                  final t = kExamTargets[i];
                   final isSelected = _selected == t['value'];
                   return GestureDetector(
                     onTap: () => setState(() => _selected = t['value']),

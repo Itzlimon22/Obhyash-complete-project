@@ -665,47 +665,6 @@ class _SignupViewState extends ConsumerState<SignupView>
             ),
           ],
         ),
-        const SizedBox(height: 20),
-
-        // Exam Target
-        _buildLabel('তোমার লক্ষ্য পরীক্ষা কোনটি?', isDark),
-        const SizedBox(height: 8),
-        GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-          childAspectRatio: 3.2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          children: [
-            _examTargetOption('hsc_2026', '📚', 'এইচএসসি ২০২৬', isDark),
-            _examTargetOption('hsc_2027', '📚', 'এইচএসসি ২০২৭', isDark),
-            _examTargetOption('mbbs_2026', '🏥', 'মেডিকেল ২০২৬', isDark),
-            _examTargetOption('mbbs_2027', '🏥', 'মেডিকেল ২০২৭', isDark),
-            _examTargetOption('buet_2026', '⚙️', 'বুয়েট ২০২৬', isDark),
-            _examTargetOption('buet_2027', '⚙️', 'বুয়েট ২০২৭', isDark),
-            _examTargetOption('ssc_2026', '✏️', 'এসএসসি ২০২৬', isDark),
-            _examTargetOption('ssc_2027', '✏️', 'এসএসসি ২০২৭', isDark),
-          ],
-        ),
-        // Other — full width
-        const SizedBox(height: 8),
-        _examTargetOptionWide('other', '🎯', 'অন্যান্য', isDark),
-        if (_examTarget.isEmpty) ...[
-          const SizedBox(height: 6),
-          Padding(
-            padding: const EdgeInsets.only(left: 4),
-            child: Text(
-              'পরেও ড্যাশবোর্ড থেকে সেট করতে পারবে',
-              style: TextStyle(
-                fontSize: 11,
-                color: isDark
-                    ? const Color(0xFF525252)
-                    : const Color(0xFFA3A3A3),
-              ),
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -810,6 +769,56 @@ class _SignupViewState extends ConsumerState<SignupView>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Exam Target
+        _buildLabel('তোমার লক্ষ্য কী?', isDark),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(
+            'তোমার পরীক্ষার লক্ষ্য নির্বাচন করো — আমরা সেই অনুযায়ী তোমাকে সাহায্য করব',
+            style: TextStyle(
+              fontSize: 12,
+              fontFamily: 'HindSiliguri',
+              color: isDark ? const Color(0xFF525252) : const Color(0xFFA3A3A3),
+            ),
+          ),
+        ),
+        GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: 3.2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            _examTargetOption('hsc_2026', '📚', 'এইচএসসি ২০২৬', isDark),
+            _examTargetOption('hsc_2027', '📚', 'এইচএসসি ২০২৭', isDark),
+            _examTargetOption('mbbs_2026', '🏥', 'মেডিকেল ২০২৬', isDark),
+            _examTargetOption('mbbs_2027', '🏥', 'মেডিকেল ২০২৭', isDark),
+            _examTargetOption('buet_2026', '⚙️', 'বুয়েট ২০২৬', isDark),
+            _examTargetOption('buet_2027', '⚙️', 'বুয়েট ২০২৭', isDark),
+            _examTargetOption('ssc_2026', '✏️', 'এসএসসি ২০২৬', isDark),
+            _examTargetOption('ssc_2027', '✏️', 'এসএসসি ২০২৭', isDark),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _examTargetOptionWide('other', '🎯', 'অন্যান্য', isDark),
+        if (_examTarget.isEmpty) ...[
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Text(
+              'পরেও ড্যাশবোর্ড থেকে সেট করতে পারবে',
+              style: TextStyle(
+                fontSize: 11,
+                color: isDark
+                    ? const Color(0xFF525252)
+                    : const Color(0xFFA3A3A3),
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(height: 20),
         _buildInputField(
           label: 'ইমেইল এড্রেস',
           icon: LucideIcons.mail,
