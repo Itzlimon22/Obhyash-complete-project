@@ -321,12 +321,6 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                       : const Color(0xFF171717),
                                 ),
                               ),
-                              if (activeTab == 'dashboard' &&
-                                  user?.examTarget != null &&
-                                  user!.examTarget != 'other') ...[
-                                const SizedBox(width: 8),
-                                _buildCountdownBadge(user.examTarget!, isDark),
-                              ],
                             ],
                           ),
                         ),

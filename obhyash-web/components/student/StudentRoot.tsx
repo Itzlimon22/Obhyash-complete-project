@@ -29,9 +29,7 @@ import StreakCelebration from '@/components/student/ui/common/StreakCelebration'
 import Dashboard from '@/components/student/features/dashboard/Dashboard';
 import ExamTargetModal from '@/components/student/features/dashboard/ExamTargetModal';
 import {
-  getDailyCompletions,
   incrementDailyCompletions,
-  getDailyMCQs,
   addDailyMCQs,
 } from '@/components/student/features/dashboard/DailyGoalCard';
 import SubjectReportView from '@/components/student/features/dashboard/SubjectReportView';
@@ -237,8 +235,6 @@ export default function StudentRoot({
 
   // Exam Target Modal + Daily Goal
   const [showTargetModal, setShowTargetModal] = useState(false);
-  const [dailyCompletions, setDailyCompletions] = useState(0);
-  const [dailyMCQs, setDailyMCQs] = useState(0);
   const hasCheckedExamTarget = useRef(false);
 
   // Sync with AuthProvider updates
@@ -259,14 +255,6 @@ export default function StudentRoot({
       }
     }
   }, [authLoading, currentUser?.id]);
-
-  // Load daily completions from localStorage
-  useEffect(() => {
-    if (currentUser?.id) {
-      setDailyCompletions(getDailyCompletions(currentUser.id));
-      setDailyMCQs(getDailyMCQs(currentUser.id));
-    }
-  }, [currentUser?.id]);
 
   // Streak System Check - Uses localStorage guard to run ONCE per calendar day
   useEffect(() => {
@@ -436,10 +424,8 @@ export default function StudentRoot({
     await updateUserProfile(updatedUser);
 
     // Update daily completions
-    const newCount = incrementDailyCompletions(currentUser.id);
-    setDailyCompletions(newCount);
-    const newMCQCount = addDailyMCQs(currentUser.id, result.totalQuestions);
-    setDailyMCQs(newMCQCount);
+    incrementDailyCompletions(currentUser.id);
+    addDailyMCQs(currentUser.id, result.totalQuestions);
 
     // Provide feedback & Celebrations
     if (newLevel !== oldLevel) {
@@ -493,17 +479,6 @@ export default function StudentRoot({
       localStorage.removeItem('obhyash_exam_draft');
     }
   }, [appState]);
-
-  // Handle Admission Track Registration
-  const handleAdmissionTrackRegister = useCallback(async () => {
-    if (!currentUser) return;
-    const updated = { ...currentUser, admission_track_interest: true };
-    setCurrentUser(updated);
-    await updateUserProfile(updated);
-    toast.success('অ্যাডমিশন ট্র্যাকের জন্য নিবন্ধন সম্পন্ন! 🎓', {
-      description: 'ট্র্যাক লঞ্চ হলে তুমি প্রথম জানতে পারবে।',
-    });
-  }, [currentUser]);
 
   // Handle Profile Updates
   const handleProfileUpdate = async (updatedData: Partial<UserProfile>) => {
@@ -599,10 +574,7 @@ export default function StudentRoot({
               onBlogClick={() => router.push('/blog')}
               history={examHistory}
               examTarget={currentUser.exam_target}
-              completedMCQsToday={dailyMCQs}
               onChangeTarget={() => setShowTargetModal(true)}
-              admissionTrackInterest={currentUser.admission_track_interest}
-              onAdmissionTrackRegister={handleAdmissionTrackRegister}
             />
           </AppLayout>
         );
