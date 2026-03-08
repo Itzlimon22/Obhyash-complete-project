@@ -42,7 +42,7 @@ interface ExamTargetModalProps {
 }
 
 const ExamTargetModal: React.FC<ExamTargetModalProps> = ({ user, onClose }) => {
-  const [selected, setSelected] = useState<string>('');
+  const [selected, setSelected] = useState<string>(user.exam_target ?? '');
   const [saving, setSaving] = useState(false);
   const supabase = createClient();
 

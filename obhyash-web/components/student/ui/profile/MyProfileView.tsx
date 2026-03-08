@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { UserProfile, ExamResult } from '@/lib/types';
 import { calculateActivityStats } from '@/lib/stats-utils';
 import dynamic from 'next/dynamic';
@@ -22,6 +22,10 @@ import useProfileData from '@/hooks/use-profile-data';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import Link from 'next/link';
 import { Gift } from 'lucide-react';
+import { EXAM_TARGETS } from '@/components/student/features/dashboard/ExamTargetModal';
+const ExamTargetModal = dynamic(
+  () => import('@/components/student/features/dashboard/ExamTargetModal'),
+);
 
 interface MyProfileViewProps {
   user: UserProfile;
@@ -40,7 +44,11 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
 }) => {
   const hookData = useProfileData();
 
+  const [showTargetModal, setShowTargetModal] = useState(false);
+  const [localExamTarget, setLocalExamTarget] = useState<string | null>(null);
+
   const user = propUser || hookData.user;
+  const displayTarget = localExamTarget ?? user?.exam_target ?? '';
   const history = propHistory ?? hookData.examHistory;
   const subjectStats = hookData.subjectStats;
   const calendarData = hookData.calendarData;
@@ -381,6 +389,58 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
 
         {/* Right Column */}
         <div className="space-y-6">
+          {/* Exam Target Card */}
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-sm p-5 sm:p-6">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xl font-bold text-neutral-800 dark:text-white flex items-center gap-2">
+                <span className="text-lg">🎯</span>
+                তোমার লক্ষ্য কী?
+              </h3>
+              <button
+                onClick={() => setShowTargetModal(true)}
+                className="text-sm font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 px-3 py-1.5 rounded-xl transition-colors active:scale-95"
+              >
+                পরিবর্তন করো
+              </button>
+            </div>
+            {displayTarget ? (
+              (() => {
+                const target = EXAM_TARGETS.find((t) => t.id === displayTarget);
+                return target ? (
+                  <div className="flex items-center gap-3 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-500 dark:border-emerald-600">
+                    <span className="text-2xl">{target.emoji}</span>
+                    <div>
+                      <p className="font-bold text-emerald-700 dark:text-emerald-400 text-base">
+                        {target.label}
+                      </p>
+                      <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70">
+                        {target.sub}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowTargetModal(true)}
+                    className="w-full p-4 rounded-2xl border-2 border-dashed border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 text-sm font-medium hover:border-emerald-400 hover:text-emerald-500 transition-colors"
+                  >
+                    + লক্ষ্য নির্ধারণ করো
+                  </button>
+                );
+              })()
+            ) : (
+              <button
+                onClick={() => setShowTargetModal(true)}
+                className="w-full p-4 rounded-2xl border-2 border-dashed border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 text-sm font-medium hover:border-emerald-400 hover:text-emerald-500 transition-colors"
+              >
+                + লক্ষ্য নির্ধারণ করো
+              </button>
+            )}
+            <p className="text-xs text-neutral-400 dark:text-neutral-500 mt-3 text-center">
+              তোমার পরীক্ষার লক্ষ্য নির্বাচন করো — আমরা সেই অনুযায়ী তোমাকে
+              সাহায্য করব
+            </p>
+          </div>
+
           {/* Streak Calendar */}
           <StreakCalendar
             calendarData={calendarData}
@@ -439,7 +499,10 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
                       strokeWidth: 2,
                       strokeDasharray: '5 5',
                     }}
-                    formatter={(value: unknown, name: unknown) => [`${value ?? 0} XP`, 'অর্জিত']}
+                    formatter={(value: unknown, name: unknown) => [
+                      `${value ?? 0} XP`,
+                      'অর্জিত',
+                    ]}
                   />
                   <Area
                     type="monotone"
@@ -455,6 +518,15 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
           </div>
         </div>
       </div>
+      {showTargetModal && user && (
+        <ExamTargetModal
+          user={{ ...user, exam_target: displayTarget || undefined }}
+          onClose={(updatedTarget) => {
+            if (updatedTarget) setLocalExamTarget(updatedTarget);
+            setShowTargetModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -499,12 +499,21 @@ function SignupForm() {
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
 
+            {/* STEP 3: CREDENTIALS & GOOGLE (Was Step 1) */}
+            {step === 3 && (
+              <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
                 {/* Exam Target */}
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                    তোমার লক্ষ্য পরীক্ষা কোনটি?
+                    তোমার লক্ষ্য কী?
                   </label>
+                  <p className="text-xs text-neutral-400 dark:text-neutral-500 ml-1 -mt-1">
+                    তোমার পরীক্ষার লক্ষ্য নির্বাচন করো — আমরা সেই অনুযায়ী
+                    তোমাকে সাহায্য করব
+                  </p>
                   <div className="grid grid-cols-2 gap-2">
                     {EXAM_TARGETS.filter((t) => t.id !== 'other').map((t) => (
                       <button
@@ -563,12 +572,7 @@ function SignupForm() {
                     </p>
                   )}
                 </div>
-              </div>
-            )}
 
-            {/* STEP 3: CREDENTIALS & GOOGLE (Was Step 1) */}
-            {step === 3 && (
-              <div className="space-y-6 animate-in slide-in-from-right-4 fade-in duration-300">
                 <div className="space-y-5">
                   <div className="space-y-1.5">
                     <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
