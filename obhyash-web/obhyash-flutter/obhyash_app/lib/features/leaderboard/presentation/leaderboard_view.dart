@@ -298,40 +298,47 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       children: [
         // ── View Mode Tab Switcher ──────────────────────────────────────────
         Container(
-          color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-          child: Row(
-            children: [
-              _ViewModeTab(
-                label: 'লেভেল র‍্যাংকিং',
-                isActive: _viewMode == 'level',
-                isDark: isDark,
-                onTap: () => setState(() => _viewMode = 'level'),
-              ),
-              const SizedBox(width: 8),
-              _ViewModeTab(
-                label: 'কলেজ র‍্যাংকিং',
-                isActive: _viewMode == 'college',
-                isDark: isDark,
-                onTap: () {
-                  setState(() => _viewMode = 'college');
-                  final inst = myProfile?.institute as String?;
-                  if (inst != null && inst.isNotEmpty) {
-                    _fetchCollege(inst);
-                  }
-                },
-              ),
-              const SizedBox(width: 8),
-              _ViewModeTab(
-                label: 'কলেজ প্রতিযোগিতা',
-                isActive: _viewMode == 'rankings',
-                isDark: isDark,
-                onTap: () {
-                  setState(() => _viewMode = 'rankings');
-                  _fetchInstituteRankings();
-                },
-              ),
-            ],
+          color: isDark ? const Color(0xFF080808) : Colors.white,
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF141414) : const Color(0xFFF3F4F6),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                _ViewModeTab(
+                  label: 'লেভেল র‍্যাংকিং',
+                  isActive: _viewMode == 'level',
+                  isDark: isDark,
+                  onTap: () => setState(() => _viewMode = 'level'),
+                ),
+                const SizedBox(width: 4),
+                _ViewModeTab(
+                  label: 'কলেজ র‍্যাংকিং',
+                  isActive: _viewMode == 'college',
+                  isDark: isDark,
+                  onTap: () {
+                    setState(() => _viewMode = 'college');
+                    final inst = myProfile?.institute as String?;
+                    if (inst != null && inst.isNotEmpty) {
+                      _fetchCollege(inst);
+                    }
+                  },
+                ),
+                const SizedBox(width: 4),
+                _ViewModeTab(
+                  label: 'কলেজ প্রতিযোগিতা',
+                  isActive: _viewMode == 'rankings',
+                  isDark: isDark,
+                  onTap: () {
+                    setState(() => _viewMode = 'rankings');
+                    _fetchInstituteRankings();
+                  },
+                ),
+              ],
+            ),
           ),
         ),
 
@@ -426,6 +433,16 @@ class _ViewModeTab extends StatelessWidget {
                 ? (isDark ? const Color(0xFF059669) : const Color(0xFF059669))
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF059669).withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                      spreadRadius: -2,
+                    ),
+                  ]
+                : [],
           ),
           alignment: Alignment.center,
           child: Text(
@@ -437,7 +454,7 @@ class _ViewModeTab extends StatelessWidget {
               color: isActive
                   ? Colors.white
                   : (isDark
-                        ? const Color(0xFF737373)
+                        ? const Color(0xFF6B7280)
                         : const Color(0xFF9CA3AF)),
             ),
           ),
@@ -833,183 +850,187 @@ class _LevelSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
+        color: isDark ? const Color(0xFF080808) : Colors.white,
         border: Border(
           bottom: BorderSide(
             color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F0F0),
           ),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: 96,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-              itemCount: levels.length,
-              itemBuilder: (ctx, i) {
-                final l = levels[i];
-                final isActive = l.id == selectedLevel;
-                final isMyLevel = l.id == myLevel;
-                final count = levelCounts[l.id];
+      child: SizedBox(
+        height: 112,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+          itemCount: levels.length,
+          itemBuilder: (ctx, i) {
+            final l = levels[i];
+            final isActive = l.id == selectedLevel;
+            final isMyLevel = l.id == myLevel;
+            final count = levelCounts[l.id];
 
-                return Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: GestureDetector(
-                    onTap: () => onSelect(l.id),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
-                      width: 80,
-                      decoration: BoxDecoration(
-                        gradient: isActive
-                            ? LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [l.start, l.end],
-                              )
-                            : null,
-                        color: isActive
-                            ? null
-                            : (isDark
-                                  ? const Color(0xFF1A1A1A)
-                                  : const Color(0xFFF5F5F5)),
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: isActive
-                              ? Colors.transparent
-                              : (isDark
-                                    ? const Color(0xFF2A2A2A)
-                                    : const Color(0xFFEAEAEA)),
-                          width: 1.5,
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: GestureDetector(
+                onTap: () => onSelect(l.id),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  width: 92,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: isActive
+                          ? [l.start, l.end]
+                          : [
+                              l.start.withValues(alpha: isDark ? 0.13 : 0.07),
+                              l.end.withValues(alpha: isDark ? 0.07 : 0.04),
+                            ],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isActive
+                          ? Colors.transparent
+                          : l.start.withValues(alpha: isDark ? 0.22 : 0.15),
+                      width: 1.5,
+                    ),
+                    boxShadow: isActive
+                        ? [
+                            BoxShadow(
+                              color: l.start.withValues(alpha: 0.45),
+                              blurRadius: 22,
+                              offset: const Offset(0, 8),
+                              spreadRadius: -4,
+                            ),
+                          ]
+                        : [],
+                  ),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 6,
                         ),
-                        boxShadow: isActive
-                            ? [
-                                BoxShadow(
-                                  color: l.start.withValues(alpha: 0.5),
-                                  blurRadius: 18,
-                                  offset: const Offset(0, 6),
-                                  spreadRadius: -4,
-                                ),
-                              ]
-                            : [],
-                      ),
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 8,
-                              horizontal: 4,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Icon in a soft circle
+                            Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isActive
+                                    ? Colors.white.withValues(alpha: 0.22)
+                                    : l.start.withValues(
+                                        alpha: isDark ? 0.16 : 0.10,
+                                      ),
+                              ),
+                              child: Icon(
+                                l.icon,
+                                size: 18,
+                                color: isActive
+                                    ? Colors.white
+                                    : l.start.withValues(
+                                        alpha: isDark ? 0.65 : 0.55,
+                                      ),
+                              ),
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  l.icon,
-                                  size: 20,
+                            const SizedBox(height: 6),
+                            Text(
+                              l.label.split(' ').first,
+                              style: TextStyle(
+                                fontFamily: 'HindSiliguri',
+                                fontWeight: FontWeight.w900,
+                                fontSize: 11,
+                                color: isActive
+                                    ? Colors.white
+                                    : l.start.withValues(
+                                        alpha: isDark ? 0.72 : 0.62,
+                                      ),
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (count != null) ...[
+                              const SizedBox(height: 3),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 1.5,
+                                ),
+                                decoration: BoxDecoration(
                                   color: isActive
-                                      ? Colors.white
-                                      : (isDark
-                                            ? const Color(0xFF4A4A4A)
-                                            : const Color(0xFFBBBBBB)),
-                                ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  l.label.split(' ').first,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 11,
-                                    color: isActive
-                                        ? Colors.white
-                                        : (isDark
-                                              ? const Color(0xFF737373)
-                                              : const Color(0xFF9E9E9E)),
-                                  ),
-                                  textAlign: TextAlign.center,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                if (count != null) ...[
-                                  const SizedBox(height: 3),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 1,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: isActive
-                                          ? Colors.white.withValues(alpha: 0.22)
-                                          : (isDark
-                                                ? const Color(0xFF262626)
-                                                : const Color(0xFFECECEC)),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      '$count',
-                                      style: TextStyle(
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w900,
-                                        color: isActive
-                                            ? Colors.white
-                                            : (isDark
-                                                  ? const Color(0xFF737373)
-                                                  : const Color(0xFF9E9E9E)),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                          if (isMyLevel)
-                            Positioned(
-                              top: -6,
-                              left: 0,
-                              right: 0,
-                              child: Center(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: isActive
-                                        ? Colors.white
-                                        : const Color(0xFFEF4444),
-                                    borderRadius: BorderRadius.circular(100),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(
-                                          alpha: 0.15,
+                                      ? Colors.white.withValues(alpha: 0.25)
+                                      : l.start.withValues(
+                                          alpha: isDark ? 0.18 : 0.10,
                                         ),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 1),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Text(
-                                    'তোমার',
-                                    style: TextStyle(
-                                      fontSize: 7,
-                                      fontWeight: FontWeight.w900,
-                                      color: isActive ? l.start : Colors.white,
-                                      letterSpacing: 0.5,
-                                    ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  '$count',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w900,
+                                    color: isActive
+                                        ? Colors.white
+                                        : l.start.withValues(
+                                            alpha: isDark ? 0.80 : 0.65,
+                                          ),
                                   ),
                                 ),
                               ),
-                            ),
-                        ],
+                            ],
+                          ],
+                        ),
                       ),
-                    ),
+                      if (isMyLevel)
+                        Positioned(
+                          top: -6,
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isActive
+                                    ? Colors.white
+                                    : const Color(0xFFEF4444),
+                                borderRadius: BorderRadius.circular(100),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.18),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                'তোমার',
+                                style: TextStyle(
+                                  fontFamily: 'HindSiliguri',
+                                  fontSize: 7,
+                                  fontWeight: FontWeight.w900,
+                                  color: isActive ? l.start : Colors.white,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                );
-              },
-            ),
-          ),
-        ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

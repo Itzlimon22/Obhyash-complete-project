@@ -113,7 +113,7 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
                 ${
                   isSelected
                     ? `border-neutral-900/10 dark:border-white/10 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] scale-105 z-10`
-                    : 'border-transparent bg-transparent hover:bg-neutral-100/50 dark:hover:bg-neutral-800/30'
+                    : 'border-transparent bg-white/40 dark:bg-neutral-900/20 hover:bg-white/70 dark:hover:bg-neutral-800/40 hover:scale-[1.02]'
                 }
               `}
             >
@@ -129,7 +129,7 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
                 className={`
                   relative w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mb-3 text-white transition-all duration-500
                   bg-gradient-to-br ${level.color} shadow-lg
-                  ${isSelected ? 'scale-110 rotate-3' : 'grayscale opacity-40 scale-95'}
+                  ${isSelected ? 'scale-110 rotate-3 shadow-xl' : 'opacity-55 scale-95'}
                 `}
               >
                 {/* Glossy Overlay */}
@@ -144,7 +144,7 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
                 className={`text-[13px] md:text-base font-black mb-1.5 tracking-tight transition-colors duration-300 ${
                   isSelected
                     ? 'text-neutral-900 dark:text-white'
-                    : 'text-neutral-400 dark:text-neutral-500'
+                    : 'text-neutral-500 dark:text-neutral-400'
                 }`}
               >
                 {level.label.split(' ')[0]}
@@ -157,7 +157,7 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
                   ${
                     isSelected
                       ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900'
-                      : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400'
+                      : 'bg-neutral-100/80 dark:bg-neutral-800/60 text-neutral-400 dark:text-neutral-500'
                   }
                 `}
               >
