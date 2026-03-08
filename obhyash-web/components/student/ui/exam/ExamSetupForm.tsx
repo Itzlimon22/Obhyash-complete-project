@@ -24,7 +24,7 @@ import {
 import { TopicSelector } from '@/components/student/features/exam/setup/TopicSelector';
 import { SubjectSelector } from '@/components/student/features/exam/setup/SubjectSelector';
 import { OmrConfigModal } from '@/components/student/features/omr/OmrConfigModal';
-import { printOMRSheet } from '@/services/print-service';
+import { downloadOMRSheet } from '@/services/download-service';
 import { EXAM_TYPE_OPTIONS } from '@/lib/constants';
 import { getAvailableQuestionCount } from '@/services/exam-service';
 
@@ -356,7 +356,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   };
 
   const handleOmrGenerate = (details: ExamDetails, total: number) => {
-    printOMRSheet(details, total);
+    downloadOMRSheet(details, total);
   };
 
   const StartExamButton = ({ className }: { className?: string }) => (
@@ -507,9 +507,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                   <span className="text-xs text-neutral-400 animate-pulse">
                     গণনা হচ্ছে...
                   </span>
-                ) : availableCount !== null ? (
-                  null
-                ) : null}
+                ) : availableCount !== null ? null : null}
               </div>
             )}
           </section>

@@ -12,9 +12,9 @@ import {
   Question,
 } from '@/lib/types';
 import {
-  printQuestionPaper,
-  printResultWithExplanations,
-} from '@/services/print-service';
+  downloadQuestionPaper,
+  downloadResult,
+} from '@/services/download-service';
 import { updateUserProfile } from '@/services/database';
 import { calculateLevel } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/client';
@@ -969,11 +969,10 @@ export default function StudentRoot({
                 : 'digital'
             }
             onDownloadQuestionPaper={() =>
-              examDetails && printQuestionPaper(examDetails, questions)
+              examDetails && downloadQuestionPaper(examDetails, questions)
             }
             onDownloadResultWithExplanations={() =>
-              examDetails &&
-              printResultWithExplanations(examDetails, questions, userAnswers)
+              examDetails && downloadResult(examDetails, questions, userAnswers)
             }
             currentUser={currentUser}
             bookmarkedIds={bookmarkedIds}
