@@ -597,8 +597,6 @@ export default function StudentRoot({
               onAnalysisClick={() => setActiveTab('analysis')}
               onPracticeClick={() => handleTabChange('practice')}
               onBlogClick={() => router.push('/blog')}
-              onProfileClick={() => setActiveTab('profile')}
-              onSubscriptionClick={() => setActiveTab('subscription')}
               history={examHistory}
               examTarget={currentUser.exam_target}
               completedMCQsToday={dailyMCQs}

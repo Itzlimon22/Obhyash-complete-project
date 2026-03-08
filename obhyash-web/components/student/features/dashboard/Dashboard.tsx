@@ -38,8 +38,6 @@ interface DashboardProps {
   onAnalysisClick: () => void;
   onPracticeClick: () => void;
   onBlogClick: () => void;
-  onSubscriptionClick: () => void;
-  onProfileClick: () => void;
   history: ExamResult[];
   examTarget?: string;
   completedMCQsToday?: number;
@@ -86,8 +84,6 @@ const Dashboard: React.FC<DashboardProps> = ({
   onAnalysisClick,
   onPracticeClick,
   onBlogClick,
-  onSubscriptionClick,
-  onProfileClick,
   history,
   examTarget,
   completedMCQsToday = 0,
@@ -222,8 +218,8 @@ const Dashboard: React.FC<DashboardProps> = ({
           )}
         </div>
       )}
-      {/* Cards Section - 2-column grid for all devices */}
-      <div className="lg:col-span-2 grid grid-cols-2 gap-3 h-fit">
+      {/* Cards Section */}
+      <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3 h-fit">
         <button
           onClick={onMockExamClick}
           className="group relative overflow-hidden bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/30 dark:to-neutral-900 border border-emerald-100 dark:border-emerald-900/40 rounded-2xl p-4 flex flex-col gap-3 hover:border-emerald-300 dark:hover:border-emerald-800 hover:-translate-y-0.5 hover:shadow-md dark:hover:shadow-emerald-950/30 transition-all active:scale-[0.97] duration-200 text-left"
@@ -410,68 +406,6 @@ const Dashboard: React.FC<DashboardProps> = ({
             </h3>
             <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5 leading-snug">
               পড়ালেখার টিপস
-            </p>
-          </div>
-        </button>
-
-        {/* প্রোফাইল */}
-        <button
-          onClick={onProfileClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-slate-50 to-white dark:from-slate-900/50 dark:to-neutral-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col gap-3 hover:border-slate-400 dark:hover:border-slate-600 hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.97] duration-200 text-left"
-        >
-          <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover:scale-105 transition-transform shrink-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.8}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-          </div>
-          <div>
-            <h3 className="font-extrabold text-sm text-neutral-900 dark:text-white group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors">
-              প্রোফাইল
-            </h3>
-            <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5 leading-snug">
-              তোমার অ্যাকাউন্ট
-            </p>
-          </div>
-        </button>
-
-        {/* সাবস্ক্রিপশন */}
-        <button
-          onClick={onSubscriptionClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-950/20 dark:to-neutral-900 border border-indigo-100 dark:border-indigo-900/30 rounded-2xl p-4 flex flex-col gap-3 hover:border-indigo-300 dark:hover:border-indigo-800 hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.97] duration-200 text-left"
-        >
-          <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-700 dark:text-indigo-400 group-hover:scale-105 transition-transform shrink-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.8}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"
-              />
-            </svg>
-          </div>
-          <div>
-            <h3 className="font-extrabold text-sm text-neutral-900 dark:text-white group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors">
-              সাবস্ক্রিপশন
-            </h3>
-            <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5 leading-snug">
-              প্ল্যান ও মূল্য
             </p>
           </div>
         </button>
