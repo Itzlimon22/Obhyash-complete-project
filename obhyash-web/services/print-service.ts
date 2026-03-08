@@ -75,12 +75,12 @@ const renderQuestionMeta = (q: Question): string => {
 
   if (years.length === 0 && institutes.length === 0) return '';
 
-  const metaParts = [];
-  if (institutes.length > 0) metaParts.push(institutes.join(', '));
-  if (years.length > 0) metaParts.push(years.join(', '));
+  const institutePart = institutes.length > 0 ? institutes.join(', ') : '';
+  const yearPart = years.length > 0 ? years.join(', ') : '';
+  const combined = [institutePart, yearPart].filter(Boolean).join(' ');
 
-  return `<div style="font-size: 8.5pt; color: #555; font-style: italic; margin-bottom: 6px; display: block;">
-            [${metaParts.join(' | ')}]
+  return `<div style="font-size: 8pt; color: #666; font-style: italic; margin-bottom: 5px; display: block;">
+            [${combined}]
           </div>`;
 };
 
@@ -101,14 +101,18 @@ export const printQuestionPaper = (
         <title>${details.subject} - Question Paper</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&family=Times+New+Roman:ital,wght@0,400;0,700;1,400&display=swap');
-          @page { size: A4; margin: 1cm; }
-          body { font-family: 'Times New Roman', 'Noto Serif Bengali', serif; font-size: 10.5pt; color: #000; line-height: 1.35; margin: 0; padding: 0.5cm; }
-          .header-container { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 15px; }
-          .institution-name { font-size: 20pt; font-weight: bold; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
-          .exam-title { font-size: 13pt; font-weight: bold; margin: 4px 0 10px 0; border: 1px solid #000; display: inline-block; padding: 4px 15px; border-radius: 4px; }
-          .meta-table { width: 100%; margin-top: 10px; border-collapse: collapse; }
-          .meta-table td { padding: 2px 0; font-weight: bold; font-size: 9.5pt; vertical-align: bottom; }
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
+          @page { size: A4; margin: 1.2cm 1cm; }
+          body { font-family: 'Noto Serif Bengali', 'Times New Roman', serif; font-size: 10.5pt; color: #000; line-height: 1.4; margin: 0; padding: 0; }
+          .header-container { text-align: center; margin-bottom: 14px; }
+          .header-top-bar { background: #000; color: #fff; padding: 6px 12px; margin-bottom: 0; }
+          .institution-name { font-size: 16pt; font-weight: 800; letter-spacing: 0.5px; margin: 0; font-family: 'Noto Serif Bengali', serif; }
+          .institution-sub { font-size: 8.5pt; font-weight: 400; letter-spacing: 1px; opacity: 0.85; margin-top: 1px; }
+          .header-body { border-left: 2.5px solid #000; border-right: 2.5px solid #000; border-bottom: 2.5px solid #000; padding: 8px 14px 10px; }
+          .subject-title { font-size: 15pt; font-weight: 800; margin: 6px 0 2px; letter-spacing: 0.3px; }
+          .exam-type-badge { display: inline-block; border: 1.5px solid #000; padding: 2px 12px; border-radius: 3px; font-size: 9pt; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 8px; }
+          .meta-table { width: 100%; margin-top: 6px; border-collapse: collapse; border-top: 1px solid #ccc; padding-top: 5px; }
+          .meta-table td { padding: 4px 0 0; font-weight: 700; font-size: 9.5pt; vertical-align: bottom; }
           .content-wrapper { column-count: 2; column-gap: 30px; column-rule: 0.5px solid #000; }
           .question-item { break-inside: avoid; margin-bottom: 15px; padding-bottom: 5px; overflow-wrap: break-word; word-break: break-word; }
           .q-header { display: flex; align-items: flex-start; font-weight: bold; margin-bottom: 4px; }
@@ -121,16 +125,21 @@ export const printQuestionPaper = (
       </head>
       <body>
         <div class="header-container">
-          <h1 class="institution-name">Obhyash (অভ্যাস) Exam Platform</h1>
-          <div class="exam-title">${details.subject}</div>
-          <div style="font-size: 9.5pt; margin-top: -8px; margin-bottom: 8px;">${details.examType}</div>
-          <table class="meta-table">
-            <tr>
-              <td width="35%">সময়: ${details.durationMinutes} মিনিট</td>
-              <td width="30%" align="center">অধ্যায়: ${details.chapters}</td>
-              <td width="35%" align="right">পূর্ণমান: ${details.totalMarks}</td>
-            </tr>
-          </table>
+          <div class="header-top-bar">
+            <div class="institution-name">অভ্যাস (Obhyash)</div>
+            <div class="institution-sub">EXAM PLATFORM &nbsp;·&nbsp; obhyash.com</div>
+          </div>
+          <div class="header-body">
+            <div class="subject-title">${details.subjectLabel}</div>
+            <div class="exam-type-badge">${details.examType}</div>
+            <table class="meta-table">
+              <tr>
+                <td width="33%">&#128336; সময়: ${details.durationMinutes} মিনিট</td>
+                <td width="34%" align="center">&#128218; অধ্যায়: ${details.chapters}</td>
+                <td width="33%" align="right">&#9998; পূর্ণমান: ${details.totalMarks}</td>
+              </tr>
+            </table>
+          </div>
         </div>
         <div class="content-wrapper">
           ${questions

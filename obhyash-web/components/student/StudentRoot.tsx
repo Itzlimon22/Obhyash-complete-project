@@ -31,6 +31,8 @@ import ExamTargetModal from '@/components/student/features/dashboard/ExamTargetM
 import {
   getDailyCompletions,
   incrementDailyCompletions,
+  getDailyMCQs,
+  addDailyMCQs,
 } from '@/components/student/features/dashboard/DailyGoalCard';
 import SubjectReportView from '@/components/student/features/dashboard/SubjectReportView';
 import LeaderboardView from '@/components/student/features/dashboard/LeaderboardView';
@@ -236,6 +238,7 @@ export default function StudentRoot({
   // Exam Target Modal + Daily Goal
   const [showTargetModal, setShowTargetModal] = useState(false);
   const [dailyCompletions, setDailyCompletions] = useState(0);
+  const [dailyMCQs, setDailyMCQs] = useState(0);
   const hasCheckedExamTarget = useRef(false);
 
   // Sync with AuthProvider updates
@@ -261,6 +264,7 @@ export default function StudentRoot({
   useEffect(() => {
     if (currentUser?.id) {
       setDailyCompletions(getDailyCompletions(currentUser.id));
+      setDailyMCQs(getDailyMCQs(currentUser.id));
     }
   }, [currentUser?.id]);
 
@@ -434,6 +438,8 @@ export default function StudentRoot({
     // Update daily completions
     const newCount = incrementDailyCompletions(currentUser.id);
     setDailyCompletions(newCount);
+    const newMCQCount = addDailyMCQs(currentUser.id, result.totalQuestions);
+    setDailyMCQs(newMCQCount);
 
     // Provide feedback & Celebrations
     if (newLevel !== oldLevel) {
@@ -591,9 +597,11 @@ export default function StudentRoot({
               onAnalysisClick={() => setActiveTab('analysis')}
               onPracticeClick={() => handleTabChange('practice')}
               onBlogClick={() => router.push('/blog')}
+              onProfileClick={() => setActiveTab('profile')}
+              onSubscriptionClick={() => setActiveTab('subscription')}
               history={examHistory}
               examTarget={currentUser.exam_target}
-              completedToday={dailyCompletions}
+              completedMCQsToday={dailyMCQs}
               onChangeTarget={() => setShowTargetModal(true)}
               admissionTrackInterest={currentUser.admission_track_interest}
               onAdmissionTrackRegister={handleAdmissionTrackRegister}

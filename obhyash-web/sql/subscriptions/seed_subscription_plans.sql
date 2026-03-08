@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS subscription_plans (
 );
 
 -- Remove all old plans for a clean slate
-DELETE FROM subscription_plans WHERE name IN ('Basic', 'Monthly', 'Quarterly', 'free', 'exam_ready', 'pro', 'session');
+DELETE FROM subscription_plans WHERE name IN ('Basic', 'Monthly', 'Quarterly', 'free', 'exam_ready', 'pro', 'session', 'annual');
 
 -- Insert the 4 launch plans.
 -- NOTE: All features are available to everyone during the launch window.
@@ -58,13 +58,5 @@ INSERT INTO subscription_plans (display_name, name, price, duration_days, featur
   '["এক্সাম রেডির সব সুবিধা","৩ মাসে ২৮% সাশ্রয়","বিষয়ভিত্তিক দুর্বলতা রিপোর্ট","প্রায়োরিটি কাস্টমার সাপোর্ট","নতুন ফিচারে আর্লি এক্সেস"]'::jsonb,
   true,
   'border-rose-500'
-),
-(
-  'সেশন (Annual)',
-  'session',
-  599,
-  365,
-  '["প্রো প্ল্যানের সব সুবিধা","পুরো পরীক্ষার সেশনব্যাপী এক্সেস","৫৭% সাশ্রয় (সর্বোচ্চ ছাড়)","এক্সক্লুসিভ স্টাডি রিসোর্স","প্রিমিয়াম ব্যাজ ও প্রোফাইল"]'::jsonb,
-  false,
-  'border-emerald-500'
+
 );
