@@ -60,7 +60,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
         )
       : 0;
 
-  // -- Rank System --
+  // - Rank Systemm -
   const getRankName = (xp: number) => {
     if (xp < 1000) return 'রকি';
     if (xp < 2000) return 'স্কাউট';
@@ -77,7 +77,7 @@ const MyProfileView: React.FC<MyProfileViewProps> = ({
     return 'লিজেন্ড';
   };
 
-  // Real Data from History
+  // Real Data History
   const activityData = useMemo(
     () => calculateActivityStats(history),
     [history],
