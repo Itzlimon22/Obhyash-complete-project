@@ -14,6 +14,9 @@ interface ExamHistoryViewProps {
   onRecheckRequest: (id: string) => void;
   bookmarkedIds?: Set<string>;
   onToggleBookmark?: (questionId: string | number) => void;
+  /** Pre-fetched bookmark question objects — when provided, the bookmarks tab
+   *  uses these directly instead of filtering from exam history. */
+  bookmarkedQuestions?: Question[];
 }
 
 const BANGLA_INDICES = ['ক', 'খ', 'গ', 'ঘ'];
@@ -167,6 +170,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   onRecheckRequest,
   bookmarkedIds,
   onToggleBookmark,
+  bookmarkedQuestions,
 }) => {
   const [activeTab, setActiveTab] = useState<'exams' | 'mistakes' | 'marked'>(
     'exams',
@@ -282,6 +286,20 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   }, [history, filterSubject, filterDate]);
 
   const bookmarks = useMemo(() => {
+    // If we have pre-fetched bookmarked questions from DB, use them directly
+    if (bookmarkedQuestions) {
+      return bookmarkedQuestions
+        .filter((q) => !filterSubject || q.subject === filterSubject)
+        .map((q) => ({
+          question: q,
+          examDate: '',
+          subject: q.subject ?? '',
+          subjectLabel: q.subjectLabel,
+          userAns: undefined as number | undefined,
+          flagged: true,
+        }));
+    }
+    // Fallback: filter from exam history (only shows bookmarks present in history)
     const all: {
       question: Question;
       examDate: string;
@@ -314,7 +332,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       });
     });
     return all.reverse();
-  }, [history, filterSubject, filterDate, bookmarkedIds]);
+  }, [history, filterSubject, filterDate, bookmarkedIds, bookmarkedQuestions]);
 
   const displayedMistakes = mistakes.slice(0, visibleCount);
   const hasMoreMistakes = visibleCount < mistakes.length;

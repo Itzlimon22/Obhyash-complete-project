@@ -4,7 +4,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 // Types & Services
-import { UserProfile, AppState, ExamConfig, ExamResult } from '@/lib/types';
+import {
+  UserProfile,
+  AppState,
+  ExamConfig,
+  ExamResult,
+  Question,
+} from '@/lib/types';
 import {
   printQuestionPaper,
   printResultWithExplanations,
@@ -16,6 +22,7 @@ import { createClient } from '@/utils/supabase/client';
 // Hooks
 import { useExamEngine } from '@/hooks/use-exam-engine';
 import { useBookmarks } from '@/hooks/use-bookmarks';
+import { getBookmarkedQuestions } from '@/services/bookmark-service';
 import { useSessionMonitor } from '@/hooks/use-session-monitor';
 
 // Components - Layout & Common
@@ -228,6 +235,14 @@ export default function StudentRoot({
     isBookmarked,
     toggle: toggleBookmark,
   } = useBookmarks(currentUser?.id, authLoading);
+
+  const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Question[]>(
+    [],
+  );
+  useEffect(() => {
+    if (!currentUser?.id || authLoading) return;
+    getBookmarkedQuestions(currentUser.id).then(setBookmarkedQuestions);
+  }, [currentUser?.id, authLoading, bookmarkedIds]);
 
   // Streak Celebration State
   const [showStreakCelebration, setShowStreakCelebration] = useState(false);
@@ -638,6 +653,7 @@ export default function StudentRoot({
               onRecheckRequest={(id) => alert('Recheck requested for: ' + id)}
               bookmarkedIds={bookmarkedIds}
               onToggleBookmark={toggleBookmark}
+              bookmarkedQuestions={bookmarkedQuestions}
             />
           </AppLayout>
         );
