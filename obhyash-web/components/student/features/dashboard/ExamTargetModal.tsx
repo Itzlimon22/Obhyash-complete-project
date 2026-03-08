@@ -19,18 +19,6 @@ export const EXAM_TARGETS = [
     sub: 'MBBS Admission',
     emoji: '🏥',
   },
-  {
-    id: 'buet_2026',
-    label: 'বুয়েট ভর্তি ২০২৬',
-    sub: 'BUET Admission',
-    emoji: '⚙️',
-  },
-  {
-    id: 'buet_2027',
-    label: 'বুয়েট ভর্তি ২০২৭',
-    sub: 'BUET Admission',
-    emoji: '⚙️',
-  },
   { id: 'ssc_2026', label: 'এসএসসি ২০২৬', sub: 'SSC 2026', emoji: '✏️' },
   { id: 'ssc_2027', label: 'এসএসসি ২০২৭', sub: 'SSC 2027', emoji: '✏️' },
   { id: 'other', label: 'অন্যান্য', sub: 'Other', emoji: '🎯' },
@@ -95,27 +83,21 @@ const ExamTargetModal: React.FC<ExamTargetModalProps> = ({ user, onClose }) => {
             <button
               key={t.id}
               onClick={() => setSelected(t.id)}
-              className={`flex items-center gap-2.5 p-3 rounded-xl border-2 text-left transition-all active:scale-95 ${
+              className={`flex items-center justify-center p-3 rounded-xl border-2 text-center transition-all active:scale-95 ${
                 selected === t.id
                   ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-600'
                   : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 bg-white dark:bg-neutral-800/50'
               }`}
             >
-              <span className="text-lg flex-shrink-0">{t.emoji}</span>
-              <div className="min-w-0">
-                <p
-                  className={`text-xs font-extrabold leading-tight truncate ${
-                    selected === t.id
-                      ? 'text-emerald-700 dark:text-emerald-400'
-                      : 'text-neutral-800 dark:text-neutral-200'
-                  }`}
-                >
-                  {t.label}
-                </p>
-                <p className="text-[10px] text-neutral-400 dark:text-neutral-500 truncate">
-                  {t.sub}
-                </p>
-              </div>
+              <p
+                className={`text-xs font-extrabold leading-tight ${
+                  selected === t.id
+                    ? 'text-emerald-700 dark:text-emerald-400'
+                    : 'text-neutral-800 dark:text-neutral-200'
+                }`}
+              >
+                {t.label}
+              </p>
             </button>
           ))}
         </div>

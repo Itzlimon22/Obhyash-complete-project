@@ -522,15 +522,12 @@ function SignupForm() {
                         onClick={() =>
                           setFormData({ ...formData, examTarget: t.id })
                         }
-                        className={`flex items-center gap-2 p-2.5 rounded-xl border-2 text-left transition-all active:scale-95 ${
+                        className={`flex items-center justify-center p-2.5 rounded-xl border-2 text-center transition-all active:scale-95 ${
                           formData.examTarget === t.id
                             ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-600'
                             : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 bg-neutral-50 dark:bg-neutral-900'
                         }`}
                       >
-                        <span className="text-base flex-shrink-0">
-                          {t.emoji}
-                        </span>
                         <span
                           className={`text-xs font-bold leading-tight ${
                             formData.examTarget === t.id
@@ -548,13 +545,12 @@ function SignupForm() {
                       onClick={() =>
                         setFormData({ ...formData, examTarget: 'other' })
                       }
-                      className={`col-span-2 flex items-center gap-2 p-2.5 rounded-xl border-2 text-left transition-all active:scale-95 ${
+                      className={`col-span-2 flex items-center justify-center p-2.5 rounded-xl border-2 text-center transition-all active:scale-95 ${
                         formData.examTarget === 'other'
                           ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-600'
                           : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 bg-neutral-50 dark:bg-neutral-900'
                       }`}
                     >
-                      <span className="text-base">🎯</span>
                       <span
                         className={`text-xs font-bold ${
                           formData.examTarget === 'other'

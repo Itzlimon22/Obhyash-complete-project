@@ -7,7 +7,6 @@ import { ExamResult, UserProfile } from '@/lib/types';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import { DashboardSkeleton } from '@/components/student/ui/common/Skeletons';
 import UserAvatar from '@/components/student/ui/common/UserAvatar';
-import CountdownBanner from './CountdownBanner';
 
 interface SubjectStats {
   id: string;
@@ -189,15 +188,6 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 px-1">
-      {/* Countdown Banner — full width above cards */}
-      {examTarget && (
-        <div className="lg:col-span-3">
-          <CountdownBanner
-            examTarget={examTarget}
-            onChangeTarget={onChangeTarget}
-          />
-        </div>
-      )}
       {/* Cards Section */}
       <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3 h-fit">
         <button

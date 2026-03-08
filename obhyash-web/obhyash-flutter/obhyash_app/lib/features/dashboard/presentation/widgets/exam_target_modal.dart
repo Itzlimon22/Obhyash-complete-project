@@ -6,8 +6,6 @@ const kExamTargets = [
   {'value': 'hsc_2027', 'label': 'এইচএসসি ২০২৭', 'icon': '📚'},
   {'value': 'mbbs_2026', 'label': 'মেডিকেল ভর্তি ২০২৬', 'icon': '🏥'},
   {'value': 'mbbs_2027', 'label': 'মেডিকেল ভর্তি ২০২৭', 'icon': '🏥'},
-  {'value': 'buet_2026', 'label': 'বুয়েট ভর্তি ২০২৬', 'icon': '⚙️'},
-  {'value': 'buet_2027', 'label': 'বুয়েট ভর্তি ২০২৭', 'icon': '⚙️'},
   {'value': 'ssc_2026', 'label': 'এসএসসি ২০২৬', 'icon': '🎓'},
   {'value': 'ssc_2027', 'label': 'এসএসসি ২০২৭', 'icon': '🎓'},
   {'value': 'other', 'label': 'অন্যান্য', 'icon': '🎯'},
@@ -166,30 +164,21 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                           width: isSelected ? 2 : 1,
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            t['icon']!,
-                            style: const TextStyle(fontSize: 16),
+                      child: Center(
+                        child: Text(
+                          t['label']!,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: isSelected
+                                ? Colors.white
+                                : (isDark
+                                      ? const Color(0xFFD4D4D4)
+                                      : const Color(0xFF171717)),
                           ),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              t['label']!,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: isSelected
-                                    ? Colors.white
-                                    : (isDark
-                                          ? const Color(0xFFD4D4D4)
-                                          : const Color(0xFF171717)),
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                   );

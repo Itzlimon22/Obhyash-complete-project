@@ -688,29 +688,18 @@ class _SignupViewState extends ConsumerState<SignupView>
           ),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        child: Row(
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 14)),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'HindSiliguri',
-                  color: isSelected
-                      ? (isDark
-                            ? const Color(0xFF34D399)
-                            : const Color(0xFF047857))
-                      : (isDark
-                            ? const Color(0xFFD4D4D4)
-                            : const Color(0xFF404040)),
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            fontFamily: 'HindSiliguri',
+            color: isSelected
+                ? (isDark ? const Color(0xFF34D399) : const Color(0xFF047857))
+                : (isDark ? const Color(0xFFD4D4D4) : const Color(0xFF404040)),
+          ),
         ),
       ),
     );
@@ -740,26 +729,18 @@ class _SignupViewState extends ConsumerState<SignupView>
           ),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        child: Row(
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 14)),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                fontFamily: 'HindSiliguri',
-                color: isSelected
-                    ? (isDark
-                          ? const Color(0xFF34D399)
-                          : const Color(0xFF047857))
-                    : (isDark
-                          ? const Color(0xFFD4D4D4)
-                          : const Color(0xFF404040)),
-              ),
-            ),
-          ],
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            fontFamily: 'HindSiliguri',
+            color: isSelected
+                ? (isDark ? const Color(0xFF34D399) : const Color(0xFF047857))
+                : (isDark ? const Color(0xFFD4D4D4) : const Color(0xFF404040)),
+          ),
         ),
       ),
     );
@@ -795,8 +776,6 @@ class _SignupViewState extends ConsumerState<SignupView>
             _examTargetOption('hsc_2027', '📚', 'এইচএসসি ২০২৭', isDark),
             _examTargetOption('mbbs_2026', '🏥', 'মেডিকেল ২০২৬', isDark),
             _examTargetOption('mbbs_2027', '🏥', 'মেডিকেল ২০২৭', isDark),
-            _examTargetOption('buet_2026', '⚙️', 'বুয়েট ২০২৬', isDark),
-            _examTargetOption('buet_2027', '⚙️', 'বুয়েট ২০২৭', isDark),
             _examTargetOption('ssc_2026', '✏️', 'এসএসসি ২০২৬', isDark),
             _examTargetOption('ssc_2027', '✏️', 'এসএসসি ২০২৭', isDark),
           ],

@@ -7,7 +7,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'widgets/dashboard_action_card.dart';
 import 'widgets/dashboard_leaderboard_card.dart';
 import 'widgets/subject_stat_card.dart';
-import 'widgets/countdown_banner.dart';
 import 'widgets/exam_target_modal.dart';
 import '../providers/dashboard_providers.dart';
 import '../domain/models.dart';
@@ -91,20 +90,6 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 0. Countdown Banner (if exam target set)
-          if (userProfile?.examTarget != null) ...[
-            CountdownBanner(
-              examTarget: userProfile!.examTarget!,
-              onChangeTarget: () async {
-                final result = await showExamTargetModal(context);
-                if (result != null && mounted) {
-                  ref.invalidate(userProfileProvider);
-                }
-              },
-            ),
-            const SizedBox(height: 10),
-          ],
-
           // 1. Actions Grid — 6 cards, 3-column (matches web)
           GridView.count(
             crossAxisCount: 3,
