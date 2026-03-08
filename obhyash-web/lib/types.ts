@@ -226,6 +226,7 @@ export interface User {
   stream?: string; // HSC, Admission
   exam_target?: string; // e.g. 'hsc_2026', 'mbbs_2026', 'buet_2026', 'ssc_2026', 'hsc_2027'
   daily_exams_goal?: number; // default 3
+  admission_track_interest?: boolean; // Pre-registration for upcoming admission track (launches ~July 2026)
 
   // Gamification & Stats
   xp?: number;

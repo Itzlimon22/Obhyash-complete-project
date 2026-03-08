@@ -40,6 +40,9 @@ interface UserDatabaseRow {
   last_streak_date?: string | null;
   exams_taken?: number | null;
 
+  // Pre-registration
+  admission_track_interest?: boolean | null;
+
   // System
   updated_at: string;
 }
@@ -85,6 +88,9 @@ const mapProfileToDbRow = (user: UserProfile): UserDatabaseRow => {
     last_streak_date: user.lastStreakDate || null,
     exams_taken: user.examsTaken || 0,
 
+    // Pre-registration
+    admission_track_interest: user.admission_track_interest ?? null,
+
     updated_at: new Date().toISOString(),
   };
 };
@@ -118,6 +124,9 @@ export const mapDbRowToProfile = (
     streakCount: data.streak || data.streak_count || 0,
     lastStreakDate: data.last_streak_date || null,
     xp: data.xp || 0,
+    // Pre-registration
+    admission_track_interest:
+      (data.admission_track_interest as boolean) ?? false,
   } as UserProfile;
 };
 

@@ -312,15 +312,8 @@ const SubscriptionView: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
             {plans
-              .filter(
-                (p) =>
-                  p.price > 0 &&
-                  (p.billingCycle.includes('মাস') ||
-                    p.billingCycle === 'Monthly' ||
-                    p.price === 149 ||
-                    p.price === 299),
-              ) // Filter specifically for desired plans
-              .sort((a, b) => a.price - b.price) // Ensure 1 month comes first
+              .filter((p) => p.price > 0)
+              .sort((a, b) => a.price - b.price)
               .map((plan) => (
                 <PricingCard
                   key={plan.id}

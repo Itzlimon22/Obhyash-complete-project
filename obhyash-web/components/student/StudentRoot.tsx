@@ -488,6 +488,17 @@ export default function StudentRoot({
     }
   }, [appState]);
 
+  // Handle Admission Track Registration
+  const handleAdmissionTrackRegister = useCallback(async () => {
+    if (!currentUser) return;
+    const updated = { ...currentUser, admission_track_interest: true };
+    setCurrentUser(updated);
+    await updateUserProfile(updated);
+    toast.success('অ্যাডমিশন ট্র্যাকের জন্য নিবন্ধন সম্পন্ন! 🎓', {
+      description: 'ট্র্যাক লঞ্চ হলে তুমি প্রথম জানতে পারবে।',
+    });
+  }, [currentUser]);
+
   // Handle Profile Updates
   const handleProfileUpdate = async (updatedData: Partial<UserProfile>) => {
     if (!currentUser) return;
@@ -584,6 +595,8 @@ export default function StudentRoot({
               examTarget={currentUser.exam_target}
               completedToday={dailyCompletions}
               onChangeTarget={() => setShowTargetModal(true)}
+              admissionTrackInterest={currentUser.admission_track_interest}
+              onAdmissionTrackRegister={handleAdmissionTrackRegister}
             />
           </AppLayout>
         );

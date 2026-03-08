@@ -9,6 +9,7 @@ import { DashboardSkeleton } from '@/components/student/ui/common/Skeletons';
 import UserAvatar from '@/components/student/ui/common/UserAvatar';
 import CountdownBanner from './CountdownBanner';
 import DailyGoalCard from './DailyGoalCard';
+import AdmissionTrackCard from './AdmissionTrackCard';
 
 interface SubjectStats {
   id: string;
@@ -41,6 +42,8 @@ interface DashboardProps {
   examTarget?: string;
   completedToday?: number;
   onChangeTarget?: () => void;
+  admissionTrackInterest?: boolean;
+  onAdmissionTrackRegister?: () => Promise<void>;
 }
 
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -85,6 +88,8 @@ const Dashboard: React.FC<DashboardProps> = ({
   examTarget,
   completedToday = 0,
   onChangeTarget,
+  admissionTrackInterest = false,
+  onAdmissionTrackRegister,
 }) => {
   const { loading: authLoading } = useAuth();
 
@@ -205,6 +210,12 @@ const Dashboard: React.FC<DashboardProps> = ({
             completedToday={completedToday}
             onStartExam={onMockExamClick}
           />
+          {onAdmissionTrackRegister && (
+            <AdmissionTrackCard
+              isRegistered={admissionTrackInterest}
+              onRegister={onAdmissionTrackRegister}
+            />
+          )}
         </div>
       )}
       {/* Cards Section - Order 1 on Mobile, Top Left on Desktop */}
