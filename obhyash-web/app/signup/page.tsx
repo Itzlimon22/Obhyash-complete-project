@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/error-utils';
 import { getRandomAvatar } from '@/lib/avatar-utils';
 import { EXAM_TARGETS } from '@/components/student/features/dashboard/ExamTargetModal';
+import { searchColleges } from '@/lib/college-mapping';
 
 const AUTH_TIMEOUT_MS = 30000;
 
@@ -56,6 +57,7 @@ function SignupForm() {
   const [success, setSuccess] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showCollegeSuggestions, setShowCollegeSuggestions] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -422,15 +424,45 @@ function SignupForm() {
                     শিক্ষা প্রতিষ্ঠান
                   </label>
                   <div className="relative group">
-                    <School className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />
+                    <School className="absolute left-4 top-3.5 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors pointer-events-none" />
                     <input
                       type="text"
                       name="institute"
                       value={formData.institute}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChange(e);
+                        setShowCollegeSuggestions(true);
+                      }}
+                      onFocus={() =>
+                        formData.institute.length > 0 &&
+                        setShowCollegeSuggestions(true)
+                      }
+                      onBlur={() =>
+                        setTimeout(() => setShowCollegeSuggestions(false), 150)
+                      }
                       placeholder="কলেজ / স্কুলের নাম"
+                      autoComplete="off"
                       className="w-full pl-12 pr-4 py-3.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all font-medium text-neutral-800 dark:text-neutral-200"
                     />
+                    {showCollegeSuggestions &&
+                      searchColleges(formData.institute).length > 0 && (
+                        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-lg overflow-hidden">
+                          {searchColleges(formData.institute).map((name) => (
+                            <button
+                              key={name}
+                              type="button"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                setFormData({ ...formData, institute: name });
+                                setShowCollegeSuggestions(false);
+                              }}
+                              className="w-full text-left px-4 py-2.5 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors border-b border-neutral-100 dark:border-neutral-800 last:border-0"
+                            >
+                              {name}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                   </div>
                 </div>
 

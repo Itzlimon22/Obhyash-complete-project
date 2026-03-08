@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/data/college_list.dart';
 import '../../dashboard/domain/models.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 
@@ -40,6 +41,8 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
 
   bool _isLoading = false;
   bool _showPassword = false;
+  List<String> _collegeSuggestions = [];
+  bool _showCollegeSuggestions = false;
 
   @override
   void initState() {
@@ -58,6 +61,8 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     _newPasswordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
 
+    _instituteController.addListener(_onInstituteChanged);
+
     _gender = user.gender ?? '';
     _stream = user.stream ?? 'HSC';
     _group = user.division ?? 'Science';
@@ -74,6 +79,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     _phoneController.dispose();
     _dobController.dispose();
     _addressController.dispose();
+    _instituteController.removeListener(_onInstituteChanged);
     _instituteController.dispose();
     _sscRollController.dispose();
     _sscRegController.dispose();
@@ -81,6 +87,15 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  void _onInstituteChanged() {
+    final suggestions = searchColleges(_instituteController.text);
+    setState(() {
+      _collegeSuggestions = suggestions;
+      _showCollegeSuggestions =
+          _instituteController.text.isNotEmpty && suggestions.isNotEmpty;
+    });
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -467,12 +482,82 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                         padding: const EdgeInsets.all(24),
                         child: Column(
                           children: [
-                            _buildTextField(
-                              label: 'শিক্ষা প্রতিষ্ঠানের নাম',
-                              controller: _instituteController,
-                              isDark: isDark,
-                              placeholder:
-                                  'তোমার শিক্ষা প্রতিষ্ঠানের নাম লিখো...',
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildTextField(
+                                  label: 'শিক্ষা প্রতিষ্ঠানের নাম',
+                                  controller: _instituteController,
+                                  isDark: isDark,
+                                  placeholder:
+                                      'তোমার শিক্ষা প্রতিষ্ঠানের নাম লিখো...',
+                                ),
+                                if (_showCollegeSuggestions)
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 4),
+                                    decoration: BoxDecoration(
+                                      color: isDark
+                                          ? const Color(0xFF1A1A1A)
+                                          : Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: isDark
+                                            ? const Color(0xFF2D2D2D)
+                                            : const Color(0xFFE5E7EB),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.08),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      children: _collegeSuggestions
+                                          .map(
+                                            (name) => InkWell(
+                                              onTap: () {
+                                                _instituteController.text =
+                                                    name;
+                                                setState(
+                                                  () =>
+                                                      _showCollegeSuggestions =
+                                                          false,
+                                                );
+                                              },
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 16,
+                                                      vertical: 12,
+                                                    ),
+                                                child: Align(
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  child: Text(
+                                                    name,
+                                                    style: TextStyle(
+                                                      fontFamily:
+                                                          'HindSiliguri',
+                                                      fontSize: 13,
+                                                      color: isDark
+                                                          ? const Color(
+                                                              0xFFE5E5E5,
+                                                            )
+                                                          : const Color(
+                                                              0xFF1F2937,
+                                                            ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
+                                    ),
+                                  ),
+                              ],
                             ),
                             const SizedBox(height: 16),
                             _buildDropdown(

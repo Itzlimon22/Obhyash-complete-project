@@ -148,6 +148,82 @@ export const getLeaderboardUsers = async (
   return [];
 };
 
+export const getInstituteLeaderboardUsers = async (
+  institute: string,
+): Promise<UserProfile[]> => {
+  if (!institute || !isSupabaseConfigured() || !supabase) return [];
+  try {
+    const { data, error } = await supabase
+      .from('public_profiles')
+      .select(
+        'id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak',
+      )
+      .eq('institute', institute)
+      .order('xp', { ascending: false })
+      .limit(100);
+
+    if (error || !data) return [];
+
+    return data.map((user: LeaderboardUserRow, index: number) => ({
+      id: user.id,
+      name: user.name || 'Unknown User',
+      institute: user.institute || institute,
+      xp: user.xp || 0,
+      level: user.level || 'Rookie',
+      examsTaken: user.exams_taken || 0,
+      avatarUrl: user.avatar_url || undefined,
+      avatarColor: user.avatar_color || generateAvatarColor(index),
+      streakCount: user.streak || 0,
+    }));
+  } catch (error) {
+    console.error('Failed to fetch institute leaderboard:', error);
+    return [];
+  }
+};
+
+export interface InstituteRankEntry {
+  institute: string;
+  avgXp: number;
+  studentCount: number;
+}
+
+export const getInstituteRankings = async (): Promise<InstituteRankEntry[]> => {
+  if (!isSupabaseConfigured() || !supabase) return [];
+  try {
+    const { data, error } = await supabase
+      .from('public_profiles')
+      .select('institute, xp')
+      .not('institute', 'is', null)
+      .neq('institute', '')
+      .order('xp', { ascending: false })
+      .limit(5000);
+
+    if (error || !data) return [];
+
+    // Group by institute, collecting XP values (already sorted desc)
+    const groups: Record<string, number[]> = {};
+    for (const row of data as { institute: string; xp: number }[]) {
+      if (!row.institute) continue;
+      if (!groups[row.institute]) groups[row.institute] = [];
+      groups[row.institute].push(row.xp || 0);
+    }
+
+    // Top-5 average; require at least 5 students
+    const rankings: InstituteRankEntry[] = [];
+    for (const [institute, xpList] of Object.entries(groups)) {
+      if (xpList.length < 5) continue;
+      const top5 = xpList.slice(0, 5);
+      const avgXp = Math.round(top5.reduce((a, b) => a + b, 0) / 5);
+      rankings.push({ institute, avgXp, studentCount: xpList.length });
+    }
+
+    return rankings.sort((a, b) => b.avgXp - a.avgXp);
+  } catch (e) {
+    console.error('Failed to fetch institute rankings:', e);
+    return [];
+  }
+};
+
 export const getLevelUserCounts = async (): Promise<Record<string, number>> => {
   const zeroCounts = (): Record<string, number> => {
     const counts: Record<string, number> = {};

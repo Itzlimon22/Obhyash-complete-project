@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../providers/auth_controller.dart';
+import '../../../core/data/college_list.dart';
 
 class SignupView extends ConsumerStatefulWidget {
   const SignupView({super.key});
@@ -27,6 +28,9 @@ class _SignupViewState extends ConsumerState<SignupView>
   String _group = 'Science';
   String _batch = 'HSC 2026';
   String _examTarget = '';
+
+  List<String> _collegeSuggestions = [];
+  bool _showCollegeSuggestions = false;
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -54,18 +58,29 @@ class _SignupViewState extends ConsumerState<SignupView>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeIn));
     _animController.forward();
+    _instituteController.addListener(_onInstituteChanged);
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
+    _instituteController.removeListener(_onInstituteChanged);
     _instituteController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _animController.dispose();
     super.dispose();
+  }
+
+  void _onInstituteChanged() {
+    final suggestions = searchColleges(_instituteController.text);
+    setState(() {
+      _collegeSuggestions = suggestions;
+      _showCollegeSuggestions =
+          _instituteController.text.isNotEmpty && suggestions.isNotEmpty;
+    });
   }
 
   String? _validateStep(int currentStep) {
@@ -604,6 +619,69 @@ class _SignupViewState extends ConsumerState<SignupView>
           hint: 'কলেজ / স্কুলের নাম',
           isDark: isDark,
         ),
+        if (_showCollegeSuggestions) ...[
+          const SizedBox(height: 4),
+          Container(
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark
+                    ? const Color(0xFF303030)
+                    : const Color(0xFFE5E5E5),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              children: _collegeSuggestions.map((name) {
+                return InkWell(
+                  onTap: () {
+                    _instituteController.text = name;
+                    setState(() {
+                      _showCollegeSuggestions = false;
+                      _collegeSuggestions.clear();
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: isDark
+                              ? const Color(0xFF262626)
+                              : const Color(0xFFF0F0F0),
+                          width: name == _collegeSuggestions.last ? 0 : 1,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      name,
+                      style: TextStyle(
+                        fontFamily: 'HindSiliguri',
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? const Color(0xFFD4D4D4)
+                            : const Color(0xFF262626),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
         const SizedBox(height: 16),
 
         _buildLabel('স্ট্রিম (Stream)', isDark),

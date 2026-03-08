@@ -1,0 +1,740 @@
+// Canonical list of top Bangladeshi colleges/schools.
+// `name` is the canonical value stored in the DB.
+// `search` contains lowercase aliases/English spellings for matching.
+
+interface CollegeEntry {
+  name: string;
+  search: string[];
+}
+
+const COLLEGE_DATA: CollegeEntry[] = [
+  // ── Dhaka Division ─────────────────────────────────────────────────────────
+  { name: 'ঢাকা কলেজ', search: ['dhaka college', 'dc'] },
+  {
+    name: 'ইডেন মহিলা কলেজ',
+    search: ['eden mohila', 'eden women', 'eden college'],
+  },
+  {
+    name: 'সরকারি তিতুমীর কলেজ',
+    search: ['titumir', 'titumeer', 'govt titumir'],
+  },
+  {
+    name: 'কবি নজরুল সরকারি কলেজ',
+    search: ['kabi nazrul', 'kabi nojrul', 'knsgc', 'nazrul college'],
+  },
+  {
+    name: 'মিরপুর সরকারি কলেজ',
+    search: ['mirpur govt college', 'mirpur college'],
+  },
+  {
+    name: 'বাংলা কলেজ, ঢাকা',
+    search: [
+      'sarkari bangla college',
+      'bangla college dhaka',
+      'bangla college',
+    ],
+  },
+  { name: 'ঢাকা কমার্স কলেজ', search: ['dhaka commerce college', 'dcc'] },
+  {
+    name: 'নটর ডেম কলেজ',
+    search: ['notre dame', 'notredame', 'ndc', 'notre dame college'],
+  },
+  {
+    name: 'হলি ক্রস কলেজ',
+    search: ['holy cross', 'holycross', 'hcc', 'holy cross college'],
+  },
+  {
+    name: 'ভিকারুননিসা নূন স্কুল এন্ড কলেজ',
+    search: ['viqarunnisa', 'vns', 'vikharunnisa', 'vnsc', 'vicarunissa'],
+  },
+  {
+    name: 'রাজউক উত্তরা মডেল কলেজ',
+    search: ['rajuk uttara', 'rumc', 'rajuk', 'uttara model college'],
+  },
+  {
+    name: 'আদমজী ক্যান্টনমেন্ট কলেজ',
+    search: ['adamjee', 'adamjee cantonment', 'acc', 'adamji'],
+  },
+  {
+    name: 'ঢাকা রেসিডেনশিয়াল মডেল কলেজ',
+    search: ['drmc', 'dhaka residential model', 'dhaka residential'],
+  },
+  {
+    name: 'সরকারি বিজ্ঞান কলেজ, ঢাকা',
+    search: [
+      'govt science college dhaka',
+      'gsc dhaka',
+      'government science college',
+    ],
+  },
+  {
+    name: 'ঢাকা ইম্পেরিয়াল কলেজ',
+    search: ['dhaka imperial', 'imperial college dhaka'],
+  },
+  {
+    name: 'ঢাকা সিটি কলেজ',
+    search: ['city college dhaka', 'dhaka city college'],
+  },
+  { name: 'আইডিয়াল কলেজ', search: ['ideal college dhaka'] },
+  {
+    name: 'ধানমণ্ডি সরকারি বালক উচ্চ বিদ্যালয় ও কলেজ',
+    search: ['dhanmondi govt boys college', 'dhanmondi college'],
+  },
+  {
+    name: 'বেগম বদরুন্নেসা সরকারি মহিলা কলেজ',
+    search: ['badrunnessa', 'badrunessa', 'begum badrunnessa'],
+  },
+  { name: 'ঢাকা পলিটেকনিক ইনস্টিটিউট', search: ['dhaka polytechnic', 'dpi'] },
+  {
+    name: 'শহীদ সোহরাওয়ার্দী কলেজ',
+    search: ['suhrawardy', 'sorawardy college', 'shaheed suhrawardy'],
+  },
+  { name: 'নারায়ণগঞ্জ কলেজ', search: ['narayanganj college'] },
+  {
+    name: 'নারায়ণগঞ্জ সরকারি মহিলা কলেজ',
+    search: ['narayanganj govt women', 'narayanganj mohila'],
+  },
+  { name: 'তোলারাম কলেজ', search: ['tolaram college', 'tolaraam'] },
+  {
+    name: 'গাজীপুর সরকারি কলেজ',
+    search: ['gazipur govt college', 'gazipur college'],
+  },
+  {
+    name: 'টঙ্গী সরকারি কলেজ',
+    search: ['tongi govt college', 'tongi college'],
+  },
+  {
+    name: 'ফরিদপুর সরকারি কলেজ',
+    search: ['faridpur govt college', 'faridpur college'],
+  },
+  {
+    name: 'রাজেন্দ্র কলেজ, ফরিদপুর',
+    search: ['rajendra college', 'faridpur rajendra'],
+  },
+  {
+    name: 'টাঙ্গাইল সরকারি কলেজ',
+    search: ['tangail govt college', 'tangail college'],
+  },
+  {
+    name: 'মাওলানা মোহাম্মদ আলী কলেজ',
+    search: ['mawlana mohammad ali college', 'mma college'],
+  },
+  {
+    name: 'কিশোরগঞ্জ সরকারি কলেজ',
+    search: ['kishoreganj govt college', 'kishoreganj college'],
+  },
+  {
+    name: 'গুরুদয়াল সরকারি কলেজ',
+    search: ['gurudayal college', 'gurudayal govt college'],
+  },
+  {
+    name: 'মানিকগঞ্জ সরকারি কলেজ',
+    search: ['manikganj govt college', 'manikganj college'],
+  },
+  {
+    name: 'নরসিংদী সরকারি কলেজ',
+    search: ['narsingdi govt college', 'narsingdi college'],
+  },
+  {
+    name: 'রাজবাড়ী সরকারি কলেজ',
+    search: ['rajbari govt college', 'rajbari college'],
+  },
+  {
+    name: 'মাদারীপুর সরকারি কলেজ',
+    search: ['madaripur govt college', 'madaripur college'],
+  },
+  {
+    name: 'গোপালগঞ্জ সরকারি কলেজ',
+    search: ['gopalganj govt college', 'gopalganj college'],
+  },
+  {
+    name: 'শরীয়তপুর সরকারি কলেজ',
+    search: ['shariatpur govt college', 'shariatpur college'],
+  },
+  {
+    name: 'মুন্সিগঞ্জ সরকারি কলেজ',
+    search: ['munshiganj govt college', 'munshiganj college'],
+  },
+  // ── Chittagong Division ─────────────────────────────────────────────────────
+  {
+    name: 'চট্টগ্রাম কলেজ',
+    search: ['chittagong college', 'ctg college', 'chattogram college'],
+  },
+  {
+    name: 'হাজী মুহাম্মদ মহসীন কলেজ',
+    search: ['hazi muhammed mohsin', 'mohsin college', 'hm mohsin'],
+  },
+  {
+    name: 'চট্টগ্রাম সিটি কলেজ',
+    search: ['chittagong city college', 'ctg city college'],
+  },
+  {
+    name: 'চট্টগ্রাম কমার্স কলেজ',
+    search: ['chittagong commerce college', 'ctg commerce'],
+  },
+  {
+    name: 'ক্যান্টনমেন্ট পাবলিক কলেজ, চট্টগ্রাম',
+    search: ['cantonment public college chittagong', 'ccpc', 'ctg cantonment'],
+  },
+  {
+    name: 'চট্টগ্রাম সরকারি মহিলা কলেজ',
+    search: ['chittagong govt womens', 'ctg mohila', 'chittagong women'],
+  },
+  {
+    name: 'চট্টগ্রাম সরকারি কমার্স কলেজ',
+    search: ['chittagong govt commerce', 'ctg govt commerce'],
+  },
+  {
+    name: 'চট্টগ্রাম মেডিকেল কলেজ',
+    search: ['chittagong medical college', 'cmc'],
+  },
+  {
+    name: 'চট্টগ্রাম ক্যান্টনমেন্ট পাবলিক কলেজ',
+    search: ['chittagong cantonment public college'],
+  },
+  {
+    name: 'কক্সবাজার সরকারি কলেজ',
+    search: [
+      "cox's bazar govt college",
+      'coxs bazar college',
+      'coxsbazar college',
+    ],
+  },
+  {
+    name: 'কুমিল্লা ভিক্টোরিয়া সরকারি কলেজ',
+    search: ['comilla victoria', 'victoria college comilla', 'cumilla college'],
+  },
+  {
+    name: 'কুমিল্লা সরকারি মহিলা কলেজ',
+    search: ['comilla govt women', 'cumilla mohila'],
+  },
+  {
+    name: 'কুমিল্লা ক্যান্টনমেন্ট কলেজ',
+    search: ['comilla cantonment college', 'cumilla cantonment'],
+  },
+  { name: 'ফেনী সরকারি কলেজ', search: ['feni govt college', 'feni college'] },
+  {
+    name: 'নোয়াখালী সরকারি কলেজ',
+    search: ['noakhali govt college', 'noakhali college'],
+  },
+  {
+    name: 'লক্ষ্মীপুর সরকারি কলেজ',
+    search: ['lakshmipur govt college', 'laxmipur college'],
+  },
+  {
+    name: 'চাঁদপুর সরকারি কলেজ',
+    search: ['chandpur govt college', 'chandpur college'],
+  },
+  {
+    name: 'ব্রাহ্মণবাড়িয়া সরকারি কলেজ',
+    search: ['brahmanbaria govt college', 'brahmanbaria college'],
+  },
+  {
+    name: 'রাঙামাটি সরকারি কলেজ',
+    search: ['rangamati govt college', 'rangamati college'],
+  },
+  {
+    name: 'বান্দরবান সরকারি কলেজ',
+    search: ['bandarban govt college', 'bandarban college'],
+  },
+  {
+    name: 'খাগড়াছড়ি সরকারি কলেজ',
+    search: ['khagrachhari govt college', 'khagrachhari college'],
+  },
+  // ── Rajshahi Division ───────────────────────────────────────────────────────
+  {
+    name: 'রাজশাহী কলেজ',
+    search: ['rajshahi college', 'rc', 'rajshahi govt college'],
+  },
+  {
+    name: 'রাজশাহী সরকারি সিটি কলেজ',
+    search: ['rajshahi city college', 'rajshahi govt city'],
+  },
+  {
+    name: 'রাজশাহী সরকারি মহিলা কলেজ',
+    search: ['rajshahi govt womens', 'rajshahi mohila'],
+  },
+  {
+    name: 'নিউ গভর্নমেন্ট ডিগ্রি কলেজ, রাজশাহী',
+    search: ['new govt degree college rajshahi', 'ngdc rajshahi'],
+  },
+  { name: 'রাজশাহী মেডিকেল কলেজ', search: ['rajshahi medical college', 'rmc'] },
+  { name: 'রাজশাহী কমার্স কলেজ', search: ['rajshahi commerce college'] },
+  {
+    name: 'চাঁপাইনবাবগঞ্জ সরকারি কলেজ',
+    search: ['chapai nawabganj govt college', 'chapainawabganj college'],
+  },
+  {
+    name: 'নাটোর সরকারি কলেজ',
+    search: ['natore govt college', 'natore college'],
+  },
+  {
+    name: 'পাবনা সরকারি এডওয়ার্ড কলেজ',
+    search: [
+      'pabna edward college',
+      'edward college pabna',
+      'govt edward college',
+    ],
+  },
+  {
+    name: 'পাবনা সরকারি মহিলা কলেজ',
+    search: ['pabna govt womens', 'pabna mohila'],
+  },
+  {
+    name: 'সিরাজগঞ্জ সরকারি কলেজ',
+    search: ['sirajganj govt college', 'sirajganj college'],
+  },
+  {
+    name: 'গভর্নমেন্ট আজিজুল হক কলেজ, বগুড়া',
+    search: ['azizul haque', 'bogra college', 'azizul haq', 'bogura college'],
+  },
+  {
+    name: 'বগুড়া সরকারি মহিলা কলেজ',
+    search: ['bogura govt womens', 'bogra mohila'],
+  },
+  {
+    name: 'জয়পুরহাট সরকারি কলেজ',
+    search: ['joypurhat govt college', 'joypurhat college'],
+  },
+  {
+    name: 'নওগাঁ সরকারি কলেজ',
+    search: ['naogaon govt college', 'naogaon college', 'nawgaon college'],
+  },
+  // ── Khulna Division ─────────────────────────────────────────────────────────
+  {
+    name: 'সরকারি বি এল কলেজ, খুলনা',
+    search: ['bl college', 'govt bl college', 'khulna bl', 'b l college'],
+  },
+  {
+    name: 'খুলনা সরকারি মহিলা কলেজ',
+    search: ['khulna govt womens', 'khulna mohila'],
+  },
+  {
+    name: 'আজম খান সরকারি কমার্স কলেজ',
+    search: ['azam khan commerce', 'govt commerce college khulna'],
+  },
+  { name: 'খুলনা মেডিকেল কলেজ', search: ['khulna medical college', 'kmc'] },
+  {
+    name: 'বাগেরহাট সরকারি কলেজ',
+    search: ['bagerhat govt college', 'bagerhat college'],
+  },
+  {
+    name: 'সাতক্ষীরা সরকারি কলেজ',
+    search: ['satkhira govt college', 'satkhira college'],
+  },
+  {
+    name: 'যশোর সরকারি সিটি কলেজ',
+    search: ['jessore city college', 'jessore college', 'jashore college'],
+  },
+  {
+    name: 'যশোর সরকারি মহিলা কলেজ',
+    search: ['jessore govt womens', 'jessore mohila'],
+  },
+  {
+    name: 'মাইকেল মধুসূদন কলেজ',
+    search: ['michael madhusudan', 'mm college jessore', 'madhusudan college'],
+  },
+  {
+    name: 'নড়াইল সরকারি ভিক্টোরিয়া কলেজ',
+    search: ['narail victoria', 'narail college'],
+  },
+  {
+    name: 'মাগুরা সরকারি কলেজ',
+    search: ['magura govt college', 'magura college'],
+  },
+  {
+    name: 'ঝিনাইদহ সরকারি কলেজ',
+    search: ['jhenaidah govt college', 'jhenaidah college'],
+  },
+  {
+    name: 'কুষ্টিয়া সরকারি কলেজ',
+    search: ['kushtia govt college', 'kushtia college'],
+  },
+  {
+    name: 'চুয়াডাঙ্গা সরকারি কলেজ',
+    search: ['chuadanga govt college', 'chuadanga college'],
+  },
+  {
+    name: 'মেহেরপুর সরকারি কলেজ',
+    search: ['meherpur govt college', 'meherpur college'],
+  },
+  // ── Barisal Division ────────────────────────────────────────────────────────
+  {
+    name: 'বরিশাল সরকারি কলেজ',
+    search: [
+      'barisal govt college',
+      'barishal govt college',
+      'bm college barisal',
+    ],
+  },
+  {
+    name: 'বরিশাল সরকারি মহিলা কলেজ',
+    search: ['barisal govt womens', 'barishal mohila'],
+  },
+  {
+    name: 'বরিশাল ক্যান্টনমেন্ট কলেজ',
+    search: ['barisal cantonment', 'barishal cantonment'],
+  },
+  {
+    name: 'বরিশাল মেডিকেল কলেজ',
+    search: ['barisal medical', 'barishal medical college'],
+  },
+  {
+    name: 'শের-ই-বাংলা মেডিকেল কলেজ',
+    search: ['shere bangla medical', 'sher e bangla medical', 'sbmc'],
+  },
+  { name: 'বিএম কলেজ, বরিশাল', search: ['bm college', 'b m college barisal'] },
+  { name: 'ভোলা সরকারি কলেজ', search: ['bhola govt college', 'bhola college'] },
+  {
+    name: 'পটুয়াখালী সরকারি কলেজ',
+    search: ['patuakhali govt college', 'patuakhali college'],
+  },
+  {
+    name: 'পিরোজপুর সরকারি কলেজ',
+    search: ['pirojpur govt college', 'pirojpur college'],
+  },
+  {
+    name: 'ঝালকাঠি সরকারি কলেজ',
+    search: ['jhalokathi govt college', 'jhalokati college'],
+  },
+  {
+    name: 'বরগুনা সরকারি কলেজ',
+    search: ['barguna govt college', 'barguna college'],
+  },
+  // ── Sylhet Division ─────────────────────────────────────────────────────────
+  {
+    name: 'সিলেট সরকারি কলেজ',
+    search: [
+      'sylhet government college',
+      'sylhet sarkari',
+      'govt college sylhet',
+    ],
+  },
+  {
+    name: 'মুরারিচাঁদ কলেজ (এমসি কলেজ), সিলেট',
+    search: ['mc college', 'murarichand college', 'murari chand', 'sylhet mc'],
+  },
+  {
+    name: 'সিলেট সরকারি মহিলা কলেজ',
+    search: ['sylhet govt womens', 'sylhet mohila', 'sylhet womens college'],
+  },
+  { name: 'সিলেট কমার্স কলেজ', search: ['sylhet commerce college'] },
+  { name: 'সিলেট ক্যান্টনমেন্ট কলেজ', search: ['sylhet cantonment college'] },
+  {
+    name: 'সিলেট মেডিকেল কলেজ',
+    search: ['sylhet medical college', 'smc sylhet'],
+  },
+  {
+    name: 'এমএজি ওসমানী মেডিকেল কলেজ',
+    search: ['osmani medical college', 'mag osmani', 'mag osmani medical'],
+  },
+  {
+    name: 'মৌলভীবাজার সরকারি কলেজ',
+    search: ['moulvibazar govt college', 'moulvibazar college'],
+  },
+  {
+    name: 'হবিগঞ্জ সরকারি কলেজ',
+    search: ['habiganj govt college', 'habiganj college'],
+  },
+  {
+    name: 'সুনামগঞ্জ সরকারি কলেজ',
+    search: ['sunamganj govt college', 'sunamganj college'],
+  },
+  // ── Rangpur Division ────────────────────────────────────────────────────────
+  {
+    name: 'রংপুর সরকারি কলেজ',
+    search: ['rangpur govt college', 'rangpur government college'],
+  },
+  {
+    name: 'কারমাইকেল কলেজ, রংপুর',
+    search: ['carmichael college', 'carmichael rangpur'],
+  },
+  {
+    name: 'রংপুর সরকারি মহিলা কলেজ',
+    search: ['rangpur govt womens', 'rangpur mohila'],
+  },
+  { name: 'রংপুর মেডিকেল কলেজ', search: ['rangpur medical college'] },
+  {
+    name: 'দিনাজপুর সরকারি কলেজ',
+    search: ['dinajpur govt college', 'dinajpur government college'],
+  },
+  {
+    name: 'সুরেন্দ্রনাথ কলেজ, দিনাজপুর',
+    search: ['surendranath college', 'snc dinajpur'],
+  },
+  {
+    name: 'দিনাজপুর সরকারি মহিলা কলেজ',
+    search: ['dinajpur govt womens', 'dinajpur mohila'],
+  },
+  {
+    name: 'গাইবান্ধা সরকারি কলেজ',
+    search: ['gaibandha govt college', 'gaibandha college'],
+  },
+  {
+    name: 'কুড়িগ্রাম সরকারি কলেজ',
+    search: ['kurigram govt college', 'kurigram college'],
+  },
+  {
+    name: 'নীলফামারী সরকারি কলেজ',
+    search: ['nilphamari govt college', 'nilphamari college'],
+  },
+  {
+    name: 'লালমনিরহাট সরকারি কলেজ',
+    search: ['lalmonirhat govt college', 'lalmonirhat college'],
+  },
+  {
+    name: 'পঞ্চগড় সরকারি কলেজ',
+    search: ['panchagarh govt college', 'panchagarh college'],
+  },
+  {
+    name: 'ঠাকুরগাঁও সরকারি কলেজ',
+    search: ['thakurgaon govt college', 'thakurgaon college'],
+  },
+  {
+    name: 'সৈয়দপুর সরকারি কলেজ',
+    search: ['saidpur govt college', 'saidpur college'],
+  },
+  // ── Mymensingh Division ─────────────────────────────────────────────────────
+  {
+    name: 'আনন্দমোহন কলেজ, ময়মনসিংহ',
+    search: ['ananda mohan', 'anandamohan', 'amc mymensingh'],
+  },
+  {
+    name: 'ময়মনসিংহ সরকারি মহিলা কলেজ',
+    search: ['mymensingh govt womens', 'mymensingh mohila'],
+  },
+  {
+    name: 'ময়মনসিংহ সরকারি কলেজ',
+    search: ['mymensingh govt college', 'mymensingh college'],
+  },
+  {
+    name: 'ময়মনসিংহ মেডিকেল কলেজ',
+    search: ['mymensingh medical college', 'mmc'],
+  },
+  { name: 'ময়মনসিংহ ক্যান্টনমেন্ট কলেজ', search: ['mymensingh cantonment'] },
+  {
+    name: 'নেত্রকোণা সরকারি কলেজ',
+    search: ['netrokona govt college', 'netrokona college'],
+  },
+  {
+    name: 'শেরপুর সরকারি কলেজ',
+    search: ['sherpur govt college', 'sherpur college'],
+  },
+  {
+    name: 'জামালপুর সরকারি আশেক মাহমুদ কলেজ',
+    search: [
+      'jamalpur ashek mahmud',
+      'jamalpur college',
+      'ashek mahmud college',
+    ],
+  },
+  // ── Notable Others ──────────────────────────────────────────────────────────
+  {
+    name: 'ফৌজদারহাট ক্যাডেট কলেজ',
+    search: ['faujdarhat cadet', 'fouzdarhat cadet'],
+  },
+  { name: 'রাজশাহী ক্যাডেট কলেজ', search: ['rajshahi cadet', 'rcc'] },
+  {
+    name: 'যশোর ক্যাডেট কলেজ',
+    search: ['jhenaidah cadet', 'jessore cadet', 'jashore cadet'],
+  },
+  { name: 'পাবনা ক্যাডেট কলেজ', search: ['pabna cadet'] },
+  { name: 'কুমিল্লা ক্যাডেট কলেজ', search: ['comilla cadet', 'cumilla cadet'] },
+  { name: 'ময়মনসিংহ ক্যাডেট কলেজ', search: ['mymensingh cadet'] },
+  { name: 'খুলনা ক্যাডেট কলেজ', search: ['khulna cadet', 'kcc'] },
+  { name: 'বরিশাল ক্যাডেট কলেজ', search: ['barisal cadet', 'barishal cadet'] },
+  {
+    name: 'সরকারি সাদত কলেজ, করটিয়া',
+    search: ['sadat college', 'karatia college', 'govt sadat college'],
+  },
+  {
+    name: 'স্কলাস্টিকা স্কুল এন্ড কলেজ',
+    search: ['scholastica', 'scholastika'],
+  },
+  {
+    name: 'সানশাইন গ্রামার স্কুল এন্ড কলেজ',
+    search: ['sunshine grammar', 'sunshine school'],
+  },
+  // ─── Additional colleges from the full district list ───────────────────────
+  // Narayanganj
+  {
+    name: 'নারায়ণগঞ্জ সরকারি তিতুমীর কলেজ',
+    search: ['narayanganj govt titumir', 'titumir narayanganj'],
+  },
+  {
+    name: 'সোনারগাঁও সরকারি কলেজ',
+    search: ['sonargaon govt college', 'sonargaon college'],
+  },
+  { name: 'টঙ্গী সরকারি কলেজ', search: ['tongi govt college'] },
+  {
+    name: 'গাজীপুর ক্যান্টনমেন্ট কলেজ',
+    search: ['gazipur cantonment college'],
+  },
+  // Rajshahi district
+  { name: 'বাঘা কলেজ', search: ['bagha college'] },
+  { name: 'চারঘাট কলেজ', search: ['charghat college'] },
+  { name: 'গোদাগাড়ী কলেজ', search: ['godagari college'] },
+  // Chapai Nawabganj
+  { name: 'ভোলাহাট কলেজ', search: ['bholahat college'] },
+  { name: 'গোমস্তাপুর কলেজ', search: ['gomastapur college'] },
+  { name: 'নাচোল কলেজ', search: ['nachole college'] },
+  { name: 'শিবগঞ্জ কলেজ', search: ['shibganj college'] },
+  // Sylhet areas
+  { name: 'বালাগঞ্জ কলেজ', search: ['balaganj college'] },
+  {
+    name: 'বিয়ানীবাজার কলেজ',
+    search: ['beani bazar college', 'beanibazar college'],
+  },
+  { name: 'বিশ্বনাথ কলেজ', search: ['bishwanath college'] },
+  { name: 'ফেঞ্চুগঞ্জ কলেজ', search: ['fenchuganj college'] },
+  { name: 'গোলাপগঞ্জ কলেজ', search: ['golapganj college'] },
+  { name: 'জকিগঞ্জ কলেজ', search: ['zakiganj college'] },
+  {
+    name: 'শ্রীমঙ্গল কলেজ',
+    search: ['sreemangal college', 'srimangal college'],
+  },
+  // Comilla areas
+  { name: 'বরুড়া কলেজ', search: ['barura college'] },
+  { name: 'চাঁদিনা কলেজ', search: ['chandina college'] },
+  { name: 'দাউদকান্দি কলেজ', search: ['daudkandi college'] },
+  {
+    name: 'লাকসাম সরকারি কলেজ',
+    search: ['laksam govt college', 'laksam college'],
+  },
+  { name: 'মুরাদনগর কলেজ', search: ['muradnagar college'] },
+  // Feni areas
+  { name: 'সোনাগাজী কলেজ', search: ['sonagazi college'] },
+  { name: 'পরশুরাম কলেজ', search: ['parshuram college'] },
+  // Brahmanbaria areas
+  { name: 'আখাউড়া কলেজ', search: ['akhaura college'] },
+  { name: 'আশুগঞ্জ কলেজ', search: ['ashuganj college'] },
+  { name: 'কসবা কলেজ', search: ['kasba college'] },
+  { name: 'নবীনগর কলেজ', search: ['nabinagar college'] },
+  { name: 'সরাইল কলেজ', search: ['sarail college'] },
+  // Khulna areas
+  {
+    name: 'বাগেরহাট সরকারি মহিলা কলেজ',
+    search: ['bagerhat govt womens', 'bagerhat mohila'],
+  },
+  { name: 'চিতলমারী কলেজ', search: ['chitalmari college'] },
+  { name: 'মোল্লারহাট কলেজ', search: ['mollahat college'] },
+  { name: 'মোরেলগঞ্জ কলেজ', search: ['morrelganj college'] },
+  { name: 'চুয়াডাঙ্গা সরকারি মহিলা কলেজ', search: ['chuadanga govt womens'] },
+  { name: 'আলমডাঙ্গা কলেজ', search: ['alamdanga college'] },
+  { name: 'দামুড়হুদা কলেজ', search: ['damurhuda college'] },
+  { name: 'মেহেরপুর সরকারি মহিলা কলেজ', search: ['meherpur govt womens'] },
+  // Jessore areas
+  { name: 'যশোর ক্যান্টনমেন্ট কলেজ', search: ['jessore cantonment college'] },
+  { name: 'ঝিকরগাছা কলেজ', search: ['jhikargachha college'] },
+  { name: 'কেশবপুর কলেজ', search: ['keshabpur college'] },
+  { name: 'মনিরামপুর কলেজ', search: ['manirampur college'] },
+  // Barisal areas
+  { name: 'বাকেরগঞ্জ কলেজ', search: ['bakerganj college'] },
+  { name: 'বানারীপাড়া কলেজ', search: ['banaripara college'] },
+  { name: 'গৌরনদী কলেজ', search: ['gaurnadi college'] },
+  { name: 'মেহেন্দিগঞ্জ কলেজ', search: ['mehendiganj college'] },
+  { name: 'বোরহানউদ্দিন কলেজ', search: ['borhanuddin college'] },
+  { name: 'চরফ্যাশন কলেজ', search: ['char fasson college'] },
+  { name: 'পটুয়াখালী সরকারি মহিলা কলেজ', search: ['patuakhali govt womens'] },
+  { name: 'বাউফল কলেজ', search: ['bauphal college'] },
+  { name: 'গলাচিপা কলেজ', search: ['galachipa college'] },
+  { name: 'কলাপাড়া কলেজ', search: ['kalapara college'] },
+  { name: 'পিরোজপুর সরকারি মহিলা কলেজ', search: ['pirojpur govt womens'] },
+  { name: 'ভান্ডারিয়া কলেজ', search: ['bhandaria college'] },
+  { name: 'মঠবাড়িয়া কলেজ', search: ['mathbaria college'] },
+  { name: 'ঝালকাঠি সরকারি মহিলা কলেজ', search: ['jhalokathi govt womens'] },
+  { name: 'বরগুনা সরকারি মহিলা কলেজ', search: ['barguna govt womens'] },
+  { name: 'আমতলী কলেজ', search: ['amtali college'] },
+  // Rangpur areas
+  {
+    name: 'রংপুর ক্যান্টনমেন্ট পাবলিক স্কুল ও কলেজ',
+    search: ['rangpur cantonment public college', 'rcpsc'],
+  },
+  { name: 'বদরগঞ্জ কলেজ', search: ['badarganj college'] },
+  { name: 'গঙ্গাচড়া কলেজ', search: ['gangachhara college'] },
+  { name: 'মিঠাপুকুর কলেজ', search: ['mithapukur college'] },
+  { name: 'পীরগঞ্জ কলেজ', search: ['pirganj college rangpur'] },
+  { name: 'গোবিন্দগঞ্জ কলেজ', search: ['gobindaganj college'] },
+  { name: 'পলাশবাড়ী কলেজ', search: ['palashbari college'] },
+  { name: 'সাদুল্লাপুর কলেজ', search: ['sadullapur college'] },
+  { name: 'সুন্দরগঞ্জ কলেজ', search: ['sundarganj college'] },
+  { name: 'ভুরুঙ্গামারী কলেজ', search: ['bhurungamari college'] },
+  { name: 'নাগেশ্বরী কলেজ', search: ['nageshwari college'] },
+  { name: 'উলিপুর কলেজ', search: ['ulipur college'] },
+  { name: 'দিমলা কলেজ', search: ['dimla college'] },
+  { name: 'ডোমার কলেজ', search: ['domar college'] },
+  { name: 'সৈয়দপুর সরকারি কলেজ', search: ['saidpur govt college'] },
+  { name: 'আদিতমারী কলেজ', search: ['aditmari college'] },
+  { name: 'হাতীবান্ধা কলেজ', search: ['hatibandha college'] },
+  { name: 'পাটগ্রাম কলেজ', search: ['patgram college'] },
+  { name: 'আটোয়ারী কলেজ', search: ['atwari college'] },
+  { name: 'বোদা কলেজ', search: ['boda college'] },
+  { name: 'তেঁতুলিয়া কলেজ', search: ['tetulia college'] },
+  { name: 'ঠাকুরগাঁও সরকারি মহিলা কলেজ', search: ['thakurgaon govt womens'] },
+  { name: 'বালিয়াডাঙ্গী কলেজ', search: ['baliadangi college'] },
+  { name: 'রাণীশংকৈল কলেজ', search: ['ranisankail college'] },
+  // Mymensingh areas
+  { name: 'ভালুকা কলেজ', search: ['bhaluka college'] },
+  { name: 'ফুলবাড়িয়া কলেজ', search: ['fulbaria college'] },
+  { name: 'গফরগাঁও কলেজ', search: ['gaffargaon college'] },
+  { name: 'হালুয়াঘাট কলেজ', search: ['haluaghat college'] },
+  {
+    name: 'মুক্তাগাছা কলেজ',
+    search: ['muktagacha college', 'muktagachha college'],
+  },
+  { name: 'ফুলপুর কলেজ', search: ['phulpur college'] },
+  { name: 'ত্রিশাল কলেজ', search: ['trishal college'] },
+  { name: 'নেত্রকোণা সরকারি মহিলা কলেজ', search: ['netrokona govt womens'] },
+  { name: 'কলমাকান্দা কলেজ', search: ['kalmakanda college'] },
+  { name: 'কেন্দুয়া কলেজ', search: ['kendua college'] },
+  { name: 'মোহনগঞ্জ কলেজ', search: ['mohanganj college'] },
+  { name: 'শেরপুর সরকারি মহিলা কলেজ', search: ['sherpur govt womens'] },
+  { name: 'ঝেনাইগাতী কলেজ', search: ['jhenaigati college'] },
+  { name: 'নালিতাবাড়ী কলেজ', search: ['nalitabari college'] },
+  { name: 'নকলা কলেজ', search: ['nakla college'] },
+  { name: 'শ্রীবরদী কলেজ', search: ['sreebardi college'] },
+  { name: 'জামালপুর সরকারি মহিলা কলেজ', search: ['jamalpur govt womens'] },
+  { name: 'বকশীগঞ্জ কলেজ', search: ['bakshiganj college'] },
+  { name: 'দেওয়ানগঞ্জ কলেজ', search: ['dewanganj college'] },
+  { name: 'ইসলামপুর কলেজ', search: ['islampur college jamalpur'] },
+  { name: 'মেলান্দহ কলেজ', search: ['melandaha college'] },
+  { name: 'সরিষাবাড়ী কলেজ', search: ['sarishabari college'] },
+];
+
+/**
+ * Returns up to 8 canonical college names matching the query.
+ * Matches against both Bengali canonical name and English/alias search terms.
+ */
+export function searchColleges(query: string): string[] {
+  const q = query.toLowerCase().trim();
+  if (q.length === 0) return [];
+
+  const seen = new Set<string>();
+  const results: string[] = [];
+
+  for (const entry of COLLEGE_DATA) {
+    if (seen.has(entry.name)) continue;
+    const matches =
+      entry.name.toLowerCase().includes(q) ||
+      entry.search.some((s) => s.includes(q));
+    if (matches) {
+      seen.add(entry.name);
+      results.push(entry.name);
+      if (results.length >= 8) break;
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Returns the canonical college name for a raw user input.
+ * Falls back to the input itself if no exact match is found.
+ */
+export function getCanonicalCollegeName(input: string): string {
+  const q = input.toLowerCase().trim();
+  const match = COLLEGE_DATA.find(
+    (c) => c.name.toLowerCase() === q || c.search.some((s) => s === q),
+  );
+  return match ? match.name : input;
+}

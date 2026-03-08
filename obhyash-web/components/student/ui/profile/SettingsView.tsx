@@ -11,6 +11,7 @@ import { useAuth } from '@/components/auth/AuthProvider';
 
 import { uploadAvatar } from '@/services/storage-service';
 import { getErrorMessage } from '@/lib/error-utils';
+import { searchColleges } from '@/lib/college-mapping';
 
 interface SettingsViewProps {
   user: UserProfile;
@@ -58,6 +59,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl); // Local state for immediate preview
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showCollegeSuggestions, setShowCollegeSuggestions] = useState(false);
 
   // Account Linking State
   const { user: currentUser } = useAuth();
@@ -456,14 +458,42 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onSave }) => {
         <div className={bodyClass}>
           <div className={inputGroupClass}>
             <label className={labelClass}>শিক্ষা প্রতিষ্ঠানের নাম</label>
-            <input
-              type="text"
-              name="institute"
-              value={formData.institute}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="তোমার শিক্ষা প্রতিষ্ঠানের নাম লিখো..."
-            />
+            <div className="relative">
+              <input
+                type="text"
+                name="institute"
+                value={formData.institute}
+                onChange={(e) => {
+                  handleChange(e);
+                  setShowCollegeSuggestions(true);
+                }}
+                onBlur={() =>
+                  setTimeout(() => setShowCollegeSuggestions(false), 150)
+                }
+                className={inputClass}
+                placeholder="তোমার শিক্ষা প্রতিষ্ঠানের নাম লিখো..."
+                autoComplete="off"
+              />
+              {showCollegeSuggestions &&
+                formData.institute.length > 0 &&
+                searchColleges(formData.institute).length > 0 && (
+                  <ul className="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-lg overflow-hidden">
+                    {searchColleges(formData.institute).map((name) => (
+                      <li
+                        key={name}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => {
+                          setFormData((prev) => ({ ...prev, institute: name }));
+                          setShowCollegeSuggestions(false);
+                        }}
+                        className="px-4 py-2.5 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer font-bengali"
+                      >
+                        {name}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+            </div>
           </div>
 
           <div className={inputGroupClass}>

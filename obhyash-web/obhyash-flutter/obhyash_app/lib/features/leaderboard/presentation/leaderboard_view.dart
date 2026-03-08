@@ -108,6 +108,21 @@ class _LBUser {
   );
 }
 
+// ─── Institute Rank Model ────────────────────────────────────────────────────
+class _InstituteRank {
+  final String institute;
+  final int avgXp;
+  final int studentCount;
+  final bool isMyCollege;
+
+  const _InstituteRank({
+    required this.institute,
+    required this.avgXp,
+    required this.studentCount,
+    required this.isMyCollege,
+  });
+}
+
 final _numFmt = NumberFormat('#,##0');
 
 // ─── View ──────────────────────────────────────────────────────────────────────
@@ -123,6 +138,11 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
   List<_LBUser> _users = [];
   bool _isLoading = false;
   Map<String, int> _levelCounts = {};
+  String _viewMode = 'level'; // 'level', 'college', or 'rankings'
+  List<_LBUser> _collegeUsers = [];
+  bool _isLoadingCollege = false;
+  List<_InstituteRank> _instituteRankings = [];
+  bool _isLoadingRankings = false;
 
   @override
   void initState() {
@@ -177,6 +197,90 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
     }
   }
 
+  Future<void> _fetchCollege(String institute) async {
+    if (institute.isEmpty) return;
+    setState(() => _isLoadingCollege = true);
+    try {
+      final supabase = Supabase.instance.client;
+      final me = supabase.auth.currentUser?.id;
+      final data = await supabase
+          .from('public_profiles')
+          .select('id, name, institute, xp, level, exams_taken, avatar_url')
+          .eq('institute', institute)
+          .order('xp', ascending: false)
+          .limit(100);
+
+      if (mounted) {
+        setState(() {
+          _collegeUsers = (data as List)
+              .map((u) => _LBUser.fromJson(u as Map<String, dynamic>, me: me))
+              .toList();
+          _isLoadingCollege = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('[LeaderboardView] _fetchCollege error: $e');
+      if (mounted) setState(() => _isLoadingCollege = false);
+    }
+  }
+
+  Future<void> _fetchInstituteRankings() async {
+    if (_instituteRankings.isNotEmpty) return; // already loaded
+    setState(() => _isLoadingRankings = true);
+    try {
+      final supabase = Supabase.instance.client;
+      final myProfile = ref
+          .read(userProfileProvider)
+          .whenOrNull(data: (u) => u);
+      final myInstitute = myProfile?.institute as String?;
+
+      final data = await supabase
+          .from('public_profiles')
+          .select('institute, xp')
+          .not('institute', 'is', null)
+          .neq('institute', '')
+          .order('xp', ascending: false)
+          .limit(5000);
+
+      // Group by institute
+      final groups = <String, List<int>>{};
+      for (final row in (data as List).cast<Map<String, dynamic>>()) {
+        final inst = row['institute'] as String?;
+        if (inst == null || inst.isEmpty) continue;
+        groups
+            .putIfAbsent(inst, () => [])
+            .add((row['xp'] as num?)?.toInt() ?? 0);
+      }
+
+      // Top-5 average; require at least 5 students
+      final rankings = <_InstituteRank>[];
+      for (final entry in groups.entries) {
+        if (entry.value.length < 5) continue;
+        final top5 = entry.value.take(5).toList(); // already sorted desc
+        final avgXp = (top5.reduce((a, b) => a + b) / 5).round();
+        rankings.add(
+          _InstituteRank(
+            institute: entry.key,
+            avgXp: avgXp,
+            studentCount: entry.value.length,
+            isMyCollege: entry.key == myInstitute,
+          ),
+        );
+      }
+      rankings.sort((a, b) => b.avgXp.compareTo(a.avgXp));
+
+      if (mounted) {
+        setState(() {
+          _instituteRankings = rankings;
+          _isLoadingRankings = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('[LeaderboardView] _fetchInstituteRankings error: $e');
+      if (mounted) setState(() => _isLoadingRankings = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -192,52 +296,102 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
 
     return Column(
       children: [
-        // ── Level Selector ──────────────────────────────────────────────────
-        _LevelSelector(
-          levels: _levels,
-          selectedLevel: _selectedLevel,
-          myLevel: myProfile?.level,
-          levelCounts: _levelCounts,
-          onSelect: (id) {
-            setState(() => _selectedLevel = id);
-            _fetch();
-          },
-          isDark: isDark,
+        // ── View Mode Tab Switcher ──────────────────────────────────────────
+        Container(
+          color: isDark ? const Color(0xFF0A0A0A) : Colors.white,
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          child: Row(
+            children: [
+              _ViewModeTab(
+                label: 'লেভেল র‍্যাংকিং',
+                isActive: _viewMode == 'level',
+                isDark: isDark,
+                onTap: () => setState(() => _viewMode = 'level'),
+              ),
+              const SizedBox(width: 8),
+              _ViewModeTab(
+                label: 'কলেজ র‍্যাংকিং',
+                isActive: _viewMode == 'college',
+                isDark: isDark,
+                onTap: () {
+                  setState(() => _viewMode = 'college');
+                  final inst = myProfile?.institute as String?;
+                  if (inst != null && inst.isNotEmpty) {
+                    _fetchCollege(inst);
+                  }
+                },
+              ),
+              const SizedBox(width: 8),
+              _ViewModeTab(
+                label: 'কলেজ প্রতিযোগিতা',
+                isActive: _viewMode == 'rankings',
+                isDark: isDark,
+                onTap: () {
+                  setState(() => _viewMode = 'rankings');
+                  _fetchInstituteRankings();
+                },
+              ),
+            ],
+          ),
         ),
+
+        // ── Level Selector (level mode only) ───────────────────────────────
+        if (_viewMode == 'level')
+          _LevelSelector(
+            levels: _levels,
+            selectedLevel: _selectedLevel,
+            myLevel: myProfile?.level,
+            levelCounts: _levelCounts,
+            onSelect: (id) {
+              setState(() => _selectedLevel = id);
+              _fetch();
+            },
+            isDark: isDark,
+          ),
 
         // ── Body ────────────────────────────────────────────────────────────
         Expanded(
-          child: _isLoading && _users.isEmpty
-              ? const Center(child: CircularProgressIndicator())
-              : ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
-                  children: [
-                    // UserProgress card (own level only)
-                    if (myProfile != null && isOnOwnLevel)
-                      _UserProgressCard(
-                        level: myProfile.level ?? 'Rookie',
-                        xp: myProfile.xp,
-                        rank: myRank,
-                        isDark: isDark,
-                      ),
-
-                    // Top 3 podium
-                    if (!_isLoading && _users.length >= 3)
-                      _PodiumSection(
-                        users: _users.take(3).toList(),
-                        isDark: isDark,
-                        onTap: (id) => context.push('/user-profile/$id'),
-                      ),
-
-                    // Leaderboard table
-                    _LeaderboardTable(
-                      users: _users,
-                      levelLabel: lvl.label.split(' ').first,
-                      isLoading: _isLoading,
-                      isDark: isDark,
-                      onUserTap: (id) => context.push('/user-profile/$id'),
-                    ),
-                  ],
+          child: _viewMode == 'rankings'
+              ? _InstituteRankingsBody(
+                  rankings: _instituteRankings,
+                  isLoading: _isLoadingRankings,
+                  isDark: isDark,
+                )
+              : _viewMode == 'level'
+              ? (_isLoading && _users.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+                        children: [
+                          if (myProfile != null && isOnOwnLevel)
+                            _UserProgressCard(
+                              level: myProfile.level ?? 'Rookie',
+                              xp: myProfile.xp,
+                              rank: myRank,
+                              isDark: isDark,
+                            ),
+                          if (!_isLoading && _users.length >= 3)
+                            _PodiumSection(
+                              users: _users.take(3).toList(),
+                              isDark: isDark,
+                              onTap: (id) => context.push('/user-profile/$id'),
+                            ),
+                          _LeaderboardTable(
+                            users: _users,
+                            levelLabel: lvl.label.split(' ').first,
+                            isLoading: _isLoading,
+                            isDark: isDark,
+                            onUserTap: (id) =>
+                                context.push('/user-profile/$id'),
+                          ),
+                        ],
+                      ))
+              : _CollegeLeaderboardBody(
+                  institute: (myProfile?.institute as String?) ?? '',
+                  users: _collegeUsers,
+                  isLoading: _isLoadingCollege,
+                  isDark: isDark,
+                  onUserTap: (id) => context.push('/user-profile/$id'),
                 ),
         ),
       ],
@@ -245,7 +399,419 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
   }
 }
 
-// ─── Level Selector ─────────────────────────────────────────────────────────────
+// ─── View Mode Tab ─────────────────────────────────────────────────────────────
+class _ViewModeTab extends StatelessWidget {
+  final String label;
+  final bool isActive;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _ViewModeTab({
+    required this.label,
+    required this.isActive,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isActive
+                ? (isDark ? const Color(0xFF059669) : const Color(0xFF059669))
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'HindSiliguri',
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: isActive
+                  ? Colors.white
+                  : (isDark
+                        ? const Color(0xFF737373)
+                        : const Color(0xFF9CA3AF)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── College Leaderboard Body ────────────────────────────────────────────────
+class _CollegeLeaderboardBody extends StatelessWidget {
+  final String institute;
+  final List<_LBUser> users;
+  final bool isLoading;
+  final bool isDark;
+  final void Function(String) onUserTap;
+
+  const _CollegeLeaderboardBody({
+    required this.institute,
+    required this.users,
+    required this.isLoading,
+    required this.isDark,
+    required this.onUserTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (institute.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('🏫', style: TextStyle(fontSize: 40)),
+              const SizedBox(height: 12),
+              Text(
+                'তোমার প্রোফাইলে কলেজের নাম যোগ করো',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                  color: isDark
+                      ? const Color(0xFF737373)
+                      : const Color(0xFF9CA3AF),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
+      children: [
+        // College name header
+        Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF0A1F17) : const Color(0xFFECFDF5),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isDark ? const Color(0xFF059669) : const Color(0xFFBBF7D0),
+            ),
+          ),
+          child: Row(
+            children: [
+              const Text('🏫', style: TextStyle(fontSize: 18)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  institute,
+                  style: TextStyle(
+                    fontFamily: 'HindSiliguri',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: isDark
+                        ? const Color(0xFF34D399)
+                        : const Color(0xFF047857),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        if (users.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 32),
+            child: Center(
+              child: Column(
+                children: [
+                  const Text('🏫', style: TextStyle(fontSize: 36)),
+                  const SizedBox(height: 10),
+                  Text(
+                    'তোমার কলেজ থেকে এখনো কেউ যোগ দেয়নি',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'HindSiliguri',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                      color: isDark
+                          ? const Color(0xFF737373)
+                          : const Color(0xFF9CA3AF),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'বন্ধুদের আমন্ত্রণ জানাও!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'HindSiliguri',
+                      fontSize: 12,
+                      color: isDark
+                          ? const Color(0xFF525252)
+                          : const Color(0xFFBBBBBB),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        else
+          _LeaderboardTable(
+            users: users,
+            levelLabel: 'কলেজ',
+            isLoading: false,
+            isDark: isDark,
+            onUserTap: onUserTap,
+          ),
+      ],
+    );
+  }
+}
+
+// ─── Institute Rankings Body ─────────────────────────────────────────────────
+class _InstituteRankingsBody extends StatelessWidget {
+  final List<_InstituteRank> rankings;
+  final bool isLoading;
+  final bool isDark;
+
+  const _InstituteRankingsBody({
+    required this.rankings,
+    required this.isLoading,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return ListView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+        children: List.generate(
+          8,
+          (_) => Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            height: 64,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (rankings.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('🏆', style: TextStyle(fontSize: 40)),
+              const SizedBox(height: 12),
+              Text(
+                'এখনো যথেষ্ট ডেটা নেই',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                  color: isDark
+                      ? const Color(0xFF737373)
+                      : const Color(0xFF9CA3AF),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'প্রতিটি কলেজ থেকে কমপক্ষে ৫ জন শিক্ষার্থী লাগবে',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontSize: 12,
+                  color: isDark
+                      ? const Color(0xFF525252)
+                      : const Color(0xFFBBBBBB),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12, left: 2),
+          child: Text(
+            'র‍্যাংকিং: প্রতিটি কলেজের শীর্ষ ৫ শিক্ষার্থীর গড় XP অনুযায়ী',
+            style: TextStyle(
+              fontFamily: 'HindSiliguri',
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: isDark ? const Color(0xFF525252) : const Color(0xFF9CA3AF),
+            ),
+          ),
+        ),
+        ...rankings.asMap().entries.map((e) {
+          final idx = e.key;
+          final entry = e.value;
+          final rank = idx + 1;
+          final isMe = entry.isMyCollege;
+          final medal = rank == 1
+              ? '🥇'
+              : rank == 2
+              ? '🥈'
+              : rank == 3
+              ? '🥉'
+              : null;
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: isMe
+                  ? (isDark ? const Color(0xFF0A1F17) : const Color(0xFFECFDF5))
+                  : (isDark ? const Color(0xFF111111) : Colors.white),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isMe
+                    ? (isDark
+                          ? const Color(0xFF059669)
+                          : const Color(0xFFBBF7D0))
+                    : (isDark
+                          ? const Color(0xFF1E1E1E)
+                          : const Color(0xFFF0F0F0)),
+              ),
+            ),
+            child: Row(
+              children: [
+                // Rank / medal
+                SizedBox(
+                  width: 32,
+                  child: Center(
+                    child: medal != null
+                        ? Text(medal, style: const TextStyle(fontSize: 20))
+                        : Text(
+                            '$rank',
+                            style: TextStyle(
+                              fontFamily: 'HindSiliguri',
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
+                              color: isDark
+                                  ? const Color(0xFF4A4A4A)
+                                  : const Color(0xFFBBBBBB),
+                            ),
+                          ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                // Institute name + student count
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        entry.institute,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontFamily: 'HindSiliguri',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: isMe
+                              ? (isDark
+                                    ? const Color(0xFF34D399)
+                                    : const Color(0xFF047857))
+                              : (isDark
+                                    ? Colors.white
+                                    : const Color(0xFF111111)),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        isMe
+                            ? 'তোমার কলেজ • ${entry.studentCount} শিক্ষার্থী'
+                            : '${entry.studentCount} জন শিক্ষার্থী',
+                        style: TextStyle(
+                          fontFamily: 'HindSiliguri',
+                          fontSize: 11,
+                          color: isDark
+                              ? const Color(0xFF525252)
+                              : const Color(0xFF9CA3AF),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Avg XP
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isMe
+                        ? (isDark
+                              ? const Color(0xFF064E3B)
+                              : const Color(0xFFD1FAE5))
+                        : (isDark
+                              ? const Color(0xFF1A1A1A)
+                              : const Color(0xFFF5F5F5)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        '${_numFmt.format(entry.avgXp)} XP',
+                        style: TextStyle(
+                          fontFamily: 'HindSiliguri',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          color: isMe
+                              ? (isDark
+                                    ? const Color(0xFF34D399)
+                                    : const Color(0xFF047857))
+                              : (isDark
+                                    ? Colors.white
+                                    : const Color(0xFF111111)),
+                        ),
+                      ),
+                      Text(
+                        'গড় স্কোর',
+                        style: TextStyle(
+                          fontFamily: 'HindSiliguri',
+                          fontSize: 9,
+                          color: isDark
+                              ? const Color(0xFF525252)
+                              : const Color(0xFF9CA3AF),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+}
+
+// ─── Level Selector ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
 class _LevelSelector extends StatelessWidget {
   final List<_LevelInfo> levels;
   final String selectedLevel;
