@@ -34,11 +34,6 @@ class MainSidebar extends StatelessWidget {
       {'id': 'practice', 'label': 'অনুশীলন', 'icon': LucideIcons.penTool},
       {'id': 'leaderboard', 'label': 'লিডারবোর্ড', 'icon': LucideIcons.trophy},
       {'id': 'analysis', 'label': 'এনালাইসিস', 'icon': LucideIcons.barChart2},
-      {
-        'id': 'my-reports',
-        'label': 'আমার রিপোর্ট',
-        'icon': LucideIcons.clipboardList,
-      },
       {'id': 'blog', 'label': 'ব্লগ', 'icon': LucideIcons.newspaper},
     ];
 

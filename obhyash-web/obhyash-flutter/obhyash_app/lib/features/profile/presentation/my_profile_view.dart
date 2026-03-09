@@ -17,6 +17,7 @@ class MyProfileView extends ConsumerWidget {
   final VoidCallback onEditProfile;
   final Function(String)? onSubjectClick;
   final VoidCallback? onViewNotifications;
+  final VoidCallback? onViewReports;
 
   const MyProfileView({
     super.key,
@@ -27,6 +28,7 @@ class MyProfileView extends ConsumerWidget {
     required this.onEditProfile,
     this.onSubjectClick,
     this.onViewNotifications,
+    this.onViewReports,
   });
 
   String _getRankName(int xp) {

@@ -48,8 +48,6 @@ import { ComplaintView } from '@/components/student/features/complaint/Complaint
 import AnalysisView from '@/components/student/features/dashboard/AnalysisView';
 import { PracticeDashboard } from '@/components/student/features/practice/PracticeDashboard';
 import NotificationsView from '@/components/student/features/notifications/NotificationsView';
-import StudentReportView from '@/components/student/features/reports/StudentReportView';
-
 // Profile Features
 import MyProfileView from '@/components/student/ui/profile/MyProfileView';
 import SubscriptionView from '@/components/student/ui/profile/SubscriptionView';
@@ -209,7 +207,6 @@ export default function StudentRoot({
     'complaint',
     'notifications',
     'about',
-    'my-reports',
     'subscription',
     'profile',
     'settings',
@@ -702,7 +699,12 @@ export default function StudentRoot({
       if (activeTab === 'settings') {
         return (
           <AppLayout activeTab="" {...commonLayoutProps} title="সেটিংস">
-            <SettingsView user={currentUser!} onSave={handleProfileUpdate} />
+            <SettingsView
+              user={currentUser!}
+              onSave={handleProfileUpdate}
+              onNavigate={(tab) => handleTabChange(tab)}
+              onLogout={handleLogoutClick}
+            />
           </AppLayout>
         );
       }
@@ -771,18 +773,6 @@ export default function StudentRoot({
             title="আমাদের সম্পর্কে"
           >
             <AboutUsView />
-          </AppLayout>
-        );
-      }
-
-      if (activeTab === 'my-reports') {
-        return (
-          <AppLayout
-            activeTab={activeTab}
-            {...commonLayoutProps}
-            title="আমার রিপোর্ট"
-          >
-            <StudentReportView user={currentUser!} />
           </AppLayout>
         );
       }

@@ -1206,27 +1206,27 @@ class _StatusBadge extends StatelessWidget {
       ),
     };
 
-    final effectiveBg = isDark ? color.withValues(alpha: 0.1) : bg;
-    final effectiveBorder = isDark ? color.withValues(alpha: 0.3) : border;
+    final solidBg = status == 'Resolved'
+        ? const Color(0xFF166534)
+        : const Color(0xFFDC2626);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: effectiveBg,
-        border: Border.all(color: effectiveBorder),
+        color: solidBg,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 10, color: color),
+          Icon(icon, size: 10, color: Colors.white),
           const SizedBox(width: 5),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.bold,
-              color: isDark ? color : color,
+              color: Colors.white,
             ),
           ),
         ],
@@ -1361,7 +1361,6 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = const Color(0xFFE11D48);
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -1369,12 +1368,12 @@ class _FilterChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
           color: isSelected
-              ? (isDark ? const Color(0xFF3F0F17) : const Color(0xFFFFF1F2))
+              ? const Color(0xFF166534)
               : (isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5)),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
-                ? (isDark ? const Color(0xFF7F1D2A) : const Color(0xFFFFCDD2))
+                ? const Color(0xFF166534)
                 : (isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5)),
           ),
         ),
@@ -1384,7 +1383,7 @@ class _FilterChip extends StatelessWidget {
             fontSize: 12,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             color: isSelected
-                ? activeColor
+                ? Colors.white
                 : (isDark ? const Color(0xFFA3A3A3) : const Color(0xFF525252)),
           ),
         ),
