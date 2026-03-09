@@ -986,84 +986,157 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* Blog Highlights Section */}
       {latestPosts.length > 0 && (
-        <section className="py-24 bg-white dark:bg-black overflow-hidden border-t border-neutral-100 dark:border-neutral-900">
+        <section className="py-24 bg-neutral-950 dark:bg-black overflow-hidden border-t border-neutral-900">
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
-            <div className="flex flex-col lg:flex-row gap-12 items-end mb-12">
-              <div className="lg:w-2/3 space-y-6">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
+
+            {/* Section Header */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-14">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/40 border border-red-800/40 text-red-400 text-xs font-black uppercase tracking-wider">
                   <BookOpen className="w-3.5 h-3.5" />
                   ব্লগ থেকে সর্বশেষ
                 </div>
-                <p className="text-neutral-600 dark:text-neutral-400 text-lg leading-relaxed max-w-2xl">
-                  আপনার পরীক্ষার প্রস্তুতির জন্য বিশেষজ্ঞ টিপস, MCQ টেকনিক এবং
-                  কার্যকরী কৌশলগুলো জেনে নাও।
+                <h2 className="text-4xl sm:text-5xl font-black text-white leading-tight">
+                  পরীক্ষার প্রস্তুতিতে<br />
+                  <span className="text-red-500">বিশেষজ্ঞ কৌশল</span>
+                </h2>
+                <p className="text-neutral-400 text-base leading-relaxed max-w-xl">
+                  MCQ টেকনিক, পেপার সলিউশন এবং স্টাডি রুটিন — সব এক জায়গায়।
                 </p>
               </div>
-              <div className="lg:w-1/3 flex justify-start lg:justify-end">
-                <Link
-                  href="/blog"
-                  className="inline-flex items-center gap-3 px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold transition-all active:scale-95 group shadow-xl shadow-emerald-700/20"
-                >
-                  ব্লগ দেখো
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-bold text-sm transition-all duration-300 group shrink-0"
+              >
+                সব পোস্ট দেখো
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
 
-            {/* Horizontal Scroll Cards */}
-            <div className="relative group">
-              {/* Mobile Scroll Hint */}
-              <div className="md:hidden flex justify-end mb-4 text-[10px] text-neutral-400 font-bold uppercase tracking-widest animate-pulse gap-1 items-center">
-                বামে স্ক্রল করো <ArrowRight className="w-3 h-3" />
-              </div>
+            {/* Featured + Sidebar Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
 
-              <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory no-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
-                {latestPosts.map((post, idx) => (
-                  <Link
-                    key={`${post.slug}-${idx}`}
-                    href={`/blog/${post.slug}`}
-                    className="flex-shrink-0 w-[85%] sm:w-[450px] snap-center block group/card"
-                  >
-                    <div className="h-full bg-white dark:bg-neutral-900 rounded-[2.5rem] border border-neutral-100 dark:border-neutral-800 p-6 sm:p-8 flex flex-col gap-6 transition-all duration-500 hover:border-emerald-200 dark:hover:border-emerald-900/40 hover:shadow-2xl hover:shadow-emerald-500/5 relative overflow-hidden">
-                      {/* Decorative Background Blob */}
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -z-10 group-hover/card:bg-emerald-500/10 transition-colors"></div>
-
-                      <div className="flex gap-6 items-start">
-                        <div
-                          className={`w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-3xl bg-gradient-to-br ${post.coverColor || 'from-neutral-200 to-neutral-300'} flex items-center justify-center text-white font-bold text-2xl sm:text-3xl shadow-lg transform group-hover/card:scale-105 transition-transform duration-500`}
-                        >
-                          {post.author.initials}
-                        </div>
-                        <div className="flex-1 space-y-3">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold border border-emerald-100 dark:border-emerald-800 uppercase tracking-widest">
-                              {post.category}
-                            </span>
-                            <span className="flex items-center gap-1.5 text-[10px] text-neutral-400 font-bold uppercase tracking-wider">
-                              <Clock className="w-3.5 h-3.5" />
-                              {post.readTime} মিনিট পড়া
-                            </span>
-                          </div>
-                          <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white group-hover/card:text-emerald-700 dark:group-hover/card:text-emerald-500 transition-colors line-clamp-2 leading-tight">
-                            {post.title}
-                          </h3>
-                        </div>
+              {/* Featured Post (first) */}
+              {latestPosts[0] && (
+                <Link
+                  href={`/blog/${latestPosts[0].slug}`}
+                  className="lg:col-span-3 block group/featured"
+                >
+                  <div className="h-full rounded-[1.75rem] overflow-hidden border border-white/[0.08] hover:border-red-500/30 hover:shadow-2xl hover:shadow-red-900/20 transition-all duration-500 hover:-translate-y-1 flex flex-col">
+                    {/* Cover area */}
+                    <div
+                      className={`relative h-56 sm:h-72 w-full bg-gradient-to-br ${latestPosts[0].coverColor || 'from-emerald-700 to-emerald-950'} flex items-end overflow-hidden`}
+                    >
+                      {latestPosts[0].coverImage && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={latestPosts[0].coverImage}
+                          alt={latestPosts[0].title}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      <div className="relative z-10 p-6 flex flex-wrap items-center gap-2">
+                        <span className="px-3 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full">
+                          {latestPosts[0].category}
+                        </span>
+                        <span className="px-2.5 py-1 bg-black/50 text-white/70 text-[10px] font-bold rounded-full flex items-center gap-1">
+                          <Clock className="w-2.5 h-2.5" />
+                          {latestPosts[0].readTime} মিনিট
+                        </span>
                       </div>
-                      <div className="space-y-4">
-                        <p className="text-neutral-500 dark:text-neutral-400 text-sm sm:text-base leading-relaxed font-medium line-clamp-3">
-                          {post.excerpt}
-                        </p>
-                        <div className="flex items-center gap-3 pt-2 text-emerald-600 dark:text-emerald-400 font-bold text-xs">
-                          <span>আরও পড়ুন</span>
-                          <ArrowRight className="w-4 h-4 group-hover/card:translate-x-2 transition-transform" />
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 p-6 sm:p-8 bg-neutral-900 flex flex-col gap-4">
+                      <h3 className="text-2xl sm:text-3xl font-black text-white group-hover/featured:text-red-400 transition-colors line-clamp-2 leading-tight">
+                        {latestPosts[0].title}
+                      </h3>
+                      <p className="text-neutral-400 text-sm sm:text-base leading-relaxed line-clamp-2 flex-1">
+                        {latestPosts[0].excerpt}
+                      </p>
+                      {latestPosts[0].tags && latestPosts[0].tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {latestPosts[0].tags.slice(0, 3).map((tag) => (
+                            <span
+                              key={tag}
+                              className="px-2 py-0.5 bg-white/5 border border-white/10 text-neutral-400 text-[10px] font-bold rounded-md"
+                            >
+                              #{tag}
+                            </span>
+                          ))}
                         </div>
+                      )}
+                      <div className="flex items-center justify-between pt-3 border-t border-white/[0.08]">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-9 h-9 rounded-full bg-gradient-to-br ${latestPosts[0].coverColor || 'from-emerald-600 to-emerald-900'} flex items-center justify-center text-white text-xs font-black shadow-md`}
+                          >
+                            {latestPosts[0].author.initials}
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-neutral-200">{latestPosts[0].author.name}</div>
+                            <div className="text-[10px] text-neutral-500">{latestPosts[0].author.role}</div>
+                          </div>
+                        </div>
+                        <span className="inline-flex items-center gap-1.5 text-red-400 font-black text-xs group-hover/featured:gap-2.5 transition-all">
+                          পড়তে শুরু করো
+                          <ArrowRight className="w-3.5 h-3.5 group-hover/featured:translate-x-1 transition-transform" />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              )}
+
+              {/* Sidebar: remaining posts + CTA */}
+              <div className="lg:col-span-2 flex flex-col gap-4">
+                {latestPosts.slice(1, 4).map((post) => (
+                  <Link key={post.slug} href={`/blog/${post.slug}`} className="group/card block flex-1">
+                    <div className="h-full bg-neutral-900 rounded-[1.5rem] border border-white/[0.08] p-4 sm:p-5 flex gap-4 items-start hover:border-red-500/30 hover:shadow-xl hover:shadow-red-900/10 hover:-translate-y-0.5 transition-all duration-300">
+                      {/* Thumbnail */}
+                      <div
+                        className={`w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br ${post.coverColor || 'from-neutral-700 to-neutral-900'} flex items-center justify-center text-white font-black text-base group-hover/card:scale-105 transition-transform duration-300 shadow-md overflow-hidden`}
+                      >
+                        {post.coverImage ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
+                        ) : (
+                          post.author.initials
+                        )}
+                      </div>
+                      {/* Text */}
+                      <div className="flex-1 min-w-0 space-y-1.5">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">
+                            {post.category}
+                          </span>
+                          <span className="text-[9px] font-bold text-neutral-500 flex items-center gap-1">
+                            <Clock className="w-2.5 h-2.5" />
+                            {post.readTime} মিনিট
+                          </span>
+                        </div>
+                        <h4 className="text-sm font-bold text-neutral-100 group-hover/card:text-red-400 transition-colors line-clamp-2 leading-snug">
+                          {post.title}
+                        </h4>
+                        <p className="text-[11px] text-neutral-500 line-clamp-1 font-medium">{post.excerpt}</p>
                       </div>
                     </div>
                   </Link>
                 ))}
 
-                {/* Blank space for end of scroll padding */}
-                <div className="flex-shrink-0 w-4 md:hidden"></div>
+                {/* Blog CTA card */}
+                <Link href="/blog" className="block group/cta mt-auto">
+                  <div className="rounded-[1.5rem] bg-gradient-to-br from-red-700 to-red-900 p-5 flex items-center justify-between text-white hover:from-red-600 hover:to-red-800 transition-all duration-300 shadow-xl shadow-red-900/30 hover:shadow-red-800/40 hover:-translate-y-0.5 border border-red-600/30">
+                    <div>
+                      <div className="font-black text-base">সব লেখা পড়ুন</div>
+                      <div className="text-red-300 text-xs font-medium mt-0.5">ব্লগে সব পোস্ট দেখো</div>
+                    </div>
+                    <div className="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center group-hover/cta:bg-white/25 transition-colors">
+                      <ArrowRight className="w-5 h-5 group-hover/cta:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </Link>
               </div>
             </div>
           </div>
