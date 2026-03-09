@@ -164,9 +164,10 @@ class _SubscriptionViewState extends ConsumerState<SubscriptionView> {
                       'আপগ্রেড করুন',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 24, // text-3xl
-                        fontWeight: FontWeight.w900, // font-black
-                        letterSpacing: -0.5, // tracking-tight
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                        fontFamily: 'HindSiliguri',
                       ),
                     ),
                   ),
@@ -182,11 +183,10 @@ class _SubscriptionViewState extends ConsumerState<SubscriptionView> {
             child: Text(
               'আপনার প্ল্যান বেছে নিন',
               style: TextStyle(
-                fontSize: 24, // text-2xl
-                fontWeight: FontWeight.w900, // font-black
-                color: isDark
-                    ? Colors.white
-                    : const Color(0xFF171717), // white : neutral-900
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                color: isDark ? Colors.white : const Color(0xFF171717),
+                fontFamily: 'HindSiliguri',
               ),
             ),
           ),
@@ -282,6 +282,7 @@ class _SubscriptionViewState extends ConsumerState<SubscriptionView> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
+                          fontFamily: 'HindSiliguri',
                         ),
                       ),
                     ],
@@ -314,6 +315,7 @@ class _SubscriptionViewState extends ConsumerState<SubscriptionView> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
+                          fontFamily: 'HindSiliguri',
                         ),
                       ),
                     ],
@@ -346,6 +348,7 @@ class _SubscriptionViewState extends ConsumerState<SubscriptionView> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
+                          fontFamily: 'HindSiliguri',
                         ),
                       ),
                     ],
@@ -378,6 +381,7 @@ class _SubscriptionViewState extends ConsumerState<SubscriptionView> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
+                          fontFamily: 'HindSiliguri',
                         ),
                       ),
                     ],
@@ -456,6 +460,7 @@ class _ComparisonTable extends StatelessWidget {
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
                       color: textSub,
+                      fontFamily: 'HindSiliguri',
                     ),
                   ),
                 ),
@@ -467,6 +472,7 @@ class _ComparisonTable extends StatelessWidget {
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
                         color: textSub,
+                        fontFamily: 'HindSiliguri',
                       ),
                     ),
                   ),
@@ -479,6 +485,7 @@ class _ComparisonTable extends StatelessWidget {
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
                         color: Color(0xFF166534),
+                        fontFamily: 'HindSiliguri',
                       ),
                     ),
                   ),
@@ -505,7 +512,11 @@ class _ComparisonTable extends StatelessWidget {
                     flex: 3,
                     child: Text(
                       label,
-                      style: TextStyle(fontSize: 13, color: textMain),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: textMain,
+                        fontFamily: 'HindSiliguri',
+                      ),
                     ),
                   ),
                   Expanded(
@@ -518,6 +529,7 @@ class _ComparisonTable extends StatelessWidget {
                                       fontSize: 11,
                                       color: textSub,
                                       fontWeight: FontWeight.bold,
+                                      fontFamily: 'HindSiliguri',
                                     ),
                                   )
                                 : const Icon(
@@ -541,6 +553,7 @@ class _ComparisonTable extends StatelessWidget {
                                 fontSize: 11,
                                 color: Color(0xFF166534),
                                 fontWeight: FontWeight.bold,
+                                fontFamily: 'HindSiliguri',
                               ),
                             )
                           : const Icon(

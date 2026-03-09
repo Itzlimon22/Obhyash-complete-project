@@ -26,6 +26,8 @@ import PersonalDetailsPanel from './settings/PersonalDetailsPanel';
 import ManageDevicesPanel from './settings/ManageDevicesPanel';
 import ReportsPanel from './settings/ReportsPanel';
 import MySubscriptionPanel from './settings/MySubscriptionPanel';
+import SubscriptionView from './SubscriptionView';
+import NotificationsView from '@/components/student/features/notifications/NotificationsView';
 
 interface SettingsViewProps {
   user: UserProfile;
@@ -36,7 +38,13 @@ interface SettingsViewProps {
   isDarkMode?: boolean;
 }
 
-type PanelSection = 'personal' | 'devices' | 'reports' | 'my-subscription';
+type PanelSection =
+  | 'personal'
+  | 'devices'
+  | 'reports'
+  | 'my-subscription'
+  | 'notifications'
+  | 'upgrade';
 
 interface BaseItem {
   label: string;
@@ -99,8 +107,8 @@ const GROUPS: SettingsGroup[] = [
         Icon: AlertTriangle,
       },
       {
-        type: 'internal',
-        tab: 'notifications',
+        type: 'panel',
+        id: 'notifications',
         label: 'নোটিফিকেশন',
         description: 'নতুন আপডেট ও বার্তা',
         Icon: Bell,
@@ -118,8 +126,8 @@ const GROUPS: SettingsGroup[] = [
         Icon: Crown,
       },
       {
-        type: 'internal',
-        tab: 'subscription',
+        type: 'panel',
+        id: 'upgrade',
         label: 'আপগ্রেড করুন',
         description: 'প্ল্যান দেখো ও আপগ্রেড করো',
         Icon: ArrowUpRight,
@@ -294,18 +302,54 @@ export default function SettingsView({
   };
 
   const renderPanel = (section: PanelSection) => {
-    switch (section) {
-      case 'personal':
-        return <PersonalDetailsPanel user={user} onSave={onSave} />;
-      case 'devices':
-        return <ManageDevicesPanel userId={user.id ?? ''} />;
-      case 'reports':
-        return <ReportsPanel user={user} />;
-      case 'my-subscription':
-        return (
-          <MySubscriptionPanel onUpgrade={() => onNavigate?.('subscription')} />
-        );
-    }
+    const panelTitles: Record<PanelSection, string> = {
+      personal: 'ব্যক্তিগত তথ্য',
+      devices: 'ডিভাইস ম্যানেজ',
+      reports: 'আমার রিপোর্ট',
+      'my-subscription': 'আমার সাবসক্রিপশন',
+      notifications: 'নোটিফিকেশন',
+      upgrade: 'আপগ্রেড করুন',
+    };
+    const content = (() => {
+      switch (section) {
+        case 'personal':
+          return <PersonalDetailsPanel user={user} onSave={onSave} />;
+        case 'devices':
+          return <ManageDevicesPanel userId={user.id ?? ''} />;
+        case 'reports':
+          return <ReportsPanel user={user} />;
+        case 'my-subscription':
+          return (
+            <MySubscriptionPanel
+              onUpgrade={() => setActiveSection('upgrade')}
+            />
+          );
+        case 'notifications':
+          return <NotificationsView />;
+        case 'upgrade':
+          return <SubscriptionView />;
+      }
+    })();
+
+    return (
+      <div>
+        {/* Panel header with back button — shown on desktop */}
+        <div className="hidden md:flex items-center gap-3 mb-5 pb-4 border-b border-neutral-200 dark:border-neutral-800">
+          <button
+            onClick={() => setActiveSection('personal')}
+            className="flex items-center gap-1.5 text-xs font-bold text-neutral-400 dark:text-neutral-500 hover:text-green-700 dark:hover:text-green-400 transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            সেটিংস
+          </button>
+          <span className="text-neutral-300 dark:text-neutral-700">/</span>
+          <h2 className="text-sm font-bold text-neutral-800 dark:text-neutral-100">
+            {panelTitles[section]}
+          </h2>
+        </div>
+        {content}
+      </div>
+    );
   };
 
   // Sidebar nav item renderer

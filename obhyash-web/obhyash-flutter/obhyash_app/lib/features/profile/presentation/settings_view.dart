@@ -7,6 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../dashboard/domain/models.dart';
 import '../../notifications/presentation/notifications_view.dart';
+import '../../subscription/presentation/my_subscription_view.dart';
+import '../../subscription/presentation/subscription_view.dart';
 import '../../../core/providers/theme_provider.dart';
 import 'personal_details_view.dart';
 import 'profile_stats_page.dart';
@@ -88,14 +90,14 @@ class SettingsView extends ConsumerWidget {
             description: 'বর্তমান প্ল্যান, ইতিহাস ও লেনদেন',
             icon: LucideIcons.crown,
             type: _ItemType.navigate,
-            route: '/my-subscription',
+            destination: const MySubscriptionView(),
           ),
           _SettingsItem(
             label: 'আপগ্রেড করুন',
             description: 'প্রিমিয়াম প্ল্যান দেখো ও আপগ্রেড করো',
             icon: LucideIcons.creditCard,
             type: _ItemType.navigate,
-            route: '/subscription',
+            destination: const _UpgradePage(),
           ),
         ],
       ),
@@ -688,6 +690,36 @@ class _ActionBtn extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// ─── Upgrade Page Wrapper ─────────────────────────────────────────────────────
+
+class _UpgradePage extends StatelessWidget {
+  const _UpgradePage();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Scaffold(
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A0A)
+          : const Color(0xFFF5F5F5),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF166534),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'আপগ্রেড করুন',
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+            fontFamily: 'HindSiliguri',
+          ),
+        ),
+      ),
+      body: const SubscriptionView(),
     );
   }
 }
