@@ -9,27 +9,34 @@ import {
   AlertTriangle,
   Bell,
   BookOpen,
-  CreditCard,
+  Crown,
+  ArrowUpRight,
   Info,
   Shield,
   FileText,
   HelpCircle,
   LogOut,
   ExternalLink,
+  Sun,
+  Moon,
 } from 'lucide-react';
+import UserAvatar from '../common/UserAvatar';
 import { UserProfile } from '@/lib/types';
 import PersonalDetailsPanel from './settings/PersonalDetailsPanel';
 import ManageDevicesPanel from './settings/ManageDevicesPanel';
 import ReportsPanel from './settings/ReportsPanel';
+import MySubscriptionPanel from './settings/MySubscriptionPanel';
 
 interface SettingsViewProps {
   user: UserProfile;
   onSave?: (data: Partial<UserProfile>) => void;
   onNavigate?: (tab: string) => void;
   onLogout?: () => void;
+  toggleTheme?: () => void;
+  isDarkMode?: boolean;
 }
 
-type PanelSection = 'personal' | 'devices' | 'reports';
+type PanelSection = 'personal' | 'devices' | 'reports' | 'my-subscription';
 
 interface BaseItem {
   label: string;
@@ -104,11 +111,18 @@ const GROUPS: SettingsGroup[] = [
     title: 'সাবস্ক্রিপশন',
     items: [
       {
+        type: 'panel',
+        id: 'my-subscription',
+        label: 'আমার সাবস্ক্রিপশন',
+        description: 'বর্তমান প্ল্যান, ইতিহাস ও লেনদেন',
+        Icon: Crown,
+      },
+      {
         type: 'internal',
         tab: 'subscription',
-        label: 'সাবস্ক্রিপশন ও আপগ্রেড',
-        description: 'প্ল্যান দেখো, আপগ্রেড করো',
-        Icon: CreditCard,
+        label: 'আপগ্রেড করুন',
+        description: 'প্ল্যান দেখো ও আপগ্রেড করো',
+        Icon: ArrowUpRight,
       },
     ],
   },
@@ -172,11 +186,90 @@ const GROUPS: SettingsGroup[] = [
   },
 ];
 
+function ProfileCard({
+  user,
+  isDarkMode,
+  toggleTheme,
+}: {
+  user: UserProfile;
+  isDarkMode?: boolean;
+  toggleTheme?: () => void;
+}) {
+  return (
+    <div className="max-w-5xl mx-auto mb-6 rounded-2xl overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-md">
+      {/* Green gradient header */}
+      <div className="bg-gradient-to-br from-green-700 to-green-900 px-6 py-8 flex flex-col items-center gap-3">
+        <UserAvatar user={user} size="2xl" showBorder />
+        <div className="text-center">
+          <h2 className="text-xl font-black text-white tracking-tight">
+            {user.name}
+          </h2>
+          {user.email && (
+            <p className="text-sm text-white/70 mt-1 truncate max-w-xs">
+              {user.email}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Info chips + theme toggle */}
+      <div className="bg-white dark:bg-neutral-950 px-5 pt-4 pb-5 space-y-4">
+        <div className="flex flex-wrap gap-2 justify-center">
+          {user.phone && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+              📞 {user.phone}
+            </span>
+          )}
+          {user.institute && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+              🏫 {user.institute}
+            </span>
+          )}
+          {user.batch && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+              📅 ব্যাচ {user.batch}
+            </span>
+          )}
+        </div>
+
+        {toggleTheme && (
+          <div className="flex rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800">
+            <button
+              onClick={() => isDarkMode && toggleTheme()}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-bold transition-all ${
+                !isDarkMode
+                  ? 'bg-green-800 text-white'
+                  : 'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900'
+              }`}
+            >
+              <Sun className="w-3.5 h-3.5" />
+              লাইট
+            </button>
+            <button
+              onClick={() => !isDarkMode && toggleTheme()}
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-bold transition-all ${
+                isDarkMode
+                  ? 'bg-green-800 text-white'
+                  : 'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-900'
+              }`}
+            >
+              <Moon className="w-3.5 h-3.5" />
+              ডার্ক
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsView({
   user,
   onSave,
   onNavigate,
   onLogout,
+  toggleTheme,
+  isDarkMode,
 }: SettingsViewProps) {
   const [activeSection, setActiveSection] = useState<PanelSection | null>(null);
   const desktopSection: PanelSection = activeSection ?? 'personal';
@@ -208,6 +301,10 @@ export default function SettingsView({
         return <ManageDevicesPanel userId={user.id ?? ''} />;
       case 'reports':
         return <ReportsPanel user={user} />;
+      case 'my-subscription':
+        return (
+          <MySubscriptionPanel onUpgrade={() => onNavigate?.('subscription')} />
+        );
     }
   };
 
@@ -243,6 +340,13 @@ export default function SettingsView({
 
   return (
     <>
+      {/* ── Profile Card ─────────────────────────────────── */}
+      <ProfileCard
+        user={user}
+        isDarkMode={isDarkMode}
+        toggleTheme={toggleTheme}
+      />
+
       {/* ── DESKTOP (md+): sidebar + content ─────────────── */}
       <div className="hidden md:flex gap-6 max-w-5xl mx-auto pb-24 items-start">
         {/* Sidebar */}

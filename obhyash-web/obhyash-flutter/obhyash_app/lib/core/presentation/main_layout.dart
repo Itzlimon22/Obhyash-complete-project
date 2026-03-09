@@ -49,6 +49,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/analysis')) return 'analysis';
     if (location.startsWith('/my-reports')) return 'my-reports';
     if (location.startsWith('/profile')) return 'profile';
+    if (location.startsWith('/my-subscription')) return 'my-subscription';
     if (location.startsWith('/subscription')) return 'subscription';
     if (location.startsWith('/complaint')) return 'complaint';
     if (location.startsWith('/about')) return 'about';
@@ -463,7 +464,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
 
                             // Profile Avatar
                             GestureDetector(
-                              onTap: () => _showProfileSheet(context, user),
+                              onTap: () => context.go('/profile'),
                               child: Container(
                                 width: 34,
                                 height: 34,
@@ -583,7 +584,13 @@ class _ProfileSheet extends StatelessWidget {
       },
       {
         'label':
-            '\u09b8\u09be\u09ac\u09b8\u09cd\u0995\u09cd\u09b0\u09bf\u09aa\u09b6\u09a8 \u0993 \u09ac\u09bf\u09b2\u09bf\u0982',
+            '\u0986\u09ae\u09be\u09b0 \u09b8\u09be\u09ac\u09b8\u09cd\u0995\u09cd\u09b0\u09bf\u09aa\u09b6\u09a8',
+        'icon': LucideIcons.crown,
+        'route': '/my-subscription',
+      },
+      {
+        'label':
+            '\u0986\u09aa\u0997\u09cd\u09b0\u09c7\u09a1 \u0995\u09b0\u09c1\u09a8',
         'icon': LucideIcons.creditCard,
         'route': '/subscription',
       },

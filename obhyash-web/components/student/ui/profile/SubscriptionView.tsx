@@ -1,113 +1,142 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import {
   SubscriptionPlan,
-  Invoice,
   PaymentMethod,
   UserProfile,
   PaymentSubmission,
 } from '@/lib/types';
 import PricingCard from './subscription/PricingCard';
-import BillingHistory from './subscription/BillingHistory';
-import PaymentMethods from './subscription/PaymentMethods';
-import AddPaymentMethodModal from './subscription/AddPaymentMethodModal';
 import ManualPaymentModal from './subscription/ManualPaymentModal';
 import { toast } from 'sonner';
 import {
   getSubscriptionPlans,
-  getUserInvoices,
   getUserPaymentMethods,
-  addPaymentMethod,
-  deletePaymentMethod,
   getUserProfile,
   submitManualPayment,
   getUserActiveSubscription,
 } from '@/services/database';
-import { printInvoice } from '@/services/print-service';
 import { cn } from '@/lib/utils';
 import {
-  Crown,
-  Shield,
-  Clock,
+  Zap,
   Headphones,
+  Clock,
+  Shield,
   RefreshCcw,
-  Sparkles,
+  CheckCircle2,
+  XCircle,
+  Check,
 } from 'lucide-react';
 
+// â”€â”€ Comparison table feature matrix â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const COMPARISON_FEATURES = [
+  {
+    label: 'à¦¦à§ˆà¦¨à¦¿à¦• à¦®à¦• à¦ªà¦°à§€à¦•à§à¦·à¦¾',
+    free: 'à§©à¦Ÿà¦¿',
+    paid: 'à¦¸à§€à¦®à¦¾à¦¹à§€à¦¨',
+  },
+  {
+    label: 'à¦…à¦¨à§à¦¶à§€à¦²à¦¨ à¦ªà§à¦°à¦¶à§à¦¨',
+    free: 'à§«à§¦à¦Ÿà¦¿/à¦¦à¦¿à¦¨',
+    paid: 'à¦¸à§€à¦®à¦¾à¦¹à§€à¦¨',
+  },
+  {
+    label: 'à¦ªà§à¦°à¦¶à§à¦¨à¦¬à§à¦¯à¦¾à¦‚à¦• à¦…à§à¦¯à¦¾à¦•à§à¦¸à§‡à¦¸',
+    free: true,
+    paid: true,
+  },
+  {
+    label: 'à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ à¦¬à§à¦¯à¦¾à¦–à§à¦¯à¦¾',
+    free: false,
+    paid: true,
+  },
+  {
+    label: 'à¦¬à¦¿à¦·à¦¯à¦¼à¦­à¦¿à¦¤à§à¦¤à¦¿à¦• à¦à¦¨à¦¾à¦²à¦¾à¦‡à¦¸à¦¿à¦¸',
+    free: false,
+    paid: true,
+  },
+  { label: 'à¦²à¦¿à¦¡à¦¾à¦°à¦¬à§‹à¦°à§à¦¡', free: true, paid: true },
+  {
+    label: 'à¦ªà§‡à¦ªà¦¾à¦° à¦¸à§à¦•à§à¦°à¦¿à¦ªà§à¦Ÿ à¦†à¦ªà¦²à§‹à¦¡',
+    free: false,
+    paid: true,
+  },
+  { label: 'à¦•à¦¾à¦¸à§à¦Ÿà¦® à¦ªà¦°à§€à¦•à§à¦·à¦¾', free: false, paid: true },
+  { label: 'AI à¦¸à¦¾à¦œà§‡à¦¶à¦¨', free: false, paid: true },
+  {
+    label: 'à¦¡à¦¾à¦‰à¦¨à¦²à§‹à¦¡/à¦ªà§à¦°à¦¿à¦¨à§à¦Ÿ',
+    free: false,
+    paid: true,
+  },
+  { label: 'à§¨à§ª/à§­ à¦¸à¦¾à¦ªà§‹à¦°à§à¦Ÿ', free: false, paid: true },
+];
+
+const TRUST_BADGES = [
+  {
+    Icon: Headphones,
+    label: 'à§¨à§ª/à§­ à¦¸à¦¾à¦ªà§‹à¦°à§à¦Ÿ',
+    color: 'text-red-500',
+    bg: 'bg-red-50 dark:bg-red-950/20',
+  },
+  {
+    Icon: Clock,
+    label: 'à¦¤à¦¾à§Žà¦•à§à¦·à¦£à¦¿à¦• à¦…à§à¦¯à¦¾à¦•à§à¦¸à§‡à¦¸',
+    color: 'text-green-700',
+    bg: 'bg-green-50 dark:bg-green-950/20',
+  },
+  {
+    Icon: Shield,
+    label: 'à¦¨à¦¿à¦°à¦¾à¦ªà¦¦ à¦ªà§‡à¦®à§‡à¦¨à§à¦Ÿ',
+    color: 'text-blue-600',
+    bg: 'bg-blue-50 dark:bg-blue-950/20',
+  },
+  {
+    Icon: RefreshCcw,
+    label: 'à¦°à¦¿à¦¨à¦¿à¦‰ à¦¸à¦¹à¦œ',
+    color: 'text-purple-600',
+    bg: 'bg-purple-50 dark:bg-purple-950/20',
+  },
+];
+
+function ComparisonCell({ value }: { value: boolean | string }) {
+  if (typeof value === 'boolean') {
+    return value ? (
+      <Check className="w-4 h-4 text-green-700 mx-auto" />
+    ) : (
+      <XCircle className="w-4 h-4 text-neutral-300 dark:text-neutral-700 mx-auto" />
+    );
+  }
+  return <span className="text-xs font-bold">{value}</span>;
+}
+
 const SubscriptionView: React.FC = () => {
-  // State
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [currentPlanId, setCurrentPlanId] = useState<string>('free');
-  const [activeSubscription, setActiveSubscription] =
-    useState<SubscriptionPlan | null>(null);
-
-  // User Data for Invoice
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
-
   const [loading, setLoading] = useState(true);
-
-  // Modals
-  const [isAddMethodOpen, setIsAddMethodOpen] = useState(false);
-  const [isAddingMethod, setIsAddingMethod] = useState(false);
-
-  // Manual Payment Logic
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(
     null,
   );
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
-  // Fix: Prefer activeSubscription data if it matches the currentPlanId to get expiresAt
-  const currentPlan: SubscriptionPlan =
-    activeSubscription && activeSubscription.id === currentPlanId
-      ? activeSubscription
-      : plans.find((p) => p.id === currentPlanId) ||
-        plans[0] || {
-          id: 'loading',
-          name: 'Loading...',
-          price: 0,
-          billingCycle: '',
-          currency: '',
-          features: [],
-          colorTheme: 'neutral',
-        };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [fetchedPlans, fetchedInvoices, fetchedMethods, user, activeSub] =
+        const [fetchedPlans, fetchedMethods, user, activeSub] =
           await Promise.all([
             getSubscriptionPlans(),
-            getUserInvoices(),
             getUserPaymentMethods(),
             getUserProfile('me'),
             getUserActiveSubscription(),
           ]);
         setPlans(fetchedPlans);
-        setInvoices(fetchedInvoices);
         setPaymentMethods(fetchedMethods);
         setCurrentUser(user);
-        setActiveSubscription(activeSub);
-
-        // Determine active plan
-        if (activeSub) {
-          setCurrentPlanId(activeSub.id);
-        } else if (fetchedInvoices && fetchedInvoices.length > 0) {
-          // Fallback: Invoice logic
-          const latestPaid = fetchedInvoices.find(
-            (inv) => inv.status === 'paid',
-          );
-          if (latestPaid) {
-            const matchedPlan = fetchedPlans.find(
-              (p) => p.name === latestPaid.planName,
-            );
-            if (matchedPlan) setCurrentPlanId(matchedPlan.id);
-          }
-        }
+        if (activeSub) setCurrentPlanId(activeSub.id);
       } catch (error) {
-        console.error('Failed to load subscription data', error);
+        console.error('Failed to load upgrade data', error);
       } finally {
         setLoading(false);
       }
@@ -117,8 +146,6 @@ const SubscriptionView: React.FC = () => {
 
   const handlePlanSelect = (plan: SubscriptionPlan) => {
     if (plan.id === 'free' || plan.id === currentPlanId) return;
-
-    // Open the manual payment modal instead of direct subscribe
     setSelectedPlan(plan);
     setIsPaymentModalOpen(true);
   };
@@ -132,7 +159,6 @@ const SubscriptionView: React.FC = () => {
       toast.error('User or Plan details missing.');
       return;
     }
-
     const submission: PaymentSubmission = {
       id: `pay_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
       userId: currentUser.id,
@@ -146,69 +172,25 @@ const SubscriptionView: React.FC = () => {
       status: 'pending',
       submittedAt: new Date().toISOString(),
     };
-
     try {
       const success = await submitManualPayment(submission);
       if (success) {
         toast.success(
-          `আপনার পেমেন্ট তথ্য জমা নেওয়া হয়েছে। যাচাই করার পর ${selectedPlan?.name} প্ল্যাওটি চালু হবে।`,
+          `à¦ªà§‡à¦®à§‡à¦¨à§à¦Ÿ à¦œà¦®à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦¯à¦¾à¦šà¦¾à¦‡ à¦¹à¦²à§‡ ${selectedPlan.name} à¦šà¦¾à¦²à§ à¦¹à¦¬à§‡à¥¤`,
         );
         setIsPaymentModalOpen(false);
         setSelectedPlan(null);
-      } else {
-        throw new Error('Submission failed');
-      }
+      } else throw new Error('Submission failed');
     } catch {
-      toast.error('ত্রুটি হয়েছে। আবার চেষ্টা করো।');
+      toast.error(
+        'à¦¤à§à¦°à§à¦Ÿà¦¿ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦†à¦¬à¦¾à¦° à¦šà§‡à¦·à§à¦Ÿà¦¾ à¦•à¦°à§‹à¥¤',
+      );
     }
   };
 
-  const handleAddPaymentMethod = async (
-    type: 'bkash' | 'nagad',
-    number: string,
-  ) => {
-    setIsAddingMethod(true);
-    try {
-      const newMethod = await addPaymentMethod({
-        type,
-        number,
-        isDefault: false,
-      });
-      setPaymentMethods((prev) => [...prev, newMethod]);
-      setIsAddMethodOpen(false);
-    } catch {
-      toast.error('মেথড যুক্ত করা যায়নি।');
-    } finally {
-      setIsAddingMethod(false);
-    }
-  };
-
-  const handleDeletePaymentMethod = async (id: string) => {
-    if (confirm('আপনি কি নিশ্চিত যে আপনি এই পেমেন্ট মেথডটি মুছে ফেলতে চান?')) {
-      try {
-        await deletePaymentMethod(id);
-        setPaymentMethods((prev) => prev.filter((m) => m.id !== id));
-      } catch (error) {
-        console.error('Failed to delete method', error);
-        toast.error('মুছে ফেলা সম্ভব হয়নি।');
-      }
-    }
-  };
-
-  const handleDownloadInvoice = (invoice: Invoice) => {
-    if (currentUser) {
-      printInvoice(invoice, currentUser);
-    } else {
-      toast.info('ব্যবহারকারীর তথ্য লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করো...');
-    }
-  };
-
-  const isFreeUser = currentPlanId === 'free' || !currentPlanId;
-
-  const TRUST_BADGES = [
-    { icon: Headphones, label: '২৪/৭ সাপোর্ট', color: 'text-red-500' },
-    { icon: Clock, label: 'তাৎক্ষণিক অ্যাক্সেস', color: 'text-emerald-500' },
-  ];
+  const premiumPlans = plans
+    .filter((p) => p.price > 0)
+    .sort((a, b) => a.price - b.price);
 
   if (isPaymentModalOpen && selectedPlan) {
     return (
@@ -226,78 +208,39 @@ const SubscriptionView: React.FC = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8 animate-fade-in pb-24 sm:pb-20 px-1">
-      {/* HERO SECTION - REPLACED WITH CURRENT PLAN CARD & BANNER */}
-      <div className="space-y-4 sm:space-y-6">
-        {/* Banner for new users or upgrades */}
-        <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-neutral-900 dark:bg-black p-8 sm:p-12 text-center">
-          <div className="absolute top-0 right-0 w-40 sm:w-64 h-40 sm:h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-40 sm:w-64 h-40 sm:h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="relative z-10 max-w-2xl mx-auto">
-            <h2 className="text-white text-2xl sm:text-3xl font-black tracking-tight">
-              প্রিমিয়াম সাবস্ক্রিপশন
-            </h2>
+    <div className="max-w-5xl mx-auto space-y-8 sm:space-y-10 pb-24 sm:pb-20 px-1 animate-fade-in">
+      {/* â”€â”€ HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-neutral-900 dark:bg-black p-8 sm:p-14 text-center">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 max-w-2xl mx-auto space-y-3">
+          <div className="inline-flex items-center gap-2 bg-green-900/50 border border-green-700/50 text-green-400 text-xs font-bold px-3 py-1.5 rounded-full mb-2">
+            <Zap size={11} />
+            à¦ªà§à¦°à¦¿à¦®à¦¿à¦¯à¦¼à¦¾à¦® à¦ªà§à¦²à§à¦¯à¦¾à¦¨
           </div>
+          <h1 className="text-white text-2xl sm:text-4xl font-black tracking-tight leading-tight">
+            à¦†à¦°à§‹ à¦¬à§‡à¦¶à¦¿ à¦ªà¦¡à¦¼à§‹,
+            <br className="hidden sm:block" /> à¦†à¦°à§‹ à¦­à¦¾à¦²à§‹
+            à¦ªà§à¦°à¦¸à§à¦¤à§à¦¤à¦¿ à¦¨à¦¾à¦“
+          </h1>
+          <p className="text-neutral-400 text-sm sm:text-base max-w-md mx-auto leading-relaxed">
+            à¦¸à§€à¦®à¦¾à¦¹à§€à¦¨ à¦ªà¦°à§€à¦•à§à¦·à¦¾, AI à¦¸à¦¾à¦œà§‡à¦¶à¦¨,
+            à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ à¦à¦¨à¦¾à¦²à¦¾à¦‡à¦¸à¦¿à¦¸ â€” à¦¸à¦¬
+            à¦•à¦¿à¦›à§ à¦à¦• à¦ªà§à¦²à§à¦¯à¦¾à¦¨à§‡
+          </p>
         </div>
-
-        {/* Current Plan Details Card (If active subscription exists) */}
-        {!isFreeUser && (
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-6 shadow-sm">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                <Crown className="w-6 h-6 sm:w-8 sm:h-8" />
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">
-                    {currentPlan.name}
-                  </h3>
-                  <span className="px-2 py-0.5 rounded-full text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">
-                    Active
-                  </span>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
-                    মেয়াদ শেষ হবে:{' '}
-                    <span className="font-bold text-neutral-700 dark:text-neutral-300">
-                      {currentPlan.expiresAt
-                        ? new Date(currentPlan.expiresAt).toLocaleDateString(
-                            'bn-BD',
-                            {
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric',
-                            },
-                          )
-                        : '(অ্যাক্টিভ)'}
-                    </span>
-                  </p>
-                  {currentPlan.expiresAt && (
-                    <p className="text-[10px] sm:text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      বাকি আছে:{' '}
-                      {Math.ceil(
-                        (new Date(currentPlan.expiresAt).getTime() -
-                          new Date().getTime()) /
-                          (1000 * 60 * 60 * 24),
-                      )}{' '}
-                      দিন
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* PRICING CARDS */}
-      <div id="pricing-plans" className="scroll-mt-24">
+      {/* â”€â”€ PRICING CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <section>
         <div className="text-center mb-6 sm:mb-8">
-          <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-2">
-            আপনার প্ল্যাও বেছে নাও
+          <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-1">
+            à¦¤à§‹à¦®à¦¾à¦° à¦ªà§à¦²à§à¦¯à¦¾à¦¨ à¦¬à§‡à¦›à§‡ à¦¨à¦¾à¦“
           </h2>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            à¦¯à§‡à¦•à§‹à¦¨à§‹ à¦¸à¦®à¦¯à¦¼ à¦¬à¦¾à¦¤à¦¿à¦² à¦•à¦°à¦¾
+            à¦¯à¦¾à¦¬à§‡
+          </p>
         </div>
 
         {loading ? (
@@ -311,74 +254,102 @@ const SubscriptionView: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
-            {plans
-              .filter((p) => p.price > 0)
-              .sort((a, b) => a.price - b.price)
-              .map((plan) => (
-                <PricingCard
-                  key={plan.id}
-                  plan={plan}
-                  isCurrent={currentPlanId === plan.id}
-                  onSelect={() => handlePlanSelect(plan)}
-                />
-              ))}
+            {premiumPlans.map((plan) => (
+              <PricingCard
+                key={plan.id}
+                plan={plan}
+                isCurrent={currentPlanId === plan.id}
+                onSelect={() => handlePlanSelect(plan)}
+              />
+            ))}
           </div>
         )}
-      </div>
+      </section>
 
-      {/* TRUST BADGES */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-        {TRUST_BADGES.map((badge, idx) => (
+      {/* â”€â”€ COMPARISON TABLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <section>
+        <div className="text-center mb-6">
+          <h2 className="text-lg sm:text-xl font-black text-neutral-900 dark:text-white">
+            à¦«à§à¦°à¦¿ à¦¬à¦¨à¦¾à¦® à¦ªà§à¦°à¦¿à¦®à¦¿à¦¯à¦¼à¦¾à¦®
+          </h2>
+        </div>
+
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-sm">
+          {/* Table header */}
+          <div className="grid grid-cols-3 bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-700">
+            <div className="p-4 text-sm font-bold text-neutral-500 dark:text-neutral-400">
+              à¦«à¦¿à¦šà¦¾à¦°
+            </div>
+            <div className="p-4 text-center">
+              <span className="text-sm font-bold text-neutral-600 dark:text-neutral-400">
+                à¦«à§à¦°à¦¿
+              </span>
+            </div>
+            <div className="p-4 text-center bg-green-800/5 dark:bg-green-900/20">
+              <span className="text-sm font-bold text-green-800 dark:text-green-400">
+                à¦ªà§à¦°à¦¿à¦®à¦¿à¦¯à¦¼à¦¾à¦®
+              </span>
+            </div>
+          </div>
+
+          {/* Rows */}
+          {COMPARISON_FEATURES.map((row, i) => (
+            <div
+              key={i}
+              className={cn(
+                'grid grid-cols-3 border-b border-neutral-100 dark:border-neutral-800 last:border-0',
+                i % 2 === 0 ? '' : 'bg-neutral-50/50 dark:bg-neutral-800/20',
+              )}
+            >
+              <div className="p-3 sm:p-4 text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 font-medium flex items-center">
+                {row.label}
+              </div>
+              <div className="p-3 sm:p-4 flex items-center justify-center text-neutral-500 dark:text-neutral-500">
+                <ComparisonCell value={row.free} />
+              </div>
+              <div className="p-3 sm:p-4 flex items-center justify-center bg-green-800/5 dark:bg-green-900/10 text-green-800 dark:text-green-400">
+                <ComparisonCell value={row.paid} />
+              </div>
+            </div>
+          ))}
+
+          {/* CTA footer */}
+          <div className="p-4 sm:p-6 grid grid-cols-3">
+            <div />
+            <div />
+            <div className="flex justify-center">
+              <button
+                onClick={() =>
+                  premiumPlans[0] && handlePlanSelect(premiumPlans[0])
+                }
+                disabled={loading || premiumPlans.length === 0}
+                className="px-5 py-2.5 rounded-xl bg-green-800 text-white text-xs sm:text-sm font-bold hover:bg-green-900 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+              >
+                <CheckCircle2 size={14} />
+                à¦à¦–à¦¨à¦‡ à¦¶à§à¦°à§ à¦•à¦°à§‹
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* â”€â”€ TRUST BADGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {TRUST_BADGES.map(({ Icon, label, color, bg }, idx) => (
           <div
             key={idx}
-            className="flex flex-col items-center justify-center text-center gap-2 p-4 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-md transition-shadow"
+            className={cn(
+              'flex flex-col items-center text-center gap-2 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800',
+              bg,
+            )}
           >
-            <badge.icon
-              className={cn('w-6 h-6', badge.color)}
-              strokeWidth={1.5}
-            />
+            <Icon className={cn('w-5 h-5', color)} strokeWidth={1.5} />
             <span className="text-xs font-bold text-neutral-600 dark:text-neutral-300">
-              {badge.label}
+              {label}
             </span>
           </div>
         ))}
       </div>
-
-      {/* BILLING & PAYMENT SECTION */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Payment Methods */}
-        <div className="lg:col-span-1">
-          {loading ? (
-            <div className="h-40 bg-white dark:bg-neutral-900 rounded-2xl animate-pulse border border-neutral-100 dark:border-neutral-800" />
-          ) : (
-            <PaymentMethods
-              methods={paymentMethods}
-              onAddMethod={() => setIsAddMethodOpen(true)}
-              onDelete={handleDeletePaymentMethod}
-            />
-          )}
-        </div>
-
-        {/* Billing History */}
-        <div className="lg:col-span-2">
-          {loading ? (
-            <div className="h-64 bg-white dark:bg-neutral-900 rounded-2xl animate-pulse border border-neutral-100 dark:border-neutral-800" />
-          ) : (
-            <BillingHistory
-              invoices={invoices}
-              onDownload={handleDownloadInvoice}
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Add Payment Method Modal */}
-      <AddPaymentMethodModal
-        isOpen={isAddMethodOpen}
-        onClose={() => setIsAddMethodOpen(false)}
-        onSubmit={handleAddPaymentMethod}
-        isLoading={isAddingMethod}
-      />
     </div>
   );
 };

@@ -1,21 +1,7 @@
 'use client';
 
 import React, { useState, ReactNode, useRef, useEffect } from 'react';
-import {
-  User,
-  CreditCard,
-  Settings,
-  Info,
-  MessageSquare,
-  LogOut,
-  Bell,
-  Search,
-  ChevronRight,
-  Menu,
-  X,
-  Moon,
-  Sun,
-} from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Sidebar from './Sidebar';
 import MobileBottomNav from './MobileBottomNav';
@@ -319,13 +305,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               </div>
 
               {/* Profile Dropdown */}
-              <div
-                className="relative pl-2 border-l border-neutral-200 dark:border-neutral-800"
-                ref={profileRef}
-              >
+              <div className="pl-2 border-l border-neutral-200 dark:border-neutral-800">
                 <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  onClick={() => onTabChange('settings')}
                   className="flex items-center gap-2 focus:outline-none group"
+                  title="সেটিংস"
                 >
                   <UserAvatar
                     user={user}
@@ -333,132 +317,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                     className="ring-2 ring-transparent group-hover:ring-emerald-100 dark:group-hover:ring-emerald-900"
                   />
                 </button>
-
-                {isProfileOpen && user && (
-                  <div className="absolute right-0 top-12 w-72 md:w-80 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-2xl shadow-xl shadow-neutral-200/50 dark:shadow-black/50 z-50 overflow-hidden animate-fade-in origin-top-right">
-                    {/* User Header - More Compact */}
-                    <div className="px-5 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/30 dark:bg-neutral-800/20">
-                      <div className="flex items-center gap-3">
-                        <UserAvatar user={user} size="md" />
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-[15px] font-bold text-neutral-900 dark:text-white truncate">
-                            {user.name}
-                          </h4>
-                          <p className="text-[13px] text-neutral-500 dark:text-neutral-400 truncate">
-                            {user.institute}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-1.5 space-y-0.5">
-                      <button
-                        onClick={() => {
-                          setIsProfileOpen(false);
-                          onTabChange('profile');
-                        }}
-                        className="w-full text-left px-3 py-1.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
-                      >
-                        <User className="w-4 h-4 text-neutral-400" />
-                        আমার প্রোফাইল
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsProfileOpen(false);
-                          onTabChange('subscription');
-                        }}
-                        className="w-full text-left px-3 py-1.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
-                      >
-                        <CreditCard className="w-4 h-4 text-neutral-400" />
-                        সাবস্ক্রিপশন ও বিলিং
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsProfileOpen(false);
-                          onTabChange('settings');
-                        }}
-                        className="w-full text-left px-3 py-1.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
-                      >
-                        <Settings className="w-4 h-4 text-neutral-400" />
-                        সেটিংস
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setIsProfileOpen(false);
-                          onTabChange('about');
-                        }}
-                        className="w-full text-left px-3 py-1.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
-                      >
-                        <Info className="w-4 h-4 text-neutral-400" />
-                        আমাদের সম্পর্কে
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsProfileOpen(false);
-                          onTabChange('complaint');
-                        }}
-                        className="w-full text-left px-3 py-1.5 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 flex items-center gap-3 transition-colors"
-                      >
-                        <MessageSquare className="w-4 h-4 text-neutral-400" />
-                        অভিযোগ ও পরামর্শ
-                      </button>
-                      <div className="h-px bg-neutral-100 dark:bg-neutral-800 my-1"></div>
-                      <div className="px-3 py-3">
-                        <div className="bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl flex items-center relative">
-                          <button
-                            onClick={() => !isDarkMode && toggleTheme()}
-                            className={`flex-1 flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg text-xs font-bold transition-all relative z-10 ${
-                              !isDarkMode
-                                ? 'text-emerald-600'
-                                : 'text-neutral-500 hover:text-neutral-300'
-                            }`}
-                          >
-                            <Sun
-                              className={`w-3.5 h-3.5 ${!isDarkMode ? 'text-emerald-500' : 'text-neutral-500'}`}
-                            />
-                            লাইট
-                          </button>
-                          <button
-                            onClick={() => isDarkMode && toggleTheme()}
-                            className={`flex-1 flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg text-xs font-bold transition-all relative z-10 ${
-                              isDarkMode
-                                ? 'text-emerald-500'
-                                : 'text-neutral-500 hover:text-neutral-700'
-                            }`}
-                          >
-                            <Moon
-                              className={`w-3.5 h-3.5 ${isDarkMode ? 'text-emerald-400' : 'text-neutral-500'}`}
-                            />
-                            ডার্ক
-                          </button>
-
-                          {/* Active State Background Indicator */}
-                          <motion.div
-                            initial={false}
-                            animate={{
-                              x: isDarkMode ? '100%' : '0%',
-                            }}
-                            transition={{
-                              type: 'spring',
-                              stiffness: 300,
-                              damping: 30,
-                            }}
-                            className="absolute inset-y-1 left-1 w-[calc(50%-4px)] bg-white dark:bg-neutral-900 rounded-lg shadow-sm border dark:border-neutral-700/50"
-                          />
-                        </div>
-                      </div>
-                      <div className="h-px bg-neutral-100 dark:bg-neutral-800 my-1"></div>
-                      <button
-                        onClick={onLogout}
-                        className="w-full text-left px-3 py-2.5 rounded-xl text-sm font-black text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 transition-colors"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        লগ আউট
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </header>

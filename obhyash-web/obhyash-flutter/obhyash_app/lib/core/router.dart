@@ -9,6 +9,7 @@ import '../features/auth/presentation/login_view.dart';
 import '../features/auth/presentation/signup_view.dart';
 import '../features/profile/presentation/profile_route_view.dart';
 import '../features/subscription/presentation/subscription_view.dart';
+import '../features/subscription/presentation/my_subscription_view.dart';
 import '../features/complaint/presentation/complaint_view.dart';
 import '../features/reports/presentation/student_report_view.dart';
 import '../features/user_profile/presentation/user_profile_view.dart';
@@ -102,6 +103,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/subscription',
             pageBuilder: (context, state) =>
                 _fadeRoute(const SubscriptionView(), state),
+          ),
+          GoRoute(
+            path: '/my-subscription',
+            pageBuilder: (context, state) =>
+                _fadeRoute(const MySubscriptionView(), state),
           ),
           GoRoute(
             path: '/history',

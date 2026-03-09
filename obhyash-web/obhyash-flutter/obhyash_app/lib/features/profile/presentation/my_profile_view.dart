@@ -14,10 +14,7 @@ class MyProfileView extends ConsumerWidget {
   final List<ExamResult> history;
   final List<SubjectStats> subjectStats;
   final List<MonthCalendarDay> calendarData;
-  final VoidCallback onEditProfile;
   final Function(String)? onSubjectClick;
-  final VoidCallback? onViewNotifications;
-  final VoidCallback? onViewReports;
 
   const MyProfileView({
     super.key,
@@ -25,10 +22,7 @@ class MyProfileView extends ConsumerWidget {
     required this.history,
     required this.subjectStats,
     required this.calendarData,
-    required this.onEditProfile,
     this.onSubjectClick,
-    this.onViewNotifications,
-    this.onViewReports,
   });
 
   String _getRankName(int xp) {
@@ -69,134 +63,6 @@ class MyProfileView extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'প্রোফাইল',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w900,
-                      color: isDark ? Colors.white : const Color(0xFF171717),
-                      fontFamily: 'HindSiliguri',
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: onEditProfile,
-                    icon: Icon(LucideIcons.pencil, size: 16),
-                    label: const Text(
-                      'এডিট করুন',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'HindSiliguri',
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      backgroundColor: isDark
-                          ? const Color(0xFF262626)
-                          : const Color(0xFFF5F5F5),
-                      foregroundColor: isDark
-                          ? Colors.white
-                          : const Color(0xFF171717),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  if (onViewNotifications != null) ...[
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: onViewNotifications,
-                        icon: Icon(LucideIcons.bell, size: 16),
-                        label: const Text(
-                          'নোটিফিকেশন',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                          side: BorderSide(
-                            color: isDark
-                                ? const Color(0xFF262626)
-                                : const Color(0xFFE5E5E5),
-                          ),
-                          backgroundColor: isDark
-                              ? const Color(0xFF171717)
-                              : Colors.white,
-                          foregroundColor: isDark
-                              ? const Color(0xFFD4D4D4)
-                              : const Color(0xFF404040),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {},
-                      icon: Icon(LucideIcons.gift, size: 16),
-                      label: const Text(
-                        'রেফার করুন',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        side: BorderSide(
-                          color: isDark
-                              ? const Color(0x887f1d1d)
-                              : const Color(0xFFfecdd3),
-                        ),
-                        backgroundColor: isDark
-                            ? const Color(0x33881337)
-                            : const Color(0xFFFFF1F2),
-                        foregroundColor: isDark
-                            ? const Color(0xFFFB7185)
-                            : const Color(0xFFE11D48),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-
           // User Profile Card
           _UserProfileCard(user: user, isDark: isDark),
           const SizedBox(height: 24), // mb-6

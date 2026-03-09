@@ -704,6 +704,8 @@ export default function StudentRoot({
               onSave={handleProfileUpdate}
               onNavigate={(tab) => handleTabChange(tab)}
               onLogout={handleLogoutClick}
+              toggleTheme={toggleTheme}
+              isDarkMode={theme === 'dark'}
             />
           </AppLayout>
         );
@@ -779,7 +781,7 @@ export default function StudentRoot({
 
       if (activeTab === 'subscription')
         return (
-          <AppLayout activeTab="" {...commonLayoutProps} title="সাবস্ক্রিপশন">
+          <AppLayout activeTab="" {...commonLayoutProps} title="আপগ্রেড">
             <SubscriptionView />
           </AppLayout>
         );
