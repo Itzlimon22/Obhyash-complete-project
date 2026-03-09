@@ -24,6 +24,10 @@ CREATE TABLE IF NOT EXISTS public.user_devices (
 CREATE INDEX IF NOT EXISTS idx_user_devices_user_id
   ON public.user_devices (user_id, last_active DESC);
 
+-- Required for Supabase Realtime DELETE events to carry old record fields
+-- (without this, only the primary key is sent in the old record)
+ALTER TABLE public.user_devices REPLICA IDENTITY FULL;
+
 -- Auto-remove devices inactive for > 30 days (pg_cron required)
 -- Schedule: runs daily at 03:00 UTC
 -- SELECT cron.schedule('cleanup-inactive-devices', '0 3 * * *',

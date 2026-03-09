@@ -57,9 +57,9 @@ export default function SettingsView({ user, onSave }: SettingsViewProps) {
       <div className="hidden md:flex gap-6 max-w-5xl mx-auto pb-24 items-start">
         {/* Sidebar */}
         <aside className="w-52 shrink-0 sticky top-4">
-          <nav className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden">
-            <div className="px-4 py-3 border-b border-neutral-100 dark:border-neutral-800">
-              <p className="text-[11px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
+          <nav className="bg-white dark:bg-neutral-950 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-sm">
+            <div className="px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 bg-green-800">
+              <p className="text-[11px] font-bold text-green-100 uppercase tracking-widest">
                 সেটিংস
               </p>
             </div>
@@ -72,8 +72,8 @@ export default function SettingsView({ user, onSave }: SettingsViewProps) {
                       onClick={() => setActiveSection(id)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
                         active
-                          ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 font-semibold'
-                          : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 font-medium'
+                          ? 'bg-green-800 text-white font-bold shadow-sm'
+                          : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 font-medium'
                       }`}
                     >
                       <Icon className="w-4 h-4 shrink-0" />
@@ -99,10 +99,10 @@ export default function SettingsView({ user, onSave }: SettingsViewProps) {
               <button
                 key={id}
                 onClick={() => setActiveSection(id)}
-                className="w-full flex items-center gap-4 p-4 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 text-left active:scale-[0.99] transition-transform"
+                className="w-full flex items-center gap-4 p-4 bg-white dark:bg-neutral-950 rounded-2xl border border-neutral-200 dark:border-neutral-800 text-left active:scale-[0.99] transition-transform shadow-sm hover:border-green-700 dark:hover:border-green-700"
               >
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0">
-                  <Icon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <div className="w-10 h-10 rounded-xl bg-green-800 flex items-center justify-center shrink-0">
+                  <Icon className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">
@@ -121,7 +121,7 @@ export default function SettingsView({ user, onSave }: SettingsViewProps) {
           <div>
             <button
               onClick={() => setActiveSection(null)}
-              className="flex items-center gap-2 mb-5 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700"
+              className="flex items-center gap-2 mb-5 text-sm font-bold text-green-800 dark:text-green-400 hover:text-green-900"
             >
               <ArrowLeft className="w-4 h-4" />
               সেটিংস

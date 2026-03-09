@@ -16,6 +16,7 @@ import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { UserProfile } from '@/lib/types';
 import { mutate } from 'swr';
 import { mapDbRowToProfile } from '@/services/user-service';
+import { unregisterCurrentDevice } from '@/services/device-session-service';
 
 interface AuthContextType {
   user: User | null;
@@ -445,6 +446,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── signOut ───────────────────────────────────────────────────────────────
   const signOut = useCallback(async () => {
+    // Unregister this device BEFORE revoking the session (RLS requires active session)
+    if (user) {
+      await unregisterCurrentDevice(user.id).catch(() => {});
+    }
     clearCachedProfile();
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -455,7 +460,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       router.push('/login');
     }
     // If signOut succeeds, the SIGNED_OUT event handler above handles redirect
-  }, [supabase, router]);
+  }, [supabase, router, user]);
 
   // ── refreshProfile ────────────────────────────────────────────────────────
   const refreshProfile = useCallback(async () => {

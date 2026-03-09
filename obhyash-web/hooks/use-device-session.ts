@@ -7,6 +7,8 @@ import {
   getDeviceType,
   DeviceSession,
 } from '@/services/device-session-service';
+import { createClient } from '@/utils/supabase/client';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 export interface DeviceLimitState {
   blocked: boolean; // true = this device is over the limit
@@ -70,6 +72,37 @@ export function useDeviceSession(
   });
 
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { signOut } = useAuth();
+
+  // Realtime: sign out immediately if this device's row is deleted remotely
+  useEffect(() => {
+    if (!userId) return;
+    const supabase = createClient();
+    const myToken = getDeviceToken();
+
+    const channel = supabase
+      .channel(`device-revoke:${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'user_devices',
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload: { old: Partial<DeviceSession> }) => {
+          if (payload.old?.device_token === myToken) {
+            // Our own device row was deleted — sign out immediately
+            signOut().catch(() => {});
+          }
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId, signOut]);
 
   useEffect(() => {
     if (!userId) return;

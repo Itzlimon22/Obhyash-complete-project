@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DeviceSession } from '@/services/device-session-service';
 import { getDeviceToken } from '@/services/device-session-service';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 interface ManageDevicesModalProps {
   open: boolean;
@@ -59,8 +60,9 @@ export function ManageDevicesModal({
   const [devices, setDevices] = useState<DeviceSession[]>(initialDevices);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const currentToken = getDeviceToken();
+  const { signOut } = useAuth();
 
-  const handleRemove = async (deviceId: string) => {
+  const handleRemove = async (deviceId: string, isCurrent: boolean) => {
     setRemovingId(deviceId);
     try {
       const res = await fetch('/api/devices', {
@@ -73,6 +75,12 @@ export function ManageDevicesModal({
 
       const updated = devices.filter((d) => d.id !== deviceId);
       setDevices(updated);
+
+      if (isCurrent) {
+        // Removed our own device from the blocked modal — sign out
+        await signOut();
+        return;
+      }
 
       // If we're now under the limit, notify parent to retry registration
       if (updated.length < limit) {
@@ -133,7 +141,7 @@ export function ManageDevicesModal({
                   variant="ghost"
                   className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
                   disabled={removingId === device.id}
-                  onClick={() => handleRemove(device.id)}
+                  onClick={() => handleRemove(device.id, isCurrent)}
                 >
                   {removingId === device.id ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

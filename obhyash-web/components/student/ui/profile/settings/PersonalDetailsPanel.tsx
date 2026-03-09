@@ -37,19 +37,18 @@ type SettingsUpdatePayload = {
 };
 
 const cardClass =
-  'bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden';
+  'bg-white dark:bg-neutral-950 rounded-2xl shadow-sm border border-neutral-200 dark:border-neutral-800 overflow-hidden';
 const headerClass =
-  'px-6 py-4 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between';
-const headerTitleClass =
-  'text-lg font-bold text-neutral-800 dark:text-neutral-100';
+  'px-6 py-4 border-b border-green-900 bg-green-800 flex items-center justify-between';
+const headerTitleClass = 'text-lg font-bold text-white';
 const bodyClass = 'p-6 space-y-6';
 const inputGroupClass = 'space-y-2';
 const labelClass =
   'block text-sm font-medium text-neutral-600 dark:text-neutral-400';
 const inputClass =
-  'w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-neutral-800 dark:text-neutral-200';
+  'w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-green-700/20 focus:border-green-700 transition-all text-neutral-800 dark:text-neutral-200';
 const selectClass =
-  'w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-neutral-800 dark:text-neutral-200 appearance-none';
+  'w-full px-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-green-700/20 focus:border-green-700 transition-all text-neutral-800 dark:text-neutral-200 appearance-none';
 
 const ChevronDownIcon = () => (
   <svg
@@ -291,7 +290,7 @@ export default function PersonalDetailsPanel({
             />
             <label
               htmlFor="avatar-upload"
-              className="flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 cursor-pointer"
+              className="flex items-center gap-2 text-sm font-bold text-green-100 hover:text-white cursor-pointer"
             >
               {uploading ? 'লোডিং...' : 'ছবি পরিবর্তন করো'}
               <Camera className="w-4 h-4" />
@@ -467,7 +466,7 @@ export default function PersonalDetailsPanel({
                           setFormData((prev) => ({ ...prev, institute: name }));
                           setShowCollegeSuggestions(false);
                         }}
-                        className="px-4 py-2.5 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 cursor-pointer font-bengali"
+                        className="px-4 py-2.5 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer font-bengali"
                       >
                         {name}
                       </li>
@@ -665,7 +664,7 @@ export default function PersonalDetailsPanel({
                 readOnly
                 className={`${inputClass} bg-neutral-100 dark:bg-neutral-800 text-neutral-500 cursor-default pr-10`}
               />
-              <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-emerald-500">
+              <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-green-700">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -688,7 +687,7 @@ export default function PersonalDetailsPanel({
             <button
               onClick={handleLinkGoogle}
               disabled={isGoogleLinked || isLinking}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${isGoogleLinked ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 cursor-default' : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700'}`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${isGoogleLinked ? 'bg-green-50 dark:bg-green-900/20 border-green-700 dark:border-green-800 text-green-700 dark:text-green-400 cursor-default' : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700'}`}
             >
               {isLinking ? (
                 <Loader2 className="w-4 h-4 animate-spin text-slate-500" />
@@ -709,7 +708,7 @@ export default function PersonalDetailsPanel({
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className="w-4 h-4 text-emerald-500"
+                  className="w-4 h-4 text-green-700"
                 >
                   <path
                     fillRule="evenodd"
@@ -777,7 +776,7 @@ export default function PersonalDetailsPanel({
       <div className="flex justify-center md:justify-end mt-4">
         <button
           onClick={handleSubmit}
-          className="w-full md:w-auto px-10 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+          className="w-full md:w-auto px-10 py-3.5 bg-green-800 hover:bg-green-900 text-white font-bold rounded-xl shadow-lg shadow-green-900/20 transition-all active:scale-95"
         >
           সব সেভ করো
         </button>
