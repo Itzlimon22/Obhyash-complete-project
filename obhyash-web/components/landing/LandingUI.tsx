@@ -198,7 +198,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     {
       name: 'তানভীর আহমেদ',
       role: 'HSC পরীক্ষার্থী (Science)',
-      text: 'Obhyash-এর AI জেনারেটেড প্রশ্নগুলো বইয়ের টপিক অনুযায়ী হয়, যা আমার রিভিশনের জন্য খুব উপকারে এসেছে। এক্সপ্ল্যাওেশনগুলোও খুব স্পষ্ট।',
+      text: 'Obhyash-এর AI জেনারেটেড প্রশ্নগুলো বইয়ের টপিক অনুযায়ী হয়, যা আমার রিভিশনের জন্য খুব উপকারে এসেছে। এক্সপ্ল্যানেশনগুলোও খুব স্পষ্ট।',
       initial: 'T',
       color: 'bg-red-500',
     },
@@ -233,7 +233,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       period: '/১ মাস',
       features: [
         'আনলিমিটেড এক্সাম',
-        'আনলিমিটেড OMR স্ক্যাও',
+        'আনলিমিটেড OMR স্ক্যান',
         'বুকমার্ক করার সুবিধা',
         'অ্যাডভান্সড এনালাইসিস',
         'বিজ্ঞাপনমুক্ত অভিজ্ঞতা',
@@ -249,12 +249,12 @@ const LandingPage: React.FC<LandingPageProps> = ({
       price: '২৯৯',
       period: '/৩ মাস',
       features: [
-        'মাসিক প্ল্যাওের সব সুবিধা',
+        'মাসিক প্ল্যানের সব সুবিধা',
         '৩৩% সাশ্রয় (বিশাল ছাড়)',
         'অগ্রাধিকার সাপোর্ট',
         'নতুন ফিচারে আর্লি এক্সেস',
       ],
-      cta: 'ব্যাও্ডেল কিনো',
+      cta: 'বান্ডেল কিনো',
       color: 'border-red-500',
       buttonColor:
         'bg-gradient-to-r from-red-600 to-red-600 text-white hover:from-red-700 hover:to-red-700 shadow-lg shadow-red-500/30',
@@ -264,10 +264,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
   const faqs = [
     {
       q: 'Obhyash অ্যাপটি কি সম্পূর্ণ ফ্রি?',
-      a: "আমাদের একটি 'বেসিক' প্ল্যাও আছে যা আজীবন ফ্রি। এতে প্রতিদিন ১টি ফ্রি এক্সাম এবং লিমিটেড ফিচার ব্যবহারের সুযোগ রয়েছে। তবে আনলিমিটেড এক্সাম এবং অ্যাডভান্সড এনালাইসিস ব্যবহারের জন্য আপনাকে মাসিক বা ত্রৈমাসিক সাবস্ক্রিপশন নিতে হবে।",
+      a: "আমাদের একটি 'বেসিক' প্ল্যান আছে যা আজীবন ফ্রি। এতে প্রতিদিন ১টি ফ্রি এক্সাম এবং লিমিটেড ফিচার ব্যবহারের সুযোগ রয়েছে। তবে আনলিমিটেড এক্সাম এবং অ্যাডভান্সড এনালাইসিস ব্যবহারের জন্য আপনাকে মাসিক বা ত্রৈমাসিক সাবস্ক্রিপশন নিতে হবে।",
     },
     {
-      q: 'OMR স্ক্যাও ফিচারটি কিভাবে কাজ করে?',
+      q: 'OMR স্ক্যান ফিচারটি কিভাবে কাজ করে?',
       a: 'বাসায় বসে সাধারণ কাগজে পরীক্ষা দাও এবং আমাদের অ্যাপের ক্যামেরা দিয়ে ওএমআর শিটটির ছবি তোলো। আমাদের উন্নত প্রযুক্তি ২০ সেকেন্ডের মধ্যে আপনার খাতা মূল্যায়ন করে নির্ভুল স্কোর দেখাবে। এটি কোচিং সেন্টারের ওএমআর রিডারের মতোই কার্যকর।',
     },
     {
@@ -411,7 +411,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 onClick={onGetStarted}
                 className="sm:w-auto w-full px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-base shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap"
               >
-                নতুন পরীক্ষা দাও
+                বিনামূল্যে শুরু করো
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -725,7 +725,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </svg>
             </div>
             <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-              OMR স্ক্যাওার
+              OMR স্ক্যানার
             </h3>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
               খাতায় পরীক্ষা দিয়ে ছবি তোলো। আমাদের কম্পিউটার ভিশন টেকনোলজি
@@ -1006,10 +1006,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto px-4 lg:px-6 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mt-2">
-              আপনার পছন্দের প্ল্যাওটি বেছে নাও
+              আপনার পছন্দের প্ল্যানটি বেছে নাও
             </h2>
             <p className="text-neutral-600 dark:text-neutral-400 mt-4 max-w-2xl mx-auto">
-              আমাদের সাশ্রয়ী সাবস্ক্রিপশন প্ল্যাওগুলোর মাধ্যমে আপনার প্রস্তুতিকে
+              আমাদের সাশ্রয়ী সাবস্ক্রিপশন প্ল্যানগুলোর মাধ্যমে আপনার প্রস্তুতিকে
               নিয়ে যাও অনন্য উচ্চতায়।
             </p>
           </div>
@@ -1018,11 +1018,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
             {pricingPlans.map((plan, idx) => (
               <div
                 key={idx}
-                className={`relative bg-white dark:bg-black rounded-3xl p-8 shadow-xl transition-all hover:-tranneutral-y-2 flex flex-col ${plan.highlight ? 'border-2 border-emerald-500 z-10 scale-105' : 'border border-red-100 dark:border-neutral-800'}`}
+                className={`relative bg-white dark:bg-black rounded-3xl p-8 shadow-xl transition-all hover:-translate-y-2 flex flex-col ${plan.highlight ? 'border-2 border-emerald-500 z-10 scale-105' : 'border border-red-100 dark:border-neutral-800'}`}
               >
                 {plan.highlight && (
-                  <div className="absolute top-0 left-1/2 -tranneutral-x-1/2 -tranneutral-y-1/2 bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">
-                    Most Popular
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">
+                    সবচেয়ে জনপ্রিয়
                   </div>
                 )}
                 <div className="mb-6">
@@ -1147,7 +1147,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             {testimonials.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-white dark:bg-black p-8 rounded-3xl border border-red-100 dark:border-neutral-800 shadow-sm relative hover:-tranneutral-y-1 transition-transform duration-300"
+                className="bg-white dark:bg-black p-8 rounded-3xl border border-red-100 dark:border-neutral-800 shadow-sm relative hover:-translate-y-1 transition-transform duration-300"
               >
                 <div className="absolute top-8 right-8 text-neutral-200 dark:text-neutral-800">
                   <svg

@@ -1,6 +1,6 @@
-import dynamic from 'next/dynamic';
+﻿import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { BlogPost } from '@/lib/blog-data';
 import {
   BookOpen,
@@ -28,6 +28,9 @@ import {
   Flame,
   Facebook,
   Youtube,
+  RotateCcw,
+  Target,
+  CalendarDays,
 } from 'lucide-react';
 
 // Next.js dynamic import lazy-loads heavy components (like LaTeX/ReactMarkdown)
@@ -148,6 +151,18 @@ const LandingPage: React.FC<LandingPageProps> = ({
     return `${m}:${sc}`;
   };
 
+  const examCountdowns = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const days = (d: Date) =>
+      Math.max(0, Math.ceil((d.getTime() - today.getTime()) / 86400000));
+    return {
+      hsc2026: days(new Date('2026-04-01')),
+      mbbs2026: days(new Date('2026-10-05')),
+      varsity2026: days(new Date('2026-09-01')),
+    };
+  }, []);
+
   // --- Data Arrays ---
 
   const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>([
@@ -246,7 +261,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     {
       name: 'তানভীর আহমেদ',
       role: 'HSC পরীক্ষার্থী (Science)',
-      text: 'Obhyash-এর AI জেনারেটেড প্রশ্নগুলো বইয়ের টপিক অনুযায়ী হয়, যা আমার রিভিশনের জন্য খুব উপকারে এসেছে। এক্সপ্ল্যাওেশনগুলোও খুব স্পষ্ট।',
+      text: 'Obhyash-এর AI জেনারেটেড প্রশ্নগুলো বইয়ের টপিক অনুযায়ী হয়, যা আমার রিভিশনের জন্য খুব উপকারে এসেছে। এক্সপ্লানেশনগুলোও খুব স্পষ্ট।',
       initial: 'T',
       color: 'bg-red-500',
     },
@@ -262,10 +277,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
   const faqs = [
     {
       q: 'Obhyash অ্যাপটি কি সম্পূর্ণ ফ্রি?',
-      a: "আমাদের একটি 'বেসিক' প্ল্যাও আছে যা সম্পূর্ণ ফ্রি। তবে আনলিমিটেড এক্সাম এবং অ্যাডভান্সড ফিচারগুলোর জন্য প্রিমিয়াম সাবস্ক্রিপশন প্রয়োজন।",
+      a: "আমাদের একটি 'বেসিক' প্ল্যান আছে যা সম্পূর্ণ ফ্রি। তবে আনলিমিটেড এক্সাম এবং অ্যাডভান্সড ফিচারগুলোর জন্য প্রিমিয়াম সাবস্ক্রিপশন প্রয়োজন।",
     },
     {
-      q: 'OMR স্ক্যাও ফিচারটি কিভাবে কাজ করে?',
+      q: 'OMR স্ক্যান ফিচারটি কিভাবে কাজ করে?',
       a: 'আপনি যেকোনো সাধারণ কাগজে পরীক্ষা দিয়ে আমাদের অ্যাপের মাধ্যমে ছবি তুললেই আমাদের AI সিস্টেম তা যাচাই করে ফলাফল জানিয়ে দিবে।',
     },
     {
@@ -428,7 +443,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 onClick={onGetStarted}
                 className="sm:w-auto w-full px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-base shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap"
               >
-                নতুন পরীক্ষা দাও
+                বিনামূল্যে শুরু করো
                 <ArrowRight className="w-5 h-5" />
               </button>
               <button
@@ -539,37 +554,45 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
                 {/* 3. Analytics Demo */}
                 {activeDemoTab === 'analytics' && (
-                  <div className="animate-in fade-in zoom-in duration-300 pt-4 w-full">
-                    <div className="flex gap-4 mb-6">
+                  <div className="animate-in fade-in zoom-in duration-300 pt-2 w-full space-y-3">
+                    <div className="flex gap-2">
                       <div className="flex-1 bg-emerald-50 dark:bg-emerald-900/10 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
-                        <div className="text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase">
-                          গড় স্কোর
-                        </div>
-                        <div className="text-2xl font-bold text-neutral-900 dark:text-white">
-                          ৮২%
-                        </div>
+                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wide">গড় স্কোর</div>
+                        <div className="text-2xl font-bold text-neutral-900 dark:text-white">৭৮%</div>
                       </div>
-                      <div className="flex-1 bg-emerald-50 dark:bg-emerald-900/10 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
-                        <div className="text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase">
-                          পরীক্ষা
-                        </div>
-                        <div className="text-2xl font-bold text-neutral-900 dark:text-white">
-                          ১৪
-                        </div>
+                      <div className="flex-1 bg-red-50 dark:bg-red-900/10 p-3 rounded-xl border border-red-100 dark:border-red-900/30">
+                        <div className="text-[10px] text-red-600 dark:text-red-400 font-bold uppercase tracking-wide">পরীক্ষা</div>
+                        <div className="text-2xl font-bold text-neutral-900 dark:text-white">২৪</div>
+                      </div>
+                      <div className="flex-1 bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-700">
+                        <div className="text-[10px] text-neutral-500 font-bold uppercase tracking-wide">XP</div>
+                        <div className="text-2xl font-bold text-neutral-900 dark:text-white">১২৪০</div>
                       </div>
                     </div>
-                    <div className="h-40 flex items-end justify-between gap-2 px-2 pb-4">
-                      {[30, 45, 35, 60, 55, 75, 85].map((h, i) => (
-                        <div
-                          key={i}
-                          className="w-full bg-neutral-100 dark:bg-neutral-800 rounded-t-lg relative group h-full flex flex-col justify-end"
-                        >
-                          <div
-                            className="w-full bg-gradient-to-t from-emerald-600 to-red-500 rounded-t-lg transition-all duration-500"
-                            style={{ height: `${h}%` }}
-                          ></div>
+                    <div className="space-y-2.5 pt-1">
+                      {[
+                        { name: 'পদার্থবিজ্ঞান', pct: 85, good: true },
+                        { name: 'রসায়ন', pct: 52, good: false },
+                        { name: 'জীববিজ্ঞান', pct: 74, good: true },
+                        { name: 'গণিত', pct: 91, good: true },
+                      ].map((s) => (
+                        <div key={s.name}>
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">{s.name}</span>
+                            <span className={`text-xs font-bold ${s.good ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>{s.pct}%</span>
+                          </div>
+                          <div className="h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-700 ${s.good ? 'bg-emerald-500' : 'bg-red-500'}`}
+                              style={{ width: `${s.pct}%` }}
+                            />
+                          </div>
                         </div>
                       ))}
+                    </div>
+                    <div className="flex items-center gap-2 pt-1 flex-wrap">
+                      <span className="px-2 py-0.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-[10px] font-bold rounded-full border border-red-200 dark:border-red-800">⚠ দুর্বল: রসায়ন</span>
+                      <span className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded-full border border-emerald-200 dark:border-emerald-800">★ সেরা: গণিত</span>
                     </div>
                   </div>
                 )}
@@ -608,12 +631,156 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </p>
             </div>
             <div className="space-y-1">
-              <h3 className="text-3xl lg:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-emerald-500">
-                ২৪/৭
+              <h3 className="text-3xl lg:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-emerald-600">
+                ৬+
               </h3>
               <p className="text-sm font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-wide">
-                AI মেন্টর
+                বিষয়ভিত্তিক প্রস্তুতি
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Audience Section */}
+      <section className="py-20 bg-white dark:bg-black border-b border-neutral-100 dark:border-neutral-900">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6">
+          <div className="text-center mb-12">
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold tracking-wider uppercase text-sm">
+              তোমার জন্যই তৈরি
+            </span>
+            <h2 className="text-3xl lg:text-4xl font-extrabold text-neutral-900 dark:text-white mt-2">
+              কোন পরীক্ষার প্রস্তুতি নিচ্ছো?
+            </h2>
+            <p className="text-neutral-500 dark:text-neutral-400 mt-3 max-w-lg mx-auto text-base">
+              অভ্যাস প্রতিটি পরীক্ষার সিলেবাস ও প্রশ্নধারা অনুযায়ী কাস্টমাইজড।
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* HSC Card */}
+            <div
+              onClick={onGetStarted}
+              className="group relative overflow-hidden rounded-3xl border-2 border-red-100 dark:border-red-900/30 bg-gradient-to-br from-red-50 via-white to-white dark:from-red-950/20 dark:via-black dark:to-black p-7 hover:border-red-500 hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-red-500/10 transition-colors" />
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-5">
+                  <div className="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-600/30 text-2xl">
+                    📚
+                  </div>
+                  {examCountdowns.hsc2026 > 0 &&
+                  examCountdowns.hsc2026 <= 30 ? (
+                    <span className="px-3 py-1 bg-red-600 text-white text-[10px] font-extrabold rounded-full animate-pulse shadow-md">
+                      মাত্র {examCountdowns.hsc2026} দিন বাকি!
+                    </span>
+                  ) : examCountdowns.hsc2026 > 0 ? (
+                    <span className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-[10px] font-bold rounded-full border border-red-200 dark:border-red-800">
+                      {examCountdowns.hsc2026} দিন বাকি
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-500 text-[10px] font-bold rounded-full">
+                      HSC ২০২৭
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-2xl font-extrabold text-neutral-900 dark:text-white mb-1">
+                  এইচএসসি (HSC)
+                </h3>
+                <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-5 leading-relaxed">
+                  উচ্চ মাধ্যমিকের পূর্ণাঙ্গ প্রস্তুতি — MCQ, বহুনির্বাচনী ও
+                  বিষয়ভিত্তিক।
+                </p>
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {['পদার্থবিজ্ঞান', 'রসায়ন', 'জীববিজ্ঞান', 'গণিত'].map(
+                    (s) => (
+                      <span
+                        key={s}
+                        className="px-2.5 py-1 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-[11px] font-bold rounded-lg border border-red-100 dark:border-red-900"
+                      >
+                        {s}
+                      </span>
+                    ),
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-red-600 dark:text-red-400 font-bold text-sm group-hover:gap-3 transition-all">
+                  শুরু করো <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+
+            {/* Medical Admission Card */}
+            <div
+              onClick={onGetStarted}
+              className="group relative overflow-hidden rounded-3xl border-2 border-emerald-100 dark:border-emerald-900/30 bg-gradient-to-br from-emerald-50 via-white to-white dark:from-emerald-950/20 dark:via-black dark:to-black p-7 hover:border-emerald-600 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/10 transition-colors" />
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-5">
+                  <div className="w-14 h-14 bg-emerald-700 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-700/30 text-2xl">
+                    🏥
+                  </div>
+                  <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold rounded-full border border-emerald-200 dark:border-emerald-800">
+                    {examCountdowns.mbbs2026} দিন বাকি
+                  </span>
+                </div>
+                <h3 className="text-2xl font-extrabold text-neutral-900 dark:text-white mb-1">
+                  মেডিকেল ভর্তি
+                </h3>
+                <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-5 leading-relaxed">
+                  MBBS ভর্তি পরীক্ষার সম্পূর্ণ সিলেবাসভিত্তিক নিবিড় প্রস্তুতি।
+                </p>
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {['জীববিজ্ঞান', 'রসায়ন', 'পদার্থ', 'English'].map((s) => (
+                    <span
+                      key={s}
+                      className="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold rounded-lg border border-emerald-100 dark:border-emerald-900"
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold text-sm group-hover:gap-3 transition-all">
+                  শুরু করো <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+
+            {/* Varsity Card */}
+            <div
+              onClick={onGetStarted}
+              className="group relative overflow-hidden rounded-3xl border-2 border-neutral-200 dark:border-neutral-800 bg-gradient-to-br from-neutral-50 via-white to-white dark:from-neutral-900/60 dark:via-black dark:to-black p-7 hover:border-neutral-500 hover:shadow-2xl hover:shadow-neutral-500/5 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-neutral-500/5 rounded-full blur-3xl pointer-events-none group-hover:bg-red-500/5 transition-colors" />
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-5">
+                  <div className="w-14 h-14 bg-black dark:bg-neutral-800 rounded-2xl flex items-center justify-center shadow-lg text-2xl">
+                    🎓
+                  </div>
+                  <span className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 text-[10px] font-bold rounded-full border border-neutral-200 dark:border-neutral-700">
+                    {examCountdowns.varsity2026} দিন বাকি
+                  </span>
+                </div>
+                <h3 className="text-2xl font-extrabold text-neutral-900 dark:text-white mb-1">
+                  বিশ্ববিদ্যালয় ভর্তি
+                </h3>
+                <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-5 leading-relaxed">
+                  ঢাবি, বুয়েট, চুয়েট সহ সকল পাবলিক বিশ্ববিদ্যালয়ের ভর্তি
+                  প্রস্তুতি।
+                </p>
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {['পদার্থবিজ্ঞান', 'রসায়ন', 'গণিত', 'English'].map((s) => (
+                    <span
+                      key={s}
+                      className="px-2.5 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 text-[11px] font-bold rounded-lg border border-neutral-200 dark:border-neutral-700"
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300 font-bold text-sm group-hover:gap-3 group-hover:text-red-600 dark:group-hover:text-red-400 transition-all">
+                  শুরু করো <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -662,7 +829,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <ScanLine className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
               </div>
               <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-                OMR স্ক্যাওিং
+                OMR স্ক্যানিং
               </h3>
               <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
                 বাসায় বসে খাতায় পরীক্ষা দিয়ে অ্যাপ দিয়ে ছবি তোলো। নিমিষেই পেয়ে
@@ -728,6 +895,35 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 করে, যাতে আপনার প্রস্তুতি হয় পূর্ণাঙ্গ।
               </p>
             </div>
+
+            {/* Practice Mode / Flashcard */}
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-red-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
+              <div className="w-16 h-16 md:w-14 md:h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <RotateCcw className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
+                ভুল থেকে শেখো
+              </h3>
+              <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                পুরনো ভুল প্রশ্নগুলো ফ্ল্যাশকার্ডে বারবার অনুশীলন করো। Spaced Repetition
+                প্রযুক্তিতে চিরকালের জন্য মনে রাখো।
+              </p>
+            </div>
+
+            {/* Daily Goal */}
+            <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left">
+              <div className="w-16 h-16 md:w-14 md:h-14 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Target className="w-8 h-8 md:w-7 md:h-7 text-emerald-600" />
+              </div>
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
+                দৈনিক লক্ষ্যমাত্রা
+              </h3>
+              <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                প্রতিদিনের MCQ লক্ষ্যমাত্রা নির্ধারণ করো। লক্ষ্য পূরণ হলে উদযাপন
+                করো এবং streak ধরে রাখো।
+              </p>
+            </div>
+
           </div>
         </div>
 
@@ -935,6 +1131,105 @@ const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
+      {/* Pre-Pricing Countdown CTA */}
+      <section className="py-20 bg-black relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/8 rounded-full blur-[120px]" />
+          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-red-600/8 rounded-full blur-[120px]" />
+        </div>
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4">
+              <CalendarDays className="w-3.5 h-3.5" />
+              পরীক্ষার কাউন্টডাউন
+            </div>
+            <h2 className="text-3xl lg:text-4xl font-extrabold text-white">
+              পরীক্ষার আগে প্রতিটি দিন মূল্যবান
+            </h2>
+            <p className="text-neutral-400 mt-3 max-w-xl mx-auto">
+              আজই শুরু করো — দেরি হলে পস্তাবে।
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
+            {/* HSC */}
+            <div
+              onClick={onGetStarted}
+              className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-7 text-center hover:bg-red-950/30 hover:border-red-500/40 transition-all duration-300 cursor-pointer group"
+            >
+              <div className="text-4xl mb-3">📚</div>
+              <h3 className="text-base font-bold text-white mb-3">
+                এইচএসসি ২০২৬
+              </h3>
+              {examCountdowns.hsc2026 > 0 ? (
+                <>
+                  <div
+                    className={`text-6xl font-black mb-1 tabular-nums ${
+                      examCountdowns.hsc2026 <= 30
+                        ? 'text-red-400'
+                        : 'text-white'
+                    }`}
+                  >
+                    {examCountdowns.hsc2026}
+                  </div>
+                  <p className="text-sm font-bold text-neutral-500">দিন বাকি</p>
+                  {examCountdowns.hsc2026 <= 30 && (
+                    <span className="inline-block mt-3 px-3 py-1 bg-red-600/20 text-red-400 text-[10px] font-extrabold rounded-full border border-red-500/30 animate-pulse">
+                      সময় কমছে — এখনই শুরু করো!
+                    </span>
+                  )}
+                </>
+              ) : (
+                <p className="text-neutral-500 text-sm">পরীক্ষা শেষ হয়েছে</p>
+              )}
+            </div>
+
+            {/* MBBS */}
+            <div
+              onClick={onGetStarted}
+              className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-7 text-center hover:bg-emerald-950/30 hover:border-emerald-500/40 transition-all duration-300 cursor-pointer group"
+            >
+              <div className="text-4xl mb-3">🏥</div>
+              <h3 className="text-base font-bold text-white mb-3">
+                মেডিকেল ভর্তি ২০২৬
+              </h3>
+              <div className="text-6xl font-black text-emerald-400 mb-1 tabular-nums">
+                {examCountdowns.mbbs2026}
+              </div>
+              <p className="text-sm font-bold text-neutral-500">দিন বাকি</p>
+            </div>
+
+            {/* Varsity */}
+            <div
+              onClick={onGetStarted}
+              className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-7 text-center hover:bg-white/8 hover:border-white/20 transition-all duration-300 cursor-pointer group"
+            >
+              <div className="text-4xl mb-3">🎓</div>
+              <h3 className="text-base font-bold text-white mb-3">
+                বিশ্ববিদ্যালয় ভর্তি ২০২৬
+              </h3>
+              <div className="text-6xl font-black text-white mb-1 tabular-nums">
+                {examCountdowns.varsity2026}
+              </div>
+              <p className="text-sm font-bold text-neutral-500">দিন বাকি</p>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <button
+              onClick={onGetStarted}
+              className="inline-flex items-center gap-3 px-10 py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-extrabold text-lg shadow-2xl shadow-emerald-600/30 transition-all active:scale-95"
+            >
+              বিনামূল্যে শুরু করো
+              <ArrowRight className="w-6 h-6" />
+            </button>
+            <p className="text-neutral-600 text-sm mt-4">
+              কোনো ক্রেডিট কার্ড লাগবে না &middot; ৩০ সেকেন্ডে রেজিস্ট্রেশন
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <section
         id="pricing"
@@ -943,10 +1238,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mb-4">
-              আপনার পছন্দের প্ল্যাওটি বেছে নাও
+              আপনার পছন্দের প্ল্যানটি বেছে নাও
             </h2>
             <p className="text-neutral-600 dark:text-neutral-400">
-              সাশ্রয়ী সাবস্ক্রিপশন প্ল্যাও।
+              সাশ্রয়ী সাবস্ক্রিপশন প্ল্যান।
             </p>
           </div>
 
@@ -954,11 +1249,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
             {pricingPlans.map((plan, i) => (
               <div
                 key={i}
-                className={`relative bg-white dark:bg-black rounded-2xl p-8 border transition-transform hover:-tranneutral-y-2 ${plan.color} ${plan.highlight ? 'shadow-2xl shadow-emerald-500/10 scale-105 z-10' : 'shadow-lg'}`}
+                className={`relative bg-white dark:bg-black rounded-2xl p-8 border transition-transform hover:-translate-y-2 ${plan.color} ${plan.highlight ? 'shadow-2xl shadow-emerald-500/10 scale-105 z-10' : 'shadow-lg'}`}
               >
                 {plan.highlight && (
-                  <div className="absolute top-0 left-1/2 -tranneutral-x-1/2 -tranneutral-y-1/2 bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
-                    Most Popular
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+                    সবচেয়ে জনপ্রিয়
                   </div>
                 )}
                 <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">
@@ -1010,7 +1305,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             {testimonials.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-white dark:bg-black p-8 rounded-3xl border border-red-100 dark:border-neutral-800 shadow-sm relative hover:-tranneutral-y-1 transition-transform duration-300"
+                className="bg-white dark:bg-black p-8 rounded-3xl border border-red-100 dark:border-neutral-800 shadow-sm relative hover:-translate-y-1 transition-transform duration-300"
               >
                 <div className="flex items-center gap-4 mb-4">
                   <div
