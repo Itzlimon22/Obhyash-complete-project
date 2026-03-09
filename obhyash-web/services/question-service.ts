@@ -73,7 +73,7 @@ export const getQuestionsPage = async (
         query = query.eq('topic', filters.topic);
       }
       if (filters.difficulty) {
-        query = query.ilike('difficulty', `%${filters.difficulty}%`);
+        query = query.eq('difficulty', filters.difficulty);
       }
       if (filters.status) {
         query = query.eq('status', filters.status);
@@ -98,37 +98,23 @@ export const getQuestionsPage = async (
       const to = from + pageSize - 1;
       query = query.range(from, to);
 
-      // Concurrent count fetches for statuses (ignoring the 'status' filter to get global counts for the other active filters)
+      // Concurrent fetches: paginated data + status counts via single RPC
+      // The RPC replaces 3 separate COUNT queries, reducing DB round-trips from 4 to 2.
       let approvedCount = 0;
       let pendingCount = 0;
       let rejectedCount = 0;
 
-      const buildBaseCountQuery = () => {
-        let q = supabase
-          .from('questions')
-          .select('*', { count: 'exact', head: true });
-        if (filters.subject) q = q.eq('subject', filters.subject);
-        if (filters.chapter) q = q.eq('chapter', filters.chapter);
-        if (filters.topic) q = q.eq('topic', filters.topic);
-        if (filters.difficulty)
-          q = q.ilike('difficulty', `%${filters.difficulty}%`);
-        if (filters.author) q = q.eq('author', filters.author);
-        if (filters.search && filters.search.trim()) {
-          const searchTerm = filters.search.trim();
-          q = q.or(
-            `question.ilike.%${searchTerm}%,exam_type.ilike.%${searchTerm}%,institute.ilike.%${searchTerm}%,institutes.cs.{${searchTerm}}`,
-          );
-        }
-        return q;
-      };
-
-      const [queryResult, approvedResult, pendingResult, rejectedResult] =
-        await Promise.all([
-          query,
-          buildBaseCountQuery().eq('status', 'Approved'),
-          buildBaseCountQuery().eq('status', 'Pending'),
-          buildBaseCountQuery().eq('status', 'Rejected'),
-        ]);
+      const [queryResult, countsResult] = await Promise.all([
+        query,
+        supabase.rpc('get_question_status_counts', {
+          p_subject: filters.subject || null,
+          p_chapter: filters.chapter || null,
+          p_topic: filters.topic || null,
+          p_difficulty: filters.difficulty || null,
+          p_author: filters.author || null,
+          p_search: filters.search?.trim() || null,
+        }),
+      ]);
 
       const { data, error, count } = queryResult;
 
@@ -138,9 +124,14 @@ export const getQuestionsPage = async (
       }
 
       const totalCount = count || 0;
-      approvedCount = approvedResult.count || 0;
-      pendingCount = pendingResult.count || 0;
-      rejectedCount = rejectedResult.count || 0;
+      const statusCounts = countsResult.data as {
+        approved: number;
+        pending: number;
+        rejected: number;
+      } | null;
+      approvedCount = statusCounts?.approved || 0;
+      pendingCount = statusCounts?.pending || 0;
+      rejectedCount = statusCounts?.rejected || 0;
 
       // Map snake_case to camelCase
       const mappedQuestions: Question[] = (data || []).map(

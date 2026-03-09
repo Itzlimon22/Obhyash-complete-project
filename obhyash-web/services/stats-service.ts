@@ -76,107 +76,46 @@ interface LeaderboardUserRow {
 export const getLeaderboardUsers = async (
   level: string,
 ): Promise<UserProfile[]> => {
-  if (isSupabaseConfigured() && supabase) {
-    const mapUsers = (
-      data: LeaderboardUserRow[],
-      fallbackLevel: string,
-    ): UserProfile[] =>
-      data.map((user, index) => ({
-        id: user.id,
-        name: user.name || 'Unknown User',
-        institute: user.institute || 'Unknown Institute',
-        xp: user.xp || 0,
-        level: user.level || fallbackLevel,
-        examsTaken: user.exams_taken || 0,
-        avatarUrl: user.avatar_url || undefined,
-        avatarColor: user.avatar_color || generateAvatarColor(index),
-        streakCount: user.streak || 0,
-      }));
-
-    try {
-      console.log('Leaderboard: Querying public_profiles...');
-      // Try querying with role filter (requires public_profiles to have 'role' column)
-      const { data, error } = await supabase
-        .from('public_profiles')
-        .select(
-          'id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak, role',
-        )
-        .eq('level', level)
-        .ilike('role', 'student')
-        .order('xp', { ascending: false })
-        .limit(100);
-      console.log('Leaderboard: Query complete', data?.length, error);
-
-      if (!error && data) {
-        return mapUsers(data, level);
-      }
-
-      // If the query failed (likely 'role' column missing from view), try without role
-      console.warn(
-        'Leaderboard: Query with role filter failed, retrying without role filter:',
-        error?.message,
-      );
-
-      const { data: fallbackData, error: fallbackError } = await supabase
-        .from('public_profiles')
-        .select(
-          'id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak',
-        )
-        .eq('level', level)
-        .order('xp', { ascending: false })
-        .limit(100);
-
-      if (fallbackError) {
-        console.error(
-          'Error fetching leaderboard users (fallback):',
-          fallbackError,
-        );
-        throw fallbackError;
-      }
-
-      if (fallbackData) {
-        return mapUsers(fallbackData, level);
-      }
-    } catch (error) {
-      console.error('Failed to fetch leaderboard users:', error);
-    }
+  try {
+    const res = await fetch(
+      `/api/leaderboard/level?level=${encodeURIComponent(level)}`,
+      {
+        // next.js fetch cache: revalidate every 5 minutes on the server
+        next: { revalidate: 300 },
+      },
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    // Restore avatar color fallback for rows that have none stored
+    return data.map((u: UserProfile & { _index?: number }) => ({
+      ...u,
+      avatarColor: u.avatarColor || generateAvatarColor(u._index ?? 0),
+    }));
+  } catch (err) {
+    console.error('Failed to fetch leaderboard users:', err);
+    return [];
   }
-
-  console.warn(
-    'Leaderboard: Database not configured or query failed, returning empty array',
-  );
-  return [];
 };
 
 export const getInstituteLeaderboardUsers = async (
   institute: string,
 ): Promise<UserProfile[]> => {
-  if (!institute || !isSupabaseConfigured() || !supabase) return [];
+  if (!institute) return [];
   try {
-    const { data, error } = await supabase
-      .from('public_profiles')
-      .select(
-        'id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak',
-      )
-      .eq('institute', institute)
-      .order('xp', { ascending: false })
-      .limit(100);
-
-    if (error || !data) return [];
-
-    return data.map((user: LeaderboardUserRow, index: number) => ({
-      id: user.id,
-      name: user.name || 'Unknown User',
-      institute: user.institute || institute,
-      xp: user.xp || 0,
-      level: user.level || 'Rookie',
-      examsTaken: user.exams_taken || 0,
-      avatarUrl: user.avatar_url || undefined,
-      avatarColor: user.avatar_color || generateAvatarColor(index),
-      streakCount: user.streak || 0,
+    const res = await fetch(
+      `/api/leaderboard/college?institute=${encodeURIComponent(institute)}`,
+      {
+        next: { revalidate: 300 },
+      },
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return data.map((u: UserProfile & { _index?: number }) => ({
+      ...u,
+      avatarColor: u.avatarColor || generateAvatarColor(u._index ?? 0),
     }));
-  } catch (error) {
-    console.error('Failed to fetch institute leaderboard:', error);
+  } catch (err) {
+    console.error('Failed to fetch institute leaderboard:', err);
     return [];
   }
 };
@@ -188,36 +127,14 @@ export interface InstituteRankEntry {
 }
 
 export const getInstituteRankings = async (): Promise<InstituteRankEntry[]> => {
-  if (!isSupabaseConfigured() || !supabase) return [];
   try {
-    const { data, error } = await supabase
-      .from('public_profiles')
-      .select('institute, xp')
-      .not('institute', 'is', null)
-      .neq('institute', '')
-      .order('xp', { ascending: false })
-      .limit(5000);
-
-    if (error || !data) return [];
-
-    // Group by institute, collecting XP values (already sorted desc)
-    const groups: Record<string, number[]> = {};
-    for (const row of data as { institute: string; xp: number }[]) {
-      if (!row.institute) continue;
-      if (!groups[row.institute]) groups[row.institute] = [];
-      groups[row.institute].push(row.xp || 0);
-    }
-
-    // Top-5 average; require at least 5 students
-    const rankings: InstituteRankEntry[] = [];
-    for (const [institute, xpList] of Object.entries(groups)) {
-      if (xpList.length < 5) continue;
-      const top5 = xpList.slice(0, 5);
-      const avgXp = Math.round(top5.reduce((a, b) => a + b, 0) / 5);
-      rankings.push({ institute, avgXp, studentCount: xpList.length });
-    }
-
-    return rankings.sort((a, b) => b.avgXp - a.avgXp);
+    // Reads from mv_institute_rankings materialized view — refreshed every 15 min by pg_cron.
+    // Response is CDN-cached for 15 min so this is effectively free at scale.
+    const res = await fetch('/api/leaderboard/rankings', {
+      next: { revalidate: 900 },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
   } catch (e) {
     console.error('Failed to fetch institute rankings:', e);
     return [];
