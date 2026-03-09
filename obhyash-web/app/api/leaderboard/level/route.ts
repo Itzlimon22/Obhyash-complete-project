@@ -32,7 +32,10 @@ export async function GET(req: NextRequest) {
 
   let rows: LeaderboardUserRow[] | null = rpcData;
 
-  if (rpcError || !rows) {
+  // Fall back when: RPC errored, returned null, OR returned empty array.
+  // The empty-array case covers a known role-case mismatch in older DB deployments
+  // where the RPC filters `role = 'student'` but rows have `role = 'Student'`.
+  if (rpcError || !rows || rows.length === 0) {
     // Fallback: direct query (still uses the composite index)
     const { data, error } = await supabase
       .from('public_profiles')
@@ -40,6 +43,7 @@ export async function GET(req: NextRequest) {
         'id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak',
       )
       .eq('level', level)
+      .ilike('role', 'student')
       .order('xp', { ascending: false })
       .limit(100);
 

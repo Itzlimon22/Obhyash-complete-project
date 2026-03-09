@@ -148,7 +148,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   const { data: leaderboardUsers = [], isLoading: isLoadingLeaderboard } =
     useSWR(
       user && !authLoading
-        ? ['leaderboardUsers', user.level || 'Level 1']
+        ? ['leaderboardUsers', user.level || 'Rookie']
         : null,
       fetchLeaderboardStats,
       { revalidateOnFocus: false, dedupingInterval: 60000 },
@@ -439,7 +439,12 @@ const Dashboard: React.FC<DashboardProps> = ({
               <span className="text-sm font-black text-emerald-700 dark:text-emerald-400">
                 🥇
               </span>
-              {topUser ? (
+              {isLoadingLeaderboard ? (
+                <>
+                  <div className="w-7 h-7 rounded-full bg-neutral-200 dark:bg-neutral-700 animate-pulse"></div>
+                  <div className="h-3.5 w-24 bg-neutral-200 dark:bg-neutral-700 rounded-full animate-pulse"></div>
+                </>
+              ) : topUser ? (
                 <>
                   <UserAvatar
                     user={topUser as unknown as UserProfile}
@@ -452,8 +457,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </>
               ) : (
                 <>
-                  <div className="w-7 h-7 rounded-full bg-neutral-200 dark:bg-neutral-700 animate-pulse"></div>
-                  <div className="h-3.5 w-24 bg-neutral-200 dark:bg-neutral-700 rounded-full animate-pulse"></div>
+                  <div className="w-7 h-7 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400 text-lg">
+                    —
+                  </div>
+                  <span className="text-sm text-neutral-400 dark:text-neutral-500">
+                    কেউ নেই
+                  </span>
                 </>
               )}
             </div>
