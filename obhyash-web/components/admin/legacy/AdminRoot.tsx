@@ -7,6 +7,8 @@ import AdminDashboard from '@/components/student/ui/AdminDashboard'; // Currentl
 import { getExamHistory } from '@/services/database';
 import { createClient } from '@/utils/supabase/client';
 import { useSessionMonitor } from '@/hooks/use-session-monitor';
+import { useDeviceSession } from '@/hooks/use-device-session';
+import { ManageDevicesModal } from '@/components/auth/ManageDevicesModal';
 import { useAuth } from '@/components/auth/AuthProvider';
 
 interface AdminRootProps {
@@ -29,6 +31,9 @@ export default function AdminRoot({
     userId: user.id,
     onForcedSignOut: signOut,
   });
+
+  // Device session limiting (Netflix-style)
+  const deviceSession = useDeviceSession(user.id);
 
   const [history, setHistory] = useState<ExamResult[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,55 +124,66 @@ export default function AdminRoot({
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-black">
-      {/* Simple Admin Header or use AdminDashboard's internal header */}
-      <div className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-6 py-3 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold">
-            A
-          </div>
-          <h1 className="font-bold text-neutral-800 dark:text-white">
-            Admin Portal
-          </h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400"
-          >
-            {isDarkMode ? '☀️' : '🌙'}
-          </button>
-          <div className="flex items-center gap-2">
-            <div className="text-right hidden sm:block">
-              <div className="text-sm font-bold text-neutral-900 dark:text-white">
-                {user.name}
-              </div>
-              <div className="text-xs text-neutral-500 text-right">
-                {user.role}
-              </div>
+    <>
+      {deviceSession.blocked && deviceSession.limitData && (
+        <ManageDevicesModal
+          open={true}
+          limit={deviceSession.limitData.limit}
+          plan={deviceSession.limitData.plan}
+          initialDevices={deviceSession.limitData.devices as never}
+          onDeviceRemoved={() => window.location.reload()}
+        />
+      )}
+      <div className="min-h-screen bg-neutral-50 dark:bg-black">
+        {/* Simple Admin Header or use AdminDashboard's internal header */}
+        <div className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 px-6 py-3 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold">
+              A
             </div>
-            {user.avatarUrl && (
-              <img
-                src={user.avatarUrl}
-                alt="Avatar"
-                className="w-8 h-8 rounded-full"
-              />
-            )}
+            <h1 className="font-bold text-neutral-800 dark:text-white">
+              Admin Portal
+            </h1>
           </div>
-          <button
-            onClick={onLogout}
-            className="text-sm font-bold text-red-600 hover:text-red-700 hover:underline"
-          >
-            Logout
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400"
+            >
+              {isDarkMode ? '☀️' : '🌙'}
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="text-right hidden sm:block">
+                <div className="text-sm font-bold text-neutral-900 dark:text-white">
+                  {user.name}
+                </div>
+                <div className="text-xs text-neutral-500 text-right">
+                  {user.role}
+                </div>
+              </div>
+              {user.avatarUrl && (
+                <img
+                  src={user.avatarUrl}
+                  alt="Avatar"
+                  className="w-8 h-8 rounded-full"
+                />
+              )}
+            </div>
+            <button
+              onClick={onLogout}
+              className="text-sm font-bold text-red-600 hover:text-red-700 hover:underline"
+            >
+              Logout
+            </button>
+          </div>
         </div>
-      </div>
 
-      <AdminDashboard
-        history={history}
-        onUpdateHistory={handleUpdateHistory}
-        onClose={() => {}} // No close action needed for root
-      />
-    </div>
+        <AdminDashboard
+          history={history}
+          onUpdateHistory={handleUpdateHistory}
+          onClose={() => {}} // No close action needed for root
+        />
+      </div>
+    </>
   );
 }

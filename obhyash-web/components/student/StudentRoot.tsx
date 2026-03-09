@@ -24,6 +24,8 @@ import { useExamEngine } from '@/hooks/use-exam-engine';
 import { useBookmarks } from '@/hooks/use-bookmarks';
 import { getBookmarkedQuestions } from '@/services/bookmark-service';
 import { useSessionMonitor } from '@/hooks/use-session-monitor';
+import { useDeviceSession } from '@/hooks/use-device-session';
+import { ManageDevicesModal } from '@/components/auth/ManageDevicesModal';
 
 // Components - Layout & Common
 import AppLayout from '@/components/student/ui/layout/AppLayout';
@@ -103,6 +105,9 @@ export default function StudentRoot({
     userId: effectiveUser?.id,
     onForcedSignOut: authSignOut,
   });
+
+  // Device session limiting (Netflix-style)
+  const deviceSession = useDeviceSession(effectiveUser?.id);
 
   const {
     appState,
@@ -1013,6 +1018,15 @@ export default function StudentRoot({
   return (
     <>
       {renderApp()}
+      {deviceSession.blocked && deviceSession.limitData && (
+        <ManageDevicesModal
+          open={true}
+          limit={deviceSession.limitData.limit}
+          plan={deviceSession.limitData.plan}
+          initialDevices={deviceSession.limitData.devices as never}
+          onDeviceRemoved={() => window.location.reload()}
+        />
+      )}
       {showStreakCelebration && (
         <StreakCelebration
           count={newStreakCount}

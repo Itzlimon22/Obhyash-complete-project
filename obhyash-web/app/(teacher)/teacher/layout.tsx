@@ -2,6 +2,8 @@
 
 import TeacherSidebar from '@/components/teacher/layout/TeacherSidebar';
 import { useSessionMonitor } from '@/hooks/use-session-monitor';
+import { useDeviceSession } from '@/hooks/use-device-session';
+import { ManageDevicesModal } from '@/components/auth/ManageDevicesModal';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -25,6 +27,9 @@ export default function TeacherLayout({
     userId: profile?.id || user?.id,
     onForcedSignOut: signOut,
   });
+
+  // Device session limiting (Netflix-style)
+  const deviceSession = useDeviceSession(profile?.id || user?.id);
 
   // Redirect if definitely not a teacher once loading is done
   useEffect(() => {
@@ -70,16 +75,27 @@ export default function TeacherLayout({
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
-      <TeacherSidebar />
-      {/* Main content area offset by sidebar width */}
-      <div className="lg:pl-72 transition-all duration-300">
-        {/* Top spacer for mobile menu button */}
-        <div className="h-14 lg:h-0" />
-        <main className="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto min-w-0 w-full overflow-x-hidden">
-          {children}
-        </main>
+    <>
+      {deviceSession.blocked && deviceSession.limitData && (
+        <ManageDevicesModal
+          open={true}
+          limit={deviceSession.limitData.limit}
+          plan={deviceSession.limitData.plan}
+          initialDevices={deviceSession.limitData.devices as never}
+          onDeviceRemoved={() => window.location.reload()}
+        />
+      )}
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+        <TeacherSidebar />
+        {/* Main content area offset by sidebar width */}
+        <div className="lg:pl-72 transition-all duration-300">
+          {/* Top spacer for mobile menu button */}
+          <div className="h-14 lg:h-0" />
+          <main className="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto min-w-0 w-full overflow-x-hidden">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
