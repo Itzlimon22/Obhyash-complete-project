@@ -384,12 +384,14 @@ export default function SettingsView({
 
   return (
     <>
-      {/* ── Profile Card ─────────────────────────────────── */}
-      <ProfileCard
-        user={user}
-        isDarkMode={isDarkMode}
-        toggleTheme={toggleTheme}
-      />
+      {/* ── Profile Card — only on main settings page ─────── */}
+      {activeSection === null && (
+        <ProfileCard
+          user={user}
+          isDarkMode={isDarkMode}
+          toggleTheme={toggleTheme}
+        />
+      )}
 
       {/* ── DESKTOP (md+): sidebar + content ─────────────── */}
       <div className="hidden md:flex gap-6 max-w-5xl mx-auto pb-24 items-start">
