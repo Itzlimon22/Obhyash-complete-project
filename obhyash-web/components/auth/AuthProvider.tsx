@@ -241,7 +241,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           // getSession() returned null with NO error.
           // WHY don't we clear state here?
-          // The Supabase JS client cache is empty, but this does NOT mean there is no session.
+          // The Supabase JS client cache is empty, but this does NOT mean there is no session
           // proxy.ts validates the session server-side via cookies, and Supabase fires
           // onAuthStateChange('INITIAL_SESSION') shortly after mount to sync the client cache.
           // If we clear user/profile here, ClientLayout redirects to /login.
