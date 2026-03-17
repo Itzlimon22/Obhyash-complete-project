@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -29,71 +29,71 @@ import {
   Check,
 } from 'lucide-react';
 
-// â”€â”€ Comparison table feature matrix â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Comparison table feature matrix ──────────────────────────────────────────
 const COMPARISON_FEATURES = [
   {
-    label: 'à¦¦à§ˆà¦¨à¦¿à¦• à¦®à¦• à¦ªà¦°à§€à¦•à§à¦·à¦¾',
-    free: 'à§©à¦Ÿà¦¿',
-    paid: 'à¦¸à§€à¦®à¦¾à¦¹à§€à¦¨',
+    label: 'দৈনিক মক পরীক্ষা',
+    free: '৩টি',
+    paid: 'সীমাহীন',
   },
   {
-    label: 'à¦…à¦¨à§à¦¶à§€à¦²à¦¨ à¦ªà§à¦°à¦¶à§à¦¨',
-    free: 'à§«à§¦à¦Ÿà¦¿/à¦¦à¦¿à¦¨',
-    paid: 'à¦¸à§€à¦®à¦¾à¦¹à§€à¦¨',
+    label: 'অনুশীলন প্রশ্ন',
+    free: '৫০টি/দিন',
+    paid: 'সীমাহীন',
   },
   {
-    label: 'à¦ªà§à¦°à¦¶à§à¦¨à¦¬à§à¦¯à¦¾à¦‚à¦• à¦…à§à¦¯à¦¾à¦•à§à¦¸à§‡à¦¸',
+    label: 'প্রশ্নব্যাংক অ্যাক্সেস',
     free: true,
     paid: true,
   },
   {
-    label: 'à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ à¦¬à§à¦¯à¦¾à¦–à§à¦¯à¦¾',
+    label: 'বিস্তারিত ব্যাখ্যা',
     free: false,
     paid: true,
   },
   {
-    label: 'à¦¬à¦¿à¦·à¦¯à¦¼à¦­à¦¿à¦¤à§à¦¤à¦¿à¦• à¦à¦¨à¦¾à¦²à¦¾à¦‡à¦¸à¦¿à¦¸',
+    label: 'বিষয়ভিত্তিক অ্যানালাইসিস',
     free: false,
     paid: true,
   },
-  { label: 'à¦²à¦¿à¦¡à¦¾à¦°à¦¬à§‹à¦°à§à¦¡', free: true, paid: true },
+  { label: 'লিডারবোর্ড', free: true, paid: true },
   {
-    label: 'à¦ªà§‡à¦ªà¦¾à¦° à¦¸à§à¦•à§à¦°à¦¿à¦ªà§à¦Ÿ à¦†à¦ªà¦²à§‹à¦¡',
+    label: 'পেপার স্ক্রিপ্ট আপলোড',
     free: false,
     paid: true,
   },
-  { label: 'à¦•à¦¾à¦¸à§à¦Ÿà¦® à¦ªà¦°à§€à¦•à§à¦·à¦¾', free: false, paid: true },
-  { label: 'AI à¦¸à¦¾à¦œà§‡à¦¶à¦¨', free: false, paid: true },
+  { label: 'কাস্টম পরীক্ষা', free: false, paid: true },
+  { label: 'AI সাজেশন', free: false, paid: true },
   {
-    label: 'à¦¡à¦¾à¦‰à¦¨à¦²à§‹à¦¡/à¦ªà§à¦°à¦¿à¦¨à§à¦Ÿ',
+    label: 'ডাউনলোড/প্রিন্ট',
     free: false,
     paid: true,
   },
-  { label: 'à§¨à§ª/à§­ à¦¸à¦¾à¦ªà§‹à¦°à§à¦Ÿ', free: false, paid: true },
+  { label: '২৪/৭ সাপোর্ট', free: false, paid: true },
 ];
 
 const TRUST_BADGES = [
   {
     Icon: Headphones,
-    label: 'à§¨à§ª/à§­ à¦¸à¦¾à¦ªà§‹à¦°à§à¦Ÿ',
+    label: '২৪/৭ সাপোর্ট',
     color: 'text-red-500',
     bg: 'bg-red-50 dark:bg-red-950/20',
   },
   {
     Icon: Clock,
-    label: 'à¦¤à¦¾à§Žà¦•à§à¦·à¦£à¦¿à¦• à¦…à§à¦¯à¦¾à¦•à§à¦¸à§‡à¦¸',
+    label: 'তাৎক্ষণিক অ্যাক্সেস',
     color: 'text-green-700',
     bg: 'bg-green-50 dark:bg-green-950/20',
   },
   {
     Icon: Shield,
-    label: 'à¦¨à¦¿à¦°à¦¾à¦ªà¦¦ à¦ªà§‡à¦®à§‡à¦¨à§à¦Ÿ',
+    label: 'নিরাপদ পেমেন্ট',
     color: 'text-blue-600',
     bg: 'bg-blue-50 dark:bg-blue-950/20',
   },
   {
     Icon: RefreshCcw,
-    label: 'à¦°à¦¿à¦¨à¦¿à¦‰ à¦¸à¦¹à¦œ',
+    label: 'রিনিউ সহজ',
     color: 'text-purple-600',
     bg: 'bg-purple-50 dark:bg-purple-950/20',
   },
@@ -176,14 +176,14 @@ const SubscriptionView: React.FC = () => {
       const success = await submitManualPayment(submission);
       if (success) {
         toast.success(
-          `à¦ªà§‡à¦®à§‡à¦¨à§à¦Ÿ à¦œà¦®à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦¯à¦¾à¦šà¦¾à¦‡ à¦¹à¦²à§‡ ${selectedPlan.name} à¦šà¦¾à¦²à§ à¦¹à¦¬à§‡à¥¤`,
+          `পেমেন্ট জমা হয়েছে। যাচাই হলে ${selectedPlan.name} চালু হবে।`,
         );
         setIsPaymentModalOpen(false);
         setSelectedPlan(null);
       } else throw new Error('Submission failed');
     } catch {
       toast.error(
-        'à¦¤à§à¦°à§à¦Ÿà¦¿ à¦¹à¦¯à¦¼à§‡à¦›à§‡à¥¤ à¦†à¦¬à¦¾à¦° à¦šà§‡à¦·à§à¦Ÿà¦¾ à¦•à¦°à§‹à¥¤',
+        'ত্রুটি হয়েছে। আবার চেষ্টা করো।',
       );
     }
   };
@@ -209,37 +209,33 @@ const SubscriptionView: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 sm:space-y-10 pb-24 sm:pb-20 px-1 animate-fade-in">
-      {/* â”€â”€ HERO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-neutral-900 dark:bg-black p-8 sm:p-14 text-center">
         <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-2xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 bg-green-900/50 border border-green-700/50 text-green-400 text-xs font-bold px-3 py-1.5 rounded-full mb-2">
             <Zap size={11} />
-            à¦ªà§à¦°à¦¿à¦®à¦¿à¦¯à¦¼à¦¾à¦® à¦ªà§à¦²à§à¦¯à¦¾à¦¨
+            প্রিমিয়াম প্ল্যান
           </div>
           <h1 className="text-white text-2xl sm:text-4xl font-black tracking-tight leading-tight">
-            à¦†à¦°à§‹ à¦¬à§‡à¦¶à¦¿ à¦ªà¦¡à¦¼à§‹,
-            <br className="hidden sm:block" /> à¦†à¦°à§‹ à¦­à¦¾à¦²à§‹
-            à¦ªà§à¦°à¦¸à§à¦¤à§à¦¤à¦¿ à¦¨à¦¾à¦“
+            আরো বেশি পড়ো,
+            <br className="hidden sm:block" /> আরো ভালো প্রস্তুতি নাও
           </h1>
           <p className="text-neutral-400 text-sm sm:text-base max-w-md mx-auto leading-relaxed">
-            à¦¸à§€à¦®à¦¾à¦¹à§€à¦¨ à¦ªà¦°à§€à¦•à§à¦·à¦¾, AI à¦¸à¦¾à¦œà§‡à¦¶à¦¨,
-            à¦¬à¦¿à¦¸à§à¦¤à¦¾à¦°à¦¿à¦¤ à¦à¦¨à¦¾à¦²à¦¾à¦‡à¦¸à¦¿à¦¸ â€” à¦¸à¦¬
-            à¦•à¦¿à¦›à§ à¦à¦• à¦ªà§à¦²à§à¦¯à¦¾à¦¨à§‡
+            সীমাহীন পরীক্ষা, AI সাজেশন, বিস্তারিত এনালাইসিস — সব কিছু এক প্ল্যানে
           </p>
         </div>
       </div>
 
-      {/* â”€â”€ PRICING CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ── PRICING CARDS ────────────────────────────────────────────────── */}
       <section>
         <div className="text-center mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white mb-1">
-            à¦¤à§‹à¦®à¦¾à¦° à¦ªà§à¦²à§à¦¯à¦¾à¦¨ à¦¬à§‡à¦›à§‡ à¦¨à¦¾à¦“
+            তোমার প্ল্যান বেছে নাও
           </h2>
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            à¦¯à§‡à¦•à§‹à¦¨à§‹ à¦¸à¦®à¦¯à¦¼ à¦¬à¦¾à¦¤à¦¿à¦² à¦•à¦°à¦¾
-            à¦¯à¦¾à¦¬à§‡
+            যেকোনো সময় বাতিল করা যাবে
           </p>
         </div>
 
@@ -266,11 +262,11 @@ const SubscriptionView: React.FC = () => {
         )}
       </section>
 
-      {/* â”€â”€ COMPARISON TABLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ── COMPARISON TABLE ─────────────────────────────────────────────── */}
       <section>
         <div className="text-center mb-6">
           <h2 className="text-lg sm:text-xl font-black text-neutral-900 dark:text-white">
-            à¦«à§à¦°à¦¿ à¦¬à¦¨à¦¾à¦® à¦ªà§à¦°à¦¿à¦®à¦¿à¦¯à¦¼à¦¾à¦®
+            ফ্রি বনাম প্রিমিয়াম
           </h2>
         </div>
 
@@ -278,16 +274,16 @@ const SubscriptionView: React.FC = () => {
           {/* Table header */}
           <div className="grid grid-cols-3 bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-700">
             <div className="p-4 text-sm font-bold text-neutral-500 dark:text-neutral-400">
-              à¦«à¦¿à¦šà¦¾à¦°
+              ফিচার
             </div>
             <div className="p-4 text-center">
               <span className="text-sm font-bold text-neutral-600 dark:text-neutral-400">
-                à¦«à§à¦°à¦¿
+                ফ্রি
               </span>
             </div>
             <div className="p-4 text-center bg-green-800/5 dark:bg-green-900/20">
               <span className="text-sm font-bold text-green-800 dark:text-green-400">
-                à¦ªà§à¦°à¦¿à¦®à¦¿à¦¯à¦¼à¦¾à¦®
+                প্রিমিয়াম
               </span>
             </div>
           </div>
@@ -326,14 +322,14 @@ const SubscriptionView: React.FC = () => {
                 className="px-5 py-2.5 rounded-xl bg-green-800 text-white text-xs sm:text-sm font-bold hover:bg-green-900 transition-colors disabled:opacity-50 flex items-center gap-1.5"
               >
                 <CheckCircle2 size={14} />
-                à¦à¦–à¦¨à¦‡ à¦¶à§à¦°à§ à¦•à¦°à§‹
+                এখনই শুরু করো
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* â”€â”€ TRUST BADGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ── TRUST BADGES ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {TRUST_BADGES.map(({ Icon, label, color, bg }, idx) => (
           <div
