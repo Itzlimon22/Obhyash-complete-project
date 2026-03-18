@@ -56,8 +56,10 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
   const formatTime = (seconds: number) => {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
     if (hrs > 0) return `${hrs}h ${mins}m`;
-    return `${mins}m`;
+    if (mins > 0) return `${mins}m ${secs}s`;
+    return `${secs}s`;
   };
 
   // Transform subject names to Bengali
@@ -198,6 +200,14 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
           </p>
           <p className="text-xl md:text-2xl font-extrabold text-red-600 dark:text-red-400">
             {formatTime(analytics.totalTime)}
+          </p>
+        </div>
+        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+          <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
+            গড় সময় (প্রতি প্রশ্ন)
+          </p>
+          <p className="text-xl md:text-2xl font-extrabold text-blue-600 dark:text-blue-400">
+            {formatTime(analytics.avgTimePerQuestion)}
           </p>
         </div>
       </div>

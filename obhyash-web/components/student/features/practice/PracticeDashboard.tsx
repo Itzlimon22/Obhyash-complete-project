@@ -92,11 +92,17 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
           if (
             userAns !== undefined &&
             userAns !== null &&
-            userAns !== -1 &&
-            userAns !== q.correctAnswerIndex
+            userAns !== -1
           ) {
-            mistakeMap.set(q.id, q);
-            freq.set(q.id, (freq.get(q.id) ?? 0) + 1);
+            const isCorrect =
+              userAns === q.correctAnswerIndex ||
+              (q.correctAnswerIndices != null &&
+                q.correctAnswerIndices.includes(userAns));
+
+            if (!isCorrect) {
+              mistakeMap.set(q.id, q);
+              freq.set(q.id, (freq.get(q.id) ?? 0) + 1);
+            }
           }
         });
       }

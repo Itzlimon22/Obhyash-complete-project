@@ -350,6 +350,10 @@ export const getSubjectAnalysis = async (
           }))
           .sort((a, b) => b.total - a.total);
 
+        const examsWithTime = filteredExams.filter(e => (e.time_taken || 0) > 0);
+        const totalTimeForAvg = examsWithTime.reduce((acc, e) => acc + (e.time_taken || 0), 0);
+        const totalQuestionsForAvg = examsWithTime.reduce((acc, e) => acc + (e.total_questions || 0), 0);
+
         return {
           totalQuestions,
           correct,
@@ -360,7 +364,7 @@ export const getSubjectAnalysis = async (
               ? Math.round((correct / totalQuestions) * 100)
               : 0,
           averageTime:
-            totalQuestions > 0 ? Math.round(totalTime / totalQuestions) : 0,
+            totalQuestionsForAvg > 0 ? Math.round(totalTimeForAvg / totalQuestionsForAvg) : 0,
           chapterPerformance,
           mistakes: [],
         };
@@ -413,6 +417,8 @@ export const getOverallAnalytics = async (
         let totalCorrect = 0;
         let totalTime = 0;
         let scoreSum = 0;
+        let examsWithTimeCount = 0;
+        let questionsWithTimeCount = 0;
 
         const subjectMap = new Map<
           string,
@@ -447,6 +453,11 @@ export const getOverallAnalytics = async (
             totalQuestions += exam.total_questions || 0;
             totalCorrect += exam.correct_count || 0;
             totalTime += exam.time_taken || 0;
+            
+            if ((exam.time_taken || 0) > 0) {
+              examsWithTimeCount++;
+              questionsWithTimeCount += exam.total_questions || 0;
+            }
 
             if (exam.total_marks > 0) {
               scoreSum += (exam.score / exam.total_marks) * 100;
@@ -534,6 +545,8 @@ export const getOverallAnalytics = async (
           totalCorrect,
           totalWrong,
           totalSkipped,
+          avgTimePerExam: examsWithTimeCount > 0 ? Math.round(totalTime / examsWithTimeCount) : 0,
+          avgTimePerQuestion: questionsWithTimeCount > 0 ? Math.round(totalTime / questionsWithTimeCount) : 0,
         };
       }
     } catch (fallbackEx) {
@@ -552,6 +565,8 @@ export const getOverallAnalytics = async (
     totalCorrect: 0,
     totalWrong: 0,
     totalSkipped: 0,
+    avgTimePerExam: 0,
+    avgTimePerQuestion: 0,
   };
 };
 // ... existing code ...

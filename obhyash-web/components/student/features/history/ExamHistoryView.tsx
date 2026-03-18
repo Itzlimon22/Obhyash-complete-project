@@ -228,23 +228,45 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   const hasMoreHistory = visibleCount < filteredHistory.length;
 
   const stats = useMemo(() => {
-    const ev = filteredHistory.filter(
+    const ev = history.filter(
       (h) => (!h.status || h.status === 'evaluated') && h.totalMarks > 0,
     );
-    const total = ev.length;
+    const totalExams = ev.length;
+
+    // Use pre-calculated fields from DB if available, otherwise sum from questions
+    const totalQuestions = ev.reduce((acc, e) => acc + (e.totalQuestions || 0), 0);
+    const totalCorrect = ev.reduce((acc, e) => acc + (e.correctCount || 0), 0);
+    const totalWrong = ev.reduce((acc, e) => acc + (e.wrongCount || 0), 0);
+    const totalSkipped = ev.reduce(
+      (acc, e) =>
+        acc +
+        Math.max(0, (e.totalQuestions || 0) - ((e.correctCount || 0) + (e.wrongCount || 0))),
+      0,
+    );
+
     const avgScore =
-      total > 0
+      totalExams > 0
         ? Math.round(
             ev.reduce((acc, c) => acc + (c.score / c.totalMarks) * 100, 0) /
-              total,
+              totalExams,
           )
         : 0;
-    const highestScore =
-      total > 0
-        ? Math.max(...ev.map((e) => (e.score / e.totalMarks) * 100))
-        : 0;
-    return { total, avgScore, highestScore };
-  }, [filteredHistory]);
+
+    const examsWithTime = ev.filter(e => (e.timeTaken || 0) > 0);
+    const totalTime = ev.reduce((acc, e) => acc + (e.timeTaken || 0), 0);
+    const questionsWithTime = examsWithTime.reduce((acc, e) => acc + (e.totalQuestions || 0), 0);
+    const avgTimePerQuestion = questionsWithTime > 0 ? Math.round(totalTime / questionsWithTime) : 0;
+
+    return {
+      totalQuestions,
+      totalCorrect,
+      totalWrong,
+      totalSkipped,
+      avgScore,
+      totalTime,
+      avgTimePerQuestion,
+    };
+  }, [history]);
 
   const mistakes = useMemo(() => {
     const all: {
@@ -263,22 +285,23 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       const flags = new Set(exam.flaggedQuestions || []);
       exam.questions.forEach((q) => {
         const ua = exam.userAnswers?.[q.id];
-        if (
-          ua !== undefined &&
-          ua !== null &&
-          ua !== -1 &&
-          ua !== q.correctAnswerIndex &&
-          !seen.has(q.id)
-        ) {
-          seen.add(q.id);
-          all.push({
-            question: q,
-            examDate: exam.date,
-            subject: exam.subject,
-            subjectLabel: exam.subjectLabel,
-            userAns: ua,
-            flagged: flags.has(q.id),
-          });
+        if (ua !== undefined && ua !== null && ua !== -1 && !seen.has(q.id)) {
+          const isCorrect =
+            ua === q.correctAnswerIndex ||
+            (q.correctAnswerIndices != null &&
+              q.correctAnswerIndices.includes(ua));
+
+          if (!isCorrect) {
+            seen.add(q.id);
+            all.push({
+              question: q,
+              examDate: exam.date,
+              subject: exam.subject,
+              subjectLabel: exam.subjectLabel,
+              userAns: ua,
+              flagged: flags.has(q.id),
+            });
+          }
         }
       });
     });
@@ -345,7 +368,15 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       month: 'short',
       day: 'numeric',
     }).format(new Date(iso));
-  const formatDuration = (s: number) => `${Math.floor(s / 60)}m ${s % 60}s`;
+  // Helper to format time seconds into hh:mm:ss format
+const formatDuration = (seconds: number) => {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  if (hrs > 0) return `${hrs}ঘণ্টা ${mins}মি`;
+  if (mins > 0) return `${mins}মি ${secs}সে`;
+  return `${secs}সেকেন্ড`;
+};
 
   const TABS = [
     {
@@ -532,41 +563,73 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
         {activeTab === 'exams' && (
           <div className="space-y-4 animate-fade-in">
             {/* Stats bar — Android Material-style chips on mobile */}
-            <div className="grid grid-cols-3 gap-2 md:gap-3">
-              {/* Total */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+              {/* Total Questions */}
               <div className="bg-emerald-700 dark:bg-emerald-800 rounded-2xl p-3 md:p-5 flex flex-col items-center md:items-start text-white shadow-md shadow-emerald-700/20">
                 <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest opacity-80 mb-0.5">
-                  মোট
+                  মোট প্রশ্ন
                 </p>
                 <p className="text-2xl md:text-4xl font-extrabold leading-tight">
-                  {stats.total}
+                  {stats.totalQuestions}
                 </p>
                 <p className="hidden md:block text-xs opacity-60 mt-0.5">
-                  পরীক্ষা
+                  সমাধান করেছ
                 </p>
               </div>
-              {/* Avg */}
+              {/* Correct */}
+              <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-5 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm">
+                <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-0.5">
+                  সঠিক
+                </p>
+                <p className="text-2xl md:text-4xl font-extrabold text-emerald-600 dark:text-emerald-500 leading-tight">
+                  {stats.totalCorrect}
+                </p>
+                <p className="hidden md:block text-xs text-neutral-400 mt-0.5">
+                  প্রশ্নের উত্তর
+                </p>
+              </div>
+              {/* Wrong */}
+              <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-5 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm">
+                <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-red-600 dark:text-red-400 mb-0.5">
+                  ভুল
+                </p>
+                <p className="text-2xl md:text-4xl font-extrabold text-red-600 dark:text-red-500 leading-tight">
+                  {stats.totalWrong}
+                </p>
+                <p className="hidden md:block text-xs text-neutral-400 mt-0.5">
+                  প্রশ্নের উত্তর
+                </p>
+              </div>
+              {/* Avg Score */}
               <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-5 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm">
                 <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mb-0.5">
-                  গড়
+                  গড় নম্বর
                 </p>
                 <p className="text-2xl md:text-4xl font-extrabold text-neutral-800 dark:text-white leading-tight">
                   {stats.avgScore}%
                 </p>
                 <p className="hidden md:block text-xs text-neutral-400 mt-0.5">
-                  স্কোর
+                  সাফল্যের হার
                 </p>
               </div>
-              {/* Best */}
-              <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-5 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            </div>
+
+            {/* Extra stats — Time metrics */}
+            <div className="grid grid-cols-2 gap-2 md:gap-3">
+              <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-4 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm">
                 <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mb-0.5">
-                  সর্বোচ্চ
+                  মোট সময়
                 </p>
-                <p className="text-2xl md:text-4xl font-extrabold text-emerald-600 dark:text-emerald-500 leading-tight">
-                  {Math.round(stats.highestScore)}%
+                <p className="text-xl md:text-2xl font-extrabold text-neutral-800 dark:text-white leading-tight">
+                  {formatDuration(stats.totalTime)}
                 </p>
-                <p className="hidden md:block text-xs text-neutral-400 mt-0.5">
-                  স্কোর
+              </div>
+              <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-4 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm">
+                <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mb-0.5">
+                  গড় সময় (প্রতি প্রশ্ন)
+                </p>
+                <p className="text-xl md:text-2xl font-extrabold text-blue-600 dark:text-blue-500 leading-tight">
+                  {formatDuration(stats.avgTimePerQuestion)}
                 </p>
               </div>
             </div>

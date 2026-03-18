@@ -540,6 +540,8 @@ export interface OverallAnalytics {
   totalCorrect: number;
   totalWrong: number;
   totalSkipped: number;
+  avgTimePerExam: number;
+  avgTimePerQuestion: number;
 }
 
 // ==========================================

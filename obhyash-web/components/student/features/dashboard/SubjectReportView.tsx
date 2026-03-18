@@ -252,7 +252,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
             </div>
             <div className="text-center md:text-left min-w-0 w-full">
               <p className="text-[9px] md:text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-tight md:tracking-wide truncate">
-                গড় সময়
+                গড় সময় (প্রতি প্রশ্ন)
               </p>
               <h3 className="text-base md:text-3xl font-extrabold text-neutral-900 dark:text-white mt-0.5 md:mt-1 truncate">
                 {stats.averageTime}s

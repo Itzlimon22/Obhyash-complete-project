@@ -60,8 +60,11 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
 
   const current = questions[currentIndex];
   const total = questions.length;
-  const correctIndex = current.correctAnswerIndex ?? 0;
-  const isCorrect = selectedIdx === correctIndex;
+  const isCorrect = selectedIdx !== null && (
+    selectedIdx === current.correctAnswerIndex ||
+    (current.correctAnswerIndices != null &&
+      current.correctAnswerIndices.includes(selectedIdx))
+  );
 
   // Count correct so far for progress bar colour
   const correctSoFar = results.filter((r) => r.grade === 'got_it').length;
@@ -71,17 +74,25 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
       if (phase === 'revealed') return;
       setSelectedIdx(idx);
       setPhase('revealed');
-      if (idx === correctIndex) {
+      const isCorrectNow =
+        idx === current.correctAnswerIndex ||
+        (current.correctAnswerIndices != null &&
+          current.correctAnswerIndices.includes(idx));
+      if (isCorrectNow) {
         playCorrectSound();
       }
     },
-    [phase, correctIndex],
+    [phase, current],
   );
 
   const handleNext = useCallback(() => {
     // If skipping (selectedIdx is null), we treat it as struggling or just move on
-    const grade: FlashcardGrade =
-      selectedIdx === correctIndex ? 'got_it' : 'struggling';
+    const isCorrectLoc = selectedIdx !== null && (
+      selectedIdx === current.correctAnswerIndex ||
+      (current.correctAnswerIndices != null &&
+        current.correctAnswerIndices.includes(selectedIdx))
+    );
+    const grade: FlashcardGrade = isCorrectLoc ? 'got_it' : 'struggling';
     const newResults = [
       ...results,
       { question: current, grade, selectedIndex: selectedIdx },
@@ -100,7 +111,6 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
     setIsExplanationOpen(false);
   }, [
     selectedIdx,
-    correctIndex,
     results,
     current,
     currentIndex,
@@ -131,7 +141,12 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
     let iconText = BANGLA_INDICES[idx] ?? (idx + 1).toString();
 
     if (phase === 'revealed') {
-      if (idx === correctIndex) {
+      const isActuallyCorrect =
+        idx === current.correctAnswerIndex ||
+        (current.correctAnswerIndices != null &&
+          current.correctAnswerIndices.includes(idx));
+
+      if (isActuallyCorrect) {
         bgClass = 'bg-emerald-50 dark:bg-emerald-900/20';
         borderClass = 'border-emerald-500 dark:border-emerald-500';
         iconBorder = 'border-emerald-600 bg-emerald-600 text-white';
@@ -323,7 +338,11 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                           <div
                             className={`text-[13px] md:text-base font-medium leading-[1.35] md:leading-relaxed select-none font-serif-exam ${
                               selectedIdx === idx ||
-                              (phase === 'revealed' && idx === correctIndex)
+                              (phase === 'revealed' && (
+                                idx === current.correctAnswerIndex ||
+                                (current.correctAnswerIndices != null &&
+                                  current.correctAnswerIndices.includes(idx))
+                              ))
                                 ? 'text-neutral-900 dark:text-neutral-100'
                                 : 'text-neutral-700 dark:text-neutral-300'
                             }`}
@@ -357,9 +376,9 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                               <span className="text-[14px] md:text-[15px] font-extrabold text-emerald-700 dark:text-emerald-400">
                                 সঠিক উত্তর :{' '}
-                                {BANGLA_INDICES[
-                                  current.correctAnswerIndex ?? 0
-                                ] || ''}
+                                {current.correctAnswerIndices && current.correctAnswerIndices.length > 0
+                                  ? current.correctAnswerIndices.map(i => BANGLA_INDICES[i]).join(', ')
+                                  : (BANGLA_INDICES[current.correctAnswerIndex ?? 0] || '')}
                               </span>
                             </div>
                             <div
@@ -464,13 +483,13 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
                 className={`
                   flex items-center gap-1.5 px-3 py-2 rounded-lg font-bold text-[12px] md:text-sm shrink-0
                   ${
-                    selectedIdx === correctIndex
+                    isCorrect
                       ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
                       : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
                   }
                 `}
               >
-                {selectedIdx === correctIndex ? '✓ সঠিক' : '✗ ভুল'}
+                {isCorrect ? '✓ সঠিক' : '✗ ভুল'}
               </motion.div>
             )}
           </AnimatePresence>
@@ -482,7 +501,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
               flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm text-white transition-all active:scale-[0.98] shadow-md
               ${
                 phase === 'revealed'
-                  ? selectedIdx === correctIndex
+                  ? isCorrect
                     ? 'bg-emerald-700 hover:bg-emerald-800 shadow-emerald-700/20'
                     : 'bg-red-600 hover:bg-red-700 shadow-red-600/20'
                   : 'bg-neutral-800 dark:bg-neutral-200 dark:text-neutral-900 hover:bg-neutral-900 dark:hover:bg-white shadow-neutral-800/20'
