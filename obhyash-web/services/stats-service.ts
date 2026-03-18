@@ -1,45 +1,13 @@
-import { UserProfile, ExamResult, Question } from '@/lib/types';
+import { UserProfile, ExamResult, Question, SubjectAnalysis, OverallAnalytics } from '@/lib/types';
 import { supabase, isSupabaseConfigured } from './core';
 import { LEVELS } from '@/components/dashboard/leaderboard/leaderboardData';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 
 // --- TYPES ---
-export interface SubjectAnalysis {
-  totalQuestions: number;
-  correct: number;
-  wrong: number;
-  skipped: number;
-  accuracy: number;
-  averageTime: number;
-  chapterPerformance: {
-    name: string;
-    total: number;
-    correct: number;
-    accuracy: number;
-  }[];
-  mistakes: {
-    question: Question;
-    examDate: string;
-    examName: string;
-    userAns: number;
-    correctAns: number;
-  }[];
-}
+// Re-exporting for compatibility, though importing directly from @/lib/types is preferred.
+export type { SubjectAnalysis, OverallAnalytics };
 
-export interface OverallAnalytics {
-  totalExams: number;
-  avgScore: number;
-  avgAccuracy: number;
-  totalTime: number;
-  timelineData: { name: string; score: number; fullDate: string }[];
-  subjectData: {
-    name: string;
-    correct: number;
-    wrong: number;
-    skipped: number;
-    total: number;
-  }[];
-}
+// Helper function to generate avatar colors
 
 // Helper function to generate avatar colors
 const generateAvatarColor = (index: number): string => {
@@ -291,7 +259,7 @@ export const getSubjectAnalysis = async (
 
         const chapterMap = new Map<
           string,
-          { name: string; total: number; correct: number }
+          { name: string; total: number; correct: number; wrong: number; skipped: number }
         >();
 
         filteredExams.forEach((exam) => {
@@ -326,6 +294,8 @@ export const getSubjectAnalysis = async (
                   name: cName,
                   total: 0,
                   correct: 0,
+                  wrong: 0,
+                  skipped: 0,
                 });
               }
 
@@ -333,14 +303,15 @@ export const getSubjectAnalysis = async (
               cData.total += 1; // 1 Question
 
               const userAnswer = answers[q.id];
-              if (
-                userAnswer !== undefined &&
-                userAnswer === q.correctAnswerIndex
-              ) {
-                cData!.correct += 1;
+              if (userAnswer === undefined) {
+                cData.skipped += 1;
+              } else if (userAnswer === q.correctAnswerIndex) {
+                cData.correct += 1;
+              } else {
+                cData.wrong += 1;
               }
             });
-          } else {
+            } else {
             // Legacy fallback if `questions` array is missing
             const chaptersText = exam.chapters || 'General';
             const chaptersArray = chaptersText
@@ -351,14 +322,18 @@ export const getSubjectAnalysis = async (
             if (chaptersArray.length > 0) {
               const wTotal = (exam.total_questions || 0) / chaptersArray.length;
               const wCorrect = (exam.correct_count || 0) / chaptersArray.length;
+              const wWrong = (exam.wrong_count || 0) / chaptersArray.length;
+              const wSkipped = ((exam.total_questions || 0) - ((exam.correct_count || 0) + (exam.wrong_count || 0))) / chaptersArray.length;
 
               chaptersArray.forEach((chap: string) => {
                 if (!chapterMap.has(chap)) {
-                  chapterMap.set(chap, { name: chap, total: 0, correct: 0 });
+                  chapterMap.set(chap, { name: chap, total: 0, correct: 0, wrong: 0, skipped: 0 });
                 }
                 const cData = chapterMap.get(chap)!;
                 cData.total += wTotal;
                 cData.correct += wCorrect;
+                cData.wrong += wWrong;
+                cData.skipped += Math.max(0, wSkipped);
               });
             }
           }
@@ -369,6 +344,8 @@ export const getSubjectAnalysis = async (
             name: c.name,
             total: Math.round(c.total),
             correct: Math.round(c.correct),
+            wrong: Math.round(c.wrong),
+            skipped: Math.round(c.skipped),
             accuracy: c.total > 0 ? Math.round((c.correct / c.total) * 100) : 0,
           }))
           .sort((a, b) => b.total - a.total);
@@ -440,6 +417,7 @@ export const getOverallAnalytics = async (
         const subjectMap = new Map<
           string,
           {
+            id: string;
             name: string;
             correct: number;
             wrong: number;
@@ -451,6 +429,9 @@ export const getOverallAnalytics = async (
           string,
           { name: string; score: number; _count: number; fullDate: string }
         >();
+
+        let totalWrong = 0;
+        let totalSkipped = 0;
 
         rawData.forEach(
           (exam: {
@@ -471,26 +452,34 @@ export const getOverallAnalytics = async (
               scoreSum += (exam.score / exam.total_marks) * 100;
             }
 
-            // Subject aggregate
-            const subj = exam.subject || 'General';
-            if (!subjectMap.has(subj)) {
-              subjectMap.set(subj, {
-                name: subj,
+            // Subject aggregate - normalize ID and resolve label
+            const subjId = exam.subject || 'General';
+            const subjName = getSubjectDisplayName(subjId);
+            
+            if (!subjectMap.has(subjId)) {
+              subjectMap.set(subjId, {
+                id: subjId,
+                name: subjName,
                 correct: 0,
                 wrong: 0,
                 skipped: 0,
                 total: 0,
               });
             }
-            const sData = subjectMap.get(subj)!;
+            const sData = subjectMap.get(subjId)!;
             sData.correct += exam.correct_count || 0;
             sData.wrong += exam.wrong_count || 0;
             sData.total += exam.total_questions || 0;
-            sData.skipped += Math.max(
+            
+            const examSkipped = Math.max(
               0,
               (exam.total_questions || 0) -
                 ((exam.correct_count || 0) + (exam.wrong_count || 0)),
             );
+            sData.skipped += examSkipped;
+            
+            totalWrong += exam.wrong_count || 0;
+            totalSkipped += examSkipped;
 
             // Timeline aggregate
             const examDate = new Date(exam.date);
@@ -541,6 +530,10 @@ export const getOverallAnalytics = async (
           subjectData: Array.from(subjectMap.values()).sort(
             (a, b) => b.total - a.total,
           ),
+          totalQuestions,
+          totalCorrect,
+          totalWrong,
+          totalSkipped,
         };
       }
     } catch (fallbackEx) {
@@ -555,6 +548,10 @@ export const getOverallAnalytics = async (
     totalTime: 0,
     timelineData: [],
     subjectData: [],
+    totalQuestions: 0,
+    totalCorrect: 0,
+    totalWrong: 0,
+    totalSkipped: 0,
   };
 };
 // ... existing code ...

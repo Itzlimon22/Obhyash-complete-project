@@ -80,12 +80,6 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
   const weakChapters = useMemo(() => {
     if (!stats) return [];
     return stats.chapterPerformance
-      .map((c) => ({
-        name: c.name,
-        total: c.total,
-        wrong: c.total - c.correct,
-        accuracy: c.accuracy,
-      }))
       .filter((c) => c.wrong > 0)
       .sort((a, b) => b.wrong - a.wrong);
   }, [stats]);

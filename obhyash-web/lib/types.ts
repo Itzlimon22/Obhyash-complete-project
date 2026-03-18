@@ -510,6 +510,8 @@ export interface SubjectAnalysis {
     name: string;
     total: number;
     correct: number;
+    wrong: number;
+    skipped: number;
     accuracy: number;
   }[];
   mistakes: {
@@ -534,6 +536,10 @@ export interface OverallAnalytics {
     skipped: number;
     total: number;
   }[];
+  totalQuestions: number;
+  totalCorrect: number;
+  totalWrong: number;
+  totalSkipped: number;
 }
 
 // ==========================================

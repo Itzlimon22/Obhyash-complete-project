@@ -71,18 +71,10 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
   }, [analytics && analytics.subjectData]);
 
   // Secondary computed stats
-  const totalQuestions = useMemo(
-    () => (analytics?.subjectData || []).reduce((sum, s) => sum + s.total, 0),
-    [analytics],
-  );
-  const totalCorrect = useMemo(
-    () => (analytics?.subjectData || []).reduce((sum, s) => sum + s.correct, 0),
-    [analytics],
-  );
-  const totalWrong = useMemo(
-    () => (analytics?.subjectData || []).reduce((sum, s) => sum + s.wrong, 0),
-    [analytics],
-  );
+  // Centralized computed stats from backend
+  const totalQuestions = analytics?.totalQuestions || 0;
+  const totalCorrect = analytics?.totalCorrect || 0;
+  const totalWrong = analytics?.totalWrong || 0;
   const bestSubject = useMemo(() => {
     const filtered = (analytics?.subjectData || []).filter((s) => s.total >= 5);
     if (!filtered.length) return null;
