@@ -2,8 +2,8 @@
 
 import TeacherSidebar from '@/components/teacher/layout/TeacherSidebar';
 import { useSessionMonitor } from '@/hooks/use-session-monitor';
-import { useDeviceSession } from '@/hooks/use-device-session';
-import { ManageDevicesModal } from '@/components/auth/ManageDevicesModal';
+// import { useDeviceSession } from '@/hooks/use-device-session'; 
+// import { ManageDevicesModal } from '@/components/auth/ManageDevicesModal';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -28,8 +28,8 @@ export default function TeacherLayout({
     onForcedSignOut: signOut,
   });
 
-  // Device session limiting (Netflix-style)
-  const deviceSession = useDeviceSession(profile?.id || user?.id);
+  // Device session limiting (Netflix-style) - DISABLED
+  // const deviceSession = useDeviceSession(profile?.id || user?.id);
 
   // Redirect if definitely not a teacher once loading is done
   useEffect(() => {
@@ -76,6 +76,7 @@ export default function TeacherLayout({
 
   return (
     <>
+      {/* 
       {deviceSession.blocked && deviceSession.limitData && (
         <ManageDevicesModal
           open={true}
@@ -85,6 +86,7 @@ export default function TeacherLayout({
           onDeviceRemoved={() => window.location.reload()}
         />
       )}
+      */}
       <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
         <TeacherSidebar />
         {/* Main content area offset by sidebar width */}

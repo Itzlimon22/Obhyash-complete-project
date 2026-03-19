@@ -66,66 +66,10 @@ async function doRegister() {
 export function useDeviceSession(
   userId: string | null | undefined,
 ): DeviceLimitState {
-  const [state, setState] = useState<DeviceLimitState>({
+  // Device limitations have been disabled as per user request.
+  // This hook now returns a constant non-blocked state.
+  return {
     blocked: false,
     limitData: null,
-  });
-
-  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const { signOut } = useAuth();
-
-  // Realtime: sign out immediately if this device's row is deleted remotely
-  useEffect(() => {
-    if (!userId) return;
-    const supabase = createClient();
-    const myToken = getDeviceToken();
-
-    const channel = supabase
-      .channel(`device-revoke:${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'user_devices',
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload: { old: Partial<DeviceSession> }) => {
-          if (payload.old?.device_token === myToken) {
-            // Our own device row was deleted — sign out immediately
-            signOut().catch(() => {});
-          }
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [userId, signOut]);
-
-  useEffect(() => {
-    if (!userId) return;
-    let cancelled = false;
-
-    doRegister()
-      .then((result) => {
-        if (!cancelled) setState(result);
-      })
-      .catch(() => {
-        /* fail open — don't block user on network error */
-      });
-
-    // Heartbeat: re-register (upserts last_active, no limit re-check needed)
-    heartbeatRef.current = setInterval(() => {
-      doRegister().catch(() => {});
-    }, HEARTBEAT_INTERVAL_MS);
-
-    return () => {
-      cancelled = true;
-      if (heartbeatRef.current) clearInterval(heartbeatRef.current);
-    };
-  }, [userId]);
-
-  return state;
+  };
 }
