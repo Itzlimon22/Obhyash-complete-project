@@ -37,7 +37,8 @@ export async function POST(req: NextRequest) {
     req.headers.get('x-real-ip') ||
     null;
 
-  // Check device limit before registering
+  /* 
+  // DEVICE LIMIT CHECK DISABLED AS PER REQUEST
   const { data: limitData, error: limitError } = await supabase.rpc(
     'check_device_limit',
     {
@@ -59,7 +60,6 @@ export async function POST(req: NextRequest) {
   };
 
   if (!limit.allowed) {
-    // Return the current device list so the client can show a "manage devices" UI
     const { data: devices } = await supabase
       .from('user_devices')
       .select('id, device_name, device_type, last_active, created_at')
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error: 'device_limit_exceeded',
-        message: `আপনার ${limit.plan} প্ল্যানে সর্বোচ্চ ${limit.limit}টি ডিভাইস অনুমোদিত। নতুন ডিভাইসে লগইন করতে একটি পুরনো ডিভাইস সরান।`,
+        message: `আপনার ${limit.plan} প্ল্যানে সর্বোচ্চ ${limit.limit}টি ডিভাইস অনুমোদিত।`,
         limit: limit.limit,
         count: limit.count,
         plan: limit.plan,
@@ -78,6 +78,7 @@ export async function POST(req: NextRequest) {
       { status: 403 },
     );
   }
+  */
 
   // Register / refresh the device
   const { data: device, error: upsertError } = await supabase
