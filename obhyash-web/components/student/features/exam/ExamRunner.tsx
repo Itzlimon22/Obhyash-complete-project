@@ -1,20 +1,20 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState } from "react";
 
-import AppLayout from '@/components/student/ui/layout/AppLayout';
-import ExamHeader from '@/components/student/ui/ExamHeader';
-import QuestionCard from '@/components/student/ui/exam/QuestionCard';
-import ExamDetailsCard from '@/components/student/ui/exam/ExamDetailsCard';
+import AppLayout from "@/components/student/ui/layout/AppLayout";
+import ExamHeader from "@/components/student/ui/ExamHeader";
+import QuestionCard from "@/components/student/ui/exam/QuestionCard";
+import ExamDetailsCard from "@/components/student/ui/exam/ExamDetailsCard";
 
-import { toast } from 'sonner';
+import { toast } from "sonner";
 
 // Common Modals (Moved to student/ui/common)
-import ConfirmationModal from '@/components/student/ui/common/ConfirmationModal';
-import TimeoutModal from '@/components/student/ui/common/TimeoutModal';
-import ReportModal from '@/components/student/ui/common/ReportModal';
-import NavigationWarningModal from '@/components/student/ui/common/NavigationWarningModal';
+import ConfirmationModal from "@/components/student/ui/common/ConfirmationModal";
+import TimeoutModal from "@/components/student/ui/common/TimeoutModal";
+import ReportModal from "@/components/student/ui/common/ReportModal";
+import NavigationWarningModal from "@/components/student/ui/common/NavigationWarningModal";
 
 // Features / Results
-import ScriptUploader from '@/components/student/ui/ScriptUploader';
+import ScriptUploader from "@/components/student/ui/ScriptUploader";
 
 // Data & Services
 import {
@@ -23,11 +23,11 @@ import {
   Question,
   UserAnswers,
   UserProfile,
-} from '@/lib/types';
+} from "@/lib/types";
 import {
   downloadQuestionPaper,
   downloadOMRSheet,
-} from '@/services/download-service';
+} from "@/services/download-service";
 
 /**
  * Props for the ExamRunner component.
@@ -76,14 +76,14 @@ interface ExamRunnerProps {
   navWarning: {
     isOpen: boolean;
     targetTab: string | null;
-    action: 'tab' | 'logout';
+    action: "tab" | "logout";
   };
   /** Setter for navigation warning state */
   setNavWarning: React.Dispatch<
     React.SetStateAction<{
       isOpen: boolean;
       targetTab: string | null;
-      action: 'tab' | 'logout';
+      action: "tab" | "logout";
     }>
   >;
   /** Function to confirm navigation away from exam */
@@ -160,8 +160,8 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
   };
 
   const handleReportSubmit = (data: Record<string, unknown>) => {
-    console.log('Report:', data);
-    toast.success('রিপোর্ট জমা নেওয়া হয়েছে। ধন্যবাদ!');
+    console.log("Report:", data);
+    toast.success("রিপোর্ট জমা নেওয়া হয়েছে। ধন্যবাদ!");
   };
 
   if (!examDetails) return null;
@@ -265,8 +265,8 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
                         Object.keys(userAnswers).length === questions.length
-                          ? 'bg-emerald-500'
-                          : 'bg-blue-500'
+                          ? "bg-emerald-500"
+                          : "bg-blue-500"
                       }`}
                       style={{
                         width: `${questions.length > 0 ? Math.round((Object.keys(userAnswers).length / questions.length) * 100) : 0}%`,
@@ -292,8 +292,8 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                     onClick={() => setIsUploadModalOpen(true)}
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm border transition-all active:scale-[0.97] ${
                       selectedScript
-                        ? 'border-emerald-400 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30'
-                        : 'border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800'
+                        ? "border-emerald-400 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30"
+                        : "border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800"
                     }`}
                   >
                     <svg
@@ -309,7 +309,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                         d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
                       />
                     </svg>
-                    {selectedScript ? 'স্ক্রিপ্ট পরিবর্তন' : 'OMR ক্যাপচার'}
+                    {selectedScript ? "স্ক্রিপ্ট পরিবর্তন" : "OMR ক্যাপচার"}
                   </button>
                   <button
                     onClick={handleSubmitRequest}
