@@ -1,4 +1,4 @@
-﻿import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { BlogPost } from '@/lib/blog-data';
@@ -1013,30 +1013,30 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* Blog Highlights Section */}
       {latestPosts.length > 0 && (
-        <section className="py-24 bg-neutral-950 dark:bg-black overflow-hidden border-t border-neutral-900">
+        <section className="py-24 bg-neutral-50 dark:bg-black overflow-hidden border-y border-neutral-100 dark:border-neutral-900/60">
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
             {/* Section Header */}
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-14">
               <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/40 border border-red-800/40 text-red-400 text-xs font-black uppercase tracking-wider">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 text-xs font-black uppercase tracking-wider">
                   <BookOpen className="w-3.5 h-3.5" />
                   ব্লগ থেকে সর্বশেষ
                 </div>
-                <h2 className="text-4xl sm:text-5xl font-black text-white leading-tight">
+                <h2 className="text-4xl sm:text-5xl font-black text-neutral-900 dark:text-white leading-tight">
                   পরীক্ষার প্রস্তুতিতে
                   <br />
-                  <span className="text-red-500">বিশেষজ্ঞ কৌশল</span>
+                  <span className="text-red-600 dark:text-red-500">বিশেষজ্ঞ কৌশল</span>
                 </h2>
-                <p className="text-neutral-400 text-base leading-relaxed max-w-xl">
+                <p className="text-neutral-600 dark:text-neutral-400 text-base leading-relaxed max-w-xl">
                   MCQ টেকনিক, পেপার সলিউশন এবং স্টাডি রুটিন — সব এক জায়গায়।
                 </p>
               </div>
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-bold text-sm transition-all duration-300 group shrink-0"
+                className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl bg-white shadow-sm dark:bg-white/5 hover:bg-neutral-50 dark:hover:bg-white/10 border border-neutral-200 dark:border-white/10 text-neutral-800 dark:text-white font-bold text-sm transition-all duration-300 group shrink-0 hover:shadow-md"
               >
                 সব পোস্ট দেখো
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 text-red-600 dark:text-white group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
 
@@ -1048,7 +1048,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   href={`/blog/${latestPosts[0].slug}`}
                   className="lg:col-span-3 block group/featured"
                 >
-                  <div className="h-full rounded-[1.75rem] overflow-hidden border border-white/[0.08] hover:border-red-500/30 hover:shadow-2xl hover:shadow-red-900/20 transition-all duration-500 hover:-translate-y-1 flex flex-col">
+                  <div className="h-full rounded-[1.75rem] overflow-hidden bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-white/[0.08] hover:border-red-400 dark:hover:border-red-500/30 hover:shadow-2xl hover:shadow-red-500/10 dark:hover:shadow-red-900/20 transition-all duration-500 hover:-translate-y-1 flex flex-col">
                     {/* Cover area */}
                     <div
                       className={`relative h-56 sm:h-72 w-full bg-gradient-to-br ${latestPosts[0].coverColor || 'from-emerald-700 to-emerald-950'} flex items-end overflow-hidden`}
@@ -1058,15 +1058,15 @@ const LandingPage: React.FC<LandingPageProps> = ({
                         <img
                           src={latestPosts[0].coverImage}
                           alt={latestPosts[0].title}
-                          className="absolute inset-0 w-full h-full object-cover"
+                          className="absolute inset-0 w-full h-full object-cover group-hover/featured:scale-105 transition-transform duration-700"
                         />
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                       <div className="relative z-10 p-6 flex flex-wrap items-center gap-2">
-                        <span className="px-3 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full">
+                        <span className="px-3 py-1 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg">
                           {latestPosts[0].category}
                         </span>
-                        <span className="px-2.5 py-1 bg-black/50 text-white/70 text-[10px] font-bold rounded-full flex items-center gap-1">
+                        <span className="px-2.5 py-1 bg-white/20 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold rounded-full flex items-center gap-1 shadow-sm">
                           <Clock className="w-2.5 h-2.5" />
                           {latestPosts[0].readTime} মিনিট
                         </span>
@@ -1074,11 +1074,11 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 p-6 sm:p-8 bg-neutral-900 flex flex-col gap-4">
-                      <h3 className="text-2xl sm:text-3xl font-black text-white group-hover/featured:text-red-400 transition-colors line-clamp-2 leading-tight">
+                    <div className="flex-1 p-6 sm:p-8 flex flex-col gap-4">
+                      <h3 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white group-hover/featured:text-red-600 dark:group-hover/featured:text-red-400 transition-colors line-clamp-2 leading-tight">
                         {latestPosts[0].title}
                       </h3>
-                      <p className="text-neutral-400 text-sm sm:text-base leading-relaxed line-clamp-2 flex-1">
+                      <p className="text-neutral-600 dark:text-neutral-400 text-sm sm:text-base leading-relaxed line-clamp-2 flex-1">
                         {latestPosts[0].excerpt}
                       </p>
                       {latestPosts[0].tags &&
@@ -1087,14 +1087,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
                             {latestPosts[0].tags.slice(0, 3).map((tag) => (
                               <span
                                 key={tag}
-                                className="px-2 py-0.5 bg-white/5 border border-white/10 text-neutral-400 text-[10px] font-bold rounded-md"
+                                className="px-2 py-0.5 bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 text-neutral-600 dark:text-neutral-400 text-[10px] font-bold rounded-md"
                               >
                                 #{tag}
                               </span>
                             ))}
                           </div>
                         )}
-                      <div className="flex items-center justify-between pt-3 border-t border-white/[0.08]">
+                      <div className="flex items-center justify-between pt-3 border-t border-neutral-100 dark:border-white/[0.08]">
                         <div className="flex items-center gap-3">
                           <div
                             className={`w-9 h-9 rounded-full bg-gradient-to-br ${latestPosts[0].coverColor || 'from-emerald-600 to-emerald-900'} flex items-center justify-center text-white text-xs font-black shadow-md`}
@@ -1102,7 +1102,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                             {latestPosts[0].author.initials}
                           </div>
                           <div>
-                            <div className="text-xs font-bold text-neutral-200">
+                            <div className="text-xs font-bold text-neutral-900 dark:text-neutral-200">
                               {latestPosts[0].author.name}
                             </div>
                             <div className="text-[10px] text-neutral-500">
@@ -1110,7 +1110,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                             </div>
                           </div>
                         </div>
-                        <span className="inline-flex items-center gap-1.5 text-red-400 font-black text-xs group-hover/featured:gap-2.5 transition-all">
+                        <span className="inline-flex items-center gap-1.5 text-red-600 dark:text-red-400 font-black text-xs group-hover/featured:gap-2.5 transition-all">
                           পড়তে শুরু করো
                           <ArrowRight className="w-3.5 h-3.5 group-hover/featured:translate-x-1 transition-transform" />
                         </span>
@@ -1128,7 +1128,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     href={`/blog/${post.slug}`}
                     className="group/card block flex-1"
                   >
-                    <div className="h-full bg-neutral-900 rounded-[1.5rem] border border-white/[0.08] p-4 sm:p-5 flex gap-4 items-start hover:border-red-500/30 hover:shadow-xl hover:shadow-red-900/10 hover:-translate-y-0.5 transition-all duration-300">
+                    <div className="h-full bg-white dark:bg-neutral-900 rounded-[1.5rem] border border-neutral-200 dark:border-white/[0.08] p-4 sm:p-5 flex gap-4 items-start hover:border-red-400 dark:hover:border-red-500/30 hover:shadow-xl hover:shadow-red-500/10 dark:hover:shadow-red-900/10 hover:-translate-y-0.5 transition-all duration-300">
                       {/* Thumbnail */}
                       <div
                         className={`w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br ${post.coverColor || 'from-neutral-700 to-neutral-900'} flex items-center justify-center text-white font-black text-base group-hover/card:scale-105 transition-transform duration-300 shadow-md overflow-hidden`}
@@ -1147,7 +1147,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                       {/* Text */}
                       <div className="flex-1 min-w-0 space-y-1.5">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">
+                          <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500">
                             {post.category}
                           </span>
                           <span className="text-[9px] font-bold text-neutral-500 flex items-center gap-1">
@@ -1155,10 +1155,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
                             {post.readTime} মিনিট
                           </span>
                         </div>
-                        <h4 className="text-sm font-bold text-neutral-100 group-hover/card:text-red-400 transition-colors line-clamp-2 leading-snug">
+                        <h4 className="text-sm font-bold text-neutral-900 dark:text-neutral-100 group-hover/card:text-red-600 dark:group-hover/card:text-red-400 transition-colors line-clamp-2 leading-snug">
                           {post.title}
                         </h4>
-                        <p className="text-[11px] text-neutral-500 line-clamp-1 font-medium">
+                        <p className="text-[11px] text-neutral-500 dark:text-neutral-500 line-clamp-1 font-medium">
                           {post.excerpt}
                         </p>
                       </div>
@@ -1168,14 +1168,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
                 {/* Blog CTA card */}
                 <Link href="/blog" className="block group/cta mt-auto">
-                  <div className="rounded-[1.5rem] bg-gradient-to-br from-red-700 to-red-900 p-5 flex items-center justify-between text-white hover:from-red-600 hover:to-red-800 transition-all duration-300 shadow-xl shadow-red-900/30 hover:shadow-red-800/40 hover:-translate-y-0.5 border border-red-600/30">
+                  <div className="rounded-[1.5rem] bg-gradient-to-br from-red-600 to-red-700 dark:from-red-700 dark:to-red-900 p-5 flex items-center justify-between text-white hover:from-red-700 hover:to-red-800 dark:hover:from-red-600 dark:hover:to-red-800 transition-all duration-300 shadow-xl shadow-red-500/30 dark:shadow-red-900/30 hover:shadow-red-500/40 dark:hover:shadow-red-800/40 hover:-translate-y-0.5 border border-red-500/30 dark:border-red-600/30">
                     <div>
-                      <div className="font-black text-base">সব লেখা পড়ুন</div>
-                      <div className="text-red-300 text-xs font-medium mt-0.5">
+                      <div className="font-black text-base drop-shadow-sm">সব লেখা পড়ুন</div>
+                      <div className="text-red-200 dark:text-red-300 text-xs font-medium mt-0.5">
                         ব্লগে সব পোস্ট দেখো
                       </div>
                     </div>
-                    <div className="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center group-hover/cta:bg-white/25 transition-colors">
+                    <div className="w-10 h-10 bg-white/20 dark:bg-white/15 backdrop-blur-md rounded-xl flex items-center justify-center group-hover/cta:bg-white/30 transition-colors shadow-inner">
                       <ArrowRight className="w-5 h-5 group-hover/cta:translate-x-1 transition-transform" />
                     </div>
                   </div>
@@ -1254,21 +1254,21 @@ const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* Pre-Pricing Countdown CTA */}
-      <section className="py-20 bg-black relative overflow-hidden">
+      <section className="py-20 bg-gradient-to-br from-emerald-50/50 via-white to-red-50/50 dark:from-emerald-950/10 dark:via-black dark:to-red-950/10 relative overflow-hidden border-t border-neutral-100 dark:border-neutral-900">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-emerald-600/8 rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-red-600/8 rounded-full blur-[120px]" />
+          <div className="absolute top-[-10%] left-[10%] w-[500px] h-[500px] bg-emerald-500/10 dark:bg-emerald-600/8 rounded-full blur-[100px]" />
+          <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] bg-red-500/10 dark:bg-red-600/8 rounded-full blur-[100px]" />
         </div>
         <div className="max-w-7xl mx-auto px-4 lg:px-6 relative z-10">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 dark:bg-white/5 border border-neutral-200 dark:border-white/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4 shadow-sm backdrop-blur-md">
               <CalendarDays className="w-3.5 h-3.5" />
               পরীক্ষার কাউন্টডাউন
             </div>
-            <h2 className="text-3xl lg:text-4xl font-extrabold text-white">
+            <h2 className="text-3xl lg:text-4xl font-extrabold text-neutral-900 dark:text-white">
               পরীক্ষার আগে প্রতিটি দিন মূল্যবান
             </h2>
-            <p className="text-neutral-400 mt-3 max-w-xl mx-auto">
+            <p className="text-neutral-600 dark:text-neutral-400 mt-3 max-w-xl mx-auto">
               আজই শুরু করো — দেরি হলে পস্তাবে।
             </p>
           </div>
@@ -1277,75 +1277,86 @@ const LandingPage: React.FC<LandingPageProps> = ({
             {/* HSC */}
             <div
               onClick={onGetStarted}
-              className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-7 text-center hover:bg-red-950/30 hover:border-red-500/40 transition-all duration-300 cursor-pointer group"
+              className="relative bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-neutral-200 dark:border-white/10 rounded-3xl p-8 text-center hover:bg-white/90 dark:hover:bg-red-950/30 hover:border-red-300 dark:hover:border-red-500/40 hover:-translate-y-1 hover:shadow-2xl hover:shadow-red-500/10 transition-all duration-300 cursor-pointer group"
             >
-              <div className="text-4xl mb-3">📚</div>
-              <h3 className="text-base font-bold text-white mb-3">
-                এইচএসসি ২০২৬
-              </h3>
-              {examCountdowns.hsc2026 > 0 ? (
-                <>
-                  <div
-                    className={`text-6xl font-black mb-1 tabular-nums ${
-                      examCountdowns.hsc2026 <= 30
-                        ? 'text-red-400'
-                        : 'text-white'
-                    }`}
-                  >
-                    {examCountdowns.hsc2026}
-                  </div>
-                  <p className="text-sm font-bold text-neutral-500">দিন বাকি</p>
-                  {examCountdowns.hsc2026 <= 30 && (
-                    <span className="inline-block mt-3 px-3 py-1 bg-red-600/20 text-red-400 text-[10px] font-extrabold rounded-full border border-red-500/30 animate-pulse">
-                      সময় কমছে — এখনই শুরু করো!
-                    </span>
-                  )}
-                </>
-              ) : (
-                <p className="text-neutral-500 text-sm">পরীক্ষা শেষ হয়েছে</p>
-              )}
+              <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 group-hover:bg-red-500/10 rounded-full blur-2xl transition-colors" />
+              <div className="relative z-10">
+                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">📚</div>
+                <h3 className="text-base font-bold text-neutral-900 dark:text-white mb-4">
+                  এইচএসসি ২০২৬
+                </h3>
+                {examCountdowns.hsc2026 > 0 ? (
+                  <>
+                    <div
+                      className={`text-6xl font-black mb-1 tabular-nums tracking-tighter ${
+                        examCountdowns.hsc2026 <= 30
+                          ? 'text-red-500 dark:text-red-400 animate-pulse'
+                          : 'text-neutral-900 dark:text-white'
+                      }`}
+                    >
+                      {examCountdowns.hsc2026}
+                    </div>
+                    <p className="text-sm font-bold text-neutral-500 dark:text-neutral-400">দিন বাকি</p>
+                    {examCountdowns.hsc2026 <= 30 && (
+                      <div className="mt-4">
+                        <span className="inline-block px-3 py-1 bg-red-50 dark:bg-red-600/20 text-red-600 dark:text-red-400 text-[10px] font-extrabold rounded-full border border-red-200 dark:border-red-500/30 animate-pulse shadow-sm">
+                          সময় কমছে — এখনই শুরু করো!
+                        </span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-neutral-500 text-sm">পরীক্ষা শেষ হয়েছে</p>
+                )}
+              </div>
             </div>
 
             {/* MBBS */}
             <div
               onClick={onGetStarted}
-              className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-7 text-center hover:bg-emerald-950/30 hover:border-emerald-500/40 transition-all duration-300 cursor-pointer group"
+              className="relative bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-neutral-200 dark:border-white/10 rounded-3xl p-8 text-center hover:bg-white/90 dark:hover:bg-emerald-950/30 hover:border-emerald-300 dark:hover:border-emerald-500/40 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 cursor-pointer group"
             >
-              <div className="text-4xl mb-3">🏥</div>
-              <h3 className="text-base font-bold text-white mb-3">
-                মেডিকেল ভর্তি ২০২৬
-              </h3>
-              <div className="text-6xl font-black text-emerald-400 mb-1 tabular-nums">
-                {examCountdowns.mbbs2026}
+              <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 group-hover:bg-emerald-500/10 rounded-full blur-2xl transition-colors" />
+              <div className="relative z-10">
+                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🏥</div>
+                <h3 className="text-base font-bold text-neutral-900 dark:text-white mb-4">
+                  মেডিকেল ভর্তি ২০২৬
+                </h3>
+                <div className="text-6xl font-black text-emerald-600 dark:text-emerald-400 mb-1 tabular-nums tracking-tighter">
+                  {examCountdowns.mbbs2026}
+                </div>
+                <p className="text-sm font-bold text-neutral-500 dark:text-neutral-400">দিন বাকি</p>
               </div>
-              <p className="text-sm font-bold text-neutral-500">দিন বাকি</p>
             </div>
 
             {/* Varsity */}
             <div
               onClick={onGetStarted}
-              className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-7 text-center hover:bg-white/8 hover:border-white/20 transition-all duration-300 cursor-pointer group"
+              className="relative bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-neutral-200 dark:border-white/10 rounded-3xl p-8 text-center hover:bg-white/90 dark:hover:bg-white/8 hover:border-neutral-300 dark:hover:border-white/20 hover:-translate-y-1 hover:shadow-2xl hover:shadow-neutral-500/10 transition-all duration-300 cursor-pointer group"
             >
-              <div className="text-4xl mb-3">🎓</div>
-              <h3 className="text-base font-bold text-white mb-3">
-                বিশ্ববিদ্যালয় ভর্তি ২০২৬
-              </h3>
-              <div className="text-6xl font-black text-white mb-1 tabular-nums">
-                {examCountdowns.varsity2026}
+              <div className="absolute top-0 right-0 w-24 h-24 bg-neutral-500/5 group-hover:bg-neutral-500/10 rounded-full blur-2xl transition-colors" />
+              <div className="relative z-10">
+                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🎓</div>
+                <h3 className="text-base font-bold text-neutral-900 dark:text-white mb-4">
+                  বিশ্ববিদ্যালয় ভর্তি ২০২৬
+                </h3>
+                <div className="text-6xl font-black text-neutral-800 dark:text-neutral-200 mb-1 tabular-nums tracking-tighter">
+                  {examCountdowns.varsity2026}
+                </div>
+                <p className="text-sm font-bold text-neutral-500 dark:text-neutral-400">দিন বাকি</p>
               </div>
-              <p className="text-sm font-bold text-neutral-500">দিন বাকি</p>
             </div>
           </div>
 
-          <div className="text-center">
+          <div className="text-center relative z-10">
             <button
               onClick={onGetStarted}
-              className="inline-flex items-center gap-3 px-10 py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-extrabold text-lg shadow-2xl shadow-emerald-600/30 transition-all active:scale-95"
+              className="inline-flex items-center gap-3 px-10 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold text-lg shadow-xl shadow-emerald-600/20 dark:shadow-emerald-900/30 transition-all active:scale-95 group"
             >
               বিনামূল্যে শুরু করো
-              <ArrowRight className="w-6 h-6" />
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
             </button>
-            <p className="text-neutral-600 text-sm mt-4">
+            <p className="text-neutral-500 dark:text-neutral-400 text-sm mt-4 font-medium">
               কোনো ক্রেডিট কার্ড লাগবে না &middot; ৩০ সেকেন্ডে রেজিস্ট্রেশন
             </p>
           </div>
