@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   createContext,
@@ -9,14 +9,14 @@ import {
   useMemo,
   useCallback,
   useRef,
-} from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
-import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
-import { UserProfile } from '@/lib/types';
-import { mutate } from 'swr';
-import { mapDbRowToProfile } from '@/services/user-service';
-import { unregisterCurrentDevice } from '@/services/device-session-service';
+} from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
+import { User, AuthChangeEvent, Session } from "@supabase/supabase-js";
+import { UserProfile } from "@/lib/types";
+import { mutate } from "swr";
+import { mapDbRowToProfile } from "@/services/user-service";
+import { unregisterCurrentDevice } from "@/services/device-session-service";
 
 interface AuthContextType {
   user: User | null;
@@ -38,10 +38,10 @@ export const useAuth = () => useContext(AuthContext);
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-const PROFILE_KEY = 'obhyash_user_profile';
+const PROFILE_KEY = "obhyash_user_profile";
 
 function readCachedProfile(): UserProfile | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(PROFILE_KEY);
     if (!raw) return null;
@@ -75,18 +75,18 @@ function clearCachedProfile() {
  * to prevent false "session corruption" modals.
  */
 function isHardAuthError(error: unknown): boolean {
-  if (!error || typeof error !== 'object') return false;
+  if (!error || typeof error !== "object") return false;
   const err = error as { name?: string; status?: number; code?: string };
-  if (err.name === 'AuthApiError') {
+  if (err.name === "AuthApiError") {
     // Some API errors are just rate limits or network issues.
     // Only fail if it's explicitly about invalid/expired credentials.
     if (err.status === 400 || err.status === 403) return true;
   }
   if (err.status === 401) return true;
   if (
-    err.code === 'invalid_jwt' ||
-    err.code === 'token_expired' ||
-    err.code === 'session_not_found'
+    err.code === "invalid_jwt" ||
+    err.code === "token_expired" ||
+    err.code === "session_not_found"
   )
     return true;
   return false;
@@ -98,10 +98,10 @@ function isHardAuthError(error: unknown): boolean {
  * and should not produce any console warning.
  */
 function isNoSessionError(error: unknown): boolean {
-  if (!error || typeof error !== 'object') return false;
+  if (!error || typeof error !== "object") return false;
   const err = error as { name?: string; message?: string };
-  if (err.name === 'AuthSessionMissingError') return true;
-  if (err.message?.toLowerCase().includes('auth session missing')) return true;
+  if (err.name === "AuthSessionMissingError") return true;
+  if (err.message?.toLowerCase().includes("auth session missing")) return true;
   return false;
 }
 
@@ -132,16 +132,22 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── fetchProfile ──────────────────────────────────────────────────────────
   const fetchProfile = useCallback(
-    async (userId: string): Promise<UserProfile | null> => {
+    async (userId: string, retryCount = 0): Promise<UserProfile | null> => {
       try {
         const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', userId)
+          .from("users")
+          .select("*")
+          .eq("id", userId)
           .single();
 
         if (error) {
-          console.error('Error fetching profile:', error);
+          console.error("Error fetching profile:", error);
+          // Automatic retry with exponential backoff (max 3 attempts)
+          if (retryCount < 3) {
+            const delayMs = Math.min(1000 * Math.pow(2, retryCount), 8000);
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+            return fetchProfile(userId, retryCount + 1);
+          }
           // Fall back to the cached profile if it belongs to the same user.
           // This prevents the admin layout from returning null (blank screen)
           // on a transient DB failure or Supabase cold-start slow query.
@@ -154,7 +160,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         writeCachedProfile(userProfile);
         return userProfile;
       } catch (error) {
-        console.error('Unexpected error fetching profile:', error);
+        console.error("Unexpected error fetching profile:", error);
+        // Automatic retry on network errors
+        if (retryCount < 3) {
+          const delayMs = Math.min(1000 * Math.pow(2, retryCount), 8000);
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+          return fetchProfile(userId, retryCount + 1);
+        }
         const cached = readCachedProfile();
         return cached?.id === userId ? cached : null;
       }
@@ -213,7 +225,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           } else {
             // Soft failure (network glitch) — keep cached state, let INITIAL_SESSION recover.
             console.warn(
-              'Soft auth check failure (network?):',
+              "Soft auth check failure (network?):",
               authError.message,
             );
             // Do NOT call setLoading(false) here — INITIAL_SESSION will handle it.
@@ -263,7 +275,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           return; // Exit early — INITIAL_SESSION takes over from here.
         }
       } catch (error) {
-        console.error('Auth initialization sequence failed:', error);
+        console.error("Auth initialization sequence failed:", error);
       } finally {
         // Skip if we are waiting for INITIAL_SESSION to provide the real session.
         // In that case INITIAL_SESSION handler is solely responsible for setLoading(false).
@@ -277,25 +289,32 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     initializeAuth();
 
     // Safety net: if waitingForInitialSession=true but INITIAL_SESSION never fires
-    // (e.g. Supabase Realtime is blocked), unblock loading after 8 seconds so the
-    // admin isn't stuck on a spinner forever. The redirect logic will then handle
+    // (e.g. Supabase Realtime is blocked), unblock loading after 5 seconds so the
+    // admin sees cached profile while we retry. The redirect logic will then handle
     // the unauthenticated state correctly.
     const initialSessionTimeout = setTimeout(() => {
       if (isMounted && !initDoneRef.current) {
         console.warn(
-          '[Auth] INITIAL_SESSION never fired — unblocking loading as fallback',
+          "[Auth] INITIAL_SESSION taking too long — using cached profile + retrying",
         );
         setLoading(false);
         initDoneRef.current = true;
+
+        // Retry INITIAL_SESSION after a short delay
+        setTimeout(() => {
+          if (isMounted && user?.id) {
+            fetchProfile(user.id);
+          }
+        }, 2000);
       }
-    }, 8000);
+    }, 5000);
 
     // ── Resiliency Listeners (Network & Focus) ───────────────────────────────
     const handleHealthCheck = async () => {
       if (!isMounted || !initDoneRef.current) return;
 
       // If we are offline, don't ping (it will just fail and trigger errors)
-      if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+      if (typeof navigator !== "undefined" && !navigator.onLine) return;
 
       // Guard: skip if a check is already in-flight
       if (isHealthCheckingRef.current) return;
@@ -318,11 +337,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         // so we can trust the local session here for client-side health checks.
         const { data, error } = await supabase.auth.getSession();
         if (error && isHardAuthError(error)) {
-          console.warn('[Auth] Health check failed - session may be corrupted');
+          console.warn("[Auth] Health check failed - session may be corrupted");
           setShowCorruptionModal(true);
         } else if (data.session?.user) {
-          if (process.env.NODE_ENV === 'development') {
-            console.log('[Auth] Health check: OK');
+          if (process.env.NODE_ENV === "development") {
+            console.log("[Auth] Health check: OK");
           }
           setUser(data.session.user);
         }
@@ -344,23 +363,41 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const onOnline = () => {
-      if (process.env.NODE_ENV === 'development')
-        console.log('[Auth] Back online - checking session');
+      if (process.env.NODE_ENV === "development")
+        console.log("[Auth] Back online - checking session and profile");
       scheduleHealthCheck(1000);
+      // Immediately refresh profile when reconnecting
+      if (user?.id) {
+        fetchProfile(user.id, 0).catch(() => {
+          console.warn(
+            "[Auth] Profile refresh on reconnect failed, using cached",
+          );
+        });
+      }
     };
 
     const onFocus = () => {
       scheduleHealthCheck(500);
+      // Also refresh profile on tab focus for freshness
+      if (user?.id) {
+        fetchProfile(user.id, 0).catch(() => {});
+      }
     };
 
     // Store as a named function so it can be properly removed on cleanup
     const onVisibilityChange = () => {
-      if (document.visibilityState === 'visible') scheduleHealthCheck(500);
+      if (document.visibilityState === "visible") {
+        scheduleHealthCheck(500);
+        // Refresh profile when tab becomes visible
+        if (user?.id) {
+          fetchProfile(user.id, 0).catch(() => {});
+        }
+      }
     };
 
-    window.addEventListener('online', onOnline);
-    window.addEventListener('focus', onFocus);
-    window.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("visibilitychange", onVisibilityChange);
 
     // ── Heartbeat (Every 10 minutes) ─────────────────────────────────────────
     const heartbeat = setInterval(handleHealthCheck, 10 * 60 * 1000);
@@ -369,31 +406,31 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV === "development") {
           console.log(
-            '[Auth] event:',
+            "[Auth] event:",
             event,
-            '| user:',
-            session?.user?.id ?? 'none',
+            "| user:",
+            session?.user?.id ?? "none",
           );
         }
 
         if (session?.user) {
           if (isMounted) setUser(session.user);
 
-          if (event === 'SIGNED_IN') {
+          if (event === "SIGNED_IN") {
             // Fresh login — invalidate all SWR caches and load profile.
             mutate(() => true, undefined, { revalidate: true });
             const fresh = await fetchProfile(session.user.id);
             if (fresh && isMounted) setProfile(fresh);
-          } else if (event === 'TOKEN_REFRESHED') {
+          } else if (event === "TOKEN_REFRESHED") {
             // Token silently refreshed — revalidate ALL SWR caches so dashboard
             // data re-fetches with the fresh token. Without this, queries made
             // just before the refresh window may return stale/empty results.
             mutate(() => true, undefined, { revalidate: true });
             const fresh = await fetchProfile(session.user.id);
             if (fresh && isMounted) setProfile(fresh);
-          } else if (event === 'INITIAL_SESSION') {
+          } else if (event === "INITIAL_SESSION") {
             // This fires when the Supabase JS client syncs the session from the server cookie.
             // It recovers the session when initializeAuth's getSession() found nothing in cache.
             if (!initDoneRef.current || !userSetByInit) {
@@ -418,7 +455,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
               });
             }
           }
-        } else if (event === 'INITIAL_SESSION') {
+        } else if (event === "INITIAL_SESSION") {
           // INITIAL_SESSION fired with NO session — the user is genuinely not logged in.
           // initializeAuth exited early (returned before finally) waiting for this event.
           // We must clear state and unblock loading here or the spinner hangs forever.
@@ -429,13 +466,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             setLoading(false);
             initDoneRef.current = true;
           }
-        } else if (event === 'SIGNED_OUT') {
+        } else if (event === "SIGNED_OUT") {
           if (isMounted) {
             setUser(null);
             setProfile(null);
           }
           clearCachedProfile();
-          router.push('/login');
+          router.push("/login");
         }
       },
     );
@@ -443,9 +480,9 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       isMounted = false;
       subscription.unsubscribe();
-      window.removeEventListener('online', onOnline);
-      window.removeEventListener('focus', onFocus);
-      window.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("visibilitychange", onVisibilityChange);
       clearInterval(heartbeat);
       clearTimeout(initialSessionTimeout);
       if (healthCheckDebounceRef.current) {
@@ -463,11 +500,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     clearCachedProfile();
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error('Sign out error:', error);
+      console.error("Sign out error:", error);
       // Fallback manual cleanup if the event doesn't fire
       setUser(null);
       setProfile(null);
-      router.push('/login');
+      router.push("/login");
     }
     // If signOut succeeds, the SIGNED_OUT event handler above handles redirect
   }, [supabase, router, user]);
