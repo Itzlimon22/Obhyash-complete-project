@@ -32,15 +32,6 @@ export const getSubjects = async (
   { id: string; name: string; label?: string; icon?: string; group?: string }[]
 > => {
   if (isSupabaseConfigured() && supabase) {
-    // Guard: verify the session is actually ready before querying.
-    // On a browser refresh, the Supabase JS client may not have synced INITIAL_SESSION
-    // yet. Without a session, RLS silently returns 0 rows (not an error).
-    // Throwing here lets SWR's onErrorRetry catch it and retry after a short delay.
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      throw new Error('Auth session not ready — will retry');
-    }
-
     let query = supabase.from('subjects').select('*');
 
     // Filter by Group (Science, Humanities, Business Studies) OR General (Mapped to division column)

@@ -398,17 +398,24 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             // It recovers the session when initializeAuth's getSession() found nothing in cache.
             if (!initDoneRef.current || !userSetByInit) {
               if (isMounted) setUser(session.user);
-              mutate(() => true, undefined, { revalidate: true });
-              const fresh = await fetchProfile(session.user.id);
-              if (fresh && isMounted) setProfile(fresh);
 
-              // CRITICAL: always unblock loading here, regardless of whether fetchProfile
-              // succeeded. If we only call setLoading(false) inside `if (fresh)`, a failed
-              // DB query causes the spinner to hang forever.
-              if (isMounted) {
+              // CRITICAL FIX: Unblock loading IMMEDIATELY — do NOT wait for fetchProfile().
+              // Previously setLoading(false) was called after the DB round-trip finished,
+              // keeping authLoading=true for 300-800ms extra. During this window, SWR
+              // keys were null and data fetches were blocked entirely, causing the
+              // dashboard to appear frozen / show no subjects after a browser refresh.
+              if (isMounted && !initDoneRef.current) {
                 setLoading(false);
                 initDoneRef.current = true;
               }
+
+              // Revalidate all SWR caches now that session is live.
+              mutate(() => true, undefined, { revalidate: true });
+
+              // Fetch fresh profile in background — does NOT block the data loading.
+              fetchProfile(session.user.id).then((fresh) => {
+                if (fresh && isMounted) setProfile(fresh);
+              });
             }
           }
         } else if (event === 'INITIAL_SESSION') {
