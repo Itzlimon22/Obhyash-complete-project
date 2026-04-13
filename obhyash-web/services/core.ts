@@ -1,6 +1,27 @@
 import { createClient } from '@/utils/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
-export const supabase = createClient();
+/**
+ * `supabase` is a transparent Proxy that always delegates property access to
+ * the live createClient() singleton — never a stale module-level reference.
+ *
+ * WHY A PROXY?
+ * Doing `export const supabase = createClient()` at module level captures a
+ * reference ONCE at import time, before auth initializes. On a browser refresh
+ * all 12 service files that import this would send queries with no session,
+ * causing blank data and infinite loading spinners.
+ *
+ * The Proxy lets all existing `supabase.from(...)`, `supabase.rpc(...)`,
+ * `supabase.auth.*` etc. calls continue to work unchanged in every service
+ * file, while always resolving against the fresh client at actual call time.
+ */
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    const client = createClient();
+    const value = (client as unknown as Record<string | symbol, unknown>)[prop];
+    return typeof value === 'function' ? value.bind(client) : value;
+  },
+});
 
 export const isSupabaseConfigured = () =>
   !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
