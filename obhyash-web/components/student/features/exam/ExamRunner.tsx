@@ -249,7 +249,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
         {/* Sticky Footer for Submit - HIDDEN ON MOBILE (moved to bottom nav) */}
         <div className="sticky bottom-0 left-0 right-0 hidden sm:block z-40">
           <div className="bg-white/95 dark:bg-neutral-950/95 backdrop-blur-xl border-t border-neutral-200 dark:border-neutral-800 shadow-[0_-8px_24px_-4px_rgba(0,0,0,0.08)]">
-            <div className="max-w-4xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
+            <div className="max-w-4xl mx-auto px-6 pt-3 pb-0 flex items-center justify-between gap-4">
               {/* Left: mini answered summary */}
               <div className="flex items-center gap-3 min-w-0">
                 <div className="hidden md:flex flex-col gap-1 min-w-[140px]">
