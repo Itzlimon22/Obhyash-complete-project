@@ -55,6 +55,13 @@ const fetchSubjectsOnly = async ([
   string | undefined,
   string | undefined,
 ]) => {
+  // Guard against race condition: on refresh, Supabase INITIAL_SESSION might fire
+  // milliseconds before the internal REST client actually attaches the Bearer token.
+  // If we query too early, RLS returns an empty array [] silently and SWR caches it.
+  const { supabase } = await import("@/services/core");
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Auth session not ready for subjects");
+
   // userId is already known — pass it through so getSubjects can skip
   // an extra auth.getUser() call which acquires the JS auth lock.
   const { getSubjects } = await import("@/services/database");
@@ -66,6 +73,10 @@ const fetchSubjectsOnly = async ([
 };
 
 const fetchLeaderboardStats = async ([_, level]: [string, string]) => {
+  const { supabase } = await import("@/services/core");
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error("Auth session not ready for leaderboard");
+
   const { getLeaderboardUsers } = await import("@/services/database");
   const users = await getLeaderboardUsers(level);
   return [...users].sort((a, b) => b.xp - a.xp);
