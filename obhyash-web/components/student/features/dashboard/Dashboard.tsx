@@ -55,6 +55,8 @@ const fetchSubjectsOnly = async ([
   string | undefined,
   string | undefined,
 ]) => {
+  // userId is already known — pass it through so getSubjects can skip
+  // an extra auth.getUser() call which acquires the JS auth lock.
   const { getSubjects } = await import("@/services/database");
   return await getSubjects(
     division || undefined,
@@ -82,20 +84,38 @@ const Dashboard: React.FC<DashboardProps> = ({
   examTarget,
   onChangeTarget,
 }) => {
-  const { loading: authLoading } = useAuth();
+  const { loading: authLoading, user: authUser } = useAuth();
+
+  // Only activate SWR keys when:
+  // 1. Auth is done loading (authLoading is false)
+  // 2. We have a real user with a valid ID
+  // Without this, SWR fires with no session → subjects table RLS blocks the query → empty data.
+  const isReady = !authLoading && !!(authUser?.id || user?.id);
+  const effectiveUserId = authUser?.id || user?.id;
 
   const { data: subjects = [], isLoading: isLoadingStats } = useSWR(
-    user && !authLoading
+    isReady && effectiveUserId
       ? [
           "userSubjects",
-          user.id,
+          effectiveUserId,
           user.division,
           user.stream,
           user.optional_subject,
         ]
       : null,
     fetchSubjectsOnly,
-    { revalidateOnFocus: false, dedupingInterval: 60000 },
+    {
+      revalidateOnFocus: false,
+      revalidateIfStale: true,            // Always re-fetch stale data (important after refresh)
+      dedupingInterval: 30_000,           // 30s (was 60s — too long after session restores)
+      onErrorRetry: (error, _key, _config, revalidate, { retryCount }) => {
+        // Retry up to 3 times with exponential backoff.
+        // This recovers from the brief window where auth session is restoring but
+        // the Supabase client isn't fully ready yet.
+        if (retryCount >= 3) return;
+        setTimeout(() => revalidate({ retryCount }), 1000 * (retryCount + 1));
+      },
+    },
   );
 
   const subjectStats = useMemo(() => {
@@ -147,11 +167,19 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   const { data: leaderboardUsers = [], isLoading: isLoadingLeaderboard } =
     useSWR(
-      user && !authLoading
+      isReady && effectiveUserId
         ? ["leaderboardUsers", user.level || "Rookie"]
         : null,
       fetchLeaderboardStats,
-      { revalidateOnFocus: false, dedupingInterval: 60000 },
+      {
+        revalidateOnFocus: false,
+        revalidateIfStale: true,
+        dedupingInterval: 30_000,
+        onErrorRetry: (error, _key, _config, revalidate, { retryCount }) => {
+          if (retryCount >= 3) return;
+          setTimeout(() => revalidate({ retryCount }), 1000 * (retryCount + 1));
+        },
+      },
     );
 
   const { topUser, userRank, totalUsers, xpDiff } = useMemo(() => {
