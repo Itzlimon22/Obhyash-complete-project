@@ -72,14 +72,25 @@ const fetchSubjectsOnly = async ([
   );
 };
 
-const fetchLeaderboardStats = async ([_, level]: [string, string]) => {
+const fetchLeaderboardStats = async ([_, level, userId]: [string, string, string]) => {
+  // Guard: ensure session is ready before fetching
   const { supabase } = await import("@/services/core");
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error("Auth session not ready for leaderboard");
 
-  const { getLeaderboardUsers } = await import("@/services/database");
-  const users = await getLeaderboardUsers(level);
-  return [...users].sort((a, b) => b.xp - a.xp);
+  // Use the lightweight summary endpoint — returns only topUser + userRank + xpDiff.
+  // This replaces the old approach that fetched 100 full user rows just to
+  // display a 2-row widget on the dashboard.
+  const res = await fetch(
+    `/api/leaderboard/summary?level=${encodeURIComponent(level)}&userId=${encodeURIComponent(userId)}`,
+    { cache: 'no-store' }, // Always fresh — CDN cache is handled server-side
+  );
+  if (!res.ok) throw new Error(`Leaderboard summary HTTP ${res.status}`);
+  return await res.json() as {
+    topUser: { id: string; name: string; avatarUrl?: string; avatarColor?: string; xp: number } | null;
+    userRank: number;
+    xpDiff: number;
+  };
 };
 
 const Dashboard: React.FC<DashboardProps> = ({
@@ -176,16 +187,16 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   const prevRankRef = useRef<number>(0);
 
-  const { data: leaderboardUsers = [], isLoading: isLoadingLeaderboard } =
+  const { data: leaderboardSummary, isLoading: isLoadingLeaderboard } =
     useSWR(
       isReady && effectiveUserId
-        ? ["leaderboardUsers", user.level || "Rookie"]
+        ? ["leaderboardSummary", user.level || "Rookie", effectiveUserId]
         : null,
       fetchLeaderboardStats,
       {
         revalidateOnFocus: false,
         revalidateIfStale: true,
-        dedupingInterval: 30_000,
+        dedupingInterval: 180_000,  // 3 min — matches the CDN cache-control
         onErrorRetry: (error, _key, _config, revalidate, { retryCount }) => {
           if (retryCount >= 3) return;
           setTimeout(() => revalidate({ retryCount }), 1000 * (retryCount + 1));
@@ -193,21 +204,10 @@ const Dashboard: React.FC<DashboardProps> = ({
       },
     );
 
-  const { topUser, userRank, totalUsers, xpDiff } = useMemo(() => {
-    if (!leaderboardUsers.length || !user)
-      return { topUser: null, userRank: 0, totalUsers: 0, xpDiff: 0 };
-
-    const rank = leaderboardUsers.findIndex((u) => u.id === user.id) + 1;
-    const top = leaderboardUsers[0];
-    const diff = top ? Math.max(0, top.xp - user.xp) : 0;
-
-    return {
-      topUser: top,
-      userRank: rank,
-      totalUsers: leaderboardUsers.length,
-      xpDiff: diff,
-    };
-  }, [leaderboardUsers, user]);
+  // Destructure directly from the summary response — no more client-side array sorting needed.
+  const topUser = leaderboardSummary?.topUser ?? null;
+  const userRank = leaderboardSummary?.userRank ?? 0;
+  const xpDiff = leaderboardSummary?.xpDiff ?? 0;
 
   React.useEffect(() => {
     if (userRank > 0) {
@@ -456,7 +456,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               ) : topUser ? (
                 <>
                   <UserAvatar
-                    user={topUser as unknown as UserProfile}
+                    user={{ id: topUser.id, name: topUser.name, avatar_url: topUser.avatarUrl, avatarColor: topUser.avatarColor } as unknown as UserProfile}
                     size="sm"
                     className="w-7 h-7 text-[11px] shadow-sm ring-2 ring-emerald-200 dark:ring-emerald-800"
                   />
