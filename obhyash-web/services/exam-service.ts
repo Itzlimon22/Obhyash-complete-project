@@ -620,16 +620,23 @@ const mapDbResultToExamResult = (data: ExamResultDbRow): ExamResult => {
   };
 };
 
-export const getExamHistory = async (): Promise<ExamResult[]> => {
+export const getExamHistory = async (knownUserId?: string): Promise<ExamResult[]> => {
   if (isSupabaseConfigured() && supabase) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // If the caller already knows the userId (e.g. from AuthProvider),
+    // skip auth.getUser() — it acquires the Supabase JS auth lock and makes
+    // a server round-trip, blocking all concurrent .from() queries for 1-3s.
+    // This was causing the dashboard to appear frozen / keep loading on refresh.
+    let resolvedUserId = knownUserId;
+    if (!resolvedUserId) {
+      const { data: { user } } = await supabase.auth.getUser();
+      resolvedUserId = user?.id;
+    }
 
-    if (!user) {
+    if (!resolvedUserId) {
       console.warn('getExamHistory: No user found');
       return [];
     }
+    const user = { id: resolvedUserId };
 
     const { data, error } = await supabase
       .from('exam_results')

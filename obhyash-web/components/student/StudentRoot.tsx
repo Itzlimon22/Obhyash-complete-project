@@ -17,7 +17,6 @@ import {
 } from '@/services/download-service';
 import { updateUserProfile } from '@/services/database';
 import { calculateLevel } from '@/lib/utils';
-import { createClient } from '@/utils/supabase/client';
 
 // Hooks
 import { useExamEngine } from '@/hooks/use-exam-engine';
@@ -87,7 +86,8 @@ export default function StudentRoot({
   const router = useRouter();
   // ... (keeping existing hooks and state)
   const engine = useExamEngine();
-  const supabase = createClient();
+  // DO NOT call createClient() at component level — use AuthProvider's supabase context instead.
+  // Calling it here creates a new reference on every render and can cause stale session issues.
   const {
     user: authUser,
     profile: authProfile,
@@ -314,8 +314,11 @@ export default function StudentRoot({
         }
 
         // 2. Fetch History (always, regardless of streak)
+        // Pass the userId directly to avoid an extra auth.getUser() round-trip
+        // inside getExamHistory, which acquires the JS auth lock and blocks all
+        // concurrent DB queries — causing the "keeps loading" state on the dashboard.
         const { getExamHistory } = await import('@/services/database');
-        const dbHistory = await getExamHistory();
+        const dbHistory = await getExamHistory(currentUser.id);
         if (dbHistory && isMounted) {
           setExamHistory(dbHistory);
         }
