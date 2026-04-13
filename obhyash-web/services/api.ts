@@ -1,6 +1,10 @@
 import { createClient } from '@/utils/supabase/client';
 
-const supabase = createClient();
+// ⚠️ DO NOT call createClient() at module level.
+// The Supabase client must be retrieved lazily inside each function
+// so it always uses the active, refreshed singleton (managed by client.ts).
+// Calling it at module level captures a reference at import time — before auth
+// is initialized — and can miss token refreshes, causing stale sessions.
 import {
   User,
   Transaction,
@@ -68,15 +72,24 @@ const toSnakeCase = (obj: unknown): unknown => {
 };
 
 export const api = {
+  // Lazy getter — always returns the active Supabase singleton.
+  // This avoids capturing a stale reference at module load time
+  // (before auth initializes), which was the root cause of session drops.
+  get _db() {
+    return createClient();
+  },
+
   // --- USER OPERATIONS ---
   users: {
     list: async (): Promise<User[]> => {
+      const supabase = createClient();
       const { data, error } = await supabase.from('users').select('*');
       if (error) throw error;
       // ✅ FIXED: Explicitly casting the return type
       return toCamelCase<User[]>(data || []);
     },
     create: async (user: Omit<User, 'id'>): Promise<User> => {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('users')
         .insert([toSnakeCase(user)])
@@ -87,6 +100,7 @@ export const api = {
       return toCamelCase<User>(data);
     },
     update: async (id: string, updates: Partial<User>): Promise<User> => {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('users')
         .update(toSnakeCase(updates))
@@ -98,10 +112,12 @@ export const api = {
       return toCamelCase<User>(data);
     },
     delete: async (id: string): Promise<void> => {
+      const supabase = createClient();
       const { error } = await supabase.from('users').delete().eq('id', id);
       if (error) throw error;
     },
     deleteBulk: async (ids: string[]): Promise<void> => {
+      const supabase = createClient();
       const { error } = await supabase.from('users').delete().in('id', ids);
       if (error) throw error;
     },
@@ -110,6 +126,7 @@ export const api = {
   // --- QUESTION OPERATIONS ---
   questions: {
     list: async (): Promise<Question[]> => {
+      const supabase = createClient();
       const { data, error } = await supabase.from('questions').select('*');
       if (error) throw error;
       // ✅ FIXED
@@ -118,6 +135,7 @@ export const api = {
     create: async (
       question: Omit<Question, 'id' | 'version' | 'createdAt'>,
     ): Promise<Question> => {
+      const supabase = createClient();
       const payload = {
         ...question,
         version: 1,
@@ -133,6 +151,7 @@ export const api = {
       return toCamelCase<Question>(data);
     },
     bulkCreate: async (questions: Partial<Question>[]): Promise<void> => {
+      const supabase = createClient();
       const payload = questions.map((q) => ({
         ...q,
         version: 1,
@@ -148,6 +167,7 @@ export const api = {
       id: string,
       updates: Partial<Question>,
     ): Promise<Question> => {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('questions')
         .update(toSnakeCase(updates))
@@ -159,6 +179,7 @@ export const api = {
       return toCamelCase<Question>(data);
     },
     delete: async (id: string): Promise<void> => {
+      const supabase = createClient();
       const { error } = await supabase.from('questions').delete().eq('id', id);
       if (error) throw error;
     },
@@ -167,6 +188,7 @@ export const api = {
   // --- REPORT OPERATIONS ---
   reports: {
     list: async (): Promise<Report[]> => {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('reports')
         .select('*, question_preview:questions(*)');
@@ -175,6 +197,7 @@ export const api = {
       return toCamelCase<Report[]>(data || []);
     },
     resolve: async (reportId: string): Promise<void> => {
+      const supabase = createClient();
       const { error } = await supabase
         .from('reports')
         .update({ status: 'Resolved' })
@@ -182,6 +205,7 @@ export const api = {
       if (error) throw error;
     },
     ignore: async (reportId: string): Promise<void> => {
+      const supabase = createClient();
       const { error } = await supabase
         .from('reports')
         .update({ status: 'Ignored' })
@@ -193,12 +217,14 @@ export const api = {
   // --- FINANCE OPERATIONS ---
   finance: {
     getTransactions: async (): Promise<Transaction[]> => {
+      const supabase = createClient();
       const { data, error } = await supabase.from('transactions').select('*');
       if (error) throw error;
       // ✅ FIXED
       return toCamelCase<Transaction[]>(data || []);
     },
     getPlanStats: async (): Promise<PlanStat[]> => {
+      const supabase = createClient();
       const { data, error } = await supabase.from('plan_stats').select('*');
       if (error) throw error;
       // ✅ FIXED
@@ -207,6 +233,7 @@ export const api = {
     createPlan: async (
       plan: Omit<SubscriptionPlan, 'id'>,
     ): Promise<SubscriptionPlan> => {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('subscription_plans')
         .insert([toSnakeCase(plan)])
@@ -221,6 +248,7 @@ export const api = {
   // --- DASHBOARD OPERATIONS ---
   dashboard: {
     getStats: async (): Promise<StatData[]> => {
+      const supabase = createClient();
       const { count: userCount, error: userError } = await supabase
         .from('users')
         .select('*', { count: 'exact', head: true });
@@ -273,6 +301,7 @@ export const api = {
   // --- ANALYTICS OPERATIONS ---
   analytics: {
     getGrowthData: async (range: string = '30d') => {
+      const supabase = createClient();
       const days = range === '7d' ? 7 : range === '30d' ? 30 : 90;
       const { data, error } = await supabase
         .from('user_growth_daily')
@@ -290,6 +319,7 @@ export const api = {
       return toCamelCase<unknown[]>(data || []);
     },
     getRevenueData: async (range: string = '30d') => {
+      const supabase = createClient();
       const days = range === '7d' ? 7 : range === '30d' ? 30 : 90;
       const { data, error } = await supabase
         .from('revenue_daily')
@@ -306,6 +336,7 @@ export const api = {
       return toCamelCase<unknown[]>(data || []);
     },
     getDatasets: async (): Promise<Dataset[]> => {
+      const supabase = createClient();
       const { data, error } = await supabase.from('datasets').select('*');
       if (error) throw error;
       // ✅ FIXED
@@ -316,12 +347,14 @@ export const api = {
   // --- SYSTEM OPERATIONS ---
   system: {
     triggerBackup: async () => {
+      const supabase = createClient();
       const { data, error } =
         await supabase.functions.invoke('backup-database');
       if (error) throw error;
       return data;
     },
     seedData: async () => {
+      const supabase = createClient();
       const { data, error } = await supabase.functions.invoke('seed-database');
       if (error) throw error;
       return data;
@@ -331,6 +364,7 @@ export const api = {
   // Inside your api object export
   public: {
     getLandingStats: async () => {
+      const supabase = createClient();
       const { data, error } = await supabase.rpc('get_landing_stats');
       if (error) {
         console.error('Failed to fetch landing stats:', error);
@@ -339,6 +373,7 @@ export const api = {
       return data; // Returns { totalUsers: 123, totalQuestions: 500, ... }
     },
     getPlans: async () => {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('subscription_plans')
         .select('*')
