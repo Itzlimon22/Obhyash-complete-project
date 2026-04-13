@@ -1,12 +1,12 @@
-import React, { useState, useRef, useMemo } from 'react';
-import useSWR from 'swr';
-import SubjectStat from './SubjectStat';
-import { celebration } from '@/lib/confetti';
-import { toast } from 'sonner';
-import { ExamResult, UserProfile } from '@/lib/types';
-import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
-import { DashboardSkeleton } from '@/components/student/ui/common/Skeletons';
-import UserAvatar from '@/components/student/ui/common/UserAvatar';
+import React, { useState, useRef, useMemo } from "react";
+import useSWR from "swr";
+import SubjectStat from "./SubjectStat";
+import { celebration } from "@/lib/confetti";
+import { toast } from "sonner";
+import { ExamResult, UserProfile } from "@/lib/types";
+import { getSubjectDisplayName } from "@/lib/data/subject-name-map";
+import { DashboardSkeleton } from "@/components/student/ui/common/Skeletons";
+import UserAvatar from "@/components/student/ui/common/UserAvatar";
 
 interface SubjectStats {
   id: string;
@@ -40,7 +40,7 @@ interface DashboardProps {
   onChangeTarget?: () => void;
 }
 
-import { useAuth } from '@/components/auth/AuthProvider';
+import { useAuth } from "@/components/auth/AuthProvider";
 
 const fetchSubjectsOnly = async ([
   _,
@@ -55,7 +55,7 @@ const fetchSubjectsOnly = async ([
   string | undefined,
   string | undefined,
 ]) => {
-  const { getSubjects } = await import('@/services/database');
+  const { getSubjects } = await import("@/services/database");
   return await getSubjects(
     division || undefined,
     stream || undefined,
@@ -64,7 +64,7 @@ const fetchSubjectsOnly = async ([
 };
 
 const fetchLeaderboardStats = async ([_, level]: [string, string]) => {
-  const { getLeaderboardUsers } = await import('@/services/database');
+  const { getLeaderboardUsers } = await import("@/services/database");
   const users = await getLeaderboardUsers(level);
   return [...users].sort((a, b) => b.xp - a.xp);
 };
@@ -87,7 +87,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   const { data: subjects = [], isLoading: isLoadingStats } = useSWR(
     user && !authLoading
       ? [
-          'userSubjects',
+          "userSubjects",
           user.id,
           user.division,
           user.stream,
@@ -115,14 +115,14 @@ const Dashboard: React.FC<DashboardProps> = ({
           hSubId === subId ||
           hSub.includes(subName) ||
           hSub.includes(subId) ||
-          (subName === 'পদার্থবিজ্ঞান' && hSub.includes('physics')) ||
-          (subName === 'রসায়ন' && hSub.includes('chemistry')) ||
-          (subName === 'গণিত' && hSub.includes('math')) ||
-          (subName === 'জীববিজ্ঞান' && hSub.includes('biology')) ||
-          (subName === 'বাংলা' && hSub.includes('bangla')) ||
-          (subName === 'ইংরেজি' && hSub.includes('english')) ||
-          (subName === 'সাধারণ জ্ঞান' && hSub.includes('gk')) ||
-          (subName === 'আইসিটি' && hSub.includes('ict'));
+          (subName === "পদার্থবিজ্ঞান" && hSub.includes("physics")) ||
+          (subName === "রসায়ন" && hSub.includes("chemistry")) ||
+          (subName === "গণিত" && hSub.includes("math")) ||
+          (subName === "জীববিজ্ঞান" && hSub.includes("biology")) ||
+          (subName === "বাংলা" && hSub.includes("bangla")) ||
+          (subName === "ইংরেজি" && hSub.includes("english")) ||
+          (subName === "সাধারণ জ্ঞান" && hSub.includes("gk")) ||
+          (subName === "আইসিটি" && hSub.includes("ict"));
 
         if (isMatch) {
           correct += exam.correctCount;
@@ -148,7 +148,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   const { data: leaderboardUsers = [], isLoading: isLoadingLeaderboard } =
     useSWR(
       user && !authLoading
-        ? ['leaderboardUsers', user.level || 'Rookie']
+        ? ["leaderboardUsers", user.level || "Rookie"]
         : null,
       fetchLeaderboardStats,
       { revalidateOnFocus: false, dedupingInterval: 60000 },
@@ -174,7 +174,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     if (userRank > 0) {
       if (prevRankRef.current > 0 && userRank < prevRankRef.current) {
         celebration.achievement();
-        toast.success('অভিনন্দন! তোমার র‍্যাংক উন্নত হয়েছে!', {
+        toast.success("অভিনন্দন! তোমার র‍্যাংক উন্নত হয়েছে!", {
           description: `তুমি এখন #${userRank} স্থানে আছো।`,
         });
       }
@@ -293,7 +293,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           </h3>
         </button>
 
-        {/* এনালাইসিস */}
+        {/* এনালাইসিস*/}
         <button
           onClick={onAnalysisClick}
           className="group relative overflow-hidden bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/20 dark:to-neutral-900 border border-rose-100 dark:border-rose-900/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-rose-300 dark:hover:border-rose-800 hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.97] duration-200 text-center h-28 sm:h-32"
@@ -422,7 +422,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     className="w-7 h-7 text-[11px] shadow-sm ring-2 ring-emerald-200 dark:ring-emerald-800"
                   />
                   <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200 truncate">
-                    {topUser.name?.split(' ').slice(0, 2).join(' ')}
+                    {topUser.name?.split(" ").slice(0, 2).join(" ")}
                   </span>
                 </>
               ) : (
@@ -440,7 +440,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             {/* Current User Row */}
             <div className="grid grid-cols-[2rem_2rem_1fr] gap-2.5 items-center px-3 py-2.5 rounded-xl bg-gradient-to-r from-emerald-50 to-emerald-50/30 dark:from-emerald-900/15 dark:to-emerald-900/5 border border-emerald-100/60 dark:border-emerald-800/30">
               <span className="text-sm font-black text-emerald-700 dark:text-emerald-400">
-                #{userRank || '-'}
+                #{userRank || "-"}
               </span>
               <UserAvatar
                 user={user}
@@ -449,7 +449,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               />
               <div className="flex items-center gap-1.5 truncate">
                 <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200 truncate">
-                  {user.name?.split(' ').slice(0, 2).join(' ')}
+                  {user.name?.split(" ").slice(0, 2).join(" ")}
                 </span>
                 <span className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded-full shrink-0">
                   তুমি
@@ -461,10 +461,10 @@ const Dashboard: React.FC<DashboardProps> = ({
             {xpDiff > 0 && (
               <div className="flex items-center gap-1.5 text-[11px] text-neutral-500 dark:text-neutral-400 px-3 pt-1">
                 <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></div>
-                শীর্ষে পৌঁছাতে আরও{' '}
+                শীর্ষে পৌঁছাতে আরও{" "}
                 <span className="font-bold text-neutral-700 dark:text-neutral-300">
                   {xpDiff.toLocaleString()} XP
-                </span>{' '}
+                </span>{" "}
                 লাগবে
               </div>
             )}
