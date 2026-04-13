@@ -6,18 +6,17 @@ import {
   AlertTriangle,
   Play,
   ArrowLeft,
-  FileQuestion,
   CheckCircle2,
-  XCircle,
-  HelpCircle,
+  MinusCircle,
+  ShieldAlert,
+  Wifi,
 } from 'lucide-react';
 import { ExamConfig } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
 
 interface ExamInstructionsViewProps {
   config: ExamConfig;
-  onStart: () => Promise<boolean>; // Returns true if successful
+  onStart: () => Promise<boolean>;
   onBack: () => void;
 }
 
@@ -32,178 +31,182 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
     setIsLoading(true);
     try {
       const success = await onStart();
-      if (!success) {
-        // If false is returned, it likely means error or no questions.
-        // The engine might have already handled state, but we ensure loading stops.
-        setIsLoading(false);
-      }
+      if (!success) setIsLoading(false);
     } catch (error) {
       console.error('Error starting exam:', error);
       setIsLoading(false);
     }
   };
 
+  const chapterLabel =
+    config.chapters === 'All'
+      ? 'সব অধ্যায়'
+      : `${config.chapters.split(',').length} টি অধ্যায়`;
+
+  const hasNegative = config.negativeMarking > 0;
+
   return (
-    <div className="w-full max-w-4xl mx-auto pb-12 px-2 md:px-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* Back Button */}
+    <div className="w-full max-w-2xl mx-auto pb-10 px-3 md:px-0 animate-in fade-in slide-in-from-bottom-3 duration-400">
+      {/* Back */}
       <button
         onClick={onBack}
-        className="mb-6 flex items-center gap-2 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300 transition-colors"
+        className="mb-5 flex items-center gap-1.5 text-sm text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors font-semibold"
       >
-        <ArrowLeft size={18} />
-        <span className="font-bold">সেটআপে ফিরে যাও</span>
+        <ArrowLeft size={15} />
+        সেটআপে ফিরে যাও
       </button>
 
-      <div className="grid md:grid-cols-3 gap-8">
-        {/* Main Card */}
-        <div className="md:col-span-2 space-y-6">
-          <div className="bg-white dark:bg-neutral-900 rounded-3xl p-8 border border-neutral-200 dark:border-neutral-800 shadow-xl shadow-neutral-200/50 dark:shadow-none">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center">
-                <FileQuestion size={24} />
-              </div>
-              <div>
-                <h1 className="text-2xl font-extrabold text-neutral-900 dark:text-white">
-                  পরীক্ষার নির্দেশাবলী
-                </h1>
-                <p className="text-sm text-neutral-500">
-                  Please read carefully before starting
-                </p>
-              </div>
-            </div>
+      {/* Header */}
+      <div className="mb-4">
+        <h1 className="text-xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
+          পরীক্ষার নির্দেশাবলী
+        </h1>
+        <p className="text-sm text-neutral-400 mt-0.5">শুরু করার আগে মনোযোগ দিয়ে পড়ো</p>
+      </div>
 
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <InstructionItem
-                  icon={<Clock className="text-emerald-500" />}
-                  title="সময় ব্যবস্থাপনা (Time Management)"
-                  desc={`এই পরীক্ষার জন্য মোট সময় ${config.durationMinutes} মিনিট। সময় শেষ হলে পরীক্ষা স্বয়ংক্রিয়ভাবে জমা হয়ে যাবে।`}
-                />
-                <InstructionItem
-                  icon={<AlertTriangle className="text-red-500" />}
-                  title="নেগেটিভ মার্কিং (Negative Marking)"
-                  desc={
-                    config.negativeMarking > 0
-                      ? `প্রতিটি ভুল উত্তরের জন্য ${config.negativeMarking} নম্বর কাটা যাবে।`
-                      : 'এই পরীক্ষায় কোনো নেগেটিভ মার্কিং নেই।'
-                  }
-                />
-                <InstructionItem
-                  icon={<CheckCircle2 className="text-emerald-500" />}
-                  title="পাস মার্ক (Pass Mark)"
-                  desc="সাধারণত ৫০% নম্বর পেলে পাস হিসেবে গণ্য করা হয়, তবে এটি পরীক্ষার ধরণের উপর নির্ভর করে।"
-                />
-              </div>
+      {/* Exam Summary Strip */}
+      <div className="grid grid-cols-4 gap-2 mb-5">
+        <StatChip
+          label="বিষয়"
+          value={config.subjectLabel?.split(' ')[0] ?? '—'}
+          color="emerald"
+        />
+        <StatChip label="অধ্যায়" value={chapterLabel} color="sky" />
+        <StatChip label="প্রশ্ন" value={`${config.questionCount} টি`} color="violet" />
+        <StatChip label="সময়" value={`${config.durationMinutes} মি`} color="amber" />
+      </div>
 
-              <div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl border border-neutral-100 dark:border-neutral-800 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                <strong className="block text-neutral-900 dark:text-white mb-2">
-                  সতর্কতা:
-                </strong>
-                পরীক্ষা চলাকালীন উইন্ডো বা ট্যাব পরিবর্তন করলে তোমার পরীক্ষা
-                বাতিল হতে পারে। ভালো ইন্টারনেট সংযোগ আছে কিনা দেখে নাও।
-              </div>
-            </div>
-          </div>
+      {/* Instructions Card */}
+      <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden mb-4">
+        {/* Rules */}
+        <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
+          <RuleRow
+            icon={<Clock size={15} className="text-emerald-500" />}
+            iconBg="bg-emerald-50 dark:bg-emerald-900/20"
+            label="সময় ব্যবস্থাপনা"
+            desc={`মোট ${config.durationMinutes} মিনিট। সময় শেষ হলে পরীক্ষা স্বয়ংক্রিয়ভাবে জমা হবে।`}
+          />
+          <RuleRow
+            icon={
+              hasNegative
+                ? <MinusCircle size={15} className="text-red-500" />
+                : <CheckCircle2 size={15} className="text-emerald-500" />
+            }
+            iconBg={hasNegative ? 'bg-red-50 dark:bg-red-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20'}
+            label="নেগেটিভ মার্কিং"
+            desc={
+              hasNegative
+                ? `প্রতিটি ভুল উত্তরের জন্য ${config.negativeMarking} নম্বর কাটা যাবে।`
+                : 'এই পরীক্ষায় কোনো নেগেটিভ মার্কিং নেই।'
+            }
+          />
+          <RuleRow
+            icon={<CheckCircle2 size={15} className="text-sky-500" />}
+            iconBg="bg-sky-50 dark:bg-sky-900/20"
+            label="পাস মার্ক"
+            desc="সাধারণত ৫০% নম্বর পেলে পাস হিসেবে গণ্য করা হয়।"
+          />
+          <RuleRow
+            icon={<Wifi size={15} className="text-violet-500" />}
+            iconBg="bg-violet-50 dark:bg-violet-900/20"
+            label="নেটওয়ার্ক"
+            desc="ভালো ইন্টারনেট সংযোগ আছে কিনা নিশ্চিত করো।"
+          />
         </div>
 
-        {/* Summary Side Panel */}
-        <div className="space-y-6">
-          <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 sticky top-24">
-            <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-4 flex items-center gap-2">
-              <HelpCircle size={18} className="text-neutral-400" />
-              সংক্ষিপ্ত বিবরণ
-            </h3>
-
-            <div className="space-y-4 mb-8">
-              <SummaryRow label="বিষয়" value={config.subjectLabel} />
-              <SummaryRow
-                label="অধ্যায়"
-                value={
-                  config.chapters === 'All'
-                    ? 'সব অধ্যায়'
-                    : `${config.chapters.split(',').length} টি অধ্যায়`
-                }
-              />
-              <SummaryRow label="প্রশ্ন সংখ্যা" value={config.questionCount} />
-              <SummaryRow label="সময়" value={`${config.durationMinutes} min`} />
-              <SummaryRow
-                label="নেগেটিভ মার্কিং"
-                value={config.negativeMarking}
-                isNegative
-              />
-            </div>
-
-            <button
-              onClick={handleStart}
-              disabled={isLoading}
-              className="w-full group relative overflow-hidden bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
-            >
-              <div className="relative z-10 flex items-center justify-center gap-2">
-                {isLoading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>লোডিং...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>পরীক্ষা শুরু করো</span>
-                    <Play size={18} fill="currentColor" />
-                  </>
-                )}
-              </div>
-            </button>
-            <p className="text-center text-[10px] text-neutral-400 mt-3">
-              Start Exam বাটনে ক্লিক করলে প্রশ্ন লোড হবে
-            </p>
-          </div>
+        {/* Warning Banner */}
+        <div className="flex items-start gap-2.5 px-4 py-3 bg-amber-50 dark:bg-amber-900/10 border-t border-amber-100 dark:border-amber-900/30">
+          <ShieldAlert size={15} className="text-amber-500 shrink-0 mt-0.5" />
+          <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+            <strong>সতর্কতা:</strong> পরীক্ষা চলাকালীন উইন্ডো বা ট্যাব পরিবর্তন করলে তোমার পরীক্ষা বাতিল হতে পারে।
+          </p>
         </div>
       </div>
+
+      {/* Negative marking badge if applicable */}
+      {hasNegative && (
+        <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30">
+          <AlertTriangle size={14} className="text-red-500 shrink-0" />
+          <p className="text-xs font-semibold text-red-700 dark:text-red-400">
+            প্রতিটি ভুলে <span className="font-black">{config.negativeMarking}</span> মার্ক কাটা যাবে — নিশ্চিত না হলে এড়িয়ে যাও।
+          </p>
+        </div>
+      )}
+
+      {/* Start Button */}
+      <button
+        onClick={handleStart}
+        disabled={isLoading}
+        className="w-full group relative overflow-hidden bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-extrabold py-4 rounded-2xl shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+      >
+        {/* Shimmer effect */}
+        <div className="absolute inset-0 -skew-x-12 translate-x-[-120%] group-hover:translate-x-[120%] transition-transform duration-700 bg-white/10" />
+
+        <div className="relative flex items-center justify-center gap-2.5">
+          {isLoading ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span>প্রশ্ন লোড হচ্ছে...</span>
+            </>
+          ) : (
+            <>
+              <Play size={16} fill="currentColor" />
+              <span>পরীক্ষা শুরু করো</span>
+            </>
+          )}
+        </div>
+      </button>
+      <p className="text-center text-[11px] text-neutral-400 dark:text-neutral-600 mt-2">
+        শুরু করলে টাইমার চালু হয়ে যাবে
+      </p>
     </div>
   );
 };
 
-const InstructionItem = ({
-  icon,
-  title,
-  desc,
+// ─── Compact Stat Chip ────────────────────────────────────────────────────────
+type ChipColor = 'emerald' | 'sky' | 'violet' | 'amber';
+
+const colorMap: Record<ChipColor, string> = {
+  emerald: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/40',
+  sky:     'bg-sky-50 dark:bg-sky-900/20 text-sky-700 dark:text-sky-400 border-sky-100 dark:border-sky-900/40',
+  violet:  'bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-400 border-violet-100 dark:border-violet-900/40',
+  amber:   'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-900/40',
+};
+
+const StatChip = ({
+  label,
+  value,
+  color,
 }: {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
+  label: string;
+  value: string;
+  color: ChipColor;
 }) => (
-  <div className="flex gap-4 p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800/30 hover:bg-neutral-100 dark:hover:bg-neutral-800/50 transition-colors">
-    <div className="mt-1">{icon}</div>
-    <div>
-      <h4 className="font-bold text-neutral-900 dark:text-white text-sm mb-1">
-        {title}
-      </h4>
-      <p className="text-sm text-neutral-500 leading-relaxed">{desc}</p>
-    </div>
+  <div className={cn('rounded-xl border px-2.5 py-2 text-center', colorMap[color])}>
+    <p className="text-[10px] font-bold uppercase tracking-wider opacity-60 mb-0.5">{label}</p>
+    <p className="text-sm font-extrabold truncate leading-tight">{value}</p>
   </div>
 );
 
-const SummaryRow = ({
+// ─── Rule Row ────────────────────────────────────────────────────────────────
+const RuleRow = ({
+  icon,
+  iconBg,
   label,
-  value,
-  isNegative = false,
+  desc,
 }: {
+  icon: React.ReactNode;
+  iconBg: string;
   label: string;
-  value: string | number;
-  isNegative?: boolean;
+  desc: string;
 }) => (
-  <div className="flex justify-between items-center py-2 border-b border-dashed border-neutral-200 dark:border-neutral-800 last:border-0">
-    <span className="text-xs font-bold text-neutral-500 uppercase">
-      {label}
-    </span>
-    <span
-      className={cn(
-        'font-bold text-sm',
-        isNegative
-          ? 'text-red-500'
-          : 'text-neutral-900 dark:text-white truncate max-w-[150px]',
-      )}
-    >
-      {value}
-    </span>
+  <div className="flex items-start gap-3 px-4 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors">
+    <div className={cn('w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5', iconBg)}>
+      {icon}
+    </div>
+    <div className="min-w-0">
+      <p className="text-xs font-bold text-neutral-700 dark:text-neutral-300">{label}</p>
+      <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed mt-0.5">{desc}</p>
+    </div>
   </div>
 );
