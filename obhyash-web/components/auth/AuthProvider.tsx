@@ -387,7 +387,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             const fresh = await fetchProfile(session.user.id);
             if (fresh && isMounted) setProfile(fresh);
           } else if (event === 'TOKEN_REFRESHED') {
-            // Silently refresh profile in background.
+            // Token silently refreshed — revalidate ALL SWR caches so dashboard
+            // data re-fetches with the fresh token. Without this, queries made
+            // just before the refresh window may return stale/empty results.
+            mutate(() => true, undefined, { revalidate: true });
             const fresh = await fetchProfile(session.user.id);
             if (fresh && isMounted) setProfile(fresh);
           } else if (event === 'INITIAL_SESSION') {
