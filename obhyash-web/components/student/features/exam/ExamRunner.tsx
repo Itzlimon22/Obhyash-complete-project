@@ -187,7 +187,9 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
           graceTimeLeft={graceTimeLeft}
           appState={appState}
           isOmrMode={isOmrMode}
-          onToggleOmr={() => setIsOmrMode(!isOmrMode)}
+          onToggleOmr={() => {
+            toast.info('OMR মোড শীঘ্রই উপলব্ধ হবে।');
+          }}
           onDownloadQuestionPaper={() =>
             downloadQuestionPaper(examDetails, questions)
           }
