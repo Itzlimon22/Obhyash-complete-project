@@ -258,7 +258,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
       children: [
         _buildLabel(label, isDark),
         DropdownButtonFormField<String>(
-          value: safeValue,
+          initialValue: safeValue,
           icon: const Icon(LucideIcons.chevronDown, size: 16),
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(

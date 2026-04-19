@@ -25,28 +25,32 @@ class SubjectsProgressSection extends StatelessWidget {
   }
 
   Color _getAccuracyBgColor(int accuracy, bool isDark) {
-    if (accuracy >= 80)
+    if (accuracy >= 80) {
       return isDark
           ? const Color(0x33064e3b)
           : const Color(0xFFD1FAE5); // emerald-900/20 : emerald-100
-    if (accuracy >= 50)
+    }
+    if (accuracy >= 50) {
       return isDark
           ? const Color(0x3378350f)
           : const Color(0xFFFEF3C7); // amber-900/20 : amber-100
+    }
     return isDark
         ? const Color(0x337f1d1d)
         : const Color(0xFFFEE2E2); // red-900/20 : red-100
   }
 
   Color _getAccuracyTextColor(int accuracy, bool isDark) {
-    if (accuracy >= 80)
+    if (accuracy >= 80) {
       return isDark
           ? const Color(0xFF34D399)
           : const Color(0xFF059669); // emerald-400 : emerald-600
-    if (accuracy >= 50)
+    }
+    if (accuracy >= 50) {
       return isDark
           ? const Color(0xFFFBBF24)
           : const Color(0xFFD97706); // amber-400 : amber-600
+    }
     return isDark
         ? const Color(0xFFF87171)
         : const Color(0xFFDC2626); // red-400 : red-600

@@ -36,20 +36,24 @@ class StreakCalendar extends StatelessWidget {
   ];
 
   Color _getColorClass(int examCount, bool isCurrentMonth, bool isDark) {
-    if (!isCurrentMonth)
+    if (!isCurrentMonth) {
       return isDark
           ? const Color(0x4D262626)
           : const Color(0xFFF5F5F5); // neutral-800/30 : neutral-100
-    if (examCount == 0)
+    }
+    if (examCount == 0) {
       return isDark
           ? const Color(0xFF404040)
           : const Color(0xFFE5E5E5); // neutral-700 : neutral-200
-    if (examCount == 1)
+    }
+    if (examCount == 1) {
       return isDark
           ? const Color(0xFF047857)
           : const Color(0xFF6EE7B7); // emerald-700 : emerald-300
-    if (examCount == 2)
+    }
+    if (examCount == 2) {
       return const Color(0xFF059669); // emerald-600 : emerald-400
+    }
     return const Color(0xFF10B981); // emerald-500 : emerald-500
   }
 

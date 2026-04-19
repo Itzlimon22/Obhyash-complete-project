@@ -129,8 +129,9 @@ class SessionMonitorService {
     final incomingSessionId = newRecord['session_id'] as String?;
 
     // Ignore if the new session is the same as ours (e.g. reconnect)
-    if (incomingSessionId == null || incomingSessionId == _currentSessionId)
+    if (incomingSessionId == null || incomingSessionId == _currentSessionId) {
       return;
+    }
 
     debugPrint(
       '[SessionMonitor] New session detected: $incomingSessionId — forcing sign-out.',

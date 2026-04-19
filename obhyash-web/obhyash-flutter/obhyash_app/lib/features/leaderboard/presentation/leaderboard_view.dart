@@ -232,7 +232,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       final myProfile = ref
           .read(userProfileProvider)
           .whenOrNull(data: (u) => u);
-      final myInstitute = myProfile?.institute as String?;
+      final myInstitute = myProfile?.institute;
 
       final data = await supabase
           .from('public_profiles')
@@ -321,7 +321,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                   isDark: isDark,
                   onTap: () {
                     setState(() => _viewMode = 'college');
-                    final inst = myProfile?.institute as String?;
+                    final inst = myProfile?.institute;
                     if (inst != null && inst.isNotEmpty) {
                       _fetchCollege(inst);
                     }
@@ -394,7 +394,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                         ],
                       ))
               : _CollegeLeaderboardBody(
-                  institute: (myProfile?.institute as String?) ?? '',
+                  institute: myProfile?.institute ?? '',
                   users: _collegeUsers,
                   isLoading: _isLoadingCollege,
                   isDark: isDark,

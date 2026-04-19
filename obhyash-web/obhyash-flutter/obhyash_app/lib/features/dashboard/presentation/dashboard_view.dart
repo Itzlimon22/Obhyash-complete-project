@@ -52,13 +52,13 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     final subjects = subjectStatsAsync.when(
       data: (data) => data,
       loading: () => <SubjectStats>[],
-      error: (_, __) => <SubjectStats>[],
+      error: (_, _) => <SubjectStats>[],
     );
 
     final leaderboard = leaderboardAsync.when(
       data: (data) => data,
       loading: () => <LeaderboardUser>[],
-      error: (_, __) => <LeaderboardUser>[],
+      error: (_, _) => <LeaderboardUser>[],
     );
 
     final currentUser = userProfileAsync.when(
@@ -68,7 +68,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
         xp: user?.xp ?? 0,
       ),
       loading: () => LeaderboardUser(id: '', name: 'Loading...', xp: 0),
-      error: (_, __) => LeaderboardUser(id: '', name: 'Error', xp: 0),
+      error: (_, _) => LeaderboardUser(id: '', name: 'Error', xp: 0),
     );
 
     int userRank = 0;

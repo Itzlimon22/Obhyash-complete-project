@@ -70,7 +70,7 @@ String _subjectDisplay(String key) {
 String _formatDur(int secs) {
   final m = secs ~/ 60;
   final s = secs % 60;
-  return '${m}মি ${s}সে';
+  return '$mমি $sসে';
 }
 
 Color _scoreColor(double s) {
@@ -155,24 +155,27 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       }
     } catch (e) {
       debugPrint('[ExamHistoryView] _fetch error: $e');
-      if (mounted)
+      if (mounted) {
         setState(() {
           _isLoading = false;
           _hasError = true;
         });
+      }
     }
   }
 
   List<_ExamRecord> get _filtered {
     return _history.where((h) {
-      if (_filterSubject.isNotEmpty && h.subject != _filterSubject)
+      if (_filterSubject.isNotEmpty && h.subject != _filterSubject) {
         return false;
+      }
       if (_filterDate != null) {
         final d = h.createdAt;
         if (d.year != _filterDate!.year ||
             d.month != _filterDate!.month ||
-            d.day != _filterDate!.day)
+            d.day != _filterDate!.day) {
           return false;
+        }
       }
       return true;
     }).toList();

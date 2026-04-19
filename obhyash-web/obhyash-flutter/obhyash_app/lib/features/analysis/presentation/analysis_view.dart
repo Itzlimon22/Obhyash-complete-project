@@ -353,8 +353,8 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                                 child: _InsightCard(
                                   emoji: '🏆',
                                   label: 'সেরা বিষয়',
-                                  name: _subjectDisplayName(bestSubj!.name),
-                                  pct: bestSubj!.accuracy.round(),
+                                  name: _subjectDisplayName(bestSubj.name),
+                                  pct: bestSubj.accuracy.round(),
                                   isGood: true,
                                   isDark: isDark,
                                 ),
@@ -364,8 +364,8 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                                 child: _InsightCard(
                                   emoji: '📈',
                                   label: 'উন্নতির সুযোগ',
-                                  name: _subjectDisplayName(worstSubj!.name),
-                                  pct: worstSubj!.accuracy.round(),
+                                  name: _subjectDisplayName(worstSubj.name),
+                                  pct: worstSubj.accuracy.round(),
                                   isGood: false,
                                   isDark: isDark,
                                 ),
@@ -376,8 +376,8 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                           _InsightCard(
                             emoji: '🏆',
                             label: 'সেরা বিষয়',
-                            name: _subjectDisplayName(bestSubj!.name),
-                            pct: bestSubj!.accuracy.round(),
+                            name: _subjectDisplayName(bestSubj.name),
+                            pct: bestSubj.accuracy.round(),
                             isGood: true,
                             isDark: isDark,
                           ),

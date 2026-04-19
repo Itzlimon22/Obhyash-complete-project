@@ -85,16 +85,20 @@ class _SignupViewState extends ConsumerState<SignupView>
 
   String? _validateStep(int currentStep) {
     if (currentStep == 1) {
-      if (_nameController.text.trim().isEmpty)
+      if (_nameController.text.trim().isEmpty) {
         return 'আপনার নাম উল্লেখ করা আবশ্যক';
-      if (_phoneController.text.trim().isEmpty)
+      }
+      if (_phoneController.text.trim().isEmpty) {
         return 'মোবাইল নম্বর উল্লেখ করা আবশ্যক';
-      if (!RegExp(r'^01\d{9}$').hasMatch(_phoneController.text.trim()))
+      }
+      if (!RegExp(r'^01\d{9}$').hasMatch(_phoneController.text.trim())) {
         return 'সঠিক মোবাইল নম্বর দিন (যেমন: 01712345678)';
+      }
       if (_gender.isEmpty) return 'লিঙ্গ নির্বাচন করা আবশ্যক';
     } else if (currentStep == 2) {
-      if (_instituteController.text.trim().isEmpty)
+      if (_instituteController.text.trim().isEmpty) {
         return 'আপনার শিক্ষা প্রতিষ্ঠানের নাম লিখুন';
+      }
     } else if (currentStep == 3) {
       if (_emailController.text.trim().isEmpty ||
           _passwordController.text.isEmpty ||
@@ -106,10 +110,12 @@ class _SignupViewState extends ConsumerState<SignupView>
       ).hasMatch(_emailController.text.trim())) {
         return 'সঠিক ইমেইল এড্রেস দিন (যেমন: example@gmail.com)';
       }
-      if (_passwordController.text.length < 6)
+      if (_passwordController.text.length < 6) {
         return 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে';
-      if (_passwordController.text != _confirmPasswordController.text)
+      }
+      if (_passwordController.text != _confirmPasswordController.text) {
         return 'পাসওয়ার্ড দুটি মিলছে না';
+      }
     }
     return null;
   }
