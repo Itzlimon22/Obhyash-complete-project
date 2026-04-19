@@ -1,13 +1,13 @@
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon } from "lucide-react";
 
 // ==========================================
 // 1. STATIC CONTENT TYPES (Curriculum)
 // ==========================================
 export type GroupType =
-  | 'General'
-  | 'Science'
-  | 'Humanities'
-  | 'Business Studies';
+  | "General"
+  | "Science"
+  | "Humanities"
+  | "Business Studies";
 
 export interface Topic {
   id: string;
@@ -36,9 +36,9 @@ export interface Subject {
 // 2. QUESTION & EXAM CORE TYPES
 // ==========================================
 
-export type QuestionType = 'MCQ' | 'TrueFalse' | 'ShortAnswer';
-export type QuestionDifficulty = 'Easy' | 'Medium' | 'Hard' | 'Mixed';
-export type QuestionStatus = 'Draft' | 'Pending' | 'Approved' | 'Rejected';
+export type QuestionType = "MCQ" | "TrueFalse" | "ShortAnswer";
+export type QuestionDifficulty = "Easy" | "Medium" | "Hard" | "Mixed";
+export type QuestionStatus = "Draft" | "Pending" | "Approved" | "Rejected";
 
 export interface QuestionOption {
   id: string; // "a", "b" or "0", "1"
@@ -144,7 +144,7 @@ export interface ExamHistory {
   date: string;
   score: number;
   total: number;
-  status: 'Passed' | 'Failed';
+  status: "Passed" | "Failed";
 }
 
 export interface ExamResult {
@@ -173,8 +173,8 @@ export interface ExamResult {
   flaggedQuestions?: (number | string)[]; // IDs of flagged questions
 
   // Submission Metadata
-  submissionType: 'digital' | 'script';
-  status?: 'pending' | 'evaluated' | 'rejected';
+  submissionType: "digital" | "script";
+  status?: "pending" | "evaluated" | "rejected";
   rejectionReason?: string;
 
   // OMR / Script Specifics
@@ -183,18 +183,18 @@ export interface ExamResult {
 }
 
 export enum Difficulty {
-  Easy = 'Easy',
-  Medium = 'Medium',
-  Hard = 'Hard',
-  Mixed = 'Mixed',
+  Easy = "Easy",
+  Medium = "Medium",
+  Hard = "Hard",
+  Mixed = "Mixed",
 }
 
 // ==========================================
 // 4. USER & PROFILE TYPES
 // ==========================================
 
-export type UserRole = 'Admin' | 'Teacher' | 'Student';
-export type UserStatus = 'Active' | 'Inactive' | 'Suspended';
+export type UserRole = "Admin" | "Teacher" | "Student";
+export type UserStatus = "Active" | "Inactive" | "Suspended";
 
 export interface User {
   id: string;
@@ -235,9 +235,9 @@ export interface User {
 
   // Subscription System
   subscription: {
-    plan: 'Free' | 'Pro' | 'Enterprise';
+    plan: "Free" | "Pro" | "Enterprise";
     expiry: string;
-    status: 'Active' | 'Past Due' | 'Canceled';
+    status: "Active" | "Past Due" | "Canceled";
   };
 
   // Usage Stats
@@ -295,7 +295,7 @@ export interface Transaction {
   };
   plan: string;
   amount: number;
-  status: 'Completed' | 'Pending' | 'Failed';
+  status: "Completed" | "Pending" | "Failed";
   date: string;
   invoiceId: string;
   method: string;
@@ -311,7 +311,7 @@ export interface PaymentSubmission {
   paymentMethod: string; // bKash, Nagad
   senderNumber: string;
   transactionId: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   submittedAt: string;
 }
 
@@ -320,7 +320,7 @@ export interface Invoice {
   date: string;
   amount: number;
   currency: string;
-  status: 'paid' | 'pending' | 'failed' | 'checking' | 'valid' | 'rejected';
+  status: "paid" | "pending" | "failed" | "checking" | "valid" | "rejected";
   planName: string;
   downloadUrl?: string;
   // New fields for detailed payment slip
@@ -331,7 +331,7 @@ export interface Invoice {
 
 export interface PaymentMethod {
   id: string;
-  type: 'card' | 'bkash' | 'nagad';
+  type: "card" | "bkash" | "nagad";
   last4?: string;
   number?: string;
   expiry?: string;
@@ -392,18 +392,18 @@ export interface DatabaseTool {
 // 7. REPORTS & DATASETS
 // ==========================================
 
-export type ReportStatus = 'Pending' | 'Resolved' | 'Ignored';
+export type ReportStatus = "Pending" | "Resolved" | "Ignored";
 export type ReportReason =
-  | 'Wrong Answer'
-  | 'Typo/Grammar'
-  | 'Inappropriate Content'
-  | 'Duplicate'
-  | 'অসম্পূর্ণ প্রশ্ন'
-  | 'ভুল উত্তর'
-  | 'প্রশ্নে ডাউট'
-  | 'ভুল ক্যাটাগরি'
-  | 'অসম্পূর্ণ সলিউশন'
-  | 'Other';
+  | "Wrong Answer"
+  | "Typo/Grammar"
+  | "Inappropriate Content"
+  | "Duplicate"
+  | "অসম্পূর্ণ প্রশ্ন"
+  | "ভুল উত্তর"
+  | "প্রশ্নে ডাউট"
+  | "ভুল ক্যাটাগরি"
+  | "অসম্পূর্ণ সলিউশন"
+  | "Other";
 
 export interface Report {
   id: string;
@@ -431,11 +431,11 @@ export interface Report {
 export interface Dataset {
   id: string;
   name: string;
-  type: 'CSV' | 'JSON' | 'SQL' | 'LOG' | 'PARQUET';
+  type: "CSV" | "JSON" | "SQL" | "LOG" | "PARQUET";
   size: string;
   rows: string;
   description: string;
-  category: 'ML Training' | 'Business Intelligence' | 'System Logs';
+  category: "ML Training" | "Business Intelligence" | "System Logs";
   lastUpdated: string;
 }
 
@@ -444,20 +444,20 @@ export interface Dataset {
 // ==========================================
 
 export enum AppState {
-  IDLE = 'IDLE', // Initial Landing Page
-  DASHBOARD = 'DASHBOARD',
-  SETUP = 'SETUP', // Exam Configuration Form
-  LOADING = 'LOADING',
-  INSTRUCTIONS = 'INSTRUCTIONS',
-  ACTIVE = 'ACTIVE', // Exam in progress
-  GRACE_PERIOD = 'GRACE_PERIOD',
-  COMPLETED = 'COMPLETED',
-  HISTORY = 'HISTORY',
-  ADMIN = 'ADMIN',
-  ERROR = 'ERROR',
-  RUNNING = 'RUNNING',
-  TIMEOUT = 'TIMEOUT',
-  SUBMITTED = 'SUBMITTED',
+  IDLE = "IDLE", // Initial Landing Page
+  DASHBOARD = "DASHBOARD",
+  SETUP = "SETUP", // Exam Configuration Form
+  LOADING = "LOADING",
+  INSTRUCTIONS = "INSTRUCTIONS",
+  ACTIVE = "ACTIVE", // Exam in progress
+  GRACE_PERIOD = "GRACE_PERIOD",
+  COMPLETED = "COMPLETED",
+  HISTORY = "HISTORY",
+  ADMIN = "ADMIN",
+  ERROR = "ERROR",
+  RUNNING = "RUNNING",
+  TIMEOUT = "TIMEOUT",
+  SUBMITTED = "SUBMITTED",
 }
 
 // ==========================================
@@ -549,17 +549,17 @@ export interface OverallAnalytics {
 // ==========================================
 
 export type NotificationType =
-  | 'exam_result'
-  | 'achievement'
-  | 'level_up'
-  | 'announcement'
-  | 'system'
-  | 'success'
-  | 'warning'
-  | 'error'
-  | 'info';
+  | "exam_result"
+  | "achievement"
+  | "level_up"
+  | "announcement"
+  | "system"
+  | "success"
+  | "warning"
+  | "error"
+  | "info";
 
-export type NotificationPriority = 'low' | 'normal' | 'high' | 'urgent';
+export type NotificationPriority = "low" | "normal" | "high" | "urgent";
 
 export interface Notification {
   id: string;
@@ -581,17 +581,17 @@ export interface Notification {
 // ==========================================
 
 export type ComplaintType =
-  | 'Technical'
-  | 'UX'
-  | 'Bug'
-  | 'Feature Request'
-  | 'Other';
+  | "Technical"
+  | "UX"
+  | "Bug"
+  | "Feature Request"
+  | "Other";
 
 export type ComplaintStatus =
-  | 'Pending'
-  | 'In Progress'
-  | 'Resolved'
-  | 'Dismissed';
+  | "Pending"
+  | "In Progress"
+  | "Resolved"
+  | "Dismissed";
 
 export interface AppComplaint {
   id: string;
