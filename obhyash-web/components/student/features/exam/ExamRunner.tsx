@@ -147,9 +147,13 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
       return;
     }
     const unanswered = questions.length - Object.keys(userAnswers).length;
-    if (!isOmrMode && unanswered > 0) {
-      setIsSubmitModalOpen(true);
+
+    // Direct submit if all answered and not OMR mode
+    if (!isOmrMode && unanswered === 0) {
+      handleConfirmSubmit();
+      toast.success("উত্তরপত্র জমা দেওয়া হয়েছে");
     } else {
+      // Show confirmation modal for incomplete exams or OMR mode
       setIsSubmitModalOpen(true);
     }
   };
