@@ -467,12 +467,23 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             initDoneRef.current = true;
           }
         } else if (event === "SIGNED_OUT") {
-          if (isMounted) {
-            setUser(null);
-            setProfile(null);
+          // Supabase fires SIGNED_OUT on the *current* client whenever ANY session
+          // for this user is revoked — including when a new device logs in with a
+          // fresh token (the old token is invalidated server-side).
+          // We must NOT blindly redirect here; instead, verify the local session
+          // is genuinely gone before treating this as a logout.
+          const { data: currentSessionData } =
+            await supabase.auth.getSession();
+          if (!currentSessionData?.session) {
+            // The local session is truly gone — real logout.
+            if (isMounted) {
+              setUser(null);
+              setProfile(null);
+            }
+            clearCachedProfile();
+            router.push("/login");
           }
-          clearCachedProfile();
-          router.push("/login");
+          // else: session still valid (e.g. another device logged out) — stay logged in.
         }
       },
     );
