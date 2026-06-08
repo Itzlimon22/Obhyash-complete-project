@@ -1,7 +1,7 @@
-import React from 'react';
-import { Flag, CheckCircle2, Loader2, Eye } from 'lucide-react';
-import { Report } from '@/lib/types';
-import { ReportStatusBadge } from './shared';
+import React from "react";
+import { Flag, CheckCircle2, Loader2, Eye } from "lucide-react";
+import { Report } from "@/lib/types";
+import { ReportStatusBadge } from "./shared";
 
 interface ReportTableProps {
   reports: Report[];
@@ -16,10 +16,10 @@ export const ReportTable: React.FC<ReportTableProps> = ({
 }) => {
   const formatDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleDateString('bn-BD', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
+      return new Date(dateString).toLocaleDateString("bn-BD", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
       });
     } catch {
       return dateString;
@@ -96,7 +96,7 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     প্রশ্ন
                   </p>
                   <div className="text-xs text-black dark:text-white line-clamp-2 leading-snug font-medium">
-                    {report.question.question}
+                    <LatexText text={report.question.question} />
                   </div>
                 </div>
               )}
@@ -104,11 +104,11 @@ export const ReportTable: React.FC<ReportTableProps> = ({
               <div className="flex items-center justify-between pt-1">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 flex items-center justify-center text-[10px] font-black uppercase">
-                    {(report.reporter_name || 'G').charAt(0)}
+                    {(report.reporter_name || "G").charAt(0)}
                   </div>
                   <div>
                     <p className="text-[11px] font-black text-black dark:text-white leading-none">
-                      {report.reporter_name || 'Guest'}
+                      {report.reporter_name || "Guest"}
                     </p>
                     <p className="text-[9px] text-black/50 dark:text-white/50 mt-0.5 font-bold uppercase tracking-tighter">
                       Reporter
@@ -182,7 +182,7 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     {report.question ? (
                       <>
                         <div className="text-sm text-black dark:text-white line-clamp-2 font-medium">
-                          {report.question.question}
+                          <LatexText text={report.question.question} />
                         </div>
                         <div className="mt-2 flex gap-2">
                           {report.question.subject && (
@@ -206,11 +206,11 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                   <td className="px-6 py-4 align-top">
                     <div className="flex items-center gap-2">
                       <div className="w-7 h-7 rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 flex items-center justify-center text-xs font-black uppercase">
-                        {(report.reporter_name || 'G').charAt(0)}
+                        {(report.reporter_name || "G").charAt(0)}
                       </div>
                       <div>
                         <p className="text-sm font-black text-black dark:text-white">
-                          {report.reporter_name || 'Guest'}
+                          {report.reporter_name || "Guest"}
                         </p>
                         <p className="text-[10px] text-black/40 dark:text-white/40 font-bold uppercase tracking-wide">
                           Student

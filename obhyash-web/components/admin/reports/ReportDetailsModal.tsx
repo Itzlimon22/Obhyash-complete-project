@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   X,
   Check,
@@ -8,12 +8,12 @@ import {
   MessageSquare,
   AlertCircle,
   ExternalLink,
-} from 'lucide-react';
-import Portal from '@/components/ui/portal';
-import { resolveReport } from '@/services/report-service';
-import { Report, UserProfile } from '@/lib/types';
-import { resolveImageUrl } from '@/lib/utils';
-import { getUserProfile } from '@/services/user-service';
+} from "lucide-react";
+import Portal from "@/components/ui/portal";
+import { resolveReport } from "@/services/report-service";
+import { Report, UserProfile } from "@/lib/types";
+import { resolveImageUrl } from "@/lib/utils";
+import { getUserProfile } from "@/services/user-service";
 
 interface ReportDetailsModalProps {
   report: Report;
@@ -29,7 +29,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
   onUpdate,
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [adminComment, setAdminComment] = useState('');
+  const [adminComment, setAdminComment] = useState("");
   const [reporterProfile, setReporterProfile] = useState<UserProfile | null>(
     null,
   );
@@ -43,7 +43,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
           const profile = await getUserProfile(report.reporter_id as string);
           setReporterProfile(profile);
         } catch (error) {
-          console.error('Error fetching reporter profile:', error);
+          console.error("Error fetching reporter profile:", error);
         } finally {
           setIsLoadingProfile(false);
         }
@@ -54,7 +54,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
 
   if (!isOpen || !report) return null;
 
-  const handleAction = async (action: 'Accept' | 'Reject') => {
+  const handleAction = async (action: "Accept" | "Reject") => {
     setIsSubmitting(true);
     try {
       await resolveReport(report.id, action, adminComment);
@@ -69,7 +69,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
 
   const formatDate = (dateString: string) => {
     try {
-      return new Date(dateString).toLocaleString('bn-BD');
+      return new Date(dateString).toLocaleString("bn-BD");
     } catch {
       return dateString;
     }
@@ -100,7 +100,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-lg shadow-sm shrink-0"
                   style={{
-                    backgroundColor: reporterProfile?.avatarColor || '#065f46',
+                    backgroundColor: reporterProfile?.avatarColor || "#065f46",
                   }}
                 >
                   {reporterProfile?.avatarUrl ? (
@@ -163,9 +163,9 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
                   </span>
                 </div>
                 {report.question ? (
-                  <p className="text-sm text-black dark:text-white font-medium leading-relaxed">
-                    {report.question.question}
-                  </p>
+                  <div className="text-sm text-black dark:text-white font-medium leading-relaxed">
+                    <LatexText text={report.question.question} />
+                  </div>
                 ) : (
                   <p className="text-red-500 text-sm font-bold">
                     প্রশ্নটি লোড করা যাচ্ছে না।
@@ -210,12 +210,12 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
                 </h4>
                 <div className="relative group rounded-xl overflow-hidden border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 min-h-[100px] flex items-center justify-center">
                   <img
-                    src={resolveImageUrl(report.image_url) ?? ''}
+                    src={resolveImageUrl(report.image_url) ?? ""}
                     alt="Reference"
                     loading="lazy"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src =
-                        'https://placehold.co/600x400?text=Image+Not+Found';
+                        "https://placehold.co/600x400?text=Image+Not+Found";
                     }}
                     className="w-full h-auto max-h-[400px] object-contain"
                   />
@@ -225,7 +225,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
                     </span>
                   </div>
                   <a
-                    href={resolveImageUrl(report.image_url) ?? '#'}
+                    href={resolveImageUrl(report.image_url) ?? "#"}
                     target="_blank"
                     rel="noreferrer"
                     className="absolute top-2 right-2 p-2 bg-black/80 text-white rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
@@ -237,7 +237,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
             )}
 
             {/* Action Section */}
-            {report.status === 'Pending' && (
+            {report.status === "Pending" && (
               <div className="mt-8 pt-6 border-t border-black/10 dark:border-white/10">
                 <div className="mb-4">
                   <label className="block text-xs font-black text-black/40 dark:text-white/40 uppercase tracking-widest mb-2">
@@ -253,7 +253,7 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
 
                 <div className="flex gap-3">
                   <button
-                    onClick={() => handleAction('Reject')}
+                    onClick={() => handleAction("Reject")}
                     disabled={isSubmitting}
                     className="flex-1 py-3 rounded-xl font-black text-red-600 dark:text-red-500 border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex justify-center items-center gap-2 uppercase tracking-wider text-sm"
                   >
@@ -261,12 +261,12 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
                     বাতিল
                   </button>
                   <button
-                    onClick={() => handleAction('Accept')}
+                    onClick={() => handleAction("Accept")}
                     disabled={isSubmitting}
                     className="flex-[2] py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-black rounded-xl shadow-lg transition-all flex justify-center items-center gap-2 uppercase tracking-wider text-sm"
                   >
                     {isSubmitting ? (
-                      'প্রসেসিং...'
+                      "প্রসেসিং..."
                     ) : (
                       <>
                         <Check size={18} />
@@ -283,18 +283,18 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({
             )}
 
             {/* Resolved/Ignored state display */}
-            {report.status !== 'Pending' && (
+            {report.status !== "Pending" && (
               <div className="mt-6 p-4 rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
                 <div className="flex items-center gap-2 mb-2">
-                  {report.status === 'Resolved' ? (
+                  {report.status === "Resolved" ? (
                     <Check size={16} className="text-emerald-700" />
                   ) : (
                     <XCircle size={16} className="text-red-600" />
                   )}
                   <span className="font-black text-sm text-black dark:text-white uppercase tracking-wide">
-                    {report.status === 'Resolved'
-                      ? 'সমাধান হয়েছে'
-                      : 'উপেক্ষা করা হয়েছে'}
+                    {report.status === "Resolved"
+                      ? "সমাধান হয়েছে"
+                      : "উপেক্ষা করা হয়েছে"}
                   </span>
                 </div>
                 {report.admin_comment && (

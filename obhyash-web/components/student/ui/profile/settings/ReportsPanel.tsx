@@ -1,51 +1,52 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import useSWRInfinite from 'swr/infinite';
-import { AlertTriangle, ChevronDown, ChevronUp, Eye } from 'lucide-react';
+import { useState } from "react";
+import useSWRInfinite from "swr/infinite";
+import { AlertTriangle, ChevronDown, ChevronUp, Eye } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { UserProfile, Report, ReportStatus } from '@/lib/types';
-import { getUserReports } from '@/services/report-service';
+} from "@/components/ui/dialog";
+import { UserProfile, Report, ReportStatus } from "@/lib/types";
+import { getUserReports } from "@/services/report-service";
+import LatexText from "@/components/student/ui/common/LatexText";
 
 interface ReportsPanelProps {
   user: UserProfile;
 }
 
-type TabFilter = 'all' | 'Pending' | 'Resolved' | 'Ignored';
+type TabFilter = "all" | "Pending" | "Resolved" | "Ignored";
 
 const PAGE_SIZE = 10;
 
 const TAB_LABELS: { id: TabFilter; label: string }[] = [
-  { id: 'all', label: 'সব' },
-  { id: 'Pending', label: 'অপেক্ষমান' },
-  { id: 'Resolved', label: 'গৃহীত' },
-  { id: 'Ignored', label: 'বাতিল' },
+  { id: "all", label: "সব" },
+  { id: "Pending", label: "অপেক্ষমান" },
+  { id: "Resolved", label: "গৃহীত" },
+  { id: "Ignored", label: "বাতিল" },
 ];
 
 const REASON_LABELS: Record<string, string> = {
-  wrong_answer: 'ভুল উত্তর',
-  wrong_explanation: 'ভুল ব্যাখ্যা',
-  typo: 'বানান ভুল',
-  unclear_question: 'অস্পষ্ট প্রশ্ন',
-  image_missing: 'ছবি নেই',
-  duplicate: 'ডুপ্লিকেট',
-  other: 'অন্যান্য',
+  wrong_answer: "ভুল উত্তর",
+  wrong_explanation: "ভুল ব্যাখ্যা",
+  typo: "বানান ভুল",
+  unclear_question: "অস্পষ্ট প্রশ্ন",
+  image_missing: "ছবি নেই",
+  duplicate: "ডুপ্লিকেট",
+  other: "অন্যান্য",
 };
 
 function StatusBadge({ status }: { status: ReportStatus }) {
-  if (status === 'Resolved') {
+  if (status === "Resolved") {
     return (
       <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-800 text-white">
         গৃহীত
       </span>
     );
   }
-  if (status === 'Ignored') {
+  if (status === "Ignored") {
     return (
       <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-red-600 text-white">
         বাতিল
@@ -103,9 +104,9 @@ function QuestionViewerDialog({
               <p className="text-xs font-semibold text-green-800 dark:text-green-400 mb-1">
                 ব্যাখ্যা
               </p>
-              <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
-                {q.explanation}
-              </p>
+              <div className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                <LatexText text={q.explanation} />
+              </div>
             </div>
           )}
         </div>
@@ -119,7 +120,7 @@ function ReportCard({ report }: { report: Report }) {
   const [viewerOpen, setViewerOpen] = useState(false);
 
   const accentColor =
-    report.status === 'Resolved' ? 'bg-green-800' : 'bg-red-600';
+    report.status === "Resolved" ? "bg-green-800" : "bg-red-600";
 
   return (
     <>
@@ -137,15 +138,15 @@ function ReportCard({ report }: { report: Report }) {
                 <StatusBadge status={report.status} />
               </div>
               <time className="text-xs text-neutral-400 shrink-0">
-                {new Date(report.created_at).toLocaleDateString('bn-BD')}
+                {new Date(report.created_at).toLocaleDateString("bn-BD")}
               </time>
             </div>
 
             {/* Question preview */}
             {report.question?.question && (
-              <p className="text-sm text-neutral-700 dark:text-neutral-300 line-clamp-2 mb-2 leading-snug">
-                {report.question.question}
-              </p>
+              <div className="text-sm text-neutral-700 dark:text-neutral-300 line-clamp-2 mb-2 leading-snug">
+                <LatexText text={report.question.question} />
+              </div>
             )}
 
             {/* Subject chip */}
@@ -171,7 +172,7 @@ function ReportCard({ report }: { report: Report }) {
                 className="flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 ml-auto"
               >
                 {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-                {expanded ? 'কম দেখুন' : 'বিস্তারিত'}
+                {expanded ? "কম দেখুন" : "বিস্তারিত"}
               </button>
             </div>
 
@@ -206,8 +207,8 @@ function ReportCard({ report }: { report: Report }) {
 
                 {report.resolved_at && (
                   <p className="text-xs text-neutral-400">
-                    সমাধান:{' '}
-                    {new Date(report.resolved_at).toLocaleDateString('bn-BD')}
+                    সমাধান:{" "}
+                    {new Date(report.resolved_at).toLocaleDateString("bn-BD")}
                   </p>
                 )}
               </div>
@@ -228,10 +229,10 @@ function ReportCard({ report }: { report: Report }) {
 }
 
 export default function ReportsPanel({ user }: ReportsPanelProps) {
-  const [activeTab, setActiveTab] = useState<TabFilter>('all');
+  const [activeTab, setActiveTab] = useState<TabFilter>("all");
 
   const { data, size, setSize, isLoading } = useSWRInfinite(
-    (pageIndex) => (user.id ? ['user-reports', user.id, pageIndex + 1] : null),
+    (pageIndex) => (user.id ? ["user-reports", user.id, pageIndex + 1] : null),
     ([, userId, page]) =>
       getUserReports(userId as string, page as number, PAGE_SIZE),
     { revalidateFirstPage: false },
@@ -244,13 +245,13 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
 
   const counts: Record<TabFilter, number> = {
     all: allReports.length,
-    Pending: allReports.filter((r) => r.status === 'Pending').length,
-    Resolved: allReports.filter((r) => r.status === 'Resolved').length,
-    Ignored: allReports.filter((r) => r.status === 'Ignored').length,
+    Pending: allReports.filter((r) => r.status === "Pending").length,
+    Resolved: allReports.filter((r) => r.status === "Resolved").length,
+    Ignored: allReports.filter((r) => r.status === "Ignored").length,
   };
 
   const filtered =
-    activeTab === 'all'
+    activeTab === "all"
       ? allReports
       : allReports.filter((r) => r.status === activeTab);
 
@@ -271,13 +272,13 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
       <div className="flex border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 overflow-x-auto">
         {TAB_LABELS.map(({ id, label }) => {
           const isActive = activeTab === id;
-          const isDanger = id === 'Pending' || id === 'Ignored';
+          const isDanger = id === "Pending" || id === "Ignored";
           const activeTabClass = isDanger
-            ? 'border-red-600 text-red-600'
-            : 'border-green-800 text-green-800 dark:text-green-400 dark:border-green-600';
+            ? "border-red-600 text-red-600"
+            : "border-green-800 text-green-800 dark:text-green-400 dark:border-green-600";
           const badgeClass = isDanger
-            ? 'bg-red-600 text-white'
-            : 'bg-green-800 text-white';
+            ? "bg-red-600 text-white"
+            : "bg-green-800 text-white";
 
           return (
             <button
@@ -286,7 +287,7 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
               className={`flex items-center gap-1.5 px-4 py-3 text-sm font-semibold border-b-2 whitespace-nowrap transition-colors ${
                 isActive
                   ? activeTabClass
-                  : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
+                  : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
               }`}
             >
               {label}
@@ -295,7 +296,7 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
                   className={`inline-flex items-center justify-center rounded-full text-xs min-w-[18px] h-[18px] px-1 font-bold ${
                     isActive
                       ? badgeClass
-                      : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300'
+                      : "bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300"
                   }`}
                 >
                   {counts[id]}
@@ -351,7 +352,7 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
                 disabled={isLoading}
                 className="w-full py-2.5 rounded-xl text-sm font-semibold text-green-800 dark:text-green-400 border border-green-800 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-950/30 transition-colors disabled:opacity-50"
               >
-                {isLoading ? 'লোড হচ্ছে...' : 'আরো দেখুন'}
+                {isLoading ? "লোড হচ্ছে..." : "আরো দেখুন"}
               </button>
             )}
           </>

@@ -1,17 +1,29 @@
-'use client';
+"use client";
 
-import 'katex/dist/katex.min.css';
-import ReactMarkdown from 'react-markdown';
-import remarkMath from 'remark-math';
-import remarkGfm from 'remark-gfm';
-import remarkBreaks from 'remark-breaks';
-import rehypeKatex from 'rehype-katex';
-import rehypeRaw from 'rehype-raw';
+import "katex/dist/katex.min.css";
+import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
+import rehypeKatex from "rehype-katex";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 
 interface MathRendererProps {
   text: string;
   block?: boolean;
 }
+
+// Allow all attributes KaTeX injects (className, style on span/div) while
+// blocking everything actually dangerous (script, event handlers, etc.).
+const sanitizeSchema = {
+  ...defaultSchema,
+  attributes: {
+    ...defaultSchema.attributes,
+    span: [...(defaultSchema.attributes?.span ?? []), "className", "style"],
+    div: [...(defaultSchema.attributes?.div ?? []), "className", "style"],
+  },
+};
 
 export function MathRenderer({ text, block = false }: MathRendererProps) {
   if (!text) return null;
@@ -21,33 +33,33 @@ export function MathRenderer({ text, block = false }: MathRendererProps) {
 
   // Normalize literal \n (two-char escape sequence) to actual newlines.
   // Handles content pasted from JSON or bulk-uploaded with \n as newline placeholder.
-  formattedText = formattedText.replace(/\\n/g, '\n');
+  formattedText = formattedText.replace(/\\n/g, "\n");
 
   // In math blocks, un-escape \\command → \command.
   // tiptap-markdown escapes backslashes in math content (e.g. \text → \\text),
   // which breaks KaTeX: \\rightarrow → \\ (line-break) + unknown 'rightarrow'.
   formattedText = formattedText.replace(
     /(\$\$[\s\S]*?\$\$|\$(?!\$)[^\n]*?\$)/g,
-    (match) => match.replace(/\\\\([a-zA-Z{])/g, '\\$1'),
+    (match) => match.replace(/\\\\([a-zA-Z{])/g, "\\$1"),
   );
 
   // Format i., ii., iii. etc
   // Use (?:\s+|^|-) to match space, start of string, or a dash before the numeral
   formattedText = formattedText.replace(
     /(?:\s+|^|-)(i|ii|iii|iv|v)\.\s+/gi,
-    '\n$1. ',
+    "\n$1. ",
   );
 
   // Format parenthesis numerals (i), (ii), etc
   formattedText = formattedText.replace(
     /(?:\s+|^|-)\((i|ii|iii|iv|v)\)\s+/gi,
-    '\n($1) ',
+    "\n($1) ",
   );
 
   // Catch the typical ending question and push it to a new line
   formattedText = formattedText.replace(
     /(?:\s+|^)নিচের কোনটি সঠিক\?/g,
-    '\n\nনিচের কোনটি সঠিক?',
+    "\n\nনিচের কোনটি সঠিক?",
   );
 
   return (
@@ -55,14 +67,18 @@ export function MathRenderer({ text, block = false }: MathRendererProps) {
       className={`prose prose-sm max-w-none dark:prose-invert 
         prose-p:leading-relaxed prose-p:my-1
         prose-li:my-0.5 prose-ul:my-1
-        ${block ? 'my-2' : 'inline'}`}
+        ${block ? "my-2" : "inline"}`}
     >
       <ReactMarkdown
         remarkPlugins={[remarkMath, remarkGfm, remarkBreaks]}
-        rehypePlugins={[rehypeKatex, rehypeRaw]}
+        rehypePlugins={[
+          rehypeKatex,
+          rehypeRaw,
+          [rehypeSanitize, sanitizeSchema],
+        ]}
         components={{
           p: ({ node, ...props }) => (
-            <span {...props} className={block ? 'block mb-2' : ''} />
+            <span {...props} className={block ? "block mb-2" : ""} />
           ),
         }}
       >

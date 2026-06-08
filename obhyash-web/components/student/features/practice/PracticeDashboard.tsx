@@ -1,13 +1,14 @@
-'use client';
+"use client";
 
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Question, ExamResult, ExamDetails, UserProfile } from '@/lib/types';
-import { getUserBookmarks, toggleBookmark } from '@/services/bookmark-service';
-import { getQuestionsByIds } from '@/services/question-service';
-import { toast } from 'sonner';
-import FlashcardMode, { FlashcardResult } from './FlashcardMode';
-import PracticeSummary from './PracticeSummary';
+import React, { useState, useMemo, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Question, ExamResult, ExamDetails, UserProfile } from "@/lib/types";
+import { getUserBookmarks, toggleBookmark } from "@/services/bookmark-service";
+import { getQuestionsByIds } from "@/services/question-service";
+import { toast } from "sonner";
+import FlashcardMode, { FlashcardResult } from "./FlashcardMode";
+import PracticeSummary from "./PracticeSummary";
+import LatexText from "@/components/student/ui/common/LatexText";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -19,17 +20,20 @@ interface PracticeDashboardProps {
   currentUser?: UserProfile | null;
 }
 
-type Tab = 'mistakes' | 'bookmarks';
-type ViewState = 'list' | 'flashcard' | 'summary';
+type Tab = "mistakes" | "bookmarks";
+type ViewState = "list" | "flashcard" | "summary";
+
+// ─── Pagination Config ────────────────────────────────────────────────────────
+const ITEMS_PER_PAGE = 15;
 
 // ─── Spaced Repetition Helpers ─────────────────────────────────────────────
 
 const REVIEW_INTERVAL_DAYS = 3;
-const LS_KEY = 'practice_last_reviewed';
+const LS_KEY = "practice_last_reviewed";
 
 function getLastReviewedMap(): Record<string, number> {
   try {
-    return JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+    return JSON.parse(localStorage.getItem(LS_KEY) || "{}");
   } catch {
     return {};
   }
@@ -57,13 +61,13 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   onNavigateToMock,
   currentUser,
 }) => {
-  const [activeTab, setActiveTab] = useState<Tab>('mistakes');
+  const [activeTab, setActiveTab] = useState<Tab>("mistakes");
   const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(
     new Set(),
   );
-  const [subjectFilter, setSubjectFilter] = useState<string>('all');
+  const [subjectFilter, setSubjectFilter] = useState<string>("all");
   const [shuffle, setShuffle] = useState(false);
-  const [viewState, setViewState] = useState<ViewState>('list');
+  const [viewState, setViewState] = useState<ViewState>("list");
   const [flashcardQuestions, setFlashcardQuestions] = useState<Question[]>([]);
   const [flashcardResults, setFlashcardResults] = useState<FlashcardResult[]>(
     [],
@@ -73,6 +77,9 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   const [globalBookmarks, setGlobalBookmarks] = useState<Question[]>([]);
   const [isLoadingBookmarks, setIsLoadingBookmarks] = useState(false);
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Spaced repetition
   const [reviewedMap, setReviewedMap] = useState<Record<string, number>>({});
@@ -89,11 +96,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       if (result.questions && result.userAnswers) {
         result.questions.forEach((q) => {
           const userAns = result.userAnswers?.[q.id];
-          if (
-            userAns !== undefined &&
-            userAns !== null &&
-            userAns !== -1
-          ) {
+          if (userAns !== undefined && userAns !== null && userAns !== -1) {
             const isCorrect =
               userAns === q.correctAnswerIndex ||
               (q.correctAnswerIndices != null &&
@@ -132,7 +135,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
           setGlobalBookmarks([]);
         }
       } catch {
-        toast.error('বুকমার্ক লোড করতে সমস্যা হয়েছে।');
+        toast.error("বুকমার্ক লোড করতে সমস্যা হয়েছে।");
       } finally {
         setIsLoadingBookmarks(false);
       }
@@ -151,7 +154,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
         setGlobalBookmarks((prev) => prev.filter((q) => q.id !== questionId));
       } else {
         newIds.add(questionId);
-        if (activeTab === 'mistakes') {
+        if (activeTab === "mistakes") {
           const q = mistakes.find((q) => q.id === questionId);
           if (q) setGlobalBookmarks((prev) => [...prev, q]);
         }
@@ -161,11 +164,11 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
         await toggleBookmark(currentUser.id, questionId, isCurrentlyBookmarked);
         toast.success(
           isCurrentlyBookmarked
-            ? 'বুকমার্ক সরানো হয়েছে'
-            : 'বুকমার্ক সেভ করা হয়েছে',
+            ? "বুকমার্ক সরানো হয়েছে"
+            : "বুকমার্ক সেভ করা হয়েছে",
         );
       } catch {
-        toast.error('বুকমার্ক আপডেট করতে সমস্যা হয়েছে।');
+        toast.error("বুকমার্ক আপডেট করতে সমস্যা হয়েছে।");
         setBookmarkedIds(bookmarkedIds);
       }
     },
@@ -173,7 +176,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   );
 
   // ── All subjects from current list ─────────────────────────────────────────
-  const baseList = activeTab === 'mistakes' ? mistakes : globalBookmarks;
+  const baseList = activeTab === "mistakes" ? mistakes : globalBookmarks;
 
   const allSubjects = useMemo(() => {
     // Group subjects by their display label to avoid duplicates like "Chemistry Ch 1" appearing twice
@@ -195,13 +198,13 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
 
   // Reset filter when tab changes
   useEffect(() => {
-    setSubjectFilter('all');
+    setSubjectFilter("all");
     setSelectedQuestions(new Set());
   }, [activeTab]);
 
   // ── Filtered list ───────────────────────────────────────────────────────────
   const currentList = useMemo(() => {
-    if (subjectFilter === 'all') return baseList;
+    if (subjectFilter === "all") return baseList;
     // Find the display label associated with the selected subject ID (the "code")
     const targetLabel = allSubjects.find(([id]) => id === subjectFilter)?.[1];
 
@@ -211,6 +214,19 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       (q) => (q.subjectLabel || q.subject) === targetLabel,
     );
   }, [baseList, subjectFilter, allSubjects]);
+
+  // Reset pagination when list changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [currentList, activeTab]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(currentList.length / ITEMS_PER_PAGE);
+  const paginatedList = useMemo(() => {
+    const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIdx = startIdx + ITEMS_PER_PAGE;
+    return currentList.slice(startIdx, endIdx);
+  }, [currentList, currentPage]);
 
   // Due-today derived
   const dueCount = useMemo(
@@ -255,13 +271,27 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     }
   };
 
+  const handlePreviousPage = () => {
+    setCurrentPage((p) => Math.max(1, p - 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((p) => Math.min(totalPages, p + 1));
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   // ── Launch helpers ──────────────────────────────────────────────────────────
   const buildDetails = (questions: Question[], mode: string): ExamDetails => ({
-    subject: 'অনুশীলন',
-    subjectLabel: 'অনুশীলন',
+    subject: "অনুশীলন",
+    subjectLabel: "অনুশীলন",
     examType: mode,
-    chapters: 'Mixed',
-    topics: 'Mixed',
+    chapters: "Mixed",
+    topics: "Mixed",
     totalQuestions: questions.length,
     durationMinutes: questions.length * 2,
     totalMarks: questions.reduce((acc, q) => acc + (q.points || 1), 0),
@@ -280,38 +310,38 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     markReviewed(qs.map((q) => q.id));
     setReviewedMap(getLastReviewedMap());
     setFlashcardQuestions(qs);
-    setViewState('flashcard');
+    setViewState("flashcard");
   };
 
   const handleFlashcardComplete = (results: FlashcardResult[]) => {
     setFlashcardResults(results);
-    setViewState('summary');
+    setViewState("summary");
   };
 
   const handlePracticeStruggling = (qs: Question[]) => {
     setFlashcardQuestions(qs);
     setFlashcardResults([]);
-    setViewState('flashcard');
+    setViewState("flashcard");
   };
 
   // ── Alternate views: flashcard / summary ───────────────────────────────────
-  if (viewState === 'flashcard') {
+  if (viewState === "flashcard") {
     return (
       <FlashcardMode
         questions={flashcardQuestions}
         onComplete={handleFlashcardComplete}
-        onExit={() => setViewState('list')}
+        onExit={() => setViewState("list")}
       />
     );
   }
 
-  if (viewState === 'summary') {
+  if (viewState === "summary") {
     return (
       <PracticeSummary
         results={flashcardResults}
         mode="flashcard"
         onPracticeStruggling={handlePracticeStruggling}
-        onBack={() => setViewState('list')}
+        onBack={() => setViewState("list")}
       />
     );
   }
@@ -321,16 +351,16 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
     const cfg =
       count >= 3
         ? {
-            bg: 'bg-emerald-900/50 text-emerald-400 border-emerald-800/50',
+            bg: "bg-emerald-900/50 text-emerald-400 border-emerald-800/50",
             label: `${count}× ভুল`,
           }
         : count === 2
           ? {
-              bg: 'bg-red-900/50 text-red-400 border-red-800/50',
+              bg: "bg-red-900/50 text-red-400 border-red-800/50",
               label: `${count}× ভুল`,
             }
           : {
-              bg: 'bg-neutral-800 text-neutral-400 border-neutral-700',
+              bg: "bg-neutral-800 text-neutral-400 border-neutral-700",
               label: `${count}× ভুল`,
             };
     return (
@@ -348,13 +378,13 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       {/* ── Stats bar ── */}
       <div className="grid grid-cols-3 gap-3 md:gap-4">
         {[
-          { label: 'মোট ভুল', value: mistakes.length, color: 'text-red-500' },
+          { label: "মোট ভুল", value: mistakes.length, color: "text-red-500" },
           {
-            label: 'বুকমার্ক',
+            label: "বুকমার্ক",
             value: globalBookmarks.length,
-            color: 'text-emerald-500',
+            color: "text-emerald-500",
           },
-          { label: 'রিভিউ বাকি', value: dueCount, color: 'text-emerald-400' },
+          { label: "রিভিউ বাকি", value: dueCount, color: "text-emerald-400" },
         ].map(({ label, value, color }) => (
           <div
             key={label}
@@ -371,21 +401,21 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       {/* ── Tabs ── */}
       <div className="flex bg-neutral-100 dark:bg-neutral-900 p-1 rounded-xl w-fit border border-neutral-200 dark:border-neutral-800">
         <button
-          onClick={() => setActiveTab('mistakes')}
+          onClick={() => setActiveTab("mistakes")}
           className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-            activeTab === 'mistakes'
-              ? 'bg-white dark:bg-neutral-800 text-emerald-700 dark:text-emerald-400 shadow-sm'
-              : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
+            activeTab === "mistakes"
+              ? "bg-white dark:bg-neutral-800 text-emerald-700 dark:text-emerald-400 shadow-sm"
+              : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
           }`}
         >
           ভুল সমূহ ({mistakes.length})
         </button>
         <button
-          onClick={() => setActiveTab('bookmarks')}
+          onClick={() => setActiveTab("bookmarks")}
           className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-            activeTab === 'bookmarks'
-              ? 'bg-white dark:bg-neutral-800 text-emerald-700 dark:text-emerald-400 shadow-sm'
-              : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
+            activeTab === "bookmarks"
+              ? "bg-white dark:bg-neutral-800 text-emerald-700 dark:text-emerald-400 shadow-sm"
+              : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
           }`}
         >
           বুকমার্ক ({globalBookmarks.length})
@@ -395,7 +425,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
       {/* ── Subject filter pills ── */}
       {allSubjects.length > 0 && (
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-          {([['all', 'সব বিষয়']] as [string, string][])
+          {([["all", "সব বিষয়"]] as [string, string][])
             .concat(allSubjects)
             .map(([code, label]) => (
               <button
@@ -403,8 +433,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                 onClick={() => setSubjectFilter(code)}
                 className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
                   subjectFilter === code
-                    ? 'bg-red-600 text-white border-red-600 shadow'
-                    : 'bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-red-400'
+                    ? "bg-red-600 text-white border-red-600 shadow"
+                    : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-red-400"
                 }`}
               >
                 {label}
@@ -415,7 +445,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
 
       {/* ── Main content box ── */}
       <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-sm min-h-[400px] flex flex-col">
-        {isLoadingBookmarks && activeTab === 'bookmarks' ? (
+        {isLoadingBookmarks && activeTab === "bookmarks" ? (
           <div className="flex-1 flex items-center justify-center p-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600" />
           </div>
@@ -441,11 +471,11 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
               কোনো তথ্য পাওয়া যায়নি
             </h3>
             <p className="text-neutral-500 text-sm max-w-md mb-6">
-              {activeTab === 'mistakes'
-                ? subjectFilter !== 'all'
+              {activeTab === "mistakes"
+                ? subjectFilter !== "all"
                   ? `"${subjectFilter}" বিষয়ে কোনো ভুল পাওয়া যায়নি।`
-                  : 'তুমি এখনো কোনো পরীক্ষায় ভুল করোনি।'
-                : 'তুমি এখনো কোনো প্রশ্ন বুকমার্ক করোনি।'}
+                  : "তুমি এখনো কোনো পরীক্ষায় ভুল করোনি।"
+                : "তুমি এখনো কোনো প্রশ্ন বুকমার্ক করোনি।"}
             </p>
             <button
               onClick={onNavigateToMock}
@@ -478,8 +508,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                   title="এলোমেলো করো"
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold border transition-all ${
                     shuffle
-                      ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700'
-                      : 'bg-white dark:bg-neutral-800 text-neutral-500 border-neutral-200 dark:border-neutral-700 hover:border-neutral-400'
+                      ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700"
+                      : "bg-white dark:bg-neutral-800 text-neutral-500 border-neutral-200 dark:border-neutral-700 hover:border-neutral-400"
                   }`}
                 >
                   <svg
@@ -490,7 +520,7 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                   >
                     <path d="M3.105 2.288a.75.75 0 0 0-.826.95l1.414 4.926A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086l-1.414 4.926a.75.75 0 0 0 .826.95 28.897 28.897 0 0 0 15.293-7.155.75.75 0 0 0 0-1.114A28.897 28.897 0 0 0 3.105 2.288Z" />
                   </svg>
-                  {shuffle ? 'র‍্যাও্ডম অন' : 'র‍্যাও্ডম'}
+                  {shuffle ? "র‍্যাও্ডম অন" : "র‍্যাও্ডম"}
                 </button>
               </div>
 
@@ -500,8 +530,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                 disabled={currentSelection.size === 0}
                 className={`px-5 py-2 rounded-lg text-sm font-bold transition-all transform active:scale-95 ${
                   currentSelection.size > 0
-                    ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20 hover:bg-emerald-800'
-                    : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'
+                    ? "bg-emerald-700 text-white shadow-md shadow-emerald-700/20 hover:bg-emerald-800"
+                    : "bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed"
                 }`}
               >
                 📇 ফ্ল্যাশকার্ড শুরু করো
@@ -510,7 +540,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
 
             {/* Question list */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-neutral-50/30 dark:bg-black/20">
-              {currentList.map((question, idx) => {
+              {paginatedList.map((question, idx) => {
+                const globalIdx = (currentPage - 1) * ITEMS_PER_PAGE + idx;
                 const freq = mistakeFrequency.get(question.id);
                 const due = isDue(question.id, reviewedMap);
                 const isSelected = selectedQuestions.has(question.id);
@@ -524,8 +555,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                     onClick={() => toggleSelection(question.id)}
                     className={`group relative bg-white dark:bg-neutral-900 border rounded-xl p-4 transition-all cursor-pointer ${
                       isSelected
-                        ? 'border-red-500 dark:border-red-500 ring-1 ring-red-500'
-                        : 'border-neutral-200 dark:border-neutral-800 hover:border-red-300 dark:hover:border-red-700'
+                        ? "border-red-500 dark:border-red-500 ring-1 ring-red-500"
+                        : "border-neutral-200 dark:border-neutral-800 hover:border-red-300 dark:hover:border-red-700"
                     }`}
                   >
                     <div className="flex items-start gap-4">
@@ -534,8 +565,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                         <div
                           className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
                             isSelected
-                              ? 'bg-red-600 border-red-600'
-                              : 'border-neutral-300 dark:border-neutral-600'
+                              ? "bg-red-600 border-red-600"
+                              : "border-neutral-300 dark:border-neutral-600"
                           }`}
                         >
                           {isSelected && (
@@ -564,15 +595,20 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                               {question.subject}
                             </span>
                           )}
-                          {freq !== undefined && activeTab === 'mistakes' && (
+                          {freq !== undefined && activeTab === "mistakes" && (
                             <FrequencyBadge count={freq} />
                           )}
                         </div>
 
                         {/* Question text */}
-                        <p className="text-sm font-medium text-neutral-900 dark:text-white leading-snug line-clamp-2">
-                          {idx + 1}. {question.question}
-                        </p>
+                        <div className="text-sm font-medium text-neutral-900 dark:text-white leading-snug line-clamp-2">
+                          <div className="flex gap-2">
+                            <span className="shrink-0">{globalIdx + 1}.</span>
+                            <div className="flex-1">
+                              <LatexText text={question.question} />
+                            </div>
+                          </div>
+                        </div>
 
                         {/* Correct answer hint */}
                         {question.options &&
@@ -591,8 +627,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                         }}
                         className={`flex-shrink-0 p-1.5 rounded-lg transition-colors ${
                           bookmarkedIds.has(question.id)
-                            ? 'text-emerald-500'
-                            : 'text-neutral-400 hover:text-emerald-500'
+                            ? "text-emerald-500"
+                            : "text-neutral-400 hover:text-emerald-500"
                         }`}
                         title="বুকমার্ক"
                       >
@@ -601,8 +637,8 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                           viewBox="0 0 20 20"
                           fill={
                             bookmarkedIds.has(question.id)
-                              ? 'currentColor'
-                              : 'none'
+                              ? "currentColor"
+                              : "none"
                           }
                           stroke="currentColor"
                           strokeWidth={1.5}
@@ -620,6 +656,91 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
                 );
               })}
             </div>
+
+            {/* Pagination controls */}
+            {totalPages > 1 && (
+              <div className="border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+                {/* Left: Info */}
+                <div className="text-sm text-neutral-600 dark:text-neutral-400 font-medium">
+                  পৃষ্ঠা {currentPage} / {totalPages} ({currentList.length}{" "}
+                  প্রশ্ন)
+                </div>
+
+                {/* Right: Controls */}
+                <div className="flex items-center gap-1.5">
+                  {/* Previous button */}
+                  <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    title="পূর্ববর্তী"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="w-4 h-4"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+
+                  {/* Page numbers */}
+                  <div className="flex items-center gap-0.5">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+                      return pageNum;
+                    }).map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        onClick={() => goToPage(pageNum)}
+                        className={`w-8 h-8 rounded-lg font-bold text-sm transition-all ${
+                          currentPage === pageNum
+                            ? "bg-red-600 text-white shadow-md"
+                            : "border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Next button */}
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-white dark:hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    title="পরবর্তী"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      className="w-4 h-4"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
