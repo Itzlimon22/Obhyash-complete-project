@@ -1,9 +1,8 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import {
   User,
-  Monitor,
   ChevronRight,
   ArrowLeft,
   AlertTriangle,
@@ -23,7 +22,7 @@ import {
 import UserAvatar from '../common/UserAvatar';
 import { UserProfile } from '@/lib/types';
 import PersonalDetailsPanel from './settings/PersonalDetailsPanel';
-import ManageDevicesPanel from './settings/ManageDevicesPanel';
+
 import ReportsPanel from './settings/ReportsPanel';
 import MySubscriptionPanel from './settings/MySubscriptionPanel';
 import SubscriptionView from './SubscriptionView';
@@ -40,7 +39,6 @@ interface SettingsViewProps {
 
 type PanelSection =
   | 'personal'
-  | 'devices'
   | 'reports'
   | 'my-subscription'
   | 'notifications'
@@ -87,13 +85,7 @@ const GROUPS: SettingsGroup[] = [
         description: 'নাম, ছবি, একাডেমিক তথ্য',
         Icon: User,
       },
-      {
-        type: 'panel',
-        id: 'devices',
-        label: 'ডিভাইস ম্যানেজ',
-        description: 'লগইন করা ডিভাইস দেখো ও সরাও',
-        Icon: Monitor,
-      },
+
     ],
   },
   {
@@ -304,7 +296,6 @@ export default function SettingsView({
   const renderPanel = (section: PanelSection) => {
     const panelTitles: Record<PanelSection, string> = {
       personal: 'ব্যক্তিগত তথ্য',
-      devices: 'ডিভাইস ম্যানেজ',
       reports: 'আমার রিপোর্ট',
       'my-subscription': 'আমার সাবসক্রিপশন',
       notifications: 'নোটিফিকেশন',
@@ -314,8 +305,7 @@ export default function SettingsView({
       switch (section) {
         case 'personal':
           return <PersonalDetailsPanel user={user} onSave={onSave} />;
-        case 'devices':
-          return <ManageDevicesPanel userId={user.id ?? ''} />;
+
         case 'reports':
           return <ReportsPanel user={user} />;
         case 'my-subscription':

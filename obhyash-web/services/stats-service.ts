@@ -2,6 +2,7 @@ import { UserProfile, ExamResult, Question, SubjectAnalysis, OverallAnalytics } 
 import { supabase, isSupabaseConfigured } from './core';
 import { LEVELS } from '@/components/dashboard/leaderboard/leaderboardData';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
+import { getSubjectSortPriority } from '@/services/metadata-service';
 
 // --- TYPES ---
 // Re-exporting for compatibility, though importing directly from @/lib/types is preferred.
@@ -539,7 +540,9 @@ export const getOverallAnalytics = async (
           totalTime,
           timelineData,
           subjectData: Array.from(subjectMap.values()).sort(
-            (a, b) => b.total - a.total,
+            (a, b) =>
+              getSubjectSortPriority(a.id, a.name) -
+              getSubjectSortPriority(b.id, b.name),
           ),
           totalQuestions,
           totalCorrect,

@@ -3,6 +3,66 @@ import { SUBJECT_METADATA, SubjectMetadata } from '@/lib/mock-data';
 export { SUBJECT_METADATA };
 export type { SubjectMetadata };
 
+/**
+ * Canonical subject ordering:
+ * Bangla 1, Bangla 2, English 1, English 2, Math, Physics 1, Physics 2,
+ * Chemistry 1, Chemistry 2, Biology 1, Biology 2, others at the end.
+ * Matching is done case-insensitively against the subject id or name.
+ */
+export const SUBJECT_ORDER_KEYS: string[] = [
+  'hsc_bangla_1',
+  'hsc_bangla_2',
+  'hsc_english_1',
+  'hsc_english_2',
+  'hsc_math',
+  'hsc_higher_math_1',
+  'hsc_higher_math_2',
+  'hsc_physics_1',
+  'hsc_physics_2',
+  'hsc_chemistry_1',
+  'hsc_chemistry_2',
+  'hsc_biology_1',
+  'hsc_biology_2',
+];
+
+/** Keywords used to sort subjects that don't have an exact id match. */
+const SUBJECT_KEYWORD_ORDER: { keywords: string[]; priority: number }[] = [
+  { keywords: ['bangla', 'বাংলা', 'ban'], priority: 0 },
+  { keywords: ['english', 'eng'], priority: 10 },
+  { keywords: ['math', 'গণিত', 'উচ্চতর গণিত'], priority: 20 },
+  { keywords: ['physics', 'পদার্থ', 'phy'], priority: 30 },
+  { keywords: ['chemistry', 'রসায়ন', 'che'], priority: 40 },
+  { keywords: ['biology', 'জীববিজ্ঞান', 'bio'], priority: 50 },
+];
+
+/** Returns a numeric sort priority for a subject. Lower = earlier. */
+export function getSubjectSortPriority(id: string, name: string): number {
+  const idLower = (id || '').toLowerCase();
+  const nameLower = (name || '').toLowerCase();
+
+  // 1. Exact id match against the canonical order list
+  const exactIdx = SUBJECT_ORDER_KEYS.indexOf(id);
+  if (exactIdx !== -1) return exactIdx;
+
+  // 2. Determine paper number (1st or 2nd)
+  const is2nd =
+    idLower.includes('_2') ||
+    nameLower.includes('২য়') ||
+    nameLower.includes('2nd') ||
+    /\b2\b/.test(nameLower);
+  const paperOffset = is2nd ? 1 : 0;
+
+  // 3. Keyword match
+  for (const { keywords, priority } of SUBJECT_KEYWORD_ORDER) {
+    if (keywords.some((kw) => idLower.includes(kw) || nameLower.includes(kw))) {
+      return priority + paperOffset;
+    }
+  }
+
+  // 4. Everything else (ICT, GK, optional subjects…) comes after Biology
+  return 100;
+}
+
 type Subject = {
   id: string;
   name?: string;
@@ -90,8 +150,8 @@ export const getSubjects = async (
         }
       });
 
-      // Enrich with icons
-      return Array.from(uniqueSubjects.values()).map((s) => ({
+      // Enrich with icons and sort by canonical subject order
+      const enriched = Array.from(uniqueSubjects.values()).map((s) => ({
         ...s,
         name: s.name || s.name_en || '', // Ensure 'name' is always a string
         icon:
@@ -100,6 +160,10 @@ export const getSubjects = async (
           (s.id ? SUBJECT_ICONS[s.id] : undefined) ||
           '📘',
       }));
+      return enriched.sort((a, b) =>
+        getSubjectSortPriority(a.id, a.name) -
+        getSubjectSortPriority(b.id, b.name),
+      );
     }
   }
 
