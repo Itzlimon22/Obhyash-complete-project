@@ -1,11 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Check, ChevronDown, Search, BookOpen } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useState, useRef, useEffect } from "react";
+import { Check, ChevronDown, Search, BookOpen } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Subject {
   id: string;
   name: string;
   icon: React.ReactNode;
+  serial?: number; // Serial number for ordering
 }
 
 interface SubjectSelectorProps {
@@ -22,14 +23,15 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
   isLoading,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
 
   const selectedSubjectData = subjects.find((s) => s.id === selectedSubject);
 
-  const filteredSubjects = subjects.filter((s) =>
-    s.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  // Filter subjects while maintaining their serial order
+  const filteredSubjects = subjects
+    .filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => (a.serial || 0) - (b.serial || 0));
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -40,8 +42,8 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   if (isLoading) {
@@ -61,20 +63,20 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 outline-none select-none',
-          'bg-white dark:bg-neutral-900',
+          "w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 outline-none select-none",
+          "bg-white dark:bg-neutral-900",
           isOpen
-            ? 'border-emerald-500 ring-4 ring-emerald-500/10'
-            : 'border-neutral-200 dark:border-neutral-800 hover:border-emerald-300 dark:hover:border-neutral-700',
+            ? "border-emerald-500 ring-4 ring-emerald-500/10"
+            : "border-neutral-200 dark:border-neutral-800 hover:border-emerald-300 dark:hover:border-neutral-700",
         )}
       >
         <div className="flex items-center gap-3 overflow-hidden">
           <div
             className={cn(
-              'w-8 h-8 rounded-lg flex items-center justify-center text-lg shrink-0 transition-colors',
+              "w-8 h-8 rounded-lg flex items-center justify-center text-lg shrink-0 transition-colors",
               selectedSubjectData
-                ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400',
+                ? "bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                : "bg-neutral-100 dark:bg-neutral-800 text-neutral-400",
             )}
           >
             {selectedSubjectData ? (
@@ -85,22 +87,22 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
           </div>
           <span
             className={cn(
-              'text-sm font-bold truncate',
+              "text-sm font-bold truncate",
               selectedSubjectData
-                ? 'text-neutral-900 dark:text-white'
-                : 'text-neutral-400',
+                ? "text-neutral-900 dark:text-white"
+                : "text-neutral-400",
             )}
           >
             {selectedSubjectData
               ? selectedSubjectData.name
-              : 'বিষয় নির্বাচন করো...'}
+              : "বিষয় নির্বাচন করো..."}
           </span>
         </div>
         <ChevronDown
           size={20}
           className={cn(
-            'text-neutral-400 transition-transform duration-200',
-            isOpen && 'rotate-180',
+            "text-neutral-400 transition-transform duration-200",
+            isOpen && "rotate-180",
           )}
         />
       </button>
@@ -108,10 +110,10 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
       {/* Dropdown Menu */}
       <div
         className={cn(
-          'absolute z-50 w-full mt-2 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-100 dark:border-neutral-800 overflow-hidden transition-all duration-200 origin-top',
+          "absolute z-50 w-full mt-2 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-100 dark:border-neutral-800 overflow-hidden transition-all duration-200 origin-top",
           isOpen
-            ? 'opacity-100 translate-y-0 scale-100 visible'
-            : 'opacity-0 -translate-y-2 scale-95 invisible pointer-events-none',
+            ? "opacity-100 translate-y-0 scale-100 visible"
+            : "opacity-0 -translate-y-2 scale-95 invisible pointer-events-none",
         )}
       >
         {/* Search */}
@@ -149,18 +151,18 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
                     setIsOpen(false);
                   }}
                   className={cn(
-                    'w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200 group',
+                    "w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200 group",
                     isSelected
-                      ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
-                      : 'hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300',
+                      ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300"
+                      : "hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300",
                   )}
                 >
                   <div
                     className={cn(
-                      'w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-sm border',
+                      "w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-sm border",
                       isSelected
-                        ? 'bg-white dark:bg-neutral-900 border-emerald-200 dark:border-emerald-500/30'
-                        : 'bg-white dark:bg-neutral-900 border-neutral-100 dark:border-neutral-700 group-hover:border-neutral-300 dark:group-hover:border-neutral-600',
+                        ? "bg-white dark:bg-neutral-900 border-emerald-200 dark:border-emerald-500/30"
+                        : "bg-white dark:bg-neutral-900 border-neutral-100 dark:border-neutral-700 group-hover:border-neutral-300 dark:group-hover:border-neutral-600",
                     )}
                   >
                     {subject.icon}

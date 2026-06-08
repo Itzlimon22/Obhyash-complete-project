@@ -14,6 +14,7 @@ import { resolveReport } from "@/services/report-service";
 import { Report, UserProfile } from "@/lib/types";
 import { resolveImageUrl } from "@/lib/utils";
 import { getUserProfile } from "@/services/user-service";
+import LatexText from "@/components/student/ui/common/LatexText";
 
 interface ReportDetailsModalProps {
   report: Report;

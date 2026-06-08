@@ -1,6 +1,6 @@
-﻿'use client';
+﻿"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   BookOpen,
   Layout,
@@ -8,25 +8,25 @@ import {
   Share2,
   Sparkles,
   Zap,
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { getErrorMessage } from '@/lib/error-utils';
+} from "lucide-react";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/lib/error-utils";
 
-import { ExamConfig, Difficulty, ExamDetails } from '@/lib/types';
-import { cn } from '@/lib/utils';
+import { ExamConfig, Difficulty, ExamDetails } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import {
   ExamTypeSelection,
   DifficultySelection,
   QuestionCountSelection,
   TimeSelection,
   NegativeMarkingSelection,
-} from '@/components/student/features/exam/setup/ExamSettings';
-import { TopicSelector } from '@/components/student/features/exam/setup/TopicSelector';
-import { SubjectSelector } from '@/components/student/features/exam/setup/SubjectSelector';
-import { OmrConfigModal } from '@/components/student/features/omr/OmrConfigModal';
-import { downloadOMRSheet } from '@/services/download-service';
-import { EXAM_TYPE_OPTIONS } from '@/lib/constants';
-import { getAvailableQuestionCount } from '@/services/exam-service';
+} from "@/components/student/features/exam/setup/ExamSettings";
+import { TopicSelector } from "@/components/student/features/exam/setup/TopicSelector";
+import { SubjectSelector } from "@/components/student/features/exam/setup/SubjectSelector";
+import { OmrConfigModal } from "@/components/student/features/omr/OmrConfigModal";
+import { downloadOMRSheet } from "@/services/download-service";
+import { EXAM_TYPE_OPTIONS } from "@/lib/constants";
+import { getAvailableQuestionCount } from "@/services/exam-service";
 
 interface ExamSetupFormProps {
   onStartExam: (config: ExamConfig) => void;
@@ -39,23 +39,25 @@ interface Subject {
   icon?: string | React.ReactNode;
   name: string;
   rawName?: string; // Added rawName
+  serial?: number; // Serial number for consistent ordering
 }
 
 interface Item {
   id: string;
   name: string;
+  serial?: number; // Serial number for consistent ordering
 }
 
 const STATIC_SUBJECT_ICONS: Record<string, string> = {
-  Physics: '⚛️',
-  Chemistry: '🧪',
-  Math: '📐',
-  Biology: '🧬',
-  Bangla: '📚',
-  English: '📝',
-  GK: '🌍',
-  ICT: '💻',
-  default: '📖',
+  Physics: "⚛️",
+  Chemistry: "🧪",
+  Math: "📐",
+  Biology: "🧬",
+  Bangla: "📚",
+  English: "📝",
+  GK: "🌍",
+  ICT: "💻",
+  default: "📖",
 };
 
 const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
@@ -72,11 +74,11 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const [isFetchingData, setIsFetchingData] = useState(true);
 
   // --- Form State ---
-  const [subject, setSubject] = useState('');
+  const [subject, setSubject] = useState("");
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [examTypes, setExamTypes] = useState<string[]>(['Academic']);
-  const [difficulties, setDifficulties] = useState<string[]>(['Medium']);
+  const [examTypes, setExamTypes] = useState<string[]>(["Academic"]);
+  const [difficulties, setDifficulties] = useState<string[]>(["Medium"]);
   const [questionCount, setQuestionCount] = useState<number>(25);
   const [duration, setDuration] = useState<number>(25);
   const [negativeMarking, setNegativeMarking] = useState<number>(0.25);
@@ -88,8 +90,8 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   // --- Hydrate Form State from SessionStorage ---
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored = sessionStorage.getItem('obhyash_setup_form_state');
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem("obhyash_setup_form_state");
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
@@ -104,7 +106,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           if (parsed.negativeMarking !== undefined)
             setNegativeMarking(parsed.negativeMarking);
         } catch (e) {
-          console.error('Failed to parse setup form state', e);
+          console.error("Failed to parse setup form state", e);
         }
       }
       setIsFormHydrated(true);
@@ -113,7 +115,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   // --- Save Form State to SessionStorage ---
   useEffect(() => {
-    if (isFormHydrated && typeof window !== 'undefined') {
+    if (isFormHydrated && typeof window !== "undefined") {
       const stateToSave = {
         subject,
         selectedChapters,
@@ -125,7 +127,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         negativeMarking,
       };
       sessionStorage.setItem(
-        'obhyash_setup_form_state',
+        "obhyash_setup_form_state",
         JSON.stringify(stateToSave),
       );
     }
@@ -161,7 +163,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               .map((c) => c.name)
           : null;
       const difficultyValue =
-        difficulties.length >= 3 ? null : difficulties.join('+');
+        difficulties.length >= 3 ? null : difficulties.join("+");
       const count = await getAvailableQuestionCount(
         subject,
         subjectLabel,
@@ -187,14 +189,14 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       try {
         setIsFetchingData(true);
         const { getUserProfile, getSubjects } =
-          await import('@/services/database');
+          await import("@/services/database");
         interface UserProfile {
           division?: string;
           section?: string;
           stream?: string;
           optional_subject?: string;
         }
-        const user: UserProfile | null = await getUserProfile('me');
+        const user: UserProfile | null = await getUserProfile("me");
 
         if (user) {
           const subjects = await getSubjects(
@@ -208,31 +210,34 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             name_en?: string;
             icon?: string;
           }
-          const formattedSubjects = subjects.map((sub: RawSubject) => {
-            const nameBn = sub.name_bn || sub.name;
-            const nameEn = sub.name || sub.name_en;
-            const label =
-              nameEn && nameEn !== nameBn && !nameBn.includes(nameEn)
-                ? `${nameBn} (${nameEn})`
-                : nameBn;
+          const formattedSubjects = subjects.map(
+            (sub: RawSubject, idx: number) => {
+              const nameBn = sub.name_bn || sub.name;
+              const nameEn = sub.name || sub.name_en;
+              const label =
+                nameEn && nameEn !== nameBn && !nameBn.includes(nameEn)
+                  ? `${nameBn} (${nameEn})`
+                  : nameBn;
 
-            return {
-              id: sub.id,
-              label: label,
-              icon:
-                sub.icon ||
-                STATIC_SUBJECT_ICONS[sub.name_en ?? ''] ||
-                STATIC_SUBJECT_ICONS[sub.id] ||
-                STATIC_SUBJECT_ICONS.default,
-              name: label,
-              rawName: nameBn, // Added rawName
-            };
-          });
+              return {
+                id: sub.id,
+                label: label,
+                icon:
+                  sub.icon ||
+                  STATIC_SUBJECT_ICONS[sub.name_en ?? ""] ||
+                  STATIC_SUBJECT_ICONS[sub.id] ||
+                  STATIC_SUBJECT_ICONS.default,
+                name: label,
+                rawName: nameBn,
+                serial: idx + 1, // Serial number based on array position
+              };
+            },
+          );
 
           setAvailableSubjects(formattedSubjects);
         }
       } catch (error) {
-        console.error('Error loading subjects:', error);
+        console.error("Error loading subjects:", error);
         toast.error(getErrorMessage(error));
       } finally {
         setIsFetchingData(false);
@@ -253,14 +258,20 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
     const fetchChapters = async () => {
       try {
-        const { getChapters } = await import('@/services/database');
+        const { getChapters } = await import("@/services/database");
         const chaptersData = await getChapters(subject);
-        setAvailableChapters(chaptersData);
+        const formattedChapters = chaptersData.map(
+          (chapter: Item, idx: number) => ({
+            ...chapter,
+            serial: idx + 1, // Serial number based on array position
+          }),
+        );
+        setAvailableChapters(formattedChapters);
         setSelectedChapters([]);
         setAvailableTopics([]);
         setSelectedTopics([]);
       } catch (error) {
-        console.error('Error loading chapters:', error);
+        console.error("Error loading chapters:", error);
         toast.error(getErrorMessage(error));
       }
     };
@@ -277,12 +288,18 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
     const fetchTopics = async () => {
       try {
-        const { getTopics } = await import('@/services/database');
+        const { getTopics } = await import("@/services/database");
         const topicsData = await getTopics(selectedChapters);
-        setAvailableTopics(topicsData);
+        const formattedTopics = topicsData.map(
+          (topic: TopicItem, idx: number) => ({
+            ...topic,
+            serial: idx + 1, // Serial number based on array position
+          }),
+        );
+        setAvailableTopics(formattedTopics);
         setSelectedTopics([]);
       } catch (error) {
-        console.error('Failed to fetch topics:', error);
+        console.error("Failed to fetch topics:", error);
       }
     };
 
@@ -297,10 +314,10 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   // --- Handlers ---
 
   const handleTopicSelectionChange = (
-    type: 'chapters' | 'topics',
+    type: "chapters" | "topics",
     names: string[],
   ) => {
-    if (type === 'chapters') {
+    if (type === "chapters") {
       const ids = availableChapters
         .filter((c) => names.includes(c.name))
         .map((c) => c.id);
@@ -315,8 +332,8 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   const handleStartExam = async () => {
     if (!subject) {
-      toast.error('অনুগ্রহ করে একটি বিষয় নির্বাচন করো');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      toast.error("অনুগ্রহ করে একটি বিষয় নির্বাচন করো");
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
@@ -342,10 +359,10 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       await onStartExam({
         subject,
         subjectLabel,
-        examType: examTypes.join(' + '),
-        chapters: chapterNames.length > 0 ? chapterNames.join(',') : 'All',
-        topics: topicNames.length > 0 ? topicNames.join(',') : 'General',
-        difficulty: difficulties.join(' + '),
+        examType: examTypes.join(" + "),
+        chapters: chapterNames.length > 0 ? chapterNames.join(",") : "All",
+        topics: topicNames.length > 0 ? topicNames.join(",") : "General",
+        difficulty: difficulties.join(" + "),
         questionCount,
         durationMinutes: duration,
         negativeMarking,
@@ -360,7 +377,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   };
 
   const StartExamButton = ({ className }: { className?: string }) => (
-    <div className={cn('pt-4', className)}>
+    <div className={cn("pt-4", className)}>
       <button
         onClick={handleStartExam}
         disabled={isLoading || !subject}
@@ -437,8 +454,8 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           {/* 2. Topics Selection Card */}
           <section
             className={cn(
-              'bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-500',
-              !subject ? 'opacity-50 pointer-events-none' : 'opacity-100',
+              "bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-500",
+              !subject ? "opacity-50 pointer-events-none" : "opacity-100",
             )}
           >
             <h3 className="text-xl font-black text-neutral-900 dark:text-white mb-8 flex items-center gap-3">
@@ -447,12 +464,14 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             <div className="grid gap-8">
               <TopicSelector
                 title="অধ্যায়"
-                items={availableChapters.map((c) => c.name)}
+                items={availableChapters
+                  .sort((a, b) => (a.serial || 0) - (b.serial || 0))
+                  .map((c) => c.name)}
                 selectedItems={availableChapters
                   .filter((c) => selectedChapters.includes(c.id))
                   .map((c) => c.name)}
                 onChange={(names) =>
-                  handleTopicSelectionChange('chapters', names)
+                  handleTopicSelectionChange("chapters", names)
                 }
                 disabled={!subject}
                 emptyLabel="এই বিষয়ের জন্য কোনো অধ্যায় পাওয়া যায়নি"
@@ -460,23 +479,27 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
               <TopicSelector
                 title="টপিক"
-                items={availableTopics.map((t) => t.name)}
-                groupedItems={availableTopics.reduce(
-                  (acc, topic: TopicItem) => {
-                    const chapterName =
-                      availableChapters.find((c) => c.id === topic.chapter_id)
-                        ?.name || 'Other';
-                    if (!acc[chapterName]) acc[chapterName] = [];
-                    acc[chapterName].push(topic.name);
-                    return acc;
-                  },
-                  {} as Record<string, string[]>,
-                )}
+                items={availableTopics
+                  .sort((a, b) => (a.serial || 0) - (b.serial || 0))
+                  .map((t) => t.name)}
+                groupedItems={availableTopics
+                  .sort((a, b) => (a.serial || 0) - (b.serial || 0))
+                  .reduce(
+                    (acc, topic: TopicItem) => {
+                      const chapterName =
+                        availableChapters.find((c) => c.id === topic.chapter_id)
+                          ?.name || "Other";
+                      if (!acc[chapterName]) acc[chapterName] = [];
+                      acc[chapterName].push(topic.name);
+                      return acc;
+                    },
+                    {} as Record<string, string[]>,
+                  )}
                 selectedItems={availableTopics
                   .filter((t) => selectedTopics.includes(t.id))
                   .map((t) => t.name)}
                 onChange={(names) =>
-                  handleTopicSelectionChange('topics', names)
+                  handleTopicSelectionChange("topics", names)
                 }
                 disabled={selectedChapters.length === 0}
                 emptyLabel="আগে অধ্যায় নির্বাচন করো"
@@ -551,7 +574,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         }
         subjects={availableSubjects.map((s) => ({
           id: s.id,
-          name: s.label || s.name || '',
+          name: s.label || s.name || "",
         }))}
       />
 
