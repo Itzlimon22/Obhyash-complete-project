@@ -2,6 +2,7 @@ import React from "react";
 import { Flag, CheckCircle2, Loader2, Eye } from "lucide-react";
 import { Report } from "@/lib/types";
 import { ReportStatusBadge } from "./shared";
+import LatexText from "@/components/student/ui/common/LatexText";
 
 interface ReportTableProps {
   reports: Report[];
