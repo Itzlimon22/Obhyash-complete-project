@@ -517,6 +517,25 @@ export default function StudentRoot({
     setActiveTab("profile");
   };
 
+  // Browser back/forward button support
+  useEffect(() => {
+    const onPopState = (e: PopStateEvent) => {
+      // Guard: don't navigate away mid-exam
+      if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
+        // Push the current state back so the URL stays correct
+        window.history.pushState({ tab: activeTab }, '', '/' + activeTab);
+        setNavWarning({ isOpen: true, targetTab: null, action: 'tab' });
+        return;
+      }
+      const tab = e.state?.tab || window.location.pathname.replace(/^\//, '') || 'dashboard';
+      const resolved = validTabs.includes(tab) ? tab : 'dashboard';
+      setActiveTab(resolved);
+      sessionStorage.setItem('obhyash_active_tab', resolved);
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [appState, activeTab]);
+
   // Navigation Logic
   const handleTabChange = (tab: string) => {
     if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
@@ -527,12 +546,11 @@ export default function StudentRoot({
         setIsReviewingHistory(false);
       }
 
-      // if (tab === 'complaint') ... removed to allow internal navigation
-
       setActiveTab(tab);
       sessionStorage.setItem("obhyash_active_tab", tab);
       if (typeof window !== "undefined" && validTabs.includes(tab)) {
-        window.history.pushState(null, "", "/" + tab);
+        // Pass tab in state so popstate can restore it without parsing the URL
+        window.history.pushState({ tab }, "", "/" + tab);
       }
     }
   };

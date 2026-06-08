@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { usePersistedState } from '@/hooks/use-persisted-state';
 import { UserProfile } from 'lib/types';
 import { LEVELS, LevelType } from './leaderboard/leaderboardData';
 import LevelSelector from './leaderboard/LevelSelector';
@@ -25,11 +26,11 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
   const { loading: authLoading } = useAuth();
 
   const [currentUser, setCurrentUser] = useState<UserProfile | undefined>(undefined);
-  const [selectedLevel, setSelectedLevel] = useState<LevelType>('Rookie');
+  const [selectedLevel, setSelectedLevel] = usePersistedState<LevelType>('lb_selected_level', 'Rookie');
   const [leaderboardUsers, setLeaderboardUsers] = useState<UserProfile[]>([]);
   const [levelCounts, setLevelCounts] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'level' | 'college' | 'rankings'>('level');
+  const [viewMode, setViewMode] = usePersistedState<'level' | 'college' | 'rankings'>('lb_view_mode', 'level');
   const [collegeUsers, setCollegeUsers] = useState<UserProfile[]>([]);
   const [isLoadingCollege, setIsLoadingCollege] = useState(false);
   const [instituteRankings, setInstituteRankings] = useState<InstituteRankEntry[]>([]);

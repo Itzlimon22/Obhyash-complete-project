@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { usePersistedState } from '@/hooks/use-persisted-state';
 import {
   AreaChart,
   Area,
@@ -30,7 +31,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
   history,
   onSubjectClick,
 }) => {
-  const [timeFilter, setTimeFilter] = useState<'all' | 'month' | 'week'>('all');
+  const [timeFilter, setTimeFilter] = usePersistedState<'all' | 'month' | 'week'>('analysis_time_filter', 'all');
 
   const { user, loading: authLoading } = useAuth();
 
