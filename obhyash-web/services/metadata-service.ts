@@ -207,9 +207,8 @@ export const getChapters = async (
   if (isSupabaseConfigured() && supabase) {
     const { data, error } = await supabase
       .from('chapters')
-      .select('id, name, serial')
+      .select('id, name')
       .eq('subject_id', subjectId)
-      .order('serial', { ascending: true, nullsFirst: false })
       .order('name', { ascending: true });
 
     if (!error && data) return data;
@@ -237,9 +236,7 @@ export const getTopics = async (
       query = query.eq('chapter_id', chapterIds);
     }
 
-    const { data, error } = await query
-      .order('serial', { ascending: true, nullsFirst: false })
-      .order('name', { ascending: true });
+    const { data, error } = await query.order('serial', { ascending: true });
 
     if (!error && data) return data;
     console.error('Error fetching topics:', error);
