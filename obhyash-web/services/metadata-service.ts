@@ -208,10 +208,30 @@ export const getChapters = async (
     const { data, error } = await supabase
       .from('chapters')
       .select('id, name')
-      .eq('subject_id', subjectId)
-      .order('name', { ascending: true });
+      .eq('subject_id', subjectId);
 
-    if (!error && data) return data;
+    if (!error && data) {
+      // Sort chapters by their position in the hsc.ts canonical definition.
+      // The chapters table has no serial column, so we derive order from hsc.ts.
+      try {
+        const { hscSubjects } = await import('@/lib/data/hsc');
+        const hscSubject = hscSubjects.find((s) => s.id === subjectId);
+        if (hscSubject) {
+          const orderMap = new Map<string, number>();
+          hscSubject.chapters.forEach((ch: { name: string }, idx: number) => {
+            orderMap.set(ch.name.trim().toLowerCase(), idx);
+          });
+          return [...data].sort((a, b) => {
+            const ai = orderMap.get(a.name.trim().toLowerCase()) ?? 9999;
+            const bi = orderMap.get(b.name.trim().toLowerCase()) ?? 9999;
+            return ai - bi;
+          });
+        }
+      } catch {
+        // hsc.ts unavailable — return DB order as-is
+      }
+      return data;
+    }
     console.error('Error fetching chapters:', error);
   }
 
