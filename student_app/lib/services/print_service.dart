@@ -308,8 +308,8 @@ class PrintService {
         "sub": details.subject.length > 10
             ? details.subject.substring(0, 10)
             : details.subject,
-        "type": (details.examType != null && details.examType!.length > 5)
-            ? details.examType!.substring(0, 5)
+        "type": (details.examType.length > 5)
+            ? details.examType.substring(0, 5)
             : details.examType,
         "pg": page + 1,
         "tot": totalPages,
@@ -777,7 +777,7 @@ class PrintService {
           }).join('')}
                   </ul>
                   <div class="explanation-box">
-                     <span class="exp-label">Explanation:</span> ${_renderLatex(q.explanation?.isEmpty == true ? 'N/A' : q.explanation)}
+                     <span class="exp-label">Explanation:</span> ${_renderLatex(q.explanation.isEmpty == true ? 'N/A' : q.explanation)}
                   </div>
                 </div>
               ''';

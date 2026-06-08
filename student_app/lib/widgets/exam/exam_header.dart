@@ -202,9 +202,9 @@ class ExamHeader extends StatelessWidget {
                     child: Switch(
                       value: isOmrMode,
                       onChanged: (val) => onToggleOmr(),
-                      activeColor: Colors.indigo,
-                      trackColor: MaterialStateProperty.resolveWith((states) {
-                        if (!states.contains(MaterialState.selected)) {
+                      activeThumbColor: Colors.indigo,
+                      trackColor: WidgetStateProperty.resolveWith((states) {
+                        if (!states.contains(WidgetState.selected)) {
                           return isDark
                               ? Colors.blueGrey[600]
                               : Colors.blueGrey[300];

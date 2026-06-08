@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/exam_types.dart';
-import 'result_summary_page.dart';
 
 class ExamHistoryPage extends StatefulWidget {
   final List<ExamResult> history;

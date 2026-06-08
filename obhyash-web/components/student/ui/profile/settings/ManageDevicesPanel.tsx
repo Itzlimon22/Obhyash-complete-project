@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 import {
   Monitor,
   Smartphone,
@@ -9,33 +9,31 @@ import {
   Loader2,
   RefreshCw,
   ShieldCheck,
-} from 'lucide-react';
-import { getDeviceToken } from '@/services/device-session-service';
-import { useAuth } from '@/components/auth/AuthProvider';
+} from "lucide-react";
+import { getDeviceToken } from "@/services/device-session-service";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 interface Device {
   id: string;
   device_name: string;
-  device_type: 'web' | 'mobile' | 'tablet';
+  device_type: "web" | "mobile" | "tablet";
   ip_address: string | null;
   last_active: string;
   created_at: string;
   device_token: string;
 }
 
-const DEVICE_LIMIT = 2;
-
 function DeviceIcon({ type }: { type: string }) {
-  const cls = 'w-5 h-5';
-  if (type === 'mobile') return <Smartphone className={cls} />;
-  if (type === 'tablet') return <Tablet className={cls} />;
+  const cls = "w-5 h-5";
+  if (type === "mobile") return <Smartphone className={cls} />;
+  if (type === "tablet") return <Tablet className={cls} />;
   return <Monitor className={cls} />;
 }
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'এইমাত্র';
+  if (mins < 1) return "এইমাত্র";
   if (mins < 60) return `${mins} মিনিট আগে`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs} ঘণ্টা আগে`;
@@ -52,8 +50,8 @@ export default function ManageDevicesPanel({ userId }: { userId: string }) {
   const fetchDevices = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/devices');
-      if (!res.ok) throw new Error('Failed to load');
+      const res = await fetch("/api/devices");
+      if (!res.ok) throw new Error("Failed to load");
       const { devices: data } = (await res.json()) as { devices: Device[] };
       setDevices(data ?? []);
     } catch {
@@ -70,12 +68,12 @@ export default function ManageDevicesPanel({ userId }: { userId: string }) {
   const handleRemove = async (deviceId: string, isCurrent: boolean) => {
     setRemovingId(deviceId);
     try {
-      const res = await fetch('/api/devices', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/devices", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ device_id: deviceId }),
       });
-      if (!res.ok) throw new Error('Failed to remove');
+      if (!res.ok) throw new Error("Failed to remove");
       setDevices((prev) => prev.filter((d) => d.id !== deviceId));
       if (isCurrent) {
         // Removed our own device — sign out immediately
@@ -88,8 +86,6 @@ export default function ManageDevicesPanel({ userId }: { userId: string }) {
     }
   };
 
-  const used = devices.length;
-
   return (
     <div className="space-y-4 animate-fade-in">
       {/* Header card */}
@@ -97,39 +93,14 @@ export default function ManageDevicesPanel({ userId }: { userId: string }) {
         <div className="px-6 py-4 border-b border-green-900 bg-green-800 flex items-center justify-between">
           <div>
             <h3 className="text-lg font-bold text-white">লগইন ডিভাইস</h3>
-            <p className="text-xs text-green-200 mt-0.5">
-              সর্বোচ্চ {DEVICE_LIMIT}টি ডিভাইস একসাথে লগইন রাখতে পারবে
-            </p>
           </div>
           <button
             onClick={fetchDevices}
             disabled={loading}
             className="p-2 rounded-xl text-green-200 hover:text-white hover:bg-green-700 transition-all disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>
-        </div>
-
-        {/* Capacity bar */}
-        <div className="px-6 py-4 border-b border-neutral-100 dark:border-neutral-800">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-              ব্যবহৃত স্লট
-            </span>
-            <span
-              className={`text-sm font-bold ${used >= DEVICE_LIMIT ? 'text-red-600' : 'text-green-800 dark:text-green-400'}`}
-            >
-              {used} / {DEVICE_LIMIT}
-            </span>
-          </div>
-          <div className="h-2.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${used >= DEVICE_LIMIT ? 'bg-red-600' : 'bg-green-800'}`}
-              style={{
-                width: `${Math.min((used / DEVICE_LIMIT) * 100, 100)}%`,
-              }}
-            />
-          </div>
         </div>
 
         {/* Device list */}
@@ -153,13 +124,13 @@ export default function ManageDevicesPanel({ userId }: { userId: string }) {
                   key={device.id}
                   className={`flex items-center gap-4 p-4 rounded-xl border transition-all ${
                     isCurrent
-                      ? 'border-green-700 dark:border-green-800 bg-green-50 dark:bg-green-950/30'
-                      : 'border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30'
+                      ? "border-green-700 dark:border-green-800 bg-green-50 dark:bg-green-950/30"
+                      : "border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30"
                   }`}
                 >
                   {/* Icon */}
                   <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isCurrent ? 'bg-green-800 text-white' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400'}`}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isCurrent ? "bg-green-800 text-white" : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400"}`}
                   >
                     <DeviceIcon type={device.device_type} />
                   </div>
@@ -192,7 +163,7 @@ export default function ManageDevicesPanel({ userId }: { userId: string }) {
                     onClick={() => handleRemove(device.id, isCurrent)}
                     disabled={removingId === device.id}
                     title={
-                      isCurrent ? 'এই ডিভাইস থেকে লগ আউট হবে' : 'ডিভাইস সরাও'
+                      isCurrent ? "এই ডিভাইস থেকে লগ আউট হবে" : "ডিভাইস সরাও"
                     }
                     className="shrink-0 p-2 rounded-xl text-neutral-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all disabled:opacity-50"
                   >

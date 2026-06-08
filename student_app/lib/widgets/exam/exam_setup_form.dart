@@ -257,7 +257,7 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
           _loadingSubjects
               ? const Center(child: CircularProgressIndicator())
               : DropdownButtonFormField<String>(
-                  value: _selectedSubject,
+                  initialValue: _selectedSubject,
                   items: _subjectsData.map((s) {
                     return DropdownMenuItem(
                       value: s['name'].toString(),
@@ -291,7 +291,7 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
                         ),
                       )
                     : DropdownButtonFormField<String>(
-                        value: _selectedChapter,
+                        initialValue: _selectedChapter,
                         items: _chaptersData.map((c) {
                           return DropdownMenuItem(
                             value: c['name'].toString(),
@@ -323,7 +323,7 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
                         ),
                       )
                     : DropdownButtonFormField<String>(
-                        value: _selectedTopic,
+                        initialValue: _selectedTopic,
                         items: _topicsData.map((t) {
                           return DropdownMenuItem(
                             value: t['name'].toString(),
@@ -429,7 +429,7 @@ class _ExamSetupFormState extends State<ExamSetupForm> {
 
           // 5. Difficulty
           DropdownButtonFormField<String>(
-            value: _selectedDifficulty,
+            initialValue: _selectedDifficulty,
             items: _difficulties
                 .map((d) => DropdownMenuItem(value: d, child: Text(d)))
                 .toList(),
