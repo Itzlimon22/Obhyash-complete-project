@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 // Types & Services
 import {
@@ -10,71 +10,69 @@ import {
   ExamConfig,
   ExamResult,
   Question,
-} from '@/lib/types';
+} from "@/lib/types";
 import {
   downloadQuestionPaper,
   downloadResult,
-} from '@/services/download-service';
-import { updateUserProfile } from '@/services/database';
-import { calculateLevel } from '@/lib/utils';
+} from "@/services/download-service";
+import { updateUserProfile } from "@/services/database";
+import { calculateLevel } from "@/lib/utils";
 
 // Hooks
-import { useExamEngine } from '@/hooks/use-exam-engine';
-import { useBookmarks } from '@/hooks/use-bookmarks';
-import { getBookmarkedQuestions } from '@/services/bookmark-service';
-import { useSessionMonitor } from '@/hooks/use-session-monitor';
-// import { useDeviceSession } from '@/hooks/use-device-session'; // Removed as per request
-// import { ManageDevicesModal } from '@/components/auth/ManageDevicesModal'; // Removed as per request
+import { useExamEngine } from "@/hooks/use-exam-engine";
+import { useBookmarks } from "@/hooks/use-bookmarks";
+import { getBookmarkedQuestions } from "@/services/bookmark-service";
+import { useSessionMonitor } from "@/hooks/use-session-monitor";
 
 // Components - Layout & Common
-import AppLayout from '@/components/student/ui/layout/AppLayout';
-import TimeoutModal from '@/components/student/ui/TimeoutModal';
-import { toast } from 'sonner';
-import { celebration } from '@/lib/confetti';
-import StreakCelebration from '@/components/student/ui/common/StreakCelebration';
+import AppLayout from "@/components/student/ui/layout/AppLayout";
+import TimeoutModal from "@/components/student/ui/TimeoutModal";
+import { toast } from "sonner";
+import { celebration } from "@/lib/confetti";
+import StreakCelebration from "@/components/student/ui/common/StreakCelebration";
 
 // Features
-import Dashboard from '@/components/student/features/dashboard/Dashboard';
-import ExamTargetModal from '@/components/student/features/dashboard/ExamTargetModal';
+import Dashboard from "@/components/student/features/dashboard/Dashboard";
+import ExamTargetModal from "@/components/student/features/dashboard/ExamTargetModal";
 import {
   incrementDailyCompletions,
   addDailyMCQs,
-} from '@/components/student/features/dashboard/DailyGoalCard';
-import SubjectReportView from '@/components/student/features/dashboard/SubjectReportView';
-import LeaderboardView from '@/components/student/features/dashboard/LeaderboardView';
-import UserProfileView from '@/components/student/features/dashboard/UserProfileView';
-import { ComplaintView } from '@/components/student/features/complaint/ComplaintView';
-import AnalysisView from '@/components/student/features/dashboard/AnalysisView';
-import { PracticeDashboard } from '@/components/student/features/practice/PracticeDashboard';
-import NotificationsView from '@/components/student/features/notifications/NotificationsView';
+} from "@/components/student/features/dashboard/DailyGoalCard";
+import SubjectReportView from "@/components/student/features/dashboard/SubjectReportView";
+import LeaderboardView from "@/components/student/features/dashboard/LeaderboardView";
+import UserProfileView from "@/components/student/features/dashboard/UserProfileView";
+import { ComplaintView } from "@/components/student/features/complaint/ComplaintView";
+import AnalysisView from "@/components/student/features/dashboard/AnalysisView";
+import { PracticeDashboard } from "@/components/student/features/practice/PracticeDashboard";
+import NotificationsView from "@/components/student/features/notifications/NotificationsView";
 // Profile Features
-import MyProfileView from '@/components/student/ui/profile/MyProfileView';
-import SubscriptionView from '@/components/student/ui/profile/SubscriptionView';
-import SettingsView from '@/components/student/ui/profile/SettingsView';
-import AboutUsView from '@/components/student/ui/profile/AboutUsView';
+import MyProfileView from "@/components/student/ui/profile/MyProfileView";
+import SubscriptionView from "@/components/student/ui/profile/SubscriptionView";
+import SettingsView from "@/components/student/ui/profile/SettingsView";
+import AboutUsView from "@/components/student/ui/profile/AboutUsView";
 
 // Exam Features
-import { ExamSetupContainer } from '@/components/student/features/exam/setup/ExamSetupContainer';
+import { ExamSetupContainer } from "@/components/student/features/exam/setup/ExamSetupContainer";
 // import InstructionsView from '@/components/student/ui/InstructionsView'; // Deprecated in new flow
-import { ExamInstructionsView } from '@/components/student/features/exam/ExamInstructionsView';
-import ExamRunner from '@/components/student/features/exam/ExamRunner';
+import { ExamInstructionsView } from "@/components/student/features/exam/ExamInstructionsView";
+import ExamRunner from "@/components/student/features/exam/ExamRunner";
 
 // History & Results
-import ExamHistoryView from '@/components/student/features/history/ExamHistoryView';
-import ResultView from '@/components/student/ui/ResultView';
-import ResultSkeleton from '@/components/student/ui/results/ResultSkeleton';
-import ExamLoadingSkeleton from '@/components/student/ui/exam/ExamLoadingSkeleton';
+import ExamHistoryView from "@/components/student/features/history/ExamHistoryView";
+import ResultView from "@/components/student/ui/ResultView";
+import ResultSkeleton from "@/components/student/ui/results/ResultSkeleton";
+import ExamLoadingSkeleton from "@/components/student/ui/exam/ExamLoadingSkeleton";
 
 interface StudentRootProps {
   user: UserProfile;
-  theme: 'light' | 'dark';
+  theme: "light" | "dark";
   toggleTheme: () => void;
   onLogout: () => void;
   subjects?: { id: string; name: string; [key: string]: unknown }[];
 }
 
-import { useAuth } from '@/components/auth/AuthProvider';
-import InitialLoader from '@/components/student/ui/InitialLoader';
+import { useAuth } from "@/components/auth/AuthProvider";
+import InitialLoader from "@/components/student/ui/InitialLoader";
 
 export default function StudentRoot({
   user: initialUser,
@@ -167,26 +165,26 @@ export default function StudentRoot({
       } else if (!success) {
         // This usually falls into AppState.ERROR, but engine might throw specifically
         toast.error(
-          'দুঃখিত, কোনো প্রশ্ন পাওয়া যায়নি। অন্য টপিক নির্বাচন করো।',
+          "দুঃখিত, কোনো প্রশ্ন পাওয়া যায়নি। অন্য টপিক নির্বাচন করো।",
           {
-            description: 'No questions found for the selected criteria.',
+            description: "No questions found for the selected criteria.",
           },
         );
       }
 
       return success;
     } catch (e: unknown) {
-      console.error('Exam start failed', e);
+      console.error("Exam start failed", e);
       const errorMessage =
-        typeof e === 'object' && e !== null && 'message' in e
+        typeof e === "object" && e !== null && "message" in e
           ? String((e as { message?: string }).message)
-          : 'Unknown error starting exam';
-      const isNoQuestions = errorMessage.includes('No questions found');
+          : "Unknown error starting exam";
+      const isNoQuestions = errorMessage.includes("No questions found");
 
       toast.error(
         isNoQuestions
-          ? 'দুঃখিত, কোনো প্রশ্ন পাওয়া যায়নি। অন্য টপিক নির্বাচন করো।'
-          : 'পরীক্ষা শুরু করতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
+          ? "দুঃখিত, কোনো প্রশ্ন পাওয়া যায়নি। অন্য টপিক নির্বাচন করো।"
+          : "পরীক্ষা শুরু করতে সমস্যা হয়েছে। আবার চেষ্টা করো।",
         {
           description: errorMessage,
         },
@@ -198,28 +196,28 @@ export default function StudentRoot({
   // Global User State
   // Valid tabs matching our Next.js root routes
   const validTabs = [
-    'dashboard',
-    'setup',
-    'history',
-    'practice',
-    'leaderboard',
-    'analysis',
-    'complaint',
-    'notifications',
-    'about',
-    'subscription',
-    'profile',
-    'settings',
+    "dashboard",
+    "setup",
+    "history",
+    "practice",
+    "leaderboard",
+    "analysis",
+    "complaint",
+    "notifications",
+    "about",
+    "subscription",
+    "profile",
+    "settings",
   ];
 
   const [activeTab, setActiveTab] = useState(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       // Allow loading initial tab based on the URL (e.g. /practice -> practice)
-      const path = window.location.pathname.replace(/^\//, '');
+      const path = window.location.pathname.replace(/^\//, "");
       if (validTabs.includes(path)) return path;
-      return sessionStorage.getItem('obhyash_active_tab') || 'dashboard';
+      return sessionStorage.getItem("obhyash_active_tab") || "dashboard";
     }
-    return 'dashboard';
+    return "dashboard";
   });
 
   // Local state to track user updates (XP, level) that happen during session
@@ -284,7 +282,7 @@ export default function StudentRoot({
       try {
         // ✅ Immediately compute the display streak from existing data
         // This prevents stale streak showing in header before async check runs
-        const { getDisplayStreak } = await import('@/services/streak-service');
+        const { getDisplayStreak } = await import("@/services/streak-service");
         const displayStreak = getDisplayStreak(currentUser);
         if (isMounted && displayStreak !== (currentUser.streakCount || 0)) {
           setCurrentUser((prev) =>
@@ -294,7 +292,7 @@ export default function StudentRoot({
 
         // ✅ localStorage guard: use LOCAL date (matching streak-service logic)
         const now = new Date();
-        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
         const streakKey = `streak_checked_${currentUser.id}`;
         const lastCheckedDate = localStorage.getItem(streakKey);
 
@@ -303,7 +301,7 @@ export default function StudentRoot({
           localStorage.setItem(streakKey, today);
 
           const { checkAndUpdateStreak } =
-            await import('@/services/streak-service');
+            await import("@/services/streak-service");
           const updatedUser = await checkAndUpdateStreak(currentUser);
 
           if (updatedUser && isMounted) {
@@ -317,13 +315,13 @@ export default function StudentRoot({
         // Pass the userId directly to avoid an extra auth.getUser() round-trip
         // inside getExamHistory, which acquires the JS auth lock and blocks all
         // concurrent DB queries — causing the "keeps loading" state on the dashboard.
-        const { getExamHistory } = await import('@/services/database');
+        const { getExamHistory } = await import("@/services/database");
         const dbHistory = await getExamHistory(currentUser.id);
         if (dbHistory && isMounted) {
           setExamHistory(dbHistory);
         }
       } catch (err) {
-        console.error('Error in streak/history sync:', err);
+        console.error("Error in streak/history sync:", err);
       }
     };
 
@@ -337,7 +335,7 @@ export default function StudentRoot({
   // Resume detection: check for unfinished exam on mount
   useEffect(() => {
     try {
-      const raw = localStorage.getItem('obhyash_exam_draft');
+      const raw = localStorage.getItem("obhyash_exam_draft");
       if (!raw) return;
 
       const draft = JSON.parse(raw);
@@ -345,7 +343,7 @@ export default function StudentRoot({
       const THREE_HOURS = 3 * 60 * 60 * 1000;
 
       if (age > THREE_HOURS) {
-        localStorage.removeItem('obhyash_exam_draft');
+        localStorage.removeItem("obhyash_exam_draft");
         return;
       }
 
@@ -358,7 +356,7 @@ export default function StudentRoot({
         {
           duration: 15000,
           action: {
-            label: '↩ চালিয়ে যাও',
+            label: "↩ চালিয়ে যাও",
             onClick: () => {
               try {
                 setQuestions(draft.questions || []);
@@ -371,23 +369,23 @@ export default function StudentRoot({
                 // Resume with remaining time
                 const remainingTime = Math.max(draft.timeLeft || 60, 60); // at least 1 min
                 beginTimer(remainingTime);
-                toast.success('পরীক্ষা পুনরুদ্ধার হয়েছে!');
+                toast.success("পরীক্ষা পুনরুদ্ধার হয়েছে!");
               } catch {
-                toast.error('পরীক্ষা পুনরুদ্ধার করতে ব্যর্থ');
-                localStorage.removeItem('obhyash_exam_draft');
+                toast.error("পরীক্ষা পুনরুদ্ধার করতে ব্যর্থ");
+                localStorage.removeItem("obhyash_exam_draft");
               }
             },
           },
         },
       );
     } catch {
-      localStorage.removeItem('obhyash_exam_draft');
+      localStorage.removeItem("obhyash_exam_draft");
     }
   }, []);
 
   // Wrong answer retry handler
   const handleRetryWrongAnswers = useCallback(
-    (wrongQuestions: import('@/lib/types').Question[]) => {
+    (wrongQuestions: import("@/lib/types").Question[]) => {
       setQuestions(wrongQuestions);
       setUserAnswers({});
       setFlaggedQuestions(new Set());
@@ -407,8 +405,8 @@ export default function StudentRoot({
   const [navWarning, setNavWarning] = useState<{
     isOpen: boolean;
     targetTab: string | null;
-    action: 'tab' | 'logout';
-  }>({ isOpen: false, targetTab: null, action: 'tab' });
+    action: "tab" | "logout";
+  }>({ isOpen: false, targetTab: null, action: "tab" });
   const [isTimeoutModalOpen, setIsTimeoutModalOpen] = useState(false);
 
   // Exam Completion Logic
@@ -455,11 +453,11 @@ export default function StudentRoot({
         duration: 8000,
       });
     } else if (isPerfect) {
-      toast.success('অসাধারন! আপনি পারফেক্ট স্কোর করেছেন।', {
+      toast.success("অসাধারন! আপনি পারফেক্ট স্কোর করেছেন।", {
         description: `আপনি +${totalXpGained} XP অর্জন করেছেন! (বোনাস সহ)`,
       });
     } else {
-      toast.success('পরীক্ষা সম্পন্ন হয়েছে!', {
+      toast.success("পরীক্ষা সম্পন্ন হয়েছে!", {
         description: `আপনি +${totalXpGained} XP অর্জন করেছেন।`,
       });
     }
@@ -489,14 +487,14 @@ export default function StudentRoot({
         pendingConfig,
         savedAt: Date.now(),
       };
-      localStorage.setItem('obhyash_exam_draft', JSON.stringify(draft));
+      localStorage.setItem("obhyash_exam_draft", JSON.stringify(draft));
     }
   }, [userAnswers, flaggedQuestions, appState]);
 
   // Clear draft when exam completes or goes back to idle
   useEffect(() => {
     if (appState === AppState.COMPLETED || appState === AppState.IDLE) {
-      localStorage.removeItem('obhyash_exam_draft');
+      localStorage.removeItem("obhyash_exam_draft");
     }
   }, [appState]);
 
@@ -509,20 +507,20 @@ export default function StudentRoot({
     const result = await updateUserProfile(newUser);
 
     if (result.success) {
-      console.log('✅ Profile updated successfully');
+      console.log("✅ Profile updated successfully");
       // Success is already shown in SettingsView
     } else {
-      console.error('❌ Profile update failed:', result.error);
+      console.error("❌ Profile update failed:", result.error);
       alert(`প্রোফাইল আপডেট করতে সমস্যা: ${result.error}`);
     }
 
-    setActiveTab('profile');
+    setActiveTab("profile");
   };
 
   // Navigation Logic
   const handleTabChange = (tab: string) => {
     if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
-      setNavWarning({ isOpen: true, targetTab: tab, action: 'tab' });
+      setNavWarning({ isOpen: true, targetTab: tab, action: "tab" });
     } else {
       if (appState === AppState.COMPLETED) {
         setAppState(AppState.IDLE);
@@ -532,16 +530,16 @@ export default function StudentRoot({
       // if (tab === 'complaint') ... removed to allow internal navigation
 
       setActiveTab(tab);
-      sessionStorage.setItem('obhyash_active_tab', tab);
-      if (typeof window !== 'undefined' && validTabs.includes(tab)) {
-        window.history.pushState(null, '', '/' + tab);
+      sessionStorage.setItem("obhyash_active_tab", tab);
+      if (typeof window !== "undefined" && validTabs.includes(tab)) {
+        window.history.pushState(null, "", "/" + tab);
       }
     }
   };
 
   const handleLogoutClick = async () => {
     if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
-      setNavWarning({ isOpen: true, targetTab: null, action: 'logout' });
+      setNavWarning({ isOpen: true, targetTab: null, action: "logout" });
     } else {
       onLogout();
     }
@@ -549,12 +547,12 @@ export default function StudentRoot({
 
   const confirmNavigation = async () => {
     setAppState(AppState.IDLE);
-    if (navWarning.action === 'tab' && navWarning.targetTab) {
+    if (navWarning.action === "tab" && navWarning.targetTab) {
       setActiveTab(navWarning.targetTab);
-    } else if (navWarning.action === 'logout') {
+    } else if (navWarning.action === "logout") {
       onLogout();
     }
-    setNavWarning({ isOpen: false, targetTab: null, action: 'tab' });
+    setNavWarning({ isOpen: false, targetTab: null, action: "tab" });
   };
 
   const commonLayoutProps = {
@@ -562,7 +560,7 @@ export default function StudentRoot({
     onTabChange: handleTabChange,
     onLogout: handleLogoutClick,
     toggleTheme: toggleTheme,
-    isDarkMode: theme === 'dark',
+    isDarkMode: theme === "dark",
   };
 
   const handleExamSubmit = async (manual = true) => {
@@ -577,21 +575,21 @@ export default function StudentRoot({
 
   const renderApp = () => {
     if (appState === AppState.IDLE) {
-      if (activeTab === 'dashboard') {
+      if (activeTab === "dashboard") {
         return (
           <AppLayout activeTab={activeTab} {...commonLayoutProps}>
             <Dashboard
               user={currentUser}
-              onMockExamClick={() => setActiveTab('setup')}
-              onHistoryClick={() => setActiveTab('history')}
+              onMockExamClick={() => setActiveTab("setup")}
+              onHistoryClick={() => setActiveTab("history")}
               onSubjectClick={(subject) => {
                 setSelectedSubjectReport(subject);
-                setActiveTab('subject_report');
+                setActiveTab("subject_report");
               }}
-              onLeaderboardClick={() => setActiveTab('leaderboard')}
-              onAnalysisClick={() => setActiveTab('analysis')}
-              onPracticeClick={() => handleTabChange('practice')}
-              onBlogClick={() => router.push('/blog')}
+              onLeaderboardClick={() => setActiveTab("leaderboard")}
+              onAnalysisClick={() => setActiveTab("analysis")}
+              onPracticeClick={() => handleTabChange("practice")}
+              onBlogClick={() => router.push("/blog")}
               history={examHistory}
               examTarget={currentUser.exam_target}
               onChangeTarget={() => setShowTargetModal(true)}
@@ -600,7 +598,7 @@ export default function StudentRoot({
         );
       }
 
-      if (activeTab === 'setup') {
+      if (activeTab === "setup") {
         return (
           <AppLayout
             activeTab={activeTab}
@@ -615,7 +613,7 @@ export default function StudentRoot({
         );
       }
 
-      if (activeTab === 'history') {
+      if (activeTab === "history") {
         return (
           <AppLayout
             activeTab={activeTab}
@@ -624,16 +622,16 @@ export default function StudentRoot({
           >
             <ExamHistoryView
               history={examHistory}
-              onBack={() => setActiveTab('dashboard')}
+              onBack={() => setActiveTab("dashboard")}
               onClearHistory={async () => {
                 const { clearExamHistory } =
-                  await import('@/services/database');
+                  await import("@/services/database");
                 const success = await clearExamHistory();
                 if (success) {
                   setExamHistory([]);
-                  toast.success('ইতিহাস মুছে ফেলা হয়েছে');
+                  toast.success("ইতিহাস মুছে ফেলা হয়েছে");
                 } else {
-                  toast.error('ইতিহাস মুছতে সমস্যা হয়েছে');
+                  toast.error("ইতিহাস মুছতে সমস্যা হয়েছে");
                 }
               }}
               onViewResult={(res) => {
@@ -643,9 +641,9 @@ export default function StudentRoot({
                 setExamDetails({
                   subject: res.subject,
                   subjectLabel: res.subjectLabel || res.subject,
-                  examType: res.examType || '',
-                  chapters: '',
-                  topics: '',
+                  examType: res.examType || "",
+                  chapters: "",
+                  topics: "",
                   totalQuestions: res.totalQuestions,
                   durationMinutes: 0,
                   totalMarks: res.totalMarks,
@@ -655,7 +653,7 @@ export default function StudentRoot({
                 setIsReviewingHistory(true);
                 setAppState(AppState.COMPLETED);
               }}
-              onRecheckRequest={(id) => alert('Recheck requested for: ' + id)}
+              onRecheckRequest={(id) => alert("Recheck requested for: " + id)}
               bookmarkedIds={bookmarkedIds}
               onToggleBookmark={toggleBookmark}
               bookmarkedQuestions={bookmarkedQuestions}
@@ -664,7 +662,7 @@ export default function StudentRoot({
         );
       }
 
-      if (activeTab === 'leaderboard') {
+      if (activeTab === "leaderboard") {
         return (
           <AppLayout
             activeTab={activeTab}
@@ -675,31 +673,31 @@ export default function StudentRoot({
               onUserClick={(user: UserProfile, rank: number) => {
                 setSelectedUserProfile(user);
                 setSelectedUserRank(rank || 0);
-                setActiveTab('user_profile');
+                setActiveTab("user_profile");
               }}
             />
           </AppLayout>
         );
       }
 
-      if (activeTab === 'profile') {
+      if (activeTab === "profile") {
         return (
           <AppLayout activeTab="" {...commonLayoutProps} title="আমার প্রোফাইল">
             <MyProfileView
               user={currentUser!}
               history={examHistory}
-              onEditProfile={() => setActiveTab('settings')}
+              onEditProfile={() => setActiveTab("settings")}
               onSubjectClick={(subject) => {
                 setSelectedSubjectReport(subject);
-                setActiveTab('subject_report');
+                setActiveTab("subject_report");
               }}
-              onViewNotifications={() => setActiveTab('notifications')}
+              onViewNotifications={() => setActiveTab("notifications")}
             />
           </AppLayout>
         );
       }
 
-      if (activeTab === 'settings') {
+      if (activeTab === "settings") {
         return (
           <AppLayout activeTab="" {...commonLayoutProps} title="সেটিংস">
             <SettingsView
@@ -708,13 +706,13 @@ export default function StudentRoot({
               onNavigate={(tab) => handleTabChange(tab)}
               onLogout={handleLogoutClick}
               toggleTheme={toggleTheme}
-              isDarkMode={theme === 'dark'}
+              isDarkMode={theme === "dark"}
             />
           </AppLayout>
         );
       }
 
-      if (activeTab === 'practice') {
+      if (activeTab === "practice") {
         return (
           <AppLayout
             activeTab={activeTab}
@@ -724,7 +722,7 @@ export default function StudentRoot({
             <PracticeDashboard
               history={examHistory}
               onStartPractice={startCustomExam}
-              onNavigateToMock={() => setActiveTab('setup')}
+              onNavigateToMock={() => setActiveTab("setup")}
               subjects={subjects.map((s) => s.id)}
               currentUser={currentUser}
             />
@@ -732,7 +730,7 @@ export default function StudentRoot({
         );
       }
 
-      if (activeTab === 'analysis') {
+      if (activeTab === "analysis") {
         return (
           <AppLayout
             activeTab={activeTab}
@@ -743,14 +741,14 @@ export default function StudentRoot({
               history={examHistory}
               onSubjectClick={(subject) => {
                 setSelectedSubjectReport(subject);
-                setActiveTab('subject_report');
+                setActiveTab("subject_report");
               }}
             />
           </AppLayout>
         );
       }
 
-      if (activeTab === 'complaint') {
+      if (activeTab === "complaint") {
         return (
           <AppLayout
             activeTab={activeTab}
@@ -762,7 +760,7 @@ export default function StudentRoot({
         );
       }
 
-      if (activeTab === 'notifications') {
+      if (activeTab === "notifications") {
         return (
           <AppLayout activeTab="" {...commonLayoutProps} title="নোটিফিকেশন">
             <NotificationsView />
@@ -770,7 +768,7 @@ export default function StudentRoot({
         );
       }
 
-      if (activeTab === 'about') {
+      if (activeTab === "about") {
         return (
           <AppLayout
             activeTab=""
@@ -782,13 +780,13 @@ export default function StudentRoot({
         );
       }
 
-      if (activeTab === 'subscription')
+      if (activeTab === "subscription")
         return (
           <AppLayout activeTab="" {...commonLayoutProps} title="আপগ্রেড">
             <SubscriptionView />
           </AppLayout>
         );
-      if (activeTab === 'user_profile' && selectedUserProfile)
+      if (activeTab === "user_profile" && selectedUserProfile)
         return (
           <AppLayout
             activeTab="leaderboard"
@@ -799,11 +797,11 @@ export default function StudentRoot({
               user={selectedUserProfile}
               currentUser={currentUser}
               rank={selectedUserRank}
-              onBack={() => setActiveTab('leaderboard')}
+              onBack={() => setActiveTab("leaderboard")}
             />
           </AppLayout>
         );
-      if (activeTab === 'subject_report' && selectedSubjectReport)
+      if (activeTab === "subject_report" && selectedSubjectReport)
         return (
           <AppLayout
             activeTab="dashboard"
@@ -813,7 +811,7 @@ export default function StudentRoot({
             <SubjectReportView
               subject={selectedSubjectReport}
               history={examHistory}
-              onBack={() => setActiveTab('dashboard')}
+              onBack={() => setActiveTab("dashboard")}
             />
           </AppLayout>
         );
@@ -876,8 +874,8 @@ export default function StudentRoot({
             onExit={() =>
               setNavWarning({
                 isOpen: true,
-                targetTab: 'dashboard',
-                action: 'tab',
+                targetTab: "dashboard",
+                action: "tab",
               })
             }
             onTimeoutReattempt={() => {
@@ -895,7 +893,7 @@ export default function StudentRoot({
             handleTabChange={handleTabChange}
             handleLogoutClick={handleLogoutClick}
             toggleTheme={toggleTheme}
-            isDarkMode={theme === 'dark'}
+            isDarkMode={theme === "dark"}
             bookmarkedIds={bookmarkedIds}
             onToggleBookmark={toggleBookmark}
           />
@@ -945,7 +943,7 @@ export default function StudentRoot({
           onTabChange={handleTabChange}
           onLogout={handleLogoutClick}
           toggleTheme={toggleTheme}
-          isDarkMode={theme === 'dark'}
+          isDarkMode={theme === "dark"}
           title="ফলাফল"
           user={currentUser!}
         >
@@ -958,15 +956,15 @@ export default function StudentRoot({
               setAppState(AppState.IDLE);
               setIsReviewingHistory(false);
             }}
-            isDarkMode={theme === 'dark'}
+            isDarkMode={theme === "dark"}
             onToggleTheme={toggleTheme}
             isHistoryMode={isReviewingHistory}
             negativeMarking={examDetails?.negativeMarking}
             submissionType={
               isOmrMode ||
-              examHistory[examHistory.length - 1]?.submissionType === 'script'
-                ? 'script'
-                : 'digital'
+              examHistory[examHistory.length - 1]?.submissionType === "script"
+                ? "script"
+                : "digital"
             }
             onDownloadQuestionPaper={() =>
               examDetails && downloadQuestionPaper(examDetails, questions)
@@ -1013,17 +1011,6 @@ export default function StudentRoot({
   return (
     <>
       {renderApp()}
-      {/* 
-      {deviceSession.blocked && deviceSession.limitData && (
-        <ManageDevicesModal
-          open={true}
-          limit={deviceSession.limitData.limit}
-          plan={deviceSession.limitData.plan}
-          initialDevices={deviceSession.limitData.devices as never}
-          onDeviceRemoved={() => window.location.reload()}
-        />
-      )}
-      */}
       {showStreakCelebration && (
         <StreakCelebration
           count={newStreakCount}

@@ -1,13 +1,11 @@
-'use client';
+"use client";
 
-import TeacherSidebar from '@/components/teacher/layout/TeacherSidebar';
-import { useSessionMonitor } from '@/hooks/use-session-monitor';
-// import { useDeviceSession } from '@/hooks/use-device-session'; 
-// import { ManageDevicesModal } from '@/components/auth/ManageDevicesModal';
-import { useAuth } from '@/components/auth/AuthProvider';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import TeacherSidebar from "@/components/teacher/layout/TeacherSidebar";
+import { useSessionMonitor } from "@/hooks/use-session-monitor";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function TeacherLayout({
   children,
@@ -28,23 +26,20 @@ export default function TeacherLayout({
     onForcedSignOut: signOut,
   });
 
-  // Device session limiting (Netflix-style) - DISABLED
-  // const deviceSession = useDeviceSession(profile?.id || user?.id);
-
   // Redirect if definitely not a teacher once loading is done
   useEffect(() => {
     if (mounted && !loading && !user) {
-      router.replace('/login');
+      router.replace("/login");
     } else if (
       mounted &&
       !loading &&
       user &&
       profile &&
-      profile.role !== 'Teacher'
+      profile.role !== "Teacher"
     ) {
       // If admin, they might be visiting. But if not teacher/admin, redirect
-      if (profile.role === 'Student') router.replace('/dashboard');
-      else if (profile.role === 'Admin') {
+      if (profile.role === "Student") router.replace("/dashboard");
+      else if (profile.role === "Admin") {
         // Allow admin for now? Or keep separate.
         // For strictness, if this is teacher-only layout:
         // router.replace('/admin/dashboard');
@@ -69,35 +64,22 @@ export default function TeacherLayout({
   // Prevent flash before redirect
   if (
     !user ||
-    (profile && profile.role !== 'Teacher' && profile.role !== 'Admin')
+    (profile && profile.role !== "Teacher" && profile.role !== "Admin")
   ) {
     return null;
   }
 
   return (
-    <>
-      {/* 
-      {deviceSession.blocked && deviceSession.limitData && (
-        <ManageDevicesModal
-          open={true}
-          limit={deviceSession.limitData.limit}
-          plan={deviceSession.limitData.plan}
-          initialDevices={deviceSession.limitData.devices as never}
-          onDeviceRemoved={() => window.location.reload()}
-        />
-      )}
-      */}
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
-        <TeacherSidebar />
-        {/* Main content area offset by sidebar width */}
-        <div className="lg:pl-72 transition-all duration-300">
-          {/* Top spacer for mobile menu button */}
-          <div className="h-14 lg:h-0" />
-          <main className="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto min-w-0 w-full overflow-x-hidden">
-            {children}
-          </main>
-        </div>
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+      <TeacherSidebar />
+      {/* Main content area offset by sidebar width */}
+      <div className="lg:pl-72 transition-all duration-300">
+        {/* Top spacer for mobile menu button */}
+        <div className="h-14 lg:h-0" />
+        <main className="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto min-w-0 w-full overflow-x-hidden">
+          {children}
+        </main>
       </div>
-    </>
+    </div>
   );
 }

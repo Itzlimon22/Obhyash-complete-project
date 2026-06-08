@@ -1,6 +1,8 @@
 /**
  * Device Session Service
- * Netflix-style device limiting — max N devices per subscription plan.
+ *
+ * Tracks devices where users are logged in.
+ * Device limits have been disabled - users can log in on multiple devices simultaneously.
  *
  * Device identity is a UUID generated once per browser and stored in localStorage.
  * - Survives page refreshes, tab closes, and browser restarts.
