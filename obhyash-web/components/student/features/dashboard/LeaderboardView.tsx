@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { UserProfile } from 'lib/types';
 import { LEVELS, LevelType } from './leaderboard/leaderboardData';
 import LevelSelector from './leaderboard/LevelSelector';
-import UserProgress from './leaderboard/UserProgress';
 import LeaderboardTable from './leaderboard/LeaderboardTable';
 import {
   getLeaderboardUsers,
@@ -64,21 +63,25 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
 
   useEffect(() => {
     if (viewMode !== 'college' || !currentUser?.institute) return;
-    setIsLoadingCollege(true);
-    getInstituteLeaderboardUsers(currentUser.institute).then((users) => {
+    const fetchCollege = async () => {
+      setIsLoadingCollege(true);
+      const users = await getInstituteLeaderboardUsers(currentUser.institute!);
       setCollegeUsers(users);
       setIsLoadingCollege(false);
-    });
+    };
+    fetchCollege();
   }, [viewMode, currentUser?.institute]);
 
   useEffect(() => {
     if (viewMode !== 'rankings') return;
     if (instituteRankings.length > 0) return;
-    setIsLoadingRankings(true);
-    getInstituteRankings().then((data) => {
+    const fetchRankings = async () => {
+      setIsLoadingRankings(true);
+      const data = await getInstituteRankings();
       setInstituteRankings(data);
       setIsLoadingRankings(false);
-    });
+    };
+    fetchRankings();
   }, [viewMode]);
 
   const userRankInOwnLevel = useMemo(() => {
@@ -131,9 +134,7 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
               currentUser={currentUser}
               levelCounts={levelCounts}
             />
-            {currentUser && (
-              <UserProgress currentUser={currentUser} userRankInOwnLevel={userRankInOwnLevel} />
-            )}
+
             <LeaderboardTable
               users={leaderboardUsers}
               selectedLevel={selectedLevel}
