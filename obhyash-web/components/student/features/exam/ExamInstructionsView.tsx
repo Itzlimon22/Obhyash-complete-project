@@ -113,48 +113,44 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
           </p>
         </div>
 
-        <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
+        <div className="grid grid-cols-2 gap-px bg-neutral-100 dark:bg-neutral-800">
           <RuleRow
             iconBg="bg-emerald-100 dark:bg-emerald-900/30"
-            icon={<Clock size={14} className="text-emerald-700 dark:text-emerald-400" />}
+            icon={<Clock size={13} className="text-emerald-700 dark:text-emerald-400" />}
             title="সময় ব্যবস্থাপনা"
-            desc={`মোট ${config.durationMinutes} মিনিট সময় আছে। সময় শেষ হলে পরীক্ষা স্বয়ংক্রিয়ভাবে জমা হয়ে যাবে।`}
+            desc={`${config.durationMinutes} মিনিট — সময় শেষে স্বয়ংক্রিয় জমা`}
           />
           <RuleRow
             iconBg={hasNegative ? 'bg-red-100 dark:bg-red-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'}
             icon={
               hasNegative
-                ? <MinusCircle size={14} className="text-red-600 dark:text-red-400" />
-                : <CheckCircle2 size={14} className="text-emerald-700 dark:text-emerald-400" />
+                ? <MinusCircle size={13} className="text-red-600 dark:text-red-400" />
+                : <CheckCircle2 size={13} className="text-emerald-700 dark:text-emerald-400" />
             }
             title="নেগেটিভ মার্কিং"
-            desc={
-              hasNegative
-                ? `প্রতিটি ভুল উত্তরের জন্য ${config.negativeMarking} নম্বর কাটা যাবে। নিশ্চিত না হলে উত্তর না দেওয়াই ভালো।`
-                : 'এই পরীক্ষায় কোনো নেগেটিভ মার্কিং নেই। নির্ভয়ে সব প্রশ্নের উত্তর দাও।'
-            }
-            badge={hasNegative ? `−${config.negativeMarking}` : undefined}
-            badgeColor={hasNegative ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' : undefined}
+            desc={hasNegative ? `প্রতি ভুলে −${config.negativeMarking} নম্বর কাটা` : 'নেগেটিভ মার্কিং নেই'}
+            badge={hasNegative ? `−${config.negativeMarking}` : '✓'}
+            badgeColor={hasNegative ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'}
           />
           <RuleRow
             iconBg="bg-sky-100 dark:bg-sky-900/30"
-            icon={<CheckCircle2 size={14} className="text-sky-700 dark:text-sky-400" />}
+            icon={<CheckCircle2 size={13} className="text-sky-700 dark:text-sky-400" />}
             title="পাস মার্ক"
-            desc="সাধারণত ৫০% নম্বর পেলে পাস হিসেবে গণ্য করা হয়।"
+            desc="৫০% বা তার বেশি পেলে পাস"
             badge="৫০%"
             badgeColor="bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400"
           />
           <RuleRow
             iconBg="bg-amber-100 dark:bg-amber-900/30"
-            icon={<AlertTriangle size={14} className="text-amber-600 dark:text-amber-400" />}
-            title="উইন্ডো / ট্যাব পরিবর্তন"
-            desc="পরীক্ষা চলাকালীন ব্রাউজার ট্যাব বা উইন্ডো পরিবর্তন করলে পরীক্ষা বাতিল হতে পারে।"
+            icon={<AlertTriangle size={13} className="text-amber-600 dark:text-amber-400" />}
+            title="ট্যাব পরিবর্তন"
+            desc="ট্যাব বদলালে পরীক্ষা বাতিল হতে পারে"
           />
           <RuleRow
             iconBg="bg-neutral-100 dark:bg-neutral-800"
-            icon={<Wifi size={14} className="text-neutral-600 dark:text-neutral-400" />}
-            title="ইন্টারনেট সংযোগ"
-            desc="পরীক্ষার আগে ভালো ইন্টারনেট সংযোগ আছে কিনা নিশ্চিত করো।"
+            icon={<Wifi size={13} className="text-neutral-600 dark:text-neutral-400" />}
+            title="ইন্টারনেট"
+            desc="স্থিতিশীল সংযোগ নিশ্চিত করো"
           />
         </div>
       </div>
@@ -229,7 +225,7 @@ const StatCell = ({
   </div>
 );
 
-// ─── Rule Row ────────────────────────────────────────────────────────────────
+// ─── Rule Card (compact 2-col grid) ──────────────────────────────────────────
 const RuleRow = ({
   icon,
   iconBg,
@@ -245,20 +241,21 @@ const RuleRow = ({
   badge?: string;
   badgeColor?: string;
 }) => (
-  <div className="flex items-start gap-4 px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors">
-    <div className={cn('w-7 h-7 rounded-xl flex items-center justify-center shrink-0 mt-0.5', iconBg)}>
+  <div className="flex items-start gap-3 px-4 py-3.5 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 transition-colors">
+    <div className={cn('w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5', iconBg)}>
       {icon}
     </div>
     <div className="flex-1 min-w-0">
-      <div className="flex items-center gap-2 flex-wrap">
-        <p className="text-sm font-extrabold text-neutral-900 dark:text-white">{title}</p>
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <p className="text-xs font-extrabold text-neutral-900 dark:text-white leading-tight">{title}</p>
         {badge && (
-          <span className={cn('text-[10px] font-black px-2 py-0.5 rounded-full', badgeColor)}>
+          <span className={cn('text-[9px] font-black px-1.5 py-0.5 rounded-full leading-none', badgeColor)}>
             {badge}
           </span>
         )}
       </div>
-      <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed mt-0.5">{desc}</p>
+      <p className="text-[10px] text-neutral-500 dark:text-neutral-400 leading-snug mt-0.5">{desc}</p>
     </div>
   </div>
 );
+

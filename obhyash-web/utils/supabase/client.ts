@@ -21,6 +21,10 @@ export function createClient(): SupabaseClient {
     return globalForSupabase._supabaseInstance;
   }
 
+  // createBrowserClient from @supabase/ssr automatically stores the session
+  // in cookies (not localStorage). The middleware reads these cookies on every
+  // request and silently refreshes the token — keeping users logged in
+  // indefinitely without any manual refresh calls needed.
   const instance = createBrowserClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: true,
