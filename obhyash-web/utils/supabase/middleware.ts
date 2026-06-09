@@ -69,10 +69,18 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isRootRoute = pathname === '/';
   const isAdminRoute = pathname.startsWith('/admin');
-  const isStudentRoute = pathname.startsWith('/dashboard');
   const isTeacherRoute = pathname.startsWith('/teacher');
   const isAuthRoute = pathname === '/login' || pathname === '/signup';
+
+  // All student tab paths that map into the SPA
+  const STUDENT_TAB_PATHS = [
+    '/dashboard', '/setup', '/history', '/practice', '/leaderboard',
+    '/analysis', '/notifications', '/subscription', '/profile', '/settings',
+    '/referral',
+  ];
+  const isStudentRoute = STUDENT_TAB_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'));
   const isProtectedRoute = isAdminRoute || isStudentRoute || isTeacherRoute;
+
 
   // SCENARIO A: Not logged in and trying to access a protected route
   if (!user && isProtectedRoute) {
