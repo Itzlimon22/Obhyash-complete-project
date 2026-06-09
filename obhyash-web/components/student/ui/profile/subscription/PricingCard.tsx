@@ -112,15 +112,14 @@ const PricingCard: React.FC<PricingCardProps> = ({
           <div className="mt-auto w-full">
             <button
               onClick={onSelect}
-              disabled={isCurrent}
               className={cn(
                 'w-full py-3 sm:py-4 rounded-xl font-bold text-sm tracking-wide transition-all shadow-lg hover:shadow-xl active:scale-95',
                 isCurrent
-                  ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 cursor-default shadow-none'
+                  ? 'bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white shadow-emerald-500/25 hover:shadow-emerald-500/40'
                   : 'bg-emerald-700 hover:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white shadow-emerald-500/25 hover:shadow-emerald-500/40',
               )}
             >
-              {isCurrent ? 'বর্তমান প্ল্যাও' : 'পেমেন্ট করো'}
+              {isCurrent ? 'রিনিউ করো' : 'পেমেন্ট করো'}
             </button>
           </div>
         </div>

@@ -114,17 +114,16 @@ const PricingCard: React.FC<PricingCardProps> = ({
 
         <button
           onClick={onSelect}
-          disabled={isCurrent}
           className={`
                 w-full py-2 rounded-lg font-bold text-xs uppercase tracking-wide transition-all active:scale-95
                 ${
                   isCurrent
-                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-default border border-slate-200 dark:border-slate-700'
+                    ? `text-white shadow-md ${plan.colorTheme === 'slate' ? 'bg-slate-700 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200' : 'bg-emerald-600 hover:bg-emerald-700'}`
                     : `text-white shadow-md shadow-${plan.colorTheme}-500/20 ${plan.colorTheme === 'emerald' ? 'bg-emerald-600 hover:bg-emerald-700' : plan.colorTheme === 'indigo' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-800 hover:bg-slate-900 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200'}`
                 }
             `}
         >
-          {isCurrent ? 'বর্তমান প্ল্যাও' : 'বেছে নাও'}
+          {isCurrent ? 'রিনিউ করো' : 'বেছে নাও'}
         </button>
       </div>
     </div>
