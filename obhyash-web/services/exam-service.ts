@@ -422,37 +422,53 @@ export const updateExamResult = async (
 ): Promise<boolean> => {
   if (!isSupabaseConfigured() || !supabase) return false;
 
-  try {
-    const { error } = await supabase
-      .from('exam_results')
-      .update({
-        score: result.score,
-        total_marks: result.totalMarks,
-        total_questions: result.totalQuestions,
-        correct_count: result.correctCount,
-        wrong_count: result.wrongCount,
-        time_taken: result.timeTaken,
-        negative_marking: result.negativeMarking,
-        user_answers: result.userAnswers,
-        questions: result.questions,
-        flagged_questions: result.flaggedQuestions,
-        subject_label: result.subjectLabel,
-        chapters: result.chapters,
-        status: result.status || 'evaluated',
-        submission_type: result.submissionType || 'digital',
-        script_image_data: result.scriptImageData,
-      })
-      .eq('id', examId);
+  const payload = {
+    score: result.score,
+    total_marks: result.totalMarks,
+    total_questions: result.totalQuestions,
+    correct_count: result.correctCount,
+    wrong_count: result.wrongCount,
+    time_taken: result.timeTaken,
+    negative_marking: result.negativeMarking,
+    user_answers: result.userAnswers,
+    questions: result.questions,
+    flagged_questions: result.flaggedQuestions,
+    subject_label: result.subjectLabel,
+    chapters: result.chapters,
+    status: result.status || 'evaluated',
+    submission_type: result.submissionType || 'digital',
+    script_image_data: result.scriptImageData,
+  };
 
-    if (error) {
-      console.error('Failed to update exam result:', error);
-      return false;
+  // Retry up to 3 times with backoff — handles transient network drops
+  const MAX_RETRIES = 3;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      // Refresh session token before each attempt — long exams can expire the token
+      await supabase.auth.refreshSession();
+
+      const { error } = await supabase
+        .from('exam_results')
+        .update(payload)
+        .eq('id', examId);
+
+      if (!error) return true;
+
+      console.warn(`[Exam Submit] Attempt ${attempt}/${MAX_RETRIES} failed:`, error.message);
+
+      if (attempt < MAX_RETRIES) {
+        await new Promise((r) => setTimeout(r, attempt * 1000)); // 1s, 2s
+      }
+    } catch (err) {
+      console.warn(`[Exam Submit] Attempt ${attempt}/${MAX_RETRIES} threw:`, err);
+      if (attempt < MAX_RETRIES) {
+        await new Promise((r) => setTimeout(r, attempt * 1000));
+      }
     }
-    return true;
-  } catch (err) {
-    console.error('Error updating exam result:', err);
-    return false;
   }
+
+  console.error('[Exam Submit] All retry attempts exhausted for exam:', examId);
+  return false;
 };
 
 export const saveExamResult = async (result: ExamResult): Promise<void> => {
@@ -460,41 +476,69 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
     throw new Error('Database configuration missing');
   }
 
+  // ── STEP 1: Save to localStorage FIRST ───────────────────────────────────
+  // This ensures the result is never permanently lost, even if the network
+  // drops during submission. The student can always recover from localStorage.
+  if (typeof window !== 'undefined') {
+    try {
+      let existingHistory: ExamResult[] = [];
+      const stored = localStorage.getItem('obhyash_exam_history');
+      if (stored) existingHistory = JSON.parse(stored);
+
+      const index = existingHistory.findIndex((r) => r.id === result.id);
+      if (index >= 0) {
+        existingHistory[index] = result;
+      } else {
+        existingHistory.push(result);
+        if (existingHistory.length > 100) {
+          existingHistory = existingHistory.slice(-100);
+        }
+      }
+      localStorage.setItem('obhyash_exam_history', JSON.stringify(existingHistory));
+      console.log('✅ Exam result saved to localStorage (backup)');
+    } catch (e) {
+      console.warn('Could not save to localStorage:', e);
+    }
+  }
+
+  // ── STEP 2: Refresh the auth session token ────────────────────────────────
+  // Long exams (45+ min) can expire the Supabase JWT. Refreshing before the
+  // DB write prevents silent auth failures at the critical submission moment.
   try {
-    // Check if this result has a valid UUID (meaning it was initiated in DB)
-    // Legacy results have Date.now() IDs which are numbers-as-strings (usually shorter or different format)
+    await supabase.auth.refreshSession();
+  } catch (refreshErr) {
+    console.warn('[Exam Submit] Session refresh failed, proceeding anyway:', refreshErr);
+  }
+
+  // ── STEP 3: Write to database ─────────────────────────────────────────────
+  try {
     const isUuid =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
         result.id,
       );
 
-    // Resolve user once — reused across both update and fallback-insert paths
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     if (isUuid) {
-      // Update existing session
+      // Update existing session row (includes retry logic)
       const success = await updateExamResult(result.id, result);
 
       // Bulk-update analytics in a single RPC call (best effort)
       if (user && result.questions && result.userAnswers) {
-        bulkUpdateQuestionAnalytics(
-          user.id,
-          result.questions,
-          result.userAnswers,
-        );
+        bulkUpdateQuestionAnalytics(user.id, result.questions, result.userAnswers);
       }
 
       if (success) {
-        console.log('✅ Exam session updated successfully');
-        return; // Done
+        console.log('✅ Exam session updated in database successfully');
+        return;
       } else {
-        console.warn('⚠️ Update failed, falling back to insert...');
+        console.warn('⚠️ Update failed after retries, falling back to insert...');
       }
     }
 
-    // Fallback: Insert new row (Legacy behavior or if init failed)
+    // Fallback: Insert new row (legacy IDs or if initiation failed)
     if (user) {
       const { error } = await supabase.from('exam_results').insert({
         user_id: user.id,
@@ -519,62 +563,27 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
       });
 
       if (error) {
-        console.error('Error saving exam result:', error);
+        console.error('[Exam Submit] Insert failed:', error);
+        // Don't throw — result is already in localStorage, student is not at risk
+        // Just warn so they know the DB didn't persist
         throw error;
-      } else {
-        console.log('✅ Exam result saved successfully (New Insert)');
+      }
 
-        // Bulk-update analytics in a single RPC call (best effort)
-        if (result.questions && result.userAnswers) {
-          bulkUpdateQuestionAnalytics(
-            user.id,
-            result.questions,
-            result.userAnswers,
-          );
-        }
+      console.log('✅ Exam result inserted to database successfully');
+
+      if (result.questions && result.userAnswers) {
+        bulkUpdateQuestionAnalytics(user.id, result.questions, result.userAnswers);
       }
     } else {
-      console.warn(
-        'No authenticated user found, cannot save exam result to database',
-      );
+      console.warn('[Exam Submit] No authenticated user — result saved only to localStorage');
       throw new Error('User not authenticated');
     }
   } catch (error) {
-    console.error('Failed to save exam result:', error);
+    console.error('[Exam Submit] Database write failed:', error);
     throw error;
   }
-
-  // Local Storage Logic (always save for backup)
-  if (typeof window !== 'undefined') {
-    let existingHistory: ExamResult[] = [];
-    try {
-      const stored = localStorage.getItem('obhyash_exam_history');
-      if (stored) {
-        existingHistory = JSON.parse(stored);
-      }
-    } catch (e) {
-      console.error('Failed to parse existing exam history:', e);
-      // If malformed, we'll start with a clean slate
-      existingHistory = [];
-    }
-    // Update if exists, else append
-    const index = existingHistory.findIndex((r) => r.id === result.id);
-    if (index >= 0) {
-      existingHistory[index] = result;
-    } else {
-      existingHistory.push(result);
-      // Cap at 100 most recent entries to prevent localStorage quota overflow
-      if (existingHistory.length > 100) {
-        existingHistory = existingHistory.slice(-100);
-      }
-    }
-
-    localStorage.setItem(
-      'obhyash_exam_history',
-      JSON.stringify(existingHistory),
-    );
-  }
 };
+
 
 const mapDbResultToExamResult = (data: ExamResultDbRow): ExamResult => {
   // Resolve the display label: prefer stored subject_label, then look up locally,

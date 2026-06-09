@@ -199,11 +199,11 @@ const ResultView: React.FC<ResultViewProps> = ({
             </div>
           )}
 
-        <div className="flex flex-col items-center gap-2 mt-5 sm:max-w-sm mx-auto">
+        <div className="grid grid-cols-2 gap-2 mt-5 max-w-sm mx-auto">
           {onDownloadResultWithExplanations && (
             <button
               onClick={onDownloadResultWithExplanations}
-              className="w-full flex justify-center items-center gap-2 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 rounded-lg text-sm font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors border border-emerald-200 dark:border-emerald-800"
+              className="flex justify-center items-center gap-1.5 px-3 py-2.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs sm:text-sm font-bold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors border border-emerald-200 dark:border-emerald-800"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -211,7 +211,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-4 h-4"
+                className="w-4 h-4 shrink-0"
               >
                 <path
                   strokeLinecap="round"
@@ -219,14 +219,14 @@ const ResultView: React.FC<ResultViewProps> = ({
                   d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
                 />
               </svg>
-              রেজাল্ট ও ব্যাখ্যা ডাউনলোড
+              <span className="text-center leading-tight">রেজাল্ট ও ব্যাখ্যা</span>
             </button>
           )}
 
           {onDownloadQuestionPaper && (
             <button
               onClick={onDownloadQuestionPaper}
-              className="w-full flex justify-center items-center gap-2 px-4 py-2.5 bg-neutral-100 dark:bg-neutral-800 text-emerald-600 dark:text-emerald-400 rounded-lg text-sm font-bold hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors border border-neutral-200 dark:border-neutral-700"
+              className="flex justify-center items-center gap-1.5 px-3 py-2.5 bg-neutral-100 dark:bg-neutral-800 text-emerald-600 dark:text-emerald-400 rounded-lg text-xs sm:text-sm font-bold hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors border border-neutral-200 dark:border-neutral-700"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -234,7 +234,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                 viewBox="0 0 24 24"
                 strokeWidth={2}
                 stroke="currentColor"
-                className="w-4 h-4"
+                className="w-4 h-4 shrink-0"
               >
                 <path
                   strokeLinecap="round"
@@ -242,10 +242,11 @@ const ResultView: React.FC<ResultViewProps> = ({
                   d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
                 />
               </svg>
-              প্রশ্নপত্র ডাউনলোড
+              <span className="text-center leading-tight">প্রশ্নপত্র ডাউনলোড</span>
             </button>
           )}
         </div>
+
       </div>
       {/* Exam Details Section */}
       <div className="bg-neutral-50 dark:bg-neutral-800/40 border-y sm:border border-neutral-100 dark:border-neutral-800 py-2 mb-6 -mx-2 sm:mx-0 px-2 sm:px-4 sm:rounded-xl flex flex-wrap justify-center gap-x-6 gap-y-2 text-[10px] sm:text-xs md:text-sm font-bold text-neutral-500 dark:text-neutral-400">

@@ -145,7 +145,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           )}
 
           {/* Action Buttons */}
-          <div className={`flex flex-col gap-2.5 ${!isWarning && "mt-6"}`}>
+          <div className={`grid grid-cols-2 gap-2.5 ${!isWarning && "mt-6"}`}>
             <button
               onClick={onConfirm}
               className={`w-full py-3.5 rounded-2xl text-white font-bold text-sm transition-all duration-150 shadow-md active:scale-[0.98] ${colors.primary}`}

@@ -334,23 +334,7 @@ const ResultShareCard = React.forwardRef<HTMLDivElement, ResultShareCardProps>(
           </div>
         </div>
 
-        {/* CTA footer */}
-        <div
-          style={{
-            margin: '16px 28px 24px',
-            padding: '14px 20px',
-            background: `linear-gradient(90deg, ${accent.ring}22, transparent)`,
-            borderLeft: `3px solid ${accent.ring}`,
-            borderRadius: '0 12px 12px 0',
-          }}
-        >
-          <div style={{ fontSize: 12, color: '#e2e8f0', fontWeight: 600 }}>
-            🎯 Obhyash-এ পরীক্ষা দিয়ে নিজেকে যাচাই করো
-          </div>
-          <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 3 }}>
-            obhyash.com — বাংলাদেশের সেরা MCQ প্র্যাকটিস প্ল্যাটফর্ম
-          </div>
-        </div>
+
       </div>
     );
   },

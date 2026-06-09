@@ -139,26 +139,19 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
 
         {/* ────────────── RIGHT ────────────── */}
         <div className="flex items-center gap-1 md:gap-2">
-          {/* OMR Toggle */}
+          {/* OMR Toggle — HIDDEN (uncomment to restore)
           <button
             onClick={onToggleOmr}
             disabled={isGracePeriod}
             title="OMR মোড টগল করো"
-            className={`flex items-center gap-1.5 px-2 md:px-3 py-1.5 rounded-xl border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
-              isOmrMode
-                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400'
-                : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700'
-            }`}
+            className={`flex items-center gap-1.5 px-2 md:px-3 py-1.5 rounded-xl border text-[10px] md:text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-40 disabled:cursor-not-allowed ${isOmrMode ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400' : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700'}`}
           >
-            <span
-              className={`relative w-6 h-3 rounded-full transition-colors shrink-0 ${isOmrMode ? 'bg-emerald-500' : 'bg-neutral-300 dark:bg-neutral-600'}`}
-            >
-              <span
-                className={`absolute top-0.5 w-2 h-2 rounded-full bg-white shadow-sm transition-transform ${isOmrMode ? 'left-[14px]' : 'left-0.5'}`}
-              />
+            <span className={`relative w-6 h-3 rounded-full transition-colors shrink-0 ${isOmrMode ? 'bg-emerald-500' : 'bg-neutral-300 dark:bg-neutral-600'}`}>
+              <span className={`absolute top-0.5 w-2 h-2 rounded-full bg-white shadow-sm transition-transform ${isOmrMode ? 'left-[14px]' : 'left-0.5'}`} />
             </span>
             <span className="hidden md:inline">OMR</span>
           </button>
+          */}
 
           {/* Downloads dropdown */}
           <div className="relative">
@@ -198,11 +191,9 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
                       </span>
                       প্রশ্নপত্র
                     </button>
+                    {/* OMR শিট download — HIDDEN (uncomment to restore)
                     <button
-                      onClick={() => {
-                        onDownloadOMR();
-                        setShowDownloads(false);
-                      }}
+                      onClick={() => { onDownloadOMR(); setShowDownloads(false); }}
                       className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
                     >
                       <span className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-600 shrink-0">
@@ -210,6 +201,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
                       </span>
                       OMR শিট
                     </button>
+                    */}
                   </div>
                 </div>
               </>

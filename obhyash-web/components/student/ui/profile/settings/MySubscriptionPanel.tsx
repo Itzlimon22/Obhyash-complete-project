@@ -200,25 +200,26 @@ export default function MySubscriptionPanel({
             ) : (
               <>
                 {/* Active plan hero card */}
-                <div className="relative overflow-hidden rounded-2xl bg-neutral-900 dark:bg-black p-6 text-white">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-green-500/10 rounded-full blur-3xl pointer-events-none" />
-                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
+                <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 p-6 shadow-sm">
+                  {/* Decorative gradient blobs */}
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-green-500/10 dark:bg-green-500/10 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
                   <div className="relative z-10">
                     {/* Status row */}
                     <div className="flex items-center justify-between mb-4">
-                      <span className="flex items-center gap-1.5 text-xs font-bold text-green-400 bg-green-900/50 px-2.5 py-1 rounded-full">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/50 px-2.5 py-1 rounded-full">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 dark:bg-green-400 animate-pulse" />
                         সক্রিয়
                       </span>
-                      <Crown size={18} className="text-yellow-300" />
+                      <Crown size={18} className="text-yellow-500 dark:text-yellow-300" />
                     </div>
 
                     {/* Plan name + price */}
-                    <h3 className="text-2xl font-black mb-0.5">
+                    <h3 className="text-2xl font-black mb-0.5 text-neutral-900 dark:text-white">
                       {activeSub.name}
                     </h3>
-                    <p className="text-sm text-neutral-400 mb-5">
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-5">
                       {activeSub.currency}
                       {activeSub.price} / {activeSub.billingCycle}
                     </p>
@@ -227,22 +228,16 @@ export default function MySubscriptionPanel({
                     <div className="flex items-center gap-5">
                       {/* SVG ring */}
                       <div className="relative w-20 h-20 shrink-0">
-                        <svg
-                          viewBox="0 0 36 36"
-                          className="w-20 h-20 -rotate-90"
-                        >
+                        <svg viewBox="0 0 36 36" className="w-20 h-20 -rotate-90">
                           <circle
-                            cx="18"
-                            cy="18"
-                            r="15.9"
+                            cx="18" cy="18" r="15.9"
                             fill="none"
-                            stroke="#374151"
+                            stroke="currentColor"
+                            className="text-neutral-200 dark:text-neutral-700"
                             strokeWidth="3.5"
                           />
                           <circle
-                            cx="18"
-                            cy="18"
-                            r="15.9"
+                            cx="18" cy="18" r="15.9"
                             fill="none"
                             stroke={progressPct > 30 ? '#166534' : '#DC2626'}
                             strokeWidth="3.5"
@@ -251,7 +246,7 @@ export default function MySubscriptionPanel({
                           />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center flex-col">
-                          <span className="text-lg font-black leading-none">
+                          <span className="text-lg font-black leading-none text-neutral-900 dark:text-white">
                             {daysLeft}
                           </span>
                           <span className="text-[9px] text-neutral-400 leading-none mt-0.5">
@@ -262,18 +257,11 @@ export default function MySubscriptionPanel({
 
                       <div className="space-y-2 flex-1">
                         <div className="flex items-center gap-2 text-sm">
-                          <Calendar
-                            size={13}
-                            className="text-neutral-400 shrink-0"
-                          />
-                          <span className="text-neutral-400 text-xs">
-                            মেয়াদ শেষ
-                          </span>
-                          <span className="font-semibold text-xs ml-auto">
+                          <Calendar size={13} className="text-neutral-400 shrink-0" />
+                          <span className="text-neutral-500 dark:text-neutral-400 text-xs">মেয়াদ শেষ</span>
+                          <span className="font-semibold text-xs ml-auto text-neutral-800 dark:text-neutral-200">
                             {activeSub.expiresAt
-                              ? new Date(
-                                  activeSub.expiresAt,
-                                ).toLocaleDateString('bn-BD', {
+                              ? new Date(activeSub.expiresAt).toLocaleDateString('bn-BD', {
                                   day: 'numeric',
                                   month: 'long',
                                   year: 'numeric',
@@ -282,17 +270,14 @@ export default function MySubscriptionPanel({
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
-                          <Clock
-                            size={13}
-                            className="text-neutral-400 shrink-0"
-                          />
-                          <span className="text-neutral-400 text-xs">বাকি</span>
+                          <Clock size={13} className="text-neutral-400 shrink-0" />
+                          <span className="text-neutral-500 dark:text-neutral-400 text-xs">বাকি</span>
                           <span
                             className={cn(
                               'font-bold text-xs ml-auto',
                               daysLeft != null && daysLeft <= 7
-                                ? 'text-red-400'
-                                : 'text-green-400',
+                                ? 'text-red-600 dark:text-red-400'
+                                : 'text-green-700 dark:text-green-400',
                             )}
                           >
                             {daysLeft} দিন
@@ -302,11 +287,11 @@ export default function MySubscriptionPanel({
                     </div>
 
                     {/* Progress bar */}
-                    <div className="mt-5 h-1.5 rounded-full bg-neutral-700 overflow-hidden">
+                    <div className="mt-5 h-1.5 rounded-full bg-neutral-200 dark:bg-neutral-700 overflow-hidden">
                       <div
                         className={cn(
                           'h-full rounded-full transition-all',
-                          progressPct > 30 ? 'bg-green-600' : 'bg-red-600',
+                          progressPct > 30 ? 'bg-green-600' : 'bg-red-500',
                         )}
                         style={{ width: `${progressPct}%` }}
                       />
@@ -315,13 +300,14 @@ export default function MySubscriptionPanel({
                     {/* Renew/Upgrade */}
                     <button
                       onClick={onUpgrade}
-                      className="mt-5 w-full py-2.5 rounded-xl border border-green-700 text-green-400 text-sm font-bold hover:bg-green-900/40 transition-colors flex items-center justify-center gap-2"
+                      className="mt-5 w-full py-2.5 rounded-xl border border-green-700 dark:border-green-700 text-green-700 dark:text-green-400 text-sm font-bold hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors flex items-center justify-center gap-2"
                     >
                       <RefreshCw size={14} />
                       রিনিউ / আপগ্রেড
                     </button>
                   </div>
                 </div>
+
 
                 {/* Features grid */}
                 {activeSub.features && activeSub.features.length > 0 && (
