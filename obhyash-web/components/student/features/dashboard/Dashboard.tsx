@@ -306,7 +306,8 @@ const Dashboard: React.FC<DashboardProps> = ({
           </h3>
         </button>
 
-        {/* লিডারবোর্ড */}
+        {/* লিডারবোর্ড কার্ড — HIDDEN (remove comment to restore):
+        {/* লিডারবোর্ড * /}
         <button
           onClick={onLeaderboardClick}
           className="group relative overflow-hidden bg-gradient-to-br from-violet-50 to-white dark:from-violet-950/20 dark:to-neutral-900 border border-violet-100 dark:border-violet-900/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-violet-300 dark:hover:border-violet-800 hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.97] duration-200 text-center h-28 sm:h-32"
@@ -331,6 +332,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             লিডারবোর্ড
           </h3>
         </button>
+        */}
 
         {/* এনালাইসিস*/}
         <button
@@ -390,13 +392,14 @@ const Dashboard: React.FC<DashboardProps> = ({
         </button>
       </div>
 
-      {/* Leaderboard Section - Order 2 on Mobile, Right Column on Desktop */}
+      {/* Leaderboard Section — HIDDEN (remove comment to restore):
+      {/* Leaderboard Section - Order 2 on Mobile, Right Column on Desktop * /}
       <div className="lg:col-span-1 h-full">
         <div
           onClick={onLeaderboardClick}
           className="relative bg-white dark:bg-neutral-900 rounded-3xl p-5 md:p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden group cursor-pointer hover:border-emerald-200 dark:hover:border-emerald-900/50 transition-all active:scale-[0.99] duration-200 h-full"
         >
-          {/* Subtle Background Pattern */}
+          {/* Subtle Background Pattern * /}
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-50 to-transparent dark:from-emerald-900/10 dark:to-transparent rounded-bl-full -mr-4 -mt-4 opacity-50"></div>
 
           <div className="flex justify-between items-center mb-4 relative z-10">
@@ -434,16 +437,16 @@ const Dashboard: React.FC<DashboardProps> = ({
             </button>
           </div>
 
-          {/* Mini Leaderboard Table */}
+          {/* Mini Leaderboard Table * /}
           <div className="relative z-10 space-y-2">
-            {/* Header Row */}
+            {/* Header Row * /}
             <div className="grid grid-cols-[2rem_2rem_1fr] gap-2.5 items-center px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
               <span>#</span>
               <span></span>
               <span>নাম</span>
             </div>
 
-            {/* Topper Row */}
+            {/* Topper Row * /}
             <div className="grid grid-cols-[2rem_2rem_1fr] gap-2.5 items-center px-3 py-2.5 rounded-xl bg-gradient-to-r from-emerald-50 to-emerald-50/30 dark:from-emerald-900/20 dark:to-emerald-900/5 border border-emerald-100/60 dark:border-emerald-800/30">
               <span className="text-sm font-black text-emerald-700 dark:text-emerald-400">
                 🥇
@@ -476,7 +479,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               )}
             </div>
 
-            {/* Current User Row */}
+            {/* Current User Row * /}
             <div className="grid grid-cols-[2rem_2rem_1fr] gap-2.5 items-center px-3 py-2.5 rounded-xl bg-gradient-to-r from-emerald-50 to-emerald-50/30 dark:from-emerald-900/15 dark:to-emerald-900/5 border border-emerald-100/60 dark:border-emerald-800/30">
               <span className="text-sm font-black text-emerald-700 dark:text-emerald-400">
                 #{userRank || "-"}
@@ -496,7 +499,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               </div>
             </div>
 
-            {/* XP Gap Indicator */}
+            {/* XP Gap Indicator * /}
             {xpDiff > 0 && (
               <div className="flex items-center gap-1.5 text-[11px] text-neutral-500 dark:text-neutral-400 px-3 pt-1">
                 <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></div>
@@ -510,6 +513,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
         </div>
       </div>
+      */}
 
       {/* Subject Stats Section - Order 3 on Mobile, Bottom Left on Desktop */}
       <div className="lg:col-span-2">
