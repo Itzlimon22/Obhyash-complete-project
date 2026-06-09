@@ -28,6 +28,8 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
 
   const [selectedLevel, setSelectedLevel] = useState<LevelType | null>(null);
   const [viewMode, setViewMode] = usePersistedState<'level' | 'college' | 'rankings'>('lb_view_mode', 'level');
+  // Track which college is being viewed in college mode (defaults to own college)
+  const [selectedCollege, setSelectedCollege] = useState<string | null>(null);
 
   // ── SWR: current user profile (cached in localStorage) ──────────────────────
   const { data: currentUser } = useSWR(
@@ -35,6 +37,16 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
     () => getUserProfile('me'),
     { revalidateOnFocus: false, dedupingInterval: 60_000 },
   );
+
+  // Effective college: user's selection or fall back to own college
+  const effectiveCollege = selectedCollege ?? currentUser?.institute ?? null;
+
+  // Set selectedCollege to own college when user data first loads (only if not already set)
+  useEffect(() => {
+    if (currentUser?.institute && !selectedCollege) {
+      setSelectedCollege(currentUser.institute);
+    }
+  }, [currentUser?.institute]);
 
   // Set selectedLevel once we know the user's level
   const resolvedLevel: LevelType = useMemo(() => {
@@ -57,21 +69,26 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
     { revalidateOnFocus: false, dedupingInterval: 60_000 },
   );
 
-  // ── SWR: college users (fetched only in college mode) ───────────────────────
+  // ── SWR: all colleges list — used both for filter dropdown AND rankings tab ──
+  // Fetch whenever college mode OR rankings mode is active
+  const { data: allColleges = [] } = useSWR(
+    viewMode === 'college' || viewMode === 'rankings' ? 'leaderboard:instituteRankings' : null,
+    getInstituteRankings,
+    { revalidateOnFocus: false, dedupingInterval: 300_000 },
+  );
+
+  // ── SWR: students for the selected college (cached per college name) ─────────
   const { data: collegeUsers = [], isLoading: isLoadingCollege } = useSWR(
-    viewMode === 'college' && currentUser?.institute
-      ? `leaderboard:college:${currentUser.institute}`
+    viewMode === 'college' && effectiveCollege
+      ? `leaderboard:college:${effectiveCollege}`
       : null,
-    () => getInstituteLeaderboardUsers(currentUser!.institute!),
+    () => getInstituteLeaderboardUsers(effectiveCollege!),
     { revalidateOnFocus: false, dedupingInterval: 120_000 },
   );
 
   // ── SWR: institute rankings (fetched only in rankings mode) ─────────────────
-  const { data: instituteRankings = [], isLoading: isLoadingRankings } = useSWR(
-    viewMode === 'rankings' ? 'leaderboard:instituteRankings' : null,
-    getInstituteRankings,
-    { revalidateOnFocus: false, dedupingInterval: 300_000 },
-  );
+  const instituteRankings = viewMode === 'rankings' ? allColleges : [];
+  const isLoadingRankings = viewMode === 'rankings' && allColleges.length === 0;
 
   const userRankInOwnLevel = useMemo(() => {
     if (!currentUser) return 0;
@@ -138,23 +155,47 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
         ) : (
           /* College mode */
           <>
-            {currentUser?.institute ? (
+            {currentUser?.institute || effectiveCollege ? (
               <>
-                <div className="mb-4 px-4 py-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 flex items-center gap-2">
-                  <span className="text-lg">🏫</span>
-                  <div>
-                    <p className="text-xs text-emerald-600 dark:text-emerald-500 font-semibold uppercase tracking-wide">
-                      তোমার কলেজ
-                    </p>
-                    <p className="text-sm font-extrabold text-emerald-800 dark:text-emerald-300">
-                      {currentUser.institute}
-                    </p>
+                {/* ── Header row: own college (left) + filter dropdown (right) ── */}
+                <div className="mb-4 flex items-center gap-3">
+                  {/* Left: own college badge */}
+                  <div className="flex-1 min-w-0 flex items-center gap-2 px-4 py-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40">
+                    <span className="text-lg flex-shrink-0">🏫</span>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-semibold uppercase tracking-wide leading-none mb-0.5">
+                        তোমার কলেজ
+                      </p>
+                      <p className="text-sm font-extrabold text-emerald-800 dark:text-emerald-300 truncate">
+                        {currentUser?.institute || '—'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Right: college filter dropdown */}
+                  <div className="flex-shrink-0">
+                    <select
+                      value={effectiveCollege ?? ''}
+                      onChange={(e) => setSelectedCollege(e.target.value)}
+                      className="text-sm font-semibold bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 rounded-xl px-3 py-2.5 pr-8 appearance-none cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all max-w-[160px] truncate"
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1.25rem' }}
+                    >
+                      {allColleges.length === 0 && (
+                        <option value="" disabled>লোড হচ্ছে…</option>
+                      )}
+                      {allColleges.map((c) => (
+                        <option key={c.institute} value={c.institute}>
+                          {c.institute} ({c.studentCount})
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
+
                 <LeaderboardTable
                   users={collegeUsers}
-                  selectedLevel={selectedLevel ?? 'Rookie'}
-                  title="কলেজ র‍্যাংকিং"
+                  selectedLevel={resolvedLevel}
+                  title={`${effectiveCollege ?? 'কলেজ'} র‍্যাংকিং`}
                   onUserClick={(user) => {
                     const rank = collegeUsers.findIndex((u) => u.id === user.id) + 1;
                     onUserClick?.(user, rank);
@@ -164,8 +205,8 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
                 {!isLoadingCollege && collegeUsers.length === 0 && (
                   <div className="text-center py-16 text-neutral-400 dark:text-neutral-600">
                     <p className="text-3xl mb-3">🏫</p>
-                    <p className="font-bold text-sm">তোমার কলেজ থেকে এখনো কেউ যোগ দেয়নি</p>
-                    <p className="text-xs mt-1">বন্ধুদের আমন্ত্রণ জানাও!</p>
+                    <p className="font-bold text-sm">এই কলেজ থেকে এখনো কেউ যোগ দেয়নি</p>
+                    <p className="text-xs mt-1">অন্য কলেজ বেছে নাও</p>
                   </div>
                 )}
               </>

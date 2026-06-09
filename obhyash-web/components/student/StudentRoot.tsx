@@ -212,12 +212,31 @@ export default function StudentRoot({
 
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== "undefined") {
-      // Allow loading initial tab based on the URL (e.g. /practice -> practice)
-      const path = window.location.pathname.replace(/^\//, "");
+      const pathname = window.location.pathname;
+      // Strip leading slash
+      const path = pathname.replace(/^\//, "");
+
+      // Deep paths: /leaderboard/user/[id] or /history/[examId]
+      if (path.startsWith("leaderboard/user/")) return "user_profile";
+      if (path.startsWith("history/") && path !== "history") return "history_result";
+
+      // Top-level tab paths
       if (validTabs.includes(path)) return path;
       return sessionStorage.getItem("obhyash_active_tab") || "dashboard";
     }
     return "dashboard";
+  });
+
+  // IDs parsed from the initial URL (for deep-link restoration)
+  const [initialDeepUserId] = useState(() => {
+    if (typeof window === "undefined") return null;
+    const m = window.location.pathname.match(/^\/leaderboard\/user\/(.+)$/);
+    return m ? m[1] : null;
+  });
+  const [initialDeepExamId] = useState(() => {
+    if (typeof window === "undefined") return null;
+    const m = window.location.pathname.match(/^\/history\/([\w-]+)$/);
+    return m ? m[1] : null;
   });
 
   // Local state to track user updates (XP, level) that happen during session
@@ -260,6 +279,50 @@ export default function StudentRoot({
       setCurrentUser(initialUser);
     }
   }, [authProfile, initialUser]);
+
+  // Deep-link restore: /history/[examId] → open that exam result
+  const deepLinkRestored = useRef(false);
+  useEffect(() => {
+    if (deepLinkRestored.current || !initialDeepExamId || !examHistory.length) return;
+    const res = examHistory.find((e) => e.id === initialDeepExamId);
+    if (!res) return;
+    deepLinkRestored.current = true;
+    setQuestions(res.questions || []);
+    setUserAnswers(res.userAnswers || {});
+    setFlaggedQuestions(new Set(res.flaggedQuestions || []));
+    setExamDetails({
+      subject: res.subject,
+      subjectLabel: res.subjectLabel || res.subject,
+      examType: res.examType || "",
+      chapters: "",
+      topics: "",
+      totalQuestions: res.totalQuestions,
+      durationMinutes: 0,
+      totalMarks: res.totalMarks,
+      negativeMarking: res.negativeMarking,
+    });
+    setTimeTaken(res.timeTaken);
+    setIsReviewingHistory(true);
+    setAppState(AppState.COMPLETED);
+  }, [initialDeepExamId, examHistory]);
+
+  // Deep-link restore: /leaderboard/user/[userId] → fetch + open that user profile
+  const deepLinkUserRestored = useRef(false);
+  useEffect(() => {
+    if (deepLinkUserRestored.current || !initialDeepUserId || authLoading) return;
+    deepLinkUserRestored.current = true;
+    import("@/services/database").then(async ({ getUserProfile }) => {
+      const user = await getUserProfile(initialDeepUserId);
+      if (user) {
+        setSelectedUserProfile(user);
+        setSelectedUserRank(0);
+        setActiveTab("user_profile");
+      } else {
+        // Profile not found — fall back to leaderboard
+        handleTabChange("leaderboard");
+      }
+    });
+  }, [initialDeepUserId, authLoading]);
 
   // Show exam target modal once per session if not set
   useEffect(() => {
@@ -683,6 +746,10 @@ export default function StudentRoot({
                 setTimeTaken(res.timeTaken);
                 setIsReviewingHistory(true);
                 setAppState(AppState.COMPLETED);
+                // Give the result view a shareable URL
+                if (res.id) {
+                  window.history.pushState({ tab: "history_result", examId: res.id }, "", `/history/${res.id}`);
+                }
               }}
               onRecheckRequest={(id) => alert("Recheck requested for: " + id)}
               bookmarkedIds={bookmarkedIds}
@@ -704,7 +771,9 @@ export default function StudentRoot({
               onUserClick={(user: UserProfile, rank: number) => {
                 setSelectedUserProfile(user);
                 setSelectedUserRank(rank || 0);
-                setActiveTab("user_profile"); // internal-only, no route
+                setActiveTab("user_profile");
+                // Give this view a shareable URL
+                window.history.pushState({ tab: "user_profile", userId: user.id }, "", `/leaderboard/user/${user.id}`);
               }}
             />
           </AppLayout>
@@ -828,7 +897,9 @@ export default function StudentRoot({
               user={selectedUserProfile}
               currentUser={currentUser}
               rank={selectedUserRank}
-              onBack={() => handleTabChange("leaderboard")}
+              onBack={() => {
+                handleTabChange("leaderboard");
+              }}
             />
           </AppLayout>
         );

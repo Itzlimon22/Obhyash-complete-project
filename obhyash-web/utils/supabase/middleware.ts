@@ -72,11 +72,13 @@ export async function updateSession(request: NextRequest) {
   const isTeacherRoute = pathname.startsWith('/teacher');
   const isAuthRoute = pathname === '/login' || pathname === '/signup';
 
-  // All student tab paths that map into the SPA
+  // All student tab paths that map into the SPA (including deep-link sub-paths)
   const STUDENT_TAB_PATHS = [
     '/dashboard', '/setup', '/history', '/practice', '/leaderboard',
     '/analysis', '/notifications', '/subscription', '/profile', '/settings',
     '/referral',
+    // Deep links — dynamic sub-paths
+    '/leaderboard/user', // /leaderboard/user/[userId]
   ];
   const isStudentRoute = STUDENT_TAB_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'));
   const isProtectedRoute = isAdminRoute || isStudentRoute || isTeacherRoute;
