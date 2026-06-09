@@ -306,8 +306,8 @@ const Dashboard: React.FC<DashboardProps> = ({
           </h3>
         </button>
 
-        {/* লিডারবোর্ড কার্ড — HIDDEN (remove comment to restore):
-        {/* লিডারবোর্ড * /}
+
+        {/* লিডারবোর্ড */}
         <button
           onClick={onLeaderboardClick}
           className="group relative overflow-hidden bg-gradient-to-br from-violet-50 to-white dark:from-violet-950/20 dark:to-neutral-900 border border-violet-100 dark:border-violet-900/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-violet-300 dark:hover:border-violet-800 hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.97] duration-200 text-center h-28 sm:h-32"
@@ -332,7 +332,8 @@ const Dashboard: React.FC<DashboardProps> = ({
             লিডারবোর্ড
           </h3>
         </button>
-        */}
+
+
 
         {/* এনালাইসিস*/}
         <button

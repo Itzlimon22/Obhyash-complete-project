@@ -14,7 +14,7 @@ import { searchColleges } from '@/lib/college-mapping';
 
 interface PersonalDetailsPanelProps {
   user: UserProfile;
-  onSave?: (data: Partial<UserProfile>) => void;
+  onSave?: (data: Partial<UserProfile>) => Promise<void> | void;
 }
 
 type SettingsUpdatePayload = {
@@ -172,8 +172,12 @@ export default function PersonalDetailsPanel({
     return true;
   };
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleSubmit = async () => {
     if (!validateForm()) return;
+    setIsSaving(true);
+
     const payload: SettingsUpdatePayload = {
       name: formData.name,
       dob: formData.dob || null,
@@ -192,8 +196,11 @@ export default function PersonalDetailsPanel({
       phone: formData.phone || null,
       avatar_url: avatarUrl || null,
     };
+
     try {
       const supabase = createClient();
+
+      // 1. Password change (independent — runs regardless of onSave)
       if (formData.newPassword) {
         const { error: passwordError } = await supabase.auth.updateUser({
           password: formData.newPassword,
@@ -203,8 +210,11 @@ export default function PersonalDetailsPanel({
           position: 'top-center',
         });
       }
+
+      // 2. Profile save — prefer the onSave callback (goes through StudentRoot → updateUserProfile)
       if (onSave) {
-        onSave({
+        // onSave is async in StudentRoot — await it so errors surface here
+        await onSave({
           ...payload,
           phone: payload.phone ?? undefined,
           dob: payload.dob ?? undefined,
@@ -212,19 +222,19 @@ export default function PersonalDetailsPanel({
           address: payload.address ?? undefined,
           avatarUrl: payload.avatar_url ?? undefined,
         });
-        toast.success('সেটিংস সফলভাবে সেভ করা হয়েছে!', {
-          position: 'top-center',
-        });
       } else {
+        // Fallback: direct DB write (used when panel is rendered standalone)
         const { error } = await supabase
           .from('users')
           .update(payload)
           .eq('id', user.id);
         if (error) throw error;
-        toast.success('সেটিংস সফলভাবে সেভ করা হয়েছে!', {
-          position: 'top-center',
-        });
       }
+
+      toast.success('সেটিংস সফলভাবে সেভ করা হয়েছে!', {
+        position: 'top-center',
+      });
+
       setFormData((prev) => ({
         ...prev,
         newPassword: '',
@@ -232,8 +242,11 @@ export default function PersonalDetailsPanel({
       }));
     } catch (error: unknown) {
       toast.error(getErrorMessage(error));
+    } finally {
+      setIsSaving(false);
     }
   };
+
 
   const eyeIcon = (
     <svg
@@ -776,9 +789,11 @@ export default function PersonalDetailsPanel({
       <div className="flex justify-center md:justify-end mt-4">
         <button
           onClick={handleSubmit}
-          className="w-full md:w-auto px-10 py-3.5 bg-green-800 hover:bg-green-900 text-white font-bold rounded-xl shadow-lg shadow-green-900/20 transition-all active:scale-95"
+          disabled={isSaving}
+          className="w-full md:w-auto px-10 py-3.5 bg-green-800 hover:bg-green-900 text-white font-bold rounded-xl shadow-lg shadow-green-900/20 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          সব সেভ করো
+          {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+          {isSaving ? 'সেভ হচ্ছে...' : 'সব সেভ করো'}
         </button>
       </div>
     </div>

@@ -502,20 +502,19 @@ export default function StudentRoot({
   const handleProfileUpdate = async (updatedData: Partial<UserProfile>) => {
     if (!currentUser) return;
     const newUser = { ...currentUser, ...updatedData };
+    // Optimistically update local state so the UI reflects changes immediately
     setCurrentUser(newUser);
 
     const result = await updateUserProfile(newUser);
 
-    if (result.success) {
-      console.log("✅ Profile updated successfully");
-      // Success is already shown in SettingsView
-    } else {
-      console.error("❌ Profile update failed:", result.error);
-      alert(`প্রোফাইল আপডেট করতে সমস্যা: ${result.error}`);
+    if (!result.success) {
+      // Revert the optimistic update so the UI doesn't show stale data
+      setCurrentUser(currentUser);
+      // Throw so the awaiting handleSubmit in PersonalDetailsPanel catches it
+      throw new Error(result.error || 'প্রোফাইল আপডেট করতে সমস্যা হয়েছে।');
     }
-
-    setActiveTab("profile");
   };
+
 
   // Browser back/forward button support
   useEffect(() => {

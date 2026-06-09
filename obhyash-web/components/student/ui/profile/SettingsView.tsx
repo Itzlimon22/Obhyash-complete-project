@@ -30,7 +30,7 @@ import NotificationsView from '@/components/student/features/notifications/Notif
 
 interface SettingsViewProps {
   user: UserProfile;
-  onSave?: (data: Partial<UserProfile>) => void;
+  onSave?: (data: Partial<UserProfile>) => Promise<void> | void;
   onNavigate?: (tab: string) => void;
   onLogout?: () => void;
   toggleTheme?: () => void;
