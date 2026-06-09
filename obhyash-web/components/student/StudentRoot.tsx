@@ -521,7 +521,7 @@ export default function StudentRoot({
     const onPopState = (e: PopStateEvent) => {
       // Guard: don't navigate away mid-exam
       if (appState === AppState.ACTIVE || appState === AppState.GRACE_PERIOD) {
-        // Push the current state back so the URL stays correct
+        // Restore the URL without navigation
         window.history.pushState({ tab: activeTab }, '', '/' + activeTab);
         setNavWarning({ isOpen: true, targetTab: null, action: 'tab' });
         return;
@@ -534,6 +534,16 @@ export default function StudentRoot({
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, [appState, activeTab]);
+
+  // On mount: sync URL to current tab so the browser address bar is always correct
+  // This fixes mobile where the initial URL might be /dashboard but the tab is "setup"
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const currentPath = window.location.pathname.replace(/^\//, '');
+    if (currentPath !== activeTab && validTabs.includes(activeTab)) {
+      window.history.replaceState({ tab: activeTab }, '', '/' + activeTab);
+    }
+  }, []);  // only on mount
 
   // Navigation Logic
   const handleTabChange = (tab: string) => {
@@ -548,8 +558,9 @@ export default function StudentRoot({
       setActiveTab(tab);
       sessionStorage.setItem("obhyash_active_tab", tab);
       if (typeof window !== "undefined" && validTabs.includes(tab)) {
-        // Pass tab in state so popstate can restore it without parsing the URL
-        window.history.pushState({ tab }, "", "/" + tab);
+        // pushState updates the URL bar without a page reload —
+        // safe on all devices including mobile Safari and PWA mode
+        window.history.pushState({ tab }, '', '/' + tab);
       }
     }
   };
@@ -597,14 +608,14 @@ export default function StudentRoot({
           <AppLayout activeTab={activeTab} {...commonLayoutProps}>
             <Dashboard
               user={currentUser}
-              onMockExamClick={() => setActiveTab("setup")}
-              onHistoryClick={() => setActiveTab("history")}
+              onMockExamClick={() => handleTabChange("setup")}
+              onHistoryClick={() => handleTabChange("history")}
               onSubjectClick={(subject) => {
                 setSelectedSubjectReport(subject);
-                setActiveTab("subject_report");
+                setActiveTab("subject_report"); // internal-only, no route
               }}
-              onLeaderboardClick={() => setActiveTab("leaderboard")}
-              onAnalysisClick={() => setActiveTab("analysis")}
+              onLeaderboardClick={() => handleTabChange("leaderboard")}
+              onAnalysisClick={() => handleTabChange("analysis")}
               onPracticeClick={() => handleTabChange("practice")}
               onBlogClick={() => router.push("/blog")}
               history={examHistory}
@@ -639,7 +650,7 @@ export default function StudentRoot({
           >
             <ExamHistoryView
               history={examHistory}
-              onBack={() => setActiveTab("dashboard")}
+              onBack={() => handleTabChange("dashboard")}
               onClearHistory={async () => {
                 const { clearExamHistory } =
                   await import("@/services/database");
@@ -690,7 +701,7 @@ export default function StudentRoot({
               onUserClick={(user: UserProfile, rank: number) => {
                 setSelectedUserProfile(user);
                 setSelectedUserRank(rank || 0);
-                setActiveTab("user_profile");
+                setActiveTab("user_profile"); // internal-only, no route
               }}
             />
           </AppLayout>
@@ -703,12 +714,12 @@ export default function StudentRoot({
             <MyProfileView
               user={currentUser!}
               history={examHistory}
-              onEditProfile={() => setActiveTab("settings")}
+              onEditProfile={() => handleTabChange("settings")}
               onSubjectClick={(subject) => {
                 setSelectedSubjectReport(subject);
-                setActiveTab("subject_report");
+                setActiveTab("subject_report"); // internal-only, no route
               }}
-              onViewNotifications={() => setActiveTab("notifications")}
+              onViewNotifications={() => handleTabChange("notifications")}
             />
           </AppLayout>
         );
@@ -739,7 +750,7 @@ export default function StudentRoot({
             <PracticeDashboard
               history={examHistory}
               onStartPractice={startCustomExam}
-              onNavigateToMock={() => setActiveTab("setup")}
+              onNavigateToMock={() => handleTabChange("setup")}
               subjects={subjects.map((s) => s.id)}
               currentUser={currentUser}
             />
@@ -758,7 +769,7 @@ export default function StudentRoot({
               history={examHistory}
               onSubjectClick={(subject) => {
                 setSelectedSubjectReport(subject);
-                setActiveTab("subject_report");
+                setActiveTab("subject_report"); // internal-only, no route
               }}
             />
           </AppLayout>
@@ -814,7 +825,7 @@ export default function StudentRoot({
               user={selectedUserProfile}
               currentUser={currentUser}
               rank={selectedUserRank}
-              onBack={() => setActiveTab("leaderboard")}
+              onBack={() => handleTabChange("leaderboard")}
             />
           </AppLayout>
         );
@@ -828,7 +839,7 @@ export default function StudentRoot({
             <SubjectReportView
               subject={selectedSubjectReport}
               history={examHistory}
-              onBack={() => setActiveTab("dashboard")}
+              onBack={() => handleTabChange("dashboard")}
             />
           </AppLayout>
         );

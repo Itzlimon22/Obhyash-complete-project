@@ -26,7 +26,8 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
   const { loading: authLoading } = useAuth();
 
   const [currentUser, setCurrentUser] = useState<UserProfile | undefined>(undefined);
-  const [selectedLevel, setSelectedLevel] = usePersistedState<LevelType>('lb_selected_level', 'Rookie');
+  // Start with null; initData() will set it to the user's actual level
+  const [selectedLevel, setSelectedLevel] = useState<LevelType | null>(null);
   const [leaderboardUsers, setLeaderboardUsers] = useState<UserProfile[]>([]);
   const [levelCounts, setLevelCounts] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -41,10 +42,10 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
     const initData = async () => {
       const user = await getUserProfile('me');
       if (user) setCurrentUser(user);
-      if (user?.level) {
-        const isLevel = LEVELS.some((l) => l.id === user.level);
-        if (isLevel) setSelectedLevel(user.level as LevelType);
-      }
+      // Always set level — user's level if valid, otherwise fall back to Rookie
+      const userLevel = user?.level as LevelType | undefined;
+      const validLevel = userLevel && LEVELS.some((l) => l.id === userLevel) ? userLevel : 'Rookie';
+      setSelectedLevel(validLevel);
       const counts = await getLevelUserCounts();
       setLevelCounts(counts);
     };
@@ -52,7 +53,7 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
   }, [authLoading]);
 
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading || !selectedLevel) return;  // wait until level is known
     const fetchLevelData = async () => {
       setIsLoading(true);
       const users = await getLeaderboardUsers(selectedLevel);
@@ -129,22 +130,26 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
           />
         ) : viewMode === 'level' ? (
           <>
-            <LevelSelector
-              selectedLevel={selectedLevel}
-              setSelectedLevel={setSelectedLevel}
-              currentUser={currentUser}
-              levelCounts={levelCounts}
-            />
+            {selectedLevel && (
+              <>
+                <LevelSelector
+                  selectedLevel={selectedLevel}
+                  setSelectedLevel={setSelectedLevel}
+                  currentUser={currentUser}
+                  levelCounts={levelCounts}
+                />
 
-            <LeaderboardTable
-              users={leaderboardUsers}
-              selectedLevel={selectedLevel}
-              onUserClick={(user) => {
-                const rank = leaderboardUsers.findIndex((u) => u.id === user.id) + 1;
-                onUserClick?.(user, rank);
-              }}
-              isLoading={isLoading}
-            />
+                <LeaderboardTable
+                  users={leaderboardUsers}
+                  selectedLevel={selectedLevel}
+                  onUserClick={(user) => {
+                    const rank = leaderboardUsers.findIndex((u) => u.id === user.id) + 1;
+                    onUserClick?.(user, rank);
+                  }}
+                  isLoading={isLoading}
+                />
+              </>
+            )}
           </>
         ) : (
           /* College mode */
@@ -164,7 +169,7 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
                 </div>
                 <LeaderboardTable
                   users={collegeUsers}
-                  selectedLevel={selectedLevel}
+                  selectedLevel={selectedLevel ?? 'Rookie'}
                   title="কলেজ র‍্যাংকিং"
                   onUserClick={(user) => {
                     const rank = collegeUsers.findIndex((u) => u.id === user.id) + 1;

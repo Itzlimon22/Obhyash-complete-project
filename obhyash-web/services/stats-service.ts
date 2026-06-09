@@ -149,7 +149,8 @@ export const getLevelUserCounts = async (): Promise<Record<string, number>> => {
 
       const { data: profilesData, error: profilesError } = await supabase
         .from('public_profiles')
-        .select('level');
+        .select('level')
+        .ilike('role', 'student'); // match only students, same as leaderboard queries
 
       if (!profilesError && profilesData) {
         const counts = zeroCounts();
