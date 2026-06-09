@@ -12,6 +12,10 @@ interface ExamSetupContainerProps {
   onStartExam: (config: ExamConfig) => void;
   /** Loading state indicating if the exam initialization is in progress. */
   isLoading: boolean;
+  /** User's academic group/division — passed down to avoid a redundant DB fetch in ExamSetupForm */
+  userDivision?: string;
+  userStream?: string;
+  userOptionalSubject?: string;
 }
 
 /**
@@ -24,6 +28,17 @@ interface ExamSetupContainerProps {
 export const ExamSetupContainer: React.FC<ExamSetupContainerProps> = ({
   onStartExam,
   isLoading,
+  userDivision,
+  userStream,
+  userOptionalSubject,
 }) => {
-  return <ExamSetupForm onStartExam={onStartExam} isLoading={isLoading} />;
+  return (
+    <ExamSetupForm
+      onStartExam={onStartExam}
+      isLoading={isLoading}
+      userDivision={userDivision}
+      userStream={userStream}
+      userOptionalSubject={userOptionalSubject}
+    />
+  );
 };

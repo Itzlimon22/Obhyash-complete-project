@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
+import useSWR from "swr";
 import {
   BookOpen,
   Layout,
@@ -31,6 +32,11 @@ import { getAvailableQuestionCount } from "@/services/exam-service";
 interface ExamSetupFormProps {
   onStartExam: (config: ExamConfig) => void;
   isLoading: boolean;
+  // Passed from StudentRoot (already fetched server-side) — avoids a redundant
+  // getUserProfile() call on every setup page open
+  userDivision?: string;
+  userStream?: string;
+  userOptionalSubject?: string;
 }
 
 interface Subject {
@@ -63,6 +69,9 @@ const STATIC_SUBJECT_ICONS: Record<string, string> = {
 const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   onStartExam,
   isLoading,
+  userDivision,
+  userStream,
+  userOptionalSubject,
 }) => {
   // --- Data State ---
   const [availableSubjects, setAvailableSubjects] = useState<Subject[]>([]);
@@ -71,7 +80,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     chapter_id?: string;
   }
   const [availableTopics, setAvailableTopics] = useState<TopicItem[]>([]);
-  const [isFetchingData, setIsFetchingData] = useState(true);
+  // isFetchingData is provided by the useSWR hook below
 
   // --- Form State ---
   const [subject, setSubject] = useState("");
@@ -182,70 +191,51 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     availableChapters,
   ]);
 
-  // --- Data Fetching ---
+  // --- Subject Fetching via SWR (cached in localStorage) ---
+  // Key includes user's group/stream so different students get different caches
+  const subjectCacheKey = `subjects:${userDivision ?? 'none'}:${userStream ?? 'none'}:${userOptionalSubject ?? 'none'}`;
+
+  const { data: rawSubjects, isLoading: isFetchingData } = useSWR(
+    subjectCacheKey,
+    async () => {
+      const { getSubjects } = await import("@/services/database");
+      return getSubjects(userDivision, userStream, userOptionalSubject);
+    },
+    { revalidateOnFocus: false, dedupingInterval: 300_000 }, // cache 5 min
+  );
 
   useEffect(() => {
-    const fetchSubjects = async () => {
-      try {
-        setIsFetchingData(true);
-        const { getUserProfile, getSubjects } =
-          await import("@/services/database");
-        interface UserProfile {
-          division?: string;
-          section?: string;
-          stream?: string;
-          optional_subject?: string;
-        }
-        const user: UserProfile | null = await getUserProfile("me");
+    if (!rawSubjects) return;
+    interface RawSubject extends Subject {
+      name_bn?: string;
+      name_en?: string;
+      icon?: string;
+    }
+    const formattedSubjects = (rawSubjects as RawSubject[]).map(
+      (sub: RawSubject, idx: number) => {
+        const nameBn = sub.name_bn || sub.name;
+        const nameEn = sub.name || sub.name_en;
+        const label =
+          nameEn && nameEn !== nameBn && !nameBn.includes(nameEn)
+            ? `${nameBn} (${nameEn})`
+            : nameBn;
 
-        if (user) {
-          const subjects = await getSubjects(
-            user.division || user.section,
-            user.stream,
-            user.optional_subject,
-          );
-
-          interface RawSubject extends Subject {
-            name_bn?: string;
-            name_en?: string;
-            icon?: string;
-          }
-          const formattedSubjects = subjects.map(
-            (sub: RawSubject, idx: number) => {
-              const nameBn = sub.name_bn || sub.name;
-              const nameEn = sub.name || sub.name_en;
-              const label =
-                nameEn && nameEn !== nameBn && !nameBn.includes(nameEn)
-                  ? `${nameBn} (${nameEn})`
-                  : nameBn;
-
-              return {
-                id: sub.id,
-                label: label,
-                icon:
-                  sub.icon ||
-                  STATIC_SUBJECT_ICONS[sub.name_en ?? ""] ||
-                  STATIC_SUBJECT_ICONS[sub.id] ||
-                  STATIC_SUBJECT_ICONS.default,
-                name: label,
-                rawName: nameBn,
-                serial: idx + 1, // Serial number based on array position
-              };
-            },
-          );
-
-          setAvailableSubjects(formattedSubjects);
-        }
-      } catch (error) {
-        console.error("Error loading subjects:", error);
-        toast.error(getErrorMessage(error));
-      } finally {
-        setIsFetchingData(false);
-      }
-    };
-
-    fetchSubjects();
-  }, []);
+        return {
+          id: sub.id,
+          label: label,
+          icon:
+            sub.icon ||
+            STATIC_SUBJECT_ICONS[sub.name_en ?? ""] ||
+            STATIC_SUBJECT_ICONS[sub.id] ||
+            STATIC_SUBJECT_ICONS.default,
+          name: label,
+          rawName: nameBn,
+          serial: idx + 1,
+        };
+      },
+    );
+    setAvailableSubjects(formattedSubjects);
+  }, [rawSubjects]);
 
   useEffect(() => {
     if (!subject) {

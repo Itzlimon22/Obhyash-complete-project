@@ -636,6 +636,9 @@ export default function StudentRoot({
             <ExamSetupContainer
               onStartExam={handleStartExam}
               isLoading={false}
+              userDivision={currentUser?.division}
+              userStream={currentUser?.stream}
+              userOptionalSubject={currentUser?.optional_subject}
             />
           </AppLayout>
         );

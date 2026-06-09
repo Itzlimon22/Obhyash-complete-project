@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import useSWR from 'swr';
 import { usePersistedState } from '@/hooks/use-persisted-state';
 import { UserProfile } from 'lib/types';
 import { LEVELS, LevelType } from './leaderboard/leaderboardData';
@@ -23,77 +24,63 @@ interface LeaderboardViewProps {
 const INSTITUTE_PAGE_SIZE = 15;
 
 const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
-  const { loading: authLoading } = useAuth();
+  const { loading: authLoading, user: authUser } = useAuth();
 
-  const [currentUser, setCurrentUser] = useState<UserProfile | undefined>(undefined);
-  // Start with null; initData() will set it to the user's actual level
   const [selectedLevel, setSelectedLevel] = useState<LevelType | null>(null);
-  const [leaderboardUsers, setLeaderboardUsers] = useState<UserProfile[]>([]);
-  const [levelCounts, setLevelCounts] = useState<Record<string, number>>({});
-  const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = usePersistedState<'level' | 'college' | 'rankings'>('lb_view_mode', 'level');
-  const [collegeUsers, setCollegeUsers] = useState<UserProfile[]>([]);
-  const [isLoadingCollege, setIsLoadingCollege] = useState(false);
-  const [instituteRankings, setInstituteRankings] = useState<InstituteRankEntry[]>([]);
-  const [isLoadingRankings, setIsLoadingRankings] = useState(false);
 
-  useEffect(() => {
-    if (authLoading) return;
-    const initData = async () => {
-      const user = await getUserProfile('me');
-      if (user) setCurrentUser(user);
-      // Always set level — user's level if valid, otherwise fall back to Rookie
-      const userLevel = user?.level as LevelType | undefined;
-      const validLevel = userLevel && LEVELS.some((l) => l.id === userLevel) ? userLevel : 'Rookie';
-      setSelectedLevel(validLevel);
-      const counts = await getLevelUserCounts();
-      setLevelCounts(counts);
-    };
-    initData();
-  }, [authLoading]);
+  // ── SWR: current user profile (cached in localStorage) ──────────────────────
+  const { data: currentUser } = useSWR(
+    authLoading || !authUser ? null : `profile:${authUser.id}`,
+    () => getUserProfile('me'),
+    { revalidateOnFocus: false, dedupingInterval: 60_000 },
+  );
 
-  useEffect(() => {
-    if (authLoading || !selectedLevel) return;  // wait until level is known
-    const fetchLevelData = async () => {
-      setIsLoading(true);
-      const users = await getLeaderboardUsers(selectedLevel);
-      setLeaderboardUsers(users);
-      setIsLoading(false);
-    };
-    fetchLevelData();
-  }, [selectedLevel, authLoading]);
+  // Set selectedLevel once we know the user's level
+  const resolvedLevel: LevelType = useMemo(() => {
+    if (selectedLevel) return selectedLevel;
+    const ul = currentUser?.level as LevelType | undefined;
+    return ul && LEVELS.some((l) => l.id === ul) ? ul : 'Rookie';
+  }, [currentUser, selectedLevel]);
 
-  useEffect(() => {
-    if (viewMode !== 'college' || !currentUser?.institute) return;
-    const fetchCollege = async () => {
-      setIsLoadingCollege(true);
-      const users = await getInstituteLeaderboardUsers(currentUser.institute!);
-      setCollegeUsers(users);
-      setIsLoadingCollege(false);
-    };
-    fetchCollege();
-  }, [viewMode, currentUser?.institute]);
+  // ── SWR: level user counts (cached) ─────────────────────────────────────────
+  const { data: levelCounts = {} } = useSWR(
+    authLoading ? null : 'leaderboard:levelCounts',
+    getLevelUserCounts,
+    { revalidateOnFocus: false, dedupingInterval: 120_000 },
+  );
 
-  useEffect(() => {
-    if (viewMode !== 'rankings') return;
-    if (instituteRankings.length > 0) return;
-    const fetchRankings = async () => {
-      setIsLoadingRankings(true);
-      const data = await getInstituteRankings();
-      setInstituteRankings(data);
-      setIsLoadingRankings(false);
-    };
-    fetchRankings();
-  }, [viewMode]);
+  // ── SWR: leaderboard users for selected level (cached per level) ─────────────
+  const { data: leaderboardUsers = [], isLoading } = useSWR(
+    authLoading ? null : `leaderboard:level:${resolvedLevel}`,
+    () => getLeaderboardUsers(resolvedLevel),
+    { revalidateOnFocus: false, dedupingInterval: 60_000 },
+  );
+
+  // ── SWR: college users (fetched only in college mode) ───────────────────────
+  const { data: collegeUsers = [], isLoading: isLoadingCollege } = useSWR(
+    viewMode === 'college' && currentUser?.institute
+      ? `leaderboard:college:${currentUser.institute}`
+      : null,
+    () => getInstituteLeaderboardUsers(currentUser!.institute!),
+    { revalidateOnFocus: false, dedupingInterval: 120_000 },
+  );
+
+  // ── SWR: institute rankings (fetched only in rankings mode) ─────────────────
+  const { data: instituteRankings = [], isLoading: isLoadingRankings } = useSWR(
+    viewMode === 'rankings' ? 'leaderboard:instituteRankings' : null,
+    getInstituteRankings,
+    { revalidateOnFocus: false, dedupingInterval: 300_000 },
+  );
 
   const userRankInOwnLevel = useMemo(() => {
     if (!currentUser) return 0;
-    if (currentUser.level === selectedLevel) {
+    if (currentUser.level === resolvedLevel) {
       const idx = leaderboardUsers.findIndex((u) => u.id === currentUser.id);
       if (idx !== -1) return idx + 1;
     }
     return 0;
-  }, [currentUser, leaderboardUsers, selectedLevel]);
+  }, [currentUser, leaderboardUsers, resolvedLevel]);
 
   if (isLoading && !leaderboardUsers.length && viewMode === 'level') {
     return <LeaderboardSkeleton />;
@@ -124,32 +111,29 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
 
         {viewMode === 'rankings' ? (
           <InstituteRankingsView
+            key={instituteRankings.length}
             rankings={instituteRankings}
             isLoading={isLoadingRankings}
             myInstitute={currentUser?.institute}
           />
         ) : viewMode === 'level' ? (
           <>
-            {selectedLevel && (
-              <>
-                <LevelSelector
-                  selectedLevel={selectedLevel}
-                  setSelectedLevel={setSelectedLevel}
-                  currentUser={currentUser}
-                  levelCounts={levelCounts}
-                />
+            <LevelSelector
+              selectedLevel={resolvedLevel}
+              setSelectedLevel={setSelectedLevel}
+              currentUser={currentUser ?? undefined}
+              levelCounts={levelCounts}
+            />
 
-                <LeaderboardTable
-                  users={leaderboardUsers}
-                  selectedLevel={selectedLevel}
-                  onUserClick={(user) => {
-                    const rank = leaderboardUsers.findIndex((u) => u.id === user.id) + 1;
-                    onUserClick?.(user, rank);
-                  }}
-                  isLoading={isLoading}
-                />
-              </>
-            )}
+            <LeaderboardTable
+              users={leaderboardUsers}
+              selectedLevel={resolvedLevel}
+              onUserClick={(user) => {
+                const rank = leaderboardUsers.findIndex((u) => u.id === user.id) + 1;
+                onUserClick?.(user, rank);
+              }}
+              isLoading={isLoading}
+            />
           </>
         ) : (
           /* College mode */
@@ -281,7 +265,7 @@ interface InstituteRankingsViewProps {
 function InstituteRankingsView({ rankings, isLoading, myInstitute }: InstituteRankingsViewProps) {
   const [page, setPage] = useState(1);
 
-  useEffect(() => { setPage(1); }, [rankings]);
+  // page resets automatically via the `key` prop on the parent — no useEffect needed
 
   const totalPages = Math.ceil(rankings.length / INSTITUTE_PAGE_SIZE);
   const globalOffset = (page - 1) * INSTITUTE_PAGE_SIZE;
