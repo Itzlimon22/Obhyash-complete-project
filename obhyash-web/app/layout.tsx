@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
-// ✅ Import the specific fonts you requested
 import { Inter, Anek_Bangla } from 'next/font/google';
 import './globals.css';
 import 'katex/dist/katex.min.css';
 import { Toaster } from 'sonner';
 import AuthProvider from '@/components/auth/AuthProvider';
+import SWRProvider from '@/components/providers/SWRProvider';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
@@ -56,24 +56,26 @@ export default function RootLayout({
       <body className="antialiased overflow-x-hidden selection:bg-brand-500/30 bg-paper-50 text-paper-900 dark:bg-paper-900 dark:text-paper-50 font-sans">
         <Suspense fallback={null}>
           <AuthProvider>
-            {children}
+            <SWRProvider>
+              {children}
 
-            {/* ✅ Render the Toast Container (Overlay) */}
-            <Toaster
-              position="top-center"
-              richColors
-              expand={true}
-              closeButton
-              theme="light"
-              toastOptions={{
-                className: 'font-anek',
-                style: {
-                  borderRadius: '1rem',
-                },
-              }}
-            />
-            <Analytics />
-            <SpeedInsights />
+              {/* ✅ Render the Toast Container (Overlay) */}
+              <Toaster
+                position="top-center"
+                richColors
+                expand={true}
+                closeButton
+                theme="light"
+                toastOptions={{
+                  className: 'font-anek',
+                  style: {
+                    borderRadius: '1rem',
+                  },
+                }}
+              />
+              <Analytics />
+              <SpeedInsights />
+            </SWRProvider>
           </AuthProvider>
         </Suspense>
       </body>
