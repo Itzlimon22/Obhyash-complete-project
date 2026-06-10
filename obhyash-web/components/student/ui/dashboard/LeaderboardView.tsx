@@ -46,8 +46,8 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
   useEffect(() => {
     const fetchLevelData = async () => {
       setIsLoading(true);
-      const users = await getLeaderboardUsers(selectedLevel);
-      setLeaderboardUsers(users);
+      const result = await getLeaderboardUsers(selectedLevel);
+      setLeaderboardUsers(result.users);
       setIsLoading(false);
     };
 

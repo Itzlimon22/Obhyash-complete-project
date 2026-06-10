@@ -42,50 +42,58 @@ interface LeaderboardUserRow {
   role?: string | null;
 }
 
+export interface LeaderboardPage {
+  users: UserProfile[];
+  hasMore: boolean;
+  nextOffset: number;
+}
+
 export const getLeaderboardUsers = async (
   level: string,
-): Promise<UserProfile[]> => {
+  offset = 0,
+  limit = 20,
+): Promise<LeaderboardPage> => {
   try {
-    const res = await fetch(
-      `/api/leaderboard/level?level=${encodeURIComponent(level)}`,
-      {
-        // next.js fetch cache: revalidate every 5 minutes on the server
-        next: { revalidate: 300 },
-      },
-    );
+    const url = `/api/leaderboard/level?level=${encodeURIComponent(level)}&offset=${offset}&limit=${limit}`;
+    const res = await fetch(url, { next: { revalidate: 60 } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    // Restore avatar color fallback for rows that have none stored
-    return data.map((u: UserProfile & { _index?: number }) => ({
-      ...u,
-      avatarColor: u.avatarColor || generateAvatarColor(u._index ?? 0),
-    }));
+    return {
+      users: (data.users ?? []).map((u: UserProfile & { _index?: number }) => ({
+        ...u,
+        avatarColor: u.avatarColor || generateAvatarColor(u._index ?? 0),
+      })),
+      hasMore: data.hasMore ?? false,
+      nextOffset: data.nextOffset ?? offset + limit,
+    };
   } catch (err) {
     console.error('Failed to fetch leaderboard users:', err);
-    return [];
+    return { users: [], hasMore: false, nextOffset: 0 };
   }
 };
 
 export const getInstituteLeaderboardUsers = async (
   institute: string,
-): Promise<UserProfile[]> => {
-  if (!institute) return [];
+  offset = 0,
+  limit = 20,
+): Promise<LeaderboardPage> => {
+  if (!institute) return { users: [], hasMore: false, nextOffset: 0 };
   try {
-    const res = await fetch(
-      `/api/leaderboard/college?institute=${encodeURIComponent(institute)}`,
-      {
-        next: { revalidate: 300 },
-      },
-    );
+    const url = `/api/leaderboard/college?institute=${encodeURIComponent(institute)}&offset=${offset}&limit=${limit}`;
+    const res = await fetch(url, { next: { revalidate: 60 } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    return data.map((u: UserProfile & { _index?: number }) => ({
-      ...u,
-      avatarColor: u.avatarColor || generateAvatarColor(u._index ?? 0),
-    }));
+    return {
+      users: (data.users ?? []).map((u: UserProfile & { _index?: number }) => ({
+        ...u,
+        avatarColor: u.avatarColor || generateAvatarColor(u._index ?? 0),
+      })),
+      hasMore: data.hasMore ?? false,
+      nextOffset: data.nextOffset ?? offset + limit,
+    };
   } catch (err) {
     console.error('Failed to fetch institute leaderboard:', err);
-    return [];
+    return { users: [], hasMore: false, nextOffset: 0 };
   }
 };
 

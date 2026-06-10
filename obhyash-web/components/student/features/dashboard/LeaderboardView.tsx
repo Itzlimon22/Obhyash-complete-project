@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
 import { usePersistedState } from '@/hooks/use-persisted-state';
 import { UserProfile } from 'lib/types';
 import { LEVELS, LevelType } from './leaderboard/leaderboardData';
@@ -62,33 +63,57 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
     { revalidateOnFocus: false, dedupingInterval: 120_000 },
   );
 
-  // ── SWR: leaderboard users for selected level (cached per level) ─────────────
-  const { data: leaderboardUsers = [], isLoading } = useSWR(
-    authLoading ? null : `leaderboard:level:${resolvedLevel}`,
-    () => getLeaderboardUsers(resolvedLevel),
-    { revalidateOnFocus: false, dedupingInterval: 60_000 },
+  // ── SWRInfinite: level leaderboard (loads 20 at a time as user scrolls) ───────
+  const getLevelKey = (pageIdx: number, prev: { hasMore: boolean; nextOffset: number } | null) => {
+    if (authLoading) return null;
+    if (prev && !prev.hasMore) return null; // stop when no more pages
+    const offset = prev ? prev.nextOffset : 0;
+    return `leaderboard:level:${resolvedLevel}:offset:${offset}`;
+  };
+  const {
+    data: levelPages,
+    isLoading: isLevelLoading,
+    isValidating: isLevelValidating,
+    size: levelSize,
+    setSize: setLevelSize,
+  } = useSWRInfinite(
+    getLevelKey,
+    (key) => {
+      const offset = parseInt(key.split(':offset:')[1], 10);
+      return getLeaderboardUsers(resolvedLevel, offset);
+    },
+    { revalidateOnFocus: false, revalidateFirstPage: false, dedupingInterval: 60_000 },
   );
+  const leaderboardUsers: UserProfile[] = levelPages ? levelPages.flatMap((p) => p.users) : [];
+  const isLoading = isLevelLoading;
+  const isLoadingMoreLevel = isLevelValidating && levelSize > 1;
+  const hasMoreLevel = levelPages ? levelPages[levelPages.length - 1]?.hasMore ?? false : false;
 
-  // ── SWR: all colleges list — used both for filter dropdown AND rankings tab ──
-  // Fetch whenever college mode OR rankings mode is active
-  const { data: allColleges = [] } = useSWR(
-    viewMode === 'college' || viewMode === 'rankings' ? 'leaderboard:instituteRankings' : null,
-    getInstituteRankings,
-    { revalidateOnFocus: false, dedupingInterval: 300_000 },
+  // ── SWRInfinite: college leaderboard (loads 20 at a time as user scrolls) ─────
+  const getCollegeKey = (pageIdx: number, prev: { hasMore: boolean; nextOffset: number } | null) => {
+    if (!effectiveCollege || viewMode !== 'college') return null;
+    if (prev && !prev.hasMore) return null;
+    const offset = prev ? prev.nextOffset : 0;
+    return `leaderboard:college:${effectiveCollege}:offset:${offset}`;
+  };
+  const {
+    data: collegePages,
+    isLoading: isCollegeLoading,
+    isValidating: isCollegeValidating,
+    size: collegeSize,
+    setSize: setCollegeSize,
+  } = useSWRInfinite(
+    getCollegeKey,
+    (key) => {
+      const offset = parseInt(key.split(':offset:')[1], 10);
+      return getInstituteLeaderboardUsers(effectiveCollege!, offset);
+    },
+    { revalidateOnFocus: false, revalidateFirstPage: false, dedupingInterval: 120_000 },
   );
-
-  // ── SWR: students for the selected college (cached per college name) ─────────
-  const { data: collegeUsers = [], isLoading: isLoadingCollege } = useSWR(
-    viewMode === 'college' && effectiveCollege
-      ? `leaderboard:college:${effectiveCollege}`
-      : null,
-    () => getInstituteLeaderboardUsers(effectiveCollege!),
-    { revalidateOnFocus: false, dedupingInterval: 120_000 },
-  );
-
-  // ── SWR: institute rankings (fetched only in rankings mode) ─────────────────
-  const instituteRankings = viewMode === 'rankings' ? allColleges : [];
-  const isLoadingRankings = viewMode === 'rankings' && allColleges.length === 0;
+  const collegeUsers: UserProfile[] = collegePages ? collegePages.flatMap((p) => p.users) : [];
+  const isLoadingCollege = isCollegeLoading;
+  const isLoadingMoreCollege = isCollegeValidating && collegeSize > 1;
+  const hasMoreCollege = collegePages ? collegePages[collegePages.length - 1]?.hasMore ?? false : false;
 
   const userRankInOwnLevel = useMemo(() => {
     if (!currentUser) return 0;
@@ -98,6 +123,20 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
     }
     return 0;
   }, [currentUser, leaderboardUsers, resolvedLevel]);
+
+  // ── SWR: all colleges list (for dropdown filter + rankings tab) ──────────────
+  const { data: allCollegesRaw = [], isLoading: isLoadingCollegesList } = useSWR(
+    viewMode === 'college' || viewMode === 'rankings' ? 'leaderboard:instituteRankings' : null,
+    getInstituteRankings,
+    { revalidateOnFocus: false, dedupingInterval: 300_000 },
+  );
+  const allColleges = [...allCollegesRaw].sort((a, b) => {
+    if (a.institute === currentUser?.institute) return -1;
+    if (b.institute === currentUser?.institute) return 1;
+    return a.institute.localeCompare(b.institute);
+  });
+  const instituteRankings = viewMode === 'rankings' ? allCollegesRaw : [];
+  const isLoadingRankings = viewMode === 'rankings' && isLoadingCollegesList;
 
   if (isLoading && !leaderboardUsers.length && viewMode === 'level') {
     return <LeaderboardSkeleton />;
@@ -143,6 +182,7 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
             />
 
             <LeaderboardTable
+              key={`level-${resolvedLevel}`}
               users={leaderboardUsers}
               selectedLevel={resolvedLevel}
               onUserClick={(user) => {
@@ -150,6 +190,9 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
                 onUserClick?.(user, rank);
               }}
               isLoading={isLoading}
+              isLoadingMore={isLoadingMoreLevel}
+              hasMore={hasMoreLevel}
+              onLoadMore={() => setLevelSize((s) => s + 1)}
             />
           </>
         ) : (
@@ -164,35 +207,25 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
                     <span className="text-lg flex-shrink-0">🏫</span>
                     <div className="min-w-0">
                       <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-semibold uppercase tracking-wide leading-none mb-0.5">
-                        তোমার কলেজ
+                        {effectiveCollege === currentUser?.institute ? 'তোমার কলেজ' : 'নির্বাচিত কলেজ'}
                       </p>
                       <p className="text-sm font-extrabold text-emerald-800 dark:text-emerald-300 truncate">
-                        {currentUser?.institute || '—'}
+                        {effectiveCollege || currentUser?.institute || '—'}
                       </p>
                     </div>
                   </div>
 
-                  {/* Right: college filter dropdown */}
-                  <div className="flex-shrink-0">
-                    <select
-                      value={effectiveCollege ?? ''}
-                      onChange={(e) => setSelectedCollege(e.target.value)}
-                      className="text-sm font-semibold bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 rounded-xl px-3 py-2.5 pr-8 appearance-none cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all max-w-[160px] truncate"
-                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1.25rem' }}
-                    >
-                      {allColleges.length === 0 && (
-                        <option value="" disabled>লোড হচ্ছে…</option>
-                      )}
-                      {allColleges.map((c) => (
-                        <option key={c.institute} value={c.institute}>
-                          {c.institute} ({c.studentCount})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  {/* Right: searchable college combobox */}
+                  <CollegeFilter
+                    colleges={allColleges}
+                    value={effectiveCollege ?? ''}
+                    onChange={setSelectedCollege}
+                    isLoading={isLoadingCollegesList}
+                  />
                 </div>
 
                 <LeaderboardTable
+                  key={`college-${effectiveCollege}`}
                   users={collegeUsers}
                   selectedLevel={resolvedLevel}
                   title={`${effectiveCollege ?? 'কলেজ'} র‍্যাংকিং`}
@@ -201,6 +234,9 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
                     onUserClick?.(user, rank);
                   }}
                   isLoading={isLoadingCollege}
+                  isLoadingMore={isLoadingMoreCollege}
+                  hasMore={hasMoreCollege}
+                  onLoadMore={() => setCollegeSize((s) => s + 1)}
                 />
                 {!isLoadingCollege && collegeUsers.length === 0 && (
                   <div className="text-center py-16 text-neutral-400 dark:text-neutral-600">
@@ -223,6 +259,97 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
     </div>
   );
 };
+
+// ─── College Filter (searchable combobox) ────────────────────────────────────
+interface CollegeFilterProps {
+  colleges: InstituteRankEntry[];
+  value: string;
+  onChange: (college: string) => void;
+  isLoading: boolean;
+}
+
+function CollegeFilter({ colleges, value, onChange, isLoading }: CollegeFilterProps) {
+  const [query, setQuery] = useState('');
+  const [open, setOpen] = useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  const filtered = query.length === 0
+    ? colleges
+    : colleges.filter((c) => c.institute.toLowerCase().includes(query.toLowerCase()));
+
+  // Close on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setQuery('');
+      }
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const selected = colleges.find((c) => c.institute === value);
+
+  return (
+    <div ref={containerRef} className="relative flex-shrink-0">
+      <button
+        onClick={() => { setOpen((o) => !o); setQuery(''); }}
+        className="flex items-center gap-1.5 text-sm font-semibold bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 rounded-xl px-3 py-2.5 hover:border-emerald-400 dark:hover:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all max-w-[148px]"
+      >
+        {isLoading ? (
+          <span className="text-neutral-400">লোড হচ্ছে…</span>
+        ) : (
+          <span className="truncate">{selected?.institute ?? 'কলেজ বেছে নাও'}</span>
+        )}
+        <svg className={`w-3.5 h-3.5 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 20 20" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 8l4 4 4-4" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-1 w-72 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl shadow-xl z-50 overflow-hidden">
+          {/* Search input */}
+          <div className="p-2 border-b border-neutral-100 dark:border-neutral-800">
+            <input
+              autoFocus
+              type="text"
+              placeholder="কলেজ খুঁজুন…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full text-sm px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/30 text-neutral-800 dark:text-neutral-200 placeholder-neutral-400"
+            />
+          </div>
+
+          {/* College list */}
+          <div className="max-h-60 overflow-y-auto divide-y divide-neutral-50 dark:divide-neutral-800">
+            {filtered.length === 0 ? (
+              <p className="text-xs text-neutral-400 text-center py-6">কোনো কলেজ পাওয়া যায়নি</p>
+            ) : (
+              filtered.map((c) => {
+                const isSelected = c.institute === value;
+                return (
+                  <button
+                    key={c.institute}
+                    onClick={() => { onChange(c.institute); setOpen(false); setQuery(''); }}
+                    className={`w-full text-left px-4 py-2.5 flex items-center justify-between gap-2 transition-colors ${
+                      isSelected
+                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
+                        : 'hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200'
+                    }`}
+                  >
+                    <span className="text-sm font-semibold truncate">{c.institute}</span>
+                    <span className="text-xs text-neutral-400 flex-shrink-0">{c.studentCount} জন</span>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ─── Pagination Controls (shared) ────────────────────────────────────────────
 interface PaginationProps {

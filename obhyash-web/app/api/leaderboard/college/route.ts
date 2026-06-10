@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 
+const PAGE_SIZE = 20;
+
 interface LeaderboardUserRow {
   id: string;
   name: string | null;
@@ -14,20 +16,21 @@ interface LeaderboardUserRow {
 }
 
 export async function GET(req: NextRequest) {
-  const institute = req.nextUrl.searchParams.get('institute');
+  const { searchParams } = req.nextUrl;
+  const institute = searchParams.get('institute');
+  const offset = Math.max(0, parseInt(searchParams.get('offset') ?? '0', 10));
+  const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') ?? String(PAGE_SIZE), 10)));
+
   if (!institute) {
-    return NextResponse.json(
-      { error: 'institute param required' },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'institute param required' }, { status: 400 });
   }
 
   const supabase = await createClient();
 
-  // Try the indexed RPC first (uses leaderboard_by_institute function + idx_profiles_institute_xp)
+  // Try indexed RPC first with offset/limit
   const { data: rpcData, error: rpcError } = await supabase.rpc(
     'leaderboard_by_institute',
-    { p_institute: institute },
+    { p_institute: institute, p_offset: offset, p_limit: limit },
   );
 
   let rows: LeaderboardUserRow[] | null = rpcData;
@@ -35,18 +38,13 @@ export async function GET(req: NextRequest) {
   if (rpcError || !rows) {
     const { data, error } = await supabase
       .from('public_profiles')
-      .select(
-        'id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak',
-      )
+      .select('id, name, institute, xp, level, exams_taken, avatar_url, avatar_color, streak')
       .eq('institute', institute)
       .order('xp', { ascending: false })
-      .limit(100);
+      .range(offset, offset + limit - 1);
 
     if (error || !data) {
-      return NextResponse.json(
-        { error: 'Failed to fetch college leaderboard' },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: 'Failed to fetch college leaderboard' }, { status: 500 });
     }
     rows = data;
   }
@@ -61,12 +59,15 @@ export async function GET(req: NextRequest) {
     avatarUrl: user.avatar_url || undefined,
     avatarColor: user.avatar_color || null,
     streakCount: user.streak || 0,
-    _index: index,
+    _index: offset + index,
   }));
 
-  return NextResponse.json(users, {
-    headers: {
-      'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+  return NextResponse.json(
+    { users, hasMore: rows.length === limit, nextOffset: offset + rows.length },
+    {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+      },
     },
-  });
+  );
 }
