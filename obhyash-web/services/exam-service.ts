@@ -447,14 +447,20 @@ export const updateExamResult = async (
       // Refresh session token before each attempt — long exams can expire the token
       await supabase.auth.refreshSession();
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('exam_results')
         .update(payload)
-        .eq('id', examId);
+        .eq('id', examId)
+        .select('id');
 
-      if (!error) return true;
+      if (!error && data && data.length > 0) {
+        return true;
+      }
 
-      console.warn(`[Exam Submit] Attempt ${attempt}/${MAX_RETRIES} failed:`, error.message);
+      console.warn(
+        `[Exam Submit] Attempt ${attempt}/${MAX_RETRIES} failed:`,
+        error ? error.message : '0 rows updated (row missing or RLS blocked)',
+      );
 
       if (attempt < MAX_RETRIES) {
         await new Promise((r) => setTimeout(r, attempt * 1000)); // 1s, 2s
