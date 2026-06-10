@@ -37,7 +37,11 @@ const NotificationsView: React.FC = () => {
       const { data, hasMore: more } = await getNotifications(limit, offset);
 
       if (isLoadMore) {
-        setNotifications((prev) => [...prev, ...data]);
+        setNotifications((prev) => {
+          const existingIds = new Set(prev.map(n => n.id));
+          const newItems = data.filter(n => !existingIds.has(n.id));
+          return [...prev, ...newItems];
+        });
       } else {
         setNotifications(data);
       }

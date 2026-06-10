@@ -3,7 +3,7 @@ import useSWR from "swr";
 import SubjectStat from "./SubjectStat";
 import { celebration } from "@/lib/confetti";
 import { toast } from "sonner";
-import { ExamResult, UserProfile } from "@/lib/types";
+import { ExamResult, UserProfile, Subject } from "@/lib/types";
 import { getSubjectDisplayName } from "@/lib/data/subject-name-map";
 import { DashboardSkeleton } from "@/components/student/ui/common/Skeletons";
 import UserAvatar from "@/components/student/ui/common/UserAvatar";
@@ -117,7 +117,18 @@ const Dashboard: React.FC<DashboardProps> = ({
   const isReady = !authLoading && !!(authUser?.id || user?.id);
   const effectiveUserId = authUser?.id || user?.id;
 
-  const { data: subjects = [], isLoading: isLoadingStats } = useSWR(
+  type DashboardSubject = { id: string; name: string; label?: string; icon?: string; group?: string; [key: string]: any };
+
+  const [fallbackSubjects] = useState<DashboardSubject[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const cached = localStorage.getItem('obhyash_cached_subjects');
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return [];
+  });
+
+  const { data: subjects = fallbackSubjects, isLoading: isLoadingStats } = useSWR(
     isReady && effectiveUserId
       ? [
           "userSubjects",
@@ -139,11 +150,17 @@ const Dashboard: React.FC<DashboardProps> = ({
         if (retryCount >= 3) return;
         setTimeout(() => revalidate({ retryCount }), 1000 * (retryCount + 1));
       },
+      fallbackData: fallbackSubjects,
+      onSuccess: (data) => {
+        if (data && data.length > 0) {
+          localStorage.setItem('obhyash_cached_subjects', JSON.stringify(data));
+        }
+      },
     },
   );
 
   const subjectStats = useMemo(() => {
-    return subjects.map((sub) => {
+    return subjects.map((sub: DashboardSubject) => {
       const subName = sub.name.toLowerCase();
       const subId = sub.id.toLowerCase();
 
