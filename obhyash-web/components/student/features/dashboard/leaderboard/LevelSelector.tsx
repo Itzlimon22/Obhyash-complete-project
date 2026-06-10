@@ -64,16 +64,6 @@ const LevelSelector: React.FC<LevelSelectorProps> = ({
                 {bnName}
               </span>
 
-              {/* Student count */}
-              <span className={[
-                'font-semibold leading-none transition-all',
-                isSelected
-                  ? 'text-[11px] text-neutral-500 dark:text-neutral-400'
-                  : 'text-[10px] text-neutral-400 dark:text-neutral-600',
-              ].join(' ')}>
-                {count > 0 ? `${count.toLocaleString()} জন` : '—'}
-              </span>
-
               {/* XP range — highlighted on selected */}
               <span className={[
                 'font-medium leading-none mt-0.5 transition-all',

@@ -28,6 +28,7 @@ import { OmrConfigModal } from "@/components/student/features/omr/OmrConfigModal
 import { downloadOMRSheet } from "@/services/download-service";
 import { EXAM_TYPE_OPTIONS } from "@/lib/constants";
 import { getAvailableQuestionCount } from "@/services/exam-service";
+import { getSubjects, getChapters, getTopics } from "@/services/database";
 
 interface ExamSetupFormProps {
   onStartExam: (config: ExamConfig) => void;
@@ -198,7 +199,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   const { data: rawSubjects, isLoading: isFetchingData } = useSWR(
     subjectCacheKey,
     async () => {
-      const { getSubjects } = await import("@/services/database");
       return getSubjects(userDivision, userStream, userOptionalSubject);
     },
     { revalidateOnFocus: false, dedupingInterval: 300_000 }, // cache 5 min
@@ -248,7 +248,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
     const fetchChapters = async () => {
       try {
-        const { getChapters } = await import("@/services/database");
         const chaptersData = await getChapters(subject);
         const formattedChapters = chaptersData.map(
           (chapter: Item, idx: number) => ({
@@ -278,7 +277,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
     const fetchTopics = async () => {
       try {
-        const { getTopics } = await import("@/services/database");
         const topicsData = await getTopics(selectedChapters);
         const formattedTopics = topicsData.map(
           (topic: TopicItem, idx: number) => ({

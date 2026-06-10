@@ -288,7 +288,12 @@ function CollegeFilter({ colleges, value, onChange, isLoading }: CollegeFilterPr
     for (const name of canonicalMatches) {
       if (!existingNames.has(name)) {
         existingNames.add(name);
-        combined.push({ institute: name, studentCount: 0, avgXp: 0 });
+        const existingRank = colleges.find((c) => c.institute === name);
+        if (existingRank) {
+          combined.push(existingRank);
+        } else {
+          combined.push({ institute: name, studentCount: 0, avgXp: 0 });
+        }
       }
     }
 
