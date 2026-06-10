@@ -33,26 +33,24 @@ export function useSessionMonitor({
   const sessionIdRef = useRef<string | null>(null);
   const supabase = createClient();
 
-  // Derive a stable session fingerprint from the current JWT.
-  // We use the `jti` claim when available, falling back to a random ID
-  // generated once per page load — still good enough to distinguish devices.
+  // Derive a stable session fingerprint for this browser device.
+  // We use a persistent device ID in localStorage to ensure multiple tabs 
+  // share the same session ID and don't kick each other out, 
+  // and to survive token refreshes (which change the JWT `iat`).
   const getSessionId = useCallback(async (): Promise<string> => {
     try {
-      const { data } = await supabase.auth.getSession();
-      const token = data.session?.access_token;
-      if (token) {
-        // Base64-decode the JWT payload (middle section)
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        if (payload.jti) return payload.jti as string;
-        // Fallback: use iat + sub as a fingerprint
-        if (payload.iat && payload.sub) return `${payload.sub}:${payload.iat}`;
+      let deviceId = localStorage.getItem('obhyash_device_id');
+      if (!deviceId) {
+        // Generate a random ID for this device
+        deviceId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        localStorage.setItem('obhyash_device_id', deviceId);
       }
+      return deviceId;
     } catch {
-      // Non-fatal — continue with random fallback
+      // Fallback for private browsing where localStorage might throw
+      return Math.random().toString(36).slice(2);
     }
-    // Random fallback (persists for this page session only)
-    return Math.random().toString(36).slice(2);
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     if (!userId) return;
