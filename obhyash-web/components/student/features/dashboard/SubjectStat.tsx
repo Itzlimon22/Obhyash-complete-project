@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ChevronDown, ArrowRight, Activity } from 'lucide-react';
 
 interface SubjectData {
   id?: string;
@@ -52,20 +53,7 @@ const SubjectItem: React.FC<{
             className={`flex items-center justify-center w-8 h-8 rounded-full transition-all ${isOpen ? 'bg-red-50 text-red-600 rotate-180 dark:bg-red-900/20 dark:text-red-400' : 'bg-neutral-50 text-neutral-500 dark:bg-neutral-800  group-hover:bg-red-50 group-hover:text-red-600 dark:group-hover:bg-red-900/20'}`}
             aria-label="Toggle details"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              className="w-4 h-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m19.5 8.25-7.5 7.5-7.5-7.5"
-              />
-            </svg>
+            <ChevronDown className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -128,20 +116,7 @@ const SubjectItem: React.FC<{
                   className="text-xs font-bold text-neutral-600 hover:text-red-600 dark:text-neutral-400 dark:hover:text-red-400 flex items-center justify-center gap-1.5 transition-colors px-6 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 w-full md:w-auto"
                 >
                   বিস্তারিত রিপোর্ট দেখো
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-3.5 h-3.5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
-                    />
-                  </svg>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
             )}
@@ -161,7 +136,8 @@ const SubjectStat: React.FC<SubjectStatProps> = ({
     return (
       <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-sm border border-neutral-100 dark:border-neutral-800">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="font-bold text-lg text-neutral-800 dark:text-white">
+          <h3 className="font-bold text-lg text-neutral-800 dark:text-white flex items-center gap-2">
+            <Activity className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             সাবজেক্ট ভিত্তিক রিপোর্ট
           </h3>
         </div>
@@ -188,7 +164,8 @@ const SubjectStat: React.FC<SubjectStatProps> = ({
   return (
     <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-sm border border-neutral-100 dark:border-neutral-800">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="font-bold text-lg text-neutral-800 dark:text-white">
+        <h3 className="font-bold text-lg text-neutral-800 dark:text-white flex items-center gap-2">
+          <Activity className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
           সাবজেক্ট ভিত্তিক রিপোর্ট
         </h3>
       </div>

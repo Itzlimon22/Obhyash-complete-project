@@ -1,5 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { usePersistedState } from '@/hooks/use-persisted-state';
+import { motion } from 'framer-motion';
+import { staggerContainer, fadeInUp } from '@/lib/animations';
+import { Database } from 'lucide-react';
 import {
   AreaChart,
   Area,
@@ -44,7 +47,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
       ? ['overall_analytics', history?.[0]?.user_id || user?.id, timeFilter]
       : null,
     async () => {
-      let userId = history?.[0]?.user_id || user?.id;
+      const userId = history?.[0]?.user_id || user?.id;
       if (!userId) return null;
       return getOverallAnalytics(userId, timeFilter);
     },
@@ -110,20 +113,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-6 animate-fade-in">
         <div className="w-20 h-20 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mb-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-10 h-10 text-neutral-400"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"
-            />
-          </svg>
+          <Database className="w-10 h-10 text-neutral-400" />
         </div>
         <h2 className="text-xl font-bold text-neutral-800 dark:text-white">
           কোনো ডাটা পাওয়া যায়নি
@@ -170,82 +160,82 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
       </div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+      <motion.div variants={staggerContainer} initial="hidden" animate="show" className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
           <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
             মোট পরীক্ষা
           </p>
           <p className="text-2xl md:text-3xl font-extrabold text-neutral-800 dark:text-white">
             {analytics.totalExams}
           </p>
-        </div>
-        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+        </motion.div>
+        <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
           <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
             গড় স্কোর
           </p>
           <p className="text-2xl md:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
             {analytics.avgScore}%
           </p>
-        </div>
-        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+        </motion.div>
+        <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
           <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
             সঠিকতা
           </p>
           <p className="text-2xl md:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">
             {analytics.avgAccuracy}%
           </p>
-        </div>
-        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+        </motion.div>
+        <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
           <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
             মোট সময়
           </p>
           <p className="text-xl md:text-2xl font-extrabold text-red-600 dark:text-red-400">
             {formatTime(analytics.totalTime)}
           </p>
-        </div>
-        <div className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+        </motion.div>
+        <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
           <p className="text-[10px] md:text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1">
             গড় সময় (প্রতি প্রশ্ন)
           </p>
           <p className="text-xl md:text-2xl font-extrabold text-blue-600 dark:text-blue-400">
             {formatTime(analytics.avgTimePerQuestion)}
           </p>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Secondary Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+      <motion.div variants={staggerContainer} initial="hidden" animate="show" className="grid grid-cols-3 gap-3">
+        <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
           <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">
             মোট প্রশ্ন
           </p>
           <p className="text-xl md:text-2xl font-extrabold text-neutral-800 dark:text-white">
             {totalQuestions.toLocaleString()}
           </p>
-        </div>
-        <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+        </motion.div>
+        <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
           <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">
             সঠিক উত্তর
           </p>
           <p className="text-xl md:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">
             {totalCorrect.toLocaleString()}
           </p>
-        </div>
-        <div className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
+        </motion.div>
+        <motion.div variants={fadeInUp} className="bg-white dark:bg-neutral-900 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col justify-between">
           <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-1">
             ভুল উত্তর
           </p>
           <p className="text-xl md:text-2xl font-extrabold text-red-500 dark:text-red-400">
             {totalWrong.toLocaleString()}
           </p>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Insight Banner: Best & Worst Subject */}
       {(bestSubject || worstSubject) && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <motion.div variants={staggerContainer} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {bestSubject && (
-            <div className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-4">
+            <motion.div variants={fadeInUp} className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-4">
               <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center flex-shrink-0 text-xl">
                 🏆
               </div>
@@ -261,10 +251,10 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
                   সঠিকতা
                 </p>
               </div>
-            </div>
+            </motion.div>
           )}
           {worstSubject && (
-            <div className="flex items-center gap-3 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/20 rounded-2xl p-4">
+            <motion.div variants={fadeInUp} className="flex items-center gap-3 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/20 rounded-2xl p-4">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0 text-xl">
                 📈
               </div>
@@ -282,12 +272,12 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
                   % সঠিকতা
                 </p>
               </div>
-            </div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chart */}
         <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm">
           <div className="flex justify-between items-center mb-6">
@@ -388,7 +378,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
             }
           />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

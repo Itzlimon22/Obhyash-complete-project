@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { motion } from 'framer-motion';
+import { Timer, CalendarClock, CheckCircle2, Target, Pencil } from 'lucide-react';
 
 // Static map: exam_target → exam date
 export const EXAM_DATES: Record<string, Date> = {
@@ -95,7 +97,9 @@ const CountdownBanner: React.FC<CountdownBannerProps> = ({
   const c = colorMap[urgency];
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
       className={`flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border ${c.bg} ${c.border} mb-1`}
     >
       <div className="flex items-center gap-3 min-w-0">
@@ -121,27 +125,29 @@ const CountdownBanner: React.FC<CountdownBannerProps> = ({
 
       <div className="flex items-center gap-2 flex-shrink-0">
         <span
-          className={`text-xs font-bold px-2.5 py-1 rounded-lg whitespace-nowrap ${c.badge}`}
+          className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-lg whitespace-nowrap ${c.badge}`}
         >
-          {urgency === 'critical'
-            ? '⚠️ শেষ মুহূর্ত'
-            : urgency === 'urgent'
-              ? '📅 প্রস্তুতি চলছে'
-              : urgency === 'past'
-                ? '✅ সম্পন্ন'
-                : '🎯 লক্ষ্য'}
+          {urgency === 'critical' ? (
+            <><Timer className="w-3.5 h-3.5" /> শেষ মুহূর্ত</>
+          ) : urgency === 'urgent' ? (
+            <><CalendarClock className="w-3.5 h-3.5" /> প্রস্তুতি চলছে</>
+          ) : urgency === 'past' ? (
+            <><CheckCircle2 className="w-3.5 h-3.5" /> সম্পন্ন</>
+          ) : (
+            <><Target className="w-3.5 h-3.5" /> লক্ষ্য</>
+          )}
         </span>
         {onChangeTarget && (
           <button
             onClick={onChangeTarget}
-            className="text-[10px] font-bold text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors p-1"
+            className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors p-1 rounded-md hover:bg-black/5 dark:hover:bg-white/10"
             aria-label="Change exam target"
           >
-            ✎
+            <Pencil className="w-3.5 h-3.5" />
           </button>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

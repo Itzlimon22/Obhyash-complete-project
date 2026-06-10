@@ -7,7 +7,9 @@ import { ExamResult, UserProfile } from "@/lib/types";
 import { getSubjectDisplayName } from "@/lib/data/subject-name-map";
 import { DashboardSkeleton } from "@/components/student/ui/common/Skeletons";
 import UserAvatar from "@/components/student/ui/common/UserAvatar";
-
+import { motion } from "framer-motion";
+import { staggerContainer, fadeInUp, hoverScale, tapScale } from "@/lib/animations";
+import { PenTool, Target, History, Trophy, BarChart2, BookOpen } from "lucide-react";
 interface SubjectStats {
   id: string;
   name: string;
@@ -226,172 +228,112 @@ const Dashboard: React.FC<DashboardProps> = ({
   }
 
   return (
-    <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 px-1">
+    <motion.div 
+      variants={staggerContainer}
+      initial="hidden"
+      animate="show"
+      className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 px-1"
+    >
       {/* Cards Section */}
-      <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3 h-fit">
-        <button
+      <motion.div variants={fadeInUp} className="lg:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3 h-fit">
+        <motion.button
+          variants={fadeInUp}
+          whileHover={hoverScale}
+          whileTap={tapScale}
           onClick={onMockExamClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/30 dark:to-neutral-900 border border-emerald-100 dark:border-emerald-900/40 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-emerald-300 dark:hover:border-emerald-800 hover:-translate-y-0.5 hover:shadow-md dark:hover:shadow-emerald-950/30 transition-all active:scale-[0.97] duration-200 text-center h-28 sm:h-32"
+          className="group relative overflow-hidden bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/30 dark:to-neutral-900 border border-emerald-100 dark:border-emerald-900/40 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-emerald-300 dark:hover:border-emerald-800 hover:shadow-md dark:hover:shadow-emerald-950/30 transition-all duration-200 text-center h-28 sm:h-32"
         >
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-700 dark:text-emerald-400 group-hover:scale-105 transition-transform shrink-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.8}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
-              />
-            </svg>
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-700 dark:text-emerald-400 group-hover:scale-110 transition-transform shrink-0">
+            <PenTool className="w-5 h-5" />
           </div>
           <h3 className="font-extrabold text-sm sm:text-base text-neutral-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
             মক পরীক্ষা
           </h3>
-        </button>
+        </motion.button>
 
         {/* অনুশীলন */}
-        <button
+        <motion.button
+          variants={fadeInUp}
+          whileHover={hoverScale}
+          whileTap={tapScale}
           onClick={onPracticeClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-sky-50 to-white dark:from-sky-950/30 dark:to-neutral-900 border border-sky-100 dark:border-sky-900/40 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-sky-300 dark:hover:border-sky-800 hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.97] duration-200 text-center h-28 sm:h-32"
+          className="group relative overflow-hidden bg-gradient-to-br from-sky-50 to-white dark:from-sky-950/30 dark:to-neutral-900 border border-sky-100 dark:border-sky-900/40 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-sky-300 dark:hover:border-sky-800 hover:shadow-md transition-all duration-200 text-center h-28 sm:h-32"
         >
-          <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center text-sky-700 dark:text-sky-400 group-hover:scale-105 transition-transform shrink-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.8}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25"
-              />
-            </svg>
+          <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center text-sky-700 dark:text-sky-400 group-hover:scale-110 transition-transform shrink-0">
+            <Target className="w-5 h-5" />
           </div>
           <h3 className="font-extrabold text-sm sm:text-base text-neutral-900 dark:text-white group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
             অনুশীলন
           </h3>
-        </button>
+        </motion.button>
 
         {/* ইতিহাস */}
-        <button
+        <motion.button
+          variants={fadeInUp}
+          whileHover={hoverScale}
+          whileTap={tapScale}
           onClick={onHistoryClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/20 dark:to-neutral-900 border border-amber-100 dark:border-amber-900/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-amber-300 dark:hover:border-amber-800 hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.97] duration-200 text-center h-28 sm:h-32"
+          className="group relative overflow-hidden bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/20 dark:to-neutral-900 border border-amber-100 dark:border-amber-900/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-amber-300 dark:hover:border-amber-800 hover:shadow-md transition-all duration-200 text-center h-28 sm:h-32"
         >
-          <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-700 dark:text-amber-400 group-hover:scale-105 transition-transform shrink-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.8}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-              />
-            </svg>
+          <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-700 dark:text-amber-400 group-hover:scale-110 transition-transform shrink-0">
+            <History className="w-5 h-5" />
           </div>
           <h3 className="font-extrabold text-sm sm:text-base text-neutral-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
             ইতিহাস
           </h3>
-        </button>
+        </motion.button>
 
 
         {/* লিডারবোর্ড */}
-        <button
+        <motion.button
+          variants={fadeInUp}
+          whileHover={hoverScale}
+          whileTap={tapScale}
           onClick={onLeaderboardClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-violet-50 to-white dark:from-violet-950/20 dark:to-neutral-900 border border-violet-100 dark:border-violet-900/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-violet-300 dark:hover:border-violet-800 hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.97] duration-200 text-center h-28 sm:h-32"
+          className="group relative overflow-hidden bg-gradient-to-br from-violet-50 to-white dark:from-violet-950/20 dark:to-neutral-900 border border-violet-100 dark:border-violet-900/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-violet-300 dark:hover:border-violet-800 hover:shadow-md transition-all duration-200 text-center h-28 sm:h-32"
         >
-          <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-700 dark:text-violet-400 group-hover:scale-105 transition-transform shrink-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.8}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0V5.625a1.125 1.125 0 0 0-1.125-1.125h-2.812a1.125 1.125 0 0 0-1.125 1.125v9.75"
-              />
-            </svg>
+          <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-700 dark:text-violet-400 group-hover:scale-110 transition-transform shrink-0">
+            <Trophy className="w-5 h-5" />
           </div>
           <h3 className="font-extrabold text-sm sm:text-base text-neutral-900 dark:text-white group-hover:text-violet-700 dark:group-hover:text-violet-400 transition-colors">
             লিডারবোর্ড
           </h3>
-        </button>
+        </motion.button>
 
 
 
         {/* এনালাইসিস*/}
-        <button
+        <motion.button
+          variants={fadeInUp}
+          whileHover={hoverScale}
+          whileTap={tapScale}
           onClick={onAnalysisClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/20 dark:to-neutral-900 border border-rose-100 dark:border-rose-900/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-rose-300 dark:hover:border-rose-800 hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.97] duration-200 text-center h-28 sm:h-32"
+          className="group relative overflow-hidden bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/20 dark:to-neutral-900 border border-rose-100 dark:border-rose-900/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-md transition-all duration-200 text-center h-28 sm:h-32"
         >
-          <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-105 transition-transform shrink-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.8}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z"
-              />
-            </svg>
+          <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform shrink-0">
+            <BarChart2 className="w-5 h-5" />
           </div>
           <h3 className="font-extrabold text-sm sm:text-base text-neutral-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
             এনালাইসিস
           </h3>
-        </button>
+        </motion.button>
 
         {/* ব্লগ */}
-        <button
+        <motion.button
+          variants={fadeInUp}
+          whileHover={hoverScale}
+          whileTap={tapScale}
           onClick={onBlogClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-teal-50 to-white dark:from-teal-950/20 dark:to-neutral-900 border border-teal-100 dark:border-teal-900/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-teal-300 dark:hover:border-teal-800 hover:-translate-y-0.5 hover:shadow-md transition-all active:scale-[0.97] duration-200 text-center h-28 sm:h-32"
+          className="group relative overflow-hidden bg-gradient-to-br from-teal-50 to-white dark:from-teal-950/20 dark:to-neutral-900 border border-teal-100 dark:border-teal-900/30 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:border-teal-300 dark:hover:border-teal-800 hover:shadow-md transition-all duration-200 text-center h-28 sm:h-32"
         >
-          <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center text-teal-700 dark:text-teal-400 group-hover:scale-105 transition-transform shrink-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.8}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
-              />
-            </svg>
+          <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center text-teal-700 dark:text-teal-400 group-hover:scale-110 transition-transform shrink-0">
+            <BookOpen className="w-5 h-5" />
           </div>
           <h3 className="font-extrabold text-sm sm:text-base text-neutral-900 dark:text-white group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors">
             ব্লগ
           </h3>
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Leaderboard Section — HIDDEN (remove comment to restore):
       {/* Leaderboard Section - Order 2 on Mobile, Right Column on Desktop * /}
@@ -517,14 +459,14 @@ const Dashboard: React.FC<DashboardProps> = ({
       */}
 
       {/* Subject Stats Section - Order 3 on Mobile, Bottom Left on Desktop */}
-      <div className="lg:col-span-2">
+      <motion.div variants={fadeInUp} className="lg:col-span-2">
         <SubjectStat
           data={subjectStats}
           onSubjectClick={onSubjectClick}
           isLoading={isLoadingStats}
         />
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

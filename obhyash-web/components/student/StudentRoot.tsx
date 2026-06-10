@@ -144,10 +144,12 @@ export default function StudentRoot({
     async (config: ExamConfig) => {
       lastExamConfigRef.current = config;
       setPendingConfig(config);
-      // Manually set to INSTRUCTIONS to show the rule page
-      // Engine is still IDLE or pre-loading, but we want to show instructions first.
-      // We rely on checking !examDetails to know it's pre-fetch.
       setAppState(AppState.INSTRUCTIONS);
+      if (typeof window !== "undefined") {
+        window.history.pushState({ tab: "exam" }, "", "/exam/active");
+        setActiveTab("exam");
+        sessionStorage.setItem("obhyash_active_tab", "exam");
+      }
     },
     [setAppState],
   );
@@ -208,6 +210,7 @@ export default function StudentRoot({
     "subscription",
     "profile",
     "settings",
+    "exam",
   ];
 
   const [activeTab, setActiveTab] = useState(() => {
@@ -219,6 +222,7 @@ export default function StudentRoot({
       // Deep paths: /leaderboard/user/[id] or /history/[examId]
       if (path.startsWith("leaderboard/user/")) return "user_profile";
       if (path.startsWith("history/") && path !== "history") return "history_result";
+      if (path.startsWith("exam/")) return "exam";
 
       // Top-level tab paths
       if (validTabs.includes(path)) return path;
@@ -705,6 +709,14 @@ export default function StudentRoot({
             />
           </AppLayout>
         );
+      }
+
+      if (activeTab === "exam") {
+        if (typeof window !== "undefined" && !localStorage.getItem("obhyash_exam_draft")) {
+           // Redirect back to setup if there's no active draft
+           setTimeout(() => handleTabChange("setup"), 0);
+        }
+        return <InitialLoader />;
       }
 
       if (activeTab === "history") {

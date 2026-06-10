@@ -2,6 +2,8 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { UserProfile } from 'lib/types';
 import { LevelType, LEVELS } from './leaderboardData';
 import UserAvatar from '@/components/student/ui/common/UserAvatar';
+import { motion } from 'framer-motion';
+import { Trophy, Loader2 } from 'lucide-react';
 
 const PAGE_SIZE = 20;
 
@@ -56,9 +58,9 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   };
 
   const getRankIcon = (idx: number) => {
-    if (idx === 0) return <span className="text-xl md:text-2xl">🥇</span>;
-    if (idx === 1) return <span className="text-xl md:text-2xl">🥈</span>;
-    if (idx === 2) return <span className="text-xl md:text-2xl">🥉</span>;
+    if (idx === 0) return <Trophy className="w-5 h-5 md:w-6 md:h-6 text-yellow-500" />;
+    if (idx === 1) return <Trophy className="w-5 h-5 md:w-6 md:h-6 text-neutral-400" />;
+    if (idx === 2) return <Trophy className="w-5 h-5 md:w-6 md:h-6 text-amber-700" />;
     return (
       <span className="font-bold text-sm md:text-base w-6 md:w-8 text-center inline-block">
         {idx + 1}
@@ -128,8 +130,11 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
               users.map((user, idx) => {
                 const isMe = user.isCurrentUser;
                 return (
-                  <tr
+                  <motion.tr
                     key={user.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: (idx % 20) * 0.05 }}
                     className={`transition-colors group ${
                       isMe
                         ? 'bg-emerald-50/70 dark:bg-emerald-900/10'
@@ -172,7 +177,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                         <span className="text-[10px] font-bold text-emerald-500/70 dark:text-emerald-600 ml-0.5">XP</span>
                       </div>
                     </td>
-                  </tr>
+                  </motion.tr>
                 );
               })
             )}
@@ -185,10 +190,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
       {isLoadingMore && (
         <div className="flex justify-center py-4 border-t border-neutral-100 dark:border-neutral-800">
           <div className="flex items-center gap-2 text-xs text-neutral-400">
-            <svg className="animate-spin w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-            </svg>
+            <Loader2 className="animate-spin w-4 h-4 text-emerald-500" />
             আরো লোড হচ্ছে…
           </div>
         </div>

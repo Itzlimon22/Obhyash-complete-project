@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { motion } from 'framer-motion';
+import { hoverScale, tapScale } from '@/lib/animations';
+import { Target } from 'lucide-react';
 
 interface DailyGoalCardProps {
   completedMCQsToday: number;
@@ -29,7 +32,8 @@ const DailyGoalCard: React.FC<DailyGoalCardProps> = ({
   const milestones = [0.25, 0.5, 0.75, 1].map((f) => Math.round(f * mcqGoal));
 
   return (
-    <div
+    <motion.div
+      whileHover={hoverScale}
       className={`flex items-center gap-4 px-4 py-4 rounded-2xl border transition-all ${
         done
           ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40'
@@ -80,8 +84,8 @@ const DailyGoalCard: React.FC<DailyGoalCardProps> = ({
       {/* Text + Progress Bar */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
-          <p className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
-            আজকের লক্ষ্য
+          <p className="text-[10px] flex items-center gap-1 font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-wider">
+            <Target className="w-3 h-3" /> আজকের লক্ষ্য
           </p>
           <span
             className={`text-[10px] font-bold tabular-nums ${
@@ -153,14 +157,15 @@ const DailyGoalCard: React.FC<DailyGoalCardProps> = ({
 
       {/* CTA */}
       {!done && (
-        <button
+        <motion.button
+          whileTap={tapScale}
           onClick={onStartExam}
-          className="flex-shrink-0 text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white px-3 py-2.5 rounded-xl transition-all whitespace-nowrap"
+          className="flex-shrink-0 text-xs font-extrabold bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2.5 rounded-xl transition-all whitespace-nowrap"
         >
           শুরু করো
-        </button>
+        </motion.button>
       )}
-    </div>
+    </motion.div>
   );
 };
 
