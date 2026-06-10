@@ -7,7 +7,6 @@ interface ConfirmationModalProps {
   onClose: () => void;
   onConfirm: () => void;
   unansweredCount: number;
-  isOmrMode?: boolean;
   isEvaluating?: boolean;
 }
 
@@ -16,12 +15,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onClose,
   onConfirm,
   unansweredCount,
-  isOmrMode = false,
   isEvaluating = false,
 }) => {
   if (!isOpen) return null;
 
-  const isWarning = !isOmrMode && unansweredCount > 0;
+  const isWarning = unansweredCount > 0;
 
   // Deep color palette - simplified solid colors
   const colors = isWarning
@@ -106,18 +104,14 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 id="confirm-modal-title"
                 className="text-lg font-bold text-neutral-900 dark:text-white leading-snug"
               >
-                {isOmrMode
-                  ? "OMR জমা নিশ্চিত করুন"
-                  : isWarning
-                    ? "অসম্পূর্ণ পরীক্ষা"
-                    : "পরীক্ষা শেষ করুন"}
+                {isWarning
+                  ? "অসম্পূর্ণ পরীক্ষা"
+                  : "পরীক্ষা শেষ করুন"}
               </h3>
               <p className="mt-1.5 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                {isOmrMode
-                  ? "আপনার OMR উত্তরপত্র জমা দিয়ে মূল্যায়নের জন্য পাঠাবেন?"
-                  : isWarning
-                    ? `আপনি এখনো ${unansweredCount}টি প্রশ্নের উত্তর দেননি। তুমি কি নিশ্চিত যে পরীক্ষা জমা দিতে চাও?`
-                    : "তুমি সব প্রশ্নের উত্তর দিয়েছো। তুমি কি উত্তরপত্র জমা দিতে প্রস্তুত?"}
+                {isWarning
+                  ? `আপনি এখনো ${unansweredCount}টি প্রশ্নের উত্তর দেননি। তুমি কি নিশ্চিত যে পরীক্ষা জমা দিতে চাও?`
+                  : "তুমি সব প্রশ্নের উত্তর দিয়েছো। তুমি কি উত্তরপত্র জমা দিতে প্রস্তুত?"}
               </p>
             </div>
           </div>

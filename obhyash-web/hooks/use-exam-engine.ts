@@ -12,7 +12,6 @@ import {
   initiateExamSession,
   saveExamResult,
 } from '@/services/exam-service';
-import { evaluateOMRScript } from '../services/gemini-service';
 import { cacheQuestions, getCachedQuestions } from '@/services/question-cache';
 import { toast } from 'sonner';
 
@@ -76,14 +75,7 @@ export const useExamEngine = () => {
   // useRef is intentional: it updates synchronously unlike React state.
   const isSubmittingRef = useRef(false);
 
-  // --- OMR State ---
-  const [isOmrMode, setIsOmrMode] = useState(false);
-  const [selectedScript, setSelectedScript] = useState<{
-    file: File;
-    base64: string;
-  } | null>(null);
   const [isEvaluating, setIsEvaluating] = useState(false);
-  const [omrError, setOmrError] = useState<string | null>(null);
 
   // --- History State (Local Sync) ---
   const [examHistory, setExamHistory] = useState<ExamResult[]>([]);
@@ -160,8 +152,6 @@ export const useExamEngine = () => {
   const startExam = async (config: ExamConfig): Promise<boolean> => {
     setErrorDetails('');
     setAppState(AppState.LOADING);
-    setIsOmrMode(false);
-    setSelectedScript(null);
 
     /** Helper: set up exam state from a question array (used by both fetch & cache paths) */
     const setupExamFromQuestions = (
@@ -267,8 +257,6 @@ export const useExamEngine = () => {
   ) => {
     setErrorDetails('');
     setAppState(AppState.LOADING);
-    setIsOmrMode(false);
-    setSelectedScript(null);
 
     try {
       setQuestions(customQuestions);
@@ -348,23 +336,7 @@ export const useExamEngine = () => {
         return { success: false, error: 'Already submitted' };
       }
 
-      // OMR Check
-      if (
-        (isOmrMode || stateRef.current === AppState.GRACE_PERIOD) &&
-        !selectedScript
-      ) {
-        if (stateRef.current === AppState.ACTIVE) {
-          setAppState(AppState.GRACE_PERIOD);
-          setGraceTimeLeft(300);
-          return { requiresUpload: true };
-        }
-        if (manualSubmit && !selectedScript) {
-          return { requiresUpload: true };
-        }
-      }
-
       isSubmittingRef.current = true;
-
       setIsEvaluating(true);
       setErrorDetails('');
 
@@ -393,28 +365,19 @@ export const useExamEngine = () => {
           questions: questions,
           // Persist Flagged Questions
           flaggedQuestions: Array.from(flaggedQuestions),
-          submissionType:
-            isOmrMode || stateRef.current === AppState.GRACE_PERIOD
-              ? 'script'
-              : 'digital',
+          submissionType: 'digital',
         };
 
-        if (newResult.submissionType === 'digital') {
-          const stats = calculateExamStats(
-            questions,
-            userAnswers,
-            examDetailsRef.current?.negativeMarking || 0,
-          );
-          newResult.score = stats.finalScore;
-          newResult.correctCount = stats.correctCount;
-          newResult.wrongCount = stats.wrongCount;
-          newResult.userAnswers = userAnswers;
-          newResult.status = 'evaluated';
-        } else {
-          newResult.scriptImageData = selectedScript?.base64;
-          // AI Evaluation has been disabled. Status is set to 'pending' for manual review.
-          newResult.status = 'pending';
-        }
+        const stats = calculateExamStats(
+          questions,
+          userAnswers,
+          examDetailsRef.current?.negativeMarking || 0,
+        );
+        newResult.score = stats.finalScore;
+        newResult.correctCount = stats.correctCount;
+        newResult.wrongCount = stats.wrongCount;
+        newResult.userAnswers = userAnswers;
+        newResult.status = 'evaluated';
 
         // Save using central database service
         await saveExamResult(newResult);
@@ -440,8 +403,6 @@ export const useExamEngine = () => {
       }
     },
     [
-      isOmrMode,
-      selectedScript,
       questions,
       userAnswers,
       flaggedQuestions,
@@ -474,7 +435,6 @@ export const useExamEngine = () => {
         // Absolute epoch ms timestamp — enables real timer resume across closes
         targetEndTime: Date.now() + timeLeft * 1000,
         graceTimeLeft,
-        isOmrMode,
         appState,
         lastUpdated: Date.now(),
         version: 2,
@@ -497,7 +457,6 @@ export const useExamEngine = () => {
     dbSessionId,
     timeLeft,
     graceTimeLeft,
-    isOmrMode,
     appState,
   ]);
 
@@ -565,7 +524,6 @@ export const useExamEngine = () => {
             targetEndTimeRef.current = parsed.targetEndTime;
           }
           setGraceTimeLeft(parsed.graceTimeLeft || 0);
-          setIsOmrMode(parsed.isOmrMode || false);
 
           if (restoredTimeLeft <= 0 && parsed.appState === AppState.ACTIVE) {
             // Expired while away — restore state first, then submitExam will
@@ -651,13 +609,7 @@ export const useExamEngine = () => {
     setGraceTimeLeft,
     timeTaken,
     setTimeTaken,
-    isOmrMode,
-    setIsOmrMode,
-    selectedScript,
-    setSelectedScript,
     isEvaluating,
-    omrError,
-    setOmrError,
     examHistory,
     setExamHistory,
     errorDetails,

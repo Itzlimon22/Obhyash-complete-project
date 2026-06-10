@@ -13,7 +13,6 @@ interface QuestionCardProps {
   onSelectOption: (optionIndex: number) => void;
   onToggleFlag: () => void;
   onReport: () => void;
-  isOmrMode?: boolean;
   showFeedback?: boolean;
   readOnly?: boolean;
   showAnswer?: boolean;
@@ -31,7 +30,6 @@ export default function QuestionCard({
   isFlagged,
   onSelectOption,
   onReport,
-  isOmrMode = false,
   showFeedback = false,
   readOnly = false,
   showAnswer = false,
@@ -174,7 +172,7 @@ export default function QuestionCard({
         className={`
     px-4 pb-4 md:px-6 md:pb-5
     grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-3 items-stretch
-    ${readOnly || isOmrMode ? 'pointer-events-none' : ''}
+    ${readOnly ? 'pointer-events-none' : ''}
   `}
       >
         {question.options.map((option, idx) => {
@@ -229,7 +227,7 @@ export default function QuestionCard({
                 group relative flex items-center gap-2.5 w-full h-full
                 px-3 py-1.5 rounded-md border
                 transition-all duration-200
-                ${isOmrMode || readOnly ? 'cursor-default' : 'cursor-pointer'}
+                ${readOnly ? 'cursor-default' : 'cursor-pointer'}
                 ${boxClass}
               `}
             >
@@ -238,9 +236,9 @@ export default function QuestionCard({
                 name={`question-${question.id}`}
                 checked={isSelected}
                 onChange={() =>
-                  !isAnswered && !isOmrMode && !readOnly && onSelectOption(idx)
+                  !isAnswered && !readOnly && onSelectOption(idx)
                 }
-                disabled={isAnswered || isOmrMode || readOnly}
+                disabled={isAnswered || readOnly}
                 className="sr-only"
               />
 

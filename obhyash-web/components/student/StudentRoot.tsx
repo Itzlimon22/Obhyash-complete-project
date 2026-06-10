@@ -117,13 +117,7 @@ export default function StudentRoot({
     timeLeft,
     graceTimeLeft,
     timeTaken,
-    isOmrMode,
-    setIsOmrMode,
-    selectedScript,
-    setSelectedScript,
     isEvaluating,
-    omrError,
-    setOmrError,
     examHistory,
     setExamHistory,
     errorDetails,
@@ -980,10 +974,6 @@ export default function StudentRoot({
             setFlaggedQuestions={setFlaggedQuestions}
             timeLeft={timeLeft}
             graceTimeLeft={graceTimeLeft}
-            isOmrMode={isOmrMode}
-            setIsOmrMode={setIsOmrMode}
-            selectedScript={selectedScript}
-            setSelectedScript={setSelectedScript}
             isEvaluating={isEvaluating}
             onSubmit={handleExamSubmit}
             onExit={() =>
@@ -1076,7 +1066,6 @@ export default function StudentRoot({
             isHistoryMode={isReviewingHistory}
             negativeMarking={examDetails?.negativeMarking}
             submissionType={
-              isOmrMode ||
               examHistory[examHistory.length - 1]?.submissionType === "script"
                 ? "script"
                 : "digital"

@@ -7,9 +7,6 @@ interface MobileBottomNavProps {
   onMenuClick: () => void;
   isLiveExam?: boolean;
   onSubmit?: () => void;
-  isOmrMode?: boolean;
-  onUpload?: () => void;
-  hasSelectedScript?: boolean;
   isEvaluating?: boolean;
   answeredCount?: number;
   totalQuestions?: number;
@@ -21,9 +18,6 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   onMenuClick,
   isLiveExam,
   onSubmit,
-  isOmrMode,
-  onUpload,
-  hasSelectedScript,
   isEvaluating = false,
   answeredCount,
   totalQuestions,
@@ -33,61 +27,24 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
         <div className="bg-white/95 dark:bg-neutral-950/95 backdrop-blur-xl border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3 px-4 py-2.5 pb-0 shadow-[0_-4px_24px_rgb(0,0,0,0.08)]">
-          {isOmrMode ? (
-            <div className="flex-1 flex gap-2">
-              <button
-                onClick={onUpload}
-                disabled={isEvaluating}
-                className={`flex-1 font-bold text-sm py-2.5 px-4 rounded-xl border transition-all flex items-center justify-center gap-2 ${hasSelectedScript ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400" : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 active:scale-[0.96]"} disabled:opacity-50`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
-                  />
-                </svg>
-                {hasSelectedScript ? "সংগৃহীত" : "OMR ক্যাপচার"}
-              </button>
-              <button
-                onClick={onSubmit}
-                disabled={!hasSelectedScript || isEvaluating}
-                className="flex-[1.2] bg-emerald-600 hover:bg-emerald-700 disabled:bg-neutral-200 dark:disabled:bg-neutral-800 disabled:text-neutral-400 dark:disabled:text-neutral-600 disabled:shadow-none text-white font-extrabold text-sm py-2.5 px-4 rounded-xl shadow-lg shadow-emerald-600/20 active:scale-[0.96] transition-all flex items-center justify-center gap-2"
-              >
-                {isEvaluating ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  "জমা দাও"
-                )}
-              </button>
-            </div>
-          ) : (
-            <div className="flex justify-end flex-1">
-              <button
-                onClick={onSubmit}
-                disabled={isEvaluating}
-                className="w-auto bg-emerald-800 hover:bg-emerald-900 disabled:bg-neutral-200 dark:disabled:bg-neutral-800 disabled:text-neutral-400 dark:disabled:text-neutral-600 text-white font-extrabold text-[13px] py-2.5 px-5 rounded-xl shadow-lg shadow-emerald-900/20 active:scale-[0.96] transition-all flex items-center justify-center gap-2"
-              >
-                {isEvaluating ? (
-                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <div className="w-4 h-4 flex items-center justify-center bg-white/20 rounded-full">
-                      <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                    </div>
-                    পরীক্ষা শেষ করো
-                  </>
-                )}
-              </button>
-            </div>
-          )}
+          <div className="flex justify-end flex-1">
+            <button
+              onClick={onSubmit}
+              disabled={isEvaluating}
+              className="w-auto bg-emerald-800 hover:bg-emerald-900 disabled:bg-neutral-200 dark:disabled:bg-neutral-800 disabled:text-neutral-400 dark:disabled:text-neutral-600 text-white font-extrabold text-[13px] py-2.5 px-5 rounded-xl shadow-lg shadow-emerald-900/20 active:scale-[0.96] transition-all flex items-center justify-center gap-2"
+            >
+              {isEvaluating ? (
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <div className="w-4 h-4 flex items-center justify-center bg-white/20 rounded-full">
+                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                  </div>
+                  পরীক্ষা শেষ করো
+                </>
+              )}
+            </button>
+          </div>
           <button
             onClick={onMenuClick}
             className="p-3 bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 rounded-xl border border-neutral-200 dark:border-neutral-800 active:scale-[0.9] transition-all"

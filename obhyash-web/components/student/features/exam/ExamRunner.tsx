@@ -13,8 +13,7 @@ import TimeoutModal from "@/components/student/ui/common/TimeoutModal";
 import ReportModal from "@/components/student/ui/common/ReportModal";
 import NavigationWarningModal from "@/components/student/ui/common/NavigationWarningModal";
 
-// Features / Results
-import ScriptUploader from "@/components/student/ui/ScriptUploader";
+
 
 // Data & Services
 import {
@@ -54,14 +53,7 @@ interface ExamRunnerProps {
   timeLeft: number;
   /** Grace period time remaining in seconds (for OMR upload) */
   graceTimeLeft: number;
-  /** Whether the exam is in OMR (Offline) mode */
-  isOmrMode: boolean;
-  /** Toggle function for OMR mode */
-  setIsOmrMode: (mode: boolean) => void;
-  /** The selected OMR script file and its base64 representation */
-  selectedScript: { file: File; base64: string } | null;
-  /** Setter for the selected OMR script */
-  setSelectedScript: (script: { file: File; base64: string } | null) => void;
+
   /** Whether the exam is currently being submitted/evaluated */
   isEvaluating?: boolean;
   /** Function to handle exam submission */
@@ -116,10 +108,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
   setFlaggedQuestions,
   timeLeft,
   graceTimeLeft,
-  isOmrMode,
-  setIsOmrMode,
-  selectedScript,
-  setSelectedScript,
+
   isEvaluating,
   onSubmit,
   onTimeoutReattempt,
@@ -136,7 +125,6 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
   onToggleBookmark,
 }) => {
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [reportModalState, setReportModalState] = useState<{
     isOpen: boolean;
     questionId: number | string | null;
@@ -145,17 +133,13 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
 
   // ... (Handlers) ...
   const handleSubmitRequest = () => {
-    if (isOmrMode && !selectedScript) {
-      setIsUploadModalOpen(true);
-      return;
-    }
     const unanswered = questions.length - Object.keys(userAnswers).length;
 
-    // Direct submit if all answered and not OMR mode
-    if (!isOmrMode && unanswered === 0) {
+    // Direct submit if all answered
+    if (unanswered === 0) {
       handleConfirmSubmit();
     } else {
-      // Show confirmation modal for incomplete exams or OMR mode
+      // Show confirmation modal for incomplete exams
       setIsSubmitModalOpen(true);
     }
   };
@@ -184,29 +168,6 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
       isLiveExam={true}
       isEvaluating={isEvaluating}
       onSubmit={handleSubmitRequest}
-      isOmrMode={isOmrMode}
-      onUpload={() => setIsUploadModalOpen(true)}
-      hasSelectedScript={!!selectedScript}
-      customHeader={
-        <ExamHeader
-          details={examDetails}
-          timeLeft={timeLeft}
-          graceTimeLeft={graceTimeLeft}
-          appState={appState}
-          isOmrMode={isOmrMode}
-          onToggleOmr={() => {
-            toast.info("OMR মোড শীঘ্রই উপলব্ধ হবে।");
-            setIsOmrMode(false);
-          }}
-          onDownloadQuestionPaper={() =>
-            downloadQuestionPaper(examDetails, questions)
-          }
-          onDownloadOMR={() => downloadOMRSheet(examDetails, questions.length)}
-          onExit={() => setNavWarning({ isOpen: true, targetTab: 'dashboard', action: 'tab' })}
-          answeredCount={Object.keys(userAnswers).length}
-          totalQuestions={questions.length}
-        />
-      }
     >
       <div className="relative min-h-full flex flex-col bg-[#f8fafc] dark:bg-black">
         {/* Exam Container (Scrollable) */}
@@ -248,7 +209,6 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                       questionId: q.id,
                     })
                   }
-                  isOmrMode={isOmrMode}
                   hideMetadata={true}
                 />
               );
@@ -260,58 +220,6 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
         <div className="sticky bottom-0 left-0 right-0 hidden sm:block z-40">
           <div className="bg-white/95 dark:bg-neutral-950/95 backdrop-blur-xl border-t border-neutral-200 dark:border-neutral-800 shadow-[0_-8px_24px_-4px_rgba(0,0,0,0.08)]">
             <div className="max-w-4xl mx-auto px-6 pt-3 pb-0 flex items-center justify-end gap-4">
-              {/* Right: action buttons */}
-              {isOmrMode ? (
-                <div className="flex items-center gap-2.5 shrink-0">
-                  <button
-                    onClick={() => setIsUploadModalOpen(true)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm border transition-all active:scale-[0.97] ${
-                      selectedScript
-                        ? "border-emerald-400 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30"
-                        : "border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800"
-                    }`}
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
-                      />
-                    </svg>
-                    {selectedScript ? "স্ক্রিপ্ট পরিবর্তন" : "OMR ক্যাপচার"}
-                  </button>
-                  <button
-                    onClick={handleSubmitRequest}
-                    disabled={!selectedScript || isEvaluating}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-500/25 transition-all active:scale-[0.97]"
-                  >
-                    {isEvaluating ? (
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2.5}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                        />
-                      </svg>
-                    )}
-                    স্ক্রিপ্ট জমা দাও
-                  </button>
-                </div>
-              ) : (
                 <button
                   onClick={handleSubmitRequest}
                   disabled={isEvaluating}
@@ -337,7 +245,6 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                   )}
                   পরীক্ষা শেষ করো
                 </button>
-              )}
             </div>
           </div>
 
@@ -368,16 +275,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
           onClose={() => setIsSubmitModalOpen(false)}
           onConfirm={handleConfirmSubmit}
           unansweredCount={questions.length - Object.keys(userAnswers).length}
-          isOmrMode={isOmrMode}
           isEvaluating={isEvaluating}
-        />
-        <ScriptUploader
-          isOpen={isUploadModalOpen}
-          onClose={() => setIsUploadModalOpen(false)}
-          onSelect={(file, base64) => {
-            setSelectedScript({ file, base64 });
-            setIsUploadModalOpen(false);
-          }}
         />
         {/* Using direct modal rendering or portal would be better, but keeping inline for simplicity with existing architecture */}
         {appState === AppState.GRACE_PERIOD && (
