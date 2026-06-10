@@ -198,7 +198,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
             downloadQuestionPaper(examDetails, questions)
           }
           onDownloadOMR={() => downloadOMRSheet(examDetails, questions.length)}
-          onExit={() => setIsSubmitModalOpen(true)}
+          onExit={() => setNavWarning({ isOpen: true, targetTab: 'dashboard', action: 'tab' })}
           answeredCount={Object.keys(userAnswers).length}
           totalQuestions={questions.length}
         />
@@ -255,42 +255,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
         {/* Sticky Footer for Submit - HIDDEN ON MOBILE (moved to bottom nav) */}
         <div className="sticky bottom-0 left-0 right-0 hidden sm:block z-40">
           <div className="bg-white/95 dark:bg-neutral-950/95 backdrop-blur-xl border-t border-neutral-200 dark:border-neutral-800 shadow-[0_-8px_24px_-4px_rgba(0,0,0,0.08)]">
-            <div className="max-w-4xl mx-auto px-6 pt-3 pb-0 flex items-center justify-between gap-4">
-              {/* Left: mini answered summary */}
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="hidden md:flex flex-col gap-1 min-w-[140px]">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-                      অগ্রগতি
-                    </span>
-                    <span className="text-[10px] font-black text-neutral-500 dark:text-neutral-400 tabular-nums">
-                      {Object.keys(userAnswers).length}/{questions.length}
-                    </span>
-                  </div>
-                  <div className="h-1.5 w-full rounded-full bg-neutral-100 dark:bg-neutral-800">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        Object.keys(userAnswers).length === questions.length
-                          ? "bg-emerald-500"
-                          : "bg-blue-500"
-                      }`}
-                      style={{
-                        width: `${questions.length > 0 ? Math.round((Object.keys(userAnswers).length / questions.length) * 100) : 0}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {questions.length - Object.keys(userAnswers).length > 0 && (
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400">
-                    <span className="text-xs font-bold">
-                      {questions.length - Object.keys(userAnswers).length}টি
-                      উত্তর বাকি
-                    </span>
-                  </div>
-                )}
-              </div>
-
+            <div className="max-w-4xl mx-auto px-6 pt-3 pb-0 flex items-center justify-end gap-4">
               {/* Right: action buttons */}
               {isOmrMode ? (
                 <div className="flex items-center gap-2.5 shrink-0">

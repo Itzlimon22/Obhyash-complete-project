@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { ExamDetails, AppState } from '@/lib/types';
-import Logo from '@/components/student/ui/Logo';
 import {
   Clock,
   Download,
   FileText,
   ClipboardList,
   LogOut,
-  CheckCircle2,
   AlertTriangle,
 } from 'lucide-react';
 
@@ -77,64 +75,37 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
 
       <div className="h-14 md:h-16 flex items-center justify-between px-3 md:px-6 gap-2">
         {/* ────────────── LEFT ────────────── */}
-        <div className="flex items-center gap-2.5">
-          {/* Logo — desktop only */}
-          <div className="hidden md:flex items-center gap-2.5 mr-1">
-            <Logo variant="icon" size="sm" />
-            <div>
-              <p className="text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-[0.2em] leading-none">
-                লাইভ
-              </p>
-              <p className="text-sm font-black text-neutral-900 dark:text-white leading-tight">
-                পরীক্ষা
-              </p>
-            </div>
-            <div className="h-6 w-px bg-neutral-200 dark:bg-neutral-700 mx-1" />
-          </div>
-
-          {/* Progress pill — always visible */}
-          <div className="flex items-center gap-2">
-            {/* Ring / pill */}
-            <div
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-xs font-black tabular-nums transition-colors ${
-                progressPct === 100
-                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400'
-                  : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300'
-              }`}
-            >
-              {progressPct === 100 ? (
-                <CheckCircle2 size={12} className="text-emerald-500 shrink-0" />
-              ) : (
-                <span
-                  className="w-2 h-2 rounded-full shrink-0 bg-emerald-500"
-                  style={{
-                    opacity: answeredCount > 0 ? 1 : 0.3,
-                  }}
-                />
-              )}
-              <span>
-                {answeredCount}
-                <span className="font-normal text-neutral-400 dark:text-neutral-500">
-                  /{totalQuestions}
-                </span>
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="hidden md:flex flex-col gap-1 min-w-[140px]">
+            <div className="flex items-center justify-between mb-0.5">
+              <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
+                অগ্রগতি
+              </span>
+              <span className="text-[10px] font-black text-neutral-500 dark:text-neutral-400 tabular-nums">
+                {answeredCount}/{totalQuestions}
               </span>
             </div>
-
-            {/* Progress bar — desktop */}
-            <div className="hidden md:flex flex-col gap-0.5 min-w-[80px]">
-              <div className="h-1.5 w-full rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${
-                    progressPct === 100 ? 'bg-emerald-500' : 'bg-blue-500'
-                  }`}
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
-              <p className="text-[9px] font-bold text-neutral-400 dark:text-neutral-600 tabular-nums">
-                {progressPct}% উত্তর দেওয়া হয়েছে
-              </p>
+            <div className="h-1.5 w-full rounded-full bg-neutral-100 dark:bg-neutral-800">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  answeredCount === totalQuestions
+                    ? 'bg-emerald-500'
+                    : 'bg-blue-500'
+                }`}
+                style={{
+                  width: `${progressPct}%`,
+                }}
+              />
             </div>
           </div>
+
+          {totalQuestions - answeredCount > 0 && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400">
+              <span className="text-xs font-bold">
+                {totalQuestions - answeredCount}টি উত্তর বাকি
+              </span>
+            </div>
+          )}
         </div>
 
         {/* ────────────── RIGHT ────────────── */}
