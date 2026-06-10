@@ -1,5 +1,8 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { getUserBookmarks, getBookmarkedQuestions, toggleBookmark } from '@/services/bookmark-service';
+import { toast } from 'sonner';
 import DeleteConfirmModal from '@/components/student/ui/common/DeleteConfirmModal';
 import { ExamResult, Question } from '@/lib/types';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
@@ -81,7 +84,8 @@ const PracticeRow: React.FC<{
   };
   isMistakeTab?: boolean;
   index: number;
-}> = ({ item, isMistakeTab, index }) => {
+  onToggleBookmark?: (id: string | number) => void;
+}> = ({ item, isMistakeTab, index, onToggleBookmark }) => {
   const [selectedOpt, setSelectedOpt] = useState<number | undefined>(undefined);
   const [revealed, setRevealed] = useState(false);
 
@@ -150,7 +154,7 @@ const PracticeRow: React.FC<{
         selectedOptionIndex={selectedOpt}
         isFlagged={item.flagged}
         onSelectOption={handleSelect}
-        onToggleFlag={() => {}}
+        onToggleFlag={() => onToggleBookmark?.(item.question.id)}
         onReport={() => {}}
         showFeedback={revealed}
         readOnly={revealed}
@@ -168,13 +172,72 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   onClearHistory,
   onViewResult,
   onRecheckRequest,
-  bookmarkedIds,
-  onToggleBookmark,
-  bookmarkedQuestions,
+  bookmarkedIds: externalBookmarkedIds,
+  onToggleBookmark: externalOnToggleBookmark,
+  bookmarkedQuestions: externalBookmarkedQuestions,
 }) => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'exams' | 'mistakes' | 'marked'>(
     'exams',
   );
+
+  const [localBookmarkedIds, setLocalBookmarkedIds] = useState<Set<string>>(new Set());
+  const [localBookmarkedQuestions, setLocalBookmarkedQuestions] = useState<Question[]>([]);
+  const [isLoadingBookmarks, setIsLoadingBookmarks] = useState(false);
+
+  const bookmarkedIds = externalBookmarkedIds || localBookmarkedIds;
+  const bookmarkedQuestions = externalBookmarkedQuestions || (localBookmarkedQuestions.length > 0 ? localBookmarkedQuestions : undefined);
+
+  useEffect(() => {
+    if (externalBookmarkedQuestions || !user?.id) return;
+    const fetchMarks = async () => {
+      setIsLoadingBookmarks(true);
+      try {
+        const idsSet = await getUserBookmarks(user.id);
+        const ids = Array.from(idsSet).map(String);
+        setLocalBookmarkedIds(new Set(ids));
+        if (ids.length > 0) {
+          const qs = await getBookmarkedQuestions(user.id);
+          setLocalBookmarkedQuestions(qs);
+        } else {
+          setLocalBookmarkedQuestions([]);
+        }
+      } catch (err) {
+        console.error("Error fetching bookmarks in history view:", err);
+      } finally {
+        setIsLoadingBookmarks(false);
+      }
+    };
+    fetchMarks();
+  }, [user?.id, externalBookmarkedQuestions]);
+
+  const handleToggleBookmark = useCallback(async (qId: string | number) => {
+    if (externalOnToggleBookmark) {
+      externalOnToggleBookmark(qId);
+      return;
+    }
+    if (!user?.id) return;
+    const questionIdStr = String(qId);
+    const isBookmarked = localBookmarkedIds.has(questionIdStr);
+    
+    const nextIds = new Set(localBookmarkedIds);
+    if (isBookmarked) {
+      nextIds.delete(questionIdStr);
+      setLocalBookmarkedQuestions(prev => prev.filter(q => q.id !== questionIdStr));
+    } else {
+      nextIds.add(questionIdStr);
+    }
+    setLocalBookmarkedIds(nextIds);
+    
+    try {
+      await toggleBookmark(user.id, questionIdStr, isBookmarked);
+      toast.success(isBookmarked ? "বুকমার্ক সরানো হয়েছে" : "বুকমার্ক সেভ করা হয়েছে");
+    } catch {
+      toast.error("বুকমার্ক আপডেট করতে সমস্যা হয়েছে।");
+      setLocalBookmarkedIds(localBookmarkedIds);
+    }
+  }, [user?.id, localBookmarkedIds, externalOnToggleBookmark]);
+
   const [filterSubject, setFilterSubject] = useState('');
   const [filterDate, setFilterDate] = useState('');
   const [visibleCount, setVisibleCount] = useState(9);
@@ -916,10 +979,11 @@ const formatDuration = (seconds: number) => {
                 <div className="space-y-2">
                   {displayedMistakes.map((item, idx) => (
                     <PracticeRow
-                      key={`${item.examDate}-${idx}`}
+                      key={`${item.examDate}-${item.question.id}-${idx}`}
                       item={item}
                       isMistakeTab
                       index={idx + 1}
+                      onToggleBookmark={handleToggleBookmark}
                     />
                   ))}
                 </div>
@@ -971,9 +1035,10 @@ const formatDuration = (seconds: number) => {
                 <div className="space-y-2">
                   {displayedBookmarks.map((item, idx) => (
                     <PracticeRow
-                      key={`${item.examDate}-${idx}`}
+                      key={`${item.examDate}-${item.question.id}-${idx}`}
                       item={item}
                       index={idx + 1}
+                      onToggleBookmark={handleToggleBookmark}
                     />
                   ))}
                 </div>

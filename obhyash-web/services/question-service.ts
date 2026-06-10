@@ -821,6 +821,7 @@ export const getQuestionsByIds = async (ids: string[]): Promise<Question[]> => {
         (q: Record<string, unknown>) =>
           ({
             ...q,
+            id: String(q.id),
             createdAt: q.created_at || new Date().toISOString(),
             correctAnswer: q.correct_answer,
             correctAnswerIndex: q.correct_answer_index,
