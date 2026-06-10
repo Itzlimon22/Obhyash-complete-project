@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 
 import AppLayout from "@/components/student/ui/layout/AppLayout";
 import ExamHeader from "@/components/student/ui/ExamHeader";
@@ -151,7 +151,6 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
     // Direct submit if all answered and not OMR mode
     if (!isOmrMode && unanswered === 0) {
       handleConfirmSubmit();
-      toast.success("উত্তরপত্র জমা দেওয়া হয়েছে");
     } else {
       // Show confirmation modal for incomplete exams or OMR mode
       setIsSubmitModalOpen(true);

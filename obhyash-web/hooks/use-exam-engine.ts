@@ -347,7 +347,6 @@ export const useExamEngine = () => {
       ) {
         return { success: false, error: 'Already submitted' };
       }
-      isSubmittingRef.current = true;
 
       // OMR Check
       if (
@@ -363,6 +362,8 @@ export const useExamEngine = () => {
           return { requiresUpload: true };
         }
       }
+
+      isSubmittingRef.current = true;
 
       setIsEvaluating(true);
       setErrorDetails('');
@@ -429,7 +430,9 @@ export const useExamEngine = () => {
         let errorMsg = 'Failed to submit exam.';
         if (error instanceof Error) errorMsg = error.message;
         setErrorDetails(errorMsg);
-        setAppState(AppState.ERROR);
+        toast.error('উত্তরপত্র জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করো।', {
+          description: errorMsg,
+        });
         return { success: false, error: errorMsg };
       } finally {
         setIsEvaluating(false);
