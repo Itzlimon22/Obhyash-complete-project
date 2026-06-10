@@ -9,6 +9,7 @@ import {
   Share2,
   Sparkles,
   Zap,
+  Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/error-utils";
@@ -364,12 +365,27 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     downloadOMRSheet(details, total);
   };
 
-  const StartExamButton = ({ className }: { className?: string }) => (
-    <div className={cn("pt-4", className)}>
+  const getThemeVars = (subjectId: string) => {
+    if (!subjectId) return { button: "bg-emerald-700 hover:bg-emerald-800 shadow-emerald-500/25", badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300" };
+    const s = subjectId.toLowerCase();
+    if (s.includes("physics")) return { button: "bg-blue-700 hover:bg-blue-800 shadow-blue-500/25", badge: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300" };
+    if (s.includes("chemistry")) return { button: "bg-orange-700 hover:bg-orange-800 shadow-orange-500/25", badge: "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300" };
+    if (s.includes("biology")) return { button: "bg-teal-700 hover:bg-teal-800 shadow-teal-500/25", badge: "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300" };
+    if (s.includes("math")) return { button: "bg-purple-700 hover:bg-purple-800 shadow-purple-500/25", badge: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300" };
+    return { button: "bg-emerald-700 hover:bg-emerald-800 shadow-emerald-500/25", badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300" };
+  };
+  const theme = getThemeVars(subject);
+
+  const StartExamButton = ({ className, compact = false }: { className?: string, compact?: boolean }) => (
+    <div className={cn(!compact && "pt-4", className)}>
       <button
         onClick={handleStartExam}
         disabled={isLoading || !subject}
-        className="w-full group relative overflow-hidden bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-5 rounded-3xl shadow-lg hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+        className={cn(
+          "w-full group relative overflow-hidden text-white font-extrabold rounded-3xl shadow-lg hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none duration-500",
+          compact ? "py-4" : "py-5",
+          subject ? theme.button : "bg-neutral-300 dark:bg-neutral-800 text-neutral-500 shadow-none"
+        )}
       >
         <div className="relative z-10 flex items-center justify-center gap-3">
           {isLoading ? (
@@ -388,9 +404,11 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           )}
         </div>
       </button>
-      <p className="text-center text-[11px] text-neutral-400 mt-4 font-bold uppercase tracking-widest">
-        পরবর্তী ধাপে নির্দেশাবলী দেখানো হবে
-      </p>
+      {!compact && (
+        <p className="text-center text-[11px] text-neutral-400 mt-4 font-bold uppercase tracking-widest">
+          পরবর্তী ধাপে নির্দেশাবলী দেখানো হবে
+        </p>
+      )}
     </div>
   );
 
@@ -400,7 +418,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 pt-6">
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-xs font-black uppercase tracking-widest">
+            <span className={cn("px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest transition-colors duration-500", theme.badge)}>
               Exam Configuration
             </span>
           </div>
@@ -448,6 +466,13 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           >
             <h3 className="text-xl font-black text-neutral-900 dark:text-white mb-8 flex items-center gap-3">
               অধ্যায় ও টপিক
+              <div className="group relative flex items-center">
+                <Info size={18} className="text-neutral-400 hover:text-emerald-500 transition-colors cursor-help" />
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-medium rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-neutral-900 dark:bg-white rotate-45" />
+                  <span className="relative z-10">আপনি কোনো নির্দিষ্ট টপিক সিলেক্ট না করলে নির্বাচিত অধ্যায়গুলোর সব টপিক থেকে প্রশ্ন আসবে।</span>
+                </div>
+              </div>
             </h3>
             <div className="grid gap-8">
               <TopicSelector
@@ -494,15 +519,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               />
             </div>
 
-            {selectedChapters.length > 0 && selectedTopics.length === 0 && (
-              <div className="mt-8 flex items-start gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl text-sm text-emerald-800 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/50">
-                <BookOpen size={18} className="mt-0.5 shrink-0" />
-                <p className="font-medium">
-                  আপনি কোনো নির্দিষ্ট টপিক সিলেক্ট না করলে নির্বাচিত অধ্যায়গুলোর
-                  সব টপিক থেকে প্রশ্ন আসবে।
-                </p>
-              </div>
-            )}
           </section>
           {/* 3. Question Count Selection Card */}
           <section className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm">
@@ -527,7 +543,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         </div>
 
         {/* Right Column: Settings Cards */}
-        <div className="xl:col-span-4 space-y-6">
+        <div className="xl:col-span-4 space-y-6 xl:sticky xl:top-24 xl:self-start z-10">
           <ExamTypeSelection
             examTypes={examTypes}
             setExamTypes={setExamTypes}
@@ -546,9 +562,11 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           />
         </div>
 
-        {/* Mobile Submit Button */}
-        <div className="xl:hidden pb-10">
-          <StartExamButton />
+        {/* Mobile Submit Button (Sticky Bottom) */}
+        <div className="xl:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl border-t border-neutral-200/50 dark:border-neutral-800/50 z-50 animate-in slide-in-from-bottom duration-500">
+          <div className="max-w-md mx-auto">
+            <StartExamButton compact />
+          </div>
         </div>
       </div>
 

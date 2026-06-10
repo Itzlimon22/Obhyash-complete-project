@@ -61,15 +61,15 @@ export default function RootLayout({
 
               {/* ✅ Render the Toast Container (Overlay) */}
               <Toaster
-                position="top-center"
+                position="bottom-center"
                 richColors
-                expand={true}
+                expand={false}
                 closeButton
-                theme="light"
+                theme="dark"
                 toastOptions={{
-                  className: 'font-anek',
+                  className: 'font-anek !rounded-2xl shadow-2xl !border-0',
                   style: {
-                    borderRadius: '1rem',
+                    padding: '16px',
                   },
                 }}
               />
