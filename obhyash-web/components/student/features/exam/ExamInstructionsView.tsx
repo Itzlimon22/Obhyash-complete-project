@@ -43,7 +43,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
 
   const hasNegative = config.negativeMarking > 0;
 
-  const chapterCount = config.chapters === 'All' ? 'সব' : config.chapters.split(',').length.toString();
+  const chapterCount = config.chapters && config.chapters !== 'All' ? config.chapters.split(',').length.toString() : 'সব';
 
   const getSubjectColor = (subjectId?: string) => {
     if (!subjectId) return 'from-emerald-500/20 to-transparent';
