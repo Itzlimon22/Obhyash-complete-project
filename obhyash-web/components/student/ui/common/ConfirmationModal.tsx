@@ -8,6 +8,7 @@ interface ConfirmationModalProps {
   onConfirm: () => void;
   unansweredCount: number;
   isOmrMode?: boolean;
+  isEvaluating?: boolean;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -16,6 +17,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onConfirm,
   unansweredCount,
   isOmrMode = false,
+  isEvaluating = false,
 }) => {
   if (!isOpen) return null;
 
@@ -148,13 +150,19 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <div className={`grid grid-cols-2 gap-2.5 ${!isWarning && "mt-6"}`}>
             <button
               onClick={onConfirm}
-              className={`w-full py-3.5 rounded-2xl text-white font-bold text-sm transition-all duration-150 shadow-md active:scale-[0.98] ${colors.primary}`}
+              disabled={isEvaluating}
+              className={`w-full py-3.5 rounded-2xl text-white font-bold text-sm transition-all duration-150 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${isEvaluating ? "bg-neutral-400" : `active:scale-[0.98] ${colors.primary}`}`}
             >
-              জমা দাও
+              {isEvaluating ? (
+                <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              ) : (
+                "জমা দাও"
+              )}
             </button>
             <button
               onClick={onClose}
-              className="w-full py-3.5 rounded-2xl bg-white dark:bg-black hover:bg-neutral-100 dark:hover:bg-neutral-900 active:scale-[0.98] text-black dark:text-white font-semibold text-sm border border-neutral-300 dark:border-neutral-700 transition-all duration-150"
+              disabled={isEvaluating}
+              className="w-full py-3.5 rounded-2xl bg-white dark:bg-black hover:bg-neutral-100 dark:hover:bg-neutral-900 text-black dark:text-white font-semibold text-sm border border-neutral-300 dark:border-neutral-700 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
             >
               ফিরে যাও
             </button>

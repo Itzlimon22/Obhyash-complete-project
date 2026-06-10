@@ -10,6 +10,7 @@ interface MobileBottomNavProps {
   isOmrMode?: boolean;
   onUpload?: () => void;
   hasSelectedScript?: boolean;
+  isEvaluating?: boolean;
   answeredCount?: number;
   totalQuestions?: number;
 }
@@ -23,6 +24,7 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   isOmrMode,
   onUpload,
   hasSelectedScript,
+  isEvaluating = false,
   answeredCount,
   totalQuestions,
 }) => {
@@ -35,7 +37,8 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             <div className="flex-1 flex gap-2">
               <button
                 onClick={onUpload}
-                className={`flex-1 font-bold text-sm py-2.5 px-4 rounded-xl border transition-all flex items-center justify-center gap-2 ${hasSelectedScript ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400" : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 active:scale-[0.96]"}`}
+                disabled={isEvaluating}
+                className={`flex-1 font-bold text-sm py-2.5 px-4 rounded-xl border transition-all flex items-center justify-center gap-2 ${hasSelectedScript ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400" : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-200 active:scale-[0.96]"} disabled:opacity-50`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -55,22 +58,33 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               </button>
               <button
                 onClick={onSubmit}
-                disabled={!hasSelectedScript}
+                disabled={!hasSelectedScript || isEvaluating}
                 className="flex-[1.2] bg-emerald-600 hover:bg-emerald-700 disabled:bg-neutral-200 dark:disabled:bg-neutral-800 disabled:text-neutral-400 dark:disabled:text-neutral-600 disabled:shadow-none text-white font-extrabold text-sm py-2.5 px-4 rounded-xl shadow-lg shadow-emerald-600/20 active:scale-[0.96] transition-all flex items-center justify-center gap-2"
               >
-                জমা দাও
+                {isEvaluating ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  "জমা দাও"
+                )}
               </button>
             </div>
           ) : (
             <div className="flex justify-end flex-1">
               <button
                 onClick={onSubmit}
-                className="w-auto bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-[13px] py-2.5 px-5 rounded-xl shadow-lg shadow-emerald-900/20 active:scale-[0.96] transition-all flex items-center justify-center gap-2"
+                disabled={isEvaluating}
+                className="w-auto bg-emerald-800 hover:bg-emerald-900 disabled:bg-neutral-200 dark:disabled:bg-neutral-800 disabled:text-neutral-400 dark:disabled:text-neutral-600 text-white font-extrabold text-[13px] py-2.5 px-5 rounded-xl shadow-lg shadow-emerald-900/20 active:scale-[0.96] transition-all flex items-center justify-center gap-2"
               >
-                <div className="w-4 h-4 flex items-center justify-center bg-white/20 rounded-full">
-                  <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                </div>
-                পরীক্ষা শেষ করো
+                {isEvaluating ? (
+                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <div className="w-4 h-4 flex items-center justify-center bg-white/20 rounded-full">
+                      <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                    </div>
+                    পরীক্ষা শেষ করো
+                  </>
+                )}
               </button>
             </div>
           )}

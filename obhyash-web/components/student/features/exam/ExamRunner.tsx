@@ -62,6 +62,8 @@ interface ExamRunnerProps {
   selectedScript: { file: File; base64: string } | null;
   /** Setter for the selected OMR script */
   setSelectedScript: (script: { file: File; base64: string } | null) => void;
+  /** Whether the exam is currently being submitted/evaluated */
+  isEvaluating?: boolean;
   /** Function to handle exam submission */
   onSubmit: (manual?: boolean) => void;
   /** Function to handle exit (unused in this component but passed down) */
@@ -118,6 +120,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
   setIsOmrMode,
   selectedScript,
   setSelectedScript,
+  isEvaluating,
   onSubmit,
   onTimeoutReattempt,
   onTimeoutCancel,
@@ -179,6 +182,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
       isDarkMode={isDarkMode}
       noPadding={true}
       isLiveExam={true}
+      isEvaluating={isEvaluating}
       onSubmit={handleSubmitRequest}
       isOmrMode={isOmrMode}
       onUpload={() => setIsUploadModalOpen(true)}
@@ -284,15 +288,45 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                   </button>
                   <button
                     onClick={handleSubmitRequest}
-                    disabled={!selectedScript}
+                    disabled={!selectedScript || isEvaluating}
                     className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-500/25 transition-all active:scale-[0.97]"
                   >
+                    {isEvaluating ? (
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                        />
+                      </svg>
+                    )}
+                    স্ক্রিপ্ট জমা দাও
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleSubmitRequest}
+                  disabled={isEvaluating}
+                  className="shrink-0 flex items-center gap-2.5 px-6 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm rounded-xl shadow-lg shadow-red-500/25 transition-all active:scale-[0.97] group"
+                >
+                  {isEvaluating ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
                     <svg
-                      className="w-4 h-4"
+                      xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
-                      stroke="currentColor"
                       strokeWidth={2.5}
+                      stroke="currentColor"
+                      className="w-4 h-4 group-hover:scale-110 transition-transform"
                     >
                       <path
                         strokeLinecap="round"
@@ -300,28 +334,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                         d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                       />
                     </svg>
-                    স্ক্রিপ্ট জমা দাও
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={handleSubmitRequest}
-                  className="shrink-0 flex items-center gap-2.5 px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-red-500/25 transition-all active:scale-[0.97] group"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2.5}
-                    stroke="currentColor"
-                    className="w-4 h-4 group-hover:scale-110 transition-transform"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                    />
-                  </svg>
+                  )}
                   পরীক্ষা শেষ করো
                 </button>
               )}
@@ -356,6 +369,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
           onConfirm={handleConfirmSubmit}
           unansweredCount={questions.length - Object.keys(userAnswers).length}
           isOmrMode={isOmrMode}
+          isEvaluating={isEvaluating}
         />
         <ScriptUploader
           isOpen={isUploadModalOpen}

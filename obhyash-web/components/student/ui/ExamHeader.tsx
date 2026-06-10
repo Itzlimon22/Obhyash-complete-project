@@ -202,11 +202,11 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
           {onExit && (
             <button
               onClick={onExit}
-              title="পরীক্ষা ছেড়ে যাও"
-              className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl border border-transparent text-neutral-500 dark:text-neutral-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-600 dark:hover:text-red-400 hover:border-red-100 dark:hover:border-red-900/40 transition-all text-xs font-bold"
+              title="পরীক্ষা বাতিল করো"
+              className="flex items-center gap-1 md:gap-1.5 px-2.5 py-1.5 md:px-3 md:py-2 rounded-xl border border-transparent text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/40 transition-all text-[11px] md:text-xs font-bold"
             >
-              <LogOut size={15} />
-              <span>বের হও</span>
+              <LogOut size={14} className="md:w-[15px] md:h-[15px]" />
+              <span>বাতিল</span>
             </button>
           )}
         </div>

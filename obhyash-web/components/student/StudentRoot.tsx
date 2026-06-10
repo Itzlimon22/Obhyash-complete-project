@@ -984,6 +984,7 @@ export default function StudentRoot({
             setIsOmrMode={setIsOmrMode}
             selectedScript={selectedScript}
             setSelectedScript={setSelectedScript}
+            isEvaluating={isEvaluating}
             onSubmit={handleExamSubmit}
             onExit={() =>
               setNavWarning({
