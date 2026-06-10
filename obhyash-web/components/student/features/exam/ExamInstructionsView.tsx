@@ -9,8 +9,10 @@ import {
   MinusCircle,
   Wifi,
   Sparkles,
-  FileText,
-  Shield,
+  BookOpen,
+  Layers,
+  HelpCircle,
+  Hourglass,
 } from 'lucide-react';
 import { ExamConfig } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -41,79 +43,84 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
 
   const hasNegative = config.negativeMarking > 0;
 
-  const chapterLabel =
-    config.chapters === 'All'
-      ? 'সব অধ্যায়'
-      : `${config.chapters.split(',').length} টি অধ্যায়`;
+  const chapterCount = config.chapters === 'All' ? 'সব' : config.chapters.split(',').length.toString();
+
+  const getSubjectColor = (subjectId?: string) => {
+    if (!subjectId) return 'from-emerald-500/20 to-transparent';
+    const s = subjectId.toLowerCase();
+    if (s.includes('physics')) return 'from-blue-500/20 to-transparent';
+    if (s.includes('chemistry')) return 'from-orange-500/20 to-transparent';
+    if (s.includes('biology')) return 'from-teal-500/20 to-transparent';
+    if (s.includes('math')) return 'from-purple-500/20 to-transparent';
+    return 'from-emerald-500/20 to-transparent';
+  };
 
   return (
-    <div className="w-full max-w-3xl mx-auto pb-24 px-4 md:px-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
-
-      {/* Back Button */}
-      <button
-        onClick={onBack}
-        className="mb-8 flex items-center gap-2 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors font-bold text-sm group"
-      >
-        <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
-        সেটআপে ফিরে যাও
-      </button>
-
-      {/* Page Header */}
-      <div className="mb-8">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-xs font-black uppercase tracking-widest mb-3">
-          <FileText size={11} />
-          নির্দেশাবলী
-        </span>
-        <h1 className="text-3xl md:text-4xl font-black text-neutral-900 dark:text-white tracking-tight">
-          পরীক্ষার বিবরণ
-        </h1>
-        <p className="text-neutral-400 dark:text-neutral-500 text-sm font-medium mt-1">
-          শুরু করার আগে নিচের তথ্যগুলো মনোযোগ দিয়ে দেখো
-        </p>
+    <div className="relative w-full max-w-3xl mx-auto pb-24 px-4 md:px-6">
+      
+      {/* 3. Ambient Glow */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10 flex justify-center">
+        <div className={cn("w-[600px] h-[300px] rounded-full bg-gradient-radial blur-[100px] opacity-60 dark:opacity-30", getSubjectColor(config.subject))} />
       </div>
 
-      {/* Exam Summary Card */}
-      <div className="bg-white dark:bg-neutral-900 rounded-[2rem] border border-neutral-200 dark:border-neutral-800 shadow-sm mb-5 overflow-hidden">
-        <div className="px-6 pt-5 pb-4 border-b border-neutral-100 dark:border-neutral-800">
+      {/* 6. Contextual Header */}
+      <div className="flex justify-center mb-8 pt-4 animate-in fade-in slide-in-from-top-4 duration-500 fill-mode-both">
+        <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/60 dark:bg-neutral-900/60 backdrop-blur-md border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest">
+          <span className="text-neutral-800 dark:text-neutral-200">{config.subjectLabel?.split(' ')[0]}</span>
+          <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+          <span>{config.examType}</span>
+          <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
+          <span>{config.difficulty}</span>
+        </div>
+      </div>
+
+      {/* Exam Summary Card (Staggered Animation 1) */}
+      <div className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl rounded-[2rem] border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm mb-5 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-both">
+        <div className="px-6 pt-5 pb-4 border-b border-neutral-100/50 dark:border-neutral-800/50">
           <p className="text-xs font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
             পরীক্ষার সারসংক্ষেপ
           </p>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-neutral-100 dark:divide-neutral-800">
+        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-neutral-100/50 dark:divide-neutral-800/50">
+          {/* 1. Professional Icons & 4. Typography Hierarchy */}
           <StatCell
-            emoji="📚"
+            icon={<BookOpen size={18} strokeWidth={2.5} />}
+            iconColor="bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
             label="বিষয়"
             value={config.subjectLabel?.split(' ')[0] ?? '—'}
           />
           <StatCell
-            emoji="📖"
+            icon={<Layers size={18} strokeWidth={2.5} />}
+            iconColor="bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
             label="অধ্যায়"
-            value={chapterLabel}
+            value={chapterCount}
           />
           <StatCell
-            emoji="❓"
+            icon={<HelpCircle size={18} strokeWidth={2.5} />}
+            iconColor="bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
             label="প্রশ্ন"
-            value={`${config.questionCount} টি`}
+            value={`${config.questionCount}`}
             highlight
           />
           <StatCell
-            emoji="⏱️"
-            label="সময়"
-            value={`${config.durationMinutes} মিনিট`}
+            icon={<Hourglass size={18} strokeWidth={2.5} />}
+            iconColor="bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
+            label="সময় (মিনিট)"
+            value={`${config.durationMinutes}`}
             highlight
           />
         </div>
       </div>
 
-      {/* Rules Card */}
-      <div className="bg-white dark:bg-neutral-900 rounded-[2rem] border border-neutral-200 dark:border-neutral-800 shadow-sm mb-5 overflow-hidden">
-        <div className="px-6 pt-5 pb-4 border-b border-neutral-100 dark:border-neutral-800">
+      {/* Rules Card (Staggered Animation 2) */}
+      <div className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl rounded-[2rem] border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm mb-5 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both">
+        <div className="px-6 pt-5 pb-4 border-b border-neutral-100/50 dark:border-neutral-800/50">
           <p className="text-xs font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
             নিয়মাবলী
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-px bg-neutral-100 dark:bg-neutral-800">
+        <div className="grid grid-cols-2 gap-px bg-neutral-100/50 dark:bg-neutral-800/50">
           <RuleRow
             iconBg="bg-emerald-100 dark:bg-emerald-900/30"
             icon={<Clock size={13} className="text-emerald-700 dark:text-emerald-400" />}
@@ -155,40 +162,41 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
         </div>
       </div>
 
-      {/* Safety reminder if negative marking */}
-      {hasNegative && (
-        <div className="flex items-start gap-3 px-5 py-4 rounded-2xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 mb-5">
-          <Shield size={16} className="text-red-500 shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700 dark:text-red-400 font-medium leading-relaxed">
-            এই পরীক্ষায় নেগেটিভ মার্কিং আছে।{' '}
-            <strong className="font-extrabold">নিশ্চিত না হলে উত্তর এড়িয়ে যাও</strong> — ভুল উত্তরে{' '}
-            <span className="font-extrabold">{config.negativeMarking} নম্বর</span> কাটা যাবে।
-          </p>
-        </div>
-      )}
+      {/* CTA (Staggered Animation 3) */}
+      <div className="flex flex-row gap-2 sm:gap-3 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
+        <button
+          onClick={onBack}
+          disabled={isLoading}
+          className="w-1/3 group relative overflow-hidden bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-800/50 hover:bg-white dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-extrabold py-4 sm:py-5 rounded-2xl sm:rounded-3xl shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 px-2"
+        >
+          <div className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-2">
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform shrink-0" />
+            <span className="text-[13px] sm:text-lg whitespace-nowrap">ফিরে যাও</span>
+          </div>
+        </button>
 
-      {/* CTA */}
-      <button
-        onClick={handleStart}
-        disabled={isLoading}
-        className="w-full group relative overflow-hidden bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-5 rounded-3xl shadow-lg hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
-      >
-        <div className="relative z-10 flex items-center justify-center gap-3">
-          {isLoading ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span className="text-lg">প্রশ্ন লোড হচ্ছে...</span>
-            </>
-          ) : (
-            <>
-              <span className="text-lg">পরীক্ষা শুরু করো</span>
-              <Sparkles size={20} className="group-hover:rotate-12 transition-transform duration-300" />
-            </>
-          )}
-        </div>
-      </button>
+        <button
+          onClick={handleStart}
+          disabled={isLoading}
+          className="w-2/3 group relative overflow-hidden bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-4 sm:py-5 rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-emerald-500/25 hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none px-2"
+        >
+          <div className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-3">
+            {isLoading ? (
+              <>
+                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
+                <span className="text-[14px] sm:text-lg whitespace-nowrap">লোড হচ্ছে...</span>
+              </>
+            ) : (
+              <>
+                <span className="text-[14px] sm:text-lg whitespace-nowrap">পরীক্ষা শুরু করো</span>
+                <Sparkles size={16} className="group-hover:rotate-12 transition-transform duration-300 shrink-0 hidden sm:block" />
+              </>
+            )}
+          </div>
+        </button>
+      </div>
 
-      <p className="text-center text-[11px] text-neutral-400 mt-4 font-bold uppercase tracking-widest">
+      <p className="text-center text-[11px] text-neutral-400 mt-4 font-bold uppercase tracking-widest animate-in fade-in duration-500 delay-500 fill-mode-both">
         শুরু করলে টাইমার চালু হয়ে যাবে
       </p>
     </div>
@@ -197,30 +205,34 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
 
 // ─── Stat Cell (summary grid) ─────────────────────────────────────────────────
 const StatCell = ({
-  emoji,
+  icon,
+  iconColor,
   label,
   value,
   highlight = false,
 }: {
-  emoji: string;
+  icon: React.ReactNode;
+  iconColor?: string;
   label: string;
   value: string;
   highlight?: boolean;
 }) => (
-  <div className="flex flex-col items-center justify-center gap-1 py-5 px-3 text-center">
-    <span className="text-2xl mb-0.5">{emoji}</span>
-    <p className="text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
-      {label}
-    </p>
+  <div className="flex flex-col items-center justify-center py-6 px-3 text-center">
+    <div className={cn("w-10 h-10 rounded-full flex items-center justify-center mb-3 shadow-inner", iconColor || "bg-neutral-100 text-neutral-500 dark:bg-neutral-800")}>
+      {icon}
+    </div>
     <p
       className={cn(
-        'font-extrabold text-sm leading-tight',
+        'font-black text-2xl md:text-3xl leading-none mb-1.5',
         highlight
           ? 'text-emerald-700 dark:text-emerald-400'
           : 'text-neutral-900 dark:text-white',
       )}
     >
       {value}
+    </p>
+    <p className="text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
+      {label}
     </p>
   </div>
 );
@@ -241,15 +253,15 @@ const RuleRow = ({
   badge?: string;
   badgeColor?: string;
 }) => (
-  <div className="flex items-start gap-3 px-4 py-3.5 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800/60 transition-colors">
-    <div className={cn('w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5', iconBg)}>
+  <div className="flex items-start gap-3 px-4 py-3.5 bg-white/60 dark:bg-neutral-900/60 backdrop-blur hover:bg-neutral-50 dark:hover:bg-neutral-800/80 transition-colors">
+    <div className={cn('w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5 shadow-sm', iconBg)}>
       {icon}
     </div>
     <div className="flex-1 min-w-0">
       <div className="flex items-center gap-1.5 flex-wrap">
         <p className="text-xs font-extrabold text-neutral-900 dark:text-white leading-tight">{title}</p>
         {badge && (
-          <span className={cn('text-[9px] font-black px-1.5 py-0.5 rounded-full leading-none', badgeColor)}>
+          <span className={cn('text-[9px] font-black px-1.5 py-0.5 rounded-full leading-none shadow-sm', badgeColor)}>
             {badge}
           </span>
         )}
@@ -258,4 +270,5 @@ const RuleRow = ({
     </div>
   </div>
 );
+
 
