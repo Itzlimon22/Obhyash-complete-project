@@ -17,6 +17,7 @@ import {
 
 import { useAuth } from '@/components/auth/AuthProvider';
 import { LeaderboardSkeleton } from '@/components/student/ui/common/Skeletons';
+import { searchColleges } from '@/lib/college-mapping';
 
 interface LeaderboardViewProps {
   onUserClick?: (user: UserProfile, rank: number) => void;
@@ -273,9 +274,26 @@ function CollegeFilter({ colleges, value, onChange, isLoading }: CollegeFilterPr
   const [open, setOpen] = useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  const filtered = query.length === 0
-    ? colleges
-    : colleges.filter((c) => c.institute.toLowerCase().includes(query.toLowerCase()));
+  const filtered = useMemo(() => {
+    if (query.length === 0) return colleges;
+
+    const rankingMatches = colleges.filter((c) =>
+      c.institute.toLowerCase().includes(query.toLowerCase())
+    );
+    const canonicalMatches = searchColleges(query);
+
+    const combined = [...rankingMatches];
+    const existingNames = new Set(rankingMatches.map((c) => c.institute));
+
+    for (const name of canonicalMatches) {
+      if (!existingNames.has(name)) {
+        existingNames.add(name);
+        combined.push({ institute: name, studentCount: 0, avgXp: 0 });
+      }
+    }
+
+    return combined;
+  }, [query, colleges]);
 
   // Close on outside click
   useEffect(() => {
