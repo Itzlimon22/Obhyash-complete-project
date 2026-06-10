@@ -433,7 +433,6 @@ export const updateExamResult = async (
     user_answers: result.userAnswers,
     questions: result.questions,
     flagged_questions: result.flaggedQuestions,
-    subject_label: result.subjectLabel,
     chapters: result.chapters,
     status: result.status || 'evaluated',
     submission_type: result.submissionType || 'digital',
@@ -549,7 +548,6 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
       const { error } = await supabase.from('exam_results').insert({
         user_id: user.id,
         subject: result.subject,
-        subject_label: result.subjectLabel,
         exam_type: result.examType,
         date: result.date || new Date().toISOString(),
         score: result.score,
