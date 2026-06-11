@@ -47,9 +47,6 @@ export default function ClientLayout({
   useEffect(() => {
     if (!loading && !user) {
       router.replace('/login');
-    } else if (!loading && user && !profile) {
-      // If user exists but profile is missing (e.g. deleted or RLS blocked)
-      router.replace('/login');
     } else if (
       !loading &&
       user &&
@@ -66,22 +63,42 @@ export default function ClientLayout({
 
   // Loading state for initial session hydration
   if (loading || !user || !profile || profile.role?.toLowerCase() !== 'admin') {
+    const isProfileMissing = !loading && user && !profile;
+    const shouldShowError = showTimeoutError || isProfileMissing;
+
     return (
       <div className="min-h-screen bg-neutral-50 dark:bg-black flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          {showTimeoutError ? (
+          {shouldShowError ? (
             <div className="text-center space-y-4">
               <p className="text-sm font-bold text-red-500">
-                Session restore timed out or profile not found.
+                {isProfileMissing 
+                  ? "Admin profile not found or access denied." 
+                  : "Session restore timed out."}
               </p>
-              <button 
-                onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 transition-colors text-white rounded-md text-sm font-medium"
-              >
-                Retry
-              </button>
+              <div className="flex gap-3 justify-center">
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 transition-colors text-white rounded-md text-sm font-medium"
+                >
+                  Retry
+                </button>
+                <button 
+                  onClick={async () => {
+                    const { createClient } = await import('@/utils/supabase/client');
+                    const supabase = createClient();
+                    await supabase.auth.signOut();
+                    window.location.href = '/login';
+                  }}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 transition-colors text-white rounded-md text-sm font-medium"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
-          ) : null}
+          ) : (
+            <Loader2 className="w-8 h-8 animate-spin text-emerald-500 mx-auto" />
+          )}
         </div>
       </div>
     );
