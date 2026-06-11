@@ -55,7 +55,7 @@ export default function AdminComplaintsPage() {
     try {
       let query = supabase
         .from('app_complaints')
-        .select('*, user:users!inner(name, email)', { count: 'exact' });
+        .select('*', { count: 'exact' });
 
       if (statusFilter !== 'All') {
         query = query.eq('status', statusFilter);
@@ -77,12 +77,26 @@ export default function AdminComplaintsPage() {
       if (complaintsError) throw complaintsError;
 
       // 3. Combine complaints with user info
+      const userIds = Array.from(new Set((complaintsData || []).map((c: any) => c.user_id).filter(Boolean)));
+      let usersMap: Record<string, any> = {};
+      
+      if (userIds.length > 0) {
+        const { data: usersData } = await supabase
+          .from('users')
+          .select('id, name, email')
+          .in('id', userIds);
+          
+        if (usersData) {
+          usersMap = usersData.reduce((acc, user) => {
+            acc[user.id] = user;
+            return acc;
+          }, {} as Record<string, any>);
+        }
+      }
+
       const mappedComplaints = (complaintsData || []).map((c: any) => ({
         ...c,
-        user:
-          c.user && !Array.isArray(c.user)
-            ? c.user
-            : { name: 'Unknown', email: '' },
+        user: usersMap[c.user_id] || { name: 'Unknown', email: '' },
       }));
 
       setComplaints(mappedComplaints);
