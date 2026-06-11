@@ -253,13 +253,14 @@ export default function StudentRoot({
     toggle: toggleBookmark,
   } = useBookmarks(currentUser?.id, authLoading);
 
-  const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Question[]>([]);
+  const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Question[] | undefined>(undefined);
   
   useEffect(() => {
     if (!currentUser?.id || authLoading) return;
     
     // Optimistically remove any questions that are no longer in bookmarkedIds
     setBookmarkedQuestions((prev) => {
+      if (!prev) return prev;
       const filtered = prev.filter((q) => bookmarkedIds.has(String(q.id)));
       return filtered.length !== prev.length ? filtered : prev;
     });

@@ -373,7 +373,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
 
   const bookmarks = useMemo(() => {
     // If we have pre-fetched bookmarked questions from DB, use them directly
-    if (bookmarkedQuestions) {
+    if (bookmarkedQuestions !== undefined) {
       return bookmarkedQuestions
         .filter((q) => !filterSubject || q.subject === filterSubject)
         .map((q) => ({

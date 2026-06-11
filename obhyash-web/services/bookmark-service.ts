@@ -75,17 +75,10 @@ export const getBookmarkedQuestions = async (
   if (!isSupabaseConfigured() || !supabase) return [];
 
   try {
-    const { data: bookmarkRows, error: bErr } = await supabase
-      .from('bookmarks')
-      .select('question_id, created_at')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (bErr || !bookmarkRows || bookmarkRows.length === 0) return [];
-
-    const ids = bookmarkRows.map((r: { question_id: string | number }) =>
-      String(r.question_id),
-    );
+    const idsSet = await getUserBookmarks(userId);
+    if (idsSet.size === 0) return [];
+    
+    const ids = Array.from(idsSet).map(String);
 
     const { data: rows, error: qErr } = await supabase
       .from('questions')
@@ -93,9 +86,6 @@ export const getBookmarkedQuestions = async (
       .in('id', ids);
 
     if (qErr || !rows) return [];
-
-    // Preserve bookmark order (most recently bookmarked first)
-    const orderMap = Object.fromEntries(ids.map((id, i) => [id, i]));
 
     return (rows as Record<string, unknown>[])
       .map((d) => ({
@@ -110,10 +100,7 @@ export const getBookmarkedQuestions = async (
         imageUrl: d.image_url as string | undefined,
         optionImages: (d.option_images as string[]) || [],
         explanationImageUrl: d.explanation_image_url as string | undefined,
-      }))
-      .sort(
-        (a, b) => (orderMap[a.id] ?? 999) - (orderMap[b.id] ?? 999),
-      ) as unknown as Question[];
+      })) as unknown as Question[];
   } catch (error) {
     console.error('Get Bookmarked Questions Error:', error);
     return [];
