@@ -168,6 +168,20 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
       isLiveExam={true}
       isEvaluating={isEvaluating}
       onSubmit={handleSubmitRequest}
+      title=""
+      customHeader={
+        <ExamHeader
+          details={examDetails}
+          timeLeft={timeLeft}
+          graceTimeLeft={graceTimeLeft}
+          appState={appState}
+          onDownloadQuestionPaper={() => downloadQuestionPaper(examDetails, questions)}
+          onDownloadOMR={() => downloadOMRSheet(examDetails, questions.length)}
+          onExit={confirmNavigation}
+          totalQuestions={questions.length}
+          answeredCount={Object.keys(userAnswers).length}
+        />
+      }
     >
       <div className="relative min-h-full flex flex-col bg-[#f8fafc] dark:bg-black">
         {/* Exam Container (Scrollable) */}
