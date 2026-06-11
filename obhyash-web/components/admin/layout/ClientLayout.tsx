@@ -17,35 +17,37 @@ export default function ClientLayout({
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [showTimeoutError, setShowTimeoutError] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        setIsMobile(true);
-        setIsSidebarOpen(false);
-      } else {
-        setIsMobile(false);
-        setIsSidebarOpen(true);
-      }
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      setIsSidebarOpen(!mobile);
     };
 
-    // Defer state updates to avoid synchronous cascading renders warning
-    setTimeout(() => {
-      setMounted(true);
-      handleResize();
-    }, 0);
-
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Safety timeout: if we're stuck loading for more than 8 seconds, show an error
+  useEffect(() => {
+    if (loading || (!profile && user)) {
+      const timer = setTimeout(() => setShowTimeoutError(true), 8000);
+      return () => clearTimeout(timer);
+    } else {
+      // Defer state reset to avoid synchronous cascading render warning
+      const resetTimer = setTimeout(() => setShowTimeoutError(false), 0);
+      return () => clearTimeout(resetTimer);
+    }
+  }, [loading, profile, user]);
+
   // Redirect if definitely not an admin once loading is done
   useEffect(() => {
-    if (mounted && !loading && !user) {
+    if (!loading && !user) {
       router.replace('/login');
     } else if (
-      mounted &&
       !loading &&
       user &&
       profile &&
@@ -57,10 +59,10 @@ export default function ClientLayout({
       else if (role === 'teacher') router.replace('/teacher/dashboard');
       else router.replace('/');
     }
-  }, [mounted, loading, user, profile, router]);
+  }, [loading, user, profile, router]);
 
   // Loading state for initial session hydration
-  if (loading || !mounted) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-neutral-50 dark:bg-black flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -75,18 +77,30 @@ export default function ClientLayout({
 
   // Prevent flash before redirect.
   // Wait for BOTH user AND profile to be confirmed before rendering children.
-  // If only user is set but profile is still null (still being fetched), we wait —
-  // this prevents data-fetching useEffects from firing before auth is complete.
-  // NOTE: return the spinner (not null) so the admin never sees a blank screen if
-  // the profile DB fetch failed or is still in-flight after loading resolves.
   if (!user || !profile || profile.role?.toLowerCase() !== 'admin') {
     return (
       <div className="min-h-screen bg-neutral-50 dark:bg-black flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
-          <p className="text-sm font-bold text-neutral-500 animate-pulse">
-            Restoring Admin Session...
-          </p>
+          {showTimeoutError ? (
+            <div className="text-center space-y-4">
+              <p className="text-sm font-bold text-red-500">
+                Session restore timed out or profile not found.
+              </p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 transition-colors text-white rounded-md text-sm font-medium"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <>
+              <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
+              <p className="text-sm font-bold text-neutral-500 animate-pulse">
+                Restoring Admin Session...
+              </p>
+            </>
+          )}
         </div>
       </div>
     );
