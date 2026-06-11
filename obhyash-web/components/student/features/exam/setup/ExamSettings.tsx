@@ -32,7 +32,7 @@ export const ExamTypeSelection: React.FC<ExamTypeSelectionProps> = ({
       <label className="block text-base font-bold text-neutral-900 dark:text-white mb-2">
         পরীক্ষার ধরন
       </label>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex flex-wrap gap-3">
         {EXAM_TYPE_OPTIONS.map((type) => {
           const isSelected = examTypes.includes(type.id);
           return (
@@ -41,27 +41,25 @@ export const ExamTypeSelection: React.FC<ExamTypeSelectionProps> = ({
               type="button"
               onClick={() => toggleExamType(type.id)}
               className={cn(
-                'flex flex-col items-start p-4 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-md',
+                'flex items-center justify-between gap-3 px-5 py-3 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-md',
                 isSelected
                   ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-900/20'
                   : 'border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900 hover:border-neutral-200',
               )}
             >
-              <div className="flex w-full justify-between items-center">
-                <span
-                  className={cn(
-                    'font-bold text-sm',
-                    isSelected
-                      ? 'text-emerald-700 dark:text-emerald-400'
-                      : 'text-neutral-600 dark:text-neutral-400',
-                  )}
-                >
-                  {type.label}
-                </span>
-                {isSelected && (
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 shadow-sm shadow-emerald-500/50" />
+              <span
+                className={cn(
+                  'font-bold text-sm',
+                  isSelected
+                    ? 'text-emerald-700 dark:text-emerald-400'
+                    : 'text-neutral-600 dark:text-neutral-400',
                 )}
-              </div>
+              >
+                {type.label}
+              </span>
+              {isSelected && (
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 shadow-sm shadow-emerald-500/50 shrink-0" />
+              )}
             </button>
           );
         })}
@@ -94,7 +92,7 @@ export const DifficultySelection: React.FC<DifficultySelectionProps> = ({
       <label className="block text-base font-bold text-neutral-900 dark:text-white mb-2">
         কঠিনতা
       </label>
-      <div className="bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-2xl flex gap-1.5 overflow-x-auto">
+      <div className="bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-2xl flex flex-wrap gap-1.5 inline-flex">
         {DIFFICULTY_OPTIONS.map((opt) => {
           const isSelected = difficulties.includes(opt.id);
           return (
@@ -103,7 +101,7 @@ export const DifficultySelection: React.FC<DifficultySelectionProps> = ({
               type="button"
               onClick={() => toggleDifficulty(opt.id)}
               className={cn(
-                'flex-1 py-3 px-2 rounded-xl text-xs font-bold transition-all duration-300 min-w-[70px]',
+                'py-2.5 px-5 rounded-xl text-xs font-bold transition-all duration-300',
                 isSelected
                   ? 'bg-white dark:bg-neutral-700 text-emerald-700 dark:text-emerald-400 shadow-md scale-[1.02]'
                   : 'text-neutral-500 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200',
@@ -224,14 +222,14 @@ export const NegativeMarkingSelection: React.FC<
       <label className="block text-base font-bold text-neutral-900 dark:text-white mb-2">
         নেগেটিভ মার্কিং
       </label>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="flex flex-wrap gap-2">
         {NEGATIVE_MARKING_OPTIONS.map((val) => (
           <button
             key={val}
             type="button"
             onClick={() => setNegativeMarking(val)}
             className={cn(
-              'py-3 rounded-2xl text-xs font-bold transition-all duration-200 border-2',
+              'py-2.5 px-5 rounded-xl text-xs font-bold transition-all duration-200 border-2',
               negativeMarking === val
                 ? 'bg-emerald-700 border-emerald-700 text-white shadow-lg shadow-emerald-500/30 scale-105'
                 : 'bg-neutral-50 dark:bg-neutral-800 border-transparent text-neutral-600 dark:text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700',

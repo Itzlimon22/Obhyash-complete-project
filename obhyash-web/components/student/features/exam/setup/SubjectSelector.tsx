@@ -111,7 +111,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex flex-col justify-end md:justify-center bg-black/40 backdrop-blur-md animate-in fade-in duration-300">
           <div className="absolute inset-0" onClick={() => setIsOpen(false)} />
-          <div className="relative w-full md:max-w-xl md:rounded-3xl rounded-t-3xl bg-white dark:bg-neutral-900 shadow-2xl flex flex-col max-h-[85vh] md:max-h-[700px] animate-in slide-in-from-bottom duration-300 md:mx-auto">
+          <div className="relative w-full md:max-w-xl md:rounded-3xl rounded-t-3xl bg-white dark:bg-neutral-900 shadow-2xl flex flex-col max-h-[50vh] md:max-h-[600px] animate-in slide-in-from-bottom duration-300 md:mx-auto">
             {/* Header */}
             <div className="flex items-center justify-between p-5 border-b border-neutral-100 dark:border-neutral-800">
               <div>
@@ -127,23 +127,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
               </button>
             </div>
 
-            {/* Search */}
-            <div className="p-4 space-y-3 bg-neutral-50/50 dark:bg-neutral-900/50">
-              <div className="relative">
-                <Search
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
-                  size={16}
-                />
-                <input
-                  type="text"
-                  placeholder="বিষয় খুঁজো..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
-                  autoFocus
-                />
-              </div>
-            </div>
+
 
             {/* List */}
             <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
