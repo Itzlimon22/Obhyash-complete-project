@@ -60,7 +60,7 @@ export function UserNav() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.replace('/');
+    window.location.href = '/';
   };
 
   return (

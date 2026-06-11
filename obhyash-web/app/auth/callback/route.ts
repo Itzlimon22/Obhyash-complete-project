@@ -70,6 +70,13 @@ export async function GET(request: Request) {
           supabase.from('users').select('role').eq('id', user.id).single(),
           'Auth profile lookup timed out',
         );
+
+        // Deny Google login if user has no profile (not registered)
+        if (!profile && user.app_metadata?.provider === 'google') {
+          await supabase.auth.signOut();
+          return NextResponse.redirect(`${origin}/login?error=unregistered_google`);
+        }
+
         const role = profile?.role?.toLowerCase() || 'student';
         if (role === 'admin') redirectPath = '/admin/dashboard';
         else if (role === 'teacher') redirectPath = '/teacher/dashboard';

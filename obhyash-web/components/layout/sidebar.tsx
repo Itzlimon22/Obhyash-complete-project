@@ -147,7 +147,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.replace('/');
+    window.location.href = '/';
   };
 
   const toggleSubmenu = (id: string) => {

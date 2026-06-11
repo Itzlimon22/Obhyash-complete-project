@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
@@ -35,6 +35,17 @@ export default function LoginPage() {
 
   const router = useRouter();
   const supabase = createClient();
+
+  // Handle errors passed via URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error') === 'unregistered_google') {
+      setTimeout(() => {
+        setError('এই Google অ্যাকাউন্টটি আমাদের সিস্টেমে নেই। দয়া করে আগে সাইন আপ করো অথবা লিংক করা ইমেইল ব্যবহার করো।');
+      }, 0);
+      window.history.replaceState({}, '', '/login');
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
