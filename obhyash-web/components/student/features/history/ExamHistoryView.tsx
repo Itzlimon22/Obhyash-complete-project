@@ -103,11 +103,12 @@ const PracticeRow: React.FC<{
       <div className="flex justify-between items-center px-1 mb-2">
         <div className="flex flex-col gap-0.5">
           <span className="text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
-            {new Date(item.examDate).toLocaleDateString('bn-BD', {
-              day: 'numeric',
-              month: 'short',
-            })}
-            &nbsp;•&nbsp;
+            {item.examDate && !isNaN(new Date(item.examDate).getTime())
+              ? new Date(item.examDate).toLocaleDateString('bn-BD', {
+                  day: 'numeric',
+                  month: 'short',
+                }) + ' • '
+              : ''}
             {item.subjectLabel || getSubjectDisplayName(item.subject)}
           </span>
           {revealed && item.userAns !== undefined && isMistakeTab && (
@@ -368,7 +369,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
       });
     });
     return all.reverse();
-  }, [history, filterSubject, filterDate]);
+  }, [history, filterSubject, filterDate, bookmarkedIds]);
 
   const bookmarks = useMemo(() => {
     // If we have pre-fetched bookmarked questions from DB, use them directly
