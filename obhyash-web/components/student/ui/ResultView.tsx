@@ -176,7 +176,7 @@ const ResultView: React.FC<ResultViewProps> = ({
           {feedback.text}
         </p>
 
-        {/* Challenge Banner for OMR */}
+        {/* Challenge Banner for OMR
         {submissionType === 'script' &&
           onChallengeEvaluation &&
           !isHistoryMode && (
@@ -197,6 +197,7 @@ const ResultView: React.FC<ResultViewProps> = ({
               </button>
             </div>
           )}
+        */}
 
         <div className="grid grid-cols-2 gap-2 mt-5 max-w-sm mx-auto">
           {onDownloadResultWithExplanations && (

@@ -18,7 +18,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
   const features = [
     {
       title: 'Advanced Evaluation',
-      desc: 'Instant feedback on your OMR scripts for efficient learning.',
+      desc: 'Instant feedback on your scripts for efficient learning.',
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -58,7 +58,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     },
     {
       title: 'Printable Materials',
-      desc: 'Generate professional question papers and OMR sheets for offline practice.',
+      desc: 'Generate professional question papers for offline practice.',
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -210,7 +210,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              New: OMR Scan Feature Available
+              {/* New: OMR Scan Feature Available */}
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight font-serif-exam">
@@ -222,7 +222,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
 
             <p className="text-lg text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
               Competitive exams. Generate custom question papers, practice
-              online, or scan your OMR sheets for instant grading.
+              online for instant grading.
             </p>
 
             <div className="flex justify-center lg:justify-start pt-4">
@@ -332,14 +332,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 name: 'Adnan Sami',
                 role: 'Medical Aspirant',
                 quote:
-                  'The OMR scanning feature is a game changer. I can practice offline and get results instantly.',
+                  'The custom exam builder is a game changer. I can practice and get results instantly.',
                 bg: 'bg-red-50 dark:bg-red-900/10 text-red-600',
               },
               {
                 name: 'Farhana Rimi',
                 role: 'HSC Candidate',
                 quote:
-                  "Zenith's custom exam builder and OMR features helped me track my progress effectively.",
+                  "Zenith's custom exam builder features helped me track my progress effectively.",
                 bg: 'bg-emerald-50 dark:bg-emerald-900/10 text-emerald-600',
               },
               {
@@ -427,14 +427,13 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     Mock Tests
                   </a>
                 </li>
-                <li>
-                  <a
-                    href="#"
-                    className="hover:text-emerald-400 transition-colors"
-                  >
-                    OMR Grading
-                  </a>
-                </li>
+                  {/*
+                  <li>
+                    <a href="#" className="hover:text-red-500 transition-colors">
+                      OMR Grading
+                    </a>
+                  </li>
+                  */}
               </ul>
             </div>
             <div>

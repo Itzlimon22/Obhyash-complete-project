@@ -91,7 +91,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
   toggleTheme,
 }) => {
   const [activeDemoTab, setActiveDemoTab] = useState<
-    'generate' | 'omr' | 'analytics'
+    'generate' | /*'omr' |*/ 'analytics'
   >('generate');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
@@ -251,6 +251,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
   }, []);
 
   const testimonials = [
+    /*
     {
       name: 'সাদিয়া আফরিন',
       role: 'মেডিকেল ভর্তি পরীক্ষার্থী',
@@ -258,6 +259,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       initial: 'S',
       color: 'bg-emerald-500',
     },
+    */
     {
       name: 'তানভীর আহমেদ',
       role: 'HSC পরীক্ষার্থী (Science)',
@@ -279,10 +281,12 @@ const LandingPage: React.FC<LandingPageProps> = ({
       q: 'Obhyash অ্যাপটি কি সম্পূর্ণ ফ্রি?',
       a: "আমাদের একটি 'বেসিক' প্ল্যান আছে যা সম্পূর্ণ ফ্রি। তবে আনলিমিটেড এক্সাম এবং অ্যাডভান্সড ফিচারগুলোর জন্য প্রিমিয়াম সাবস্ক্রিপশন প্রয়োজন।",
     },
+    /*
     {
       q: 'OMR স্ক্যান ফিচারটি কিভাবে কাজ করে?',
       a: 'আপনি যেকোনো সাধারণ কাগজে পরীক্ষা দিয়ে আমাদের অ্যাপের মাধ্যমে ছবি তুললেই আমাদের AI সিস্টেম তা যাচাই করে ফলাফল জানিয়ে দিবে।',
     },
+    */
     {
       q: 'পেমেন্ট পদ্ধতি কি কি?',
       a: 'বর্তমানে আমরা বিকাশ, নগদ এবং রকেটের মাধ্যমে পেমেন্ট গ্রহণ করছি। খুব শীঘ্রই কার্ড পেমেন্ট যুক্ত করা হবে।',
@@ -434,8 +438,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
               <span className="font-bold text-emerald-600 dark:text-emerald-400">
                 Adaptive AI
               </span>{' '}
-              এর সাহায্যে নিজের দুর্বলতা কাটিয়ে ওঠো। আনলিমিটেড প্রশ্ন, OMR
-              Upload এবং স্মার্ট এনালাইসিস—সবই এক অ্যাপে।
+              এর সাহায্যে নিজের দুর্বলতা কাটিয়ে ওঠো। আনলিমিটেড প্রশ্ন,
+              {/* OMR Upload এবং */} স্মার্ট এনালাইসিস—সবই এক অ্যাপে।
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
@@ -476,12 +480,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   >
                     <FileText className="w-3 h-3" /> কাস্টম
                   </button>
+                  {/*
                   <button
                     onClick={() => setActiveDemoTab('omr')}
                     className={`flex items-center gap-1 px-3 py-1 rounded transition-all ${activeDemoTab === 'omr' ? 'bg-white dark:bg-neutral-700 shadow text-emerald-600 dark:text-emerald-400' : 'text-neutral-500 dark:text-neutral-400'}`}
                   >
                     <ScanLine className="w-3 h-3" /> OMR
                   </button>
+                  */}
                   <button
                     onClick={() => setActiveDemoTab('analytics')}
                     className={`flex items-center gap-1 px-3 py-1 rounded transition-all ${activeDemoTab === 'analytics' ? 'bg-white dark:bg-neutral-700 shadow text-emerald-600 dark:text-emerald-400' : 'text-neutral-500 dark:text-neutral-400'}`}
@@ -528,7 +534,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
                 )}
 
-                {/* 2. OMR Demo */}
+                {/* 2. OMR Demo
                 {activeDemoTab === 'omr' && (
                   <div className="animate-in fade-in zoom-in duration-300 flex flex-col items-center justify-center h-full pt-4">
                     <div className="relative w-48 h-64 bg-white border border-neutral-300 rounded shadow-md p-4 flex flex-col gap-3">
@@ -551,6 +557,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     </div>
                   </div>
                 )}
+                */}
 
                 {/* 3. Analytics Demo */}
                 {activeDemoTab === 'analytics' && (
@@ -850,7 +857,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 </p>
               </div>
 
-              {/* OMR Scanning */}
+              {/* OMR Scanning
               <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
                 <div className="w-16 h-16 md:w-14 md:h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-100 dark:ring-red-900/30">
                   <ScanLine className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
@@ -863,6 +870,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   যাবেন নির্ভুল ফলাফল ও বিস্তারিত সমাধান।
                 </p>
               </div>
+              */}
 
               {/* AI Question Generator */}
               <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">

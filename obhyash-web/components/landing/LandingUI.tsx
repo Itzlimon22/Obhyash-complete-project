@@ -157,7 +157,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
   toggleTheme,
 }) => {
   const [activeDemoTab, setActiveDemoTab] = useState<
-    'generate' | 'omr' | 'analytics'
+    'generate' | /*'omr' |*/ 'analytics'
   >('generate');
   const [latestPosts, setLatestPosts] = useState<BlogPost[]>([]);
   const marqueeRef = useRef<HTMLDivElement>(null);
@@ -188,6 +188,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
   };
 
   const testimonials = [
+    /*
     {
       name: 'সাদিয়া আফরিন',
       role: 'মেডিকেল ভর্তি পরীক্ষার্থী',
@@ -195,6 +196,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       initial: 'S',
       color: 'bg-emerald-500',
     },
+    */
     {
       name: 'তানভীর আহমেদ',
       role: 'HSC পরীক্ষার্থী (Science)',
@@ -233,7 +235,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       period: '/১ মাস',
       features: [
         'আনলিমিটেড এক্সাম',
-        'আনলিমিটেড OMR স্ক্যান',
+        /* 'আনলিমিটেড OMR স্ক্যান', */
         'বুকমার্ক করার সুবিধা',
         'অ্যাডভান্সড এনালাইসিস',
         'বিজ্ঞাপনমুক্ত অভিজ্ঞতা',
@@ -398,10 +400,13 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </h1>
 
             <p className="text-lg text-neutral-600 dark:text-neutral-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
-              আনলিমিটেড প্রশ্নে ইচ্ছেমতো পরীক্ষা,{' '}
+              আনলিমিটেড প্রশ্নে ইচ্ছেমতো পরীক্ষা
+              {/*
+              ,{' '}
               <span className="text-emerald-600 dark:text-emerald-400">
                 OMR Upload
               </span>{' '}
+              */}
               এবং নিজের অগ্রগতি যাচাই করো এক নিমিষেই। একাডেমিক এবং অ্যাডমিশন
               প্রস্তুতির সেরা সঙ্গী।
             </p>
@@ -486,12 +491,14 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   >
                     কাস্টম এক্সাম
                   </button>
+                  {/*
                   <button
                     onClick={() => setActiveDemoTab('omr')}
                     className={`px-3 py-1 rounded-md transition-all ${activeDemoTab === 'omr' ? 'bg-white dark:bg-neutral-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-neutral-500'}`}
                   >
                     OMR যাচাই
                   </button>
+                  */}
                   <button
                     onClick={() => setActiveDemoTab('analytics')}
                     className={`px-3 py-1 rounded-md transition-all ${activeDemoTab === 'analytics' ? 'bg-white dark:bg-neutral-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-neutral-500'}`}
@@ -553,6 +560,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     </div>
                   </div>
                 )}
+                {/* 2. OMR Demo - HIDDEN
                 {activeDemoTab === 'omr' && (
                   <div className="animate-fade-in flex flex-col items-center justify-center h-full pt-4">
                     <div className="relative w-48 h-64 bg-white border border-neutral-300 rounded shadow-md p-4 flex flex-col gap-3">
@@ -594,6 +602,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     </div>
                   </div>
                 )}
+                */}
                 {activeDemoTab === 'analytics' && (
                   <div className="animate-fade-in pt-4">
                     <div className="flex gap-4 mb-6">
@@ -703,7 +712,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </ul>
           </div>
 
-          {/* Card 2: OMR Scanner */}
+          {/* Card 2: OMR Scanner
           <div className="lg:col-span-3 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-red-200 dark:hover:border-red-900 transition-all">
             <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
               Available Now
@@ -732,6 +741,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               মুহূর্তের মধ্যে খাতা মূল্যায়ন করে নির্ভুল ফলাফল প্রদান করবে।
             </p>
           </div>
+          */}
 
           {/* Card 3: Analysis */}
           <div className="lg:col-span-2 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-emerald-200 dark:hover:border-emerald-900 transition-all">
@@ -818,7 +828,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               PDF ও অফলাইন টুলস
             </h3>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-              প্রশ্নপত্র এবং OMR শিট PDF আকারে ডাউনলোড করে প্রিন্ট করো। অফলাইনে
+              প্রশ্নপত্র {/* এবং OMR শিট */} PDF আকারে ডাউনলোড করে প্রিন্ট করো। অফলাইনে
               পরীক্ষা দেওয়ার পূর্ণ স্বাধীনতা।
             </p>
           </div>
@@ -1297,6 +1307,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     প্রশ্ন ব্যাংক (Question Bank)
                   </a>
                 </li>
+                {/*
                 <li>
                   <a
                     href="#"
@@ -1305,6 +1316,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     OMR গ্রেডিং (OMR Grading)
                   </a>
                 </li>
+                */}
                 <li>
                   <a
                     href="#"

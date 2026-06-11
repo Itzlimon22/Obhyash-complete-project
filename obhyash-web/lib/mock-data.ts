@@ -242,7 +242,6 @@ export const MOCK_PLANS: SubscriptionPlan[] = [
     currency: '৳',
     features: [
       'আনলিমিটেড মক এক্সাম',
-      'আনলিমিটেড OMR স্ক্যাওিং',
       'ব্যাখ্যাসহ সমাধান (AI)',
       'বিজ্ঞাপনমুক্ত অভিজ্ঞতা',
     ],

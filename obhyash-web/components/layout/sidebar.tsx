@@ -95,12 +95,14 @@ const SIDEBAR_NAVIGATION: { title?: string; items: NavItem[] }[] = [
         icon: Bell,
         href: '/admin/notifications',
       },
+      /*
       {
         id: 'omr-check',
-        label: 'ওএমআর চেকিং',
-        icon: FileQuestion,
+        title: 'OMR Check',
         href: '/admin/omr-check',
+        icon: <ScanLine className="w-5 h-5" />,
       },
+      */
       {
         id: 'complaints',
         label: 'অভিযোগ কেন্দ্র',
