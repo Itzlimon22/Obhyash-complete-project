@@ -86,7 +86,6 @@ export default function SubscriptionsPage() {
   const [subscriptions, setSubscriptions] = useState<SubscriptionHistory[]>([]);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<
     'All' | 'Pending' | 'Approved' | 'Rejected'
@@ -134,7 +133,6 @@ export default function SubscriptionsPage() {
   }, [reqPage, subPage, statusFilter, searchQuery]); // Re-fetch when pagination or filters change
 
   const fetchData = async (showToast = false) => {
-    if (showToast) setIsRefreshing(true);
 
     const supabase = createClient();
 
@@ -248,7 +246,6 @@ export default function SubscriptionsPage() {
       }
     } finally {
       setIsLoading(false);
-      setIsRefreshing(false);
     }
   };
 
@@ -582,17 +579,6 @@ export default function SubscriptionsPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              onClick={() => fetchData(true)}
-              disabled={isRefreshing}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs sm:text-sm font-medium rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-95 disabled:opacity-50"
-            >
-              <RefreshCw
-                size={16}
-                className={isRefreshing ? 'animate-spin' : ''}
-              />
-              <span>{isRefreshing ? 'লোডিং...' : 'রিফ্রেশ'}</span>
-            </button>
 
             {/* View Toggles for Requests and Subscriptions */}
             {(activeTab === 'requests' || activeTab === 'subscriptions') && (

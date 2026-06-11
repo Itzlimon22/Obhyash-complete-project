@@ -24,7 +24,6 @@ import { Card, CardContent } from '@/components/ui/card';
 export default function AdminComplaintsPage() {
   const [complaints, setComplaints] = useState<AppComplaint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<ComplaintStatus | 'All'>(
     'All',
@@ -51,7 +50,6 @@ export default function AdminComplaintsPage() {
   }, [page, statusFilter, searchQuery]);
 
   const fetchComplaints = async (showToast = false) => {
-    if (showToast) setIsRefreshing(true);
     const supabase = createClient();
 
     try {
@@ -96,7 +94,6 @@ export default function AdminComplaintsPage() {
       toast.error('Failed to load complaints');
     } finally {
       setIsLoading(false);
-      setIsRefreshing(false);
     }
   };
 
@@ -166,18 +163,6 @@ export default function AdminComplaintsPage() {
                 </div>
               </div>
             </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => fetchComplaints(true)}
-              className="w-10 h-10 rounded-xl border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 shadow-sm"
-              disabled={isRefreshing}
-            >
-              <RefreshCw
-                size={16}
-                className={isRefreshing ? 'animate-spin' : ''}
-              />
-            </Button>
           </div>
         </div>
 

@@ -17,7 +17,6 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  RefreshCw,
   BarChart3,
   Settings,
   Database,
@@ -209,8 +208,6 @@ const fetchAdminDashboardData = async () => {
 export default function DashboardPage() {
   const router = useRouter();
 
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
   const { data, error, isLoading, mutate } = useSWR('adminDashboard', fetchAdminDashboardData, {
     revalidateOnFocus: false,
     revalidateIfStale: true,
@@ -256,13 +253,6 @@ export default function DashboardPage() {
 
   const handleNavigate = (path: string) => {
     router.push(`/admin/${path}`);
-  };
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    await mutate();
-    setIsRefreshing(false);
-    toast.success('Dashboard refreshed successfully');
   };
 
   const handleExport = () => {
@@ -313,19 +303,6 @@ export default function DashboardPage() {
 
           {/* Action Buttons - Scrollable on mobile */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:overflow-visible md:pb-0 md:mx-0 md:px-0 scrollbar-none">
-            <button
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="group shrink-0 flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-[11px] md:text-xs font-bold rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-95 disabled:opacity-50"
-            >
-              <RefreshCw
-                size={14}
-                className={
-                  isRefreshing ? 'animate-spin text-red-500' : 'text-red-500'
-                }
-              />
-              <span>{isRefreshing ? '...' : 'Refresh'}</span>
-            </button>
             <button
               onClick={handleExport}
               className="group shrink-0 flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-[11px] md:text-xs font-bold rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-95"

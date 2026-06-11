@@ -40,7 +40,6 @@ interface ReferralHistory {
 export default function AdminReferralsPage() {
   const [history, setHistory] = useState<ReferralHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [stats, setStats] = useState({
     totalRedemptions: 0,
@@ -62,7 +61,6 @@ export default function AdminReferralsPage() {
   }, [searchQuery]);
 
   const fetchData = async (showToast = false) => {
-    if (showToast) setIsRefreshing(true);
     try {
       const res = await fetch(
         `/api/admin/referrals?page=${page}&pageSize=${pageSize}`,
@@ -82,7 +80,6 @@ export default function AdminReferralsPage() {
       toast.error(err.message || 'Error loading referral data');
     } finally {
       setIsLoading(false);
-      setIsRefreshing(false);
     }
   };
 
@@ -147,17 +144,6 @@ export default function AdminReferralsPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              onClick={() => fetchData(true)}
-              disabled={isRefreshing}
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs sm:text-sm font-medium rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-95 disabled:opacity-50"
-            >
-              <RefreshCw
-                size={16}
-                className={isRefreshing ? 'animate-spin' : ''}
-              />
-              <span>{isRefreshing ? 'লোডিং...' : 'রিফ্রেশ'}</span>
-            </button>
           </div>
         </div>
 

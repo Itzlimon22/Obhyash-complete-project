@@ -34,7 +34,6 @@ export default function UserManagementPage() {
     users,
     filteredUsers,
     isLoading,
-    isRefreshing,
     fetchUsers,
 
     // Filters
@@ -232,18 +231,6 @@ export default function UserManagementPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2 md:gap-3">
-            <button
-              onClick={() => fetchUsers(true)}
-              disabled={isRefreshing}
-              className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-neutral-900 hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200 text-xs md:text-sm font-medium rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all shadow-sm active:scale-[0.98] disabled:opacity-50"
-            >
-              <RefreshCw
-                size={16}
-                className={isRefreshing ? 'animate-spin' : ''}
-              />
-              <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
-            </button>
-
             <div className="hidden md:flex bg-neutral-100 dark:bg-neutral-800 p-1 rounded-xl">
               <button
                 onClick={() => setViewStyle('card')}

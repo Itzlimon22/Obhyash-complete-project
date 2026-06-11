@@ -76,7 +76,6 @@ interface UserFromDatabase {
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
   const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [examStats, setExamStats] = useState<ExamStats>({
     totalExams: 0,
@@ -98,8 +97,6 @@ export default function AnalyticsPage() {
   }, [timeRange]);
 
   const fetchAnalyticsData = async (showToast = false) => {
-    if (showToast) setIsRefreshing(true);
-
     const supabase = createClient();
 
     try {
@@ -226,12 +223,7 @@ export default function AnalyticsPage() {
       toast.error('Failed to load analytics data');
     } finally {
       setIsLoading(false);
-      setIsRefreshing(false);
     }
-  };
-
-  const handleRefresh = () => {
-    fetchAnalyticsData(true);
   };
 
   const handleExport = () => {
@@ -276,18 +268,6 @@ export default function AnalyticsPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <button
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-neutral-50 dark:bg-neutral-900 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-600 dark:text-neutral-400 text-[11px] font-black rounded-xl border border-neutral-200 dark:border-neutral-800 transition-all uppercase tracking-tight active:scale-95 disabled:opacity-50"
-              >
-                <RefreshCw
-                  size={14}
-                  className={isRefreshing ? 'animate-spin' : ''}
-                />
-                <span>Refresh</span>
-              </button>
-
               <button
                 onClick={handleExport}
                 className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-black text-[11px] font-black rounded-xl shadow-lg active:scale-95 transition-all uppercase tracking-tight"
