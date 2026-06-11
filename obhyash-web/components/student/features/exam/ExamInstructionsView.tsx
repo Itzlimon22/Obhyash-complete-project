@@ -56,7 +56,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
   };
 
   return (
-    <div className="relative w-full max-w-3xl mx-auto pb-24 px-4 md:px-6">
+    <div className="relative w-full max-w-3xl mx-auto pb-4 md:pb-8 px-2 md:px-6">
       
       {/* 3. Ambient Glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10 flex justify-center">
@@ -64,7 +64,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
       </div>
 
       {/* 6. Contextual Header */}
-      <div className="flex justify-center mb-8 pt-4 animate-in fade-in slide-in-from-top-4 duration-500 fill-mode-both">
+      <div className="flex justify-center mb-3 pt-2 md:mb-8 md:pt-4 animate-in fade-in slide-in-from-top-4 duration-500 fill-mode-both">
         <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/60 dark:bg-neutral-900/60 backdrop-blur-md border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm text-[11px] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest">
           <span className="text-neutral-800 dark:text-neutral-200">{config.subjectLabel?.split(' ')[0]}</span>
           <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
@@ -75,9 +75,9 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
       </div>
 
       {/* Exam Summary Card (Staggered Animation 1) */}
-      <div className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl rounded-[2rem] border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm mb-5 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-both">
-        <div className="px-6 pt-5 pb-4 border-b border-neutral-100/50 dark:border-neutral-800/50">
-          <p className="text-xs font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
+      <div className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl rounded-[1.5rem] md:rounded-[2rem] border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm mb-3 md:mb-5 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-both">
+        <div className="px-4 pt-3 pb-2 md:px-6 md:pt-5 md:pb-4 border-b border-neutral-100/50 dark:border-neutral-800/50">
+          <p className="text-[10px] md:text-xs font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
             পরীক্ষার সারসংক্ষেপ
           </p>
         </div>
@@ -113,9 +113,9 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
       </div>
 
       {/* Rules Card (Staggered Animation 2) */}
-      <div className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl rounded-[2rem] border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm mb-5 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both">
-        <div className="px-6 pt-5 pb-4 border-b border-neutral-100/50 dark:border-neutral-800/50">
-          <p className="text-xs font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
+      <div className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl rounded-[1.5rem] md:rounded-[2rem] border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm mb-3 md:mb-5 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both">
+        <div className="px-4 pt-3 pb-2 md:px-6 md:pt-5 md:pb-4 border-b border-neutral-100/50 dark:border-neutral-800/50">
+          <p className="text-[10px] md:text-xs font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
             নিয়মাবলী
           </p>
         </div>
@@ -139,26 +139,14 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
             badge={hasNegative ? `−${config.negativeMarking}` : '✓'}
             badgeColor={hasNegative ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' : 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'}
           />
-          <RuleRow
-            iconBg="bg-sky-100 dark:bg-sky-900/30"
-            icon={<CheckCircle2 size={13} className="text-sky-700 dark:text-sky-400" />}
-            title="পাস মার্ক"
-            desc="৫০% বা তার বেশি পেলে পাস"
-            badge="৫০%"
-            badgeColor="bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400"
-          />
+
           <RuleRow
             iconBg="bg-amber-100 dark:bg-amber-900/30"
             icon={<AlertTriangle size={13} className="text-amber-600 dark:text-amber-400" />}
             title="ট্যাব পরিবর্তন"
             desc="ট্যাব বদলালে পরীক্ষা বাতিল হতে পারে"
           />
-          <RuleRow
-            iconBg="bg-neutral-100 dark:bg-neutral-800"
-            icon={<Wifi size={13} className="text-neutral-600 dark:text-neutral-400" />}
-            title="ইন্টারনেট"
-            desc="স্থিতিশীল সংযোগ নিশ্চিত করো"
-          />
+
         </div>
       </div>
 
@@ -167,7 +155,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
         <button
           onClick={onBack}
           disabled={isLoading}
-          className="w-1/3 group relative overflow-hidden bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-800/50 hover:bg-white dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-extrabold py-4 sm:py-5 rounded-2xl sm:rounded-3xl shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 px-2"
+          className="w-1/3 group relative overflow-hidden bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-800/50 hover:bg-white dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-extrabold py-3 sm:py-5 rounded-xl sm:rounded-3xl shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 px-2"
         >
           <div className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-2">
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform shrink-0" />
@@ -178,7 +166,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
         <button
           onClick={handleStart}
           disabled={isLoading}
-          className="w-2/3 group relative overflow-hidden bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-4 sm:py-5 rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-emerald-500/25 hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none px-2"
+          className="w-2/3 group relative overflow-hidden bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-3 sm:py-5 rounded-xl sm:rounded-3xl shadow-lg hover:shadow-emerald-500/25 hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none px-2"
         >
           <div className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-3">
             {isLoading ? (
@@ -196,7 +184,7 @@ export const ExamInstructionsView: React.FC<ExamInstructionsViewProps> = ({
         </button>
       </div>
 
-      <p className="text-center text-[11px] text-neutral-400 mt-4 font-bold uppercase tracking-widest animate-in fade-in duration-500 delay-500 fill-mode-both">
+      <p className="text-center text-[10px] sm:text-[11px] text-neutral-400 mt-2 md:mt-4 font-bold uppercase tracking-widest animate-in fade-in duration-500 delay-500 fill-mode-both">
         শুরু করলে টাইমার চালু হয়ে যাবে
       </p>
     </div>
@@ -217,13 +205,13 @@ const StatCell = ({
   value: string;
   highlight?: boolean;
 }) => (
-  <div className="flex flex-col items-center justify-center py-6 px-3 text-center">
-    <div className={cn("w-10 h-10 rounded-full flex items-center justify-center mb-3 shadow-inner", iconColor || "bg-neutral-100 text-neutral-500 dark:bg-neutral-800")}>
+  <div className="flex flex-col items-center justify-center py-3 px-2 md:py-6 md:px-3 text-center">
+    <div className={cn("w-7 h-7 md:w-10 md:h-10 rounded-full flex items-center justify-center mb-1.5 md:mb-3 shadow-inner", iconColor || "bg-neutral-100 text-neutral-500 dark:bg-neutral-800")}>
       {icon}
     </div>
     <p
       className={cn(
-        'font-black text-2xl md:text-3xl leading-none mb-1.5',
+        'font-black text-lg md:text-3xl leading-none mb-1 md:mb-1.5',
         highlight
           ? 'text-emerald-700 dark:text-emerald-400'
           : 'text-neutral-900 dark:text-white',
@@ -231,7 +219,7 @@ const StatCell = ({
     >
       {value}
     </p>
-    <p className="text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
+    <p className="text-[9px] md:text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
       {label}
     </p>
   </div>
@@ -253,20 +241,20 @@ const RuleRow = ({
   badge?: string;
   badgeColor?: string;
 }) => (
-  <div className="flex items-start gap-3 px-4 py-3.5 bg-white/60 dark:bg-neutral-900/60 backdrop-blur hover:bg-neutral-50 dark:hover:bg-neutral-800/80 transition-colors">
-    <div className={cn('w-6 h-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5 shadow-sm', iconBg)}>
+  <div className="flex items-start gap-2.5 md:gap-3 px-3 py-2.5 md:px-4 md:py-3.5 bg-white/60 dark:bg-neutral-900/60 backdrop-blur hover:bg-neutral-50 dark:hover:bg-neutral-800/80 transition-colors">
+    <div className={cn('w-5 h-5 md:w-6 md:h-6 rounded-md md:rounded-lg flex items-center justify-center shrink-0 mt-0.5 shadow-sm', iconBg)}>
       {icon}
     </div>
     <div className="flex-1 min-w-0">
       <div className="flex items-center gap-1.5 flex-wrap">
-        <p className="text-xs font-extrabold text-neutral-900 dark:text-white leading-tight">{title}</p>
+        <p className="text-[11px] md:text-xs font-extrabold text-neutral-900 dark:text-white leading-tight">{title}</p>
         {badge && (
-          <span className={cn('text-[9px] font-black px-1.5 py-0.5 rounded-full leading-none shadow-sm', badgeColor)}>
+          <span className={cn('text-[8px] md:text-[9px] font-black px-1.5 py-0.5 rounded-full leading-none shadow-sm', badgeColor)}>
             {badge}
           </span>
         )}
       </div>
-      <p className="text-[10px] text-neutral-500 dark:text-neutral-400 leading-snug mt-0.5">{desc}</p>
+      <p className="text-[9px] md:text-[10px] text-neutral-500 dark:text-neutral-400 leading-snug mt-0.5">{desc}</p>
     </div>
   </div>
 );
