@@ -507,8 +507,8 @@ const formatDuration = (seconds: number) => {
   return (
     <div className="min-h-screen bg-[#f5f5f5] dark:bg-[#0e0e0e] transition-colors pb-28 md:pb-10">
       {/* ── Android-style top app bar (mobile) / Desktop header ── */}
-      <header className="bg-white dark:bg-[#161616] border-b border-neutral-200 dark:border-neutral-800 shadow-sm overflow-x-auto hide-scrollbar">
-        <div className="max-w-6xl mx-auto px-2 md:px-4 py-2 md:py-0 md:h-16 flex items-center justify-start md:justify-end gap-3 min-w-max w-fit md:w-full">
+      <header className="overflow-x-auto hide-scrollbar pt-4 md:pt-6">
+        <div className="max-w-6xl mx-auto px-2 md:px-4 flex items-center justify-start md:justify-end gap-3 min-w-max w-fit md:w-full">
           {/* Tab strip */}
           <div className="flex items-center gap-1 bg-neutral-100 dark:bg-neutral-800 rounded-xl p-1">
             {TABS.map((tab) => (

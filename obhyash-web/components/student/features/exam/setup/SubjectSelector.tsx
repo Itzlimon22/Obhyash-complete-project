@@ -113,17 +113,17 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
           <div className="absolute inset-0" onClick={() => setIsOpen(false)} />
           <div className="relative w-full md:max-w-xl md:rounded-3xl rounded-t-3xl bg-white dark:bg-neutral-900 shadow-2xl flex flex-col max-h-[50vh] md:max-h-[600px] animate-in slide-in-from-bottom duration-300 md:mx-auto">
             {/* Header */}
-            <div className="flex items-center justify-between p-5 border-b border-neutral-100 dark:border-neutral-800">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800">
               <div>
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
+                <h3 className="text-base font-bold text-neutral-900 dark:text-white leading-tight">
                   বিষয়
                 </h3>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-2 bg-neutral-100 dark:bg-neutral-800 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                className="p-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 

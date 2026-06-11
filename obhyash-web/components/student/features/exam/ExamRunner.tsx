@@ -111,6 +111,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
 
   isEvaluating,
   onSubmit,
+  onExit,
   onTimeoutReattempt,
   onTimeoutCancel,
   navWarning,
@@ -177,7 +178,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
           appState={appState}
           onDownloadQuestionPaper={() => downloadQuestionPaper(examDetails, questions)}
           onDownloadOMR={() => downloadOMRSheet(examDetails, questions.length)}
-          onExit={confirmNavigation}
+          onExit={onExit}
           totalQuestions={questions.length}
           answeredCount={Object.keys(userAnswers).length}
         />

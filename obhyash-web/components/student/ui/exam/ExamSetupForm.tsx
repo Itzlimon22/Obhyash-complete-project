@@ -411,8 +411,8 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         onClick={handleStartExam}
         disabled={isLoading || !subject}
         className={cn(
-          "w-full group relative overflow-hidden text-white font-extrabold rounded-3xl shadow-lg hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none duration-500",
-          compact ? "py-4" : "py-5",
+          "w-fit px-12 mx-auto xl:mx-0 group relative overflow-hidden text-white font-extrabold rounded-3xl shadow-lg hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none duration-500",
+          compact ? "py-4" : "py-4 md:py-5",
           subject
             ? theme.button
             : "bg-neutral-300 dark:bg-neutral-800 text-neutral-500 shadow-none",
@@ -591,7 +591,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         </div>
 
         {/* Mobile Submit Button (Flow with content) */}
-        <div className="xl:hidden mt-4 mb-8">
+        <div className="xl:hidden mt-4 mb-8 flex justify-center w-full">
           <StartExamButton />
         </div>
       </div>

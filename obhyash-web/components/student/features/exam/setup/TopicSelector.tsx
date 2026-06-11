@@ -215,38 +215,25 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
           <div className="absolute inset-0" onClick={() => setIsOpen(false)} />
           <div className="relative w-full md:max-w-xl md:rounded-3xl rounded-t-3xl bg-white dark:bg-neutral-900 shadow-2xl flex flex-col max-h-[50vh] md:max-h-[600px] animate-in slide-in-from-bottom duration-300 md:mx-auto">
             {/* Header */}
-            <div className="flex items-center justify-between p-5 border-b border-neutral-100 dark:border-neutral-800">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800">
               <div>
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
+                <h3 className="text-base font-bold text-neutral-900 dark:text-white leading-tight">
                   {title}
                 </h3>
-                <p className="text-xs text-neutral-500">
+                <p className="text-[11px] text-neutral-500">
                   {localSelected.length} selected of {totalCount}
                 </p>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-2 bg-neutral-100 dark:bg-neutral-800 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                className="p-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
             {/* Actions */}
-            <div className="p-4 space-y-3 bg-neutral-50/50 dark:bg-neutral-900/50">
-              <div className="relative">
-                <Search
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
-                  size={16}
-                />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
-                />
-              </div>
+            <div className="p-3 bg-neutral-50/50 dark:bg-neutral-900/50 border-b border-neutral-100 dark:border-neutral-800">
               <div className="flex gap-2">
                 {isGrouped ? (
                   <>
