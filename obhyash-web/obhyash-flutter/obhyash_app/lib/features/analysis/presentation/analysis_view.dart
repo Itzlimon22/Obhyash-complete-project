@@ -443,7 +443,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             ),
             const SizedBox(height: 8),
             Text(
-              'বিশ্লেষণ দেখতে অন্তত একটি পরীক্ষা সম্পন্ন করুন।\nঅথবা সময়সীমা পরিবর্তন করুন।',
+              'বিশ্লেষণ দেখতে অন্তত একটি পরীক্ষা সম্পন্ন করো।\nঅথবা সময়সীমা পরিবর্তন করো।',
               style: TextStyle(
                 fontSize: 14,
                 color: isDark

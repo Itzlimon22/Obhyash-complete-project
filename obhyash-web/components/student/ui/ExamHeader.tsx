@@ -69,7 +69,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
       <div className="h-14 md:h-16 flex items-center justify-between px-3 md:px-6 gap-2">
         {/* ────────────── LEFT ────────────── */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="hidden md:flex flex-col gap-1 min-w-[140px]">
+          <div className="hidden md:flex flex-col gap-1 min-w-[140px]" title="অগ্রগতি">
             <div className="flex items-center justify-between mb-0.5">
               <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">
                 অগ্রগতি
@@ -160,6 +160,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
 
           {/* Timer */}
           <div
+            title="অবশিষ্ট সময়"
             className={`flex items-center gap-1.5 px-2.5 py-1.5 md:px-4 md:py-2 rounded-xl border transition-all duration-300 ${timerCls}`}
           >
             {isGracePeriod ? (

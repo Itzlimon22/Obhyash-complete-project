@@ -200,7 +200,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
   void _startExam() async {
     if (_selectedSubject == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('অনুগ্রহ করে একটি বিষয় নির্বাচন করুন')),
+        const SnackBar(content: Text('অনুগ্রহ করে একটি বিষয় নির্বাচন করো')),
       );
       return;
     }
@@ -230,7 +230,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'প্রশ্ন প্রস্তুত করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।',
+              'প্রশ্ন প্রস্তুত করতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
             ),
             backgroundColor: Colors.red,
           ),
@@ -279,7 +279,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'পরীক্ষা সেটআপ করুন',
+                  'পরীক্ষা সেটআপ করো',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
@@ -416,7 +416,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     const SizedBox(height: 8),
                     if (_selectedChapters.isEmpty)
                       const Text(
-                        'আগে অধ্যায় নির্বাচন করুন',
+                        'আগে অধ্যায় নির্বাচন করো',
                         style: TextStyle(fontSize: 13, color: Colors.grey),
                       )
                     else if (_topics.isEmpty)
@@ -638,7 +638,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        'পরীক্ষা শুরু করুন',
+                        'পরীক্ষা শুরু করো',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,

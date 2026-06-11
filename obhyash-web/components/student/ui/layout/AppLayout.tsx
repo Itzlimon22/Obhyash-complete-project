@@ -241,7 +241,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 bg-red-50 dark:bg-red-900/10 rounded-full border border-red-100 dark:border-red-900/20 group cursor-pointer transition-all hover:border-red-200 hover:bg-red-100/50 dark:hover:bg-red-900/20 shadow-sm"
-                title="Daily Streak"
+                title="ডেইলি স্ট্রিক"
                 onClick={() => {
                   // Optional: Add logic here if needed (e.g. show streak details)
                 }}

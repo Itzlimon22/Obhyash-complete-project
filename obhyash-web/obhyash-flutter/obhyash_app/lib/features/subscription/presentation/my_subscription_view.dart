@@ -335,7 +335,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                 },
                 icon: const Icon(LucideIcons.copy, size: 16),
                 label: const Text(
-                  'রিসিট কপি করুন',
+                  'রিসিট কপি করো',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 style: OutlinedButton.styleFrom(
@@ -553,8 +553,8 @@ class _OverviewTab extends StatelessWidget {
                       Expanded(
                         child: Text(
                           daysLeft == 0
-                              ? 'আজই মেয়াদ শেষ হচ্ছে! নবায়ন করুন।'
-                              : 'মাত্র $daysLeft দিন বাকি! শীঘ্রই নবায়ন করুন।',
+                              ? 'আজই মেয়াদ শেষ হচ্ছে! নবায়ন করো।'
+                              : 'মাত্র $daysLeft দিন বাকি! শীঘ্রই নবায়ন করো।',
                           style: const TextStyle(
                             color: Color(0xFFFCA5A5),
                             fontSize: 12,
@@ -652,7 +652,7 @@ class _OverviewTab extends StatelessWidget {
           onPressed: onUpgrade,
           icon: const Icon(LucideIcons.zap, size: 16),
           label: Text(
-            daysLeft <= 30 ? 'প্ল্যান নবায়ন করুন' : 'প্ল্যান আপগ্রেড করুন',
+            daysLeft <= 30 ? 'প্ল্যান নবায়ন করো' : 'প্ল্যান আপগ্রেড করো',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           style: ElevatedButton.styleFrom(
@@ -729,7 +729,7 @@ class _FreePlanCard extends StatelessWidget {
               onPressed: onUpgrade,
               icon: const Icon(LucideIcons.zap, size: 16),
               label: const Text(
-                'প্ল্যান দেখুন ও আপগ্রেড করুন',
+                'প্ল্যান দেখো ও আপগ্রেড করো',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               style: ElevatedButton.styleFrom(

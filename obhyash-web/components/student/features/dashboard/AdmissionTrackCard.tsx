@@ -91,7 +91,7 @@ const AdmissionTrackCard: React.FC<AdmissionTrackCardProps> = ({
                 ) : (
                   <PlusCircle className="w-3.5 h-3.5" />
                 )}
-                আর্লি এক্সেস নিন
+                আর্লি এক্সেস নাও
               </motion.button>
             )}
           </AnimatePresence>

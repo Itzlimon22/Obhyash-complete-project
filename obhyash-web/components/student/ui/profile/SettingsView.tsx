@@ -120,7 +120,7 @@ const GROUPS: SettingsGroup[] = [
       {
         type: 'panel',
         id: 'upgrade',
-        label: 'আপগ্রেড করুন',
+        label: 'আপগ্রেড করো',
         description: 'প্ল্যান দেখো ও আপগ্রেড করো',
         Icon: ArrowUpRight,
       },
@@ -299,7 +299,7 @@ export default function SettingsView({
       reports: 'আমার রিপোর্ট',
       'my-subscription': 'আমার সাবসক্রিপশন',
       notifications: 'নোটিফিকেশন',
-      upgrade: 'আপগ্রেড করুন',
+      upgrade: 'আপগ্রেড করো',
     };
     const content = (() => {
       switch (section) {

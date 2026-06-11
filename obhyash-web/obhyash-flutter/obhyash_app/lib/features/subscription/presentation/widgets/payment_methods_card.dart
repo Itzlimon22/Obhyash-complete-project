@@ -154,7 +154,7 @@ class PaymentMethodsCard extends StatelessWidget {
                     size: 14,
                   ), // hover:text-emerald-600
                   label: const Text(
-                    'যুক্ত করুন',
+                    'যুক্ত করো',
                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                   style:
@@ -232,7 +232,7 @@ class PaymentMethodsCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'bKash বা Nagad যুক্ত করুন সহজ পেমেন্টের জন্য।',
+                    'bKash বা Nagad যুক্ত করো সহজ পেমেন্টের জন্য।',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12,

@@ -141,7 +141,7 @@ export default function QuestionCard({
           {/* Report button */}
           <button
             onClick={onReport}
-            title="Report Issue"
+            title="রিপোর্ট করো"
             className="
               rounded p-1 transition-colors
               text-neutral-400 hover:text-red-500

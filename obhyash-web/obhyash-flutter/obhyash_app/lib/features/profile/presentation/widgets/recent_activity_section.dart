@@ -82,7 +82,7 @@ class RecentActivitySection extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'সব দেখুন',
+                      'সব দেখো',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,

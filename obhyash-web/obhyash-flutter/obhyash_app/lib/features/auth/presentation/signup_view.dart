@@ -243,7 +243,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'মাত্র ৩টি ধাপে সম্পন্ন করুন আপনার রেজিস্ট্রেশন',
+                          'মাত্র ৩টি ধাপে সম্পন্ন করো আপনার রেজিস্ট্রেশন',
                           style: TextStyle(
                             fontSize: 14,
                             fontFamily: 'HindSiliguri',
@@ -387,7 +387,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                                               ),
                                               SizedBox(width: 8),
                                               Text(
-                                                'অপেক্ষা করুন...',
+                                                'অপেক্ষা করো...',
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontFamily: 'HindSiliguri',
@@ -398,7 +398,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                                           )
                                         : _step == 3
                                         ? const Text(
-                                            'অ্যাকাউন্ট তৈরি করুন',
+                                            'অ্যাকাউন্ট তৈরি করো',
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 16,
@@ -451,7 +451,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                               children: [
                                 const TextSpan(text: 'আগেই অ্যাকাউন্ট আছে? '),
                                 TextSpan(
-                                  text: 'লগইন করুন',
+                                  text: 'লগইন করো',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: isDark
@@ -909,7 +909,7 @@ class _SignupViewState extends ConsumerState<SignupView>
         ),
         const SizedBox(height: 16),
         _buildInputField(
-          label: 'পাসওয়ার্ড নিশ্চিত করুন',
+          label: 'পাসওয়ার্ড নিশ্চিত করো',
           icon: LucideIcons.lock,
           controller: _confirmPasswordController,
           hint: 'পাসওয়ার্ডটি আবার লিখুন',
@@ -1119,7 +1119,7 @@ class _SignupViewState extends ConsumerState<SignupView>
               ),
               const SizedBox(height: 12),
               Text(
-                'আপনার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। এখন লগইন করুন।',
+                'আপনার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। এখন লগইন করো।',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,

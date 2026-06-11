@@ -489,7 +489,7 @@ class _ExamsTab extends StatelessWidget {
               child: _emptyState(
                 isDark,
                 'কোনো পরীক্ষার ইতিহাস নেই',
-                'একটি মক পরীক্ষা দিন এবং ফলাফল এখানে দেখুন।',
+                'একটি মক পরীক্ষা দিন এবং ফলাফল এখানে দেখো।',
               ),
             ),
           ],
@@ -844,7 +844,7 @@ class _MistakesTabState extends State<_MistakesTab> {
       return _emptyState(
         widget.isDark,
         'কোনো ভুল নেই! 🎉',
-        'পরীক্ষা দিন এবং ভুল উত্তরগুলো এখানে দেখুন।',
+        'পরীক্ষা দিন এবং ভুল উত্তরগুলো এখানে দেখো।',
       );
     }
     return RefreshIndicator(
@@ -1115,7 +1115,7 @@ class _BookmarksTabState extends State<_BookmarksTab> {
       return _emptyState(
         widget.isDark,
         'কোনো বুকমার্ক নেই',
-        'পরীক্ষার সময় প্রশ্নে বুকমার্ক করুন এবং পরে এখানে দেখুন।',
+        'পরীক্ষার সময় প্রশ্নে বুকমার্ক করো এবং পরে এখানে দেখো।',
       );
     }
     return ListView.builder(
@@ -1466,7 +1466,7 @@ Widget _errorState(bool isDark, VoidCallback onRetry) {
           ),
           const SizedBox(height: 8),
           const Text(
-            'ইন্টারনেট সংযোগ পরীক্ষা করুন এবং আবার চেষ্টা করুন।',
+            'ইন্টারনেট সংযোগ পরীক্ষা করো এবং আবার চেষ্টা করো।',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 13, color: Color(0xFFA3A3A3)),
           ),
@@ -1480,7 +1480,7 @@ Widget _errorState(bool isDark, VoidCallback onRetry) {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Text(
-                'আবার চেষ্টা করুন',
+                'আবার চেষ্টা করো',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,

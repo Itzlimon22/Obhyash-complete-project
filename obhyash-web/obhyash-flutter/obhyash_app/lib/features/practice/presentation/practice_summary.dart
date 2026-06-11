@@ -339,7 +339,7 @@ class _PracticeSummaryState extends State<PracticeSummary>
                     ),
                     child: Center(
                       child: Text(
-                        'অনুশীলনে ফিরে যান',
+                        'অনুশীলনে ফিরে যাও',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

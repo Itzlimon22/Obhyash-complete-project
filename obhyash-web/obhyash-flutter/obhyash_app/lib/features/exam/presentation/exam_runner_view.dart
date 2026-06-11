@@ -29,12 +29,12 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
       builder: (context) => AlertDialog(
         title: const Text('সতর্কতা!'),
         content: const Text(
-          'পরীক্ষা চলাকালীন অবস্থায় বের হতে পারবেন না। বের হতে হলে আগে খাতা জমা দিন।',
+          'পরীক্ষা চলাকালীন অবস্থায় বের হতে পারবেন না। বের হতে হলে আগে খাতা জমা দাও।',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('বন্ধ করুন'),
+            child: const Text('বন্ধ করো'),
           ),
           TextButton(
             onPressed: () {
@@ -46,7 +46,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
               });
             },
             child: const Text(
-              'জমা দিন ও বের হোন',
+              'জমা দাও ও বের হোন',
               style: TextStyle(color: Colors.red),
             ),
           ),
@@ -77,7 +77,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF10B981),
             ),
-            child: const Text('হ্যাঁ, জমা দিন'),
+            child: const Text('হ্যাঁ, জমা দাও'),
           ),
         ],
       ),

@@ -105,7 +105,7 @@ class _ResultViewState extends State<ResultView> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'প্রশ্ন $questionId রিপোর্ট করুন',
+                'প্রশ্ন $questionId রিপোর্ট করো',
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -155,7 +155,7 @@ class _ResultViewState extends State<ResultView> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                     ),
-                    child: const Text('জমা দিন'),
+                    child: const Text('জমা দাও'),
                   ),
                 ],
               ),

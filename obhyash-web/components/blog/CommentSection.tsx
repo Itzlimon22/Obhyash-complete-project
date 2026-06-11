@@ -345,7 +345,7 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
         ) : topLevel.length === 0 ? (
           <div className="text-center py-10 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
             <p className="text-slate-500 dark:text-slate-400 text-[15px]">
-              এখনো কেউ মতামত জানায়নি। আপনিই প্রথম মতামত দিন!
+              এখনো কেউ মতামত জানায়নি। আপনিই প্রথম মতামত দাও!
             </p>
           </div>
         ) : (

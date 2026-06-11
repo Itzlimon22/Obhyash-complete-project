@@ -237,6 +237,7 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
                 <button
                   onClick={handleSubmitRequest}
                   disabled={isEvaluating}
+                  title="পরীক্ষা শেষ করো"
                   className="shrink-0 flex items-center gap-2.5 px-6 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm rounded-xl shadow-lg shadow-red-500/25 transition-all active:scale-[0.97] group"
                 >
                   {isEvaluating ? (

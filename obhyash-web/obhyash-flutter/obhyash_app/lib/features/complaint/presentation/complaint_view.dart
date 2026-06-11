@@ -188,7 +188,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
     if (_selectedType == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('অনুগ্রহ করে অভিযোগের ধরণ নির্বাচন করুন'),
+          content: Text('অনুগ্রহ করে অভিযোগের ধরণ নির্বাচন করো'),
           backgroundColor: Colors.red,
         ),
       );
@@ -322,7 +322,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     ),
                   ),
                   child: const Text(
-                    'আরেকটি অভিযোগ করুন',
+                    'আরেকটি অভিযোগ করো',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -345,7 +345,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     ),
                   ),
                   child: const Text(
-                    'আমার অভিযোগ দেখুন',
+                    'আমার অভিযোগ দেখো',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -507,7 +507,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '১. অভিযোগের ধরণ নির্বাচন করুন',
+                  '১. অভিযোগের ধরণ নির্বাচন করো',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -718,7 +718,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'জমা দিন',
+                            'জমা দাও',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -795,7 +795,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                           ),
                         ),
                         child: const Text(
-                          'নতুন অভিযোগ করুন',
+                          'নতুন অভিযোগ করো',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),

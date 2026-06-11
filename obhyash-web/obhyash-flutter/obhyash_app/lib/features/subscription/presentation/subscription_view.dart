@@ -161,7 +161,7 @@ class _SubscriptionViewState extends ConsumerState<SubscriptionView> {
                   ),
                   const Center(
                     child: Text(
-                      'আপগ্রেড করুন',
+                      'আপগ্রেড করো',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,

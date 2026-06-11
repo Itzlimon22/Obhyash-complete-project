@@ -904,7 +904,7 @@ class _SRWeakness extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    '"${weak.first.name == 'General' ? 'সাধারণ প্রশ্ন' : weak.first.name}" অধ্যায়টি আরও অনুশীলন করুন।',
+                                    '"${weak.first.name == 'General' ? 'সাধারণ প্রশ্ন' : weak.first.name}" অধ্যায়টি আরও অনুশীলন করো।',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: isDark

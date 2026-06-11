@@ -86,11 +86,11 @@ class AuthController extends AsyncNotifier<void> {
         }
       } catch (e) {
         String errorMessage =
-            'ইমেইল বা পাসওয়ার্ড ভুল হয়েছে। আবার চেষ্টা করুন।';
+            'ইমেইল বা পাসওয়ার্ড ভুল হয়েছে। আবার চেষ্টা করো।';
         if (e is AuthException) {
           if (e.message.contains('Email not confirmed')) {
             errorMessage =
-                'দয়া করে আপনার ইমেইল চেক করুন এবং ভেরিফাই লিংক এ ক্লিক করুন।';
+                'দয়া করে আপনার ইমেইল চেক করো এবং ভেরিফাই লিংক এ ক্লিক করো।';
           }
         }
         throw Exception(errorMessage);

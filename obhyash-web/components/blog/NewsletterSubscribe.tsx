@@ -48,7 +48,7 @@ export default function NewsletterSubscribe() {
           </div>
           <div className="min-w-0">
             <h3 className="text-[15px] font-bold text-slate-900 dark:text-slate-100 leading-tight">
-              নিউজলেটারে যোগ দিন
+              নিউজলেটারে যোগ দাও
             </h3>
             <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">
               নতুন পোস্ট প্রকাশ হলে সরাসরি ইমেইলে পাবেন

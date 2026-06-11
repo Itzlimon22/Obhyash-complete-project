@@ -108,7 +108,7 @@ class _PaymentViewState extends State<PaymentView>
       if (mounted) {
         setState(() => _isSubmitting = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('ত্রুটি হয়েছে। আবার চেষ্টা করুন।')),
+          const SnackBar(content: Text('ত্রুটি হয়েছে। আবার চেষ্টা করো।')),
         );
       }
     }
@@ -420,7 +420,7 @@ class _PaymentViewState extends State<PaymentView>
                       ),
                     )
                   : const Text(
-                      'পেমেন্ট নিশ্চিত করুন',
+                      'পেমেন্ট নিশ্চিত করো',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,

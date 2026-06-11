@@ -237,7 +237,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'ইন্টারনেট সংযোগ পরীক্ষা করুন এবং আবার চেষ্টা করুন।',
+              'ইন্টারনেট সংযোগ পরীক্ষা করো এবং আবার চেষ্টা করো।',
               style: TextStyle(fontSize: 13, color: Color(0xFFA3A3A3)),
               textAlign: TextAlign.center,
             ),
@@ -246,7 +246,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
               onPressed: _fetchReports,
               icon: const Icon(LucideIcons.refreshCw, size: 16),
               label: const Text(
-                'আবার চেষ্টা করুন',
+                'আবার চেষ্টা করো',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               style: ElevatedButton.styleFrom(
@@ -560,7 +560,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                                         ],
                                       )
                                     : const Text(
-                                        'আরো দেখুন',
+                                        'আরো দেখো',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                         ),

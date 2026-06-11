@@ -276,7 +276,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                 GestureDetector(
                   onTap: _fetch,
                   child: Text(
-                    'আবার চেষ্টা করুন',
+                    'আবার চেষ্টা করো',
                     style: TextStyle(
                       fontSize: 14,
                       color: isDark

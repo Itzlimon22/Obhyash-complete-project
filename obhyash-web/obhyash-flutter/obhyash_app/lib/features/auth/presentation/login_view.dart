@@ -171,7 +171,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'আপনার অ্যাকাউন্টে লগইন করুন',
+                          'আপনার অ্যাকাউন্টে লগইন করো',
                           style: TextStyle(
                             fontSize: 14,
                             fontFamily: 'HindSiliguri',

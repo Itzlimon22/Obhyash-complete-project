@@ -332,7 +332,7 @@ class PricingCard extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              isCurrent ? 'বর্তমান প্ল্যান' : 'পেমেন্ট করুন',
+                              isCurrent ? 'বর্তমান প্ল্যান' : 'পেমেন্ট করো',
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,

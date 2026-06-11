@@ -119,7 +119,7 @@ export const downloadQuestionPaper = (
         </style>
       </head>
       <body>
-        ${dlToolbar('PDF ডাউনলোড করুন')}
+        ${dlToolbar('PDF ডাউনলোড করো')}
         <div class="header-container">
           <div class="header-top-bar">
             <div class="institution-name">অভ্যাস (Obhyash)</div>
@@ -240,7 +240,7 @@ export const downloadOMRSheet = (
         </style>
     </head>
     <body>
-        ${dlToolbar('PDF ডাউনলোড করুন')}
+        ${dlToolbar('PDF ডাউনলোড করো')}
         <div class="page">
             <div class="marker tl"></div>
             <div class="marker tr"></div>
@@ -391,7 +391,7 @@ export const downloadResult = (
         </style>
       </head>
       <body>
-        ${dlToolbar('PDF ডাউনলোড করুন')}
+        ${dlToolbar('PDF ডাউনলোড করো')}
         <div class="header-container">
           <h1 class="institution-name">Obhyash (অভ্যাস) Exam Platform</h1>
           <div class="exam-title">${details.subject} - Solution</div>

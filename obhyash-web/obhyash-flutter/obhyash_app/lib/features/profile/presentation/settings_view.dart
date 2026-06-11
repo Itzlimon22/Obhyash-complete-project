@@ -93,7 +93,7 @@ class SettingsView extends ConsumerWidget {
             destination: const MySubscriptionView(),
           ),
           _SettingsItem(
-            label: 'আপগ্রেড করুন',
+            label: 'আপগ্রেড করো',
             description: 'প্রিমিয়াম প্ল্যান দেখো ও আপগ্রেড করো',
             icon: LucideIcons.creditCard,
             type: _ItemType.navigate,
@@ -711,7 +711,7 @@ class _UpgradePage extends StatelessWidget {
         foregroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          'আপগ্রেড করুন',
+          'আপগ্রেড করো',
           style: TextStyle(
             fontWeight: FontWeight.w900,
             fontSize: 18,

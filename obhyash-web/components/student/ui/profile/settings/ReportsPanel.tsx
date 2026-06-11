@@ -77,7 +77,7 @@ function QuestionViewerDialog({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
-            প্রশ্ন দেখুন
+            প্রশ্ন দেখো
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-3 text-sm">
@@ -164,7 +164,7 @@ function ReportCard({ report }: { report: Report }) {
                   className="flex items-center gap-1 text-xs text-green-800 dark:text-green-400 hover:underline"
                 >
                   <Eye size={13} />
-                  প্রশ্ন দেখুন
+                  প্রশ্ন দেখো
                 </button>
               )}
               <button
@@ -172,7 +172,7 @@ function ReportCard({ report }: { report: Report }) {
                 className="flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 ml-auto"
               >
                 {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-                {expanded ? "কম দেখুন" : "বিস্তারিত"}
+                {expanded ? "কম দেখো" : "বিস্তারিত"}
               </button>
             </div>
 
@@ -352,7 +352,7 @@ export default function ReportsPanel({ user }: ReportsPanelProps) {
                 disabled={isLoading}
                 className="w-full py-2.5 rounded-xl text-sm font-semibold text-green-800 dark:text-green-400 border border-green-800 dark:border-green-700 hover:bg-green-50 dark:hover:bg-green-950/30 transition-colors disabled:opacity-50"
               >
-                {isLoading ? "লোড হচ্ছে..." : "আরো দেখুন"}
+                {isLoading ? "লোড হচ্ছে..." : "আরো দেখো"}
               </button>
             )}
           </>

@@ -106,7 +106,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               >
                 {isWarning
                   ? "অসম্পূর্ণ পরীক্ষা"
-                  : "পরীক্ষা শেষ করুন"}
+                  : "পরীক্ষা শেষ করো"}
               </h3>
               <p className="mt-1.5 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
                 {isWarning
