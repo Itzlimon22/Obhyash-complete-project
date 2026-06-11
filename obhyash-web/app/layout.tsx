@@ -24,8 +24,34 @@ const anekBangla = Anek_Bangla({
 });
 
 export const metadata: Metadata = {
-  title: 'Obhyash',
-  description: 'Smart Exam Platform',
+  title: {
+    template: '%s | Obhyash',
+    default: 'Obhyash - The Smart Exam Platform for Students',
+  },
+  description: 'Prepare for your exams with Obhyash. Practice thousands of questions, track your progress, identify your mistakes, and improve your scores with our smart exam platform.',
+  keywords: ['exam preparation', 'practice tests', 'mock tests', 'student platform', 'education', 'obhyash', 'bcs', 'admission test', 'smart exam'],
+  authors: [{ name: 'Obhyash Team' }],
+  creator: 'Obhyash',
+  publisher: 'Obhyash',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    title: 'Obhyash - Smart Exam Platform',
+    description: 'Prepare for your exams with Obhyash. Practice thousands of questions, track your progress, and improve your scores.',
+    url: 'https://obhyash.com', // Replace with your actual domain
+    siteName: 'Obhyash',
+    locale: 'bn_BD',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Obhyash - Smart Exam Platform',
+    description: 'Practice thousands of questions and track your progress with our smart exam platform.',
+    creator: '@obhyash',
+  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
