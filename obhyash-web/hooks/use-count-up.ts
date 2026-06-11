@@ -7,6 +7,7 @@ export function useCountUp(
   targetValue: number,
   duration: number = 2000,
   startValue: number = 0,
+  decimals: number = 0,
 ) {
   const [count, setCount] = useState(startValue);
 
@@ -19,9 +20,9 @@ export function useCountUp(
       // Easing function: easeOutExpo
       const easing = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
 
-      const currentCount = Math.floor(
-        easing * (targetValue - startValue) + startValue,
-      );
+      const rawValue = easing * (targetValue - startValue) + startValue;
+      const factor = Math.pow(10, decimals);
+      const currentCount = Math.floor(rawValue * factor) / factor;
       setCount(currentCount);
 
       if (progress < 1) {
@@ -30,7 +31,7 @@ export function useCountUp(
     };
 
     window.requestAnimationFrame(step);
-  }, [targetValue, duration, startValue]);
+  }, [targetValue, duration, startValue, decimals]);
 
   return count;
 }

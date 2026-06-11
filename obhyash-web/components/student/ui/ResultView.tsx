@@ -152,7 +152,7 @@ const ResultView: React.FC<ResultViewProps> = ({
   const feedback = getFeedbackMessage();
 
   // Count animations
-  const animatedScore = useCountUp(finalScore, 1500);
+  const animatedScore = useCountUp(finalScore, 1500, 0, 2);
 
   // Trigger Perfect Score Celebration
   useEffect(() => {
@@ -361,7 +361,7 @@ const ResultView: React.FC<ResultViewProps> = ({
             </svg>
           </div>
           <div className="text-sm sm:text-3xl font-bold text-neutral-800 dark:text-white mb-0.5">
-            {animatedScore.toFixed(1)}{' '}
+            {animatedScore.toFixed(2)}{' '}
             <span className="text-[10px] sm:text-lg text-neutral-500 dark:text-neutral-400 font-normal">
               / {totalPoints}
             </span>

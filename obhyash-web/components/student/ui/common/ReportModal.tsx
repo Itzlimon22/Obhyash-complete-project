@@ -68,19 +68,26 @@ const ReportModal: React.FC<ReportModalProps> = ({
 
     try {
       setUploadPhase('saving');
-      await submitReport({
-        questionId,
-        type: selectedType,
-        comment,
-        reporterId,
-        reporterName,
-      });
+      
+      // Use Promise.race to enforce a 10-second timeout in case the database connection hangs
+      await Promise.race([
+        submitReport({
+          questionId,
+          type: selectedType,
+          comment,
+          reporterId,
+          reporterName,
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Request timed out')), 10000)
+        )
+      ]);
 
       setSubmitted(true);
       setTimeout(() => onClose(), 1500);
     } catch (error) {
       console.error(error);
-      toast.error('রিপোর্ট পাঠাতে সমস্যা হয়েছে');
+      toast.error('রিপোর্ট পাঠাতে সমস্যা হয়েছে (Timeout/Error)');
     } finally {
       setUploadPhase('idle');
     }
