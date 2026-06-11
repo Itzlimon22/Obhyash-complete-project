@@ -47,6 +47,9 @@ export default function ClientLayout({
   useEffect(() => {
     if (!loading && !user) {
       router.replace('/login');
+    } else if (!loading && user && !profile) {
+      // If user exists but profile is missing (e.g. deleted or RLS blocked)
+      router.replace('/login');
     } else if (
       !loading &&
       user &&
