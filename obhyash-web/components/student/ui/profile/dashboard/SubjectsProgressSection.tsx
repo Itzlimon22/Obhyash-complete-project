@@ -25,7 +25,7 @@ const SubjectsProgressSection: React.FC<SubjectsProgressSectionProps> = ({
           বিষয়ভিত্তিক দক্ষতা
         </h3>
         <p className="text-sm text-neutral-500 dark:text-neutral-400">
-          এখনও কোনো পরীক্ষা দেওয়া হয়নি। পরীক্ষা দিলে এখানে আপনার বিষয়ভিত্তিক
+          এখনও কোনো পরীক্ষা দেওয়া হয়নি। পরীক্ষা দিলে এখানে তোমার বিষয়ভিত্তিক
           দক্ষতা দেখা যাবে।
         </p>
       </div>

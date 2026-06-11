@@ -37,7 +37,7 @@ export default function LikeButton({ postSlug }: LikeButtonProps) {
   const toggleLike = async () => {
     if (!user) {
       toast('লগইন প্রয়োজন', {
-        description: 'পোস্ট লাইক করতে অনুগ্রহ করে আপনার একাউন্টে প্রবেশ করো।',
+        description: 'পোস্ট লাইক করতে অনুগ্রহ করে তোমার একাউন্টে প্রবেশ করো।',
       });
       return;
     }

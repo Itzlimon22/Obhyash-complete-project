@@ -106,7 +106,7 @@ export function ManageDevicesModal({
             <DialogTitle>ডিভাইস সীমা পূর্ণ</DialogTitle>
           </div>
           <DialogDescription>
-            আপনার <strong>{plan}</strong> প্ল্যানে সর্বোচ্চ{' '}
+            তোমার <strong>{plan}</strong> প্ল্যানে সর্বোচ্চ{' '}
             <strong>{limit}টি</strong> ডিভাইস অনুমোদিত। নতুন ডিভাইসে লগইন করতে
             নিচের তালিকা থেকে একটি ডিভাইস সরান।
           </DialogDescription>

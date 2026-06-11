@@ -570,7 +570,7 @@ export default function TeacherCreateQuestionPage() {
                         <div className="text-lg font-medium text-neutral-200 leading-relaxed mb-6 whitespace-pre-wrap">
                           {formData.question || (
                             <span className="text-neutral-600 italic">
-                              আপনার প্রশ্নটি এখানে দেখা যাবে...
+                              তোমার প্রশ্নটি এখানে দেখা যাবে...
                             </span>
                           )}
                         </div>

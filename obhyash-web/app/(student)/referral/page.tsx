@@ -383,7 +383,7 @@ export default function ReferralPage() {
                   </div>
                 </div>
                 <p className="text-center text-xs text-neutral-500 dark:text-neutral-400">
-                  আপনি নিজের পছন্দমতো কোড দিতে পারেন অথবা 'অটো' বাটনে ক্লিক করতে
+                  তুমি নিজের পছন্দমতো কোড দিতে পারেন অথবা 'অটো' বাটনে ক্লিক করতে
                   পারেন।
                 </p>
               </div>

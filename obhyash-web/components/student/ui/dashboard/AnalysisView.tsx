@@ -131,7 +131,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
             পারফরম্যাও্স এনালাইসিস
           </h1>
           <p className="text-neutral-500 dark:text-neutral-400 text-sm">
-            আপনার অগ্রগতির সামগ্রিক চিত্র
+            তোমার অগ্রগতির সামগ্রিক চিত্র
           </p>
         </div>
 

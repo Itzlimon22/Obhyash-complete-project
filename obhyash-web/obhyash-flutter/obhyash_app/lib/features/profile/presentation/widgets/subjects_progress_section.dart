@@ -84,7 +84,7 @@ class SubjectsProgressSection extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'এখনও কোনো পরীক্ষা দেওয়া হয়নি। পরীক্ষা দিলে এখানে আপনার বিষয়ভিত্তিক দক্ষতা দেখা যাবে।',
+              'এখনও কোনো পরীক্ষা দেওয়া হয়নি। পরীক্ষা দিলে এখানে তোমার বিষয়ভিত্তিক দক্ষতা দেখা যাবে।',
               style: TextStyle(
                 fontSize: 14,
                 color: isDark

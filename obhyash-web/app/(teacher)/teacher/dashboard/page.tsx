@@ -217,7 +217,7 @@ export default function TeacherDashboard() {
                 স্বাগতম, {userName}! 👋
               </h1>
               <p className="text-emerald-100 text-lg md:text-xl font-medium max-w-2xl leading-relaxed">
-                আপনার ড্যাশবোর্ডে আপনাকে স্বাগতম। প্রশ্ন তৈরি করো এবং
+                তোমার ড্যাশবোর্ডে তোমাকে স্বাগতম। প্রশ্ন তৈরি করো এবং
                 শিক্ষার্থীদের অগ্রগতি পর্যবেক্ষণ করো।
               </p>
             </div>
@@ -348,7 +348,7 @@ export default function TeacherDashboard() {
             প্রোফাইল
           </h3>
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            আপনার তথ্য আপডেট করো
+            তোমার তথ্য আপডেট করো
           </p>
           <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full -mr-4 -mt-4 group-hover:scale-110 transition-transform duration-500 pointer-events-none" />
         </Link>

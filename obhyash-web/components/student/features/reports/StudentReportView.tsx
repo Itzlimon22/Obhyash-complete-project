@@ -153,7 +153,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
           আমার রিপোর্টসমূহ
         </h1>
         <p className="text-xs md:text-sm text-neutral-500 dark:text-neutral-400">
-          আপনার দাখিলকৃত প্রশ্নের রিপোর্ট ও অ্যাডমিন ফিডব্যাক
+          তোমার দাখিলকৃত প্রশ্নের রিপোর্ট ও অ্যাডমিন ফিডব্যাক
         </p>
       </div>
 
@@ -166,7 +166,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
             কোনো রিপোর্ট পাওয়া যায়নি
           </h3>
           <p className="text-neutral-500 dark:text-neutral-400">
-            আপনি এখন পর্যন্ত কোনো প্রশ্ন রিপোর্ট করেননি।
+            তুমি এখন পর্যন্ত কোনো প্রশ্ন রিপোর্ট করেননি।
           </p>
         </div>
       ) : (
@@ -303,7 +303,7 @@ const StudentReportView: React.FC<StudentReportViewProps> = ({ user }) => {
                         <div className="bg-white dark:bg-neutral-900/80 p-3 md:p-4 rounded-xl border border-neutral-100 dark:border-neutral-700/50 shadow-sm relative overflow-hidden">
                           <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-400"></div>
                           <h4 className="text-[10px] uppercase tracking-widest font-black text-red-500 mb-2 flex items-center gap-1.5 ml-2">
-                            আপনার মন্তব্য
+                            তোমার মন্তব্য
                           </h4>
                           <p className="text-[13px] md:text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-medium ml-2">
                             &quot;{report.description || 'কোনো বিবরণ নেই'}&quot;

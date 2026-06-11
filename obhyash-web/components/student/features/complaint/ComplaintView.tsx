@@ -185,7 +185,7 @@ export const ComplaintView: React.FC = () => {
               বার্তা গৃহীত হয়েছে!
             </h2>
             <p className="text-neutral-500 dark:text-neutral-400">
-              আমাদের টিম বিষয়টি দেখছে। আপনার মতামতের জন্য ধন্যবাদ।
+              আমাদের টিম বিষয়টি দেখছে। তোমার মতামতের জন্য ধন্যবাদ।
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
@@ -259,7 +259,7 @@ export const ComplaintView: React.FC = () => {
                 <span className="text-emerald-200">আমরা শুনছি।</span>
               </h1>
               <p className="text-emerald-100 text-lg md:text-xl font-medium leading-relaxed max-w-lg">
-                &apos;অভ্যাস&apos; প্ল্যাটফর্মকে আরও উন্নত করতে আপনার মতামত বা
+                &apos;অভ্যাস&apos; প্ল্যাটফর্মকে আরও উন্নত করতে তোমার মতামত বা
                 অভিযোগ আমাদের জানান।
               </p>
             </div>
@@ -373,7 +373,7 @@ export const ComplaintView: React.FC = () => {
                     </div>
                   </button>
                   <p className="mt-4 text-sm text-neutral-400">
-                    আপনার ফিডব্যাক আমাদের জন্য অত্যন্ত গুরুত্বপূর্ণ ❤️
+                    তোমার ফিডব্যাক আমাদের জন্য অত্যন্ত গুরুত্বপূর্ণ ❤️
                   </p>
                 </div>
               </form>
@@ -387,7 +387,7 @@ export const ComplaintView: React.FC = () => {
                   জরুরী প্রয়োজনে
                 </h4>
                 <p className="text-sm text-red-600/80 dark:text-red-400/80 leading-relaxed mb-4">
-                  আপনার যদি একাউন্ট সম্পর্কিত কোনো জটিল সমস্যা থাকে অথবা পেমেন্ট
+                  তোমার যদি একাউন্ট সম্পর্কিত কোনো জটিল সমস্যা থাকে অথবা পেমেন্ট
                   সংক্রান্ত কোনো বিষয় থাকে, তবে সরাসরি আমাদের মেইল করতে পারেন।
                 </p>
                 <div className="flex items-center gap-2 text-sm font-bold text-neutral-900 dark:text-white bg-white dark:bg-neutral-800 p-3 rounded-xl border border-red-100 dark:border-neutral-700">
@@ -430,7 +430,7 @@ export const ComplaintView: React.FC = () => {
                 কোনো অভিযোগ নেই
               </h3>
               <p className="text-neutral-500">
-                আপনি এখনো কোনো অভিযোগ বা পরামর্শ জমা দেননি।
+                তুমি এখনো কোনো অভিযোগ বা পরামর্শ জমা দেননি।
               </p>
               <button
                 onClick={() => setActiveTab('new')}

@@ -165,7 +165,7 @@ const TeacherSettingsView: React.FC<TeacherSettingsViewProps> = ({
       <div className="bg-gradient-to-r from-emerald-900 to-emerald-800 rounded-2xl p-6 text-white shadow-lg shadow-emerald-900/10 mb-8">
         <h1 className="text-2xl font-bold mb-2">সেটিংস</h1>
         <p className="text-emerald-100 text-sm">
-          আপনার ব্যক্তিগত এবং পেশাগত তথ্য এখানে আপডেট করো।
+          তোমার ব্যক্তিগত এবং পেশাগত তথ্য এখানে আপডেট করো।
         </p>
       </div>
 

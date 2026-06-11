@@ -509,12 +509,12 @@ export default function StudentRoot({
     // Provide feedback & Celebrations
     if (newLevel !== oldLevel) {
       celebration.levelUp();
-      toast.success(`অভিনন্দন! আপনি ${newLevel}-এ উন্নীত হয়েছেন!`, {
+      toast.success(`অভিনন্দন! তুমি ${newLevel}-এ উন্নীত হয়েছেন!`, {
         description: `আপনার বর্তমান XP: ${updatedUser.xp}`,
         duration: 8000,
       });
     } else if (isPerfect) {
-      toast.success("অসাধারন! আপনি পারফেক্ট স্কোর করেছেন।", {
+      toast.success("অসাধারন! তুমি পারফেক্ট স্কোর করেছেন।", {
         description: `আপনি +${totalXpGained} XP অর্জন করেছেন! (বোনাস সহ)`,
       });
     } else {

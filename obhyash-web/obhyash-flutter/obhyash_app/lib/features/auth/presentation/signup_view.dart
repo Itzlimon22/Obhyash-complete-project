@@ -243,7 +243,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'মাত্র ৩টি ধাপে সম্পন্ন করো আপনার রেজিস্ট্রেশন',
+                          'মাত্র ৩টি ধাপে সম্পন্ন করো তোমার রেজিস্ট্রেশন',
                           style: TextStyle(
                             fontSize: 14,
                             fontFamily: 'HindSiliguri',

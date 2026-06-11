@@ -115,7 +115,7 @@ export const checkAndUpdateStreak = async (
       const { createNotification } = await import('./notification-service');
       const message =
         diff === 1
-          ? `আজকের লগইন এর জন্য আপনি +${xpGained} XP অর্জন করেছেন।`
+          ? `আজকের লগইন এর জন্য তুমি +${xpGained} XP অর্জন করেছেন।`
           : `ফিরে আসার জন্য +${xpGained} XP! প্রতিদিন লগইন করে স্ট্রিক বজায় রাখো।`;
 
       await createNotification(

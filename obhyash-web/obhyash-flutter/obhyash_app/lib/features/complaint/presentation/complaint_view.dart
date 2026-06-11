@@ -293,7 +293,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             ),
             const SizedBox(height: 8),
             Text(
-              'আমাদের টিম বিষয়টি দেখছে। আপনার মতামতের জন্য ধন্যবাদ।',
+              'আমাদের টিম বিষয়টি দেখছে। তোমার মতামতের জন্য ধন্যবাদ।',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
@@ -492,7 +492,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      '\'অভ্যাস\' প্ল্যাটফর্মকে আরও উন্নত করতে আপনার মতামত বা অভিযোগ আমাদের জানান।',
+                      '\'অভ্যাস\' প্ল্যাটফর্মকে আরও উন্নত করতে তোমার মতামত বা অভিযোগ আমাদের জানান।',
                       style: TextStyle(
                         color: Color(0xFFE0E7FF),
                         fontSize: 16,

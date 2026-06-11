@@ -368,8 +368,8 @@ export default function BlogListingClient({
                   </div>
                   <div className="bg-white dark:bg-[#111] border border-black/5 dark:border-white/5 rounded-2xl p-6 sm:p-8 mb-8 text-center flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
                     <p className="text-slate-600 dark:text-slate-400 font-medium text-[15px] sm:text-[16px] text-left max-w-2xl leading-[1.6]">
-                      <strong>এখানে নতুন?</strong> অভ্যাস-এ রেজিস্টার করে আপনার
-                      অনুশীলনের তথ্যের ওপর ভিত্তি করে আপনার দুর্বল বিষয়গুলোর
+                      <strong>এখানে নতুন?</strong> অভ্যাস-এ রেজিস্টার করে তোমার
+                      অনুশীলনের তথ্যের ওপর ভিত্তি করে তোমার দুর্বল বিষয়গুলোর
                       জন্য নির্দিষ্ট স্টাডি টিপস, পরীক্ষার কৌশল এবং আর্টিকেল
                       পান।
                     </p>
@@ -385,7 +385,7 @@ export default function BlogListingClient({
                 <div className="flex items-center gap-2 mb-6">
                   <Sparkles className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                   <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 tracking-tight font-anek">
-                    আপনার জন্য প্রস্তাবিত
+                    তোমার জন্য প্রস্তাবিত
                   </h2>
                 </div>
               )}
@@ -488,7 +488,7 @@ export default function BlogListingClient({
               যা শিখেছেন তা অনুশীলনের জন্য প্রস্তুত?
             </h2>
             <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-lg mx-auto text-[15px] leading-[1.6] font-anek">
-              বোর্ড স্ট্যাও্ডার্ড MCQ মডেল টেস্ট দিন, আপনার অগ্রগতি ট্র্যাক করো
+              বোর্ড স্ট্যাও্ডার্ড MCQ মডেল টেস্ট দিন, তোমার অগ্রগতি ট্র্যাক করো
               এবং দুর্বল বিষয়গুলো চিহ্নিত করো — সবই এক জায়গায়।
             </p>
             <Link

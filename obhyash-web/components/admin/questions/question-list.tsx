@@ -303,7 +303,7 @@ export const QuestionList: React.FC<QuestionListProps> = ({
               প্রশ্ন মুছে ফেলুন
             </DialogTitle>
             <DialogDescription>
-              আপনি কি নিশ্চিত যে আপনি এই প্রশ্নটি মুছে ফেলতে চান? এই ক্রিয়াটি
+              তুমি কি নিশ্চিত যে তুমি এই প্রশ্নটি মুছে ফেলতে চান? এই ক্রিয়াটি
               অপরিবর্তনীয়।
             </DialogDescription>
           </DialogHeader>

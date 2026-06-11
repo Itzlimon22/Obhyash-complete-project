@@ -292,7 +292,7 @@ function SignupForm() {
             অ্যাকাউন্ট তৈরি সফল!
           </h2>
           <p className="text-slate-600 dark:text-slate-400 mb-8">
-            আপনার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। এখন লগইন করো।
+            তোমার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। এখন লগইন করো।
           </p>
           <Link
             href="/login"
@@ -342,7 +342,7 @@ function SignupForm() {
         <div className="p-5 md:p-10">
           <div className="text-center mb-4 md:mb-8">
             <p className="text-slate-500 dark:text-slate-400 text-sm">
-              মাত্র ৩টি ধাপে সম্পন্ন করো আপনার রেজিস্ট্রেশন
+              মাত্র ৩টি ধাপে সম্পন্ন করো তোমার রেজিস্ট্রেশন
             </p>
           </div>
 
@@ -360,7 +360,7 @@ function SignupForm() {
               <div className="space-y-5 animate-in slide-in-from-right-4 fade-in duration-300">
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                    আপনার নাম
+                    তোমার নাম
                   </label>
                   <div className="relative group">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-red-500 transition-colors" />

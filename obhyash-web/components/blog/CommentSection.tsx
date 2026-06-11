@@ -318,7 +318,7 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
                 মতামত জানাতে লগইন করো
               </span>
               <span className="text-sm text-slate-500 dark:text-slate-400">
-                কমেন্ট করতে আপনার একাউন্টে প্রবেশ করো।
+                কমেন্ট করতে তোমার একাউন্টে প্রবেশ করো।
               </span>
             </div>
             <a

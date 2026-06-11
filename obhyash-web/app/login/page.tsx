@@ -55,7 +55,7 @@ export default function LoginPage() {
       if (signInError) {
         if (signInError.message.includes('Email not confirmed')) {
           setError(
-            'দয়া করে আপনার ইমেইল চেক করো এবং ভেরিফাই লিংক এ ক্লিক করো।',
+            'দয়া করে তোমার ইমেইল চেক করো এবং ভেরিফাই লিংক এ ক্লিক করো।',
           );
         } else {
           setError('ইমেইল বা পাসওয়ার্ড ভুল হয়েছে। আবার চেষ্টা করো।');
@@ -99,7 +99,7 @@ export default function LoginPage() {
               স্বাগতম!
             </h4>
             <p className="text-slate-500 dark:text-slate-400 text-sm">
-              আপনার অ্যাকাউন্টে লগইন করো
+              তোমার অ্যাকাউন্টে লগইন করো
             </p>
           </div>
 

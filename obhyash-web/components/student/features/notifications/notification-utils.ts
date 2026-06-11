@@ -79,7 +79,7 @@ export const FUNNY_EMPTY_STATES = [
     icon: '🙋‍♂️',
   },
   {
-    message: 'মিস করছি আপনাকে! 🥺',
+    message: 'মিস করছি তোমাকে! 🥺',
     subtext: 'নোটিফিকেশন সেকশনটা একদম একা হয়ে গেছে।',
     icon: '💔',
   },
@@ -161,7 +161,7 @@ export const FUNNY_EMPTY_STATES = [
   },
   {
     message: 'ভয় পাবেন না! 💪',
-    subtext: 'আমরা আছি আপনার পাশে, পরীক্ষার লড়াইয়ে।',
+    subtext: 'আমরা আছি তোমার পাশে, পরীক্ষার লড়াইয়ে।',
     icon: '🛡️',
   },
   {

@@ -412,7 +412,7 @@ export const extendSubscription = async (
     await createNotification(
       userId,
       'বোনাস সাবস্ক্রিপশন!',
-      `আপনার রিপোর্টের জন্য ধন্যবাদ। পুরস্কার হিসেবে আপনার সাবস্ক্রিপশনের মেয়াদ ${days} দিন বাড়ানো হয়েছে!`,
+      `আপনার রিপোর্টের জন্য ধন্যবাদ। পুরস্কার হিসেবে তোমার সাবস্ক্রিপশনের মেয়াদ ${days} দিন বাড়ানো হয়েছে!`,
       'success',
       {
         actionUrl: '/subscription',

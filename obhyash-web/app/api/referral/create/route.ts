@@ -70,7 +70,7 @@ export const POST = async (req: Request) => {
       await supabase.from('notifications').insert({
         user_id: user.id,
         title: 'রেফারেল কোড আপডেট!',
-        message: `আপনার রেফারেল কোড পরিবর্তন করা হয়েছে। আপনার নতুন কোড: ${customCode}`,
+        message: `আপনার রেফারেল কোড পরিবর্তন করা হয়েছে। তোমার নতুন কোড: ${customCode}`,
         type: 'system',
         is_read: false,
       });

@@ -289,7 +289,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     },
     {
       q: 'আমি কি মোবাইল থেকে পরীক্ষা দিতে পারবো?',
-      a: 'হ্যাঁ, Obhyash সম্পূর্ণ মোবাইল-ফ্রেন্ডলি। আপনি যেকোনো স্মার্টফোন, ট্যাবলেট বা কম্পিউটার থেকে এটি ব্যবহার করতে পারবেন।',
+      a: 'হ্যাঁ, Obhyash সম্পূর্ণ মোবাইল-ফ্রেন্ডলি। তুমি যেকোনো স্মার্টফোন, ট্যাবলেট বা কম্পিউটার থেকে এটি ব্যবহার করতে পারবেন।',
     },
   ];
 
@@ -424,7 +424,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight text-neutral-950 dark:text-white leading-[1.2]">
-              আপনার প্রস্তুতি হোক <br />
+              তোমার প্রস্তুতি হোক <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-red-600 py-2">
                 স্মার্ট ও নির্ভুল
               </span>
@@ -819,7 +819,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               কেন আমরা সেরা?
             </span>
             <h2 className="text-3xl lg:text-4xl font-extrabold text-neutral-900 dark:text-white mt-2">
-              আপনার প্রস্তুতিকে দাও <br className="hidden md:block" />
+              তোমার প্রস্তুতিকে দাও <br className="hidden md:block" />
               <span className="relative whitespace-nowrap">
                 <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-500 dark:from-red-400 dark:to-red-500">
                   নতুন মাত্রা
@@ -845,7 +845,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   স্মার্ট এনালাইসিস
                 </h3>
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  প্রতিটি পরীক্ষার পর দেখো আপনার সবল ও দুর্বল দিকগুলো। গ্রাফ এবং
+                  প্রতিটি পরীক্ষার পর দেখো তোমার সবল ও দুর্বল দিকগুলো। গ্রাফ এবং
                   চার্টের মাধ্যমে নিজের অগ্রগতি নিজেই যাচাই করো।
                 </p>
               </div>
@@ -873,7 +873,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   AI প্রশ্ন জেনারেটর
                 </h3>
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  আপনার সিলেবাস অনুযায়ী যেকোনো বিষয়ের উপর আনলিমিটেড কাস্টম
+                  তোমার সিলেবাস অনুযায়ী যেকোনো বিষয়ের উপর আনলিমিটেড কাস্টম
                   প্রশ্নপত্র তৈরি করো এক ক্লিকেই।
                 </p>
               </div>
@@ -901,7 +901,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   এক্সাম হিস্ট্রি
                 </h3>
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  আপনার পুরনো সব এক্সাম এবং ভুলগুলোর বিস্তারিত সমাধান দেখো
+                  তোমার পুরনো সব এক্সাম এবং ভুলগুলোর বিস্তারিত সমাধান দেখো
                   যেকোনো সময়।
                 </p>
               </div>
@@ -918,8 +918,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   স্মার্ট প্রশ্ন ব্যাংক
                 </h3>
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-                  সিস্টেম আপনার দুর্বল টপিকগুলো মনে রাখে এবং সেই অনুযায়ী প্রশ্ন
-                  করে, যাতে আপনার প্রস্তুতি হয় পূর্ণাঙ্গ।
+                  সিস্টেম তোমার দুর্বল টপিকগুলো মনে রাখে এবং সেই অনুযায়ী প্রশ্ন
+                  করে, যাতে তোমার প্রস্তুতি হয় পূর্ণাঙ্গ।
                 </p>
               </div>
 
@@ -1003,7 +1003,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </h3>
                 </div>
                 <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                  আপনার স্কোর অনুযায়ী চান্স পাওয়ার সম্ভাবনা যাচাই।
+                  তোমার স্কোর অনুযায়ী চান্স পাওয়ার সম্ভাবনা যাচাই।
                 </p>
               </div>
             </div>
@@ -1371,7 +1371,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-extrabold text-neutral-900 dark:text-white mb-4">
-              আপনার পছন্দের প্ল্যানটি{' '}
+              তোমার পছন্দের প্ল্যানটি{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-emerald-500 dark:from-emerald-400 dark:to-emerald-500">
                 বেছে নাও
               </span>
@@ -1541,7 +1541,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 </span>
               </div>
               <p className="text-neutral-500 dark:text-neutral-400 text-sm leading-relaxed">
-                বাংলাদেশের সবচেয়ে আধুনিক AI-ভিত্তিক এক্সাম প্ল্যাটফর্ম। আপনার
+                বাংলাদেশের সবচেয়ে আধুনিক AI-ভিত্তিক এক্সাম প্ল্যাটফর্ম। তোমার
                 প্রস্তুতিকে আরও সহজ ও কার্যকর করতে আমরা অঙ্গীকারবদ্ধ।
               </p>
               <div className="flex gap-4">

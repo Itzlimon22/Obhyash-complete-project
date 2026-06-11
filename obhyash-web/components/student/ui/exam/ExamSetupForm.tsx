@@ -155,7 +155,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   // --- Modals State ---
 
-
   // Fetch available question count when subject/chapters/difficulty change
   useEffect(() => {
     if (!subject) {
@@ -194,7 +193,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   // --- Subject Fetching via SWR (cached in localStorage) ---
   // Key includes user's group/stream so different students get different caches
-  const subjectCacheKey = `subjects:${userDivision ?? 'none'}:${userStream ?? 'none'}:${userOptionalSubject ?? 'none'}`;
+  const subjectCacheKey = `subjects:${userDivision ?? "none"}:${userStream ?? "none"}:${userOptionalSubject ?? "none"}`;
 
   const { data: rawSubjects, isLoading: isFetchingData } = useSWR(
     subjectCacheKey,
@@ -360,20 +359,53 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     }
   };
 
-
-
   const getThemeVars = (subjectId: string) => {
-    if (!subjectId) return { button: "bg-emerald-700 hover:bg-emerald-800 shadow-emerald-500/25", badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300" };
+    if (!subjectId)
+      return {
+        button: "bg-emerald-700 hover:bg-emerald-800 shadow-emerald-500/25",
+        badge:
+          "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
+      };
     const s = subjectId.toLowerCase();
-    if (s.includes("physics")) return { button: "bg-blue-700 hover:bg-blue-800 shadow-blue-500/25", badge: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300" };
-    if (s.includes("chemistry")) return { button: "bg-orange-700 hover:bg-orange-800 shadow-orange-500/25", badge: "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300" };
-    if (s.includes("biology")) return { button: "bg-teal-700 hover:bg-teal-800 shadow-teal-500/25", badge: "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300" };
-    if (s.includes("math")) return { button: "bg-purple-700 hover:bg-purple-800 shadow-purple-500/25", badge: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300" };
-    return { button: "bg-emerald-700 hover:bg-emerald-800 shadow-emerald-500/25", badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300" };
+    if (s.includes("physics"))
+      return {
+        button: "bg-blue-700 hover:bg-blue-800 shadow-blue-500/25",
+        badge:
+          "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
+      };
+    if (s.includes("chemistry"))
+      return {
+        button: "bg-orange-700 hover:bg-orange-800 shadow-orange-500/25",
+        badge:
+          "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
+      };
+    if (s.includes("biology"))
+      return {
+        button: "bg-teal-700 hover:bg-teal-800 shadow-teal-500/25",
+        badge:
+          "bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300",
+      };
+    if (s.includes("math"))
+      return {
+        button: "bg-purple-700 hover:bg-purple-800 shadow-purple-500/25",
+        badge:
+          "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
+      };
+    return {
+      button: "bg-emerald-700 hover:bg-emerald-800 shadow-emerald-500/25",
+      badge:
+        "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
+    };
   };
   const theme = getThemeVars(subject);
 
-  const StartExamButton = ({ className, compact = false }: { className?: string, compact?: boolean }) => (
+  const StartExamButton = ({
+    className,
+    compact = false,
+  }: {
+    className?: string;
+    compact?: boolean;
+  }) => (
     <div className={cn(!compact && "pt-4", className)}>
       <button
         onClick={handleStartExam}
@@ -381,7 +413,9 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         className={cn(
           "w-full group relative overflow-hidden text-white font-extrabold rounded-3xl shadow-lg hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none duration-500",
           compact ? "py-4" : "py-5",
-          subject ? theme.button : "bg-neutral-300 dark:bg-neutral-800 text-neutral-500 shadow-none"
+          subject
+            ? theme.button
+            : "bg-neutral-300 dark:bg-neutral-800 text-neutral-500 shadow-none",
         )}
       >
         <div className="relative z-10 flex items-center justify-center gap-3">
@@ -392,7 +426,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             </>
           ) : (
             <>
-              <span className="text-xl">পরীক্ষা শুরু করো</span>
+              <span className="text-xl">শুরু করো</span>
               <Sparkles
                 size={22}
                 className="group-hover:rotate-12 transition-transform"
@@ -415,7 +449,12 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 pt-6">
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <span className={cn("px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest transition-colors duration-500", theme.badge)}>
+            <span
+              className={cn(
+                "px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest transition-colors duration-500",
+                theme.badge,
+              )}
+            >
               Exam Configuration
             </span>
           </div>
@@ -423,7 +462,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             পরীক্ষা সেটআপ
           </h1>
         </div>
-
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
@@ -455,10 +493,16 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             <h3 className="text-xl font-black text-neutral-900 dark:text-white mb-8 flex items-center gap-3">
               অধ্যায় ও টপিক
               <div className="group relative flex items-center">
-                <Info size={18} className="text-neutral-400 hover:text-emerald-500 transition-colors cursor-help" />
+                <Info
+                  size={18}
+                  className="text-neutral-400 hover:text-emerald-500 transition-colors cursor-help"
+                />
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-medium rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
                   <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-neutral-900 dark:bg-white rotate-45" />
-                  <span className="relative z-10">আপনি কোনো নির্দিষ্ট টপিক সিলেক্ট না করলে নির্বাচিত অধ্যায়গুলোর সব টপিক থেকে প্রশ্ন আসবে।</span>
+                  <span className="relative z-10">
+                    তুমি কোনো নির্দিষ্ট টপিক সিলেক্ট না করলে নির্বাচিত
+                    অধ্যায়গুলোর সব টপিক থেকে প্রশ্ন আসবে।
+                  </span>
                 </div>
               </div>
             </h3>
@@ -506,7 +550,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
                 emptyLabel="আগে অধ্যায় নির্বাচন করো"
               />
             </div>
-
           </section>
           {/* 3. Question Count Selection Card */}
           <section className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm">
@@ -550,14 +593,11 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           />
         </div>
 
-        {/* Mobile Submit Button (Sticky Bottom) */}
-        <div className="xl:hidden fixed bottom-[72px] md:bottom-[76px] left-0 right-0 p-4 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl border-t border-neutral-200/50 dark:border-neutral-800/50 z-40 animate-in slide-in-from-bottom duration-500 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-          <div className="max-w-md mx-auto">
-            <StartExamButton compact />
-          </div>
+        {/* Mobile Submit Button (Flow with content) */}
+        <div className="xl:hidden mt-4 mb-8">
+          <StartExamButton />
         </div>
       </div>
-
     </div>
   );
 };

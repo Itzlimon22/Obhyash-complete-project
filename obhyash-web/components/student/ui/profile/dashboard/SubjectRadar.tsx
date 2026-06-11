@@ -19,7 +19,7 @@ const SubjectRadar: React.FC<SubjectRadarProps> = ({ data }) => {
         বিষয়ভিত্তিক দক্ষতা
       </h3>
       <p className="text-base text-neutral-500 dark:text-neutral-400 mb-6">
-        আপনার বিভিন্ন বিষয়ের দক্ষতার তুলনামূলক চিত্র
+        তোমার বিভিন্ন বিষয়ের দক্ষতার তুলনামূলক চিত্র
       </p>
 
       <div className="h-[320px] w-full">

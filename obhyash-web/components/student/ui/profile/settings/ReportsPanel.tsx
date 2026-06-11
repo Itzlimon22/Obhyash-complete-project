@@ -182,7 +182,7 @@ function ReportCard({ report }: { report: Report }) {
                 {report.description && (
                   <div>
                     <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-0.5">
-                      আপনার বিবরণ
+                      তোমার বিবরণ
                     </p>
                     <div className="p-3 rounded-lg bg-neutral-50 dark:bg-neutral-800 border-l-4 border-red-500">
                       <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">

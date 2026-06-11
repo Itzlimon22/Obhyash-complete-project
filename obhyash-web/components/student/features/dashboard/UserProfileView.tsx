@@ -307,7 +307,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
             {!isViewingSelf && (
               <div className="bg-white dark:bg-neutral-900 rounded-3xl shadow-sm border border-neutral-100 dark:border-neutral-800 p-6 flex-1">
                 <h3 className="text-lg font-bold text-neutral-800 dark:text-white mb-4 text-center">
-                  তুলনা: আপনি vs {user.name?.split(' ')[0]}
+                  তুলনা: তুমি vs {user.name?.split(' ')[0]}
                 </h3>
 
                 {/* XP Comparison Summary */}
@@ -315,7 +315,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-neutral-500"></div>
                     <span className="text-xs font-bold text-neutral-700 dark:text-neutral-300">
-                      আপনি — {myXp.toLocaleString()} XP
+                      তুমি — {myXp.toLocaleString()} XP
                     </span>
                   </div>
                   <div className="flex items-center gap-2">

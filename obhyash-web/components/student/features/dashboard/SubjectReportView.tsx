@@ -460,7 +460,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
                   চমৎকার পারফরম্যাও্স!
                 </h4>
                 <p className="text-neutral-500 dark:text-neutral-400 text-sm max-w-xs mx-auto">
-                  নির্বাচিত ফিল্টারে আপনার কোনো ভুল উত্তর পাওয়া যায়নি। অনুশীলন
+                  নির্বাচিত ফিল্টারে তোমার কোনো ভুল উত্তর পাওয়া যায়নি। অনুশীলন
                   চালিয়ে যাও।
                 </p>
               </div>

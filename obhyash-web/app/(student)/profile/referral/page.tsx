@@ -72,7 +72,7 @@ export default function ReferralPage() {
           <div className="flex items-center gap-2">
             <Gift className="w-5 h-5 text-emerald-600" />
             <span className="font-medium text-neutral-800 dark:text-neutral-200">
-              আপনার রেফারেল কোড
+              তোমার রেফারেল কোড
             </span>
           </div>
           {data.referral?.code ? (

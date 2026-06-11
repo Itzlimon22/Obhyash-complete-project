@@ -14,7 +14,7 @@ export default function AuthCodeErrorPage() {
         </h1>
         
         <p className="text-neutral-600 dark:text-neutral-400 mb-8 leading-relaxed">
-          আপনার অথেন্টিকেশন লিঙ্কটি অবৈধ অথবা মেয়াদ শেষ হয়ে গেছে। দয়া করে আবার চেষ্টা করো।
+          তোমার অথেন্টিকেশন লিঙ্কটি অবৈধ অথবা মেয়াদ শেষ হয়ে গেছে। দয়া করে আবার চেষ্টা করো।
         </p>
         
         <div className="space-y-3">

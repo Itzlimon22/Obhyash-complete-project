@@ -26,7 +26,7 @@ export default function GlobalError({
         দুঃখিত! অপ্রত্যাশিত কিছু ঘটেছে।
       </h2>
       <p className="text-neutral-500 dark:text-neutral-400 max-w-md mx-auto mb-8 leading-relaxed font-medium">
-        আমাদের সিস্টেমে সাময়িক সমস্যা হয়েছে অথবা আপনার ইন্টারনেট সংযোগ
+        আমাদের সিস্টেমে সাময়িক সমস্যা হয়েছে অথবা তোমার ইন্টারনেট সংযোগ
         বিচ্ছিন্ন হতে পারে। দয়া করে আবার চেষ্টা করো।
       </p>
 

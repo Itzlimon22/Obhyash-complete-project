@@ -90,7 +90,7 @@ class AuthController extends AsyncNotifier<void> {
         if (e is AuthException) {
           if (e.message.contains('Email not confirmed')) {
             errorMessage =
-                'দয়া করে আপনার ইমেইল চেক করো এবং ভেরিফাই লিংক এ ক্লিক করো।';
+                'দয়া করে তোমার ইমেইল চেক করো এবং ভেরিফাই লিংক এ ক্লিক করো।';
           }
         }
         throw Exception(errorMessage);

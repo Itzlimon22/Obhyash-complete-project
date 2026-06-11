@@ -70,7 +70,7 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
             কোনো বিল নেই
           </p>
           <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-[200px]">
-            আপনার পেমেন্ট ইতিহাস এখানে দেখা যাবে।
+            তোমার পেমেন্ট ইতিহাস এখানে দেখা যাবে।
           </p>
         </div>
       ) : (

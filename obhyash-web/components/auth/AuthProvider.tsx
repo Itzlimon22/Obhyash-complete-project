@@ -550,7 +550,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
               সেশন সমস্যা!
             </h3>
             <p className="text-neutral-500 dark:text-neutral-400 text-sm mb-8 leading-relaxed">
-              আপনার লগইন সেশনটি মেয়াদোত্তীর্ণ বা ত্রুটিপূর্ণ হয়েছে।
+              তোমার লগইন সেশনটি মেয়াদোত্তীর্ণ বা ত্রুটিপূর্ণ হয়েছে।
               নিরবচ্ছিন্ন অভিজ্ঞতার জন্য দয়া করে আবার লগইন করো।
             </p>
             <button

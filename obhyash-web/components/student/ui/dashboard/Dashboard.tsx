@@ -227,7 +227,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           <div className="flex items-center gap-4 mb-4 relative z-10">
             <div className="flex-1 bg-red-50 dark:bg-red-900/10 rounded-xl p-3 border border-red-100 dark:border-red-800/30">
               <span className="text-[10px] text-neutral-500 dark:text-neutral-400 font-bold uppercase tracking-wider block mb-1">
-                আপনার র‍্যাংক
+                তোমার র‍্যাংক
               </span>
               <div className="flex items-baseline gap-1">
                 <span className="text-2xl font-bold text-red-700 dark:text-red-400">
@@ -268,7 +268,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             </div>
           ) : (
             <div className="text-xs text-emerald-600 dark:text-emerald-400 relative z-10 font-bold bg-emerald-50 dark:bg-emerald-900/20 p-2 rounded-lg inline-block">
-              অভিনন্দন! আপনি এখন সবার শীর্ষে!
+              অভিনন্দন! তুমি এখন সবার শীর্ষে!
             </div>
           )}
 

@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     if (insertError) {
       if (insertError.code === '23505') {
         return NextResponse.json(
-          { error: 'এই ইমেইলটি দিয়ে আপনি আগেই সাবস্ক্রাইব করেছেন!' },
+          { error: 'এই ইমেইলটি দিয়ে তুমি আগেই সাবস্ক্রাইব করেছেন!' },
           { status: 409 },
         );
       }
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'অভিনন্দন! আপনি সফলভাবে নিউজলেটার সাবস্ক্রাইব করেছেন।',
+      message: 'অভিনন্দন! তুমি সফলভাবে নিউজলেটার সাবস্ক্রাইব করেছেন।',
     });
   } catch (error: any) {
     console.error('Error subscribing to newsletter:', error);

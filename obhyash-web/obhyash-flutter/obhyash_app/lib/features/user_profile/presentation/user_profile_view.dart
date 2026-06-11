@@ -566,7 +566,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'তুলনা: আপনি vs ${user.name.split(' ').first}',
+                          'তুলনা: তুমি vs ${user.name.split(' ').first}',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,

@@ -39,7 +39,7 @@ const UserProgress: React.FC<UserProgressProps> = ({
           </div>
           <div className="flex-1">
             <h3 className="font-bold text-neutral-900 dark:text-white text-sm md:text-lg">
-              আপনি বর্তমানে{' '}
+              তুমি বর্তমানে{' '}
               <span className="text-red-600 dark:text-red-400">
                 {currentUserLevelInfo?.label.split(' ')[0]}
               </span>{' '}
@@ -53,7 +53,7 @@ const UserProgress: React.FC<UserProgressProps> = ({
               </p>
             ) : (
               <p className="text-xs md:text-sm text-emerald-500 font-bold">
-                অভিনন্দন! আপনি সর্বোচ্চ লেভেলে পৌঁছেছেন!
+                অভিনন্দন! তুমি সর্বোচ্চ লেভেলে পৌঁছেছেন!
               </p>
             )}
           </div>
