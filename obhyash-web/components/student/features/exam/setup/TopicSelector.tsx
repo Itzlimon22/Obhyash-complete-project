@@ -275,7 +275,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
             </div>
 
             {/* List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-3 space-y-1 custom-scrollbar min-h-[30vh]">
               {(
                 isGrouped
                   ? Object.keys(filteredData.groups).length === 0
@@ -297,7 +297,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
                     <div
                       key={group}
                       className={cn(
-                        'border rounded-xl overflow-hidden mb-3 transition-colors',
+                        'border rounded-xl overflow-hidden mb-1.5 transition-colors',
                         isExpanded
                           ? 'border-emerald-100 dark:border-emerald-900/30'
                           : 'border-neutral-200 dark:border-neutral-800',
@@ -305,7 +305,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
                     >
                       <div
                         className={cn(
-                          'flex items-center justify-between p-3 cursor-pointer transition-colors select-none',
+                          'flex items-center justify-between p-2 px-3 cursor-pointer transition-colors select-none',
                           isExpanded
                             ? 'bg-emerald-50/50 dark:bg-emerald-900/10'
                             : 'bg-neutral-50 dark:bg-neutral-800/50 hover:bg-neutral-100 dark:hover:bg-neutral-800',
@@ -357,7 +357,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
                         </button>
                       </div>
                       {isExpanded && (
-                        <div className="p-2 space-y-1 bg-white dark:bg-neutral-900">
+                        <div className="px-2 pb-2 space-y-1 bg-white dark:bg-neutral-900">
                           {groupItems.map((item) => (
                             <SelectorItem
                               key={item}
@@ -387,7 +387,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
             <div className="p-4 border-t border-neutral-100 dark:border-neutral-800 pb-safe">
               <button
                 onClick={handleConfirm}
-                className="w-full py-3.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 font-bold hover:scale-[0.98] transition-transform"
+                className="w-full py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-t-xl sm:rounded-lg rounded-b-none sm:rounded-b-lg animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 font-bold hover:scale-[0.98] transition-transform"
               >
                 Confirm Selection ({localSelected.length})
               </button>
@@ -412,7 +412,7 @@ const SelectorItem = React.memo(
     <button
       onClick={onToggle}
       className={cn(
-        'w-full flex items-center justify-between p-4 rounded-xl text-left transition-all duration-200 border',
+        'w-full flex items-center justify-between p-3 rounded-lg text-left transition-all duration-200 border',
         isSelected
           ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30'
           : 'bg-white dark:bg-neutral-800/50 border-transparent hover:bg-neutral-50 dark:hover:bg-neutral-800',

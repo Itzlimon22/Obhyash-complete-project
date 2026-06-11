@@ -732,15 +732,26 @@ export default function StudentRoot({
             <ExamHistoryView
               history={examHistory}
               onBack={() => handleTabChange("dashboard")}
-              onClearHistory={async () => {
-                const { clearExamHistory } =
+              onClearHistory={async (ids?: string[]) => {
+                const { clearExamHistory, bulkDeleteExamResults } =
                   await import("@/services/database");
-                const success = await clearExamHistory();
-                if (success) {
-                  setExamHistory([]);
-                  toast.success("ইতিহাস মুছে ফেলা হয়েছে");
+                
+                if (ids && ids.length > 0) {
+                  const success = await bulkDeleteExamResults(ids);
+                  if (success) {
+                    setExamHistory((prev) => prev.filter((e) => !ids.includes(e.id)));
+                    toast.success("নির্বাচিত ইতিহাস মুছে ফেলা হয়েছে");
+                  } else {
+                    toast.error("কিছু ইতিহাস মুছতে সমস্যা হয়েছে");
+                  }
                 } else {
-                  toast.error("ইতিহাস মুছতে সমস্যা হয়েছে");
+                  const success = await clearExamHistory();
+                  if (success) {
+                    setExamHistory([]);
+                    toast.success("ইতিহাস মুছে ফেলা হয়েছে");
+                  } else {
+                    toast.error("ইতিহাস মুছতে সমস্যা হয়েছে");
+                  }
                 }
               }}
               onViewResult={(res) => {

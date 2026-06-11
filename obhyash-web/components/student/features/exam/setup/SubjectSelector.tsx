@@ -130,7 +130,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
 
 
             {/* List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-3 space-y-1 custom-scrollbar min-h-[30vh]">
               {filteredSubjects.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-neutral-400">
                   <BookOpen size={32} className="mb-2 opacity-20" />
@@ -147,7 +147,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
                         setIsOpen(false);
                       }}
                       className={cn(
-                        "w-full flex items-center gap-3 p-4 rounded-xl text-left transition-all duration-200 group border",
+                        "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all duration-200 group border",
                         isSelected
                           ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30 text-emerald-900 dark:text-emerald-100"
                           : "bg-white dark:bg-neutral-800/50 border-transparent hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300",
@@ -155,7 +155,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
                     >
                       <div
                         className={cn(
-                          "w-10 h-10 rounded-lg flex items-center justify-center text-xl shadow-sm border shrink-0",
+                          "w-8 h-8 rounded-md flex items-center justify-center text-lg shadow-sm border shrink-0",
                           isSelected
                             ? "bg-white dark:bg-neutral-900 border-emerald-200 dark:border-emerald-500/30"
                             : "bg-white dark:bg-neutral-900 border-neutral-100 dark:border-neutral-700 group-hover:border-neutral-300 dark:group-hover:border-neutral-600",

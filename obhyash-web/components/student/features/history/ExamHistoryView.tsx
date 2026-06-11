@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { getUserBookmarks, getBookmarkedQuestions, toggleBookmark } from '@/services/bookmark-service';
 import { toast } from 'sonner';
-import DeleteConfirmModal from '@/components/student/ui/common/DeleteConfirmModal';
+
 import { ExamResult, Question } from '@/lib/types';
 import { getSubjectDisplayName } from '@/lib/data/subject-name-map';
 import LatexText from '@/components/student/ui/common/LatexText';
@@ -12,7 +12,7 @@ import QuestionCard from '@/components/student/ui/exam/QuestionCard';
 interface ExamHistoryViewProps {
   history: ExamResult[];
   onBack: () => void;
-  onClearHistory: () => Promise<void> | void;
+  onClearHistory: (ids?: string[]) => Promise<void> | void;
   onViewResult: (result: ExamResult) => void;
   onRecheckRequest: (id: string) => void;
   bookmarkedIds?: Set<string>;
@@ -241,8 +241,7 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   const [filterSubject, setFilterSubject] = useState('');
   const [filterDate, setFilterDate] = useState('');
   const [visibleCount, setVisibleCount] = useState(9);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+
   const [sortBy, setSortBy] = useState<'date' | 'score-high' | 'score-low'>(
     'date',
   );
@@ -681,47 +680,33 @@ const formatDuration = (seconds: number) => {
             <div className="grid grid-cols-2 gap-2 md:gap-3">
               <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-4 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm">
                 <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mb-0.5">
-                  মোট সময়
+                  মোট সময় (মিনিট)
                 </p>
                 <p className="text-xl md:text-2xl font-extrabold text-neutral-800 dark:text-white leading-tight">
-                  {formatDuration(stats.totalTime)}
+                  {stats.totalTime > 0 ? Math.max(1, Math.round(stats.totalTime / 60)) : 0}
                 </p>
               </div>
-              <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-4 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm">
-                <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400 mb-0.5">
-                  গড় সময় (প্রতি প্রশ্ন)
-                </p>
+              <div className="bg-white dark:bg-[#1c1c1c] rounded-2xl p-3 md:p-4 flex flex-col items-center md:items-start border border-neutral-200 dark:border-neutral-800 shadow-sm relative">
+                <div className="flex items-center gap-1 mb-0.5 group">
+                  <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
+                    গড় সময় (সেকেন্ড)
+                  </p>
+                  <div className="text-neutral-400 hover:text-emerald-500 transition-colors cursor-help">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                    </svg>
+                  </div>
+                  <div className="absolute bottom-[calc(100%-8px)] left-1/2 md:left-4 -translate-x-1/2 md:-translate-x-0 w-max max-w-[200px] p-2 bg-neutral-900 dark:bg-neutral-800 text-white text-[10px] font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 text-center shadow-xl pointer-events-none">
+                    প্রতিটি প্রশ্নের জন্য তোমার গড়ে কত সেকেন্ড সময় লাগে
+                    <div className="absolute top-full left-1/2 md:left-6 -translate-x-1/2 border-4 border-transparent border-t-neutral-900 dark:border-t-neutral-800"></div>
+                  </div>
+                </div>
                 <p className="text-xl md:text-2xl font-extrabold text-blue-600 dark:text-blue-500 leading-tight">
-                  {formatDuration(stats.avgTimePerQuestion)}
+                  {stats.avgTimePerQuestion}
                 </p>
               </div>
             </div>
 
-            {/* Clear history */}
-            {history.length > 0 && (
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setShowDeleteModal(true)}
-                  className="flex items-center gap-1.5 text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 px-3 py-1.5 rounded-xl transition-colors"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="currentColor"
-                    className="w-3.5 h-3.5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                    />
-                  </svg>
-                  সব মুছুন
-                </button>
-              </div>
-            )}
 
             {/* Empty state */}
             {displayedHistory.length === 0 ? (
@@ -1084,21 +1069,6 @@ const formatDuration = (seconds: number) => {
           );
         })}
       </nav>
-
-      <DeleteConfirmModal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        onConfirm={async () => {
-          setIsDeleting(true);
-          await onClearHistory();
-          setIsDeleting(false);
-          setShowDeleteModal(false);
-        }}
-        title="সব ইতিহাস মুছবে?"
-        description="এই পদক্ষেপটি স্থায়ী। তোমার সব পরীক্ষার ইতিহাস ডেটাবেজ থেকে মুছে যাবে।"
-        confirmLabel="হ্যাঁ, মুছে ফেলো"
-        isLoading={isDeleting}
-      />
     </div>
   );
 };

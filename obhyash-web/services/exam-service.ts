@@ -795,3 +795,34 @@ export const deleteExamResult = async (examId: string): Promise<boolean> => {
     return false;
   }
 };
+
+export const bulkDeleteExamResults = async (examIds: string[]): Promise<boolean> => {
+  if (!isSupabaseConfigured() || !supabase || examIds.length === 0) return false;
+
+  try {
+    const { error } = await supabase
+      .from('exam_results')
+      .delete()
+      .in('id', examIds);
+
+    if (error) {
+      console.error(`Failed to bulk delete exam results:`, error);
+      return false;
+    }
+
+    // Update local storage
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('obhyash_exam_history');
+      if (stored) {
+        const history: ExamResult[] = JSON.parse(stored);
+        const updated = history.filter((r) => !examIds.includes(r.id));
+        localStorage.setItem('obhyash_exam_history', JSON.stringify(updated));
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error(`Error bulk deleting exam results:`, error);
+    return false;
+  }
+};
