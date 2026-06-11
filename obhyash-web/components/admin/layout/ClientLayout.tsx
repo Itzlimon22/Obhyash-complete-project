@@ -62,22 +62,7 @@ export default function ClientLayout({
   }, [loading, user, profile, router]);
 
   // Loading state for initial session hydration
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-black flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
-          <p className="text-sm font-bold text-neutral-500 animate-pulse">
-            Restoring Admin Session...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Prevent flash before redirect.
-  // Wait for BOTH user AND profile to be confirmed before rendering children.
-  if (!user || !profile || profile.role?.toLowerCase() !== 'admin') {
+  if (loading || !user || !profile || profile.role?.toLowerCase() !== 'admin') {
     return (
       <div className="min-h-screen bg-neutral-50 dark:bg-black flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -93,14 +78,7 @@ export default function ClientLayout({
                 Retry
               </button>
             </div>
-          ) : (
-            <>
-              <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
-              <p className="text-sm font-bold text-neutral-500 animate-pulse">
-                Restoring Admin Session...
-              </p>
-            </>
-          )}
+          ) : null}
         </div>
       </div>
     );
