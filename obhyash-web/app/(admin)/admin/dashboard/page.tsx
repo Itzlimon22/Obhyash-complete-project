@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import useSWR from 'swr';
 import { useRouter } from 'next/navigation';
 import {
   Upload,
@@ -64,20 +65,174 @@ interface ExamResult {
     | null;
 }
 
+const fetchAdminDashboardData = async () => {
+  const supabase = createClient();
+
+  // Guard against race condition: on hard refresh, Supabase might fire queries 
+  // milliseconds before the internal REST client actually attaches the admin's Bearer token.
+  // If we query too early, RLS blocks access silently returning count: 0.
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Auth session not ready for admin dashboard');
+
+  const [
+    usersResult,
+    questionsResult,
+    reportsResult,
+    examResultsResult,
+    recentUsersResult,
+    recentExamsResult,
+  ] = await Promise.all([
+    supabase.from('users').select('*', { count: 'exact', head: true }),
+    supabase.from('questions').select('*', { count: 'exact', head: true }),
+    supabase
+      .from('reports')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'Pending'),
+    supabase
+      .from('exam_results')
+      .select('*', { count: 'exact', head: true }),
+    supabase
+      .from('users')
+      .select('id, name, created_at')
+      .gte(
+        'created_at',
+        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      )
+      .order('created_at', { ascending: false })
+      .limit(5),
+    supabase
+      .from('exam_results')
+      .select('id, created_at, users(name)')
+      .gte(
+        'created_at',
+        new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+      )
+      .order('created_at', { ascending: false })
+      .limit(5),
+  ]);
+
+  const userGrowth = 12;
+  const examGrowth = 8;
+
+  const dashStats: DashboardStats = {
+    totalUsers: usersResult.count || 0,
+    activeUsers: Math.floor((usersResult.count || 0) * 0.7),
+    totalQuestions: questionsResult.count || 0,
+    totalExams: examResultsResult.count || 0,
+    pendingReports: reportsResult.count || 0,
+    userGrowth,
+    examGrowth,
+  };
+
+  const formattedStats: StatData[] = [
+    {
+      id: 'users',
+      title: 'Total Users',
+      value: dashStats.totalUsers,
+      icon: Users,
+      colorClass: 'text-red-600 dark:text-red-400',
+      bgClass: 'bg-red-50 dark:bg-red-950/30',
+      trend: { value: userGrowth, isPositive: true },
+    },
+    {
+      id: 'active-users',
+      title: 'Active Users',
+      value: dashStats.activeUsers,
+      icon: Activity,
+      colorClass: 'text-emerald-600 dark:text-emerald-400',
+      bgClass: 'bg-emerald-50 dark:bg-emerald-950/30',
+    },
+    {
+      id: 'questions',
+      title: 'Total Questions',
+      value: dashStats.totalQuestions,
+      icon: FileQuestion,
+      colorClass: 'text-red-600 dark:text-red-400',
+      bgClass: 'bg-red-50 dark:bg-red-950/30',
+    },
+    {
+      id: 'exams',
+      title: 'Exams Taken',
+      value: dashStats.totalExams,
+      icon: CheckCircle,
+      colorClass: 'text-emerald-600 dark:text-emerald-400',
+      bgClass: 'bg-emerald-50 dark:bg-emerald-950/30',
+      trend: { value: examGrowth, isPositive: true },
+    },
+    {
+      id: 'reports',
+      title: 'Pending Reports',
+      value: dashStats.pendingReports,
+      icon: AlertCircle,
+      colorClass: 'text-red-600 dark:text-red-400',
+      bgClass: 'bg-red-50 dark:bg-red-950/30',
+    },
+  ];
+
+  const activities: RecentActivity[] = [];
+
+  if (recentUsersResult.data) {
+    recentUsersResult.data.forEach((user: User) => {
+      activities.push({
+        id: user.id,
+        type: 'user',
+        message: `${user.name || 'New user'} joined the platform`,
+        timestamp: user.created_at,
+        icon: 'user',
+      });
+    });
+  }
+
+  if (recentExamsResult.data) {
+    recentExamsResult.data.forEach((exam: ExamResult) => {
+      activities.push({
+        id: exam.id,
+        type: 'exam',
+        message: `${exam.users?.[0]?.name || 'A user'} completed an exam`,
+        timestamp: exam.created_at,
+        icon: 'exam',
+      });
+    });
+  }
+
+  activities.sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+  );
+
+  return {
+    dashboardStats: dashStats,
+    stats: formattedStats,
+    recentActivity: activities.slice(0, 10),
+  };
+};
+
 export default function DashboardPage() {
   const router = useRouter();
 
-  const [stats, setStats] = useState<StatData[]>([]);
-  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(
-    null,
-  );
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchDashboardData();
+  const { data, error, isLoading, mutate } = useSWR('adminDashboard', fetchAdminDashboardData, {
+    revalidateOnFocus: false,
+    revalidateIfStale: true,
+    onErrorRetry: (error, _key, _config, revalidate, { retryCount }) => {
+      // Retry up to 3 times to recover from the brief window where auth session 
+      // is restoring but the Supabase client isn't fully ready yet.
+      if (retryCount >= 3) return;
+      setTimeout(() => revalidate({ retryCount }), 1000 * (retryCount + 1));
+    },
+  });
 
+  const stats = data?.stats || [];
+  const dashboardStats = data?.dashboardStats || null;
+  const recentActivity = data?.recentActivity || [];
+
+  useEffect(() => {
+    if (error) {
+      toast.error('Failed to load dashboard data');
+    }
+  }, [error]);
+
+  useEffect(() => {
     // Set up real-time subscription
     const supabase = createClient();
     const channel = supabase
@@ -85,180 +240,29 @@ export default function DashboardPage() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'users' },
-        () => {
-          fetchDashboardData();
-        },
+        () => mutate(),
       )
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'exam_results' },
-        () => {
-          fetchDashboardData();
-        },
+        () => mutate(),
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
-
-  const fetchDashboardData = async (showToast = false) => {
-    if (showToast) setIsRefreshing(true);
-
-    const supabase = createClient();
-
-    try {
-      // Fetch all stats in parallel
-      const [
-        usersResult,
-        questionsResult,
-        reportsResult,
-        examResultsResult,
-        recentUsersResult,
-        recentExamsResult,
-      ] = await Promise.all([
-        supabase.from('users').select('*', { count: 'exact', head: true }),
-        supabase.from('questions').select('*', { count: 'exact', head: true }),
-        supabase
-          .from('reports')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'Pending'),
-        supabase
-          .from('exam_results')
-          .select('*', { count: 'exact', head: true }),
-        supabase
-          .from('users')
-          .select('id, name, created_at')
-          .gte(
-            'created_at',
-            new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-          )
-          .order('created_at', { ascending: false })
-          .limit(5),
-        supabase
-          .from('exam_results')
-          .select('id, created_at, users(name)')
-          .gte(
-            'created_at',
-            new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          )
-          .order('created_at', { ascending: false })
-          .limit(5),
-      ]);
-
-      const userGrowth = 12;
-      const examGrowth = 8;
-
-      const dashStats: DashboardStats = {
-        totalUsers: usersResult.count || 0,
-        activeUsers: Math.floor((usersResult.count || 0) * 0.7),
-        totalQuestions: questionsResult.count || 0,
-        totalExams: examResultsResult.count || 0,
-        pendingReports: reportsResult.count || 0,
-        userGrowth,
-        examGrowth,
-      };
-
-      setDashboardStats(dashStats);
-
-      const formattedStats: StatData[] = [
-        {
-          id: 'users',
-          title: 'Total Users',
-          value: dashStats.totalUsers,
-          icon: Users,
-          colorClass: 'text-red-600 dark:text-red-400',
-          bgClass: 'bg-red-50 dark:bg-red-950/30',
-          trend: { value: userGrowth, isPositive: true },
-        },
-        {
-          id: 'active-users',
-          title: 'Active Users',
-          value: dashStats.activeUsers,
-          icon: Activity,
-          colorClass: 'text-emerald-600 dark:text-emerald-400',
-          bgClass: 'bg-emerald-50 dark:bg-emerald-950/30',
-        },
-        {
-          id: 'questions',
-          title: 'Total Questions',
-          value: dashStats.totalQuestions,
-          icon: FileQuestion,
-          colorClass: 'text-red-600 dark:text-red-400',
-          bgClass: 'bg-red-50 dark:bg-red-950/30',
-        },
-        {
-          id: 'exams',
-          title: 'Exams Taken',
-          value: dashStats.totalExams,
-          icon: CheckCircle,
-          colorClass: 'text-emerald-600 dark:text-emerald-400',
-          bgClass: 'bg-emerald-50 dark:bg-emerald-950/30',
-          trend: { value: examGrowth, isPositive: true },
-        },
-        {
-          id: 'reports',
-          title: 'Pending Reports',
-          value: dashStats.pendingReports,
-          icon: AlertCircle,
-          colorClass: 'text-red-600 dark:text-red-400',
-          bgClass: 'bg-red-50 dark:bg-red-950/30',
-        },
-      ];
-
-      setStats(formattedStats);
-
-      const activities: RecentActivity[] = [];
-
-      if (recentUsersResult.data) {
-        recentUsersResult.data.forEach((user: User) => {
-          activities.push({
-            id: user.id,
-            type: 'user',
-            message: `${user.name || 'New user'} joined the platform`,
-            timestamp: user.created_at,
-            icon: 'user',
-          });
-        });
-      }
-
-      if (recentExamsResult.data) {
-        recentExamsResult.data.forEach((exam: ExamResult) => {
-          activities.push({
-            id: exam.id,
-            type: 'exam',
-            message: `${exam.users?.[0]?.name || 'A user'} completed an exam`,
-            timestamp: exam.created_at,
-            icon: 'exam',
-          });
-        });
-      }
-
-      activities.sort(
-        (a, b) =>
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-      );
-      setRecentActivity(activities.slice(0, 10));
-
-      if (showToast) {
-        toast.success('Dashboard refreshed successfully');
-      }
-    } catch (error) {
-      console.error('Failed to load dashboard data:', error);
-      toast.error('Failed to load dashboard data');
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  };
+  }, [mutate]);
 
   const handleNavigate = (path: string) => {
     router.push(`/admin/${path}`);
   };
 
-  const handleRefresh = () => {
-    fetchDashboardData(true);
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await mutate();
+    setIsRefreshing(false);
+    toast.success('Dashboard refreshed successfully');
   };
 
   const handleExport = () => {
