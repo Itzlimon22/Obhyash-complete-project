@@ -53,6 +53,9 @@ export function useSessionMonitor({
   }, []);
 
   useEffect(() => {
+    // Feature disabled: allow multiple devices simultaneously without kicking users out.
+    return;
+    /*
     if (!userId) return;
 
     let mounted = true;
@@ -143,6 +146,7 @@ export function useSessionMonitor({
         channelRef.current = null;
       }
     };
+    */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 }

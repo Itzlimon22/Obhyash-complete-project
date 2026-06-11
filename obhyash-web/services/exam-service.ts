@@ -443,8 +443,6 @@ export const updateExamResult = async (
   const MAX_RETRIES = 3;
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      // Refresh session token before each attempt — long exams can expire the token
-      await supabase.auth.refreshSession();
 
       const { data, error } = await supabase
         .from('exam_results')
@@ -506,16 +504,7 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
     }
   }
 
-  // ── STEP 2: Refresh the auth session token ────────────────────────────────
-  // Long exams (45+ min) can expire the Supabase JWT. Refreshing before the
-  // DB write prevents silent auth failures at the critical submission moment.
-  try {
-    await supabase.auth.refreshSession();
-  } catch (refreshErr) {
-    console.warn('[Exam Submit] Session refresh failed, proceeding anyway:', refreshErr);
-  }
-
-  // ── STEP 3: Write to database ─────────────────────────────────────────────
+  // ── STEP 2: Database write ─────────────────────────────────────────────
   try {
     const isUuid =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(

@@ -25,8 +25,7 @@ import {
 } from "@/components/student/features/exam/setup/ExamSettings";
 import { TopicSelector } from "@/components/student/features/exam/setup/TopicSelector";
 import { SubjectSelector } from "@/components/student/features/exam/setup/SubjectSelector";
-import { OmrConfigModal } from "@/components/student/features/omr/OmrConfigModal";
-import { downloadOMRSheet } from "@/services/download-service";
+
 import { EXAM_TYPE_OPTIONS } from "@/lib/constants";
 import { getAvailableQuestionCount } from "@/services/exam-service";
 import { getSubjects, getChapters, getTopics } from "@/services/database";
@@ -155,7 +154,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   ]);
 
   // --- Modals State ---
-  const [isOmrConfigOpen, setIsOmrConfigOpen] = useState(false);
+
 
   // Fetch available question count when subject/chapters/difficulty change
   useEffect(() => {
@@ -361,9 +360,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     }
   };
 
-  const handleOmrGenerate = (details: ExamDetails, total: number) => {
-    downloadOMRSheet(details, total);
-  };
+
 
   const getThemeVars = (subjectId: string) => {
     if (!subjectId) return { button: "bg-emerald-700 hover:bg-emerald-800 shadow-emerald-500/25", badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300" };
@@ -427,15 +424,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           </h1>
         </div>
 
-        <button
-          onClick={() => setIsOmrConfigOpen(true)}
-          className="group flex items-center gap-3 px-6 py-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl font-black text-neutral-700 dark:text-neutral-300 shadow-sm hover:shadow-xl hover:border-emerald-500/30 transition-all active:scale-95"
-        >
-          <div className="w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all">
-            <Share2 className="w-5 h-5" />
-          </div>
-          <span>OMR Sheet</span>
-        </button>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
@@ -563,28 +551,13 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         </div>
 
         {/* Mobile Submit Button (Sticky Bottom) */}
-        <div className="xl:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl border-t border-neutral-200/50 dark:border-neutral-800/50 z-50 animate-in slide-in-from-bottom duration-500">
+        <div className="xl:hidden fixed bottom-[72px] md:bottom-[76px] left-0 right-0 p-4 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl border-t border-neutral-200/50 dark:border-neutral-800/50 z-40 animate-in slide-in-from-bottom duration-500 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           <div className="max-w-md mx-auto">
             <StartExamButton compact />
           </div>
         </div>
       </div>
 
-      {/* Modals */}
-      <OmrConfigModal
-        isOpen={isOmrConfigOpen}
-        onClose={() => setIsOmrConfigOpen(false)}
-        onGenerate={handleOmrGenerate}
-        initialSubject={
-          availableSubjects.find((s) => s.id === subject)?.label || subject
-        }
-        subjects={availableSubjects.map((s) => ({
-          id: s.id,
-          name: s.label || s.name || "",
-        }))}
-      />
-
-      {/* OMR Sheet is now generated and printed via printOMRSheet service */}
     </div>
   );
 };

@@ -347,7 +347,7 @@ export const useExamEngine = () => {
           : 0;
         setTimeTaken(duration);
 
-        const resultId = dbSessionId || Date.now().toString();
+        const resultId = dbSessionId || crypto.randomUUID();
         const newResult: ExamResult = {
           id: resultId,
           subject: examDetailsRef.current?.subject || 'Unknown',
