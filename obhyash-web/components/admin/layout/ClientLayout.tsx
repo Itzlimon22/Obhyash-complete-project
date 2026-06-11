@@ -20,7 +20,6 @@ export default function ClientLayout({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const handleResize = () => {
       if (window.innerWidth < 1024) {
         setIsMobile(true);
@@ -30,7 +29,13 @@ export default function ClientLayout({
         setIsSidebarOpen(true);
       }
     };
-    handleResize();
+
+    // Defer state updates to avoid synchronous cascading renders warning
+    setTimeout(() => {
+      setMounted(true);
+      handleResize();
+    }, 0);
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -44,11 +49,12 @@ export default function ClientLayout({
       !loading &&
       user &&
       profile &&
-      profile.role !== 'Admin'
+      profile.role?.toLowerCase() !== 'admin'
     ) {
       // If not an admin, send to appropriate home or error
-      if (profile.role === 'Student') router.replace('/dashboard');
-      else if (profile.role === 'Teacher') router.replace('/teacher/dashboard');
+      const role = profile.role?.toLowerCase();
+      if (role === 'student') router.replace('/dashboard');
+      else if (role === 'teacher') router.replace('/teacher/dashboard');
       else router.replace('/');
     }
   }, [mounted, loading, user, profile, router]);
@@ -73,7 +79,7 @@ export default function ClientLayout({
   // this prevents data-fetching useEffects from firing before auth is complete.
   // NOTE: return the spinner (not null) so the admin never sees a blank screen if
   // the profile DB fetch failed or is still in-flight after loading resolves.
-  if (!user || !profile || profile.role !== 'Admin') {
+  if (!user || !profile || profile.role?.toLowerCase() !== 'admin') {
     return (
       <div className="min-h-screen bg-neutral-50 dark:bg-black flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
