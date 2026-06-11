@@ -48,25 +48,23 @@ export default function GlobalError({
         </Link>
       </div>
 
-      {/* Dev-only error stack trace mapping */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="mt-12 w-full max-w-3xl bg-neutral-950 dark:bg-black rounded-2xl p-6 text-left overflow-auto border border-neutral-800 shadow-2xl">
-          <p className="text-red-400 font-mono text-sm mb-3 font-bold flex items-center gap-2">
-            <AlertOctagon size={16} /> Error Details (Dev Only):
-          </p>
-          <pre className="text-neutral-300 font-mono text-xs whitespace-pre-wrap leading-relaxed">
-            <span className="text-red-300 font-bold">{error.name}: </span>
-            {error.message}
-            {'\n\n'}
-            <span className="opacity-70">{error.stack}</span>
-            {error.digest && (
-              <div className="mt-4 pt-4 border-t border-neutral-800 text-neutral-500">
-                Digest: {error.digest}
-              </div>
-            )}
-          </pre>
-        </div>
-      )}
+      {/* Error stack trace mapping for debugging */}
+      <div className="mt-12 w-full max-w-3xl bg-neutral-950 dark:bg-black rounded-2xl p-6 text-left overflow-auto border border-neutral-800 shadow-2xl">
+        <p className="text-red-400 font-mono text-sm mb-3 font-bold flex items-center gap-2">
+          <AlertOctagon size={16} /> Error Details:
+        </p>
+        <pre className="text-neutral-300 font-mono text-xs whitespace-pre-wrap leading-relaxed">
+          <span className="text-red-300 font-bold">{error.name}: </span>
+          {error.message}
+          {'\n\n'}
+          <span className="opacity-70">{error.stack}</span>
+          {error.digest && (
+            <div className="mt-4 pt-4 border-t border-neutral-800 text-neutral-500">
+              Digest: {error.digest}
+            </div>
+          )}
+        </pre>
+      </div>
     </div>
   );
 }
