@@ -481,7 +481,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
               setProfile(null);
             }
             clearCachedProfile();
-            router.push("/login");
+            router.push("/");
           }
           // else: session still valid (e.g. another device logged out) — stay logged in.
         }
@@ -504,20 +504,25 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── signOut ───────────────────────────────────────────────────────────────
   const signOut = useCallback(async () => {
-    // Unregister this device BEFORE revoking the session (RLS requires active session)
-    if (user) {
-      await unregisterCurrentDevice(user.id).catch(() => {});
-    }
+    const userId = user?.id;
+
+    // Instant UI feedback and redirect to landing page
+    setUser(null);
+    setProfile(null);
     clearCachedProfile();
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error("Sign out error:", error);
-      // Fallback manual cleanup if the event doesn't fire
-      setUser(null);
-      setProfile(null);
-      router.push("/login");
-    }
-    // If signOut succeeds, the SIGNED_OUT event handler above handles redirect
+    router.push("/");
+
+    // Background cleanup
+    (async () => {
+      // Unregister this device BEFORE revoking the session (RLS requires active session)
+      if (userId) {
+        await unregisterCurrentDevice(userId).catch(() => {});
+      }
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Sign out error:", error);
+      }
+    })();
   }, [supabase, router, user]);
 
   // ── refreshProfile ────────────────────────────────────────────────────────
