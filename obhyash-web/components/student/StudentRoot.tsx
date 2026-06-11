@@ -529,6 +529,15 @@ export default function StudentRoot({
       const latestResult = examHistory[examHistory.length - 1];
       if (latestResult && currentUser) {
         handleExamComplete(latestResult);
+        
+        // Give the live result view a shareable URL so it doesn't vanish on refresh
+        if (latestResult.id) {
+          window.history.replaceState(
+            { tab: "history_result", examId: latestResult.id },
+            "",
+            `/history/${latestResult.id}`
+          );
+        }
       }
     }
   }, [appState]);
