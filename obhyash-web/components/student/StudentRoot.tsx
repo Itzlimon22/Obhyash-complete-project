@@ -253,12 +253,23 @@ export default function StudentRoot({
     toggle: toggleBookmark,
   } = useBookmarks(currentUser?.id, authLoading);
 
-  const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Question[]>(
-    [],
-  );
+  const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Question[]>([]);
+  
   useEffect(() => {
     if (!currentUser?.id || authLoading) return;
-    getBookmarkedQuestions(currentUser.id).then(setBookmarkedQuestions);
+    
+    // Optimistically remove any questions that are no longer in bookmarkedIds
+    setBookmarkedQuestions((prev) => {
+      const filtered = prev.filter((q) => bookmarkedIds.has(String(q.id)));
+      return filtered.length !== prev.length ? filtered : prev;
+    });
+
+    // Fetch latest from DB to capture any additions
+    getBookmarkedQuestions(currentUser.id).then((fetchedQs) => {
+      // Filter the DB result against current bookmarkedIds to prevent stale reads
+      // (e.g. DB hasn't processed the deletion yet)
+      setBookmarkedQuestions(fetchedQs.filter((q) => bookmarkedIds.has(String(q.id))));
+    });
   }, [currentUser?.id, authLoading, bookmarkedIds]);
 
   // Streak Celebration State
