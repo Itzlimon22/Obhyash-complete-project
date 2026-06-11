@@ -196,7 +196,7 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
                 )}
               >
                 {selectedItems.length === 0
-                  ? 'সব টপিক (All Topics)'
+                  ? 'সব টপিক'
                   : selectedItems.length === totalCount
                     ? 'সব নির্বাচন করা হয়েছে'
                     : `${selectedItems.length} টি নির্বাচিত`}

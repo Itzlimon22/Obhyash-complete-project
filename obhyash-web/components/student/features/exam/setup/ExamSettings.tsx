@@ -28,9 +28,9 @@ export const ExamTypeSelection: React.FC<ExamTypeSelectionProps> = ({
   };
 
   return (
-    <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
+    <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
       <label className="block text-base font-bold text-neutral-900 dark:text-white mb-2">
-        পরীক্ষার ধরণ (Exam Type)
+        পরীক্ষার ধরন
       </label>
       <div className="grid grid-cols-2 gap-3">
         {EXAM_TYPE_OPTIONS.map((type) => {
@@ -90,9 +90,9 @@ export const DifficultySelection: React.FC<DifficultySelectionProps> = ({
   };
 
   return (
-    <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
+    <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
       <label className="block text-base font-bold text-neutral-900 dark:text-white mb-2">
-        কঠিনতা (Difficulty)
+        কঠিনতা
       </label>
       <div className="bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-2xl flex gap-1.5 overflow-x-auto">
         {DIFFICULTY_OPTIONS.map((opt) => {
@@ -163,7 +163,7 @@ export const QuestionCountSelection: React.FC<QuestionCountSelectionProps> = ({
   if (noContainer) return content;
 
   return (
-    <div className="bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
+    <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
       {content}
     </div>
   );
@@ -179,11 +179,11 @@ export const TimeSelection: React.FC<TimeSelectionProps> = ({
   setDuration,
 }) => {
   return (
-    <div className="space-y-6 bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
+    <div className="space-y-6 bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
       <div className="flex justify-between items-center mb-1">
         <label className="flex items-center gap-2 text-neutral-900 dark:text-white font-bold text-base">
           <Clock size={20} className="text-emerald-600" />
-          সময় (Time)
+          সময়
         </label>
         <div className="px-4 py-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
           <span className="text-xl font-black text-emerald-700 dark:text-emerald-400">
@@ -220,9 +220,9 @@ export const NegativeMarkingSelection: React.FC<
   NegativeMarkingSelectionProps
 > = ({ negativeMarking, setNegativeMarking }) => {
   return (
-    <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-3xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
+    <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
       <label className="block text-base font-bold text-neutral-900 dark:text-white mb-2">
-        নেগেটিভ মার্কিং (Negative Marking)
+        নেগেটিভ মার্কিং
       </label>
       <div className="grid grid-cols-5 gap-2">
         {NEGATIVE_MARKING_OPTIONS.map((val) => (

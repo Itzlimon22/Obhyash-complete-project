@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Check, ChevronDown, Search, BookOpen } from "lucide-react";
+import { Check, ChevronDown, Search, BookOpen, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Subject {
@@ -55,7 +55,7 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
   return (
     <div className="space-y-2 relative" ref={containerRef}>
       <label className="block text-sm font-bold text-neutral-700 dark:text-neutral-300">
-        বিষয় (Subject)
+        বিষয়
       </label>
 
       {/* Trigger Button */}
@@ -107,78 +107,97 @@ export const SubjectSelector: React.FC<SubjectSelectorProps> = ({
         />
       </button>
 
-      {/* Dropdown Menu */}
-      <div
-        className={cn(
-          "absolute z-50 w-full mt-2 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-100 dark:border-neutral-800 overflow-hidden transition-all duration-200 origin-top",
-          isOpen
-            ? "opacity-100 translate-y-0 scale-100 visible"
-            : "opacity-0 -translate-y-2 scale-95 invisible pointer-events-none",
-        )}
-      >
-        {/* Search */}
-        <div className="p-3 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
-          <div className="relative">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
-              size={16}
-            />
-            <input
-              type="text"
-              placeholder="বিষয় খুঁজুন..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg text-sm focus:outline-none focus:border-emerald-500 transition-colors"
-              autoFocus={isOpen}
-            />
+      {/* Modal / Dialog */}
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] flex flex-col justify-end md:justify-center bg-black/40 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="absolute inset-0" onClick={() => setIsOpen(false)} />
+          <div className="relative w-full md:max-w-xl md:rounded-3xl rounded-t-3xl bg-white dark:bg-neutral-900 shadow-2xl flex flex-col max-h-[85vh] md:max-h-[700px] animate-in slide-in-from-bottom duration-300 md:mx-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between p-5 border-b border-neutral-100 dark:border-neutral-800">
+              <div>
+                <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
+                  বিষয়
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-2 bg-neutral-100 dark:bg-neutral-800 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Search */}
+            <div className="p-4 space-y-3 bg-neutral-50/50 dark:bg-neutral-900/50">
+              <div className="relative">
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
+                  size={16}
+                />
+                <input
+                  type="text"
+                  placeholder="বিষয় খুঁজো..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-t-2xl sm:rounded-xl rounded-b-none sm:rounded-b-xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            {/* List */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+              {filteredSubjects.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-neutral-400">
+                  <BookOpen size={32} className="mb-2 opacity-20" />
+                  <p className="text-sm">কোনো বিষয় পাওয়া যায়নি</p>
+                </div>
+              ) : (
+                filteredSubjects.map((subject) => {
+                  const isSelected = selectedSubject === subject.id;
+                  return (
+                    <button
+                      key={subject.id}
+                      onClick={() => {
+                        onSelect(subject.id);
+                        setIsOpen(false);
+                      }}
+                      className={cn(
+                        "w-full flex items-center gap-3 p-4 rounded-xl text-left transition-all duration-200 group border",
+                        isSelected
+                          ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30 text-emerald-900 dark:text-emerald-100"
+                          : "bg-white dark:bg-neutral-800/50 border-transparent hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300",
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "w-10 h-10 rounded-lg flex items-center justify-center text-xl shadow-sm border shrink-0",
+                          isSelected
+                            ? "bg-white dark:bg-neutral-900 border-emerald-200 dark:border-emerald-500/30"
+                            : "bg-white dark:bg-neutral-900 border-neutral-100 dark:border-neutral-700 group-hover:border-neutral-300 dark:group-hover:border-neutral-600",
+                        )}
+                      >
+                        {subject.icon}
+                      </div>
+                      <span className="flex-1 font-semibold text-sm md:text-base">
+                        {subject.name}
+                      </span>
+                      {isSelected && (
+                        <div className="w-5 h-5 rounded-full border border-emerald-600 bg-emerald-600 text-white flex items-center justify-center transition-all shrink-0">
+                           <Check size={12} strokeWidth={3} />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+            
+            {/* Safe area padding for bottom */}
+            <div className="pb-safe" />
           </div>
         </div>
-
-        {/* List */}
-        <div className="max-h-[300px] overflow-y-auto p-2 space-y-1 custom-scrollbar">
-          {filteredSubjects.length === 0 ? (
-            <div className="py-8 text-center text-neutral-400 text-sm">
-              কোনো বিষয় পাওয়া যায়নি
-            </div>
-          ) : (
-            filteredSubjects.map((subject) => {
-              const isSelected = selectedSubject === subject.id;
-              return (
-                <button
-                  key={subject.id}
-                  onClick={() => {
-                    onSelect(subject.id);
-                    setIsOpen(false);
-                  }}
-                  className={cn(
-                    "w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200 group",
-                    isSelected
-                      ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300"
-                      : "hover:bg-neutral-50 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300",
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "w-8 h-8 rounded-lg flex items-center justify-center text-lg shadow-sm border",
-                      isSelected
-                        ? "bg-white dark:bg-neutral-900 border-emerald-200 dark:border-emerald-500/30"
-                        : "bg-white dark:bg-neutral-900 border-neutral-100 dark:border-neutral-700 group-hover:border-neutral-300 dark:group-hover:border-neutral-600",
-                    )}
-                  >
-                    {subject.icon}
-                  </div>
-                  <span className="flex-1 font-bold text-sm">
-                    {subject.name}
-                  </span>
-                  {isSelected && (
-                    <Check size={16} className="text-emerald-600" />
-                  )}
-                </button>
-              );
-            })
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 };

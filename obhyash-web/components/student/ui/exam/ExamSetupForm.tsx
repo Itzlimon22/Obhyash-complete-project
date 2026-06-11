@@ -446,9 +446,9 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
   return (
     <div className="w-full max-w-7xl mx-auto pb-32 px-4 md:px-6 lg:px-8 font-sans animate-in fade-in duration-700">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 pt-6">
-        <div>
-          <div className="flex items-center gap-2 mb-3">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 pt-6">
+        <div className="w-full flex justify-center md:justify-start">
+          <div className="flex items-center gap-2">
             <span
               className={cn(
                 "px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest transition-colors duration-500",
@@ -458,9 +458,6 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
               Exam Configuration
             </span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-neutral-900 dark:text-white tracking-tight">
-            পরীক্ষা সেটআপ
-          </h1>
         </div>
       </div>
 
@@ -468,7 +465,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
         {/* Left Column: Selection (Subject & Topics) */}
         <div className="xl:col-span-8 space-y-8">
           {/* 1. Subject Selection Card */}
-          <section className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+          <section className="bg-white dark:bg-neutral-900 rounded-2xl p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm">
             <h3 className="text-xl font-black text-neutral-900 dark:text-white mb-8 flex items-center gap-3">
               বিষয় নির্বাচন
             </h3>
@@ -486,7 +483,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           {/* 2. Topics Selection Card */}
           <section
             className={cn(
-              "bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-500",
+              "bg-white dark:bg-neutral-900 rounded-2xl p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-500",
               !subject ? "opacity-50 pointer-events-none" : "opacity-100",
             )}
           >
@@ -552,7 +549,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
             </div>
           </section>
           {/* 3. Question Count Selection Card */}
-          <section className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+          <section className="bg-white dark:bg-neutral-900 rounded-2xl p-8 md:p-10 border border-neutral-200 dark:border-neutral-800 shadow-sm">
             <QuestionCountSelection
               questionCount={questionCount}
               setQuestionCount={setQuestionCount}
