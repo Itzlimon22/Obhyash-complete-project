@@ -158,7 +158,7 @@ export const DatabaseToolsSection: React.FC = () => {
       id: 'seed-hsc',
       label: 'Seed HSC Data',
       description: 'Populate database with default HSC subjects/chapters.',
-      icon: Database,
+      icon: (props: any) => <Database {...props} />,
       action: async () => {
         // ⚠️ LOGIC: Usually strictly restricted to Admins.
         // For now, we simulate a delay. In production, call a Supabase RPC function.
@@ -171,7 +171,7 @@ export const DatabaseToolsSection: React.FC = () => {
       id: 'backup-daily',
       label: 'Manual Backup',
       description: 'Trigger a manual backup snapshot.',
-      icon: Upload,
+      icon: (props: any) => <Upload {...props} />,
       action: async () => {
         // ⚠️ LOGIC: Supabase handles backups automatically.
         // This button could trigger a CSV export or just be a visual placeholder.
