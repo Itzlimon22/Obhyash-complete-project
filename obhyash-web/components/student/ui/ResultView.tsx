@@ -58,6 +58,7 @@ const ResultView: React.FC<ResultViewProps> = ({
   const [reportingQuestionId, setReportingQuestionId] = useState<
     number | string | null
   >(null);
+  const [reviewFilter, setReviewFilter] = useState<'all' | 'correct' | 'wrong' | 'skipped'>('all');
 
   const openReportModal = (id: number | string) => {
     setReportingQuestionId(id);
@@ -479,29 +480,73 @@ const ResultView: React.FC<ResultViewProps> = ({
 
       {/* Review Section */}
       <div className="max-w-3xl mx-auto">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h3 className="text-xl md:text-2xl font-bold text-neutral-800 dark:text-white">
             উত্তরপত্র পর্যালোচনা
           </h3>
-          <div className="flex gap-3">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-              <span className="text-sm font-medium text-neutral-600 dark:text-neutral-300">
-                সঠিক
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <span className="text-sm font-medium text-neutral-600 dark:text-neutral-300">
-                ভুল
-              </span>
-            </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setReviewFilter('all')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-colors border ${
+                reviewFilter === 'all'
+                  ? 'bg-neutral-800 text-white border-neutral-800 dark:bg-white dark:text-neutral-900 dark:border-white'
+                  : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800'
+              }`}
+            >
+              সব ({questions.length})
+            </button>
+            <button
+              onClick={() => setReviewFilter(reviewFilter === 'correct' ? 'all' : 'correct')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-colors border ${
+                reviewFilter === 'correct'
+                  ? 'bg-emerald-500 text-white border-emerald-500'
+                  : 'bg-white text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:bg-neutral-900 dark:border-emerald-900/50 dark:text-emerald-400 dark:hover:bg-emerald-900/20'
+              }`}
+            >
+              <div className={`w-2.5 h-2.5 rounded-full ${reviewFilter === 'correct' ? 'bg-white' : 'bg-emerald-500'}`}></div>
+              সঠিক ({correctCount})
+            </button>
+            <button
+              onClick={() => setReviewFilter(reviewFilter === 'wrong' ? 'all' : 'wrong')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-colors border ${
+                reviewFilter === 'wrong'
+                  ? 'bg-red-500 text-white border-red-500'
+                  : 'bg-white text-red-600 border-red-200 hover:bg-red-50 dark:bg-neutral-900 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20'
+              }`}
+            >
+              <div className={`w-2.5 h-2.5 rounded-full ${reviewFilter === 'wrong' ? 'bg-white' : 'bg-red-500'}`}></div>
+              ভুল ({wrongCount})
+            </button>
+            <button
+              onClick={() => setReviewFilter(reviewFilter === 'skipped' ? 'all' : 'skipped')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-colors border ${
+                reviewFilter === 'skipped'
+                  ? 'bg-neutral-500 text-white border-neutral-500'
+                  : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800'
+              }`}
+            >
+              <div className={`w-2.5 h-2.5 rounded-full ${reviewFilter === 'skipped' ? 'bg-white' : 'bg-neutral-400'}`}></div>
+              স্কিপ ({skippedCount})
+            </button>
           </div>
         </div>
 
         <div className="space-y-6">
           {questions.map((q, idx) => {
             const questionId = q.id;
+            const ua = userAnswers[q.id];
+            const isSkipped = ua === undefined;
+            const isCorrect =
+              !isSkipped &&
+              (ua === q.correctAnswerIndex ||
+                (q.correctAnswerIndices != null &&
+                  q.correctAnswerIndices.includes(ua)));
+            const isWrong = !isSkipped && !isCorrect;
+
+            if (reviewFilter === 'correct' && !isCorrect) return null;
+            if (reviewFilter === 'wrong' && !isWrong) return null;
+            if (reviewFilter === 'skipped' && !isSkipped) return null;
+
             return (
               <QuestionCard
                 key={q.id}
