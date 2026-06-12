@@ -107,7 +107,7 @@ BEGIN
       p_search IS NULL
       OR question   ILIKE '%' || p_search || '%'
       OR exam_type  ILIKE '%' || p_search || '%'
-      OR institute  ILIKE '%' || p_search || '%'
+      OR institutes ILIKE '%' || p_search || '%'
     );
 
   RETURN json_build_object(
