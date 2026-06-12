@@ -1,3 +1,4 @@
+import { usePathname} from 'next/navigation';
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -9,6 +10,8 @@ import Link from "next/link";
 import LiveExamFormModal from "./LiveExamFormModal";
 
 export default function LiveExamDashboard() {
+  const pathname = usePathname();
+  const basePath = pathname.startsWith('/teacher') ? '/teacher/live-exams' : '/admin/live-exams';
   const [exams, setExams] = useState<LiveExam[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -144,14 +147,14 @@ export default function LiveExamDashboard() {
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Link 
-                          href={`/admin/live-exams/${exam.id}/builder`}
+                          href={`${basePath}/${exam.id}/builder`}
                           className="p-1.5 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md transition-colors"
                           title="Question Builder"
                         >
                           <List size={18} />
                         </Link>
                         <Link 
-                          href={`/admin/live-exams/${exam.id}/results`}
+                          href={`${basePath}/${exam.id}/results`}
                           className="p-1.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
                           title="Leaderboard & Results"
                         >

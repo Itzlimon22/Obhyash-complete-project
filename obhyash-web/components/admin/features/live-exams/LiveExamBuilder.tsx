@@ -7,10 +7,12 @@ import { LiveExam, Question } from "@/lib/types";
 import { getLiveExam, getLiveExamQuestions, addQuestionToLiveExam, removeQuestionFromLiveExam, reorderLiveExamQuestions } from "@/services/live-exam-admin-service";
 import { getQuestionsPage } from "@/services/question-service";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import {  useRouter , usePathname} from 'next/navigation';
 
 export default function LiveExamBuilder({ examId }: { examId: string }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const basePath = pathname.startsWith('/teacher') ? '/teacher/live-exams' : '/admin/live-exams';
   const [exam, setExam] = useState<LiveExam | null>(null);
   const [examQuestions, setExamQuestions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +36,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
       ]);
       if (!examData) {
         toast.error("Exam not found");
-        router.push("/admin/live-exams");
+        router.push(basePath);
         return;
       }
       setExam(examData);
@@ -131,7 +133,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
     <div className="p-4 md:p-8 space-y-6 h-[calc(100vh-80px)] flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-4 shrink-0">
-        <Link href="/admin/live-exams" className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors">
+        <Link href={basePath} className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors">
           <ArrowLeft size={20} />
         </Link>
         <div>

@@ -16,6 +16,7 @@ import {
   Sparkles,
   GraduationCap,
   UserCircle,
+  Radio,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/components/auth/AuthProvider';
@@ -42,6 +43,13 @@ const TEACHER_NAVIGATION = [
         labelEn: 'Question Bank',
         icon: FileQuestion,
         href: '/teacher/question-management',
+      },
+      {
+        id: 'live-exams',
+        label: 'লাইভ পরীক্ষা',
+        labelEn: 'Live Exams',
+        icon: Radio,
+        href: '/teacher/live-exams',
       },
     ],
   },
