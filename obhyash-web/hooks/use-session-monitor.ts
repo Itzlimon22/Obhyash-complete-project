@@ -53,9 +53,6 @@ export function useSessionMonitor({
   }, []);
 
   useEffect(() => {
-    // Feature disabled: allow multiple devices simultaneously without kicking users out.
-    return;
-    /*
     if (!userId) return;
 
     let mounted = true;
@@ -65,59 +62,23 @@ export function useSessionMonitor({
       if (!mounted) return;
       sessionIdRef.current = mySessionId;
 
-      // Create a presence channel scoped to this user
+      // Create a presence channel scoped to this user to keep the Realtime connection warm
       const channel = supabase.channel(`session:${userId}`, {
         config: { presence: { key: mySessionId } },
       });
 
-      // Track our own presence
+      // Track our own presence, but do NOT kick out other sessions
       channel.on('presence', { event: 'sync' }, () => {
         if (!mounted || !sessionIdRef.current) return;
-
-        const presenceState = channel.presenceState();
-
-        // Collect all session IDs from other devices
-        const otherSessions = Object.keys(presenceState).filter(
-          (id) => id !== sessionIdRef.current,
-        );
-
-        if (otherSessions.length > 0) {
-          // Another device with a different session is present
-          // Give a small debounce — they may be leaving, not joining
-          setTimeout(async () => {
-            if (!mounted) return;
-
-            // Re-check: still other sessions?
-            const currentState = channel.presenceState();
-            const stillOthers = Object.keys(currentState).filter(
-              (id) => id !== sessionIdRef.current,
-            );
-
-            if (stillOthers.length > 0) {
-              toast.error('অন্য ডিভাইসে লগইন হয়েছে। সেশন বন্ধ হচ্ছে...', {
-                duration: 4000,
-                id: 'forced-signout',
-              });
-
-              // Small delay so the toast is visible before redirect
-              await new Promise((r) => setTimeout(r, 1500));
-
-              if (onForcedSignOut) {
-                await onForcedSignOut();
-              } else {
-                await supabase.auth.signOut();
-              }
-            }
-          }, 2000); // 2 s debounce
-        }
+        // Logic to kick out other sessions has been removed
       });
 
       const subscribeWithRetry = async (attempt = 0) => {
         if (!mounted) return;
 
-        const status = await channel.subscribe(async (status: string) => {
+        await channel.subscribe(async (status: string) => {
           if (status === 'SUBSCRIBED' && mounted) {
-            // Broadcast our presence
+            // Broadcast our presence to keep the connection warm
             await channel.track({ session_id: mySessionId });
           } else if (status === 'CHANNEL_ERROR' || status === 'CLOSED') {
             if (mounted && attempt < 5) {
@@ -146,7 +107,6 @@ export function useSessionMonitor({
         channelRef.current = null;
       }
     };
-    */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [userId, getSessionId, supabase]);
 }
