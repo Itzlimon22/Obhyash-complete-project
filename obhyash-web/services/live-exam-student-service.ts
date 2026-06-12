@@ -191,8 +191,8 @@ export async function getPublicLeaderboard(examId: string, limit: number = 100):
       submit_time,
       users (
         name,
-        avatarUrl,
-        avatarColor,
+        avatarUrl:avatar_url,
+        avatarColor:avatar_color,
         institute
       )
     `)

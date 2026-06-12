@@ -215,8 +215,8 @@ export async function getLiveExamLeaderboard(examId: string): Promise<any[]> {
       *,
       users (
         name,
-        avatarUrl,
-        avatarColor,
+        avatarUrl:avatar_url,
+        avatarColor:avatar_color,
         institute
       )
     `
