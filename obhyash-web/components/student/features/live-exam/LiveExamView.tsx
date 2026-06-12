@@ -102,11 +102,10 @@ const LiveExamView: React.FC = () => {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 md:p-8 animate-in fade-in duration-300">
-      <div className="bg-[#EAECE4] dark:bg-neutral-800 rounded-3xl p-6 md:p-10 shadow-sm border border-neutral-200 dark:border-neutral-700 min-h-[80vh]">
+    <div className="w-full max-w-6xl mx-auto px-2 md:px-4 pt-4 md:pt-6 animate-in fade-in duration-300 min-h-[80vh]">
         
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <h2 className="text-2xl md:text-3xl font-extrabold text-[#2F61E1] dark:text-blue-400">
             মডেল টেস্ট
           </h2>
@@ -181,7 +180,6 @@ const LiveExamView: React.FC = () => {
             </div>
           ))}
         </div>
-
       </div>
     </div>
   );

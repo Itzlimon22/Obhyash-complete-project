@@ -44,8 +44,7 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 md:p-8 animate-in fade-in zoom-in-95 duration-300">
-      <div className="bg-[#f7f5f2] dark:bg-neutral-900 rounded-3xl p-6 md:p-10 shadow-sm border border-neutral-200 dark:border-neutral-800 min-h-[80vh]">
+    <div className="w-full max-w-6xl mx-auto px-2 md:px-4 pt-4 md:pt-6 animate-in fade-in zoom-in-95 duration-300 min-h-[80vh]">
         
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
@@ -153,8 +152,6 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
               </div>
             </div>
           ))}
-        </div>
-
       </div>
     </div>
   );
