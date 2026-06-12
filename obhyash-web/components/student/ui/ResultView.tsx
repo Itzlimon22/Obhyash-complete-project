@@ -484,48 +484,48 @@ const ResultView: React.FC<ResultViewProps> = ({
           <h3 className="text-xl md:text-2xl font-bold text-neutral-800 dark:text-white">
             উত্তরপত্র পর্যালোচনা
           </h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-4 sm:gap-6">
             <button
               onClick={() => setReviewFilter('all')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-colors border ${
+              className={`flex items-center gap-1.5 text-sm font-bold transition-colors ${
                 reviewFilter === 'all'
-                  ? 'bg-neutral-800 text-white border-neutral-800 dark:bg-white dark:text-neutral-900 dark:border-white'
-                  : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800'
+                  ? 'text-neutral-900 dark:text-white'
+                  : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200'
               }`}
             >
               সব ({questions.length})
             </button>
             <button
               onClick={() => setReviewFilter(reviewFilter === 'correct' ? 'all' : 'correct')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-colors border ${
+              className={`flex items-center gap-1.5 text-sm font-bold transition-colors ${
                 reviewFilter === 'correct'
-                  ? 'bg-emerald-500 text-white border-emerald-500'
-                  : 'bg-white text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:bg-neutral-900 dark:border-emerald-900/50 dark:text-emerald-400 dark:hover:bg-emerald-900/20'
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-neutral-500 hover:text-emerald-600 dark:text-neutral-400 dark:hover:text-emerald-400'
               }`}
             >
-              <div className={`w-2.5 h-2.5 rounded-full ${reviewFilter === 'correct' ? 'bg-white' : 'bg-emerald-500'}`}></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
               সঠিক ({correctCount})
             </button>
             <button
               onClick={() => setReviewFilter(reviewFilter === 'wrong' ? 'all' : 'wrong')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-colors border ${
+              className={`flex items-center gap-1.5 text-sm font-bold transition-colors ${
                 reviewFilter === 'wrong'
-                  ? 'bg-red-500 text-white border-red-500'
-                  : 'bg-white text-red-600 border-red-200 hover:bg-red-50 dark:bg-neutral-900 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20'
+                  ? 'text-red-600 dark:text-red-400'
+                  : 'text-neutral-500 hover:text-red-600 dark:text-neutral-400 dark:hover:text-red-400'
               }`}
             >
-              <div className={`w-2.5 h-2.5 rounded-full ${reviewFilter === 'wrong' ? 'bg-white' : 'bg-red-500'}`}></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
               ভুল ({wrongCount})
             </button>
             <button
               onClick={() => setReviewFilter(reviewFilter === 'skipped' ? 'all' : 'skipped')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-colors border ${
+              className={`flex items-center gap-1.5 text-sm font-bold transition-colors ${
                 reviewFilter === 'skipped'
-                  ? 'bg-neutral-500 text-white border-neutral-500'
-                  : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800'
+                  ? 'text-neutral-800 dark:text-neutral-200'
+                  : 'text-neutral-400 hover:text-neutral-800 dark:text-neutral-500 dark:hover:text-neutral-300'
               }`}
             >
-              <div className={`w-2.5 h-2.5 rounded-full ${reviewFilter === 'skipped' ? 'bg-white' : 'bg-neutral-400'}`}></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-neutral-400"></div>
               স্কিপ ({skippedCount})
             </button>
           </div>
