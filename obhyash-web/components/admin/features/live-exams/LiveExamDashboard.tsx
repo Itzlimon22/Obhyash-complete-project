@@ -1,5 +1,5 @@
-import { usePathname} from 'next/navigation';
 "use client";
+import { usePathname } from 'next/navigation';
 
 import React, { useState, useEffect } from "react";
 import { Plus, Edit2, List, Trash2, Trophy } from "lucide-react";
