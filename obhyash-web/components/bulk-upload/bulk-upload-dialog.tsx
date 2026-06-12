@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import * as XLSX from 'xlsx';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/services/core';
 import {
   Upload,
   X,
@@ -29,10 +29,7 @@ import { QuestionFormDialog } from './question-form-dialog';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
+import { useAuth } from '@/components/auth/AuthProvider';
 
 export default function BulkUploadDialog({
   onClose,
@@ -59,6 +56,7 @@ export default function BulkUploadDialog({
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const downloadErrorLogs = () => {
     const blob = new Blob([JSON.stringify(failedData, null, 2)], {
@@ -313,11 +311,7 @@ export default function BulkUploadDialog({
     setLogs(['🚀 Verifying admin session...']);
 
     try {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-      if (userError || !user) throw new Error('Session expired.');
+      if (!user) throw new Error('Session expired.');
 
       const userId = user.id;
       setLogs((prev) => [...prev, '✅ Session verified. Preparing payload...']);

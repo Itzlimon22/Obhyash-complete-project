@@ -14,8 +14,9 @@ export const submitComplaint = async (
 
   try {
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+    const user = session?.user;
     if (!user) return { success: false, error: 'User not authenticated' };
 
     const { error } = await supabase.from('app_complaints').insert({

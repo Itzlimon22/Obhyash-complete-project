@@ -14,7 +14,7 @@ import {
 import { ExamResult } from '@/lib/types';
 import { getSubjectAnalysis, SubjectAnalysis } from '@/services/database';
 import { printSubjectReport } from '@/services/print-service';
-import { supabase } from '@/services/core';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 interface SubjectReportViewProps {
   subject: string;
@@ -27,6 +27,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
   history,
   onBack,
 }) => {
+  const { user } = useAuth();
   const [timeFilter, setTimeFilter] = useState<'all' | 'month' | 'week'>('all');
 
   // Async Data State (Simulating Supabase Fetch)
@@ -39,9 +40,6 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
     const fetchStats = async () => {
       setLoading(true);
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
         if (user && isMounted) {
           const analysis = await getSubjectAnalysis(
             user.id,
@@ -62,7 +60,7 @@ const SubjectReportView: React.FC<SubjectReportViewProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [subject, timeFilter]);
+  }, [subject, timeFilter, user]);
 
   // Chart Data Preparation
   const pieData = stats

@@ -74,8 +74,9 @@ export const getUserInvoices = async (): Promise<Invoice[]> => {
   }
 
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
 
   if (user) {
     const { data, error } = await supabase
@@ -135,8 +136,9 @@ export const getUserPaymentMethods = async (): Promise<PaymentMethod[]> => {
   }
 
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
 
   if (!user) return [];
 
@@ -202,8 +204,9 @@ export const addPaymentMethod = async (
   }
 
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user;
 
   if (!user) throw new Error('User not authenticated');
 
@@ -242,8 +245,9 @@ export const getUserActiveSubscription =
     }
 
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+    const user = session?.user;
     if (!user) return null;
 
     const { data, error } = await supabase

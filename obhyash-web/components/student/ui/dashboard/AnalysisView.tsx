@@ -11,7 +11,7 @@ import {
 import { ExamResult } from '@/lib/types';
 import SubjectStat from './SubjectStat';
 import { getOverallAnalytics, OverallAnalytics } from '@/services/database';
-import { supabase } from '@/services/core';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 interface AnalysisViewProps {
   history: ExamResult[];
@@ -22,6 +22,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
   history,
   onSubjectClick,
 }) => {
+  const { user } = useAuth();
   const [timeFilter, setTimeFilter] = useState<'all' | 'month' | 'week'>('all');
   const [analytics, setAnalytics] = useState<OverallAnalytics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,10 +35,6 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
     const fetchAnalytics = async () => {
       setIsLoading(true);
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
         if (user && isMounted) {
           // Now calling RPC-based service
           // Note: history prop is no longer needed for calculation,
@@ -58,7 +55,7 @@ const AnalysisView: React.FC<AnalysisViewProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [timeFilter]); // history dependency removed as we fetch fresh from DB
+  }, [timeFilter, user]); // history dependency removed as we fetch fresh from DB
 
   const formatTime = (seconds: number) => {
     const hrs = Math.floor(seconds / 3600);

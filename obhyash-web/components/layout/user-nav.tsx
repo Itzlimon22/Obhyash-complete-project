@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-// ✅ New Import
-import { createBrowserClient } from '@supabase/ssr';
+
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/auth/AuthProvider';
 import {
   LogOut,
   Settings,
@@ -30,37 +29,12 @@ import { UserProfile } from '@/lib/types';
 import UserAvatar from '@/components/student/ui/common/UserAvatar';
 
 export function UserNav() {
-  const [email, setEmail] = useState<string>('');
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const { user, profile: userProfile, signOut } = useAuth();
   const router = useRouter();
-
-  // ✅ New Client Initialization
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const {
-          data: { user: authUser },
-        } = await supabase.auth.getUser();
-        if (authUser) {
-          setEmail(authUser.email || '');
-          const profile = await getUserProfile(authUser.id);
-          setUserProfile(profile);
-        }
-      } catch (error) {
-        console.error('Failed to fetch user profile:', error);
-      }
-    };
-    fetchUser();
-  }, [supabase]);
+  const email = user?.email || '';
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = '/';
+    await signOut();
   };
 
   return (

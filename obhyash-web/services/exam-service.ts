@@ -111,9 +111,8 @@ export const fetchQuestionsWithDiagnostics = async (
   };
 
   try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
 
     // Build filter arrays — null means "no restriction / all"
     const difficulties =
@@ -367,9 +366,8 @@ export const initiateExamSession = async (
   if (!isSupabaseConfigured() || !supabase) return null;
 
   try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
 
     if (!user) return null;
 
@@ -511,9 +509,8 @@ export const saveExamResult = async (result: ExamResult): Promise<void> => {
         result.id,
       );
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
 
     if (isUuid) {
       // Update existing session row (includes retry logic)
@@ -630,8 +627,8 @@ export const getExamHistory = async (knownUserId?: string): Promise<ExamResult[]
     // This was causing the dashboard to appear frozen / keep loading on refresh.
     let resolvedUserId = knownUserId;
     if (!resolvedUserId) {
-      const { data: { user } } = await supabase.auth.getUser();
-      resolvedUserId = user?.id;
+      const { data: { session } } = await supabase.auth.getSession();
+      resolvedUserId = session?.user?.id;
     }
 
     if (!resolvedUserId) {
@@ -736,9 +733,8 @@ export const clearExamHistory = async (): Promise<boolean> => {
   if (!isSupabaseConfigured() || !supabase) return false;
 
   try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
 
     if (!user) return false;
 

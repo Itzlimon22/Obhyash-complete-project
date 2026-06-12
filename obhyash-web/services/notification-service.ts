@@ -19,8 +19,9 @@ export const getNotifications = async (
   if (isSupabaseConfigured() && supabase) {
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user;
 
       if (!user) {
         console.warn('No authenticated user found');
@@ -139,8 +140,9 @@ export const markAllNotificationsAsRead = async (): Promise<boolean> => {
 
       // Get current user
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user) return false;
 
       // Fallback: Direct Update
@@ -176,8 +178,9 @@ export const deleteNotification = async (
   if (isSupabaseConfigured() && supabase) {
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user;
 
       if (!user) {
         console.warn('No authenticated user found');
