@@ -398,7 +398,7 @@ export interface PlanStat {
 export interface NavItem {
   id: string;
   label: string;
-  icon: any;
+  icon: string | React.ElementType;
   path?: string;
   hasSubmenu?: boolean;
   count?: number;
@@ -413,7 +413,7 @@ export interface StatData {
   id: string;
   title: string;
   value: string | number;
-  icon: any;
+  icon: string | React.ElementType;
   trend?: {
     value: number;
     isPositive: boolean;
@@ -426,7 +426,7 @@ export interface DatabaseTool {
   id: string;
   label: string;
   description: string;
-  icon: any;
+  icon: string | React.ElementType;
   action: () => void;
 }
 

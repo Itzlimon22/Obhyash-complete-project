@@ -44,7 +44,7 @@ export const StatCard: React.FC<{ data: StatData }> = ({ data }) => {
         <div
           className={`p-2 md:p-2.5 rounded-lg md:rounded-xl ${data.bgClass} ${data.colorClass} dark:bg-opacity-10 bg-opacity-20 flex items-center justify-center shadow-inner shrink-0`}
         >
-          <data.icon size={18} className="md:w-5 md:h-5" strokeWidth={2.5} />
+          {data.icon && <data.icon size={18} className="md:w-5 md:h-5" strokeWidth={2.5} />}
         </div>
       </div>
 
@@ -125,9 +125,9 @@ const ToolItem: React.FC<{ tool: DatabaseTool }> = ({ tool }) => {
               size={20}
               className="text-emerald-500 md:w-[22px] md:h-[22px]"
             />
-          ) : (
+          ) : tool.icon ? (
             <tool.icon size={20} className="md:w-[22px] md:h-[22px]" />
-          )}
+          ) : null}
         </div>
         <div className="min-w-0">
           <h5 className="text-sm md:text-base font-semibold text-paper-900 dark:text-gray-200 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors truncate">
@@ -158,7 +158,7 @@ export const DatabaseToolsSection: React.FC = () => {
       id: 'seed-hsc',
       label: 'Seed HSC Data',
       description: 'Populate database with default HSC subjects/chapters.',
-      icon: (props: any) => <Database {...props} />,
+      icon: Database,
       action: async () => {
         // ⚠️ LOGIC: Usually strictly restricted to Admins.
         // For now, we simulate a delay. In production, call a Supabase RPC function.
@@ -171,7 +171,7 @@ export const DatabaseToolsSection: React.FC = () => {
       id: 'backup-daily',
       label: 'Manual Backup',
       description: 'Trigger a manual backup snapshot.',
-      icon: (props: any) => <Upload {...props} />,
+      icon: Upload,
       action: async () => {
         // ⚠️ LOGIC: Supabase handles backups automatically.
         // This button could trigger a CSV export or just be a visual placeholder.
