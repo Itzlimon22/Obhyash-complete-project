@@ -100,26 +100,11 @@ const LiveExamView: React.FC = () => {
               <div className="absolute top-0 left-0 w-full h-[45%] bg-white/20 backdrop-blur-[2px] rounded-b-[40px] pointer-events-none border-b border-white/30 z-10"></div>
               
               {/* Faint Background Image */}
-              {card.bgImage && !card.isNursing && (
+              {card.bgImage && (
                 <div 
                   className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[80%] opacity-10 bg-no-repeat bg-contain bg-bottom pointer-events-none"
                   style={{ backgroundImage: `url(${card.bgImage})` }}
                 ></div>
-              )}
-
-              {/* Nursing Custom Background */}
-              {card.isNursing && (
-                <>
-                  <div className="absolute top-[20%] right-[10%] w-16 h-16 bg-white rounded-full flex items-center justify-center p-1 shadow-md z-0 opacity-90">
-                     {/* Replace with actual BD Govt logo if available */}
-                     <div className="w-full h-full rounded-full border-2 border-red-600 flex items-center justify-center bg-green-600">
-                       <div className="w-1/2 h-1/2 rounded-full bg-red-600"></div>
-                     </div>
-                  </div>
-                  <div className="absolute -bottom-8 -right-4 w-48 h-48 border-4 border-white/20 rounded-full flex items-center justify-center pointer-events-none">
-                     <div className="text-white/20 text-xs text-center font-bold absolute transform rotate-45 w-full">নার্সিং কলেজ</div>
-                  </div>
-                </>
               )}
 
               {/* Live Badge */}
@@ -133,7 +118,7 @@ const LiveExamView: React.FC = () => {
               {/* Content Box */}
               <div className="relative z-20 p-6 flex flex-col h-full justify-between">
                 <div>
-                  <h3 className={`font-black text-white ${card.isNursing ? 'text-2xl mt-4 opacity-80' : 'text-3xl md:text-4xl tracking-tight'}`}>
+                  <h3 className="font-black text-white text-3xl md:text-4xl tracking-tight">
                     {card.title}
                   </h3>
                   
