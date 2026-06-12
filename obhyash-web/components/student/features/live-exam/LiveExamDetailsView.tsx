@@ -1,4 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { getStudentLiveExamDetails, getPublicLeaderboard } from "@/services/live-exam-student-service";
+import { LiveExam, LiveExamAttempt } from "@/lib/types";
+import { toast } from "sonner";
+import { Trophy, Clock, Target } from "lucide-react";
+import { LiveExamSession } from "./LiveExamSession";
 
 export interface LiveExamDetailsViewProps {
   examId: string;
@@ -13,33 +19,84 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   status,
   onBack,
 }) => {
-  // Placeholder Data
-  const schedule = {
-    start: { date: "15 Sep 2025", time: "7:00 AM" },
-    end: { date: "10 Sep 2026", time: "7:00 AM" },
+  const { user } = useAuth();
+  const [exam, setExam] = useState<LiveExam | null>(null);
+  const [attempt, setAttempt] = useState<LiveExamAttempt | null>(null);
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isTakingExam, setIsTakingExam] = useState(false);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchDetails();
+    }
+  }, [examId, user?.id]);
+
+  const fetchDetails = async () => {
+    try {
+      setIsLoading(true);
+      const { exam, attempt } = await getStudentLiveExamDetails(examId, user!.id);
+      setExam(exam);
+      setAttempt(attempt);
+
+      if (attempt?.status === "submitted") {
+        const lb = await getPublicLeaderboard(examId, 5);
+        setLeaderboard(lb);
+      }
+    } catch (error) {
+      toast.error("Failed to load exam details");
+    } finally {
+      setIsLoading(false);
+    }
   };
-  const scheduleTaken = {
-    start: { date: "8 Sep 2025", time: "7:00 AM" },
-    end: { date: "3 Sep 2026", time: "7:00 AM" },
-  };
 
-  const currentSchedule = status === "taken" ? scheduleTaken : schedule;
+  if (isLoading) {
+    return <div className="w-full flex justify-center py-20 text-neutral-500 font-medium">Loading details...</div>;
+  }
 
-  const previousAttempts = [
-    { id: 1, attemptText: "প্রচেষ্টা ১", date: "8:08 PM 11 June 2026", score: 0 },
-  ];
+  if (!exam) return null;
 
-  const leaderboard = [
-    { id: 1, name: "Md. Alif Salman", subtitle: "Notre Dame College, Dhaka", avatar: "https://i.pravatar.cc/150?u=1", rank: "#1" },
-    { id: 2, name: "saidul islam", subtitle: "Chattogram University", avatar: "https://i.pravatar.cc/150?u=2", rank: "#2" },
-    { id: 3, name: "Monoar Hossen", subtitle: "", avatar: "https://i.pravatar.cc/150?u=3", rank: "#3", placeholderIcon: "🤖" },
-    { id: 4, name: "Monoar Hossen", subtitle: "", avatar: "https://i.pravatar.cc/150?u=4", rank: "#4", placeholderIcon: "👾" },
-    { id: 5, name: "", subtitle: "", avatar: "https://i.pravatar.cc/150?u=5", rank: "#5", placeholderIcon: "🍁" },
-  ];
+  const now = new Date();
+  const start = new Date(exam.start_time);
+  const end = new Date(exam.end_time);
+
+  let statusText = "Upcoming";
+  let canStart = false;
+
+  if (now >= start && now <= end) {
+    statusText = "Ongoing";
+    canStart = true;
+  } else if (now > end) {
+    statusText = "Past";
+  }
+
+  const isTaken = attempt?.status === "submitted";
+  const displayStatus = isTaken ? "taken" : "untaken";
+
+  if (isTakingExam) {
+    return (
+      <LiveExamSession
+        exam={exam}
+        onExit={() => {
+          setIsTakingExam(false);
+          fetchDetails(); // refresh attempt status
+        }}
+        isDarkMode={typeof document !== "undefined" && document.documentElement.classList.contains("dark")}
+        toggleTheme={() => {
+          if (document.documentElement.classList.contains("dark")) {
+            document.documentElement.classList.remove("dark");
+            localStorage.setItem("theme", "light");
+          } else {
+            document.documentElement.classList.add("dark");
+            localStorage.setItem("theme", "dark");
+          }
+        }}
+      />
+    );
+  }
 
   return (
     <div className="w-full max-w-6xl mx-auto px-2 md:px-4 pt-4 md:pt-6 animate-in fade-in zoom-in-95 duration-300">
-      {/* Remove the dark background wrapper so cards sit directly on the page background */}
       
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
@@ -53,21 +110,21 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
             </svg>
           </button>
           <h2 className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white">
-            {examTitle}
+            {exam.title}
           </h2>
         </div>
 
-        {status === "taken" && (
+        {isTaken && attempt && (
           <div className="bg-[#ebd9d9] dark:bg-red-900/30 text-red-700 dark:text-red-400 px-3 py-1.5 rounded-full flex items-center gap-2 font-bold text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
               <path fillRule="evenodd" d="M12.963 2.286a.75.75 0 00-1.071-.136 9.742 9.742 0 00-3.539 6.177A7.547 7.547 0 016.648 6.61a.75.75 0 00-1.152-.082A9 9 0 1015.68 4.534a7.46 7.46 0 01-2.717-2.248z" clipRule="evenodd" />
             </svg>
-            ৯
+            Score: {attempt.score}
           </div>
         )}
       </div>
 
-      <div className={`grid gap-12 lg:gap-16 ${status === "taken" ? "lg:grid-cols-[1fr_1fr]" : "max-w-2xl mx-auto"}`}>
+      <div className={`grid gap-12 lg:gap-16 ${isTaken ? "lg:grid-cols-[1fr_1fr]" : "max-w-2xl mx-auto"}`}>
         
         {/* Left Column: Shared details */}
         <div className="space-y-6">
@@ -84,18 +141,18 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
             <div className="flex justify-between items-center">
               <div>
                 <div className="font-extrabold text-neutral-900 dark:text-white text-lg">
-                  {currentSchedule.start.date}
+                  {start.toLocaleDateString()}
                 </div>
                 <div className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
-                  {currentSchedule.start.time}
+                  {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
               <div className="text-right">
                 <div className="font-extrabold text-neutral-900 dark:text-white text-lg">
-                  {currentSchedule.end.date}
+                  {end.toLocaleDateString()}
                 </div>
                 <div className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
-                  {currentSchedule.end.time}
+                  {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
             </div>
@@ -108,57 +165,72 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-red-600">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                ১ ঘন্টা
+                {exam.duration_minutes} মিনিট
               </div>
               <div className="w-px h-6 bg-neutral-200 dark:bg-neutral-700"></div>
               <div className="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-green-700">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                 </svg>
-                ১০০ প্রশ্ন
+                {exam.total_questions} প্রশ্ন
               </div>
             </div>
             
-            <div className="bg-[#ebfaef] dark:bg-green-900/30 text-[#2ca05a] dark:text-green-400 px-4 py-2 rounded-xl flex items-center gap-1.5 font-bold">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                <path fillRule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clipRule="evenodd" />
-              </svg>
-              Ongoing
+            <div className={`px-4 py-2 rounded-xl flex items-center gap-1.5 font-bold ${canStart ? "bg-[#ebfaef] dark:bg-green-900/30 text-[#2ca05a] dark:text-green-400" : "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400"}`}>
+              {canStart ? (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                    <path fillRule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clipRule="evenodd" />
+                  </svg>
+                  {statusText}
+                </>
+              ) : (
+                statusText
+              )}
             </div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3">
-            <button className="w-full bg-[#0B6B42] hover:bg-[#095937] text-white py-3.5 rounded-xl font-bold text-lg transition-colors">
-              {status === "untaken" ? "পরীক্ষা শুরু করো" : "পুনরায় পরীক্ষা দাও"}
-            </button>
+            {!isTaken ? (
+              <button 
+                disabled={!canStart}
+                className="w-full bg-[#0B6B42] hover:bg-[#095937] disabled:opacity-50 disabled:hover:bg-[#0B6B42] text-white py-3.5 rounded-xl font-bold text-lg transition-colors"
+                onClick={() => setIsTakingExam(true)}
+              >
+                {canStart ? "পরীক্ষা শুরু করো" : "পরীক্ষা শুরু হয়নি"}
+              </button>
+            ) : (
+              <button className="w-full bg-[#0B6B42] hover:bg-[#095937] text-white py-3.5 rounded-xl font-bold text-lg transition-colors">
+                সমাধান দেখুন
+              </button>
+            )}
+            
             <button className="w-full bg-transparent border-2 border-[#0B6B42] text-[#0B6B42] dark:border-green-600 dark:text-green-500 py-3.5 rounded-xl font-bold text-lg hover:bg-[#0B6B42]/5 dark:hover:bg-green-900/20 transition-colors">
-              {status === "untaken" ? "অন্যান্য পরীক্ষা" : "প্রশ্ন দেখো"}
+              অন্যান্য পরীক্ষা
             </button>
           </div>
 
           {/* Previous Attempts (Taken Only) */}
-          {status === "taken" && (
+          {isTaken && attempt && (
             <div className="mt-8">
               <h3 className="text-xl font-extrabold text-neutral-900 dark:text-white mb-4">
-                পূর্বের প্রচেষ্টাসমূহ
+                আপনার ফলাফল
               </h3>
               <div className="space-y-4">
-                {previousAttempts.map((attempt) => (
-                  <div key={attempt.id} className="bg-white dark:bg-neutral-800 rounded-2xl p-5 shadow-sm border border-neutral-100 dark:border-neutral-700 flex items-center justify-between">
-                    <div>
-                      <div className="font-extrabold text-lg text-neutral-900 dark:text-white">
-                        {attempt.attemptText}
-                      </div>
-                      <div className="text-sm text-neutral-500 dark:text-neutral-400 font-medium mt-1">
-                        {attempt.date}
-                      </div>
+                <div className="bg-white dark:bg-neutral-800 rounded-2xl p-5 shadow-sm border border-neutral-100 dark:border-neutral-700 flex items-center justify-between">
+                  <div>
+                    <div className="font-extrabold text-lg text-neutral-900 dark:text-white">
+                      সর্বশেষ প্রচেষ্টা
                     </div>
-                    <div className="w-10 h-10 bg-neutral-100 dark:bg-neutral-700 rounded-full flex items-center justify-center font-extrabold text-lg text-neutral-700 dark:text-neutral-300">
-                      {attempt.score}
+                    <div className="text-sm text-neutral-500 dark:text-neutral-400 font-medium mt-1">
+                      {new Date(attempt.submit_time || "").toLocaleString()}
                     </div>
                   </div>
-                ))}
+                  <div className="w-10 h-10 bg-neutral-100 dark:bg-neutral-700 rounded-full flex items-center justify-center font-extrabold text-lg text-neutral-700 dark:text-neutral-300">
+                    {attempt.score}
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -166,53 +238,50 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
         </div>
 
         {/* Right Column: Leaderboard (Taken Only) */}
-        {status === "taken" && (
+        {isTaken && (
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-extrabold text-neutral-900 dark:text-white">
                 লিডারবোর্ড
               </h3>
               <button className="w-10 h-10 bg-[#0B6B42] hover:bg-[#095937] text-white rounded-full flex items-center justify-center transition-colors shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
+                <Trophy size={20} />
               </button>
             </div>
 
             <div className="space-y-3">
-              {leaderboard.map((user) => (
-                <div key={user.id} className="bg-white dark:bg-neutral-800 rounded-2xl p-3 sm:p-4 shadow-sm border border-neutral-100 dark:border-neutral-700 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    {/* Avatar */}
-                    {user.avatar ? (
-                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-neutral-200 dark:bg-neutral-700 shrink-0">
-                        <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+              {leaderboard.length === 0 ? (
+                <div className="p-4 text-center text-neutral-500">No leaderboard data yet.</div>
+              ) : (
+                leaderboard.map((lbEntry, index) => (
+                  <div key={lbEntry.id} className="bg-white dark:bg-neutral-800 rounded-2xl p-3 sm:p-4 shadow-sm border border-neutral-100 dark:border-neutral-700 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      {/* Avatar */}
+                      <div 
+                        className="w-14 h-14 rounded-xl flex items-center justify-center text-white font-bold text-xl shrink-0"
+                        style={{ backgroundColor: lbEntry.users?.avatarColor || '#10b981' }}
+                      >
+                        {lbEntry.users?.name?.charAt(0)?.toUpperCase() || 'U'}
                       </div>
-                    ) : (
-                      <div className="w-14 h-14 rounded-xl bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center text-2xl shrink-0">
-                        {user.placeholderIcon}
-                      </div>
-                    )}
-                    
-                    {/* Details */}
-                    <div>
-                      <div className="font-extrabold text-neutral-900 dark:text-white text-base sm:text-lg">
-                        {user.name || "Unknown"}
-                      </div>
-                      {user.subtitle && (
-                        <div className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
-                          {user.subtitle}
+                      
+                      {/* Details */}
+                      <div>
+                        <div className="font-extrabold text-neutral-900 dark:text-white text-base sm:text-lg">
+                          {lbEntry.users?.name || "Unknown"}
                         </div>
-                      )}
+                        <div className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
+                          Score: {lbEntry.score}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Rank */}
+                    <div className={`font-black text-xl pl-4 ${index === 0 ? "text-yellow-500" : index === 1 ? "text-gray-400" : index === 2 ? "text-orange-500" : "text-neutral-400"}`}>
+                      #{index + 1}
                     </div>
                   </div>
-                  
-                  {/* Rank */}
-                  <div className="font-black text-neutral-800 dark:text-neutral-200 text-xl pl-4">
-                    {user.rank}
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         )}

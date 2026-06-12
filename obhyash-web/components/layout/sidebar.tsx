@@ -21,6 +21,7 @@ import {
   Bell,
   AlertTriangle,
   MessageSquare,
+  Radio,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -75,6 +76,12 @@ const SIDEBAR_NAVIGATION: { title?: string; items: NavItem[] }[] = [
         label: 'প্রশ্ন ব্যাংক',
         icon: FileQuestion,
         href: '/admin/question-management',
+      },
+      {
+        id: 'live-exams',
+        label: 'লাইভ পরীক্ষা',
+        icon: Radio,
+        href: '/admin/live-exams',
       },
       {
         id: 'subscriptions',

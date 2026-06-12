@@ -1,5 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LiveExamDetailsView from "./LiveExamDetailsView";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { getPublishedLiveExams } from "@/services/live-exam-student-service";
+import { LiveExam } from "@/lib/types";
+import { toast } from "sonner";
 
 export interface LiveExamCategoryViewProps {
   categoryTitle: string;
@@ -12,25 +16,49 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
   onBack,
   onExamClick,
 }) => {
+  const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState<"All" | "Ongoing" | "Upcoming">("All");
   const [selectedExam, setSelectedExam] = useState<{ id: string; title: string; status: "untaken" | "taken" } | null>(null);
+  const [exams, setExams] = useState<(LiveExam & { userAttemptStatus?: string })[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Hardcoded placeholder data precisely matching the design
-  const exams = [
-    { id: "1", title: "Medical weekly test - 1", time: "১ ঘন্টা", questions: "১০০ টি প্রশ্ন", statusText: "Ongoing", daysLeft: "82", taken: false },
-    { id: "2", title: "Medical weekly test - 2", time: "১ ঘন্টা", questions: "১০০ টি প্রশ্ন", statusText: "Ongoing", daysLeft: "89", taken: false },
-    { id: "3", title: "Medical weekly test - 3", time: "১ ঘন্টা", questions: "১০০ টি প্রশ্ন", statusText: "Ongoing", daysLeft: "96", taken: true },
-    { id: "4", title: "Medical weekly test - 4", time: "১ ঘন্টা", questions: "১০০ টি প্রশ্ন", statusText: "Ongoing", daysLeft: "103", taken: false },
-    { id: "5", title: "Medical Monthly exam test-01", time: "১ ঘন্টা", questions: "১০০ টি প্রশ্ন", statusText: "Ongoing", daysLeft: "110", taken: true },
-    { id: "6", title: "Medical weekly test - 5", time: "১ ঘন্টা", questions: "১০০ টি প্রশ্ন", statusText: "Ongoing", daysLeft: "110", taken: false },
-    { id: "7", title: "Medical weekly test - 6", time: "১ ঘন্টা", questions: "১০০ টি প্রশ্ন", statusText: "Ongoing", daysLeft: "117", taken: false },
-    { id: "8", title: "Medical weekly test - 7", time: "১ ঘন্টা", questions: "১০০ টি প্রশ্ন", statusText: "Ongoing", daysLeft: "124", taken: false },
-    { id: "9", title: "Medical weekly test - 8", time: "১ ঘন্টা", questions: "১০০ টি প্রশ্ন", statusText: "Ongoing", daysLeft: "131", taken: false },
-    { id: "10", title: "Monthly Test exam-02", time: "১ ঘন্টা", questions: "১০০ টি প্রশ্ন", statusText: "Ongoing", daysLeft: "152", taken: false },
-    { id: "11", title: "Medical weekly test - 9", time: "১ ঘন্টা", questions: "৬০ টি প্রশ্ন", statusText: "Ongoing", daysLeft: "138", taken: false },
-    { id: "12", title: "Medical weekly test - 10", time: "১ ঘন্টা", questions: "১০০ টি প্রশ্ন", statusText: "Ongoing", daysLeft: "145", taken: false },
-    { id: "13", title: "Medical monthly Test exam-03", time: "১ ঘন্টা", questions: "১০০ টি প্রশ্ন", statusText: "Ongoing", daysLeft: "152", taken: false },
-  ];
+  useEffect(() => {
+    if (user?.id) {
+      fetchExams();
+    }
+  }, [categoryTitle, user?.id]);
+
+  const fetchExams = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getPublishedLiveExams(categoryTitle, user?.id);
+      setExams(data);
+    } catch (error) {
+      toast.error("Failed to load live exams");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filteredExams = exams.filter(exam => {
+    // Search filter
+    if (searchQuery && !exam.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+
+    const now = new Date();
+    const start = new Date(exam.start_time);
+    const end = new Date(exam.end_time);
+
+    const isOngoing = now >= start && now <= end;
+    const isUpcoming = now < start;
+
+    if (activeFilter === "Ongoing" && !isOngoing) return false;
+    if (activeFilter === "Upcoming" && !isUpcoming) return false;
+
+    return true;
+  });
 
   if (selectedExam) {
     return (
@@ -38,7 +66,10 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
         examId={selectedExam.id}
         examTitle={selectedExam.title}
         status={selectedExam.status}
-        onBack={() => setSelectedExam(null)}
+        onBack={() => {
+          setSelectedExam(null);
+          fetchExams(); // Refresh to catch any attempt status changes
+        }}
       />
     );
   }
@@ -112,46 +143,77 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
 
         {/* Exams Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {exams.map((exam) => (
-            <div 
-              key={exam.id}
-              onClick={() => setSelectedExam({ id: exam.id, title: exam.title, status: exam.taken ? "taken" : "untaken" })}
-              className="bg-white dark:bg-neutral-800 rounded-2xl p-5 shadow-sm border border-neutral-100 dark:border-neutral-700 hover:shadow-md hover:border-neutral-200 dark:hover:border-neutral-600 transition-all cursor-pointer flex flex-col justify-between"
-            >
-              <div>
-                <h3 className="font-bold text-lg text-neutral-900 dark:text-white mb-3">
-                  {exam.title}
-                </h3>
-                
-                <div className="flex items-center gap-4 text-sm text-neutral-500 dark:text-neutral-400 mb-5 font-medium">
-                  <div className="flex items-center gap-1.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {exam.time}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                    </svg>
-                    {exam.questions}
-                  </div>
-                </div>
-              </div>
+          {isLoading ? (
+            <div className="col-span-full py-12 text-center text-neutral-500 font-medium">Loading exams...</div>
+          ) : filteredExams.length === 0 ? (
+            <div className="col-span-full py-12 text-center text-neutral-500 font-medium">No live exams found for this category.</div>
+          ) : (
+            filteredExams.map((exam) => {
+              const isTaken = exam.userAttemptStatus === "submitted";
+              const now = new Date();
+              const start = new Date(exam.start_time);
+              const end = new Date(exam.end_time);
+              let statusText = "Upcoming";
+              let statusColor = "text-blue-600 dark:text-blue-400";
+              let statusBg = "bg-blue-50 dark:bg-blue-900/20";
 
-              <div className="bg-[#ebfaef] dark:bg-green-900/20 rounded-xl p-3 flex items-center justify-between mt-auto">
-                <div className="flex items-center gap-1.5 text-[#2ca05a] dark:text-green-400 font-bold text-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                    <path fillRule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clipRule="evenodd" />
-                  </svg>
-                  {exam.statusText}
+              if (now >= start && now <= end) {
+                statusText = "Ongoing";
+                statusColor = "text-[#2ca05a] dark:text-green-400";
+                statusBg = "bg-[#ebfaef] dark:bg-green-900/20";
+              } else if (now > end) {
+                statusText = "Past";
+                statusColor = "text-neutral-500 dark:text-neutral-400";
+                statusBg = "bg-neutral-100 dark:bg-neutral-800";
+              }
+
+              // Calculate days left or since
+              const msDiff = Math.abs(now.getTime() - start.getTime());
+              const daysDiff = Math.ceil(msDiff / (1000 * 60 * 60 * 24));
+              const timeDisplay = now > start ? `${daysDiff} দিন আগে` : `বাকি - ${daysDiff} দিন`;
+
+              return (
+                <div 
+                  key={exam.id}
+                  onClick={() => setSelectedExam({ id: exam.id, title: exam.title, status: isTaken ? "taken" : "untaken" })}
+                  className="bg-white dark:bg-neutral-800 rounded-2xl p-5 shadow-sm border border-neutral-100 dark:border-neutral-700 hover:shadow-md hover:border-neutral-200 dark:hover:border-neutral-600 transition-all cursor-pointer flex flex-col justify-between"
+                >
+                  <div>
+                    <h3 className="font-bold text-lg text-neutral-900 dark:text-white mb-3">
+                      {exam.title}
+                    </h3>
+                    
+                    <div className="flex items-center gap-4 text-sm text-neutral-500 dark:text-neutral-400 mb-5 font-medium">
+                      <div className="flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {exam.duration_minutes} মিনিট
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                        </svg>
+                        {exam.total_questions} টি প্রশ্ন
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={`${statusBg} rounded-xl p-3 flex items-center justify-between mt-auto`}>
+                    <div className={`flex items-center gap-1.5 ${statusColor} font-bold text-sm`}>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                        <path fillRule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clipRule="evenodd" />
+                      </svg>
+                      {isTaken ? "Taken" : statusText}
+                    </div>
+                    <div className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                      {timeDisplay}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
-                  সময় বাকি - {exam.daysLeft} দিন
-                </div>
-              </div>
-            </div>
-          ))}
+              );
+            })
+          )}
       </div>
     </div>
   );

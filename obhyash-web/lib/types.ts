@@ -182,6 +182,48 @@ export interface ExamResult {
   scriptImageData?: string;
 }
 
+// ==========================================
+// 3.1 LIVE EXAMS
+// ==========================================
+
+export interface LiveExam {
+  id: string;
+  category: string;
+  title: string;
+  description?: string;
+  start_time: string;
+  end_time: string;
+  duration_minutes: number;
+  total_marks: number;
+  total_questions?: number; // Fetched from relation count
+  negative_marking: number;
+  status: "draft" | "published" | "archived";
+  created_at: string;
+  updated_at: string;
+  created_by?: string;
+}
+
+export interface LiveExamAttempt {
+  id: string;
+  live_exam_id: string;
+  user_id: string;
+  start_time: string;
+  submit_time?: string;
+  score?: number;
+  correct_count?: number;
+  wrong_count?: number;
+  user_answers?: UserAnswers;
+  status: "ongoing" | "submitted";
+  created_at: string;
+  // Joined fields for leaderboard
+  user?: {
+    name: string;
+    avatarUrl?: string;
+    avatarColor?: string;
+    institute?: string;
+  };
+}
+
 export enum Difficulty {
   Easy = "Easy",
   Medium = "Medium",
