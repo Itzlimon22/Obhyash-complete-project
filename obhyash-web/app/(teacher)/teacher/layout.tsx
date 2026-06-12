@@ -14,11 +14,6 @@ export default function TeacherLayout({
 }) {
   const { user, profile, loading, signOut } = useAuth();
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Multi-device session monitor - keeps the Supabase Realtime connection warm
   useSessionMonitor({
@@ -28,10 +23,9 @@ export default function TeacherLayout({
 
   // Redirect if definitely not a teacher once loading is done
   useEffect(() => {
-    if (mounted && !loading && !user) {
+    if (!loading && !user) {
       router.replace("/login");
     } else if (
-      mounted &&
       !loading &&
       user &&
       profile &&
@@ -45,17 +39,14 @@ export default function TeacherLayout({
         // router.replace('/admin/dashboard');
       }
     }
-  }, [mounted, loading, user, profile, router]);
+  }, [loading, user, profile, router]);
 
   // Loading state for initial session hydration
-  if (loading || !mounted) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-50 dark:bg-black flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
-          <p className="text-sm font-bold text-neutral-500 animate-pulse">
-            রিসেট হচ্ছে সেশন (Restoring Session)...
-          </p>
+          <Loader2 className="w-8 h-8 animate-spin text-emerald-500 mx-auto" />
         </div>
       </div>
     );
