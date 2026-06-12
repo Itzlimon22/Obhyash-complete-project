@@ -42,7 +42,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
       setExam(examData);
       setExamQuestions(questionsData);
     } catch (error) {
-      toast.error("Failed to load exam data");
+      toast.error("Failed to load exam data: " + String(error)); console.error("Load Exam Error:", error);
     } finally {
       setIsLoading(false);
     }

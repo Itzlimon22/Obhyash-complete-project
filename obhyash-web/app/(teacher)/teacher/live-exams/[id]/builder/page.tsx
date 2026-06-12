@@ -2,10 +2,11 @@ import { Metadata } from 'next';
 import LiveExamBuilder from '@/components/admin/features/live-exams/LiveExamBuilder';
 
 export const metadata: Metadata = {
-  title: 'Live Exam Builder | Admin',
+  title: 'Live Exam Builder | Teacher',
   description: 'Add and organize questions for a live exam.',
 };
 
-export default function LiveExamBuilderPage({ params }: { params: { id: string } }) {
-  return <LiveExamBuilder examId={params.id} />;
+export default async function LiveExamBuilderPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  return <LiveExamBuilder examId={resolvedParams.id} />;
 }

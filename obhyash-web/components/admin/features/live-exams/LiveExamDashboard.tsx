@@ -27,7 +27,7 @@ export default function LiveExamDashboard() {
       const data = await getLiveExams();
       setExams(data);
     } catch (error) {
-      toast.error("Failed to fetch live exams");
+      toast.error("Failed to fetch live exams: " + String(error));
     } finally {
       setIsLoading(false);
     }

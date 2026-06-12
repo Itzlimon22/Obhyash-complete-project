@@ -2,10 +2,11 @@ import { Metadata } from 'next';
 import LiveExamResults from '@/components/admin/features/live-exams/LiveExamResults';
 
 export const metadata: Metadata = {
-  title: 'Live Exam Leaderboard | Admin',
-  description: 'View leaderboard and results for a live exam.',
+  title: 'Live Exam Results | Admin',
+  description: 'View leaderboard and attempts for a live exam.',
 };
 
-export default function LiveExamResultsPage({ params }: { params: { id: string } }) {
-  return <LiveExamResults examId={params.id} />;
+export default async function LiveExamResultsPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  return <LiveExamResults examId={resolvedParams.id} />;
 }
