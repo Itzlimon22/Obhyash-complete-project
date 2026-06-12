@@ -7,17 +7,23 @@ import AdminMobileBottomNav from '@/components/admin/layout/AdminMobileBottomNav
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
+import { useSessionMonitor } from '@/hooks/use-session-monitor';
 
 export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, signOut } = useAuth();
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [showTimeoutError, setShowTimeoutError] = useState(false);
+
+  useSessionMonitor({
+    userId: profile?.id || user?.id,
+    onForcedSignOut: signOut,
+  });
 
   useEffect(() => {
     const handleResize = () => {
