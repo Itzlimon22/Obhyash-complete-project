@@ -172,7 +172,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                     </button>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium line-clamp-2" dangerouslySetInnerHTML={{ __html: eq.question.question_text }}></p>
+                    <p className="text-sm font-medium line-clamp-2" dangerouslySetInnerHTML={{ __html: eq.question.question }}></p>
                     <div className="flex items-center gap-2 mt-2 text-xs text-neutral-500">
                       <span className="px-2 py-0.5 bg-neutral-200 dark:bg-neutral-800 rounded-md">{eq.question.subject}</span>
                       <span>{eq.question.difficulty}</span>
@@ -229,7 +229,7 @@ export default function LiveExamBuilder({ examId }: { examId: string }) {
                 const isAdded = examQuestions.some(eq => eq.question.id === q.id);
                 return (
                   <div key={q.id} className="p-3 bg-neutral-50 dark:bg-neutral-800/30 border border-neutral-200 dark:border-neutral-800 rounded-xl">
-                    <p className="text-sm font-medium line-clamp-3 mb-2" dangerouslySetInnerHTML={{ __html: q.question_text }}></p>
+                    <p className="text-sm font-medium line-clamp-3 mb-2" dangerouslySetInnerHTML={{ __html: q.question }}></p>
                     <div className="flex items-center justify-between mt-3">
                       <span className="text-xs text-neutral-500 bg-neutral-200 dark:bg-neutral-800 px-2 py-1 rounded-md">{q.subject}</span>
                       <button 

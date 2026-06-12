@@ -117,7 +117,7 @@ export const useLiveExamEngine = () => {
 
         const stats = calculateExamStats(questions, userAnswers, examDetailsRef.current?.negativeMarking || 0);
 
-        await submitLiveExam(attemptId, userId, userAnswers, stats.correctCount, stats.wrongCount, stats.finalScore);
+        await submitLiveExam(attemptId, userAnswers, stats.correctCount, stats.wrongCount, stats.finalScore);
 
         setAppState(AppState.COMPLETED);
         toast.success("পরীক্ষা সফলভাবে জমা হয়েছে!");

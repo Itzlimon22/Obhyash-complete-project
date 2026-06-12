@@ -179,7 +179,6 @@ const LiveExamView: React.FC = () => {
 
             </div>
           ))}
-        </div>
       </div>
     </div>
   );

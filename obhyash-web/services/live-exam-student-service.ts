@@ -142,8 +142,8 @@ export async function startLiveExam(
 
   if (questionsError) throw questionsError;
 
-  const questions = questionsData.map((q: { points: number; questions: Question }) => ({
-    ...q.questions,
+  const questions = questionsData.map((q: any) => ({
+    ...(Array.isArray(q.questions) ? q.questions[0] : q.questions),
     points: q.points,
   }));
 

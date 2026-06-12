@@ -58,9 +58,22 @@ export const LiveExamSession: React.FC<LiveExamSessionProps> = ({
   if (engine.appState === AppState.INSTRUCTIONS) {
     return (
       <ExamInstructionsView
-        onStart={() => engine.beginTimer()}
+        config={{
+          subject: exam.category,
+          subjectLabel: exam.title,
+          examType: "Live Exam",
+          chapters: "All",
+          topics: "All",
+          difficulty: "Mixed",
+          questionCount: exam.total_questions || 0,
+          durationMinutes: exam.duration_minutes || 0,
+          negativeMarking: exam.negative_marking || 0,
+        }}
+        onStart={async () => {
+          engine.beginTimer();
+          return true;
+        }}
         onBack={onExit}
-        isLiveExam={true}
       />
     );
   }
