@@ -33,7 +33,46 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
     try {
       setIsLoading(true);
       const data = await getPublishedLiveExams(categoryTitle, user?.id);
-      setExams(data);
+      
+      // Inject mock data for every category
+      const mockExams: (LiveExam & { userAttemptStatus?: string })[] = [
+        {
+          id: `mock-untaken-${categoryTitle}`,
+          category: categoryTitle,
+          title: `[Mock] ${categoryTitle} - Untaken`,
+          description: "This is a mock untaken exam for testing.",
+          start_time: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // started yesterday
+          end_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(), // ends in 7 days
+          duration_minutes: 45,
+          total_marks: 50,
+          negative_marking: 0.25,
+          status: "published",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          created_by: "system",
+          total_questions: 50,
+          userAttemptStatus: undefined, // untaken
+        },
+        {
+          id: `mock-taken-${categoryTitle}`,
+          category: categoryTitle,
+          title: `[Mock] ${categoryTitle} - Taken`,
+          description: "This is a mock taken exam for testing.",
+          start_time: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // started 2 days ago
+          end_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(), // ends in 7 days
+          duration_minutes: 60,
+          total_marks: 100,
+          negative_marking: 0.25,
+          status: "published",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          created_by: "system",
+          total_questions: 100,
+          userAttemptStatus: "submitted", // taken
+        }
+      ];
+      
+      setExams([...data, ...mockExams]);
     } catch (error) {
       toast.error("Failed to load live exams");
     } finally {

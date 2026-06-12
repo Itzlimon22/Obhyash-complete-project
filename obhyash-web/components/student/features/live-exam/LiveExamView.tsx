@@ -61,31 +61,7 @@ const LiveExamView: React.FC = () => {
       bgImage: "https://cdn-icons-png.flaticon.com/512/2941/2941490.png",
       categoryTitle: "Varsity A weekly - 2025",
     },
-    {
-      id: "varsity_b",
-      title: "ভার্সিটি",
-      subtitle: "খ ইউনিট\nঅ্যাডমিশন টেস্ট",
-      footerIcon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-        </svg>
-      ),
-      footerText: "উইকলি",
-      gradient: "bg-gradient-to-br from-lime-500 to-green-700",
-      bgImage: "https://cdn-icons-png.flaticon.com/512/2941/2941490.png",
-      categoryTitle: "Varsity B weekly - 2025",
-    },
-    {
-      id: "nursing",
-      title: "NURSING",
-      subtitle: "",
-      footerIcon: null,
-      footerText: "",
-      gradient: "bg-gradient-to-br from-purple-400 to-fuchsia-500",
-      bgImage: "", // Has custom center logo in design
-      isNursing: true,
-      categoryTitle: "Nursing - 2025",
-    },
+
   ];
 
   if (selectedCategory) {
