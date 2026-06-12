@@ -616,6 +616,13 @@ export default function StudentRoot({
         setNavWarning({ isOpen: true, targetTab: null, action: 'tab' });
         return;
       }
+      
+      // If we're on the results page (completed state) and the user navigates back, exit the results view
+      if (appState === AppState.COMPLETED) {
+        setAppState(AppState.IDLE);
+        setIsReviewingHistory(false);
+      }
+
       const tab = e.state?.tab || window.location.pathname.replace(/^\//, '') || 'dashboard';
       const resolved = validTabs.includes(tab) ? tab : 'dashboard';
       setActiveTab(resolved);
@@ -1100,6 +1107,12 @@ export default function StudentRoot({
             onRestart={() => {
               setAppState(AppState.IDLE);
               setIsReviewingHistory(false);
+              // Ensure the URL matches the active tab when returning
+              window.history.pushState(
+                { tab: isReviewingHistory ? "history" : activeTab },
+                "",
+                "/" + (isReviewingHistory ? "history" : activeTab)
+              );
             }}
             isDarkMode={theme === "dark"}
             onToggleTheme={toggleTheme}
