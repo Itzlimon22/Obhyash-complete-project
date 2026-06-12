@@ -53,6 +53,7 @@ import AboutUsView from "@/components/student/ui/profile/AboutUsView";
 
 // Exam Features
 import { ExamSetupContainer } from "@/components/student/features/exam/setup/ExamSetupContainer";
+import LiveExamView from "@/components/student/features/live-exam/LiveExamView";
 // import InstructionsView from '@/components/student/ui/InstructionsView'; // Deprecated in new flow
 import { ExamInstructionsView } from "@/components/student/features/exam/ExamInstructionsView";
 import ExamRunner from "@/components/student/features/exam/ExamRunner";
@@ -194,6 +195,7 @@ export default function StudentRoot({
   const validTabs = [
     "dashboard",
     "setup",
+    "live_exam",
     "history",
     "practice",
     "leaderboard",
@@ -747,6 +749,18 @@ export default function StudentRoot({
            setTimeout(() => handleTabChange("setup"), 0);
         }
         return <InitialLoader />;
+      }
+
+      if (activeTab === "live_exam") {
+        return (
+          <AppLayout
+            activeTab={activeTab}
+            {...commonLayoutProps}
+            title="লাইভ পরীক্ষা"
+          >
+            <LiveExamView />
+          </AppLayout>
+        );
       }
 
       if (activeTab === "history") {
