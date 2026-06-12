@@ -1,4 +1,4 @@
-﻿-- =============================================================================
+-- =============================================================================
 -- Admin Panel Scaling: Questions + Users
 -- Run this on your Supabase SQL editor.
 -- =============================================================================
@@ -93,7 +93,7 @@ DECLARE
 BEGIN
   SELECT
     COUNT(*) FILTER (WHERE status = 'Approved'),
-    COUNT(*) FILTER (WHERE status = 'Pending'),
+    COUNT(*) FILTER (WHERE status = 'Pending' OR status IS NULL),
     COUNT(*) FILTER (WHERE status = 'Rejected')
   INTO v_approved, v_pending, v_rejected
   FROM public.questions

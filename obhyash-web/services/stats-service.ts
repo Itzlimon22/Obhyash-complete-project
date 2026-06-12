@@ -605,10 +605,10 @@ export const getTeacherStats = async (
       const stats = {
         totalQuestions: data?.length || 0,
         approved:
-          data?.filter((q: { status: string }) => q.status === 'Approved')
+          data?.filter((q: { status: string | null }) => q.status === 'Approved')
             .length || 0,
         pending:
-          data?.filter((q: { status: string }) => q.status === 'Pending')
+          data?.filter((q: { status: string | null }) => q.status === 'Pending' || !q.status)
             .length || 0,
         rejected:
           data?.filter((q: { status: string }) => q.status === 'Rejected')

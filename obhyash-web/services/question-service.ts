@@ -76,7 +76,11 @@ export const getQuestionsPage = async (
         query = query.eq('difficulty', filters.difficulty);
       }
       if (filters.status) {
-        query = query.eq('status', filters.status);
+        if (filters.status === 'Pending') {
+          query = query.or('status.eq.Pending,status.is.null');
+        } else {
+          query = query.eq('status', filters.status);
+        }
       }
       if (filters.author) {
         query = query.eq('author', filters.author);
@@ -200,7 +204,13 @@ export const getQuestionCount = async (
       if (filters.topic) query = query.eq('topic', filters.topic);
       if (filters.difficulty)
         query = query.ilike('difficulty', `%${filters.difficulty}%`);
-      if (filters.status) query = query.eq('status', filters.status);
+      if (filters.status) {
+        if (filters.status === 'Pending') {
+          query = query.or('status.eq.Pending,status.is.null');
+        } else {
+          query = query.eq('status', filters.status);
+        }
+      }
       if (filters.author) query = query.eq('author', filters.author);
       if (filters.search) {
         const searchTerm = filters.search.trim();
