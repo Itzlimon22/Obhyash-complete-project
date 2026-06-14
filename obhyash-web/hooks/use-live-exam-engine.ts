@@ -69,7 +69,13 @@ export const useLiveExamEngine = () => {
 
       setUserAnswers({});
       setFlaggedQuestions(new Set());
-      setAppState(AppState.INSTRUCTIONS);
+      
+      const duration = exam.duration_minutes * 60;
+      if (duration > 0) {
+        targetEndTimeRef.current = Date.now() + duration * 1000;
+        setTimeLeft(duration);
+      }
+      setAppState(AppState.ACTIVE);
       return true;
     } catch (e: unknown) {
       console.error(e);

@@ -194,40 +194,57 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
             negativeMarking={examDetails.negativeMarking || 0.25}
           />
 
-          <div className="space-y-6">
-            {questions.map((q, idx) => {
-              const questionId = q.id;
-              return (
-                <QuestionCard
-                  key={q.id}
-                  question={q}
-                  serialNumber={idx + 1}
-                  selectedOptionIndex={userAnswers[q.id]}
-                  isFlagged={flaggedQuestions.has(questionId)}
-                  onSelectOption={(optIdx) =>
-                    setUserAnswers((prev) => ({ ...prev, [q.id]: optIdx }))
-                  }
-                  onToggleFlag={() => {
-                    // Toggles the EXAM FLAG (mark for review) -- separate from bookmarks
-                    setFlaggedQuestions((prev) => {
-                      const next = new Set(prev);
-                      if (next.has(questionId)) next.delete(questionId);
-                      else next.add(questionId);
-                      return next;
-                    });
-                  }}
-                  isBookmarked={bookmarkedIds.has(String(questionId))}
-                  onToggleBookmark={() => onToggleBookmark(questionId)}
-                  onReport={() =>
-                    setReportModalState({
-                      isOpen: true,
-                      questionId: q.id,
-                    })
-                  }
-                  hideMetadata={true}
-                />
-              );
-            })}
+          <div className="space-y-8">
+            {Object.entries(
+              questions.reduce((acc, q, idx) => {
+                const subject = q.subject || "General";
+                if (!acc[subject]) acc[subject] = [];
+                acc[subject].push({ q, idx });
+                return acc;
+              }, {} as Record<string, { q: Question; idx: number }[]>)
+            ).map(([subject, subjectQuestions]) => (
+              <div key={subject} className="bg-white dark:bg-neutral-900 rounded-3xl p-4 sm:p-6 shadow-sm border border-neutral-100 dark:border-neutral-800">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-neutral-100 dark:border-neutral-800">
+                  <div className="w-2 h-8 bg-blue-600 rounded-full"></div>
+                  <h3 className="text-2xl font-black text-neutral-900 dark:text-white uppercase tracking-wider">{subject}</h3>
+                </div>
+                <div className="space-y-6">
+                  {subjectQuestions.map(({ q, idx }) => {
+                    const questionId = q.id;
+                    return (
+                      <QuestionCard
+                        key={q.id}
+                        question={q}
+                        serialNumber={idx + 1}
+                        selectedOptionIndex={userAnswers[q.id]}
+                        isFlagged={flaggedQuestions.has(questionId)}
+                        onSelectOption={(optIdx) =>
+                          setUserAnswers((prev) => ({ ...prev, [q.id]: optIdx }))
+                        }
+                        onToggleFlag={() => {
+                          // Toggles the EXAM FLAG (mark for review) -- separate from bookmarks
+                          setFlaggedQuestions((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(questionId)) next.delete(questionId);
+                            else next.add(questionId);
+                            return next;
+                          });
+                        }}
+                        isBookmarked={bookmarkedIds.has(String(questionId))}
+                        onToggleBookmark={() => onToggleBookmark(questionId)}
+                        onReport={() =>
+                          setReportModalState({
+                            isOpen: true,
+                            questionId: q.id,
+                          })
+                        }
+                        hideMetadata={true}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
