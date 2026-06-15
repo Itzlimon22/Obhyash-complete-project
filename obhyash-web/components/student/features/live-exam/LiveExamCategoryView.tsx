@@ -5,14 +5,18 @@ import { getPublishedLiveExams } from "@/services/live-exam-student-service";
 import { LiveExam } from "@/lib/types";
 import { toast } from "sonner";
 
+import AppLayout from "@/components/student/ui/layout/AppLayout";
+
 export interface LiveExamCategoryViewProps {
   categoryTitle: string;
+  commonLayoutProps: any;
   onBack: () => void;
   onExamClick: (examId: string, status: "untaken" | "taken") => void;
 }
 
 const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
   categoryTitle,
+  commonLayoutProps,
   onBack,
   onExamClick,
 }) => {
@@ -105,6 +109,7 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
         examId={selectedExam.id}
         examTitle={selectedExam.title}
         status={selectedExam.status}
+        commonLayoutProps={commonLayoutProps}
         onBack={() => {
           setSelectedExam(null);
           fetchExams(); // Refresh to catch any attempt status changes
@@ -114,6 +119,11 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
   }
 
   return (
+    <AppLayout
+      activeTab="live_exam"
+      {...commonLayoutProps}
+      title="লাইভ পরীক্ষা"
+    >
     <div className="w-full max-w-6xl mx-auto px-2 md:px-4 pt-4 md:pt-6 animate-in fade-in zoom-in-95 duration-300 min-h-[80vh]">
         
         {/* Header */}
@@ -255,6 +265,7 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
           )}
       </div>
     </div>
+    </AppLayout>
   );
 };
 

@@ -6,10 +6,13 @@ import { toast } from "sonner";
 import { Trophy, Clock, Target } from "lucide-react";
 import { LiveExamSession } from "./LiveExamSession";
 
+import AppLayout from "@/components/student/ui/layout/AppLayout";
+
 export interface LiveExamDetailsViewProps {
   examId: string;
   examTitle: string;
   status: "untaken" | "taken";
+  commonLayoutProps: any;
   onBack: () => void;
 }
 
@@ -17,6 +20,7 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   examId,
   examTitle,
   status,
+  commonLayoutProps,
   onBack,
 }) => {
   const { user } = useAuth();
@@ -81,21 +85,18 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
           setIsTakingExam(false);
           fetchDetails(); // refresh attempt status
         }}
-        isDarkMode={typeof document !== "undefined" && document.documentElement.classList.contains("dark")}
-        toggleTheme={() => {
-          if (document.documentElement.classList.contains("dark")) {
-            document.documentElement.classList.remove("dark");
-            localStorage.setItem("theme", "light");
-          } else {
-            document.documentElement.classList.add("dark");
-            localStorage.setItem("theme", "dark");
-          }
-        }}
+        isDarkMode={commonLayoutProps.isDarkMode}
+        toggleTheme={commonLayoutProps.toggleTheme}
       />
     );
   }
 
   return (
+    <AppLayout
+      activeTab="live_exam"
+      {...commonLayoutProps}
+      title="লাইভ পরীক্ষা"
+    >
     <div className="w-full max-w-6xl mx-auto px-2 md:px-4 pt-4 md:pt-6 animate-in fade-in zoom-in-95 duration-300">
       
       {/* Header */}
@@ -288,6 +289,7 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
 
       </div>
     </div>
+    </AppLayout>
   );
 };
 

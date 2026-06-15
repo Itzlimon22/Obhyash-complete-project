@@ -753,13 +753,7 @@ export default function StudentRoot({
 
       if (activeTab === "live_exam") {
         return (
-          <AppLayout
-            activeTab={activeTab}
-            {...commonLayoutProps}
-            title="লাইভ পরীক্ষা"
-          >
-            <LiveExamView />
-          </AppLayout>
+          <LiveExamView commonLayoutProps={commonLayoutProps} />
         );
       }
 

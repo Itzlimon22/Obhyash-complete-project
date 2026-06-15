@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import LiveExamCategoryView from "./LiveExamCategoryView";
+import AppLayout from "@/components/student/ui/layout/AppLayout";
 
-const LiveExamView: React.FC = () => {
+export interface LiveExamViewProps {
+  commonLayoutProps: any;
+}
+
+const LiveExamView: React.FC<LiveExamViewProps> = ({ commonLayoutProps }) => {
   const [selectedCategory, setSelectedCategory] = useState<{ id: string; title: string } | null>(null);
 
   const cards = [
@@ -68,6 +73,7 @@ const LiveExamView: React.FC = () => {
     return (
       <LiveExamCategoryView
         categoryTitle={selectedCategory.title}
+        commonLayoutProps={commonLayoutProps}
         onBack={() => setSelectedCategory(null)}
         onExamClick={(examId, status) => {
           // This will be handled in the next step when the user provides images
@@ -78,6 +84,11 @@ const LiveExamView: React.FC = () => {
   }
 
   return (
+    <AppLayout
+      activeTab="live_exam"
+      {...commonLayoutProps}
+      title="লাইভ পরীক্ষা"
+    >
     <div className="w-full max-w-6xl mx-auto px-2 md:px-4 pt-4 md:pt-6 animate-in fade-in duration-300 min-h-[80vh]">
         
         {/* Header */}
@@ -142,6 +153,7 @@ const LiveExamView: React.FC = () => {
           ))}
       </div>
     </div>
+    </AppLayout>
   );
 };
 
