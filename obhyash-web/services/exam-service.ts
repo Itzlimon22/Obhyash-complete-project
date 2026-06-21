@@ -215,10 +215,10 @@ export const fetchQuestionsWithDiagnostics = async (
       .eq('status', 'Approved');
     if (chapters) query = query.in('chapter', chapters);
     if (topics) query = query.in('topic', topics);
-    if (difficulties && difficulties.length === 1)
-      query = query.ilike('difficulty', `%${difficulties[0]}%`);
-    if (examTypes && examTypes.length === 1)
-      query = query.ilike('exam_type', `%${examTypes[0]}%`);
+    // Independent OR filter: any question matching ANY selected difficulty is included
+    if (difficulties && difficulties.length > 0) query = query.in('difficulty', difficulties);
+    // Independent OR filter: any question matching ANY selected exam type is included
+    if (examTypes && examTypes.length > 0) query = query.in('exam_type', examTypes);
     query = query.limit(config.questionCount * 3);
 
     const { data: fallbackData, error: fallbackError } = await query;
@@ -261,6 +261,7 @@ export const getAvailableQuestionCount = async (
   subjectLabel?: string,
   chapters?: string[] | null,
   difficulty?: string | null,
+  examTypes?: string[] | null,
 ): Promise<number> => {
   if (!isSupabaseConfigured() || !supabase) return 0;
 
@@ -283,16 +284,20 @@ export const getAvailableQuestionCount = async (
       .from('questions')
       .select('id', { count: 'exact', head: true })
       .or(matchConditions.join(','))
-      .eq('status', 'Approved'); // Only count approved questions
+      .eq('status', 'Approved');
 
     if (chapters && chapters.length > 0) {
       query = query.in('chapter', chapters);
     }
+    // Independent OR: any question matching ANY selected difficulty is included
     if (difficulty && difficulty !== 'Mixed' && difficulty !== 'All') {
-      const diffs = difficulty.split('+').map((d) => d.trim());
-      if (diffs.length === 1) {
-        query = query.ilike('difficulty', `%${diffs[0]}%`);
-      }
+      const diffs = difficulty.split('+').map((d) => d.trim()).filter(Boolean);
+      if (diffs.length > 0) query = query.in('difficulty', diffs);
+    }
+    // Independent OR: any question matching ANY selected exam type is included
+    if (examTypes && examTypes.length > 0 &&
+        !examTypes.includes('All') && !examTypes.includes('Mixed')) {
+      query = query.in('exam_type', examTypes);
     }
 
     const { count, error } = await query;

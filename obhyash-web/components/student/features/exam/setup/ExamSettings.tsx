@@ -17,6 +17,9 @@ export const ExamTypeSelection: React.FC<ExamTypeSelectionProps> = ({
   examTypes,
   setExamTypes,
 }) => {
+  const allTypes = EXAM_TYPE_OPTIONS.map((t) => t.id);
+  const allSelected = allTypes.every((t) => examTypes.includes(t));
+
   const toggleExamType = (id: string) => {
     setExamTypes((prev) => {
       if (prev.includes(id)) {
@@ -27,12 +30,30 @@ export const ExamTypeSelection: React.FC<ExamTypeSelectionProps> = ({
     });
   };
 
+  const toggleAll = () => {
+    setExamTypes(allSelected ? ['Academic'] : allTypes);
+  };
+
   return (
     <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
-      <label className="block text-base font-bold text-neutral-900 dark:text-white mb-2">
-        পরীক্ষার ধরন
-      </label>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex items-center justify-between">
+        <label className="block text-base font-bold text-neutral-900 dark:text-white">
+          পরীক্ষার ধরন
+        </label>
+        <button
+          type="button"
+          onClick={toggleAll}
+          className={cn(
+            'text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border transition-all',
+            allSelected
+              ? 'bg-emerald-600 text-white border-emerald-600'
+              : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-emerald-400',
+          )}
+        >
+          {allSelected ? '✓ সব' : 'সব নির্বাচন'}
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-2">
         {EXAM_TYPE_OPTIONS.map((type) => {
           const isSelected = examTypes.includes(type.id);
           return (
@@ -41,12 +62,15 @@ export const ExamTypeSelection: React.FC<ExamTypeSelectionProps> = ({
               type="button"
               onClick={() => toggleExamType(type.id)}
               className={cn(
-                'flex items-center justify-between gap-3 px-5 py-3 rounded-2xl border-2 transition-all duration-200 text-left hover:shadow-md',
+                'flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 transition-all duration-200 text-left hover:shadow-md',
                 isSelected
                   ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-900/20'
                   : 'border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900 hover:border-neutral-200',
               )}
             >
+              {isSelected && (
+                <div className="w-2 h-2 rounded-full bg-emerald-600 shadow-sm shadow-emerald-500/50 shrink-0" />
+              )}
               <span
                 className={cn(
                   'font-bold text-sm',
@@ -57,13 +81,16 @@ export const ExamTypeSelection: React.FC<ExamTypeSelectionProps> = ({
               >
                 {type.label}
               </span>
-              {isSelected && (
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-600 shadow-sm shadow-emerald-500/50 shrink-0" />
-              )}
             </button>
           );
         })}
       </div>
+      {examTypes.length > 1 && (
+        <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+          <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-[8px]">OR</span>
+          {examTypes.length}টি ধরনের প্রশ্ন একসাথে আসবে
+        </p>
+      )}
     </div>
   );
 };
@@ -77,6 +104,9 @@ export const DifficultySelection: React.FC<DifficultySelectionProps> = ({
   difficulties,
   setDifficulties,
 }) => {
+  const allDiffs = DIFFICULTY_OPTIONS.map((o) => o.id);
+  const allSelected = allDiffs.every((d) => difficulties.includes(d));
+
   const toggleDifficulty = (id: string) => {
     setDifficulties((prev) => {
       if (prev.includes(id)) {
@@ -87,12 +117,30 @@ export const DifficultySelection: React.FC<DifficultySelectionProps> = ({
     });
   };
 
+  const toggleAll = () => {
+    setDifficulties(allSelected ? ['Medium'] : allDiffs);
+  };
+
   return (
     <div className="space-y-4 bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300">
-      <label className="block text-base font-bold text-neutral-900 dark:text-white mb-2">
-        কঠিনতা
-      </label>
-      <div className="bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-2xl flex flex-wrap gap-1.5 inline-flex">
+      <div className="flex items-center justify-between">
+        <label className="block text-base font-bold text-neutral-900 dark:text-white">
+          কঠিনতা
+        </label>
+        <button
+          type="button"
+          onClick={toggleAll}
+          className={cn(
+            'text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border transition-all',
+            allSelected
+              ? 'bg-emerald-600 text-white border-emerald-600'
+              : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-emerald-400',
+          )}
+        >
+          {allSelected ? '✓ সব' : 'সব নির্বাচন'}
+        </button>
+      </div>
+      <div className="bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-2xl flex flex-wrap gap-1.5">
         {DIFFICULTY_OPTIONS.map((opt) => {
           const isSelected = difficulties.includes(opt.id);
           return (
@@ -112,6 +160,12 @@ export const DifficultySelection: React.FC<DifficultySelectionProps> = ({
           );
         })}
       </div>
+      {difficulties.length > 1 && (
+        <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+          <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-[8px]">OR</span>
+          {difficulties.length}টি স্তরের প্রশ্ন একসাথে আসবে
+        </p>
+      )}
     </div>
   );
 };

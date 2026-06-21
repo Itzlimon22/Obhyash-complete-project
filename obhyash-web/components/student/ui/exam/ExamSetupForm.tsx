@@ -155,7 +155,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
 
   // --- Modals State ---
 
-  // Fetch available question count when subject/chapters/difficulty change
+  // Fetch available question count when subject/chapters/difficulty/examType change
   useEffect(() => {
     if (!subject) {
       setAvailableCount(null);
@@ -173,11 +173,16 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
           : null;
       const difficultyValue =
         difficulties.length >= 3 ? null : difficulties.join("+");
+      // Pass examTypes only when not all types selected
+      const TOTAL_EXAM_TYPES = 5; // matches EXAM_TYPE_OPTIONS length
+      const examTypesFilter =
+        examTypes.length >= TOTAL_EXAM_TYPES ? null : examTypes;
       const count = await getAvailableQuestionCount(
         subject,
         subjectLabel,
         chapterNames,
         difficultyValue,
+        examTypesFilter,
       );
       setAvailableCount(count);
       setIsCountLoading(false);
@@ -187,6 +192,7 @@ const ExamSetupForm: React.FC<ExamSetupFormProps> = ({
     subject,
     selectedChapters,
     difficulties,
+    examTypes,
     availableSubjects,
     availableChapters,
   ]);

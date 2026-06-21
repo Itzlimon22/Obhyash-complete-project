@@ -1,15 +1,15 @@
-import { Question } from '@/lib/types';
-import { supabase, isSupabaseConfigured } from './core';
-import { createNotification } from './notification-service';
-import { generateQuestionFingerprint } from '@/lib/crypto-utils';
+import { Question } from "@/lib/types";
+import { supabase, isSupabaseConfigured } from "./core";
+import { createNotification } from "./notification-service";
+import { generateQuestionFingerprint } from "@/lib/crypto-utils";
 import {
   findHscSubject,
   findHscChapter,
   findHscTopic,
-} from '@/lib/data/hsc-helpers';
+} from "@/lib/data/hsc-helpers";
 
 const isValidUUID = (id: unknown): boolean =>
-  typeof id === 'string' &&
+  typeof id === "string" &&
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 
 // --- TYPES ---
@@ -36,7 +36,7 @@ export interface PaginatedQuestionsResponse {
 
 export interface BulkUploadJob {
   id: string;
-  status: 'Processing' | 'Completed' | 'Failed';
+  status: "Processing" | "Completed" | "Failed";
   total_rows: number;
   processed_rows: number;
   inserted_rows: number;
@@ -54,36 +54,36 @@ export const getQuestionsPage = async (
   page: number = 1,
   pageSize: number = 20,
   filters: QuestionFilters = {},
-  sortBy: string = 'created_at',
-  sortOrder: 'asc' | 'desc' = 'desc',
+  sortBy: string = "created_at",
+  sortOrder: "asc" | "desc" = "desc",
 ): Promise<PaginatedQuestionsResponse> => {
   if (isSupabaseConfigured() && supabase) {
     try {
       // Build the query
-      let query = supabase.from('questions').select('*', { count: 'exact' });
+      let query = supabase.from("questions").select("*", { count: "exact" });
 
       // Apply filters
       if (filters.subject) {
-        query = query.eq('subject', filters.subject);
+        query = query.eq("subject", filters.subject);
       }
       if (filters.chapter) {
-        query = query.eq('chapter', filters.chapter);
+        query = query.eq("chapter", filters.chapter);
       }
       if (filters.topic) {
-        query = query.eq('topic', filters.topic);
+        query = query.eq("topic", filters.topic);
       }
       if (filters.difficulty) {
-        query = query.eq('difficulty', filters.difficulty);
+        query = query.eq("difficulty", filters.difficulty);
       }
       if (filters.status) {
-        if (filters.status === 'Pending') {
-          query = query.or('status.eq.Pending,status.is.null');
+        if (filters.status === "Pending") {
+          query = query.or("status.eq.Pending,status.is.null");
         } else {
-          query = query.eq('status', filters.status);
+          query = query.eq("status", filters.status);
         }
       }
       if (filters.author) {
-        query = query.eq('author', filters.author);
+        query = query.eq("author", filters.author);
       }
 
       // Apply search (full-text search on question content and metadata)
@@ -95,7 +95,7 @@ export const getQuestionsPage = async (
       }
 
       // Apply sorting
-      query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+      query = query.order(sortBy, { ascending: sortOrder === "asc" });
 
       // Apply pagination
       const from = (page - 1) * pageSize;
@@ -110,7 +110,7 @@ export const getQuestionsPage = async (
 
       const [queryResult, countsResult] = await Promise.all([
         query,
-        supabase.rpc('get_question_status_counts', {
+        supabase.rpc("get_question_status_counts", {
           p_subject: filters.subject || null,
           p_chapter: filters.chapter || null,
           p_topic: filters.topic || null,
@@ -123,7 +123,7 @@ export const getQuestionsPage = async (
       const { data, error, count } = queryResult;
 
       if (error) {
-        console.error('Error fetching questions page:', error);
+        console.error("Error fetching questions page:", error);
         throw error;
       }
 
@@ -170,7 +170,7 @@ export const getQuestionsPage = async (
         pageSize,
       };
     } catch (error) {
-      console.error('Failed to fetch questions page:', error);
+      console.error("Failed to fetch questions page:", error);
     }
   }
 
@@ -196,22 +196,22 @@ export const getQuestionCount = async (
   if (isSupabaseConfigured() && supabase) {
     try {
       let query = supabase
-        .from('questions')
-        .select('*', { count: 'exact', head: true });
+        .from("questions")
+        .select("*", { count: "exact", head: true });
 
-      if (filters.subject) query = query.eq('subject', filters.subject);
-      if (filters.chapter) query = query.eq('chapter', filters.chapter);
-      if (filters.topic) query = query.eq('topic', filters.topic);
+      if (filters.subject) query = query.eq("subject", filters.subject);
+      if (filters.chapter) query = query.eq("chapter", filters.chapter);
+      if (filters.topic) query = query.eq("topic", filters.topic);
       if (filters.difficulty)
-        query = query.ilike('difficulty', `%${filters.difficulty}%`);
+        query = query.ilike("difficulty", `%${filters.difficulty}%`);
       if (filters.status) {
-        if (filters.status === 'Pending') {
-          query = query.or('status.eq.Pending,status.is.null');
+        if (filters.status === "Pending") {
+          query = query.or("status.eq.Pending,status.is.null");
         } else {
-          query = query.eq('status', filters.status);
+          query = query.eq("status", filters.status);
         }
       }
-      if (filters.author) query = query.eq('author', filters.author);
+      if (filters.author) query = query.eq("author", filters.author);
       if (filters.search) {
         const searchTerm = filters.search.trim();
         query = query.or(
@@ -224,7 +224,7 @@ export const getQuestionCount = async (
       if (error) throw error;
       return count || 0;
     } catch (error) {
-      console.error('Failed to get question count:', error);
+      console.error("Failed to get question count:", error);
     }
   }
 
@@ -238,13 +238,13 @@ export const getQuestion = async (id: string): Promise<Question | null> => {
   if (isSupabaseConfigured() && supabase) {
     try {
       const { data, error } = await supabase
-        .from('questions')
-        .select('*')
-        .eq('id', id)
+        .from("questions")
+        .select("*")
+        .eq("id", id)
         .single();
 
       if (error) {
-        console.error('Error fetching question:', error);
+        console.error("Error fetching question:", error);
         return null;
       }
 
@@ -268,7 +268,7 @@ export const getQuestion = async (id: string): Promise<Question | null> => {
         };
       }
     } catch (error) {
-      console.error('Failed to fetch question:', error);
+      console.error("Failed to fetch question:", error);
     }
   }
 
@@ -292,7 +292,7 @@ export const createQuestion = async (
 
       // Generate fingerprint for deduplication
       const fingerprint = await generateQuestionFingerprint({
-        question: question.question || '',
+        question: question.question || "",
         options: question.options || [],
         subject: question.subject,
         chapter: question.chapter,
@@ -303,8 +303,8 @@ export const createQuestion = async (
         options: question.options || [],
         correct_answer_indices: correctAnswerIndices,
         explanation: question.explanation,
-        type: question.type || 'MCQ',
-        difficulty: question.difficulty || 'Medium',
+        type: question.type || "MCQ",
+        difficulty: question.difficulty || "Medium",
         subject: question.subject,
         subject_id: question.subjectId || null,
         chapter: question.chapter,
@@ -314,12 +314,12 @@ export const createQuestion = async (
         stream: question.stream,
         division: question.division,
         section: question.section,
-        exam_type: question.examType || 'Academic',
+        exam_type: question.examType || "Academic",
         institutes: question.institutes || [],
         years: question.years || [],
-        status: question.status || 'Pending',
-        author: question.author || 'Admin',
-        author_name: question.authorName || question.author || 'Admin',
+        status: question.status || "Pending",
+        author: question.author || "Admin",
+        author_name: question.authorName || question.author || "Admin",
         tags: question.tags || [],
         version: 1,
         image_url: question.imageUrl,
@@ -331,14 +331,14 @@ export const createQuestion = async (
       };
 
       const { data, error } = await supabase
-        .from('questions')
+        .from("questions")
         .insert(payload)
         .select()
         .single();
 
       if (error) {
         console.error(
-          'Error creating question:',
+          "Error creating question:",
           JSON.stringify(error, null, 2),
         );
         return {
@@ -348,32 +348,32 @@ export const createQuestion = async (
       }
 
       // Notify Admin if not created by Admin
-      if (payload.author !== 'Admin') {
+      if (payload.author !== "Admin") {
         // TODO: Replace with actual Admin ID fetching logic
-        const ADMIN_ID = 'me'; // For testing purposes, notifying self
+        const ADMIN_ID = "me"; // For testing purposes, notifying self
         await createNotification(
           ADMIN_ID,
-          'New Question Pending',
+          "New Question Pending",
           `A new question has been submitted by ${payload.author} and is waiting for approval.`,
-          'info',
+          "info",
           {
-            actionUrl: '/admin/question-management',
-            priority: 'normal',
+            actionUrl: "/admin/question-management",
+            priority: "normal",
           },
         );
       }
 
       return { success: true, id: data?.id };
     } catch (error) {
-      console.error('Failed to create question:', error);
+      console.error("Failed to create question:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
 
-  return { success: false, error: 'Database not configured' };
+  return { success: false, error: "Database not configured" };
 };
 
 /**
@@ -428,26 +428,26 @@ export const updateQuestion = async (
       delete payload.authorName;
 
       const { error } = await supabase
-        .from('questions')
+        .from("questions")
         .update(payload)
-        .eq('id', id);
+        .eq("id", id);
 
       if (error) {
-        console.error('Error updating question:', error);
+        console.error("Error updating question:", error);
         return { success: false, error: error.message };
       }
 
       return { success: true };
     } catch (error) {
-      console.error('Failed to update question:', error);
+      console.error("Failed to update question:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
 
-  return { success: false, error: 'Database not configured' };
+  return { success: false, error: "Database not configured" };
 };
 
 /**
@@ -459,26 +459,26 @@ export const deleteQuestions = async (
   if (isSupabaseConfigured() && supabase) {
     try {
       const { error, count } = await supabase
-        .from('questions')
+        .from("questions")
         .delete()
-        .in('id', ids);
+        .in("id", ids);
 
       if (error) {
-        console.error('Error deleting questions:', error);
+        console.error("Error deleting questions:", error);
         return { success: false, error: error.message };
       }
 
       return { success: true, deletedCount: count || ids.length };
     } catch (error) {
-      console.error('Failed to delete questions:', error);
+      console.error("Failed to delete questions:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
 
-  return { success: false, error: 'Database not configured' };
+  return { success: false, error: "Database not configured" };
 };
 
 /**
@@ -491,26 +491,26 @@ export const bulkUpdateQuestionStatus = async (
   if (isSupabaseConfigured() && supabase) {
     try {
       const { error, count } = await supabase
-        .from('questions')
+        .from("questions")
         .update({ status, updated_at: new Date().toISOString() })
-        .in('id', ids);
+        .in("id", ids);
 
       if (error) {
-        console.error('Error updating question status:', error);
+        console.error("Error updating question status:", error);
         return { success: false, error: error.message };
       }
 
       return { success: true, updatedCount: count || ids.length };
     } catch (error) {
-      console.error('Failed to update question status:', error);
+      console.error("Failed to update question status:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
 
-  return { success: false, error: 'Database not configured' };
+  return { success: false, error: "Database not configured" };
 };
 
 /**
@@ -530,26 +530,26 @@ export const bulkUpdateMetadata = async (
       if (fields.topic !== undefined) updateData.topic = fields.topic;
 
       const { error, count } = await supabase
-        .from('questions')
+        .from("questions")
         .update(updateData)
-        .in('id', ids);
+        .in("id", ids);
 
       if (error) {
-        console.error('Error updating question metadata:', error);
+        console.error("Error updating question metadata:", error);
         return { success: false, error: error.message };
       }
 
       return { success: true, updatedCount: count || ids.length };
     } catch (error) {
-      console.error('Failed to update question metadata:', error);
+      console.error("Failed to update question metadata:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
 
-  return { success: false, error: 'Database not configured' };
+  return { success: false, error: "Database not configured" };
 };
 
 /**
@@ -568,7 +568,7 @@ export const checkDuplicateQuestions = async (
     // 1. Generate fingerprints for all input questions
     const fingerprintPromises = questions.map(async (q) => {
       return await generateQuestionFingerprint({
-        question: q.question || '',
+        question: q.question || "",
         options: q.options || [],
         subject: q.subject,
         chapter: q.chapter,
@@ -583,9 +583,9 @@ export const checkDuplicateQuestions = async (
       const batch = fingerprints.slice(i, i + BATCH_SIZE);
 
       const { data, error } = await supabase
-        .from('questions')
-        .select('fingerprint')
-        .in('fingerprint', batch);
+        .from("questions")
+        .select("fingerprint")
+        .in("fingerprint", batch);
 
       if (error) throw error;
 
@@ -602,7 +602,7 @@ export const checkDuplicateQuestions = async (
       }
     }
   } catch (err) {
-    console.error('Duplicate check error:', err);
+    console.error("Duplicate check error:", err);
   }
 
   return duplicateIndices;
@@ -616,15 +616,15 @@ export const createBulkUploadJob = async (
 ): Promise<{ id: string | null; error?: string }> => {
   if (isSupabaseConfigured() && supabase) {
     const { data, error } = await supabase
-      .from('bulk_upload_jobs')
-      .insert({ total_rows: totalRows, status: 'Processing' })
-      .select('id')
+      .from("bulk_upload_jobs")
+      .insert({ total_rows: totalRows, status: "Processing" })
+      .select("id")
       .single();
 
     if (error) return { id: null, error: error.message };
     return { id: data.id };
   }
-  return { id: null, error: 'Database not configured' };
+  return { id: null, error: "Database not configured" };
 };
 
 /**
@@ -635,9 +635,9 @@ export const getBulkUploadJobStatus = async (
 ): Promise<BulkUploadJob | null> => {
   if (isSupabaseConfigured() && supabase) {
     const { data, error } = await supabase
-      .from('bulk_upload_jobs')
-      .select('*')
-      .eq('id', id)
+      .from("bulk_upload_jobs")
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (error) return null;
@@ -677,7 +677,7 @@ export const bulkCreateQuestions = async (
           (q.correctAnswerIndex !== undefined ? [q.correctAnswerIndex] : [0]);
 
         const fingerprint = await generateQuestionFingerprint({
-          question: q.question || '',
+          question: q.question || "",
           options: q.options || [],
           subject: q.subject,
           chapter: q.chapter,
@@ -692,14 +692,14 @@ export const bulkCreateQuestions = async (
         let finalTopic = q.topic;
 
         // 1. Resolve Subject
-        const matchedSub = findHscSubject(q.subjectId || q.subject || '');
+        const matchedSub = findHscSubject(q.subjectId || q.subject || "");
         if (matchedSub) {
           sId = matchedSub.id;
           finalSubject = matchedSub.name;
         }
 
         // 2. Resolve Chapter
-        const matchedChap = findHscChapter(q.chapterId || q.chapter || '');
+        const matchedChap = findHscChapter(q.chapterId || q.chapter || "");
         if (matchedChap) {
           cId = matchedChap.chapter.id;
           finalChapter = matchedChap.chapter.name;
@@ -712,7 +712,7 @@ export const bulkCreateQuestions = async (
 
         // 3. Resolve Topic
         const matchedTop = findHscTopic(
-          q.topicId || q.topic || '',
+          q.topicId || q.topic || "",
           cId || q.chapter,
         );
         if (matchedTop) {
@@ -734,8 +734,8 @@ export const bulkCreateQuestions = async (
           options: q.options || [],
           correct_answer_indices: correctAnswerIndices,
           explanation: q.explanation,
-          type: q.type || 'MCQ',
-          difficulty: q.difficulty || 'Medium',
+          type: q.type || "MCQ",
+          difficulty: q.difficulty || "Medium",
           subject: finalSubject,
           subject_id: sId || null,
           chapter: finalChapter,
@@ -745,12 +745,12 @@ export const bulkCreateQuestions = async (
           stream: q.stream,
           division: q.division,
           section: q.section,
-          exam_type: q.examType || 'Academic',
+          exam_type: q.examType || "Academic",
           institutes: q.institutes || [],
           years: q.years || [],
-          status: q.status || 'Pending',
-          author: q.author || 'Admin',
-          author_name: q.authorName || q.author || 'Admin',
+          status: q.status || "Pending",
+          author: q.author || "Admin",
+          author_name: q.authorName || q.author || "Admin",
           tags: q.tags || [],
           version: 1,
           image_url: q.imageUrl,
@@ -764,13 +764,13 @@ export const bulkCreateQuestions = async (
       const payload = await Promise.all(payloadPromises);
 
       // Use the modernized SQL RPC for atomic bulk merge with job support
-      const { data, error } = await supabase.rpc('bulk_merge_questions_v2', {
+      const { data, error } = await supabase.rpc("bulk_merge_questions_v2", {
         p_questions: payload,
         p_job_id: internalJobId || null,
       });
 
       if (error) {
-        console.error('Bulk merge error:', error);
+        console.error("Bulk merge error:", error);
         return {
           success: false,
           count: 0,
@@ -790,7 +790,7 @@ export const bulkCreateQuestions = async (
         jobId: internalJobId,
       };
     } catch (err) {
-      console.error('Bulk insert exception:', err);
+      console.error("Bulk insert exception:", err);
       return {
         success: false,
         count: 0,
@@ -806,7 +806,7 @@ export const bulkCreateQuestions = async (
     count: 0,
     duplicates: 0,
     errors: questions.length,
-    errorDetails: ['Supabase not configured'],
+    errorDetails: ["Supabase not configured"],
   };
 };
 /**
@@ -818,12 +818,12 @@ export const getQuestionsByIds = async (ids: string[]): Promise<Question[]> => {
       if (ids.length === 0) return [];
 
       const { data, error } = await supabase
-        .from('questions')
-        .select('*')
-        .in('id', ids);
+        .from("questions")
+        .select("*")
+        .in("id", ids);
 
       if (error) {
-        console.error('Error fetching questions by IDs:', error);
+        console.error("Error fetching questions by IDs:", error);
         return [];
       }
 
@@ -845,7 +845,7 @@ export const getQuestionsByIds = async (ids: string[]): Promise<Question[]> => {
           }) as Question,
       );
     } catch (error) {
-      console.error('Failed to fetch questions by IDs:', error);
+      console.error("Failed to fetch questions by IDs:", error);
     }
   }
   return [];
