@@ -174,141 +174,111 @@ class _SubjectItemState extends State<_SubjectItem> {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Accuracy Colors
-    Color accBgColor;
+    // Web-app matching colors (sleek, minimalist)
     Color accTextColor;
     if (accuracy >= 80) {
-      accBgColor = isDark
-          ? const Color(0xFF064E3B).withOpacity(0.2)
-          : const Color(0xFFECFDF5);
       accTextColor = isDark ? const Color(0xFF34D399) : const Color(0xFF059669);
     } else if (accuracy >= 50) {
-      accBgColor = isDark
-          ? const Color(0xFF78350F).withOpacity(0.2)
-          : const Color(0xFFFFFBEB);
       accTextColor = isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706);
     } else {
-      accBgColor = isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5);
-      accTextColor = isDark ? const Color(0xFFA3A3A3) : const Color(0xFF525252);
+      accTextColor = isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373);
     }
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF262626).withOpacity(0.5) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: isDark ? const Color(0xFF1A1A1A) : Colors.white, // Sleek transparent-like dark background
+        borderRadius: BorderRadius.circular(12), // Web-app radius
         border: Border.all(
           color: _isOpen
-              ? (isDark
-                    ? const Color(0xFF881337)
-                    : const Color(0xFFFECDD3)) // rose-900 or rose-200
-              : (isDark
-                    ? const Color(0xFF404040)
-                    : const Color(0xFFE5E5E5)), // neutral-700 or neutral-200
+              ? (isDark ? const Color(0xFF047857) : const Color(0xFF34D399)) // Green accent when open
+              : (isDark ? const Color(0xFF333333) : const Color(0xFFE5E5E5)), // Thin sleek border
+          width: 1,
         ),
-        boxShadow: _isOpen
-            ? [
-                BoxShadow(
-                  color: isDark
-                      ? const Color(0xFF4C0519).withOpacity(0.5)
-                      : const Color(0xFFFFE4E6),
-                  blurRadius: 4,
-                  spreadRadius: 1,
-                ),
-              ]
-            : [],
       ),
       child: Column(
         children: [
           InkWell(
             onTap: () => setState(() => _isOpen = !_isOpen),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0), // More compact padding
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        width: 6,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: _isOpen
-                              ? const Color(0xFFF43F5E) // rose-500
-                              : (isDark
-                                    ? const Color(0xFF404040)
-                                    : const Color(0xFFE5E5E5)),
-                          borderRadius: BorderRadius.circular(4),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        // Web-app style left accent bar
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: 4,
+                          height: 18, // Shorter and sleeker
+                          decoration: BoxDecoration(
+                            color: _isOpen
+                                ? const Color(0xFF10B981) // emerald-500
+                                : (accuracy > 0
+                                    ? accTextColor
+                                    : (isDark ? const Color(0xFF404040) : const Color(0xFFD4D4D4))),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      AnimatedDefaultTextStyle(
-                        duration: const Duration(milliseconds: 300),
-                        style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: _isOpen
-                              ? (isDark
-                                    ? const Color(0xFFFB7185)
-                                    : const Color(0xFFE11D48))
-                              : (isDark
-                                    ? const Color(0xFFE5E5E5)
-                                    : const Color(0xFF262626)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: AnimatedDefaultTextStyle(
+                            duration: const Duration(milliseconds: 300),
+                            style: TextStyle(
+                              fontFamily: 'HindSiliguri',
+                              fontWeight: FontWeight.w600, // Medium weight like webapp
+                              fontSize: 14, // Smaller font like webapp
+                              color: _isOpen
+                                  ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
+                                  : (isDark ? Colors.white : const Color(0xFF1F2937)),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            child: Text(widget.subject.name),
+                          ),
                         ),
-                        child: Text(widget.subject.name),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Row(
                     children: [
+                      // Web-app style minimalist % badge
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
+                          horizontal: 8,
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: accBgColor,
-                          borderRadius: BorderRadius.circular(8),
+                          color: isDark ? const Color(0xFF262626) : const Color(0xFFF3F4F6),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           '$accuracy%',
                           style: TextStyle(
-                            color: accTextColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                            color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 11,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
                       AnimatedRotation(
                         turns: _isOpen ? 0.5 : 0,
                         duration: const Duration(milliseconds: 300),
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: _isOpen
-                                ? (isDark
-                                      ? const Color(0xFF881337).withOpacity(0.2)
-                                      : const Color(0xFFFFF1F2))
-                                : (isDark
-                                      ? const Color(0xFF262626)
-                                      : const Color(0xFFFAFAFA)),
+                            color: isDark ? const Color(0xFF262626) : const Color(0xFFF3F4F6),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             LucideIcons.chevronDown,
-                            size: 16,
-                            color: _isOpen
-                                ? (isDark
-                                      ? const Color(0xFFFB7185)
-                                      : const Color(0xFFE11D48))
-                                : (isDark
-                                      ? const Color(0xFFA3A3A3)
-                                      : const Color(0xFF737373)),
+                            size: 14,
+                            color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563),
                           ),
                         ),
                       ),
@@ -333,16 +303,12 @@ class _SubjectItemState extends State<_SubjectItem> {
 
   Widget _buildDetailsPanel(bool isDark) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
       decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF262626).withOpacity(0.1)
-            : const Color(0xFFFAFAFA).withOpacity(0.5),
+        color: isDark ? const Color(0xFF151515) : const Color(0xFFFAFAFA),
         border: Border(
           top: BorderSide(
-            color: isDark
-                ? const Color(0xFF404040).withOpacity(0.5)
-                : const Color(0xFFF5F5F5),
+            color: isDark ? const Color(0xFF333333) : const Color(0xFFE5E5E5),
           ),
         ),
       ),
@@ -359,56 +325,40 @@ class _SubjectItemState extends State<_SubjectItem> {
               _StatBox(
                 label: 'ভুল',
                 value: widget.subject.wrong.toString(),
-                color: const Color(0xFFF43F5E),
-              ), // rose-500
+                color: const Color(0xFFE11D48),
+              ), // rose-600
               const SizedBox(width: 8),
               _StatBox(
                 label: 'স্কিপড',
                 value: widget.subject.skipped.toString(),
-                color: const Color(0xFFF59E0B),
-              ), // amber-500
+                color: const Color(0xFFD97706),
+              ), // amber-600
             ],
           ),
           const SizedBox(height: 16),
-          // Progress Bar Component
+          // Sleek minimalist Progress Bar Component
           ClipRRect(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(4), // sleek radius
             child: Container(
-              height: 12,
+              height: 6, // ultra-thin sleek bar
               width: double.infinity,
-              color: isDark ? const Color(0xFF333333) : const Color(0xFFF0F0F0),
+              color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
               child: Row(
                 children: [
                   if (widget.subject.correct > 0)
                     Expanded(
                       flex: widget.subject.correct,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0xFF34D399), Color(0xFF059669)],
-                          ),
-                        ),
-                      ),
+                      child: Container(color: const Color(0xFF10B981)),
                     ),
                   if (widget.subject.wrong > 0)
                     Expanded(
                       flex: widget.subject.wrong,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0xFFFB7185), Color(0xFFE11D48)],
-                          ),
-                        ),
-                      ),
+                      child: Container(color: const Color(0xFFF43F5E)),
                     ),
                   if (widget.subject.skipped > 0)
                     Expanded(
                       flex: widget.subject.skipped,
-                      child: Container(
-                        color: isDark
-                            ? const Color(0xFF4B4B20)
-                            : const Color(0xFFFEF3C7),
-                      ),
+                      child: Container(color: const Color(0xFFF59E0B)),
                     ),
                 ],
               ),
@@ -420,27 +370,16 @@ class _SubjectItemState extends State<_SubjectItem> {
               alignment: Alignment.centerRight,
               child: InkWell(
                 onTap: widget.onClick,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(6),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 7,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: isDark
-                          ? [
-                              const Color(0xFF064E3B).withOpacity(0.4),
-                              const Color(0xFF065F46).withOpacity(0.3),
-                            ]
-                          : [const Color(0xFFECFDF5), const Color(0xFFD1FAE5)],
-                    ),
+                    color: isDark ? const Color(0xFF10B981).withValues(alpha: 0.1) : const Color(0xFF059669).withValues(alpha: 0.06),
                     border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF059669).withOpacity(0.4)
-                          : const Color(0xFFA7F3D0),
+                      color: isDark ? const Color(0xFF10B981).withValues(alpha: 0.2) : const Color(0xFF059669).withValues(alpha: 0.15),
+                      width: 1,
                     ),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -449,20 +388,16 @@ class _SubjectItemState extends State<_SubjectItem> {
                         'বিস্তারিত রিপোর্ট',
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontFamily: 'HindSiliguri',
-                          color: isDark
-                              ? const Color(0xFF34D399)
-                              : const Color(0xFF059669),
+                          color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
                         ),
                       ),
-                      const SizedBox(width: 5),
+                      const SizedBox(width: 6),
                       Icon(
                         LucideIcons.arrowRight,
-                        size: 13,
-                        color: isDark
-                            ? const Color(0xFF34D399)
-                            : const Color(0xFF059669),
+                        size: 14,
+                        color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
                       ),
                     ],
                   ),
@@ -488,54 +423,37 @@ class _StatBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Force the subject stat card to always use the deep rich dark theme
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border(
-            top: BorderSide(color: color, width: 2.5),
-            left: BorderSide(
-              color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF0F0F0),
-            ),
-            right: BorderSide(
-              color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF0F0F0),
-            ),
-            bottom: BorderSide(
-              color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF0F0F0),
-            ),
+          color: color.withValues(alpha: isDark ? 0.08 : 0.05), // Subtle premium tint
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: color.withValues(alpha: isDark ? 0.2 : 0.15), // Tinted border
+            width: 1,
           ),
-          boxShadow: [
-            if (!isDark)
-              BoxShadow(
-                color: color.withOpacity(0.08),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-          ],
         ),
         child: Column(
           children: [
             Text(
               label,
               style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: isDark
-                    ? const Color(0xFF737373)
-                    : const Color(0xFFA3A3A3),
-                letterSpacing: 0.5,
+                fontFamily: 'HindSiliguri',
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF6B7280),
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               value,
               style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
+                fontSize: 18,
+                fontWeight: FontWeight.bold, // Replaced w900 which can fail on some fonts
                 color: color,
               ),
             ),

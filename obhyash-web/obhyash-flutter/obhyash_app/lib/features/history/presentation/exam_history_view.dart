@@ -109,6 +109,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
   String _filterSubject = '';
   DateTime? _filterDate;
+  String _searchText = '';
 
   @override
   void initState() {
@@ -174,6 +175,14 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         if (d.year != _filterDate!.year ||
             d.month != _filterDate!.month ||
             d.day != _filterDate!.day) {
+          return false;
+        }
+      }
+      if (_searchText.isNotEmpty) {
+        final q = _searchText.toLowerCase();
+        if (!h.subjectLabel.toLowerCase().contains(q) &&
+            !_subjectDisplay(h.subject).toLowerCase().contains(q) &&
+            !_examTypeLabel(h.examType).toLowerCase().contains(q)) {
           return false;
         }
       }
@@ -266,46 +275,66 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       children: [
         // ── Tab Bar ─────────────────────────────────────────────────────────
         Container(
-          margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+          margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5),
-            ),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: TabBar(
             controller: _tab,
             indicator: BoxDecoration(
-              color: isDark ? const Color(0xFF171717) : Colors.white,
-              borderRadius: BorderRadius.circular(10),
+              color: isDark ? const Color(0xFF404040) : Colors.white,
+              borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 if (!isDark)
                   const BoxShadow(
-                    color: Color(0x15000000),
+                    color: Color(0x10000000),
                     blurRadius: 4,
                     offset: Offset(0, 1),
                   ),
               ],
             ),
-            labelColor: const Color(0xFF059669), // emerald-600
-            unselectedLabelColor: const Color(0xFFA3A3A3),
+            indicatorSize: TabBarIndicatorSize.tab,
+            labelColor: isDark ? const Color(0xFF34D399) : const Color(0xFF047857), // emerald-400 : emerald-700
+            unselectedLabelColor: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
             labelStyle: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 12,
+              fontSize: 13,
+              fontFamily: 'HindSiliguri',
             ),
             dividerColor: Colors.transparent,
             tabs: const [
               Tab(
-                icon: Icon(LucideIcons.clipboardList, size: 14),
-                text: 'পরীক্ষা',
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(LucideIcons.clipboardList, size: 16),
+                    SizedBox(width: 6),
+                    Text('পরীক্ষা'),
+                  ],
+                ),
               ),
               Tab(
-                icon: Icon(LucideIcons.alertCircle, size: 14),
-                text: 'ভুলসমূহ',
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(LucideIcons.alertCircle, size: 16),
+                    SizedBox(width: 6),
+                    Text('ভুলসমূহ'),
+                  ],
+                ),
               ),
-              Tab(icon: Icon(LucideIcons.bookmark, size: 14), text: 'বুকমার্ক'),
+              Tab(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(LucideIcons.bookmark, size: 16),
+                    SizedBox(width: 6),
+                    Text('বুকমার্ক'),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -313,116 +342,155 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         // ── Filters ─────────────────────────────────────────────────────────
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
+          child: Column(
             children: [
-              // Subject filter
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF171717) : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF262626)
-                          : const Color(0xFFE5E5E5),
-                    ),
+              // Search Bar
+              Container(
+                height: 42,
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
                   ),
-                  child: DropdownButton<String>(
-                    value: _filterSubject.isEmpty ? '' : _filterSubject,
-                    isExpanded: true,
-                    isDense: true,
-                    underline: const SizedBox.shrink(),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF171717),
+                ),
+                child: TextField(
+                  onChanged: (v) => setState(() => _searchText = v),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark ? Colors.white : const Color(0xFF171717),
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'খুঁজুন...',
+                    hintStyle: TextStyle(
+                      fontSize: 13,
+                      color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFFA3A3A3),
                     ),
-                    dropdownColor: isDark
-                        ? const Color(0xFF262626)
-                        : Colors.white,
-                    items: [
-                      const DropdownMenuItem(
-                        value: '',
-                        child: Text('সকল বিষয়'),
-                      ),
-                      ..._uniqueSubjects.map(
-                        (s) => DropdownMenuItem(
-                          value: s.key,
-                          child: Text(s.value),
-                        ),
-                      ),
-                    ],
-                    onChanged: (v) => setState(() => _filterSubject = v ?? ''),
+                    prefixIcon: Icon(
+                      LucideIcons.search,
+                      size: 16,
+                      color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFFA3A3A3),
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              // Date filter chip
-              GestureDetector(
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: _filterDate ?? DateTime.now(),
-                    firstDate: DateTime(2023),
-                    lastDate: DateTime.now(),
-                  );
-                  setState(() => _filterDate = picked);
-                },
-                child: Container(
-                  height: 40,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: _filterDate != null
-                        ? const Color(0xFF059669).withValues(alpha: 0.1)
-                        : (isDark ? const Color(0xFF171717) : Colors.white),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: _filterDate != null
-                          ? const Color(0xFF059669)
-                          : (isDark
-                                ? const Color(0xFF262626)
-                                : const Color(0xFFE5E5E5)),
+              // Subject & Date Row
+              Row(
+                children: [
+                  // Subject filter
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+                        ),
+                      ),
+                      child: DropdownButton<String>(
+                        value: _filterSubject.isEmpty ? '' : _filterSubject,
+                        isExpanded: true,
+                        isDense: true,
+                        underline: const SizedBox.shrink(),
+                        icon: Icon(
+                          LucideIcons.chevronDown,
+                          size: 16,
+                          color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFFA3A3A3),
+                        ),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'HindSiliguri',
+                          color: isDark ? Colors.white : const Color(0xFF171717),
+                        ),
+                        dropdownColor: isDark ? const Color(0xFF262626) : Colors.white,
+                        items: [
+                          const DropdownMenuItem(
+                            value: '',
+                            child: Text('সকল বিষয়'),
+                          ),
+                          ..._uniqueSubjects.map(
+                            (s) => DropdownMenuItem(
+                              value: s.key,
+                              child: Text(s.value),
+                            ),
+                          ),
+                        ],
+                        onChanged: (v) => setState(() => _filterSubject = v ?? ''),
+                      ),
                     ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        LucideIcons.calendar,
-                        size: 14,
+                  const SizedBox(width: 8),
+                  // Date filter chip
+                  GestureDetector(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: _filterDate ?? DateTime.now(),
+                        firstDate: DateTime(2023),
+                        lastDate: DateTime.now(),
+                      );
+                      setState(() => _filterDate = picked);
+                    },
+                    child: Container(
+                      height: 42,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
                         color: _filterDate != null
-                            ? const Color(0xFF059669)
-                            : const Color(0xFFA3A3A3),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        _filterDate != null
-                            ? DateFormat('d/M').format(_filterDate!)
-                            : 'তারিখ',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                            ? (isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5))
+                            : (isDark ? const Color(0xFF1C1C1C) : Colors.white),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
                           color: _filterDate != null
-                              ? const Color(0xFF059669)
-                              : const Color(0xFFA3A3A3),
+                              ? const Color(0xFF10B981) // emerald-500
+                              : (isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
                         ),
                       ),
-                      if (_filterDate != null) ...[
-                        const SizedBox(width: 4),
-                        GestureDetector(
-                          onTap: () => setState(() => _filterDate = null),
-                          child: const Icon(
-                            LucideIcons.x,
-                            size: 12,
-                            color: Color(0xFF059669),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            LucideIcons.calendar,
+                            size: 16,
+                            color: _filterDate != null
+                                ? (isDark ? const Color(0xFF34D399) : const Color(0xFF047857))
+                                : const Color(0xFFA3A3A3),
                           ),
-                        ),
-                      ],
-                    ],
+                          const SizedBox(width: 6),
+                          Text(
+                            _filterDate != null
+                                ? DateFormat('d/M').format(_filterDate!)
+                                : 'তারিখ',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'HindSiliguri',
+                              color: _filterDate != null
+                                  ? (isDark ? const Color(0xFF34D399) : const Color(0xFF047857))
+                                  : const Color(0xFFA3A3A3),
+                            ),
+                          ),
+                          if (_filterDate != null) ...[
+                            const SizedBox(width: 6),
+                            GestureDetector(
+                              onTap: () => setState(() => _filterDate = null),
+                              child: Icon(
+                                LucideIcons.x,
+                                size: 14,
+                                color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
@@ -488,7 +556,7 @@ class _ExamsTab extends StatelessWidget {
               height: 400,
               child: _emptyState(
                 isDark,
-                'কোনো পরীক্ষার ইতিহাস নেই',
+                'কোনো ফলাফল পাওয়া যায়নি',
                 'একটি মক পরীক্ষা দিন এবং ফলাফল এখানে দেখো।',
               ),
             ),
@@ -497,105 +565,213 @@ class _ExamsTab extends StatelessWidget {
       );
     }
 
-    final avgScore =
-        records.map((r) => r.score).reduce((a, b) => a + b) / records.length;
-    final highestScore = records
-        .map((r) => r.score)
-        .reduce((a, b) => a > b ? a : b);
+    int totalQuestions = 0;
+    int totalCorrect = 0;
+    int totalWrong = 0;
+    int totalTime = 0;
+
+    for (final r in records) {
+      totalQuestions += r.totalQuestions;
+      totalCorrect += r.correctCount;
+      totalWrong += r.wrongCount;
+      totalTime += r.timeTaken ?? 0;
+    }
+
+    final avgScore = records.isEmpty ? 0.0 : records.map((r) => r.score).reduce((a, b) => a + b) / records.length;
+    final avgTime = records.isEmpty ? 0 : (totalTime / records.length).round();
+    final totalTimeMins = totalTime > 0 ? (totalTime / 60).round() : 0;
 
     return RefreshIndicator(
       onRefresh: onRefresh,
       color: const Color(0xFF047857),
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
-          // ── Sort chips
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _SortChip(
-                  label: 'সাম্প্রতিক',
-                  active: sortBy == _SortMode.date,
-                  isDark: isDark,
-                  onTap: () => onSortChange(_SortMode.date),
-                ),
-                const SizedBox(width: 6),
-                _SortChip(
-                  label: 'স্কোর: বেশি',
-                  active: sortBy == _SortMode.scoreDesc,
-                  isDark: isDark,
-                  onTap: () => onSortChange(_SortMode.scoreDesc),
-                ),
-                const SizedBox(width: 6),
-                _SortChip(
-                  label: 'স্কোর: কম',
-                  active: sortBy == _SortMode.scoreAsc,
-                  isDark: isDark,
-                  onTap: () => onSortChange(_SortMode.scoreAsc),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Stats Row
+          // Sort & Clear Header
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Total exams — emerald
-              _StatCard(
-                label: 'মোট',
-                value: '${records.length}',
-                isDark: isDark,
-                gradient: const [Color(0xFF047857), Color(0xFF059669)],
-                white: true,
+              Container(
+                height: 36,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+                  ),
+                ),
+                child: DropdownButton<_SortMode>(
+                  value: sortBy,
+                  underline: const SizedBox.shrink(),
+                  icon: Icon(LucideIcons.chevronDown, size: 14, color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFFA3A3A3)),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'HindSiliguri',
+                    color: isDark ? Colors.white : const Color(0xFF171717),
+                  ),
+                  dropdownColor: isDark ? const Color(0xFF262626) : Colors.white,
+                  items: const [
+                    DropdownMenuItem(value: _SortMode.date, child: Text('তারিখ অনুযায়ী')),
+                    DropdownMenuItem(value: _SortMode.scoreDesc, child: Text('স্কোর: বেশি আগে')),
+                    DropdownMenuItem(value: _SortMode.scoreAsc, child: Text('স্কোর: কম আগে')),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) onSortChange(v);
+                  },
+                ),
               ),
-              const SizedBox(width: 8),
-              _StatCard(
-                label: 'গড়',
-                value: '${avgScore.round()}%',
-                isDark: isDark,
-              ),
-              const SizedBox(width: 8),
-              _StatCard(
-                label: 'সর্বোচ্চ',
-                value: '${highestScore.round()}%',
-                isDark: isDark,
-                valueColor: const Color(0xFF059669),
-              ),
+              if (onClear != null)
+                TextButton.icon(
+                  onPressed: isClearing ? null : onClear,
+                  icon: isClearing
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(LucideIcons.trash2, size: 14, color: Colors.red),
+                  label: const Text(
+                    'ইতিহাস মুছুন',
+                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12, fontFamily: 'HindSiliguri'),
+                  ),
+                ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
-          // Clear history
-          if (onClear != null)
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: isClearing ? null : onClear,
-                icon: isClearing
-                    ? const SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(
-                        LucideIcons.trash2,
-                        size: 14,
-                        color: Colors.red,
-                      ),
-                label: const Text(
-                  'ইতিহাস মুছুন',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
+          // ── Stats Row 1 ──
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF047857), // emerald-700
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [const BoxShadow(color: Color(0x33047857), blurRadius: 8, offset: Offset(0, 4))],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('মোট প্রশ্ন', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white70, fontFamily: 'HindSiliguri')),
+                      const SizedBox(height: 4),
+                      Text('$totalQuestions', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white, height: 1)),
+                    ],
                   ),
                 ),
               ),
-            ),
-
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('সঠিক', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF059669), fontFamily: 'HindSiliguri')),
+                      const SizedBox(height: 4),
+                      Text('$totalCorrect', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF059669), height: 1)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 8),
+
+          // ── Stats Row 2 ──
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('ভুল', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFDC2626), fontFamily: 'HindSiliguri')),
+                      const SizedBox(height: 4),
+                      Text('$totalWrong', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFFDC2626), height: 1)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('গড় নম্বর', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFA3A3A3), fontFamily: 'HindSiliguri')),
+                      const SizedBox(height: 4),
+                      Text('${avgScore.round()}%', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: isDark ? Colors.white : const Color(0xFF171717), height: 1)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // ── Stats Row 3 ──
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('মোট সময় (মিনিট)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFA3A3A3), fontFamily: 'HindSiliguri')),
+                      const SizedBox(height: 4),
+                      Text('$totalTimeMins', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: isDark ? Colors.white : const Color(0xFF171717), height: 1)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('গড় সময় (সেকেন্ড)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFA3A3A3), fontFamily: 'HindSiliguri')),
+                      const SizedBox(height: 4),
+                      Text('$avgTime', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF2563EB), height: 1)), // blue-600
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
 
           // Exam cards
           ...records.map((r) => _ExamCard(record: r, isDark: isDark)),
@@ -618,43 +794,49 @@ class _ExamCard extends StatelessWidget {
     final label = record.subjectLabel.isNotEmpty
         ? record.subjectLabel
         : _subjectDisplay(record.subject);
+    final timeStr = record.timeTaken != null ? _formatDur(record.timeTaken!) : '--';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
         ),
-        boxShadow: isDark
-            ? []
-            : [const BoxShadow(color: Color(0x08000000), blurRadius: 4)],
       ),
       child: Row(
         children: [
           // Score circle
-          Container(
+          SizedBox(
             width: 36,
             height: 36,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-              border: Border.all(color: color, width: 2),
-            ),
-            child: Center(
-              child: Text(
-                '${record.score.round()}%',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w900,
-                  color: color,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                CircularProgressIndicator(
+                  value: record.score / 100,
+                  strokeWidth: 3,
+                  backgroundColor: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+                  valueColor: AlwaysStoppedAnimation<Color>(color),
                 ),
-              ),
+                Center(
+                  child: Text(
+                    '${record.score.round()}%',
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'HindSiliguri',
+                      color: isDark ? Colors.white : const Color(0xFF171717),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 12),
+          // Middle details
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -664,41 +846,46 @@ class _ExamCard extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
+                    fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF171717),
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 6),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 4,
-                  children: [
-                    _Chip(label: dateStr, isDark: isDark),
-                    _Chip(
-                      label:
-                          '${record.correctCount}/${record.totalQuestions} সঠিক',
-                      isDark: isDark,
-                      color: color,
-                    ),
-                    if (record.wrongCount > 0)
-                      _Chip(
-                        label: '${record.wrongCount} ভুল',
-                        isDark: isDark,
-                        color: const Color(0xFFEF4444),
-                      ),
-                    if (record.timeTaken != null)
-                      _Chip(
-                        label: _formatDur(record.timeTaken!),
-                        isDark: isDark,
-                      ),
-                    if (record.examType.isNotEmpty && record.examType != 'mock')
-                      _Chip(
-                        label: _examTypeLabel(record.examType),
-                        isDark: isDark,
-                        color: const Color(0xFF8B5CF6),
-                      ),
-                  ],
+                Text(
+                  dateStr,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'HindSiliguri',
+                    color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${record.score.toStringAsFixed(1)} / ${record.totalQuestions}  ·  $timeStr',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'HindSiliguri',
+                    color: isDark ? const Color(0xFF737373) : const Color(0xFFA3A3A3),
+                  ),
                 ),
               ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Chevron button
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              LucideIcons.chevronRight,
+              size: 16,
+              color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
             ),
           ),
         ],
@@ -1286,113 +1473,6 @@ class _BookmarksTabState extends State<_BookmarksTab> {
 }
 
 // ─── Shared Widgets ────────────────────────────────────────────────────────────
-class _StatCard extends StatelessWidget {
-  final String label, value;
-  final bool isDark;
-  final Color? valueColor;
-  final List<Color>? gradient;
-  final bool white;
-
-  const _StatCard({
-    required this.label,
-    required this.value,
-    required this.isDark,
-    this.valueColor,
-    this.gradient,
-    this.white = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          gradient: gradient != null ? LinearGradient(colors: gradient!) : null,
-          color: gradient == null
-              ? (isDark ? const Color(0xFF171717) : Colors.white)
-              : null,
-          borderRadius: BorderRadius.circular(14),
-          border: gradient == null
-              ? Border.all(
-                  color: isDark
-                      ? const Color(0xFF262626)
-                      : const Color(0xFFE5E5E5),
-                )
-              : null,
-          boxShadow: gradient != null
-              ? [
-                  BoxShadow(
-                    color: gradient!.first.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ]
-              : [],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: white
-                    ? Colors.white.withOpacity(0.8)
-                    : const Color(0xFFA3A3A3),
-                letterSpacing: 0.5,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w900,
-                color: white
-                    ? Colors.white
-                    : (valueColor ??
-                          (isDark ? Colors.white : const Color(0xFF171717))),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Chip extends StatelessWidget {
-  final String label;
-  final bool isDark;
-  final Color? color;
-
-  const _Chip({required this.label, required this.isDark, this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: color != null
-            ? color!.withOpacity(0.1)
-            : (isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5)),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-          color:
-              color ??
-              (isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373)),
-        ),
-      ),
-    );
-  }
-}
 
 Widget _emptyState(bool isDark, String title, String subtitle) {
   return Center(
@@ -1495,45 +1575,4 @@ Widget _errorState(bool isDark, VoidCallback onRetry) {
   );
 }
 
-class _SortChip extends StatelessWidget {
-  final String label;
-  final bool active;
-  final bool isDark;
-  final VoidCallback onTap;
 
-  const _SortChip({
-    required this.label,
-    required this.active,
-    required this.isDark,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: active
-              ? const Color(0xFF047857)
-              : (isDark ? const Color(0xFF1C1C1C) : Colors.white),
-          borderRadius: BorderRadius.circular(100),
-          border: Border.all(
-            color: active
-                ? const Color(0xFF047857)
-                : (isDark ? const Color(0xFF333333) : const Color(0xFFE5E5E5)),
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            color: active ? Colors.white : const Color(0xFFA3A3A3),
-          ),
-        ),
-      ),
-    );
-  }
-}

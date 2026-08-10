@@ -3,6 +3,7 @@ import 'package:student_app/theme.dart';
 
 import '../widgets/exam/mock_exam_setup_page.dart';
 import '../pages/complaint_page.dart';
+import '../pages/referral_page.dart';
 
 class AppDrawer extends StatelessWidget {
   final bool isMobile;
@@ -119,6 +120,21 @@ class AppDrawer extends StatelessWidget {
                 Icons.emoji_events_outlined,
                 "লিডারবোর্ড",
                 false,
+              ),
+              _buildMenuItem(
+                context,
+                Icons.card_giftcard,
+                "রেফারেল",
+                false,
+                onTap: () {
+                  if (isMobile) Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ReferralPage(),
+                    ),
+                  );
+                },
               ),
               _buildMenuItem(context, Icons.history, "হিস্টরি", false),
 

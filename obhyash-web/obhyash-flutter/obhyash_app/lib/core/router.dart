@@ -24,6 +24,7 @@ import '../features/exam/presentation/exam_runner_view.dart';
 import '../features/notifications/presentation/notifications_view.dart';
 import '../features/blog/presentation/blog_view.dart';
 import '../features/referral/presentation/referral_view.dart';
+import '../features/live_exam/presentation/live_exam_category_view.dart';
 import 'presentation/main_layout.dart';
 
 CustomTransitionPage _fadeRoute(Widget child, GoRouterState state) {
@@ -172,6 +173,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/referral',
             pageBuilder: (context, state) =>
                 _fadeRoute(const ReferralView(), state),
+          ),
+          GoRoute(
+            path: '/live_exam/:category',
+            pageBuilder: (context, state) {
+              final category = state.pathParameters['category']!;
+              return _fadeRoute(LiveExamCategoryView(category: category), state);
+            },
           ),
         ],
       ),

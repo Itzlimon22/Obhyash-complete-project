@@ -41,6 +41,7 @@ dependencies:
   flutter_math_fork: ^0.7.2
   flutter_svg: ^2.3.0
   url_launcher: ^6.3.2
+  share_plus: ^13.3.0
   # Note: flutter_tex is heavy for web. using flutter_math_fork for performance.
   # flutter_tex: ^4.0.3
 

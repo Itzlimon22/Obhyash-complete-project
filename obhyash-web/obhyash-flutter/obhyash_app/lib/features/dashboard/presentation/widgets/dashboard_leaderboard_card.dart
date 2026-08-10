@@ -27,31 +27,17 @@ class DashboardLeaderboardCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF171717) : Colors.white,
+          color: isDark ? const Color(0xFF171717) : const Color(0xFF0F172A), // Deep rich color instead of white
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFE5E5E5),
+            color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFF1E293B),
           ),
           boxShadow: [
-            if (!isDark) ...[
-              BoxShadow(
-                color: const Color(0xFF059669).withOpacity(0.06),
-                blurRadius: 20,
-                offset: const Offset(0, 6),
-                spreadRadius: -4,
-              ),
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-            if (isDark)
-              BoxShadow(
-                color: Colors.black.withOpacity(0.4),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
           ],
         ),
         child: Stack(
@@ -181,22 +167,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: isDark
-                          ? [
-                              const Color(0xFF064E3B).withOpacity(0.25),
-                              const Color(0xFF064E3B).withOpacity(0.08),
-                            ]
-                          : [
-                              const Color(0xFFECFDF5),
-                              const Color(0xFFECFDF5).withOpacity(0.4),
-                            ],
-                    ),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF059669).withOpacity(0.35)
-                          : const Color(0xFFA7F3D0).withOpacity(0.8),
-                    ),
+                    color: const Color(0xFF10B981), // Solid green
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
@@ -214,13 +185,11 @@ class DashboardLeaderboardCard extends StatelessWidget {
                             topUser!.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: 'HindSiliguri',
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
-                              color: isDark
-                                  ? const Color(0xFFE5E5E5)
-                                  : const Color(0xFF1A1A1A),
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -261,22 +230,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: isDark
-                          ? [
-                              const Color(0xFF064E3B).withOpacity(0.18),
-                              const Color(0xFF064E3B).withOpacity(0.06),
-                            ]
-                          : [
-                              const Color(0xFFECFDF5),
-                              const Color(0xFFECFDF5).withOpacity(0.4),
-                            ],
-                    ),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF059669).withOpacity(0.35)
-                          : const Color(0xFFA7F3D0).withOpacity(0.8),
-                    ),
+                    color: const Color(0xFFEF4444), // Solid red
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
@@ -285,13 +239,11 @@ class DashboardLeaderboardCard extends StatelessWidget {
                         width: 36,
                         child: Text(
                           '#$userRank',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontFamily: 'HindSiliguri',
                             fontWeight: FontWeight.w900,
                             fontSize: 14,
-                            color: isDark
-                                ? const Color(0xFF34D399)
-                                : const Color(0xFF059669),
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -306,13 +258,11 @@ class DashboardLeaderboardCard extends StatelessWidget {
                                 currentUser.name,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
-                                  color: isDark
-                                      ? const Color(0xFFE5E5E5)
-                                      : const Color(0xFF1A1A1A),
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
@@ -323,20 +273,16 @@ class DashboardLeaderboardCard extends StatelessWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: isDark
-                                    ? const Color(0xFF064E3B).withOpacity(0.4)
-                                    : const Color(0xFFD1FAE5),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(100),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'তুমি',
                                 style: TextStyle(
                                   fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.bold,
                                   fontSize: 9,
-                                  color: isDark
-                                      ? const Color(0xFF34D399)
-                                      : const Color(0xFF059669),
+                                  color: Colors.white,
                                 ),
                               ),
                             ),

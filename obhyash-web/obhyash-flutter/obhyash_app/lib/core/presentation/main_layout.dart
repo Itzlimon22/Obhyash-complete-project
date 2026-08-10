@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +13,7 @@ import '../../features/auth/providers/auth_controller.dart';
 import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
 import '../../features/dashboard/presentation/widgets/countdown_banner.dart';
+import '../../features/notifications/presentation/notifications_view.dart';
 
 final _unreadNotifCountProvider = FutureProvider.autoDispose<int>((ref) async {
   final user = ref.watch(authProvider);
@@ -395,7 +396,15 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                 final unread =
                                     unreadAsync.whenOrNull(data: (c) => c) ?? 0;
                                 return GestureDetector(
-                                  onTap: () => context.push('/notifications'),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const NotificationsView(),
+                                      ),
+                                    );
+                                  },
+                                  behavior: HitTestBehavior.opaque,
                                   child: Stack(
                                     clipBehavior: Clip.none,
                                     children: [

@@ -135,7 +135,7 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
     if (profile == null) return [];
 
     final prefs = ref.watch(sharedPreferencesProvider);
-    final cacheKey = 'subject_stats_${profile.id}';
+    final cacheKey = 'subject_stats_v2_${profile.id}';
 
     // 1. Cache-first
     final cached = prefs.getString(cacheKey);
@@ -144,7 +144,6 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
         final List list = jsonDecode(cached);
         final cachedStats = list
             .map((e) => SubjectStats.fromJson(e))
-            .where((s) => s.total > 0)
             .toList();
         // Only use cache if it has data; empty cache forces a re-fetch
         if (cachedStats.isNotEmpty) {
@@ -210,7 +209,6 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
             total: total,
           );
         })
-        .where((s) => s.total > 0)
         .toList();
 
     prefs.setString(
