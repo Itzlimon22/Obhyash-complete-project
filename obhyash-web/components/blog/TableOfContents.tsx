@@ -19,7 +19,7 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
 
   // Auto-expand on desktop (md = 768px)
   useEffect(() => {
-    if (window.innerWidth >= 768) setIsOpen(true);
+    if (window.innerWidth >= 768) queueMicrotask(() => setIsOpen(true));
   }, []);
 
   useEffect(() => {

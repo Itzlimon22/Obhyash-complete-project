@@ -46,8 +46,10 @@ const LeaderboardView: React.FC<LeaderboardViewProps> = ({ onUserClick }) => {
   // Set selectedCollege to own college when user data first loads (only if not already set)
   useEffect(() => {
     if (currentUser?.institute && !selectedCollege) {
-      setSelectedCollege(currentUser.institute);
+      // Defer to avoid synchronous setState inside an effect (cascading renders)
+      queueMicrotask(() => setSelectedCollege(currentUser.institute!));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.institute]);
 
   // Set selectedLevel once we know the user's level

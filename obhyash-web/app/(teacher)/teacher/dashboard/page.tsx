@@ -32,7 +32,8 @@ function useAnimatedCounter(target: number, duration = 1200) {
   const [count, setCount] = useState(0);
   useEffect(() => {
     if (target === 0) {
-      setCount(0);
+      // Defer to avoid synchronous setState inside an effect (cascading renders)
+      queueMicrotask(() => setCount(0));
       return;
     }
     let start = 0;

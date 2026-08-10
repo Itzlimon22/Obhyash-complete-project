@@ -9,7 +9,9 @@ const Portal: React.FC<PortalProps> = ({ children }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    // Defer mount state update to avoid synchronous setState inside effect
+    // (SSR hydration guard — must remain client-only, hence useEffect)
+    queueMicrotask(() => setMounted(true));
     return () => setMounted(false);
   }, []);
 

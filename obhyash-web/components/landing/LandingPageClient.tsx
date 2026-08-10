@@ -12,8 +12,11 @@ export default function LandingPageClient() {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('theme');
       const dark = stored === 'dark';
-      setIsDarkMode(dark);
-      document.documentElement.classList.toggle('dark', dark);
+      // Defer to avoid synchronous setState inside an effect
+      queueMicrotask(() => {
+        setIsDarkMode(dark);
+        document.documentElement.classList.toggle('dark', dark);
+      });
     }
   }, []);
 
