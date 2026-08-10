@@ -35,13 +35,13 @@ class AppTheme {
   static const Color background = Color(0xFF000000); // Pure Black
   static const Color surface = Color(0xFF121212); // Neutral Dark Grey
 
-  // Dashboard Accents
-  static const Color cardArchive = Color(0xFFD97706);
-  static const Color cardPractice = Color(0xFF6366F1);
-  static const Color cardLive = Color(0xFFEC4899);
-  static const Color cardMock = Color(0xFF0EA5E9);
-  static const Color cardAI = Color(0xFF8B5CF6);
-  static const Color cardLeaderboard = Color(0xFFF59E0B);
+  // Dashboard Accents (Web Aligned)
+  static const Color cardLive = Color(0xFFE11D48); // Deep Red (Mock Exam equivalent in web)
+  static const Color cardMock = Color(0xFF1D4ED8); // Deep Blue (History equivalent)
+  static const Color cardPractice = Color(0xFF059669); // Emerald Green (Practice)
+  static const Color cardArchive = Color(0xFF0D9488); // Teal (Blog equivalent)
+  static const Color cardLeaderboard = Color(0xFFF59E0B); // Amber (Leaderboard)
+  static const Color cardAI = Color(0xFF6D28D9); // Violet (Analysis equivalent)
 
   // ---------------------------------------------------------------------------
   // 2. LIGHT MODE CONFIG

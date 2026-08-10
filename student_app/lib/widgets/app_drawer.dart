@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:student_app/theme.dart';
 
 import '../widgets/exam/mock_exam_setup_page.dart';
+import '../pages/complaint_page.dart';
 
 class AppDrawer extends StatelessWidget {
   final bool isMobile;
@@ -126,6 +127,21 @@ class AppDrawer extends StatelessWidget {
                 child: Divider(color: Colors.white10),
               ),
 
+              _buildMenuItem(
+                context,
+                Icons.support_agent_outlined,
+                "সাপোর্ট ও অভিযোগ",
+                false,
+                onTap: () {
+                  if (isMobile) Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ComplaintPage(),
+                    ),
+                  );
+                },
+              ),
               _buildMenuItem(
                 context,
                 Icons.admin_panel_settings_outlined,

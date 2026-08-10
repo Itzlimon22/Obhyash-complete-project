@@ -1,9 +1,9 @@
 // File: lib/widgets/dashboard_grid.dart
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme.dart';
 import 'dashboard_card.dart';
 // ✅ Import pages for navigation
-import '../pages/exam_page.dart';
 import '../widgets/exam/mock_exam_setup_page.dart';
 
 class DashboardGrid extends StatelessWidget {
@@ -21,47 +21,48 @@ class DashboardGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: AppSpacing.md,
       crossAxisSpacing: AppSpacing.md,
-      childAspectRatio: 1.0, // Square cards look cleaner here
+      childAspectRatio: 1.0, 
       children: [
         DashboardCard(
-          title: "Live Exam",
-          icon: Icons.timer_outlined,
-          color: AppTheme.cardLive,
-          // ✅ Navigate to Exam Page
-          onTap: () => _navigateTo(context, const ExamPage()),
-        ),
-        DashboardCard(
-          title: "Mock Exam",
-          icon: Icons.edit_note_outlined,
+          title: "মক এক্সাম",
+          svgAsset: "assets/icons/file-text.svg",
           color: AppTheme.cardMock,
-          // ✅ Navigate to Setup Page
           onTap: () => _navigateTo(context, const MockExamSetupPage()),
         ),
         DashboardCard(
-          title: "AI Chat",
-          icon: Icons.smart_toy_outlined,
-          color: AppTheme.cardAI,
-          onTap: () {
-            // TODO: Navigate to AI Chat
-          },
+          title: "ইতিহাস",
+          svgAsset: "assets/icons/clock.svg",
+          color: AppTheme.cardLive,
+          onTap: () {},
         ),
         DashboardCard(
-          title: "প্র্যাকটিস", // Practice
-          icon: Icons.bolt_outlined,
+          title: "লিডারবোর্ড",
+          svgAsset: "assets/icons/medal.svg",
+          color: AppTheme.cardLeaderboard,
+          onTap: () {},
+        ),
+        DashboardCard(
+          title: "এনালাইসিস",
+          svgAsset: "assets/icons/trending-up.svg",
+          color: AppTheme.cardAI,
+          onTap: () {},
+        ),
+        DashboardCard(
+          title: "অনুশীলন",
+          svgAsset: "assets/icons/dumbbell.svg",
           color: AppTheme.cardPractice,
           onTap: () {},
         ),
         DashboardCard(
-          title: "আর্কাইভ", // Archive
-          icon: Icons.inventory_2_outlined,
+          title: "ব্লগ",
+          svgAsset: "assets/icons/rss.svg",
           color: AppTheme.cardArchive,
-          onTap: () {},
-        ),
-        DashboardCard(
-          title: "লিডারবোর্ড", // Leaderboard
-          icon: Icons.emoji_events_outlined,
-          color: AppTheme.cardLeaderboard,
-          onTap: () {},
+          onTap: () async {
+            final Uri url = Uri.parse('https://obhyash.com/blog');
+            if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+              debugPrint('Could not launch $url');
+            }
+          },
         ),
       ],
     );
