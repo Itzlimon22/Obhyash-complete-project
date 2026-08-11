@@ -100,7 +100,7 @@ class _PracticeSummaryState extends State<PracticeSummary>
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF0A0A0A)
+          ? const Color(0xFF000000)
           : const Color(0xFFF5F5F5),
       body: SafeArea(
         child: FadeTransition(
@@ -120,7 +120,7 @@ class _PracticeSummaryState extends State<PracticeSummary>
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF171717),
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -160,7 +160,7 @@ class _PracticeSummaryState extends State<PracticeSummary>
                                   fontWeight: FontWeight.bold,
                                   color: isDark
                                       ? Colors.white
-                                      : const Color(0xFF171717),
+                                      : const Color(0xFF0F172A),
                                 ),
                               ),
                               const Text(
@@ -186,7 +186,7 @@ class _PracticeSummaryState extends State<PracticeSummary>
                     _StatCard(
                       label: 'মোট',
                       value: _total,
-                      color: isDark ? Colors.white : const Color(0xFF171717),
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                       isDark: isDark,
                     ),
                     const SizedBox(width: 12),
@@ -200,7 +200,7 @@ class _PracticeSummaryState extends State<PracticeSummary>
                     _StatCard(
                       label: 'কঠিন',
                       value: _strugglingCount,
-                      color: const Color(0xFFDC2626),
+                      color: const Color(0xFFB91C1C),
                       isDark: isDark,
                     ),
                   ],
@@ -231,7 +231,7 @@ class _PracticeSummaryState extends State<PracticeSummary>
                             const Icon(
                               Icons.warning_amber_rounded,
                               size: 16,
-                              color: Color(0xFFDC2626),
+                              color: Color(0xFFB91C1C),
                             ),
                             const SizedBox(width: 6),
                             Text(
@@ -239,7 +239,7 @@ class _PracticeSummaryState extends State<PracticeSummary>
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFFDC2626),
+                                color: Color(0xFFB91C1C),
                               ),
                             ),
                           ],
@@ -288,12 +288,12 @@ class _PracticeSummaryState extends State<PracticeSummary>
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFDC2626),
+                        color: const Color(0xFFB91C1C),
                         borderRadius: BorderRadius.circular(14),
                         boxShadow: [
                           BoxShadow(
                             color: const Color(
-                              0xFFDC2626,
+                              0xFFB91C1C,
                             ).withValues(alpha: 0.3),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
@@ -345,7 +345,7 @@ class _PracticeSummaryState extends State<PracticeSummary>
                           fontWeight: FontWeight.bold,
                           color: isDark
                               ? Colors.white
-                              : const Color(0xFF171717),
+                              : const Color(0xFF0F172A),
                         ),
                       ),
                     ),
@@ -430,7 +430,7 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF171717) : Colors.white,
+          color: isDark ? const Color(0xFF0F172A) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),

@@ -73,7 +73,7 @@ class _BlogViewState extends State<BlogView> {
             value: _loadingProgress / 100,
             minHeight: 3,
             backgroundColor: Colors.transparent,
-            color: const Color(0xFF10B981), // emerald-500
+            color: const Color(0xFF047857), // emerald-500
           )
         else
           const SizedBox(height: 3),
@@ -82,7 +82,7 @@ class _BlogViewState extends State<BlogView> {
         Container(
           height: 44,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF171717) : Colors.white,
+            color: isDark ? const Color(0xFF0F172A) : Colors.white,
             border: Border(
               bottom: BorderSide(
                 color: isDark
@@ -99,7 +99,7 @@ class _BlogViewState extends State<BlogView> {
                   LucideIcons.chevronLeft,
                   size: 20,
                   color: _canGoBack
-                      ? (isDark ? Colors.white : const Color(0xFF171717))
+                      ? (isDark ? Colors.white : const Color(0xFF0F172A))
                       : (isDark
                             ? const Color(0xFF525252)
                             : const Color(0xFFD4D4D4)),

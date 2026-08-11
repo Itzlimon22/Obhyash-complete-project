@@ -280,7 +280,7 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       decoration: BoxDecoration(
                         color: _filter == f.$1
-                            ? const Color(0xFFE11D48)
+                            ? const Color(0xFFB91C1C)
                             : (isDark
                                   ? const Color(0xFF262626)
                                   : const Color(0xFFF5F5F5)),
@@ -324,21 +324,21 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
                               label: 'মোট প্রশ্ন',
                               value: _stats!.totalQuestions.toString(),
                               icon: LucideIcons.clipboardList,
-                              color: const Color(0xFFE11D48),
+                              color: const Color(0xFFB91C1C),
                               isDark: isDark,
                             ),
                             _SRKpi(
                               label: 'নির্ভুলতা',
                               value: '${_stats!.accuracy}%',
                               icon: LucideIcons.checkCircle2,
-                              color: const Color(0xFF059669),
+                              color: const Color(0xFF047857),
                               isDark: isDark,
                             ),
                             _SRKpi(
                               label: 'গড় সময়',
                               value: '${_stats!.averageTime}s',
                               icon: LucideIcons.clock,
-                              color: const Color(0xFFE11D48),
+                              color: const Color(0xFFB91C1C),
                               isDark: isDark,
                             ),
                           ],
@@ -391,7 +391,7 @@ class _SRKpi extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 3),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -413,7 +413,7 @@ class _SRKpi extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w900,
-              color: isDark ? Colors.white : const Color(0xFF171717),
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
           ),
           Text(
@@ -439,13 +439,13 @@ class _SRDonut extends StatelessWidget {
     final sections = [
       PieChartSectionData(
         value: stats.correct.toDouble().clamp(0.001, double.infinity),
-        color: const Color(0xFF10B981),
+        color: const Color(0xFF047857),
         title: '',
         radius: 48,
       ),
       PieChartSectionData(
         value: stats.wrong.toDouble().clamp(0.001, double.infinity),
-        color: const Color(0xFFF43F5E),
+        color: const Color(0xFFB91C1C),
         title: '',
         radius: 48,
       ),
@@ -460,7 +460,7 @@ class _SRDonut extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -474,7 +474,7 @@ class _SRDonut extends StatelessWidget {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF171717),
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
           ),
           const SizedBox(height: 16),
@@ -503,7 +503,7 @@ class _SRDonut extends StatelessWidget {
                             fontWeight: FontWeight.w900,
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF171717),
+                                : const Color(0xFF0F172A),
                           ),
                         ),
                         const Text(
@@ -526,14 +526,14 @@ class _SRDonut extends StatelessWidget {
                     _SRLegend(
                       'সঠিক',
                       stats.correct,
-                      const Color(0xFF10B981),
+                      const Color(0xFF047857),
                       isDark,
                     ),
                     const SizedBox(height: 10),
                     _SRLegend(
                       'ভুল',
                       stats.wrong,
-                      const Color(0xFFF43F5E),
+                      const Color(0xFFB91C1C),
                       isDark,
                     ),
                     const SizedBox(height: 10),
@@ -587,7 +587,7 @@ class _SRLegend extends StatelessWidget {
           fontSize: 13,
           fontFamily: 'monospace',
           fontWeight: FontWeight.bold,
-          color: isDark ? Colors.white : const Color(0xFF171717),
+          color: isDark ? Colors.white : const Color(0xFF0F172A),
         ),
       ),
     ],
@@ -605,7 +605,7 @@ class _SRChapterList extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      color: isDark ? const Color(0xFF171717) : Colors.white,
+      color: isDark ? const Color(0xFF0F172A) : Colors.white,
       borderRadius: BorderRadius.circular(20),
       border: Border.all(
         color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -619,7 +619,7 @@ class _SRChapterList extends StatelessWidget {
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : const Color(0xFF171717),
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
           ),
         ),
         const SizedBox(height: 14),
@@ -644,10 +644,10 @@ class _SRChapterRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = chapter;
     final Color bar = c.accuracy >= 80
-        ? const Color(0xFF10B981)
+        ? const Color(0xFF047857)
         : c.accuracy >= 50
         ? const Color(0xFFF59E0B)
-        : const Color(0xFFF43F5E);
+        : const Color(0xFFB91C1C);
     final pct = c.total > 0 ? (c.accuracy / 100.0).clamp(0.0, 1.0) : 0.0;
 
     return Column(
@@ -725,7 +725,7 @@ class _SRWeakness extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -765,7 +765,7 @@ class _SRWeakness extends StatelessWidget {
                   child: const Icon(
                     LucideIcons.xCircle,
                     size: 16,
-                    color: Color(0xFFE11D48),
+                    color: Color(0xFFB91C1C),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -774,7 +774,7 @@ class _SRWeakness extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF171717),
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
               ],
@@ -787,13 +787,13 @@ class _SRWeakness extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF052E16)
+                          ? const Color(0xFF047857)
                           : const Color(0xFFECFDF5),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isDark
-                            ? const Color(0xFF064E3B)
-                            : const Color(0xFFD1FAE5),
+                            ? const Color(0xFF047857)
+                            : const Color(0xFFECFDF5),
                       ),
                     ),
                     child: const Row(
@@ -802,7 +802,7 @@ class _SRWeakness extends StatelessWidget {
                         Icon(
                           LucideIcons.checkCircle2,
                           size: 18,
-                          color: Color(0xFF059669),
+                          color: Color(0xFF047857),
                         ),
                         SizedBox(width: 8),
                         Text(
@@ -810,7 +810,7 @@ class _SRWeakness extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF059669),
+                            color: Color(0xFF047857),
                           ),
                         ),
                       ],
@@ -832,7 +832,7 @@ class _SRWeakness extends StatelessWidget {
                                 border: Border.all(
                                   color: isDark
                                       ? const Color(0xFF3F0F17)
-                                      : const Color(0xFFFFE4E6),
+                                      : const Color(0xFFFEF2F2),
                                 ),
                               ),
                               child: Column(
@@ -843,7 +843,7 @@ class _SRWeakness extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 9,
                                       fontWeight: FontWeight.w900,
-                                      color: Color(0xFFE11D48),
+                                      color: Color(0xFFB91C1C),
                                       letterSpacing: 1.0,
                                     ),
                                   ),
@@ -857,7 +857,7 @@ class _SRWeakness extends StatelessWidget {
                                       fontWeight: FontWeight.bold,
                                       color: isDark
                                           ? Colors.white
-                                          : const Color(0xFF171717),
+                                          : const Color(0xFF0F172A),
                                     ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
@@ -867,7 +867,7 @@ class _SRWeakness extends StatelessWidget {
                                     '${weak.first.wrong}টি ভুল',
                                     style: const TextStyle(
                                       fontSize: 11,
-                                      color: Color(0xFFE11D48),
+                                      color: Color(0xFFB91C1C),
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -881,13 +881,13 @@ class _SRWeakness extends StatelessWidget {
                               padding: const EdgeInsets.all(14),
                               decoration: BoxDecoration(
                                 color: isDark
-                                    ? const Color(0xFF052E16)
+                                    ? const Color(0xFF047857)
                                     : const Color(0xFFECFDF5),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: isDark
-                                      ? const Color(0xFF064E3B)
-                                      : const Color(0xFFD1FAE5),
+                                      ? const Color(0xFF047857)
+                                      : const Color(0xFFECFDF5),
                                 ),
                               ),
                               child: Column(
@@ -898,7 +898,7 @@ class _SRWeakness extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 9,
                                       fontWeight: FontWeight.w900,
-                                      color: Color(0xFF059669),
+                                      color: Color(0xFF047857),
                                       letterSpacing: 1.0,
                                     ),
                                   ),
@@ -909,7 +909,7 @@ class _SRWeakness extends StatelessWidget {
                                       fontSize: 12,
                                       color: isDark
                                           ? const Color(0xFF6EE7B7)
-                                          : const Color(0xFF065F46),
+                                          : const Color(0xFF047857),
                                       height: 1.4,
                                     ),
                                     maxLines: 3,
@@ -934,7 +934,7 @@ class _SRWeakness extends StatelessWidget {
                                     const Icon(
                                       LucideIcons.alertTriangle,
                                       size: 12,
-                                      color: Color(0xFFE11D48),
+                                      color: Color(0xFFB91C1C),
                                     ),
                                     const SizedBox(width: 8),
                                     Expanded(
@@ -954,7 +954,7 @@ class _SRWeakness extends StatelessWidget {
                                       style: const TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFFE11D48),
+                                        color: Color(0xFFB91C1C),
                                       ),
                                     ),
                                   ],
@@ -992,7 +992,7 @@ class _SREmpty extends StatelessWidget {
             child: const Icon(
               LucideIcons.fileBarChart,
               size: 32,
-              color: Color(0xFFE11D48),
+              color: Color(0xFFB91C1C),
             ),
           ),
           const SizedBox(height: 16),
@@ -1001,7 +1001,7 @@ class _SREmpty extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF171717),
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
           ),
           const SizedBox(height: 8),

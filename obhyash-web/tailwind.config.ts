@@ -20,13 +20,25 @@ const config = {
     extend: {
       colors: {
         // --- 🟢 NEW: Brand Colors ---
+        // --- 🟢 STRICT BRAND PALETTE ---
         brand: {
-          50: '#fff1f2',
-          100: '#ffe4e6',
-          500: '#f43f5e',
-          600: '#e11d48',
-          700: '#be123c',
-          900: '#881337',
+          50: '#ecfdf5',  // Soft Mint (Backgrounds)
+          100: '#d1fae5',
+          500: '#047857', // Primary Deep Green
+          600: '#065f46',
+          700: '#064e3b',
+          900: '#022c22',
+        },
+        danger: {
+          50: '#fef2f2',  // Soft Rose (Backgrounds)
+          500: '#b91c1c', // Primary Deep Red
+          700: '#991b1b',
+          900: '#450a0a',
+        },
+        warning: {
+          50: '#fffbeb',
+          500: '#f59e0b', // Primary Warm Gold
+          700: '#b45309',
         },
         // --- 🟢 NEW: Custom Dark Backgrounds ---
         obsidian: {
@@ -90,7 +102,7 @@ const config = {
       boxShadow: {
         // --- 🟢 NEW: Custom Shadows ---
         glass: '0 4px 30px rgba(0, 0, 0, 0.1)',
-        glow: '0 0 15px rgba(244, 63, 94, 0.15)',
+        glow: '0 0 15px rgba(4, 120, 87, 0.15)',
         subtle: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
       },
       keyframes: {

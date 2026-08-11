@@ -69,8 +69,8 @@ class CountdownBanner extends StatelessWidget {
       case _Urgency.critical:
         borderColor = const Color(0xFFFECACA); // red-200
         bgColor = isDark ? const Color(0xFF2A1515) : const Color(0xFFFFF5F5);
-        textColor = const Color(0xFFDC2626); // red-600
-        labelColor = const Color(0xFFEF4444); // red-500
+        textColor = const Color(0xFFB91C1C); // red-600
+        labelColor = const Color(0xFFB91C1C); // red-500
         statusText = 'মাত্র $days দিন বাকি!';
         break;
       case _Urgency.urgent:
@@ -84,14 +84,14 @@ class CountdownBanner extends StatelessWidget {
         borderColor = const Color(0xFFA7F3D0); // emerald-200
         bgColor = isDark ? const Color(0xFF0A1F17) : const Color(0xFFF0FDF4);
         textColor = const Color(0xFF047857); // emerald-700
-        labelColor = const Color(0xFF10B981); // emerald-500
+        labelColor = const Color(0xFF047857); // emerald-500
         statusText = '$days দিন বাকি';
         break;
       case _Urgency.past:
         borderColor = isDark
             ? const Color(0xFF404040)
             : const Color(0xFFE5E5E5);
-        bgColor = isDark ? const Color(0xFF171717) : const Color(0xFFFAFAFA);
+        bgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFFAFAFA);
         textColor = const Color(0xFF737373); // neutral-500
         labelColor = const Color(0xFF737373);
         statusText = 'পরীক্ষা শেষ';

@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 import '../../../core/providers/auth_provider.dart';
+import 'package:obhyash_app/core/utils/app_popups.dart';
 
 // --- Domain Models ---
 enum ComplaintType { technical, ux, bug, featureRequest }
@@ -49,9 +50,9 @@ final complaintTypes = [
     'icon': LucideIcons.zap,
     'color': const Color(0xFFEFF6FF), // blue-50
     'darkColor': const Color(0x4D1E3A8A), // blue-900/30
-    'iconColor': const Color(0xFF2563EB), // blue-600
-    'darkIconColor': const Color(0xFF60A5FA), // blue-400
-    'borderColor': const Color(0xFF3B82F6), // blue-500
+    'iconColor': const Color(0xFF0F172A), // blue-600
+    'darkIconColor': const Color(0xFF334155), // blue-400
+    'borderColor': const Color(0xFF0F172A), // blue-500
     'description': 'অ্যাপ ক্র্যাশ, লোডিং সমস্যা বা এরর',
   },
   {
@@ -63,7 +64,7 @@ final complaintTypes = [
     'darkColor': const Color(0x4D581C87), // purple-900/30
     'iconColor': const Color(0xFF9333EA), // purple-600
     'darkIconColor': const Color(0xFFC084FC), // purple-400
-    'borderColor': const Color(0xFFA855F7), // purple-500
+    'borderColor': const Color(0xFF0F172A), // purple-500
     'description': 'ইন্টারফেস বা ব্যবহারের সুবিধা নিয়ে পরামর্শ',
   },
   {
@@ -73,9 +74,9 @@ final complaintTypes = [
     'icon': LucideIcons.bug,
     'color': const Color(0xFFFFF1F2), // rose-50
     'darkColor': const Color(0x4D881337), // rose-900/30
-    'iconColor': const Color(0xFFE11D48), // rose-600
-    'darkIconColor': const Color(0xFFFB7185), // rose-400
-    'borderColor': const Color(0xFFF43F5E), // rose-500
+    'iconColor': const Color(0xFFB91C1C), // rose-600
+    'darkIconColor': const Color(0xFFB91C1C), // rose-400
+    'borderColor': const Color(0xFFB91C1C), // rose-500
     'description': 'কোনো ফিচার ঠিকমতো কাজ করছে না',
   },
   {
@@ -88,7 +89,7 @@ final complaintTypes = [
     'iconColor': const Color(0xFFD97706), // amber-600
     'darkIconColor': const Color(0xFFFBBF24), // amber-400
     'borderColor': const Color(0xFFF59E0B), // amber-500
-    'description': 'নতুন কোনো সুবিধা বা ফিচার চান?',
+    'description': 'নতুন কোনো সুবিধা বা ফিচার চাও?',
   },
 ];
 
@@ -105,14 +106,14 @@ final statusConfig = {
     'icon': LucideIcons.refreshCcw,
     'color': const Color(0xFFDBEAFE), // blue-100
     'darkColor': const Color(0x331E3A8A), // blue-900/20
-    'iconColor': const Color(0xFF3B82F6), // blue-500
+    'iconColor': const Color(0xFF0F172A), // blue-500
   },
   'Resolved': {
     'label': 'সমাধান হয়েছে',
     'icon': LucideIcons.checkCheck,
-    'color': const Color(0xFFD1FAE5), // emerald-100
+    'color': const Color(0xFFECFDF5), // emerald-100
     'darkColor': const Color(0x33064E3B), // emerald-900/20
-    'iconColor': const Color(0xFF10B981), // emerald-500
+    'iconColor': const Color(0xFF047857), // emerald-500
   },
   'Dismissed': {
     'label': 'বাতিল',
@@ -175,9 +176,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-        );
+        AppPopups.show(context, message: 'Error: $e', isError: true);
       }
     } finally {
       if (mounted) setState(() => _isLoadingComplaints = false);
@@ -186,20 +185,18 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
 
   Future<void> _handleSubmit() async {
     if (_selectedType == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('অনুগ্রহ করে অভিযোগের ধরণ নির্বাচন করো'),
-          backgroundColor: Colors.red,
-        ),
+      AppPopups.show(
+        context,
+        message: 'অনুগ্রহ করে অভিযোগের ধরণ নির্বাচন করো',
+        isError: true,
       );
       return;
     }
     if (_descriptionController.text.length < 10) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('অনুগ্রহ করে বিস্তারিত লিখুন (কমপক্ষে ১০ অক্ষর)'),
-          backgroundColor: Colors.red,
-        ),
+      AppPopups.show(
+        context,
+        message: 'অনুগ্রহ করে বিস্তারিত লেখো (কমপক্ষে ১০ অক্ষর)',
+        isError: true,
       );
       return;
     }
@@ -219,18 +216,15 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
 
       if (mounted) {
         setState(() => _isSuccess = true);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('আপনার বার্তা আমরা পেয়েছি! ধন্যবাদ। 🚀'),
-            backgroundColor: Colors.green,
-          ),
+        AppPopups.show(
+          context,
+          message: 'তোমার বার্তা আমরা পেয়েছি! ধন্যবাদ। 🚀',
+          isError: false,
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-        );
+        AppPopups.show(context, message: 'Error: $e', isError: true);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -251,7 +245,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
         padding: const EdgeInsets.all(32),
         margin: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF171717) : Colors.white,
+          color: isDark ? const Color(0xFF0F172A) : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
@@ -273,13 +267,13 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               decoration: BoxDecoration(
                 color: isDark
                     ? const Color(0x33064E3B)
-                    : const Color(0xFFD1FAE5),
+                    : const Color(0xFFECFDF5),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 LucideIcons.checkCircle2,
                 size: 48,
-                color: Color(0xFF10B981),
+                color: Color(0xFF047857),
               ), // emerald-500
             ),
             const SizedBox(height: 24),
@@ -288,7 +282,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w900,
-                color: isDark ? Colors.white : const Color(0xFF171717),
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
             const SizedBox(height: 8),
@@ -315,7 +309,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                         : const Color(0xFFF5F5F5),
                     foregroundColor: isDark
                         ? Colors.white
-                        : const Color(0xFF171717),
+                        : const Color(0xFF0F172A),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -337,7 +331,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: const Color(0xFFE11D48), // rose-600
+                    backgroundColor: const Color(0xFFB91C1C), // rose-600
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
@@ -430,7 +424,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
-                      Color(0xFF059669),
+                      Color(0xFF047857),
                       Color(0xFF047857),
                     ], // emerald-600 to emerald-700
                     begin: Alignment.topLeft,
@@ -439,7 +433,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: const [
                     BoxShadow(
-                      color: Color(0x33059669),
+                      color: Color(0x33047857),
                       blurRadius: 20,
                       offset: Offset(0, 10),
                     ),
@@ -482,7 +476,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     ),
                     const SizedBox(height: 16),
                     const Text(
-                      'কিছু বলতে চান?\nআমরা শুনছি।',
+                      'কিছু বলতে চাও?\nআমরা শুনছি।',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 32,
@@ -511,7 +505,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF171717),
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
               ),
@@ -534,11 +528,11 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? (isDark ? const Color(0xFF262626) : Colors.white)
-                            : (isDark ? const Color(0xFF171717) : Colors.white),
+                            : (isDark ? const Color(0xFF0F172A) : Colors.white),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isSelected
-                              ? const Color(0xFFF43F5E)
+                              ? const Color(0xFFB91C1C)
                               : Colors.transparent, // rose-500
                           width: 2,
                         ),
@@ -582,11 +576,11 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                         fontWeight: FontWeight.bold,
                                         color: isSelected
                                             ? const Color(
-                                                0xFFE11D48,
+                                                0xFFB91C1C,
                                               ) // rose-600
                                             : (isDark
                                                   ? Colors.white
-                                                  : const Color(0xFF171717)),
+                                                  : const Color(0xFF0F172A)),
                                       ),
                                     ),
                                     Text(
@@ -620,7 +614,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                               right: 0,
                               child: Icon(
                                 LucideIcons.checkCircle2,
-                                color: Color(0xFFF43F5E),
+                                color: Color(0xFFB91C1C),
                                 size: 20,
                               ),
                             ),
@@ -635,11 +629,11 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '২. বিস্তারিত লিখুন',
+                  '২. বিস্তারিত লেখো',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF171717),
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
               ),
@@ -648,14 +642,14 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 controller: _descriptionController,
                 maxLines: 8,
                 style: TextStyle(
-                  color: isDark ? Colors.white : const Color(0xFF171717),
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
                 decoration: InputDecoration(
                   hintText:
-                      'আপনার সমস্যা বা পরামর্শ সম্পর্কে বিস্তারিত লিখুন...',
+                      'তোমার সমস্যা বা পরামর্শ সম্পর্কে বিস্তারিত লেখো...',
                   hintStyle: const TextStyle(color: Color(0xFFA3A3A3)),
                   filled: true,
-                  fillColor: isDark ? const Color(0xFF171717) : Colors.white,
+                  fillColor: isDark ? const Color(0xFF0F172A) : Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide(
@@ -668,7 +662,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: const BorderSide(
-                      color: Color(0xFFF43F5E),
+                      color: Color(0xFFB91C1C),
                       width: 2,
                     ), // rose-500
                   ),
@@ -684,8 +678,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     horizontal: 32,
                   ),
                   backgroundColor: isDark
-                      ? const Color(0xFFE11D48)
-                      : const Color(0xFF171717),
+                      ? const Color(0xFFB91C1C)
+                      : const Color(0xFF0F172A),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -731,7 +725,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'আপনার ফিডব্যাক আমাদের জন্য অত্যন্ত গুরুত্বপূর্ণ ❤️',
+                'তোমার ফিডব্যাক আমাদের জন্য অত্যন্ত গুরুত্বপূর্ণ ❤️',
                 style: TextStyle(color: Color(0xFFA3A3A3), fontSize: 14),
               ),
             ] else ...[
@@ -740,7 +734,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 const Padding(
                   padding: EdgeInsets.all(40.0),
                   child: Center(
-                    child: CircularProgressIndicator(color: Color(0xFFF43F5E)),
+                    child: CircularProgressIndicator(color: Color(0xFFB91C1C)),
                   ),
                 )
               else if (_myComplaints.isEmpty)
@@ -748,7 +742,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                   padding: const EdgeInsets.all(40),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF171717)
+                        ? const Color(0xFF0F172A)
                         : const Color(0xFFFAFAFA),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
@@ -777,14 +771,14 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                       ),
                       const SizedBox(height: 8),
                       const Text(
-                        'আপনি এখনো কোনো অভিযোগ বা পরামর্শ জমা দেননি।',
+                        'তুমি এখনো কোনো অভিযোগ বা পরামর্শ জমা দেননি।',
                         style: TextStyle(color: Color(0xFFA3A3A3)),
                       ),
                       const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: () => setState(() => _activeTab = 'new'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFE11D48), // rose-600
+                          backgroundColor: const Color(0xFFB91C1C), // rose-600
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
@@ -822,7 +816,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     return Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF171717) : Colors.white,
+                        color: isDark ? const Color(0xFF0F172A) : Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isDark
@@ -865,7 +859,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                           fontWeight: FontWeight.bold,
                                           color: isDark
                                               ? Colors.white
-                                              : const Color(0xFF171717),
+                                              : const Color(0xFF0F172A),
                                         ),
                                       ),
                                       Text(
@@ -935,8 +929,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: isDark
-                                      ? const Color(0x33059669)
-                                      : const Color(0xFFD1FAE5),
+                                      ? const Color(0x33047857)
+                                      : const Color(0xFFECFDF5),
                                 ),
                               ),
                               child: Column(
@@ -947,7 +941,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                       const Icon(
                                         LucideIcons.checkCheck,
                                         size: 14,
-                                        color: Color(0xFF10B981),
+                                        color: Color(0xFF047857),
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
@@ -956,7 +950,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                           color: isDark
-                                              ? const Color(0xFF34D399)
+                                              ? const Color(0xFF047857)
                                               : const Color(0xFF047857),
                                         ),
                                       ),
@@ -968,7 +962,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                     style: TextStyle(
                                       color: isDark
                                           ? const Color(0xFF6EE7B7)
-                                          : const Color(0xFF059669),
+                                          : const Color(0xFF047857),
                                     ),
                                   ),
                                 ],
@@ -1001,7 +995,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
           color: isActive
-              ? (isDark ? const Color(0xFF171717) : Colors.white)
+              ? (isDark ? const Color(0xFF0F172A) : Colors.white)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           boxShadow: isActive
@@ -1014,7 +1008,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               icon,
               size: 16,
               color: isActive
-                  ? const Color(0xFFE11D48)
+                  ? const Color(0xFFB91C1C)
                   : const Color(0xFF737373),
             ),
             const SizedBox(width: 8),
@@ -1024,7 +1018,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: isActive
-                    ? const Color(0xFFE11D48) // rose-600
+                    ? const Color(0xFFB91C1C) // rose-600
                     : const Color(0xFF737373),
               ),
             ),

@@ -44,9 +44,9 @@ class DailyGoalCard extends StatelessWidget {
 
     final bgColor = isDone
         ? (isDark ? const Color(0xFF0A1F17) : const Color(0xFFF0FDF4))
-        : (isDark ? const Color(0xFF171717) : Colors.white);
+        : (isDark ? const Color(0xFF0F172A) : Colors.white);
     final borderColor = isDone
-        ? (isDark ? const Color(0xFF065F46) : const Color(0xFFA7F3D0))
+        ? (isDark ? const Color(0xFF047857) : const Color(0xFFA7F3D0))
         : (isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5));
 
     return Container(
@@ -76,7 +76,7 @@ class DailyGoalCard extends StatelessWidget {
                         : const Color(0xFFE5E5E5),
                     valueColor: AlwaysStoppedAnimation<Color>(
                       isDone
-                          ? const Color(0xFF10B981) // emerald-500
+                          ? const Color(0xFF047857) // emerald-500
                           : const Color(0xFF047857), // emerald-700
                     ),
                   ),
@@ -86,7 +86,7 @@ class DailyGoalCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
-                    color: isDark ? Colors.white : const Color(0xFF171717),
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
               ],
@@ -104,7 +104,7 @@ class DailyGoalCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF10B981),
+                    color: const Color(0xFF047857),
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -118,7 +118,7 @@ class DailyGoalCard extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: isDark
                         ? const Color(0xFFD4D4D4)
-                        : const Color(0xFF171717),
+                        : const Color(0xFF0F172A),
                   ),
                 ),
               ],

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../domain/exam_models.dart';
 import 'question_card.dart';
 
-class ReviewList extends StatelessWidget {
+class ReviewList extends StatefulWidget {
   final List<Question> questions;
   final Map<String, int> userAnswers;
   final Set<String> bookmarked;
@@ -19,34 +19,93 @@ class ReviewList extends StatelessWidget {
   });
 
   @override
+  State<ReviewList> createState() => _ReviewListState();
+}
+
+class _ReviewListState extends State<ReviewList> {
+  String _reviewFilter = 'all'; // 'all', 'correct', 'wrong', 'skipped'
+
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Calculate counts for filters
+    int correctCount = 0;
+    int wrongCount = 0;
+    int skippedCount = 0;
+
+    for (var q in widget.questions) {
+      final ua = widget.userAnswers[q.id];
+      if (ua == null) {
+        skippedCount++;
+      } else if (ua == q.correctAnswerIndex) {
+        correctCount++;
+      } else {
+        wrongCount++;
+      }
+    }
+
+    final filteredQuestions = widget.questions.where((q) {
+      final ua = widget.userAnswers[q.id];
+      final isSkipped = ua == null;
+      final isCorrect = !isSkipped && (ua == q.correctAnswerIndex);
+      final isWrong = !isSkipped && !isCorrect;
+
+      if (_reviewFilter == 'correct' && !isCorrect) return false;
+      if (_reviewFilter == 'wrong' && !isWrong) return false;
+      if (_reviewFilter == 'skipped' && !isSkipped) return false;
+      return true;
+    }).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 16, top: 24),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'উত্তরপত্র পর্যালোচনা',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF171717),
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
-              Row(
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
-                  _LegendItem(
-                    color: Colors.green,
-                    label: 'সঠিক',
+                  _FilterButton(
+                    label: 'সব (${widget.questions.length})',
+                    isSelected: _reviewFilter == 'all',
+                    color: isDark ? Colors.white : Colors.black87,
+                    onTap: () => setState(() => _reviewFilter = 'all'),
                     isDark: isDark,
                   ),
-                  const SizedBox(width: 12),
-                  _LegendItem(color: Colors.red, label: 'ভুল', isDark: isDark),
+                  _FilterButton(
+                    label: 'সঠিক ($correctCount)',
+                    isSelected: _reviewFilter == 'correct',
+                    color: Colors.green,
+                    onTap: () => setState(() => _reviewFilter = 'correct'),
+                    isDark: isDark,
+                  ),
+                  _FilterButton(
+                    label: 'ভুল ($wrongCount)',
+                    isSelected: _reviewFilter == 'wrong',
+                    color: Colors.red,
+                    onTap: () => setState(() => _reviewFilter = 'wrong'),
+                    isDark: isDark,
+                  ),
+                  _FilterButton(
+                    label: 'স্কিপ ($skippedCount)',
+                    isSelected: _reviewFilter == 'skipped',
+                    color: Colors.grey,
+                    onTap: () => setState(() => _reviewFilter = 'skipped'),
+                    isDark: isDark,
+                  ),
                 ],
               ),
             ],
@@ -54,16 +113,18 @@ class ReviewList extends StatelessWidget {
         ),
 
         // Reusing QuestionCard in review mode
-        ...List.generate(questions.length, (index) {
-          final q = questions[index];
+        ...List.generate(filteredQuestions.length, (index) {
+          final q = filteredQuestions[index];
+          // Find original index for serial number
+          final originalIndex = widget.questions.indexOf(q);
           return QuestionCard(
             question: q,
-            serialNumber: index + 1,
-            selectedOptionIndex: userAnswers[q.id],
+            serialNumber: originalIndex + 1,
+            selectedOptionIndex: widget.userAnswers[q.id],
             isFlagged: false, // Don't show exam flags here
-            isBookmarked: bookmarked.contains(q.id),
-            onToggleBookmark: () => onToggleBookmark(q.id),
-            onReport: () => onReport(q.id),
+            isBookmarked: widget.bookmarked.contains(q.id),
+            onToggleBookmark: () => widget.onToggleBookmark(q.id),
+            onReport: () => widget.onReport(q.id),
             onSelectOption: (_) {}, // Read only
             onToggleFlag: () {}, // Read only
             showFeedback:
@@ -76,36 +137,61 @@ class ReviewList extends StatelessWidget {
   }
 }
 
-class _LegendItem extends StatelessWidget {
-  final Color color;
+class _FilterButton extends StatelessWidget {
   final String label;
+  final bool isSelected;
+  final Color color;
+  final VoidCallback onTap;
   final bool isDark;
 
-  const _LegendItem({
-    required this.color,
+  const _FilterButton({
     required this.label,
+    required this.isSelected,
+    required this.color,
+    required this.onTap,
     required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF737373),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? color
+                : (isDark ? Colors.grey[800]! : Colors.grey[300]!),
           ),
         ),
-      ],
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (label != 'সব' && !label.startsWith('সব')) ...[
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: isSelected
+                    ? color
+                    : (isDark ? Colors.grey[400] : Colors.grey[600]),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

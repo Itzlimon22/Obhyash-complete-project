@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../domain/exam_models.dart';
 import 'widgets/result_stats.dart';
 import 'widgets/review_list.dart';
+import 'package:obhyash_app/core/utils/app_popups.dart';
 
 class ResultView extends StatefulWidget {
   final ExamResult result;
@@ -95,7 +96,7 @@ class _ResultViewState extends State<ResultView> {
         ),
         decoration: BoxDecoration(
           color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF171717)
+              ? const Color(0xFF0F172A)
               : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
@@ -146,10 +147,10 @@ class _ResultViewState extends State<ResultView> {
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pop(ctx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('রিপোর্ট সফলভাবে জমা দেওয়া হয়েছে!'),
-                        ),
+                      AppPopups.show(
+                        context,
+                        message: 'রিপোর্ট সফলভাবে জমা দেওয়া হয়েছে!',
+                        isError: false,
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -181,6 +182,26 @@ class _ResultViewState extends State<ResultView> {
         ? (widget.result.score / widget.result.totalMarks) * 100
         : 0.0;
 
+    // Feedback Logic
+    String feedbackTitle;
+    String feedbackText;
+    if (widget.isHistoryMode) {
+      feedbackTitle = 'ফলাফল পর্যালোচনা';
+      feedbackText = 'তোমার পূর্ববর্তী পরীক্ষার বিস্তারিত ফলাফল';
+    } else if (percentage >= 90) {
+      feedbackTitle = 'অসাধারণ!';
+      feedbackText = 'তুমি এই বিষয়টি খুব ভালো আয়ত্ত করেছো।';
+    } else if (percentage >= 70) {
+      feedbackTitle = 'খুব ভালো!';
+      feedbackText = 'ভালো ধারণা আছে, চালিয়ে যাও।';
+    } else if (percentage >= 50) {
+      feedbackTitle = 'ভালো প্রচেষ্টা';
+      feedbackText = 'তুমি সঠিক পথে আছেন।';
+    } else {
+      feedbackTitle = 'আরও ভালো করতে হবে';
+      feedbackText = 'বিষয়টি পুনরায় পড়ে আবার চেষ্টা করো।';
+    }
+
     return Scaffold(
       backgroundColor: isDark ? Colors.black : const Color(0xFFFAFAFA),
       appBar: AppBar(
@@ -203,6 +224,27 @@ class _ResultViewState extends State<ResultView> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Column(
           children: [
+            // Dynamic Header
+            Text(
+              feedbackTitle,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              feedbackText,
+              style: TextStyle(
+                fontSize: 14,
+                color: isDark ? Colors.grey[400] : Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+
             // Banner for OMR review
             if (widget.result.submissionType == 'script' &&
                 !widget.isHistoryMode)
@@ -280,7 +322,7 @@ class _ResultViewState extends State<ResultView> {
                     label: const Text('ফলাফল ও ব্যাখ্যা'),
                     style: OutlinedButton.styleFrom(
                       backgroundColor: const Color(0xFFECFDF5), // emerald-50
-                      foregroundColor: const Color(0xFF059669), // emerald-600
+                      foregroundColor: const Color(0xFF047857), // emerald-600
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       side: const BorderSide(color: Color(0xFFE0E7FF)),
                     ),
@@ -288,7 +330,79 @@ class _ResultViewState extends State<ResultView> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+
+            // Exam Details Ribbon
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 24),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF262626).withValues(alpha: 0.4)
+                    : const Color(0xFFF9FAFB),
+                border: Border.all(
+                  color: isDark
+                      ? const Color(0xFF404040)
+                      : const Color(0xFFF3F4F6),
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.menu_book_rounded,
+                        size: 16,
+                        color: Colors.green,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        widget.result.subjectLabel ?? widget.result.subject,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.history_rounded,
+                        size: 16,
+                        color: Colors.green,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        widget.isHistoryMode ? 'ইতিহাস' : 'আজকের পরীক্ষা',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.help_outline_rounded,
+                        size: 16,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'মোট প্রশ্ন: ${widget.result.totalQuestions}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
 
             ResultStats(
               percentage: percentage,

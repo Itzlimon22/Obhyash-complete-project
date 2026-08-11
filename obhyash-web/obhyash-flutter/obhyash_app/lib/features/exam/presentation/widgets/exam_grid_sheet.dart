@@ -25,7 +25,7 @@ class ExamGridSheet extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: const [
           BoxShadow(
@@ -64,7 +64,7 @@ class ExamGridSheet extends StatelessWidget {
                     child: _StatChip(
                       label: 'Answered',
                       count: answeredCount,
-                      color: const Color(0xFF10B981),
+                      color: const Color(0xFF047857),
                       isDark: isDark,
                     ),
                   ),
@@ -109,7 +109,7 @@ class ExamGridSheet extends StatelessWidget {
                   final isFlagged = flaggedQuestions.contains(qId);
 
                   Color getBgColor() {
-                    if (isAnswered) return const Color(0xFF10B981);
+                    if (isAnswered) return const Color(0xFF047857);
                     if (isFlagged) return const Color(0xFFF59E0B);
                     return isDark
                         ? const Color(0xFF262626)

@@ -26,7 +26,7 @@ class SubjectStatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEEEEEE),
@@ -56,7 +56,7 @@ class SubjectStatCard extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF064E3B).withOpacity(0.25)
+                      ? const Color(0xFF047857).withOpacity(0.25)
                       : const Color(0xFFECFDF5),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -64,8 +64,8 @@ class SubjectStatCard extends StatelessWidget {
                   LucideIcons.barChart2,
                   size: 16,
                   color: isDark
-                      ? const Color(0xFF34D399)
-                      : const Color(0xFF059669),
+                      ? const Color(0xFF047857)
+                      : const Color(0xFF047857),
                 ),
               ),
               const SizedBox(width: 10),
@@ -177,7 +177,7 @@ class _SubjectItemState extends State<_SubjectItem> {
     // Web-app matching colors (sleek, minimalist)
     Color accTextColor;
     if (accuracy >= 80) {
-      accTextColor = isDark ? const Color(0xFF34D399) : const Color(0xFF059669);
+      accTextColor = isDark ? const Color(0xFF047857) : const Color(0xFF047857);
     } else if (accuracy >= 50) {
       accTextColor = isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706);
     } else {
@@ -188,12 +188,18 @@ class _SubjectItemState extends State<_SubjectItem> {
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1A1A1A) : Colors.white, // Sleek transparent-like dark background
+        color: isDark
+            ? const Color(0xFF1A1A1A)
+            : Colors.white, // Sleek transparent-like dark background
         borderRadius: BorderRadius.circular(12), // Web-app radius
         border: Border.all(
           color: _isOpen
-              ? (isDark ? const Color(0xFF047857) : const Color(0xFF34D399)) // Green accent when open
-              : (isDark ? const Color(0xFF333333) : const Color(0xFFE5E5E5)), // Thin sleek border
+              ? (isDark
+                    ? const Color(0xFF047857)
+                    : const Color(0xFF047857)) // Green accent when open
+              : (isDark
+                    ? const Color(0xFF333333)
+                    : const Color(0xFFE5E5E5)), // Thin sleek border
           width: 1,
         ),
       ),
@@ -203,7 +209,10 @@ class _SubjectItemState extends State<_SubjectItem> {
             onTap: () => setState(() => _isOpen = !_isOpen),
             borderRadius: BorderRadius.circular(12),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0), // More compact padding
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14.0,
+                vertical: 12.0,
+              ), // More compact padding
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -217,10 +226,12 @@ class _SubjectItemState extends State<_SubjectItem> {
                           height: 18, // Shorter and sleeker
                           decoration: BoxDecoration(
                             color: _isOpen
-                                ? const Color(0xFF10B981) // emerald-500
+                                ? const Color(0xFF047857) // emerald-500
                                 : (accuracy > 0
-                                    ? accTextColor
-                                    : (isDark ? const Color(0xFF404040) : const Color(0xFFD4D4D4))),
+                                      ? accTextColor
+                                      : (isDark
+                                            ? const Color(0xFF404040)
+                                            : const Color(0xFFD4D4D4))),
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -230,11 +241,16 @@ class _SubjectItemState extends State<_SubjectItem> {
                             duration: const Duration(milliseconds: 300),
                             style: TextStyle(
                               fontFamily: 'HindSiliguri',
-                              fontWeight: FontWeight.w600, // Medium weight like webapp
+                              fontWeight:
+                                  FontWeight.w600, // Medium weight like webapp
                               fontSize: 14, // Smaller font like webapp
                               color: _isOpen
-                                  ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
-                                  : (isDark ? Colors.white : const Color(0xFF1F2937)),
+                                  ? (isDark
+                                        ? const Color(0xFF047857)
+                                        : const Color(0xFF047857))
+                                  : (isDark
+                                        ? Colors.white
+                                        : const Color(0xFF1F2937)),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -253,13 +269,17 @@ class _SubjectItemState extends State<_SubjectItem> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF262626) : const Color(0xFFF3F4F6),
+                          color: isDark
+                              ? const Color(0xFF262626)
+                              : const Color(0xFFF3F4F6),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           '$accuracy%',
                           style: TextStyle(
-                            color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563),
+                            color: isDark
+                                ? const Color(0xFFA3A3A3)
+                                : const Color(0xFF4B5563),
                             fontWeight: FontWeight.w700,
                             fontSize: 11,
                           ),
@@ -272,13 +292,17 @@ class _SubjectItemState extends State<_SubjectItem> {
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF262626) : const Color(0xFFF3F4F6),
+                            color: isDark
+                                ? const Color(0xFF262626)
+                                : const Color(0xFFF3F4F6),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             LucideIcons.chevronDown,
                             size: 14,
-                            color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563),
+                            color: isDark
+                                ? const Color(0xFFA3A3A3)
+                                : const Color(0xFF4B5563),
                           ),
                         ),
                       ),
@@ -319,13 +343,13 @@ class _SubjectItemState extends State<_SubjectItem> {
               _StatBox(
                 label: 'সঠিক',
                 value: widget.subject.correct.toString(),
-                color: const Color(0xFF059669),
+                color: const Color(0xFF047857),
               ), // emerald-600
               const SizedBox(width: 8),
               _StatBox(
                 label: 'ভুল',
                 value: widget.subject.wrong.toString(),
-                color: const Color(0xFFE11D48),
+                color: const Color(0xFFB91C1C),
               ), // rose-600
               const SizedBox(width: 8),
               _StatBox(
@@ -348,12 +372,12 @@ class _SubjectItemState extends State<_SubjectItem> {
                   if (widget.subject.correct > 0)
                     Expanded(
                       flex: widget.subject.correct,
-                      child: Container(color: const Color(0xFF10B981)),
+                      child: Container(color: const Color(0xFF047857)),
                     ),
                   if (widget.subject.wrong > 0)
                     Expanded(
                       flex: widget.subject.wrong,
-                      child: Container(color: const Color(0xFFF43F5E)),
+                      child: Container(color: const Color(0xFFB91C1C)),
                     ),
                   if (widget.subject.skipped > 0)
                     Expanded(
@@ -372,11 +396,18 @@ class _SubjectItemState extends State<_SubjectItem> {
                 onTap: widget.onClick,
                 borderRadius: BorderRadius.circular(6),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF10B981).withValues(alpha: 0.1) : const Color(0xFF059669).withValues(alpha: 0.06),
+                    color: isDark
+                        ? const Color(0xFF047857).withValues(alpha: 0.1)
+                        : const Color(0xFF047857).withValues(alpha: 0.06),
                     border: Border.all(
-                      color: isDark ? const Color(0xFF10B981).withValues(alpha: 0.2) : const Color(0xFF059669).withValues(alpha: 0.15),
+                      color: isDark
+                          ? const Color(0xFF047857).withValues(alpha: 0.2)
+                          : const Color(0xFF047857).withValues(alpha: 0.15),
                       width: 1,
                     ),
                     borderRadius: BorderRadius.circular(6),
@@ -390,14 +421,18 @@ class _SubjectItemState extends State<_SubjectItem> {
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'HindSiliguri',
-                          color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                          color: isDark
+                              ? const Color(0xFF047857)
+                              : const Color(0xFF047857),
                         ),
                       ),
                       const SizedBox(width: 6),
                       Icon(
                         LucideIcons.arrowRight,
                         size: 14,
-                        color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                        color: isDark
+                            ? const Color(0xFF047857)
+                            : const Color(0xFF047857),
                       ),
                     ],
                   ),
@@ -430,10 +465,14 @@ class _StatBox extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: isDark ? 0.08 : 0.05), // Subtle premium tint
+          color: color.withValues(
+            alpha: isDark ? 0.08 : 0.05,
+          ), // Subtle premium tint
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: color.withValues(alpha: isDark ? 0.2 : 0.15), // Tinted border
+            color: color.withValues(
+              alpha: isDark ? 0.2 : 0.15,
+            ), // Tinted border
             width: 1,
           ),
         ),
@@ -445,7 +484,9 @@ class _StatBox extends StatelessWidget {
                 fontFamily: 'HindSiliguri',
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF6B7280),
+                color: isDark
+                    ? const Color(0xFFA3A3A3)
+                    : const Color(0xFF6B7280),
               ),
             ),
             const SizedBox(height: 2),
@@ -453,7 +494,8 @@ class _StatBox extends StatelessWidget {
               value,
               style: TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.bold, // Replaced w900 which can fail on some fonts
+                fontWeight: FontWeight
+                    .bold, // Replaced w900 which can fail on some fonts
                 color: color,
               ),
             ),

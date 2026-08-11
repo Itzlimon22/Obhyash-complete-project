@@ -1,7 +1,9 @@
-﻿import 'package:fl_chart/fl_chart.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/presentation/widgets/app_dropdown.dart';
+
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -295,16 +297,16 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                             value: '${_analytics!.avgScore}%',
                             isDark: isDark,
                             valueColor: isDark
-                                ? const Color(0xFF34D399)
-                                : const Color(0xFF059669),
+                                ? const Color(0xFF047857)
+                                : const Color(0xFF047857),
                           ),
                           _StatCard(
                             label: 'সঠিকতা',
                             value: '${_analytics!.avgAccuracy}%',
                             isDark: isDark,
                             valueColor: isDark
-                                ? const Color(0xFF34D399)
-                                : const Color(0xFF059669),
+                                ? const Color(0xFF047857)
+                                : const Color(0xFF047857),
                           ),
                           _StatCard(
                             label: 'মোট সময়',
@@ -312,7 +314,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                             isDark: isDark,
                             valueColor: isDark
                                 ? const Color(0xFFF87171)
-                                : const Color(0xFFE11D48),
+                                : const Color(0xFFB91C1C),
                           ),
                         ],
                       ),
@@ -330,14 +332,14 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                           _SecondaryStatChip(
                             label: 'সঠিক',
                             value: '$totalC',
-                            color: const Color(0xFF059669),
+                            color: const Color(0xFF047857),
                             isDark: isDark,
                           ),
                           const SizedBox(width: 10),
                           _SecondaryStatChip(
                             label: 'ভুল',
                             value: '$totalW',
-                            color: const Color(0xFFE11D48),
+                            color: const Color(0xFFB91C1C),
                             isDark: isDark,
                           ),
                         ],
@@ -438,7 +440,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF171717),
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
             const SizedBox(height: 8),
@@ -482,34 +484,17 @@ class _TimeFilterDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      child: DropdownButton<String>(
-        value: value,
-        isDense: true,
-        underline: const SizedBox.shrink(),
-        onChanged: (val) {
-          if (val != null) onChanged(val);
-        },
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 13,
-          color: isDark ? Colors.white : const Color(0xFF171717),
-        ),
-        dropdownColor: isDark ? const Color(0xFF262626) : Colors.white,
-        items: const [
-          DropdownMenuItem(value: 'all', child: Text('সব সময় (All Time)')),
-          DropdownMenuItem(value: 'month', child: Text('এই মাস (This Month)')),
-          DropdownMenuItem(value: 'week', child: Text('এই সপ্তাহ (This Week)')),
-        ],
-      ),
+    return AppDropdown<String>(
+      value: value,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      options: const [
+        AppDropdownOption(value: 'all', label: 'সব সময় (All Time)'),
+        AppDropdownOption(value: 'month', label: 'এই মাস (This Month)'),
+        AppDropdownOption(value: 'week', label: 'এই সপ্তাহ (This Week)'),
+      ],
+      onChanged: (val) {
+        if (val != null) onChanged(val);
+      },
     );
   }
 }
@@ -532,7 +517,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -568,7 +553,7 @@ class _StatCard extends StatelessWidget {
               fontWeight: FontWeight.w900,
               color:
                   valueColor ??
-                  (isDark ? Colors.white : const Color(0xFF171717)),
+                  (isDark ? Colors.white : const Color(0xFF0F172A)),
             ),
           ),
         ],
@@ -605,7 +590,7 @@ class _ScoreChart extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -625,7 +610,7 @@ class _ScoreChart extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF171717),
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
               Row(
@@ -636,7 +621,7 @@ class _ScoreChart extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF059669),
+                        color: Color(0xFF047857),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -648,7 +633,7 @@ class _ScoreChart extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF064E3B)
+                          ? const Color(0xFF047857)
                           : const Color(0xFFECFDF5),
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -657,7 +642,7 @@ class _ScoreChart extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF059669),
+                        color: Color(0xFF047857),
                       ),
                     ),
                   ),
@@ -730,7 +715,7 @@ class _ScoreChart extends StatelessWidget {
                           (s) => LineTooltipItem(
                             '${s.y.round()}%',
                             const TextStyle(
-                              color: Color(0xFF059669),
+                              color: Color(0xFF047857),
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
                             ),
@@ -744,13 +729,13 @@ class _ScoreChart extends StatelessWidget {
                     spots: spots,
                     isCurved: true,
                     preventCurveOverShooting: true,
-                    color: const Color(0xFF059669),
+                    color: const Color(0xFF047857),
                     barWidth: 3,
                     dotData: FlDotData(
                       show: spots.length <= 10,
                       getDotPainter: (_, _, _, _) => FlDotCirclePainter(
                         radius: 3,
-                        color: const Color(0xFF059669),
+                        color: const Color(0xFF047857),
                         strokeWidth: 2,
                         strokeColor: Colors.white,
                       ),
@@ -761,8 +746,8 @@ class _ScoreChart extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          const Color(0xFF059669).withValues(alpha: 0.3),
-                          const Color(0xFF059669).withValues(alpha: 0.0),
+                          const Color(0xFF047857).withValues(alpha: 0.3),
+                          const Color(0xFF047857).withValues(alpha: 0.0),
                         ],
                       ),
                     ),
@@ -794,7 +779,7 @@ class _SubjectStatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -811,7 +796,7 @@ class _SubjectStatCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF171717),
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
           ),
           const SizedBox(height: 16),
@@ -859,15 +844,15 @@ class _SubjectItemState extends State<_SubjectItem> {
     final accuracy = s.accuracy.round();
     final Color accColor;
     if (accuracy >= 80) {
-      accColor = isDark ? const Color(0xFF34D399) : const Color(0xFF059669);
+      accColor = isDark ? const Color(0xFF047857) : const Color(0xFF047857);
     } else if (accuracy >= 50) {
-      accColor = isDark ? const Color(0xFFFB7185) : const Color(0xFFE11D48);
+      accColor = isDark ? const Color(0xFFB91C1C) : const Color(0xFFB91C1C);
     } else {
       accColor = isDark ? const Color(0xFF737373) : const Color(0xFF737373);
     }
     final Color accBg;
     if (accuracy >= 80) {
-      accBg = isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5);
+      accBg = isDark ? const Color(0xFF047857) : const Color(0xFFECFDF5);
     } else if (accuracy >= 50) {
       accBg = isDark ? const Color(0xFF3F0F17) : const Color(0xFFFFF1F2);
     } else {
@@ -915,7 +900,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                       height: 32,
                       decoration: BoxDecoration(
                         color: _isOpen
-                            ? const Color(0xFFE11D48)
+                            ? const Color(0xFFB91C1C)
                             : (isDark
                                   ? const Color(0xFF404040)
                                   : const Color(0xFFE5E5E5)),
@@ -931,8 +916,8 @@ class _SubjectItemState extends State<_SubjectItem> {
                           fontSize: 15,
                           color: _isOpen
                               ? (isDark
-                                    ? const Color(0xFFFB7185)
-                                    : const Color(0xFFE11D48))
+                                    ? const Color(0xFFB91C1C)
+                                    : const Color(0xFFB91C1C))
                               : (isDark
                                     ? const Color(0xFFE5E5E5)
                                     : const Color(0xFF262626)),
@@ -976,7 +961,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                           child: const Icon(
                             LucideIcons.externalLink,
                             size: 13,
-                            color: Color(0xFF059669),
+                            color: Color(0xFF047857),
                           ),
                         ),
                       ),
@@ -1003,8 +988,8 @@ class _SubjectItemState extends State<_SubjectItem> {
                           size: 15,
                           color: _isOpen
                               ? (isDark
-                                    ? const Color(0xFFFB7185)
-                                    : const Color(0xFFE11D48))
+                                    ? const Color(0xFFB91C1C)
+                                    : const Color(0xFFB91C1C))
                               : (isDark
                                     ? const Color(0xFF737373)
                                     : const Color(0xFFA3A3A3)),
@@ -1039,8 +1024,8 @@ class _SubjectItemState extends State<_SubjectItem> {
                                       label: 'সঠিক',
                                       value: '${s.correct}',
                                       color: isDark
-                                          ? const Color(0xFF34D399)
-                                          : const Color(0xFF059669),
+                                          ? const Color(0xFF047857)
+                                          : const Color(0xFF047857),
                                       isDark: isDark,
                                     ),
                                     const SizedBox(width: 8),
@@ -1049,7 +1034,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                                       value: '${s.wrong}',
                                       color: isDark
                                           ? const Color(0xFFF87171)
-                                          : const Color(0xFFE11D48),
+                                          : const Color(0xFFB91C1C),
                                       isDark: isDark,
                                     ),
                                     const SizedBox(width: 8),
@@ -1058,7 +1043,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                                       value: '${s.skipped}',
                                       color: isDark
                                           ? const Color(0xFFF87171)
-                                          : const Color(0xFFE11D48),
+                                          : const Color(0xFFB91C1C),
                                       isDark: isDark,
                                     ),
                                   ],
@@ -1078,8 +1063,8 @@ class _SubjectItemState extends State<_SubjectItem> {
                                               decoration: const BoxDecoration(
                                                 gradient: LinearGradient(
                                                   colors: [
-                                                    Color(0xFF34D399),
-                                                    Color(0xFF059669),
+                                                    Color(0xFF047857),
+                                                    Color(0xFF047857),
                                                   ],
                                                 ),
                                               ),
@@ -1092,7 +1077,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                                                 gradient: LinearGradient(
                                                   colors: [
                                                     Color(0xFFF87171),
-                                                    Color(0xFFE11D48),
+                                                    Color(0xFFB91C1C),
                                                   ],
                                                 ),
                                               ),
@@ -1205,7 +1190,7 @@ class _SecondaryStatChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF171717) : Colors.white,
+          color: isDark ? const Color(0xFF0F172A) : Colors.white,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -1239,7 +1224,7 @@ class _SecondaryStatChip extends StatelessWidget {
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
                 color:
-                    color ?? (isDark ? Colors.white : const Color(0xFF171717)),
+                    color ?? (isDark ? Colors.white : const Color(0xFF0F172A)),
               ),
             ),
           ],
@@ -1267,13 +1252,13 @@ class _InsightCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final baseColor = isGood
-        ? const Color(0xFF059669)
-        : const Color(0xFFE11D48);
+        ? const Color(0xFF047857)
+        : const Color(0xFFB91C1C);
     final bgColor = isGood
         ? (isDark ? const Color(0xFF022C22) : const Color(0xFFECFDF5))
         : (isDark ? const Color(0xFF2D0A0D) : const Color(0xFFFFF1F2));
     final borderColor = isGood
-        ? (isDark ? const Color(0xFF064E3B) : const Color(0xFFBBF7D0))
+        ? (isDark ? const Color(0xFF047857) : const Color(0xFFBBF7D0))
         : (isDark ? const Color(0xFF4C0519) : const Color(0xFFFECDD3));
 
     return Container(
@@ -1317,7 +1302,7 @@ class _InsightCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : const Color(0xFF171717),
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

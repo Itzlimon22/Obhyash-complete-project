@@ -20,7 +20,7 @@ class RecentActivitySection extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -87,8 +87,8 @@ class RecentActivitySection extends StatelessWidget {
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: isDark
-                            ? const Color(0xFFFB7185)
-                            : const Color(0xFFE11D48),
+                            ? const Color(0xFFB91C1C)
+                            : const Color(0xFFB91C1C),
                         fontFamily: 'HindSiliguri',
                       ),
                     ),
@@ -161,10 +161,10 @@ class RecentActivitySection extends StatelessWidget {
                       ? exam.correctCount / exam.totalQuestions
                       : 0.0;
                   final Color progressColor = pct >= 0.8
-                      ? const Color(0xFF10B981)
+                      ? const Color(0xFF047857)
                       : pct >= 0.5
                       ? const Color(0xFFF59E0B)
-                      : const Color(0xFFEF4444);
+                      : const Color(0xFFB91C1C);
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(
@@ -216,7 +216,7 @@ class RecentActivitySection extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                   color: isDark
                                       ? Colors.white
-                                      : const Color(0xFF171717),
+                                      : const Color(0xFF0F172A),
                                   fontFamily: 'HindSiliguri',
                                 ),
                                 overflow: TextOverflow.ellipsis,

@@ -44,15 +44,9 @@ class ResultStats extends StatelessWidget {
           children: [
             // Accuracy
             Expanded(
-              child: _StatCard(
+              child: _CircularAccuracyCard(
                 title: 'সঠিকতা',
-                value: '${percentage.round()}%',
-                icon: Icons.pie_chart_outline,
-                color: percentage >= 70
-                    ? Colors.green
-                    : percentage >= 40
-                    ? Colors.orange
-                    : Colors.red,
+                percentage: percentage,
                 isDark: isDark,
               ),
             ),
@@ -87,7 +81,7 @@ class ResultStats extends StatelessWidget {
         // Summary Table
         Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF171717) : Colors.white,
+            color: isDark ? const Color(0xFF0F172A) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -125,47 +119,65 @@ class ResultStats extends StatelessWidget {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Column(
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _TableRow(
-                      label: 'মোট প্রশ্ন',
-                      value: totalQuestions.toString(),
-                      isDark: isDark,
+                    // Left Column
+                    Expanded(
+                      child: Column(
+                        children: [
+                          _TableRow(
+                            label: 'মোট প্রশ্ন',
+                            value: totalQuestions.toString(),
+                            isDark: isDark,
+                          ),
+                          _TableRow(
+                            label: 'উত্তর দেওয়া হয়েছে',
+                            value: (correctCount + wrongCount).toString(),
+                            isDark: isDark,
+                          ),
+                          _TableRow(
+                            label: 'উত্তর দেওয়া হয়নি',
+                            value: skippedCount.toString(),
+                            isDark: isDark,
+                          ),
+                        ],
+                      ),
                     ),
-                    _TableRow(
-                      label: 'উত্তর দেওয়া হয়েছে',
-                      value: (correctCount + wrongCount).toString(),
-                      isDark: isDark,
+                    VerticalDivider(
+                      width: 1,
+                      thickness: 1,
+                      color: isDark
+                          ? const Color(0xFF262626)
+                          : const Color(0xFFE5E5E5),
                     ),
-                    _TableRow(
-                      label: 'উত্তর দেওয়া হয়নি',
-                      value: skippedCount.toString(),
-                      isDark: isDark,
-                    ),
-                    const Divider(),
-                    _TableRow(
-                      label: 'সঠিক উত্তর',
-                      value: correctCount.toString(),
-                      isDark: isDark,
-                      valueColor: Colors.green,
-                    ),
-                    _TableRow(
-                      label: 'ভুল উত্তর',
-                      value: wrongCount.toString(),
-                      isDark: isDark,
-                      valueColor: Colors.red,
-                    ),
-                    _TableRow(
-                      label: 'নেগেটিভ মার্কিং (${negativeMarking}x)',
-                      value: '-${negativeMarksDeduction.toStringAsFixed(2)}',
-                      isDark: isDark,
-                      valueColor: Colors.red,
-                      bgColor: Colors.red.withValues(alpha: 0.05),
+                    // Right Column
+                    Expanded(
+                      child: Column(
+                        children: [
+                          _TableRow(
+                            label: 'সঠিক উত্তর',
+                            value: correctCount.toString(),
+                            isDark: isDark,
+                            valueColor: Colors.green,
+                          ),
+                          _TableRow(
+                            label: 'ভুল উত্তর',
+                            value: wrongCount.toString(),
+                            isDark: isDark,
+                            valueColor: Colors.red,
+                          ),
+                          _TableRow(
+                            label: 'নেগেটিভ মার্কিং (${negativeMarking}x)',
+                            value:
+                                '-${negativeMarksDeduction.toStringAsFixed(2)}',
+                            isDark: isDark,
+                            valueColor: Colors.red,
+                            bgColor: Colors.red.withValues(alpha: 0.05),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -239,7 +251,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -261,7 +273,7 @@ class _StatCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF171717),
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
           ),
           if (subtitle != null)
@@ -320,6 +332,79 @@ class _TableRow extends StatelessWidget {
               fontSize: 14,
               fontWeight: FontWeight.bold,
               color: valueColor ?? (isDark ? Colors.white : Colors.black),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CircularAccuracyCard extends StatelessWidget {
+  final String title;
+  final double percentage;
+  final bool isDark;
+
+  const _CircularAccuracyCard({
+    required this.title,
+    required this.percentage,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = percentage >= 70
+        ? Colors.green
+        : percentage >= 40
+        ? Colors.orange
+        : Colors.red;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+        ),
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            width: 56,
+            height: 56,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                CircularProgressIndicator(
+                  value: percentage / 100,
+                  strokeWidth: 6,
+                  color: color,
+                  backgroundColor: isDark
+                      ? const Color(0xFF262626)
+                      : const Color(0xFFF3F4F6),
+                  strokeCap: StrokeCap.round,
+                ),
+                Center(
+                  child: Text(
+                    '${percentage.round()}%',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
             ),
           ),
         ],

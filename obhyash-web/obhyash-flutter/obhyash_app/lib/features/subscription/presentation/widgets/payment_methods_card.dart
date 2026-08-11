@@ -49,7 +49,7 @@ class PaymentMethodsCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(8), // rounded-lg
           gradient: const LinearGradient(
             colors: [
-              Color(0xFFF97316),
+              Color(0xFFF59E0B),
               Color(0xFFEA580C),
             ], // orange-500 to orange-600
           ),
@@ -93,7 +93,7 @@ class PaymentMethodsCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isDark
-            ? const Color(0xFF171717)
+            ? const Color(0xFF0F172A)
             : Colors.white, // neutral-900 : white
         borderRadius: BorderRadius.circular(16), // rounded-2xl
         border: Border.all(
@@ -160,9 +160,9 @@ class PaymentMethodsCard extends StatelessWidget {
                   style:
                       TextButton.styleFrom(
                         foregroundColor: isDark
-                            ? const Color(0xFF34D399)
+                            ? const Color(0xFF047857)
                             : const Color(
-                                0xFF059669,
+                                0xFF047857,
                               ), // text-emerald-400 : text-emerald-600
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -333,7 +333,7 @@ class PaymentMethodsCard extends StatelessWidget {
                                         color: isDark
                                             ? const Color(0x4D064E3B)
                                             : const Color(
-                                                0xFFD1FAE5,
+                                                0xFFECFDF5,
                                               ), // emerald-900/30 : emerald-100
                                         borderRadius: BorderRadius.circular(
                                           16,
@@ -345,9 +345,9 @@ class PaymentMethodsCard extends StatelessWidget {
                                           fontSize: 9, // text-[9px]
                                           fontWeight: FontWeight.bold,
                                           color: isDark
-                                              ? const Color(0xFF34D399)
+                                              ? const Color(0xFF047857)
                                               : const Color(
-                                                  0xFF059669,
+                                                  0xFF047857,
                                                 ), // text-emerald-400 : text-emerald-600
                                         ),
                                       ),
@@ -383,7 +383,7 @@ class PaymentMethodsCard extends StatelessWidget {
                                                   WidgetState.hovered,
                                                 )) {
                                                   return const Color(
-                                                    0xFFEF4444,
+                                                    0xFFB91C1C,
                                                   ); // text-red-500
                                                 }
                                                 return null;

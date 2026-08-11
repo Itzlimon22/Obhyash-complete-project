@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:obhyash_app/core/utils/app_popups.dart';
 
 // --- Domain Model ---
 class AppNotification {
@@ -47,8 +48,8 @@ Map<String, dynamic> getNotificationStyle(String type, bool isDark) {
         'icon': LucideIcons.checkCircle2,
         'bg': isDark
             ? const Color(0x33064E3B)
-            : const Color(0xFFD1FAE5), // emerald-900/20 : emerald-100
-        'color': const Color(0xFF10B981), // emerald-500
+            : const Color(0xFFECFDF5), // emerald-900/20 : emerald-100
+        'color': const Color(0xFF047857), // emerald-500
       };
     case 'warning':
       return {
@@ -63,8 +64,8 @@ Map<String, dynamic> getNotificationStyle(String type, bool isDark) {
         'icon': LucideIcons.alertCircle,
         'bg': isDark
             ? const Color(0x33881337)
-            : const Color(0xFFFFE4E6), // rose-900/20 : rose-100
-        'color': const Color(0xFFF43F5E), // rose-500
+            : const Color(0xFFFEF2F2), // rose-900/20 : rose-100
+        'color': const Color(0xFFB91C1C), // rose-500
       };
     case 'system':
       return {
@@ -72,7 +73,7 @@ Map<String, dynamic> getNotificationStyle(String type, bool isDark) {
         'bg': isDark
             ? const Color(0x334C1D95)
             : const Color(0xFFEDE9FE), // violet-900/20 : violet-100
-        'color': const Color(0xFF8B5CF6), // violet-500
+        'color': const Color(0xFF0F172A), // violet-500
       };
     case 'info':
     default:
@@ -81,7 +82,7 @@ Map<String, dynamic> getNotificationStyle(String type, bool isDark) {
         'bg': isDark
             ? const Color(0x331E3A8A)
             : const Color(0xFFDBEAFE), // blue-900/20 : blue-100
-        'color': const Color(0xFF3B82F6), // blue-500
+        'color': const Color(0xFF0F172A), // blue-500
       };
   }
 }
@@ -190,11 +191,10 @@ class _NotificationsViewState extends State<NotificationsView> {
             .eq('is_read', false);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('সব বার্তা পঠিত হিসেবে চিহ্নিত করা হয়েছে! 👍'),
-            backgroundColor: Colors.green,
-          ),
+        AppPopups.show(
+          context,
+          message: 'সব বার্তা পঠিত হিসেবে চিহ্নিত করা হয়েছে! 👍',
+          isError: false,
         );
       }
     } catch (e) {
@@ -211,12 +211,7 @@ class _NotificationsViewState extends State<NotificationsView> {
     try {
       await supabase.from('notifications').delete().eq('id', id);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('মুছে ফেলা হয়েছে 🗑️'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        AppPopups.show(context, message: 'মুছে ফেলা হয়েছে 🗑️', isError: false);
       }
     } catch (e) {
       debugPrint('Failed to delete notification: $e');
@@ -247,7 +242,7 @@ class _NotificationsViewState extends State<NotificationsView> {
 
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF0A0A0A)
+          ? const Color(0xFF000000)
           : const Color(0xFFFAFAFA), // neutral-950 : neutral-50/50
       appBar: AppBar(
         title: const Text(
@@ -258,7 +253,7 @@ class _NotificationsViewState extends State<NotificationsView> {
           ),
         ),
         backgroundColor: isDark
-            ? const Color(0xFF0A0A0A)
+            ? const Color(0xFF000000)
             : const Color(0xFFFAFAFA),
         elevation: 0,
         leading: IconButton(
@@ -271,7 +266,7 @@ class _NotificationsViewState extends State<NotificationsView> {
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFFF43F5E)),
+              child: CircularProgressIndicator(color: Color(0xFFB91C1C)),
             )
           : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -295,7 +290,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                                   fontWeight: FontWeight.w900, // font-black
                                   color: isDark
                                       ? Colors.white
-                                      : const Color(0xFF171717),
+                                      : const Color(0xFF0F172A),
                                 ),
                               ),
                               const Text('🔔', style: TextStyle(fontSize: 24)),
@@ -303,7 +298,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'আপনার সব আপডেট এবং অ্যাক্টিভিটি।',
+                            'তোমার সব আপডেট এবং অ্যাক্টিভিটি।',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -320,12 +315,12 @@ class _NotificationsViewState extends State<NotificationsView> {
                           icon: const Icon(
                             LucideIcons.checkCheck,
                             size: 16,
-                            color: Color(0xFF10B981),
+                            color: Color(0xFF047857),
                           ), // emerald-500
                           label: const Text('সব পড়ুন'),
                           style: OutlinedButton.styleFrom(
                             backgroundColor: isDark
-                                ? const Color(0xFF171717)
+                                ? const Color(0xFF0F172A)
                                 : Colors.white,
                             foregroundColor: isDark
                                 ? const Color(0xFFD4D4D4)
@@ -359,7 +354,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                                 colors: isDark
                                     ? [
                                         const Color(0xFF262626),
-                                        const Color(0xFF171717),
+                                        const Color(0xFF0F172A),
                                       ]
                                     : [
                                         const Color(0xFFEDE9FE),
@@ -420,7 +415,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                                         ? const Color(0x66171717)
                                         : const Color(0x66FFFFFF))
                                   : (isDark
-                                        ? const Color(0xFF171717)
+                                        ? const Color(0xFF0F172A)
                                         : Colors.white),
                               borderRadius: BorderRadius.circular(24),
                               border: Border.all(
@@ -451,7 +446,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                                       width: 8,
                                       height: 8,
                                       decoration: const BoxDecoration(
-                                        color: Color(0xFFF43F5E),
+                                        color: Color(0xFFB91C1C),
                                         shape: BoxShape.circle,
                                       ),
                                     ),
@@ -494,7 +489,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                                                   : (isDark
                                                         ? Colors.white
                                                         : const Color(
-                                                            0xFF171717,
+                                                            0xFF0F172A,
                                                           )),
                                             ),
                                             maxLines: 1,

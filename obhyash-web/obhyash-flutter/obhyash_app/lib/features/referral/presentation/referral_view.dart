@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/providers/auth_provider.dart';
+import 'package:obhyash_app/core/utils/app_popups.dart';
 
 class ReferralView extends ConsumerStatefulWidget {
   const ReferralView({super.key});
@@ -135,8 +136,10 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
       // Fallback: copy to clipboard
       await Clipboard.setData(ClipboardData(text: text));
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('শেয়ার লিংক ক্লিপবোর্ডে কপি হয়েছে')),
+        AppPopups.show(
+          context,
+          message: 'শেয়ার লিংক ক্লিপবোর্ডে কপি হয়েছে',
+          isError: false,
         );
       }
     }
@@ -150,9 +153,9 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
       if (next != null && prev == null) _loadReferral();
     });
     final bg = isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9);
-    final card = isDark ? const Color(0xFF171717) : Colors.white;
+    final card = isDark ? const Color(0xFF0F172A) : Colors.white;
     final border = isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5);
-    final textPrimary = isDark ? Colors.white : const Color(0xFF171717);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
     final textSecondary = isDark
         ? const Color(0xFFA3A3A3)
         : const Color(0xFF737373);
@@ -173,13 +176,13 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                       gradient: const LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [Color(0xFFE11D48), Color(0xFFBE123C)],
+                        colors: [Color(0xFFB91C1C), Color(0xFFBE123C)],
                       ),
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
                           color: const Color(
-                            0xFFE11D48,
+                            0xFFB91C1C,
                           ).withValues(alpha: 0.25),
                           blurRadius: 16,
                           offset: const Offset(0, 6),
@@ -367,7 +370,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFE11D48),
+                              backgroundColor: const Color(0xFFB91C1C),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 13),
                               shape: RoundedRectangleBorder(
@@ -465,7 +468,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                       style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w900,
-                                        color: Color(0xFFE11D48),
+                                        color: Color(0xFFB91C1C),
                                         fontFamily: 'HindSiliguri',
                                       ),
                                     ),
@@ -610,7 +613,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                             final statusColor = status == 'Approved'
                                 ? const Color(0xFF047857)
                                 : status == 'Rejected'
-                                ? const Color(0xFFDC2626)
+                                ? const Color(0xFFB91C1C)
                                 : const Color(0xFFF59E0B);
                             final statusLabel = status == 'Approved'
                                 ? 'অনুমোদিত'
@@ -640,7 +643,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                   CircleAvatar(
                                     radius: 16,
                                     backgroundColor: const Color(
-                                      0xFFE11D48,
+                                      0xFFB91C1C,
                                     ).withValues(alpha: 0.15),
                                     child: Text(
                                       name.isNotEmpty
@@ -649,7 +652,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                       style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFFE11D48),
+                                        color: Color(0xFFB91C1C),
                                       ),
                                     ),
                                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:obhyash_app/core/utils/app_popups.dart';
 
 const kExamTargets = [
   {'value': 'hsc_2026', 'label': 'এইচএসসি ২০২৬', 'icon': '📚'},
@@ -59,8 +60,10 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
       if (mounted) Navigator.of(context).pop(_selected);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('সংরক্ষণ করতে সমস্যা হয়েছে')),
+        AppPopups.show(
+          context,
+          message: 'সংরক্ষণ করতে সমস্যা হয়েছে',
+          isError: false,
         );
       }
     } finally {
@@ -71,7 +74,7 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final sheetBg = isDark ? const Color(0xFF171717) : Colors.white;
+    final sheetBg = isDark ? const Color(0xFF0F172A) : Colors.white;
     final borderColor = isDark
         ? const Color(0xFF262626)
         : const Color(0xFFE5E5E5);
@@ -110,7 +113,7 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: isDark ? Colors.white : const Color(0xFF171717),
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -175,7 +178,7 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                                 ? Colors.white
                                 : (isDark
                                       ? const Color(0xFFD4D4D4)
-                                      : const Color(0xFF171717)),
+                                      : const Color(0xFF0F172A)),
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),

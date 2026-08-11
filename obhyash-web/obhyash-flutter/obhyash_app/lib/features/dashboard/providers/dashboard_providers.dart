@@ -142,9 +142,7 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
     if (cached != null) {
       try {
         final List list = jsonDecode(cached);
-        final cachedStats = list
-            .map((e) => SubjectStats.fromJson(e))
-            .toList();
+        final cachedStats = list.map((e) => SubjectStats.fromJson(e)).toList();
         // Only use cache if it has data; empty cache forces a re-fetch
         if (cachedStats.isNotEmpty) {
           return cachedStats;
@@ -163,53 +161,50 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
 
     final history = await repository.getUserHistory(profile.id);
 
-    final fresh = subjects
-        .map((sub) {
-          final subName = sub.name.toLowerCase();
-          final subId = sub.id.toLowerCase();
+    final fresh = subjects.map((sub) {
+      final subName = sub.name.toLowerCase();
+      final subId = sub.id.toLowerCase();
 
-          int correct = 0;
-          int wrong = 0;
-          int skipped = 0;
-          int total = 0;
+      int correct = 0;
+      int wrong = 0;
+      int skipped = 0;
+      int total = 0;
 
-          for (var exam in history) {
-            final hSub = (exam.subjectLabel ?? exam.subject).toLowerCase();
-            final hSubId = exam.subject.toLowerCase();
+      for (var exam in history) {
+        final hSub = (exam.subjectLabel ?? exam.subject).toLowerCase();
+        final hSubId = exam.subject.toLowerCase();
 
-            final isMatch =
-                hSubId == subId ||
-                hSub.contains(subName) ||
-                hSub.contains(subId) ||
-                (subName == 'পদার্থবিজ্ঞান' && hSub.contains('physics')) ||
-                (subName == 'রসায়ন' && hSub.contains('chemistry')) ||
-                (subName == 'গণিত' && hSub.contains('math')) ||
-                (subName == 'জীববিজ্ঞান' && hSub.contains('biology')) ||
-                (subName == 'বাংলা' && hSub.contains('bangla')) ||
-                (subName == 'ইংরেজি' && hSub.contains('english')) ||
-                (subName == 'সাধারণ জ্ঞান' && hSub.contains('gk')) ||
-                (subName == 'আইসিটি' && hSub.contains('ict'));
+        final isMatch =
+            hSubId == subId ||
+            hSub.contains(subName) ||
+            hSub.contains(subId) ||
+            (subName == 'পদার্থবিজ্ঞান' && hSub.contains('physics')) ||
+            (subName == 'রসায়ন' && hSub.contains('chemistry')) ||
+            (subName == 'গণিত' && hSub.contains('math')) ||
+            (subName == 'জীববিজ্ঞান' && hSub.contains('biology')) ||
+            (subName == 'বাংলা' && hSub.contains('bangla')) ||
+            (subName == 'ইংরেজি' && hSub.contains('english')) ||
+            (subName == 'সাধারণ জ্ঞান' && hSub.contains('gk')) ||
+            (subName == 'আইসিটি' && hSub.contains('ict'));
 
-            if (isMatch) {
-              correct += exam.correctCount;
-              wrong += exam.wrongCount;
-              total += exam.totalQuestions;
-              skipped +=
-                  (exam.totalQuestions - exam.correctCount - exam.wrongCount)
-                      .clamp(0, 9999);
-            }
-          }
+        if (isMatch) {
+          correct += exam.correctCount;
+          wrong += exam.wrongCount;
+          total += exam.totalQuestions;
+          skipped += (exam.totalQuestions - exam.correctCount - exam.wrongCount)
+              .clamp(0, 9999);
+        }
+      }
 
-          return SubjectStats(
-            id: sub.id,
-            name: sub.name,
-            correct: correct,
-            wrong: wrong,
-            skipped: skipped,
-            total: total,
-          );
-        })
-        .toList();
+      return SubjectStats(
+        id: sub.id,
+        name: sub.name,
+        correct: correct,
+        wrong: wrong,
+        skipped: skipped,
+        total: total,
+      );
+    }).toList();
 
     prefs.setString(
       cacheKey,

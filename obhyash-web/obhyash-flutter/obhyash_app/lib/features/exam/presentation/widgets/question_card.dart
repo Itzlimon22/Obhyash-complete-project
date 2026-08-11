@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/presentation/widgets/latex_text.dart';
 import '../../domain/exam_models.dart';
 
-class QuestionCard extends StatelessWidget {
+class QuestionCard extends StatefulWidget {
   final Question question;
   final int serialNumber;
   final int? selectedOptionIndex;
@@ -34,8 +34,50 @@ class QuestionCard extends StatelessWidget {
     this.onToggleBookmark,
   });
 
-  String _toBengaliNumeral(int number) {
-    const englishToBengali = {
+  @override
+  State<QuestionCard> createState() => _QuestionCardState();
+}
+
+class _QuestionCardState extends State<QuestionCard>
+    with SingleTickerProviderStateMixin {
+  bool _isExplanationOpen = false;
+  late AnimationController _animCtrl;
+  late Animation<double> _arrowTurns;
+
+  @override
+  void initState() {
+    super.initState();
+    _isExplanationOpen = widget.showFeedback;
+    _animCtrl = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _arrowTurns = Tween<double>(
+      begin: 0,
+      end: 0.5,
+    ).animate(CurvedAnimation(parent: _animCtrl, curve: Curves.easeInOut));
+    if (_isExplanationOpen) _animCtrl.value = 1.0;
+  }
+
+  @override
+  void dispose() {
+    _animCtrl.dispose();
+    super.dispose();
+  }
+
+  void _toggleExplanation() {
+    setState(() {
+      _isExplanationOpen = !_isExplanationOpen;
+      if (_isExplanationOpen) {
+        _animCtrl.forward();
+      } else {
+        _animCtrl.reverse();
+      }
+    });
+  }
+
+  String _toBengaliNumeral(int n) {
+    const m = {
       '0': '০',
       '1': '১',
       '2': '২',
@@ -47,11 +89,7 @@ class QuestionCard extends StatelessWidget {
       '8': '৮',
       '9': '৯',
     };
-    return number
-        .toString()
-        .split('')
-        .map((c) => englishToBengali[c] ?? c)
-        .join();
+    return n.toString().split('').map((c) => m[c] ?? c).join();
   }
 
   static const _banglaIndices = [
@@ -70,62 +108,109 @@ class QuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isAnswered = selectedOptionIndex != null;
+    final isAnswered = widget.selectedOptionIndex != null;
 
+    // Card border — orange ring when flagged
     Color borderColor = isDark
-        ? const Color(0xFF262626)
-        : const Color(0xFFE5E5E5);
-    if (isFlagged) {
-      borderColor = const Color(0xFFFBBF24).withValues(alpha: 0.5); // amber-400
-    } else if (isAnswered) {
-      borderColor = const Color(
-        0xFF10B981,
-      ).withValues(alpha: 0.3); // emerald-500
+        ? const Color(0xFF333333)
+        : const Color(0xFFE5E7EB);
+    double borderWidth = 1;
+    if (widget.isFlagged) {
+      borderColor = const Color(0xFFFB923C); // orange-400
+      borderWidth = 2;
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: borderColor,
-          width: isFlagged || isAnswered ? 2 : 1,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 4,
-            offset: Offset(0, 1),
-          ),
-        ],
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor, width: borderWidth),
+        boxShadow: isDark
+            ? []
+            : [
+                const BoxShadow(
+                  color: Color(0x0A000000),
+                  blurRadius: 6,
+                  offset: Offset(0, 2),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header / Meta
+          // ── Top section: serial + question + tags/actions ─────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            padding: const EdgeInsets.fromLTRB(10, 12, 10, 8),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Serial number + question text (inline)
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'প্রশ্ন ${_toBengaliNumeral(serialNumber)}',
+                      '${_toBengaliNumeral(widget.serialNumber)}. ',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: isDark
-                            ? const Color(0xFF737373)
-                            : const Color(0xFFA3A3A3),
-                        letterSpacing: 1.0,
+                            ? const Color(0xFFE5E5E5)
+                            : const Color(0xFF1F2937),
+                        height: 1.4,
                       ),
                     ),
-                    if (isFlagged)
+                    Expanded(
+                      child: LatexText(
+                        text: widget.question.question,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'HindSiliguri',
+                          color: isDark
+                              ? const Color(0xFFF5F5F5)
+                              : const Color(0xFF111827),
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
+                // Tags + action buttons row
+                Row(
+                  children: [
+                    // Subject tag (if present)
+                    if (widget.question.subjectLabel?.isNotEmpty == true) ...[
                       Container(
-                        margin: const EdgeInsets.only(left: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF0D3326)
+                              : const Color(0xFFE8F4F0),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          widget.question.subjectLabel!.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF1A7A5A),
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                    ],
+
+                    // Flagged badge
+                    if (widget.isFlagged) ...[
+                      Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 2,
@@ -137,7 +222,7 @@ class QuestionCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          'Marked',
+                          'চিহ্নিত',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -147,48 +232,43 @@ class QuestionCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text(
-                      '${question.points} Marks',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(width: 6),
+                    ],
+
+                    const Spacer(),
+
+                    // Bookmark button
+                    _IconBtn(
+                      onTap: widget.onToggleBookmark,
+                      tooltip: widget.isBookmarked
+                          ? 'বুকমার্ক সরাও'
+                          : 'বুকমার্ক করো',
+                      child: Icon(
+                        widget.isBookmarked
+                            ? Icons.bookmark_rounded
+                            : Icons.bookmark_border_rounded,
+                        size: 18,
+                        color: widget.isBookmarked
+                            ? const Color(0xFFF59E0B) // amber-500
+                            : (isDark
+                                  ? const Color(0xFF525252)
+                                  : const Color(0xFF9CA3AF)),
+                      ),
+                    ),
+
+                    const SizedBox(width: 2),
+
+                    // Report button
+                    _IconBtn(
+                      onTap: widget.onReport,
+                      tooltip: 'রিপোর্ট করো',
+                      child: Icon(
+                        Icons.warning_amber_rounded,
+                        size: 18,
                         color: isDark
-                            ? const Color(0xFF737373)
-                            : const Color(0xFFA3A3A3),
+                            ? const Color(0xFF525252)
+                            : const Color(0xFF9CA3AF),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Report Button
-                    IconButton(
-                      onPressed: onReport,
-                      iconSize: 20,
-                      color: isDark
-                          ? const Color(0x80EF4444)
-                          : const Color(0xFFF87171),
-                      icon: const Icon(Icons.flag_outlined),
-                      tooltip: 'Report Issue',
-                      constraints: const BoxConstraints(),
-                      padding: const EdgeInsets.all(8),
-                    ),
-                    // Bookmark Button
-                    IconButton(
-                      onPressed: onToggleBookmark,
-                      iconSize: 20,
-                      color: isBookmarked
-                          ? const Color(0xFF10B981)
-                          : (isDark
-                                ? const Color(0xFF525252)
-                                : const Color(0xFFD4D4D4)),
-                      icon: Icon(
-                        isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                      ),
-                      tooltip: isBookmarked ? 'বুকমার্ক সরাও' : 'বুকমার্ক করো',
-                      constraints: const BoxConstraints(),
-                      padding: const EdgeInsets.all(8),
                     ),
                   ],
                 ),
@@ -196,151 +276,182 @@ class QuestionCard extends StatelessWidget {
             ),
           ),
 
-          // Question Text
+          // ── Options ───────────────────────────────────────────────────────
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: LatexText(
-              text: question.question,
-              style: TextStyle(
-                fontSize: 18,
-                color: isDark
-                    ? const Color(0xFFF5F5F5)
-                    : const Color(0xFF171717),
-                fontFamily: 'HindSiliguri',
-                height: 1.6,
-              ),
-            ),
-          ),
-
-          // Options Grid
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            child: Wrap(
-              runSpacing: 12,
-              children: List.generate(question.options.length, (idx) {
-                final option = question.options[idx];
-                final isSelected = selectedOptionIndex == idx;
-                final isCorrect = idx == question.correctAnswerIndex;
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 14),
+            child: Column(
+              children: List.generate(widget.question.options.length, (idx) {
+                final option = widget.question.options[idx];
+                final isSelected = widget.selectedOptionIndex == idx;
+                final isCorrect = idx == widget.question.correctAnswerIndex;
                 final banglaIndex = _banglaIndices.length > idx
                     ? _banglaIndices[idx]
                     : (idx + 1).toString();
 
-                Color bgClass = isDark
-                    ? const Color(0x66262626)
-                    : const Color(0xFFFAFAFA);
-                Color borderClass = Colors.transparent;
-                Color iconBorder = isDark
+                // ── State colours (matches web exactly) ──
+                Color boxBg = isDark
+                    ? const Color(0xFF1F1F1F)
+                    : const Color(0xFFF8F9FA);
+                Color boxBorder = isDark
+                    ? const Color(0xFF333333)
+                    : const Color(0xFFE5E7EB);
+                Color bulletBg = Colors.transparent;
+                Color bulletBorder = isDark
                     ? const Color(0xFF525252)
-                    : const Color(0xFFD4D4D4);
-                Color iconTextCol = isDark
-                    ? const Color(0xFFA3A3A3)
-                    : const Color(0xFF737373);
-                String iconText = banglaIndex;
+                    : const Color(0xFFD1D5DB);
+                Color bulletText = isDark
+                    ? const Color(0xFFD4D4D4)
+                    : const Color(0xFF6B7280);
+                Color optionTextColor = isDark
+                    ? const Color(0xFFE5E5E5)
+                    : const Color(0xFF1F2937);
+                bool boldText = false;
+                double opacity = 1.0;
 
-                if (showFeedback) {
+                if (widget.showFeedback) {
                   if (isCorrect) {
-                    bgClass = isDark
-                        ? const Color(0x33064E3B)
-                        : const Color(0xFFECFDF5);
-                    borderClass = const Color(0xFF10B981);
-                    iconBorder = const Color(0xFF059669);
-                    iconTextCol = Colors.white;
-                    iconText = '✓';
+                    boxBg = isDark
+                        ? const Color(0xFF047857).withValues(alpha: 0.15)
+                        : const Color(0xFFECFDF5).withValues(alpha: 0.4);
+                    boxBorder = isDark
+                        ? const Color(0xFF047857)
+                        : const Color(0xFFBBF7D0);
+                    bulletBg = const Color(0xFF047857);
+                    bulletBorder = const Color(0xFF047857);
+                    bulletText = Colors.white;
+                    optionTextColor = isDark
+                        ? const Color(0xFF047857)
+                        : const Color(0xFF047857);
+                    boldText = true;
                   } else if (isSelected) {
-                    bgClass = isDark
-                        ? const Color(0x337F1D1D)
-                        : const Color(0xFFFEF2F2);
-                    borderClass = const Color(0xFFEF4444);
-                    iconBorder = const Color(0xFFDC2626);
-                    iconTextCol = Colors.white;
-                    iconText = '✕';
+                    boxBg = isDark
+                        ? const Color(0xFF7F1D1D).withValues(alpha: 0.15)
+                        : const Color(0xFFFEF2F2).withValues(alpha: 0.4);
+                    boxBorder = isDark
+                        ? const Color(0xFF991B1B)
+                        : const Color(0xFFFECACA);
+                    bulletBg = const Color(0xFFB91C1C);
+                    bulletBorder = const Color(0xFFB91C1C);
+                    bulletText = Colors.white;
+                    optionTextColor = isDark
+                        ? const Color(0xFFF87171)
+                        : const Color(0xFFB91C1C);
+                    boldText = true;
                   } else {
-                    bgClass =
-                        (isDark
-                                ? const Color(0x66262626)
-                                : const Color(0xFFFAFAFA))
-                            .withValues(alpha: 0.7);
+                    opacity = 0.6;
                   }
-                } else if (showAnswer && isCorrect) {
-                  bgClass = isDark
-                      ? const Color(0x1A064E3B)
-                      : const Color(0xFFECFDF5);
-                  borderClass = const Color(0x8010B981);
-                  iconBorder = const Color(0xFF10B981);
-                  iconTextCol = const Color(0xFF059669);
-                  iconText = '✓';
+                } else if (widget.showAnswer && isCorrect) {
+                  boxBg = isDark
+                      ? const Color(0xFF047857).withValues(alpha: 0.15)
+                      : const Color(0xFFECFDF5).withValues(alpha: 0.4);
+                  boxBorder = isDark
+                      ? const Color(0xFF047857)
+                      : const Color(0xFFBBF7D0);
+                  bulletBg = const Color(0xFF047857);
+                  bulletBorder = const Color(0xFF047857);
+                  bulletText = Colors.white;
+                  optionTextColor = isDark
+                      ? const Color(0xFF047857)
+                      : const Color(0xFF047857);
+                  boldText = true;
                 } else if (isSelected) {
-                  bgClass = isDark
-                      ? const Color(0x33064E3B)
-                      : const Color(0xFFECFDF5);
-                  borderClass = const Color(0xFF10B981);
-                  iconBorder = const Color(0xFF059669);
-                  iconTextCol = Colors.white;
-                  iconText = '✓';
+                  // Web: neutral-200/neutral-700 for selected
+                  boxBg = isDark
+                      ? const Color(0xFF404040)
+                      : const Color(0xFFE5E7EB);
+                  boxBorder = isDark
+                      ? const Color(0xFF525252)
+                      : const Color(0xFF9CA3AF);
+                  bulletBg = isDark
+                      ? const Color(0xFFE5E5E5)
+                      : const Color(0xFF1F2937);
+                  bulletBorder = isDark
+                      ? const Color(0xFFE5E5E5)
+                      : const Color(0xFF1F2937);
+                  bulletText = isDark ? const Color(0xFF1F2937) : Colors.white;
+                  optionTextColor = isDark
+                      ? Colors.white
+                      : const Color(0xFF111827);
+                  boldText = true;
                 }
 
                 return GestureDetector(
                   onTap: () {
-                    if (!isAnswered && !isOmrMode && !readOnly) {
-                      onSelectOption(idx);
+                    if (!isAnswered && !widget.isOmrMode && !widget.readOnly) {
+                      widget.onSelectOption(idx);
                     }
                   },
                   behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      color: bgClass,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: borderClass),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 24,
-                          height: 24,
-                          margin: const EdgeInsets.only(top: 2, right: 12),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: iconBorder, width: 2),
-                            color: iconTextCol == Colors.white
-                                ? iconBorder
-                                : Colors.transparent,
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            iconText,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: iconTextCol == Colors.white
-                                  ? Colors.white
-                                  : iconTextCol,
+                  child: Opacity(
+                    opacity: opacity,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: boxBg,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: boxBorder),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Circular badge (letter)
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 24,
+                            height: 24,
+                            margin: const EdgeInsets.only(right: 10),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: bulletBg,
+                              border: Border.all(
+                                color: bulletBorder,
+                                width: 1.5,
+                              ),
+                              boxShadow:
+                                  bulletBg == Colors.transparent && !isDark
+                                  ? [
+                                      const BoxShadow(
+                                        color: Color(0x0D000000),
+                                        blurRadius: 2,
+                                        offset: Offset(0, 1),
+                                      ),
+                                    ]
+                                  : [],
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              banglaIndex,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: bulletText,
+                                height: 1.0,
+                              ),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          child: LatexText(
-                            text: option,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'HindSiliguri',
-                              color: isSelected || (showFeedback && isCorrect)
-                                  ? (isDark
-                                        ? const Color(0xFFF5F5F5)
-                                        : const Color(0xFF171717))
-                                  : (isDark
-                                        ? const Color(0xFFD4D4D4)
-                                        : const Color(0xFF404040)),
-                              height: 1.5,
+                          // Option text
+                          Expanded(
+                            child: LatexText(
+                              text: option,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontFamily: 'HindSiliguri',
+                                fontWeight: boldText
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: optionTextColor,
+                                height: 1.4,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -348,78 +459,188 @@ class QuestionCard extends StatelessWidget {
             ),
           ),
 
-          // Explanation Section
-          if (showFeedback &&
-              question.explanation != null &&
-              question.explanation!.isNotEmpty)
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              padding: const EdgeInsets.all(20),
+          // ── Explanation (collapsible, web-style) ──────────────────────────
+          if (widget.showFeedback &&
+              widget.question.explanation != null &&
+              widget.question.explanation!.isNotEmpty)
+            _ExplanationPanel(
+              question: widget.question,
+              isDark: isDark,
+              isOpen: _isExplanationOpen,
+              arrowTurns: _arrowTurns,
+              onToggle: _toggleExplanation,
+              banglaIndices: _banglaIndices,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Explanation Panel ─────────────────────────────────────────────────────────
+
+class _ExplanationPanel extends StatelessWidget {
+  final Question question;
+  final bool isDark;
+  final bool isOpen;
+  final Animation<double> arrowTurns;
+  final VoidCallback onToggle;
+  final List<String> banglaIndices;
+
+  const _ExplanationPanel({
+    required this.question,
+    required this.isDark,
+    required this.isOpen,
+    required this.arrowTurns,
+    required this.onToggle,
+    required this.banglaIndices,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final correctLabel = question.correctAnswerIndex < banglaIndices.length
+        ? banglaIndices[question.correctAnswerIndex]
+        : '${question.correctAnswerIndex + 1}';
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      margin: const EdgeInsets.fromLTRB(10, 0, 10, 12),
+      decoration: BoxDecoration(
+        color: isOpen
+            ? (isDark
+                  ? const Color(0xFF047857).withValues(alpha: 0.1)
+                  : const Color(0xFFECFDF5).withValues(alpha: 0.5))
+            : (isDark ? const Color(0xFF1C1C1C) : const Color(0xFFFAFAFA)),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: isOpen
+              ? (isDark
+                    ? const Color(0xFF047857).withValues(alpha: 0.4)
+                    : const Color(0xFFBBF7D0))
+              : (isDark ? const Color(0xFF333333) : const Color(0xFFE5E7EB)),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Toggle header
+          GestureDetector(
+            onTap: onToggle,
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+              child: Row(
+                children: [
+                  // Pulsing dot
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF047857),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'সঠিক উত্তর : $correctLabel',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: isDark
+                          ? const Color(0xFF047857)
+                          : const Color(0xFF047857),
+                    ),
+                  ),
+                  const Spacer(),
+                  // Animated chevron
+                  Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1F2937) : Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: isDark
+                            ? const Color(0xFF047857).withValues(alpha: 0.6)
+                            : const Color(0xFFECFDF5),
+                      ),
+                    ),
+                    child: RotationTransition(
+                      turns: arrowTurns,
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 18,
+                        color: isDark
+                            ? const Color(0xFF047857)
+                            : const Color(0xFF047857),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Collapsible content
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 200),
+            crossFadeState: isOpen
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            firstChild: const SizedBox.shrink(),
+            secondChild: Container(
+              padding: const EdgeInsets.fromLTRB(14, 4, 14, 14),
               decoration: BoxDecoration(
                 border: Border(
                   top: BorderSide(
                     color: isDark
-                        ? const Color(0xFF262626)
-                        : const Color(0xFFF5F5F5),
+                        ? const Color(0xFF047857).withValues(alpha: 0.3)
+                        : const Color(0xFFECFDF5),
                   ),
                 ),
               ),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0x1A064E3B)
-                      : const Color(0xFFECFDF5),
-                  border: Border.all(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: LatexText(
+                  text: question.explanation!,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontFamily: 'HindSiliguri',
+                    height: 1.6,
                     color: isDark
-                        ? const Color(0x4D065F46)
-                        : const Color(0xFFD1FAE5),
+                        ? const Color(0xFFD4D4D4)
+                        : const Color(0xFF374151),
                   ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.lightbulb,
-                          size: 16,
-                          color: isDark
-                              ? const Color(0xFF34D399)
-                              : const Color(0xFF059669),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'ব্যাখ্যা (EXPLANATION)',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: isDark
-                                ? const Color(0xFF34D399)
-                                : const Color(0xFF059669),
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    LatexText(
-                      text: question.explanation!,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontFamily: 'HindSiliguri',
-                        color: isDark
-                            ? const Color(0xFFD4D4D4)
-                            : const Color(0xFF404040),
-                        height: 1.6,
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Small icon button helper ──────────────────────────────────────────────────
+
+class _IconBtn extends StatelessWidget {
+  final VoidCallback? onTap;
+  final String tooltip;
+  final Widget child;
+
+  const _IconBtn({
+    required this.onTap,
+    required this.tooltip,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Padding(padding: const EdgeInsets.all(6), child: child),
       ),
     );
   }

@@ -6,6 +6,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../features/dashboard/presentation/dashboard_view.dart';
 import '../features/auth/presentation/login_view.dart';
+import '../features/auth/presentation/update_password_view.dart';
+
 import '../features/auth/presentation/signup_view.dart';
 import '../features/profile/presentation/profile_route_view.dart';
 import '../features/subscription/presentation/subscription_view.dart';
@@ -40,14 +42,24 @@ CustomTransitionPage _fadeRoute(Widget child, GoRouterState state) {
   );
 }
 
+// Global navigator keys
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
 final routerProvider = Provider<GoRouter>((ref) {
-  final rootNavigatorKey = GlobalKey<NavigatorState>();
-  final shellNavigatorKey = GlobalKey<NavigatorState>();
-
   final authStateStream = Supabase.instance.client.auth.onAuthStateChange;
+  late final GoRouter router;
 
-  return GoRouter(
-    navigatorKey: rootNavigatorKey,
+  authStateStream.listen((data) {
+    if (data.event == AuthChangeEvent.passwordRecovery) {
+      // Delay slightly to ensure GoRouter is fully mounted
+      Future.delayed(const Duration(milliseconds: 100), () {
+        router.go('/update-password');
+      });
+    }
+  });
+
+  router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
     refreshListenable: _GoRouterRefreshStream(authStateStream),
     redirect: (context, state) {
@@ -56,8 +68,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isLoggingIn =
           state.matchedLocation == '/login' ||
           state.matchedLocation == '/signup';
+      final isUpdatingPassword = state.matchedLocation == '/update-password';
 
-      if (!isAuth && !isLoggingIn) {
+      if (!isAuth && !isLoggingIn && !isUpdatingPassword) {
         return '/login';
       }
       if (isAuth && isLoggingIn) {
@@ -67,124 +80,161 @@ final routerProvider = Provider<GoRouter>((ref) {
     },
     routes: [
       GoRoute(
+        path: '/update-password',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => _fadeRoute(const UpdatePasswordView(), state),
+      ),
+      GoRoute(
         path: '/login',
+        parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) => _fadeRoute(const LoginView(), state),
       ),
       GoRoute(
         path: '/signup',
+        parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) => _fadeRoute(const SignupView(), state),
       ),
       GoRoute(
         path: '/exam',
+        parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) =>
             _fadeRoute(const ExamRunnerView(), state),
       ),
       GoRoute(
         path: '/notifications',
+        parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) =>
             _fadeRoute(const NotificationsView(), state),
       ),
-      ShellRoute(
-        navigatorKey: shellNavigatorKey,
-        builder: (context, state, child) {
-          return MainLayout(child: child);
+
+      // Stateful shell route for bottom tabs and drawer items
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return MainLayout(navigationShell: navigationShell);
         },
-        routes: [
-          GoRoute(
-            path: '/',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const DashboardView(), state),
+        branches: [
+          // Branch 0: Dashboard (Home tab)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/',
+                pageBuilder: (context, state) =>
+                    _fadeRoute(const DashboardView(), state),
+                routes: [
+                  GoRoute(
+                    path: 'practice',
+                    builder: (context, state) => const PracticeDashboard(),
+                  ),
+                  GoRoute(
+                    path: 'analysis',
+                    builder: (context, state) => const AnalysisView(),
+                  ),
+                  GoRoute(
+                    path: 'my-reports',
+                    builder: (context, state) => const StudentReportView(),
+                  ),
+                  GoRoute(
+                    path: 'subject/:subject',
+                    builder: (context, state) {
+                      final subject = state.pathParameters['subject']!;
+                      return SubjectReportView(subject: subject);
+                    },
+                  ),
+                  GoRoute(
+                    path: 'live_exam/:category',
+                    builder: (context, state) {
+                      final category = state.pathParameters['category']!;
+                      return LiveExamCategoryView(category: category);
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/profile',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const ProfileRouteView(), state),
+
+          // Branch 1: History tab
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/history',
+                pageBuilder: (context, state) =>
+                    _fadeRoute(const ExamHistoryView(), state),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/subscription',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const SubscriptionView(), state),
+
+          // Branch 2: Setup (Mock Exam tab)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/setup',
+                pageBuilder: (context, state) =>
+                    _fadeRoute(const ExamSetupView(), state),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/my-subscription',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const MySubscriptionView(), state),
+
+          // Branch 3: Leaderboard tab
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/leaderboard',
+                pageBuilder: (context, state) =>
+                    _fadeRoute(const LeaderboardView(), state),
+                routes: [
+                  GoRoute(
+                    path: 'user-profile/:userId',
+                    builder: (context, state) {
+                      final userId = state.pathParameters['userId']!;
+                      return UserProfileView(userId: userId);
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/history',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const ExamHistoryView(), state),
-          ),
-          GoRoute(
-            path: '/setup',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const ExamSetupView(), state),
-          ),
-          GoRoute(
-            path: '/practice',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const PracticeDashboard(), state),
-          ),
-          GoRoute(
-            path: '/leaderboard',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const LeaderboardView(), state),
-          ),
-          GoRoute(
-            path: '/analysis',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const AnalysisView(), state),
-          ),
-          GoRoute(
-            path: '/my-reports',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const StudentReportView(), state),
-          ),
-          GoRoute(
-            path: '/complaint',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const ComplaintView(), state),
-          ),
-          GoRoute(
-            path: '/about',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const AboutUsView(), state),
-          ),
-          GoRoute(
-            path: '/user-profile/:userId',
-            pageBuilder: (context, state) {
-              final userId = state.pathParameters['userId']!;
-              return _fadeRoute(UserProfileView(userId: userId), state);
-            },
-          ),
-          GoRoute(
-            path: '/subject/:subject',
-            pageBuilder: (context, state) {
-              final subject = state.pathParameters['subject']!;
-              return _fadeRoute(SubjectReportView(subject: subject), state);
-            },
-          ),
-          GoRoute(
-            path: '/blog',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const BlogView(), state),
-          ),
-          GoRoute(
-            path: '/referral',
-            pageBuilder: (context, state) =>
-                _fadeRoute(const ReferralView(), state),
-          ),
-          GoRoute(
-            path: '/live_exam/:category',
-            pageBuilder: (context, state) {
-              final category = state.pathParameters['category']!;
-              return _fadeRoute(LiveExamCategoryView(category: category), state);
-            },
+
+          // Branch 4: Profile / Drawer items (Hidden from bottom nav, accessible via menu)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                pageBuilder: (context, state) =>
+                    _fadeRoute(const ProfileRouteView(), state),
+                routes: [
+                  GoRoute(
+                    path: 'subscription',
+                    builder: (context, state) => const SubscriptionView(),
+                  ),
+                  GoRoute(
+                    path: 'my-subscription',
+                    builder: (context, state) => const MySubscriptionView(),
+                  ),
+                  GoRoute(
+                    path: 'complaint',
+                    builder: (context, state) => const ComplaintView(),
+                  ),
+                  GoRoute(
+                    path: 'about',
+                    builder: (context, state) => const AboutUsView(),
+                  ),
+                  GoRoute(
+                    path: 'blog',
+                    builder: (context, state) => const BlogView(),
+                  ),
+                  GoRoute(
+                    path: 'referral',
+                    builder: (context, state) => const ReferralView(),
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       ),
     ],
   );
+  return router;
 });
 
 class _GoRouterRefreshStream extends ChangeNotifier {
@@ -201,24 +251,5 @@ class _GoRouterRefreshStream extends ChangeNotifier {
   void dispose() {
     _subscription.cancel();
     super.dispose();
-  }
-}
-
-// Temporary scaffold while we build out the views
-class PlaceholderScaffold extends StatelessWidget {
-  final String title;
-  const PlaceholderScaffold({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(
-        child: Text(
-          'Coming Soon: $title',
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
-      ),
-    );
   }
 }

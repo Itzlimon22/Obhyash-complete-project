@@ -1,7 +1,11 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/utils/app_popups.dart';
+
+import '../../../core/presentation/widgets/app_dropdown.dart';
+
 
 import '../../../core/data/college_list.dart';
 import '../../dashboard/domain/models.dart';
@@ -119,13 +123,10 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
 
     if (_newPasswordController.text.isNotEmpty &&
         _newPasswordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'à¦ªà¦¾à¦¸à¦“à§Ÿà¦¾à¦°à§à¦¡ à¦¦à§à¦Ÿà¦¿ à¦®à¦¿à¦²à¦›à§‡ à¦¨à¦¾!',
-          ),
-          backgroundColor: Colors.red,
-        ),
+      AppPopups.show(
+        context,
+        message: 'à¦ªà¦¾à¦¸à¦“à§Ÿà¦¾à¦°à§ à¦¡ à¦¦à§ à¦Ÿà¦¿ à¦®à¦¿à¦²à¦›à§‡ à¦¨à¦¾!',
+        isError: true,
       );
       return;
     }
@@ -161,13 +162,10 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           UserAttributes(password: _newPasswordController.text),
         );
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'à¦ªà¦¾à¦¸à¦“à§Ÿà¦¾à¦°à§à¦¡ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦ªà¦°à¦¿à¦¬à¦°à§à¦¤à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡!',
-              ),
-              backgroundColor: Colors.green,
-            ),
+          AppPopups.show(
+            context,
+            message: 'à¦ªà¦¾à¦¸à¦“à§Ÿà¦¾à¦°à§ à¦¡ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦ªà¦°à¦¿à¦¬à¦°à§ à¦¤à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡!',
+            isError: false,
           );
         }
       }
@@ -178,21 +176,20 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
       ref.invalidate(userProfileProvider);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦¸à§‡à¦­ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡!',
-            ),
-            backgroundColor: Colors.green,
-          ),
+        AppPopups.show(
+          context,
+          message: 'à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦¸à§‡à¦­ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡!',
+          isError: false,
         );
         _newPasswordController.clear();
         _confirmPasswordController.clear();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        AppPopups.show(
+          context,
+          message: e.toString(),
+          isError: true,
         );
       }
     } finally {
@@ -247,58 +244,17 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
     required String label,
     required String value,
     required List<String> items,
-    required Function(String?) onChanged,
+    required void Function(String?) onChanged,
     required bool isDark,
   }) {
-    // Ensure the value exists in the list to prevent errors
     final safeValue = items.contains(value) ? value : items.first;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildLabel(label, isDark),
-        DropdownButtonFormField<String>(
-          initialValue: safeValue,
-          icon: const Icon(LucideIcons.chevronDown, size: 16),
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
-            filled: true,
-            fillColor: isDark
-                ? const Color(0xFF0A0A0A)
-                : const Color(0xFFFAFAFA),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: isDark
-                    ? const Color(0xFF262626)
-                    : const Color(0xFFE5E5E5),
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: isDark
-                    ? const Color(0xFF262626)
-                    : const Color(0xFFE5E5E5),
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                color: Color(0xFF10B981),
-              ), // emerald-500
-            ),
-          ),
-          dropdownColor: isDark ? const Color(0xFF171717) : Colors.white,
-          items: items.map((e) {
-            return DropdownMenuItem(value: e, child: Text(e));
-          }).toList(),
-          onChanged: onChanged,
-        ),
-      ],
+    return AppDropdown<String>(
+      label: label,
+      value: safeValue,
+      icon: LucideIcons.chevronDown,
+      options: items.map((e) => AppDropdownOption(value: e, label: e)).toList(),
+      onChanged: onChanged,
     );
   }
 

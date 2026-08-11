@@ -223,7 +223,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
               child: const Icon(
                 LucideIcons.alertCircle,
                 size: 36,
-                color: Color(0xFFE11D48),
+                color: Color(0xFFB91C1C),
               ),
             ),
             const SizedBox(height: 20),
@@ -232,7 +232,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF171717),
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
             const SizedBox(height: 8),
@@ -250,7 +250,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFE11D48),
+                backgroundColor: const Color(0xFFB91C1C),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
@@ -309,13 +309,13 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                                 border: Border.all(
                                   color: isDark
                                       ? const Color(0xFF7F1D2A)
-                                      : const Color(0xFFFFE4E6),
+                                      : const Color(0xFFFEF2F2),
                                 ),
                               ),
                               child: const Icon(
                                 LucideIcons.alertTriangle,
                                 size: 18,
-                                color: Color(0xFFE11D48),
+                                color: Color(0xFFB91C1C),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -329,7 +329,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                                     fontWeight: FontWeight.bold,
                                     color: isDark
                                         ? Colors.white
-                                        : const Color(0xFF171717),
+                                        : const Color(0xFF0F172A),
                                   ),
                                 ),
                                 const Text(
@@ -353,24 +353,24 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                             children: [
                               _StatChip(
                                 label: '$pendingCount অপেক্ষমান',
-                                color: const Color(0xFFE11D48),
+                                color: const Color(0xFFB91C1C),
                                 bg: isDark
                                     ? const Color(0xFF3F0F17)
                                     : const Color(0xFFFFF1F2),
                                 border: isDark
                                     ? const Color(0xFF7F1D2A)
-                                    : const Color(0xFFFFE4E6),
+                                    : const Color(0xFFFEF2F2),
                                 icon: LucideIcons.clock,
                               ),
                               _StatChip(
                                 label: '$resolvedCount গৃহীত',
-                                color: const Color(0xFF059669),
+                                color: const Color(0xFF047857),
                                 bg: isDark
-                                    ? const Color(0xFF052E16)
+                                    ? const Color(0xFF047857)
                                     : const Color(0xFFECFDF5),
                                 border: isDark
-                                    ? const Color(0xFF064E3B)
-                                    : const Color(0xFFD1FAE5),
+                                    ? const Color(0xFF047857)
+                                    : const Color(0xFFECFDF5),
                                 icon: LucideIcons.checkCircle2,
                               ),
                               if (ignoredCount > 0)
@@ -441,7 +441,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                             ),
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? const Color(0xFF171717)
+                                  ? const Color(0xFF0F172A)
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(24),
                               border: Border.all(
@@ -475,13 +475,13 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                                     fontWeight: FontWeight.bold,
                                     color: isDark
                                         ? Colors.white
-                                        : const Color(0xFF171717),
+                                        : const Color(0xFF0F172A),
                                   ),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   _reports.isEmpty
-                                      ? 'আপনি এখন পর্যন্ত কোনো প্রশ্ন রিপোর্ট করেননি।'
+                                      ? 'তুমি এখন পর্যন্ত কোনো প্রশ্ন রিপোর্ট করেননি।'
                                       : 'এই ফিল্টারে কোনো রিপোর্ট পাওয়া যায়নি।',
                                   style: const TextStyle(
                                     fontSize: 13,
@@ -525,7 +525,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                                     vertical: 12,
                                   ),
                                   backgroundColor: isDark
-                                      ? const Color(0xFF171717)
+                                      ? const Color(0xFF0F172A)
                                       : Colors.white,
                                   foregroundColor: isDark
                                       ? const Color(0xFFA3A3A3)
@@ -598,7 +598,7 @@ class _ReportCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -636,13 +636,13 @@ class _ReportCard extends StatelessWidget {
                       border: Border.all(
                         color: isDark
                             ? const Color(0xFF7F1D2A)
-                            : const Color(0xFFFFE4E6),
+                            : const Color(0xFFFEF2F2),
                       ),
                     ),
                     child: const Icon(
                       LucideIcons.alertTriangle,
                       size: 18,
-                      color: Color(0xFFE11D48),
+                      color: Color(0xFFB91C1C),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -665,7 +665,7 @@ class _ReportCard extends StatelessWidget {
                                   fontWeight: FontWeight.w900,
                                   color: isDark
                                       ? Colors.white
-                                      : const Color(0xFF171717),
+                                      : const Color(0xFF0F172A),
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -831,15 +831,15 @@ class _ReportCard extends StatelessWidget {
 
                             // User comment
                             _AccentPanel(
-                              label: 'আপনার মন্তব্য',
-                              accentColor: const Color(0xFFE11D48),
+                              label: 'তোমার মন্তব্য',
+                              accentColor: const Color(0xFFB91C1C),
                               bgColor: isDark
                                   ? const Color(0xFF1A0508)
                                   : const Color(0xFFFFF1F2),
                               borderColor: isDark
                                   ? const Color(0xFF3F0F17)
-                                  : const Color(0xFFFFE4E6),
-                              labelColor: const Color(0xFFE11D48),
+                                  : const Color(0xFFFEF2F2),
+                              labelColor: const Color(0xFFB91C1C),
                               isDark: isDark,
                               child: Text(
                                 '"${report.description ?? 'কোনো বিবরণ নেই'}"',
@@ -898,14 +898,14 @@ class _ReportCard extends StatelessWidget {
                                 report.adminComment!.isNotEmpty)
                               _AccentPanel(
                                 label: 'অ্যাডমিন ফিডব্যাক',
-                                accentColor: const Color(0xFF059669),
+                                accentColor: const Color(0xFF047857),
                                 bgColor: isDark
-                                    ? const Color(0xFF052E16)
+                                    ? const Color(0xFF047857)
                                     : const Color(0xFFECFDF5),
                                 borderColor: isDark
-                                    ? const Color(0xFF064E3B)
-                                    : const Color(0xFFD1FAE5),
-                                labelColor: const Color(0xFF059669),
+                                    ? const Color(0xFF047857)
+                                    : const Color(0xFFECFDF5),
+                                labelColor: const Color(0xFF047857),
                                 labelIcon: LucideIcons.checkCircle2,
                                 isDark: isDark,
                                 child: Text(
@@ -914,7 +914,7 @@ class _ReportCard extends StatelessWidget {
                                     fontSize: 13,
                                     color: isDark
                                         ? const Color(0xFF6EE7B7)
-                                        : const Color(0xFF065F46),
+                                        : const Color(0xFF047857),
                                     height: 1.5,
                                   ),
                                 ),
@@ -972,7 +972,7 @@ class _ReportCard extends StatelessWidget {
       context: ctx,
       builder: (_) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: isDark ? const Color(0xFF171717) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 560),
           child: SingleChildScrollView(
@@ -995,7 +995,7 @@ class _ReportCard extends StatelessWidget {
                       child: const Icon(
                         LucideIcons.eye,
                         size: 18,
-                        color: Color(0xFFE11D48),
+                        color: Color(0xFFB91C1C),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -1007,7 +1007,7 @@ class _ReportCard extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: isDark
                               ? Colors.white
-                              : const Color(0xFF171717),
+                              : const Color(0xFF0F172A),
                         ),
                       ),
                     ),
@@ -1047,7 +1047,7 @@ class _ReportCard extends StatelessWidget {
                           height: 1.5,
                           color: isDark
                               ? Colors.white
-                              : const Color(0xFF171717),
+                              : const Color(0xFF0F172A),
                         ),
                       ),
                       const SizedBox(height: 14),
@@ -1061,16 +1061,16 @@ class _ReportCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: isCorrect
                                 ? (isDark
-                                      ? const Color(0xFF052E16)
+                                      ? const Color(0xFF047857)
                                       : const Color(0xFFECFDF5))
                                 : (isDark
-                                      ? const Color(0xFF171717)
+                                      ? const Color(0xFF0F172A)
                                       : Colors.white),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                               color: isCorrect
                                   ? (isDark
-                                        ? const Color(0xFF064E3B)
+                                        ? const Color(0xFF047857)
                                         : const Color(0xFFA7F3D0))
                                   : (isDark
                                         ? const Color(0xFF262626)
@@ -1086,8 +1086,8 @@ class _ReportCard extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                   color: isCorrect
                                       ? (isDark
-                                            ? const Color(0xFF34D399)
-                                            : const Color(0xFF065F46))
+                                            ? const Color(0xFF047857)
+                                            : const Color(0xFF047857))
                                       : (isDark
                                             ? const Color(0xFFA3A3A3)
                                             : const Color(0xFF525252)),
@@ -1099,8 +1099,8 @@ class _ReportCard extends StatelessWidget {
                                   style: TextStyle(
                                     color: isCorrect
                                         ? (isDark
-                                              ? const Color(0xFF34D399)
-                                              : const Color(0xFF065F46))
+                                              ? const Color(0xFF047857)
+                                              : const Color(0xFF047857))
                                         : (isDark
                                               ? const Color(0xFFA3A3A3)
                                               : const Color(0xFF525252)),
@@ -1122,13 +1122,13 @@ class _ReportCard extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF052E16)
+                          ? const Color(0xFF047857)
                           : const Color(0xFFECFDF5),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isDark
-                            ? const Color(0xFF064E3B)
-                            : const Color(0xFFD1FAE5),
+                            ? const Color(0xFF047857)
+                            : const Color(0xFFECFDF5),
                       ),
                     ),
                     child: Column(
@@ -1139,7 +1139,7 @@ class _ReportCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF059669),
+                            color: Color(0xFF047857),
                             letterSpacing: 1.5,
                           ),
                         ),
@@ -1150,7 +1150,7 @@ class _ReportCard extends StatelessWidget {
                             fontSize: 13,
                             color: isDark
                                 ? const Color(0xFF6EE7B7)
-                                : const Color(0xFF065F46),
+                                : const Color(0xFF047857),
                             height: 1.5,
                           ),
                         ),
@@ -1185,30 +1185,30 @@ class _StatusBadge extends StatelessWidget {
     ) = switch (status) {
       'Resolved' => (
         LucideIcons.checkCircle2,
-        const Color(0xFF059669),
+        const Color(0xFF047857),
         const Color(0xFFECFDF5),
-        const Color(0xFFD1FAE5),
+        const Color(0xFFECFDF5),
         'গৃহীত',
       ),
       'Ignored' => (
         LucideIcons.xCircle,
-        const Color(0xFFE11D48),
+        const Color(0xFFB91C1C),
         const Color(0xFFFFF1F2),
-        const Color(0xFFFFE4E6),
+        const Color(0xFFFEF2F2),
         'বাতিল',
       ),
       _ => (
         LucideIcons.clock,
-        const Color(0xFFE11D48),
+        const Color(0xFFB91C1C),
         const Color(0xFFFFF1F2),
-        const Color(0xFFFFE4E6),
+        const Color(0xFFFEF2F2),
         'অপেক্ষমান',
       ),
     };
 
     final solidBg = status == 'Resolved'
         ? const Color(0xFF166534)
-        : const Color(0xFFDC2626);
+        : const Color(0xFFB91C1C);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

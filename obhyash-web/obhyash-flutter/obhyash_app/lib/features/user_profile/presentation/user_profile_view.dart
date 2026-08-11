@@ -91,10 +91,10 @@ String _upSubjName(String key) {
 
 Color _upLevelColor(String id) {
   const colors = {
-    'Legend': Color(0xFFE11D48),
+    'Legend': Color(0xFFB91C1C),
     'Titan': Color(0xFFF59E0B),
-    'Warrior': Color(0xFFF43F5E),
-    'Scout': Color(0xFF10B981),
+    'Warrior': Color(0xFFB91C1C),
+    'Scout': Color(0xFF047857),
     'Rookie': Color(0xFF94A3B8),
   };
   return colors[id] ?? const Color(0xFF94A3B8);
@@ -280,8 +280,8 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                     style: TextStyle(
                       fontSize: 14,
                       color: isDark
-                          ? const Color(0xFF60A5FA)
-                          : const Color(0xFF2563EB),
+                          ? const Color(0xFF334155)
+                          : const Color(0xFF0F172A),
                     ),
                   ),
                 ),
@@ -308,7 +308,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF171717) : Colors.white,
+                    color: isDark ? const Color(0xFF0F172A) : Colors.white,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
                       color: isDark
@@ -350,7 +350,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                                           fontWeight: FontWeight.bold,
                                           color: isDark
                                               ? Colors.white
-                                              : const Color(0xFF171717),
+                                              : const Color(0xFF0F172A),
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -363,7 +363,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                                           vertical: 2,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFFFE4E6),
+                                          color: const Color(0xFFFEF2F2),
                                           borderRadius: BorderRadius.circular(
                                             100,
                                           ),
@@ -373,7 +373,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,
-                                            color: Color(0xFFE11D48),
+                                            color: Color(0xFFB91C1C),
                                           ),
                                         ),
                                       ),
@@ -433,21 +433,21 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                             label: 'র‍্যাংক',
                             value: '#$_rank',
                             icon: LucideIcons.mapPin,
-                            color: const Color(0xFF10B981),
+                            color: const Color(0xFF047857),
                             isDark: isDark,
                           ),
                           _UPStatBox(
                             label: 'পরীক্ষা',
                             value: user.examsTaken.toString(),
                             icon: LucideIcons.fileText,
-                            color: const Color(0xFFE11D48),
+                            color: const Color(0xFFB91C1C),
                             isDark: isDark,
                           ),
                           _UPStatBox(
                             label: 'স্ট্রিক',
                             value: user.streakCount.toString(),
                             icon: LucideIcons.flame,
-                            color: const Color(0xFFF97316),
+                            color: const Color(0xFFF59E0B),
                             isDark: isDark,
                           ),
                         ],
@@ -462,13 +462,13 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF052E16)
+                        ? const Color(0xFF047857)
                         : const Color(0xFFECFDF5),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF064E3B)
-                          : const Color(0xFFD1FAE5),
+                          ? const Color(0xFF047857)
+                          : const Color(0xFFECFDF5),
                     ),
                   ),
                   child: Row(
@@ -478,13 +478,13 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                         height: 52,
                         decoration: BoxDecoration(
                           color: isDark
-                              ? const Color(0xFF064E3B)
+                              ? const Color(0xFF047857)
                               : Colors.white,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
                               color: const Color(
-                                0xFF059669,
+                                0xFF047857,
                               ).withValues(alpha: 0.2),
                               blurRadius: 8,
                             ),
@@ -493,7 +493,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                         child: const Icon(
                           LucideIcons.checkCircle2,
                           size: 26,
-                          color: Color(0xFF059669),
+                          color: Color(0xFF047857),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -506,15 +506,15 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                               fontSize: 28,
                               fontWeight: FontWeight.w900,
                               color: isDark
-                                  ? const Color(0xFF34D399)
-                                  : const Color(0xFF065F46),
+                                  ? const Color(0xFF047857)
+                                  : const Color(0xFF047857),
                             ),
                           ),
                           const Text(
                             'সঠিক উত্তর',
                             style: TextStyle(
                               fontSize: 13,
-                              color: Color(0xFF059669),
+                              color: Color(0xFF047857),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -531,8 +531,8 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: isDark
-                                    ? const Color(0xFF34D399)
-                                    : const Color(0xFF059669),
+                                    ? const Color(0xFF047857)
+                                    : const Color(0xFF047857),
                               ),
                             ),
                             const Text(
@@ -554,7 +554,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF171717) : Colors.white,
+                      color: isDark ? const Color(0xFF0F172A) : Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isDark
@@ -572,12 +572,12 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                             fontWeight: FontWeight.bold,
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF171717),
+                                : const Color(0xFF0F172A),
                           ),
                         ),
                         const SizedBox(height: 16),
                         _UPXPBar(
-                          label: 'আপনি',
+                          label: 'তুমি',
                           xp: myProfile.xp,
                           maxXp: [
                             myProfile.xp,
@@ -596,7 +596,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                             user.xp,
                             1,
                           ].reduce((a, b) => a > b ? a : b),
-                          color: const Color(0xFF059669),
+                          color: const Color(0xFF047857),
                           isDark: isDark,
                         ),
                         const SizedBox(height: 16),
@@ -650,7 +650,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                 if (analytics.subjects.isNotEmpty)
                   Container(
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF171717) : Colors.white,
+                      color: isDark ? const Color(0xFF0F172A) : Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isDark
@@ -668,7 +668,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                               const Icon(
                                 LucideIcons.barChart2,
                                 size: 16,
-                                color: Color(0xFF059669),
+                                color: Color(0xFF047857),
                               ),
                               const SizedBox(width: 8),
                               Text(
@@ -678,7 +678,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                                   fontWeight: FontWeight.bold,
                                   color: isDark
                                       ? Colors.white
-                                      : const Color(0xFF171717),
+                                      : const Color(0xFF0F172A),
                                 ),
                               ),
                             ],
@@ -751,9 +751,9 @@ class _UPAvatar extends StatelessWidget {
     width: size,
     height: size,
     decoration: BoxDecoration(
-      color: const Color(0xFFE11D48),
+      color: const Color(0xFFB91C1C),
       shape: BoxShape.circle,
-      border: Border.all(color: const Color(0xFFFFE4E6), width: 3),
+      border: Border.all(color: const Color(0xFFFEF2F2), width: 3),
     ),
     child: Center(
       child: Text(
@@ -794,7 +794,7 @@ class _UPStatBox extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w900,
-            color: isDark ? Colors.white : const Color(0xFF171717),
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
           ),
         ),
         Text(
@@ -926,7 +926,7 @@ class _UPCompareCell extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF059669),
+                color: Color(0xFF047857),
               ),
             ),
           ],
@@ -936,14 +936,14 @@ class _UPCompareCell extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              'আপনি',
+              'তুমি',
               style: TextStyle(fontSize: 9, color: Color(0xFFA3A3A3)),
             ),
             const SizedBox(width: 16),
             Flexible(
               child: Text(
                 opponentName,
-                style: const TextStyle(fontSize: 9, color: Color(0xFF059669)),
+                style: const TextStyle(fontSize: 9, color: Color(0xFF047857)),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -973,9 +973,9 @@ class _UPSubjectRow extends StatelessWidget {
     final s = subject;
     final accuracy = s.accuracy.round();
     final Color accColor = accuracy >= 80
-        ? const Color(0xFF059669)
+        ? const Color(0xFF047857)
         : accuracy >= 50
-        ? const Color(0xFFE11D48)
+        ? const Color(0xFFB91C1C)
         : const Color(0xFF737373);
 
     return Column(
@@ -992,7 +992,7 @@ class _UPSubjectRow extends StatelessWidget {
                   height: 28,
                   decoration: BoxDecoration(
                     color: isOpen
-                        ? const Color(0xFFE11D48)
+                        ? const Color(0xFFB91C1C)
                         : (isDark
                               ? const Color(0xFF404040)
                               : const Color(0xFFE5E5E5)),
@@ -1008,8 +1008,8 @@ class _UPSubjectRow extends StatelessWidget {
                       fontSize: 14,
                       color: isOpen
                           ? (isDark
-                                ? const Color(0xFFFB7185)
-                                : const Color(0xFFE11D48))
+                                ? const Color(0xFFB91C1C)
+                                : const Color(0xFFB91C1C))
                           : (isDark ? Colors.white : const Color(0xFF262626)),
                     ),
                   ),
@@ -1065,13 +1065,13 @@ class _UPSubjectRow extends StatelessWidget {
                           _UPMini(
                             'সঠিক',
                             s.correct,
-                            const Color(0xFF059669),
+                            const Color(0xFF047857),
                             isDark,
                           ),
                           _UPMini(
                             'ভুল',
                             s.wrong,
-                            const Color(0xFFE11D48),
+                            const Color(0xFFB91C1C),
                             isDark,
                           ),
                           _UPMini(
@@ -1093,14 +1093,14 @@ class _UPSubjectRow extends StatelessWidget {
                                 Flexible(
                                   flex: s.correct.clamp(1, 9999),
                                   child: Container(
-                                    color: const Color(0xFF059669),
+                                    color: const Color(0xFF047857),
                                   ),
                                 ),
                                 if (s.wrong > 0)
                                   Flexible(
                                     flex: s.wrong,
                                     child: Container(
-                                      color: const Color(0xFFE11D48),
+                                      color: const Color(0xFFB91C1C),
                                     ),
                                   ),
                                 if (s.skipped > 0)

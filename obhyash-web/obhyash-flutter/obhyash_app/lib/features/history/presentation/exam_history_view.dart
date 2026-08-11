@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/utils/app_popups.dart';
+
+import '../../../core/presentation/widgets/app_dropdown.dart';
+
 import 'package:intl/intl.dart';
 import '../../../core/providers/auth_provider.dart';
 
@@ -247,15 +251,21 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           _history = [];
         });
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('ইতিহাস মুছে ফেলা হয়েছে'),
-              backgroundColor: Color(0xFF059669),
-            ),
+          AppPopups.show(
+            context,
+            message: 'ইতিহাস মুছে ফেলা হয়েছে',
+            isError: false,
           );
         }
       }
     } catch (e) {
+      if (mounted) {
+        AppPopups.show(
+          context,
+          message: 'ইতিহাস মুছতে সমস্যা হয়েছে',
+          isError: true,
+        );
+      }
       debugPrint('[ExamHistoryView] _clearHistory error: $e');
     } finally {
       if (mounted) setState(() => _isClearing = false);
@@ -382,47 +392,16 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                 children: [
                   // Subject filter
                   Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+                    child: AppDropdown<String>(
+                      value: _filterSubject.isEmpty ? '' : _filterSubject,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      options: [
+                        const AppDropdownOption(value: '', label: 'সকল বিষয়'),
+                        ..._uniqueSubjects.map(
+                          (s) => AppDropdownOption(value: s.key, label: s.value),
                         ),
-                      ),
-                      child: DropdownButton<String>(
-                        value: _filterSubject.isEmpty ? '' : _filterSubject,
-                        isExpanded: true,
-                        isDense: true,
-                        underline: const SizedBox.shrink(),
-                        icon: Icon(
-                          LucideIcons.chevronDown,
-                          size: 16,
-                          color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFFA3A3A3),
-                        ),
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
-                          color: isDark ? Colors.white : const Color(0xFF171717),
-                        ),
-                        dropdownColor: isDark ? const Color(0xFF262626) : Colors.white,
-                        items: [
-                          const DropdownMenuItem(
-                            value: '',
-                            child: Text('সকল বিষয়'),
-                          ),
-                          ..._uniqueSubjects.map(
-                            (s) => DropdownMenuItem(
-                              value: s.key,
-                              child: Text(s.value),
-                            ),
-                          ),
-                        ],
-                        onChanged: (v) => setState(() => _filterSubject = v ?? ''),
-                      ),
+                      ],
+                      onChanged: (v) => setState(() => _filterSubject = v ?? ''),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -557,7 +536,7 @@ class _ExamsTab extends StatelessWidget {
               child: _emptyState(
                 isDark,
                 'কোনো ফলাফল পাওয়া যায়নি',
-                'একটি মক পরীক্ষা দিন এবং ফলাফল এখানে দেখো।',
+                'একটি মক পরীক্ষা দাও এবং ফলাফল এখানে দেখো।',
               ),
             ),
           ],
@@ -591,36 +570,17 @@ class _ExamsTab extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                height: 36,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
-                  ),
-                ),
-                child: DropdownButton<_SortMode>(
-                  value: sortBy,
-                  underline: const SizedBox.shrink(),
-                  icon: Icon(LucideIcons.chevronDown, size: 14, color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFFA3A3A3)),
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'HindSiliguri',
-                    color: isDark ? Colors.white : const Color(0xFF171717),
-                  ),
-                  dropdownColor: isDark ? const Color(0xFF262626) : Colors.white,
-                  items: const [
-                    DropdownMenuItem(value: _SortMode.date, child: Text('তারিখ অনুযায়ী')),
-                    DropdownMenuItem(value: _SortMode.scoreDesc, child: Text('স্কোর: বেশি আগে')),
-                    DropdownMenuItem(value: _SortMode.scoreAsc, child: Text('স্কোর: কম আগে')),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) onSortChange(v);
-                  },
-                ),
+              AppDropdown<_SortMode>(
+                value: sortBy,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                options: const [
+                  AppDropdownOption(value: _SortMode.date, label: 'তারিখ অনুযায়ী'),
+                  AppDropdownOption(value: _SortMode.scoreDesc, label: 'স্কোর: বেশি আগে'),
+                  AppDropdownOption(value: _SortMode.scoreAsc, label: 'স্কোর: কম আগে'),
+                ],
+                onChanged: (v) {
+                  if (v != null) onSortChange(v);
+                },
               ),
               if (onClear != null)
                 TextButton.icon(
@@ -1031,7 +991,7 @@ class _MistakesTabState extends State<_MistakesTab> {
       return _emptyState(
         widget.isDark,
         'কোনো ভুল নেই! 🎉',
-        'পরীক্ষা দিন এবং ভুল উত্তরগুলো এখানে দেখো।',
+        'পরীক্ষা দাও এবং ভুল উত্তরগুলো এখানে দেখো।',
       );
     }
     return RefreshIndicator(

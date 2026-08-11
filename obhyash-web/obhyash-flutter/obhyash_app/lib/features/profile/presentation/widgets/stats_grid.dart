@@ -36,7 +36,7 @@ class StatsGrid extends StatelessWidget {
               title: 'মোট পরীক্ষা',
               value: examsTaken.toString(),
               icon: LucideIcons.fileEdit,
-              color: const Color(0xFFE11D48), // rose-600
+              color: const Color(0xFFB91C1C), // rose-600
               bgColor: Theme.of(context).brightness == Brightness.dark
                   ? const Color(0x33e11d48) // rose-900/20
                   : const Color(0xFFFFF1F2), // rose-50
@@ -46,9 +46,9 @@ class StatsGrid extends StatelessWidget {
               title: 'গড় স্কোর',
               value: '$avgScore%',
               icon: LucideIcons.crosshair,
-              color: const Color(0xFF059669), // emerald-600
+              color: const Color(0xFF047857), // emerald-600
               bgColor: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0x33059669) // emerald-900/20
+                  ? const Color(0x33047857) // emerald-900/20
                   : const Color(0xFFECFDF5), // emerald-50
             ),
             _buildStatCard(
@@ -90,7 +90,7 @@ class StatsGrid extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16), // sm:p-6
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white, // neutral-900
+        color: isDark ? const Color(0xFF0F172A) : Colors.white, // neutral-900
         borderRadius: BorderRadius.circular(20), // sm:rounded-3xl
         border: Border.all(
           color: isDark
@@ -144,7 +144,7 @@ class StatsGrid extends StatelessWidget {
               fontWeight: FontWeight.w900, // font-black
               color: isDark
                   ? Colors.white
-                  : const Color(0xFF171717), // neutral-900
+                  : const Color(0xFF0F172A), // neutral-900
               letterSpacing: -0.5,
             ),
           ),

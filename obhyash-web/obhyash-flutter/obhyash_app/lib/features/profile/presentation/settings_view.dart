@@ -109,7 +109,7 @@ class SettingsView extends ConsumerWidget {
             description: 'আর্টিকেল ও গাইড পড়ো',
             icon: LucideIcons.bookOpen,
             type: _ItemType.navigate,
-            route: '/blog',
+            route: '/profile/blog',
           ),
         ],
       ),
@@ -121,7 +121,7 @@ class SettingsView extends ConsumerWidget {
             description: 'Obhyash সম্পর্কে জানো',
             icon: LucideIcons.info,
             type: _ItemType.navigate,
-            route: '/about',
+            route: '/profile/about',
           ),
           _SettingsItem(
             label: 'প্রাইভেসি পলিসি',
@@ -190,7 +190,7 @@ class SettingsView extends ConsumerWidget {
             context: context,
             builder: (ctx) => AlertDialog(
               title: const Text('লগ আউট?'),
-              content: const Text('আপনি কি সত্যিই বের হতে চান?'),
+              content: const Text('তুমি কি সত্যিই বের হতে চাও?'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
@@ -199,7 +199,7 @@ class SettingsView extends ConsumerWidget {
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, true),
                   style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFFDC2626),
+                    foregroundColor: const Color(0xFFB91C1C),
                   ),
                   child: const Text(
                     'লগ আউট',
@@ -221,8 +221,8 @@ class SettingsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeMode = ref.watch(themeModeProvider);
-    final bg = isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF5F5F5);
-    final cardBg = isDark ? const Color(0xFF171717) : Colors.white;
+    final bg = isDark ? const Color(0xFF000000) : const Color(0xFFF5F5F5);
+    final cardBg = isDark ? const Color(0xFF0F172A) : Colors.white;
     final groups = _buildGroups(context);
 
     final nameParts = user.name.trim().split(' ');
@@ -296,7 +296,7 @@ class SettingsView extends ConsumerWidget {
                           height: 80,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: const Color(0xFFE11D48),
+                            color: const Color(0xFFB91C1C),
                             border: Border.all(
                               color: Colors.white.withOpacity(0.3),
                               width: 3,
@@ -506,14 +506,14 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iconColor = item.danger
-        ? const Color(0xFFDC2626)
+        ? const Color(0xFFB91C1C)
         : const Color(0xFF166534);
     final iconBg = item.danger
-        ? const Color(0xFFDC2626).withOpacity(0.1)
+        ? const Color(0xFFB91C1C).withOpacity(0.1)
         : const Color(0xFF166534).withOpacity(0.1);
     final labelColor = item.danger
-        ? const Color(0xFFDC2626)
-        : (isDark ? Colors.white : const Color(0xFF171717));
+        ? const Color(0xFFB91C1C)
+        : (isDark ? Colors.white : const Color(0xFF0F172A));
 
     return InkWell(
       onTap: onTap,
@@ -653,7 +653,7 @@ class _ActionBtn extends StatelessWidget {
         ? (isDark ? const Color(0x33881337) : const Color(0xFFFFF1F2))
         : (isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF5F5F5));
     final fg = isAccent
-        ? (isDark ? const Color(0xFFFB7185) : const Color(0xFFE11D48))
+        ? (isDark ? const Color(0xFFB91C1C) : const Color(0xFFB91C1C))
         : (isDark ? const Color(0xFFD4D4D4) : const Color(0xFF404040));
 
     return Expanded(
@@ -704,7 +704,7 @@ class _UpgradePage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: isDark
-          ? const Color(0xFF0A0A0A)
+          ? const Color(0xFF000000)
           : const Color(0xFFF5F5F5),
       appBar: AppBar(
         backgroundColor: const Color(0xFF166534),

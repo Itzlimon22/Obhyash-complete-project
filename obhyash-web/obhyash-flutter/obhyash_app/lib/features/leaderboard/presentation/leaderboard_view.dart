@@ -1,5 +1,6 @@
-﻿import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -30,7 +31,7 @@ const _levels = [
     'Legend',
     'লিজেন্ড (Legend)',
     5000,
-    Color(0xFFE11D48),
+    Color(0xFFB91C1C),
     Color(0xFF881337),
     LucideIcons.flame,
   ),
@@ -46,15 +47,15 @@ const _levels = [
     'Warrior',
     'ওয়ারিয়র (Warrior)',
     2000,
-    Color(0xFFF43F5E),
-    Color(0xFFDC2626),
+    Color(0xFFB91C1C),
+    Color(0xFFB91C1C),
     LucideIcons.users,
   ),
   _LevelInfo(
     'Scout',
     'স্কাউট (Scout)',
     800,
-    Color(0xFF10B981),
+    Color(0xFF047857),
     Color(0xFF14B8A6),
     LucideIcons.eye,
   ),
@@ -381,7 +382,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                             _PodiumSection(
                               users: _users.take(3).toList(),
                               isDark: isDark,
-                              onTap: (id) => context.push('/user-profile/$id'),
+                              onTap: (id) =>
+                                  context.push('/leaderboard/user-profile/$id'),
                             ),
                           _LeaderboardTable(
                             users: _users,
@@ -389,7 +391,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                             isLoading: _isLoading,
                             isDark: isDark,
                             onUserTap: (id) =>
-                                context.push('/user-profile/$id'),
+                                context.push('/leaderboard/user-profile/$id'),
                           ),
                         ],
                       ))
@@ -398,7 +400,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                   users: _collegeUsers,
                   isLoading: _isLoadingCollege,
                   isDark: isDark,
-                  onUserTap: (id) => context.push('/user-profile/$id'),
+                  onUserTap: (id) =>
+                      context.push('/leaderboard/user-profile/$id'),
                 ),
         ),
       ],
@@ -430,13 +433,13 @@ class _ViewModeTab extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: isActive
-                ? (isDark ? const Color(0xFF059669) : const Color(0xFF059669))
+                ? (isDark ? const Color(0xFF047857) : const Color(0xFF047857))
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
             boxShadow: isActive
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF059669).withValues(alpha: 0.3),
+                      color: const Color(0xFF047857).withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                       spreadRadius: -2,
@@ -524,7 +527,7 @@ class _CollegeLeaderboardBody extends StatelessWidget {
             color: isDark ? const Color(0xFF0A1F17) : const Color(0xFFECFDF5),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: isDark ? const Color(0xFF059669) : const Color(0xFFBBF7D0),
+              color: isDark ? const Color(0xFF047857) : const Color(0xFFBBF7D0),
             ),
           ),
           child: Row(
@@ -539,7 +542,7 @@ class _CollegeLeaderboardBody extends StatelessWidget {
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
                     color: isDark
-                        ? const Color(0xFF34D399)
+                        ? const Color(0xFF047857)
                         : const Color(0xFF047857),
                   ),
                 ),
@@ -706,7 +709,7 @@ class _InstituteRankingsBody extends StatelessWidget {
               border: Border.all(
                 color: isMe
                     ? (isDark
-                          ? const Color(0xFF059669)
+                          ? const Color(0xFF047857)
                           : const Color(0xFFBBF7D0))
                     : (isDark
                           ? const Color(0xFF1E1E1E)
@@ -749,7 +752,7 @@ class _InstituteRankingsBody extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                           color: isMe
                               ? (isDark
-                                    ? const Color(0xFF34D399)
+                                    ? const Color(0xFF047857)
                                     : const Color(0xFF047857))
                               : (isDark
                                     ? Colors.white
@@ -781,8 +784,8 @@ class _InstituteRankingsBody extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isMe
                         ? (isDark
-                              ? const Color(0xFF064E3B)
-                              : const Color(0xFFD1FAE5))
+                              ? const Color(0xFF047857)
+                              : const Color(0xFFECFDF5))
                         : (isDark
                               ? const Color(0xFF1A1A1A)
                               : const Color(0xFFF5F5F5)),
@@ -799,7 +802,7 @@ class _InstituteRankingsBody extends StatelessWidget {
                           fontWeight: FontWeight.w900,
                           color: isMe
                               ? (isDark
-                                    ? const Color(0xFF34D399)
+                                    ? const Color(0xFF047857)
                                     : const Color(0xFF047857))
                               : (isDark
                                     ? Colors.white
@@ -1001,7 +1004,7 @@ class _LevelSelector extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: isActive
                                     ? Colors.white
-                                    : const Color(0xFFEF4444),
+                                    : const Color(0xFFB91C1C),
                                 borderRadius: BorderRadius.circular(100),
                                 boxShadow: [
                                   BoxShadow(
@@ -1062,7 +1065,7 @@ class _UserProgressCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -1100,8 +1103,8 @@ class _UserProgressCard extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                       letterSpacing: 0.5,
                       color: isDark
-                          ? const Color(0xFFFB7185)
-                          : const Color(0xFFE11D48),
+                          ? const Color(0xFFB91C1C)
+                          : const Color(0xFFB91C1C),
                     ),
                   ),
                   Text(
@@ -1111,8 +1114,8 @@ class _UserProgressCard extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                       height: 1.1,
                       color: isDark
-                          ? const Color(0xFFFB7185)
-                          : const Color(0xFFE11D48),
+                          ? const Color(0xFFB91C1C)
+                          : const Color(0xFFB91C1C),
                     ),
                   ),
                 ],
@@ -1129,11 +1132,11 @@ class _UserProgressCard extends StatelessWidget {
                 Wrap(
                   children: [
                     Text(
-                      'আপনি বর্তমানে ',
+                      'তুমি বর্তমানে ',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF171717),
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                     Text(
@@ -1142,8 +1145,8 @@ class _UserProgressCard extends StatelessWidget {
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: isDark
-                            ? const Color(0xFFFB7185)
-                            : const Color(0xFFE11D48),
+                            ? const Color(0xFFB91C1C)
+                            : const Color(0xFFB91C1C),
                       ),
                     ),
                     Text(
@@ -1151,7 +1154,7 @@ class _UserProgressCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF171717),
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                   ],
@@ -1170,7 +1173,7 @@ class _UserProgressCard extends StatelessWidget {
                     'অভিনন্দন! সর্বোচ্চ লেভেলে পৌঁছেছেন!',
                     style: TextStyle(
                       fontSize: 11,
-                      color: Color(0xFF059669),
+                      color: Color(0xFF047857),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1193,7 +1196,7 @@ class _UserProgressCard extends StatelessWidget {
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'monospace',
-                      color: isDark ? Colors.white : const Color(0xFF171717),
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -1222,8 +1225,8 @@ class _UserProgressCard extends StatelessWidget {
                           : const Color(0xFFF5F5F5),
                       valueColor: AlwaysStoppedAnimation<Color>(
                         isDark
-                            ? const Color(0xFFFB7185)
-                            : const Color(0xFFE11D48),
+                            ? const Color(0xFFB91C1C)
+                            : const Color(0xFFB91C1C),
                       ),
                     ),
                   ),
@@ -1257,7 +1260,7 @@ class _LeaderboardTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -1339,7 +1342,7 @@ class _LeaderboardTable extends StatelessWidget {
               final isTop3 = i < 3;
               final isLast = i == users.length - 1;
               final top3Color = i == 0
-                  ? const Color(0xFFE11D48)
+                  ? const Color(0xFFB91C1C)
                   : i == 1
                   ? const Color(0xFFF59E0B)
                   : const Color(0xFF94A3B8);
@@ -1351,7 +1354,7 @@ class _LeaderboardTable extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isMe
                         ? (isDark
-                              ? const Color(0xFFE11D48).withValues(alpha: 0.04)
+                              ? const Color(0xFFB91C1C).withValues(alpha: 0.04)
                               : const Color(0xFFFFF1F2))
                         : Colors.transparent,
                     border: Border(
@@ -1407,11 +1410,11 @@ class _LeaderboardTable extends StatelessWidget {
                                         fontFamily: 'HindSiliguri',
                                         color: isMe
                                             ? (isDark
-                                                  ? const Color(0xFFFB7185)
-                                                  : const Color(0xFFE11D48))
+                                                  ? const Color(0xFFB91C1C)
+                                                  : const Color(0xFFB91C1C))
                                             : (isDark
                                                   ? Colors.white
-                                                  : const Color(0xFF171717)),
+                                                  : const Color(0xFF0F172A)),
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -1424,7 +1427,7 @@ class _LeaderboardTable extends StatelessWidget {
                                         vertical: 1,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFFFE4E6),
+                                        color: const Color(0xFFFEF2F2),
                                         borderRadius: BorderRadius.circular(
                                           100,
                                         ),
@@ -1434,7 +1437,7 @@ class _LeaderboardTable extends StatelessWidget {
                                         style: TextStyle(
                                           fontSize: 9,
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFFE11D48),
+                                          color: Color(0xFFB91C1C),
                                         ),
                                       ),
                                     ),
@@ -1467,7 +1470,7 @@ class _LeaderboardTable extends StatelessWidget {
                             fontFamily: 'monospace',
                             fontWeight: FontWeight.w900,
                             fontSize: 14,
-                            color: Color(0xFF059669),
+                            color: Color(0xFF047857),
                           ),
                         ),
                         const SizedBox(width: 4),
@@ -1613,12 +1616,12 @@ const _hdr = TextStyle(
 // ─── Avatar Color ─────────────────────────────────────────────────────────────────────────
 Color _avatarColor(String name) {
   const colors = <Color>[
-    Color(0xFFE11D48),
-    Color(0xFF3B82F6),
-    Color(0xFF10B981),
+    Color(0xFFB91C1C),
+    Color(0xFF0F172A),
+    Color(0xFF047857),
     Color(0xFFF59E0B),
-    Color(0xFF8B5CF6),
-    Color(0xFFF97316),
+    Color(0xFF0F172A),
+    Color(0xFFF59E0B),
     Color(0xFF06B6D4),
     Color(0xFFEC4899),
   ];
@@ -1739,7 +1742,7 @@ class _PodiumSection extends StatelessWidget {
             rank: 1,
             avatarSize: 64.0,
             platformH: 80.0,
-            accentColor: const Color(0xFFE11D48),
+            accentColor: const Color(0xFFB91C1C),
             medal: '🏆',
           ),
           if (users.length >= 3)
@@ -1756,7 +1759,7 @@ class _PodiumSection extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -1779,7 +1782,7 @@ class _PodiumSection extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'HindSiliguri',
-                    color: isDark ? Colors.white : const Color(0xFF171717),
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
               ],
@@ -1833,7 +1836,7 @@ class _PodiumSection extends StatelessWidget {
                               fontFamily: 'HindSiliguri',
                               color: isDark
                                   ? Colors.white
-                                  : const Color(0xFF171717),
+                                  : const Color(0xFF0F172A),
                             ),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,

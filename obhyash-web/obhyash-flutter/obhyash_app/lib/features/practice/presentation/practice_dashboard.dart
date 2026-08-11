@@ -1,6 +1,7 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
+import '../../../core/presentation/widgets/latex_text.dart';
 import 'flashcard_mode.dart';
 import 'practice_summary.dart';
 
@@ -76,9 +78,10 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
   String _subjectFilter = 'all';
 
   List<PracticeQuestion> _mistakes = [];
-  Map<String, int> _mistakeFreq = {};
+  final Map<String, int> _mistakeFreq = {};
   List<PracticeQuestion> _bookmarks = [];
   Set<String> _bookmarkedIds = {};
+  int _totalBookmarks = 0;
 
   final Set<String> _selectedIds = {};
   bool _isLoading = true;
@@ -93,10 +96,44 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
   List<PracticeQuestion> _flashcardQuestions = [];
   List<FlashcardResult> _flashcardResults = [];
 
+  // Internal maps used by paginated mistakes fetch
+  final Map<String, PracticeQuestion> _mistakeMap = {};
+
+  final ScrollController _scrollController = ScrollController();
+
+  // Bookmarks Pagination
+  int _bOffset = 0;
+  bool _bHasMore = true;
+  bool _bIsLoadingMore = false;
+
+  // Mistakes Pagination
+  int _mOffset = 0;
+  bool _mHasMore = true;
+  bool _mIsLoadingMore = false;
+  static const int _limit = 20;
+
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     _loadReviewedDates().then((_) => _fetchData());
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      if (_activeTab == 'mistakes') {
+        _loadMoreMistakes();
+      } else {
+        _loadMoreBookmarks();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   // ── Spaced repetition helpers ───────────────────────────────────────────────
@@ -146,43 +183,114 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
 
   Future<void> _fetchData() async {
     setState(() => _isLoading = true);
+    await Future.wait([
+      _fetchBookmarks(isRefresh: true),
+      _fetchMistakes(isRefresh: true),
+    ]);
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+        _dueCount = _computeDueCount();
+      });
+    }
+  }
+
+  Future<void> _fetchBookmarks({bool isRefresh = false}) async {
+    if (isRefresh) {
+      _bOffset = 0;
+      _bHasMore = true;
+    }
+
     try {
       final sb = Supabase.instance.client;
       final uid = sb.auth.currentUser?.id;
-      if (uid == null) {
-        debugPrint('[PracticeDashboard] userId is null — skipping fetch');
-        if (mounted) setState(() => _isLoading = false);
-        return;
+      if (uid == null) return;
+
+      // Fetch total count first (only on refresh)
+      if (isRefresh) {
+        final countResponse = await sb
+            .from('bookmarks')
+            .select('question_id')
+            .eq('user_id', uid)
+            .count(CountOption.exact);
+        if (mounted) {
+          setState(() => _totalBookmarks = countResponse.count ?? 0);
+        }
       }
 
-      // 1. Bookmarks via bookmarks table -> questions join
       final bData = await sb
           .from('bookmarks')
-          .select('question_id, questions(*)')
-          .eq('user_id', uid);
+          .select('question_id')
+          .eq('user_id', uid)
+          .range(_bOffset, _bOffset + _limit - 1);
+
       final bList = <PracticeQuestion>[];
       final bIds = <String>{};
-      for (final row in (bData as List)) {
-        final qRow = row['questions'] as Map<String, dynamic>?;
-        if (qRow != null) {
-          final q = PracticeQuestion.fromJson(qRow);
+
+      if ((bData as List).isNotEmpty) {
+        final questionIds = bData
+            .map((b) => b['question_id'] as String)
+            .toList();
+        final qData = await sb
+            .from('questions')
+            .select('*')
+            .inFilter('id', questionIds);
+
+        for (final row in (qData as List)) {
+          final q = PracticeQuestion.fromJson(row as Map<String, dynamic>);
           bList.add(q);
           bIds.add(q.id);
         }
       }
 
-      // 2. Mistakes derived from exam_results JSONB
-      //    questions  = List of question objects stored at exam time
-      //    user_answers = Map<questionId, answerIndex>
+      if (mounted) {
+        setState(() {
+          if (isRefresh) {
+            _bookmarks = bList;
+            _bookmarkedIds = bIds;
+          } else {
+            _bookmarks.addAll(bList);
+            _bookmarkedIds.addAll(bIds);
+          }
+          if (bData.length < _limit) {
+            _bHasMore = false;
+          }
+          _bOffset += bData.length;
+        });
+      }
+    } catch (e) {
+      debugPrint('[PracticeDashboard] _fetchBookmarks error: $e');
+    }
+  }
+
+  Future<void> _loadMoreBookmarks() async {
+    if (_bIsLoadingMore || !_bHasMore) return;
+    setState(() => _bIsLoadingMore = true);
+    await _fetchBookmarks();
+    if (mounted) setState(() => _bIsLoadingMore = false);
+  }
+
+  Future<void> _fetchMistakes({bool isRefresh = false}) async {
+    if (isRefresh) {
+      _mOffset = 0;
+      _mHasMore = true;
+      _mistakeMap.clear();
+      _mistakeFreq.clear();
+    }
+
+    try {
+      final sb = Supabase.instance.client;
+      final uid = sb.auth.currentUser?.id;
+      if (uid == null) return;
+
       final mData = await sb
           .from('exam_results')
           .select('questions, user_answers')
           .eq('user_id', uid)
           .not('questions', 'is', null)
-          .not('user_answers', 'is', null);
-
-      final mListMap = <String, PracticeQuestion>{};
-      final mFreq = <String, int>{};
+          .not('user_answers', 'is', null)
+          .order('created_at', ascending: false)
+          .range(_mOffset, _mOffset + _limit - 1);
 
       for (final result in (mData as List)) {
         final questionsRaw = result['questions'];
@@ -199,31 +307,38 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
           final raw = userAnswers[q.id];
           if (raw == null) continue;
           final userAnswer = (raw as num).toInt();
-          if (userAnswer == -1) continue; // skipped
+          if (userAnswer == -1) continue;
           if (userAnswer != q.correctAnswerIndex) {
-            mListMap[q.id] = q;
-            mFreq[q.id] = (mFreq[q.id] ?? 0) + 1;
+            _mistakeMap[q.id] = q;
+            _mistakeFreq[q.id] = (_mistakeFreq[q.id] ?? 0) + 1;
           }
         }
       }
 
-      final sortedMistakes = mListMap.values.toList()
-        ..sort((a, b) => (mFreq[b.id] ?? 0).compareTo(mFreq[a.id] ?? 0));
+      final sortedMistakes = _mistakeMap.values.toList()
+        ..sort(
+          (a, b) =>
+              (_mistakeFreq[b.id] ?? 0).compareTo(_mistakeFreq[a.id] ?? 0),
+        );
 
       if (mounted) {
         setState(() {
-          _bookmarks = bList;
-          _bookmarkedIds = bIds;
           _mistakes = sortedMistakes;
-          _mistakeFreq = mFreq;
-          _dueCount = sortedMistakes.where((q) => _isDue(q.id)).length;
-          _isLoading = false;
+          if (mData.length < _limit) _mHasMore = false;
+          _mOffset += mData.length;
+          _dueCount = _computeDueCount();
         });
       }
     } catch (e) {
-      debugPrint('[PracticeDashboard] _fetchData error: $e');
-      if (mounted) setState(() => _isLoading = false);
+      debugPrint('[PracticeDashboard] _fetchMistakes error: $e');
     }
+  }
+
+  Future<void> _loadMoreMistakes() async {
+    if (_mIsLoadingMore || !_mHasMore) return;
+    setState(() => _mIsLoadingMore = true);
+    await _fetchMistakes();
+    if (mounted) setState(() => _mIsLoadingMore = false);
   }
 
   // ── Bookmark toggle ─────────────────────────────────────────────────────────
@@ -238,6 +353,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
       if (isMarked) {
         _bookmarkedIds.remove(qid);
         _bookmarks.removeWhere((q) => q.id == qid);
+        _totalBookmarks = (_totalBookmarks - 1).clamp(0, _totalBookmarks);
       } else {
         _bookmarkedIds.add(qid);
         final q = _mistakes.firstWhere(
@@ -245,6 +361,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
           orElse: () => _bookmarks.firstWhere((b) => b.id == qid),
         );
         if (!_bookmarks.any((b) => b.id == qid)) _bookmarks.add(q);
+        _totalBookmarks++;
       }
     });
 
@@ -376,14 +493,14 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                           _StatBox(
                             label: 'মোট ভুল',
                             value: _mistakes.length,
-                            color: const Color(0xFFF43F5E),
+                            color: const Color(0xFFB91C1C),
                             isDark: isDark,
                           ),
                           const SizedBox(width: 8),
                           _StatBox(
                             label: 'বুকমার্ক',
-                            value: _bookmarks.length,
-                            color: const Color(0xFF10B981),
+                            value: _totalBookmarks,
+                            color: const Color(0xFF047857),
                             isDark: isDark,
                           ),
                           const SizedBox(width: 8),
@@ -435,7 +552,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF171717)
+                                ? const Color(0xFF0F172A)
                                 : const Color(0xFFF5F5F5),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
@@ -458,7 +575,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                                 }),
                               ),
                               _TabBtn(
-                                label: 'বুকমার্ক (${_bookmarks.length})',
+                                label: 'বুকমার্ক ($_totalBookmarks)',
                                 active: _activeTab == 'bookmarks',
                                 isDark: isDark,
                                 onTap: () => setState(() {
@@ -510,7 +627,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                         margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? const Color(0xFF171717)
+                              ? const Color(0xFF0F172A)
                               : Colors.white,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
@@ -585,12 +702,12 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               height: 20,
               decoration: BoxDecoration(
                 color: allSelected
-                    ? const Color(0xFFE11D48)
+                    ? const Color(0xFFB91C1C)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
                   color: allSelected
-                      ? const Color(0xFFE11D48)
+                      ? const Color(0xFFB91C1C)
                       : const Color(0xFFA3A3A3),
                 ),
               ),
@@ -616,11 +733,11 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: _shuffle
-                    ? const Color(0xFF059669).withValues(alpha: 0.1)
+                    ? const Color(0xFF047857).withValues(alpha: 0.1)
                     : (isDark ? const Color(0xFF262626) : Colors.white),
                 border: Border.all(
                   color: _shuffle
-                      ? const Color(0xFF059669).withValues(alpha: 0.3)
+                      ? const Color(0xFF047857).withValues(alpha: 0.3)
                       : (isDark
                             ? const Color(0xFF404040)
                             : const Color(0xFFE5E5E5)),
@@ -633,7 +750,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                     LucideIcons.shuffle,
                     size: 14,
                     color: _shuffle
-                        ? const Color(0xFF059669)
+                        ? const Color(0xFF047857)
                         : const Color(0xFFA3A3A3),
                   ),
                   const SizedBox(width: 4),
@@ -645,7 +762,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: _shuffle
-                          ? const Color(0xFF059669)
+                          ? const Color(0xFF047857)
                           : const Color(0xFFA3A3A3),
                     ),
                   ),
@@ -710,7 +827,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSel
-                ? const Color(0xFFE11D48)
+                ? const Color(0xFFB91C1C)
                 : (isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
           ),
         ),
@@ -722,11 +839,11 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               width: 20,
               height: 20,
               decoration: BoxDecoration(
-                color: isSel ? const Color(0xFFE11D48) : Colors.transparent,
+                color: isSel ? const Color(0xFFB91C1C) : Colors.transparent,
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
                   color: isSel
-                      ? const Color(0xFFE11D48)
+                      ? const Color(0xFFB91C1C)
                       : const Color(0xFFA3A3A3),
                 ),
               ),
@@ -778,7 +895,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                                 : LucideIcons.bookmark,
                             size: 16,
                             color: isBookmarked
-                                ? const Color(0xFF10B981)
+                                ? const Color(0xFF047857)
                                 : const Color(0xFFA3A3A3),
                           ),
                         ),
@@ -786,27 +903,25 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    '${i + 1}. ${q.questionText}',
+                  LatexText(
+                    text: '${i + 1}. ${q.questionText}',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: isDark ? Colors.white : const Color(0xFF171717),
+                      fontFamily: 'HindSiliguri',
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   if (q.options.isNotEmpty &&
                       q.correctAnswerIndex < q.options.length) ...[
                     const SizedBox(height: 4),
-                    Text(
-                      '\u2713 ${q.options[q.correctAnswerIndex]}',
+                    LatexText(
+                      text: '✓ ${q.options[q.correctAnswerIndex]}',
                       style: const TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF059669),
+                        fontFamily: 'HindSiliguri',
+                        color: Color(0xFF047857),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ],
@@ -848,7 +963,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF171717),
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
             const SizedBox(height: 8),
@@ -868,7 +983,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDC2626),
+                  color: const Color(0xFFB91C1C),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Text(
@@ -909,7 +1024,7 @@ class _StatBox extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF171717) : Colors.white,
+          color: isDark ? const Color(0xFF0F172A) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -1010,12 +1125,12 @@ class _Pill extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
           color: active
-              ? const Color(0xFFE11D48)
-              : (isDark ? const Color(0xFF171717) : Colors.white),
+              ? const Color(0xFFB91C1C)
+              : (isDark ? const Color(0xFF0F172A) : Colors.white),
           borderRadius: BorderRadius.circular(100),
           border: Border.all(
             color: active
-                ? const Color(0xFFE11D48)
+                ? const Color(0xFFB91C1C)
                 : (isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5)),
           ),
         ),
@@ -1042,15 +1157,15 @@ class _FreqBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final (bg, border, text) = count >= 3
         ? (
-            const Color(0xFF059669).withValues(alpha: 0.15),
-            const Color(0xFF059669).withValues(alpha: 0.4),
-            const Color(0xFF059669),
+            const Color(0xFF047857).withValues(alpha: 0.15),
+            const Color(0xFF047857).withValues(alpha: 0.4),
+            const Color(0xFF047857),
           )
         : count == 2
         ? (
-            const Color(0xFFDC2626).withValues(alpha: 0.15),
-            const Color(0xFFDC2626).withValues(alpha: 0.4),
-            const Color(0xFFDC2626),
+            const Color(0xFFB91C1C).withValues(alpha: 0.15),
+            const Color(0xFFB91C1C).withValues(alpha: 0.4),
+            const Color(0xFFB91C1C),
           )
         : (
             const Color(0xFF404040).withValues(alpha: 0.3),

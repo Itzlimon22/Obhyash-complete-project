@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -91,31 +92,41 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "আজকের দিনটি শুভ হোক,",
-                  style: TextStyle(
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'HindSiliguri',
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'স্বাগতম, ${currentUser.name.split(' ').first}! 👋',
-                  style: TextStyle(
-                    color: isDark ? Colors.white : const Color(0xFF111827),
-                    fontWeight: FontWeight.w900,
-                    fontSize: 28,
-                    letterSpacing: -0.5,
-                    fontFamily: 'HindSiliguri',
-                  ),
-                ),
-              ],
-            ),
+            child:
+                Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "আজকের দিনটি শুভ হোক,",
+                          style: TextStyle(
+                            color: isDark ? Colors.grey[400] : Colors.grey[600],
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'HindSiliguri',
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'স্বাগতম, ${currentUser.name.split(' ').first}! 👋',
+                          style: TextStyle(
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF111827),
+                            fontWeight: FontWeight.w900,
+                            fontSize: 28,
+                            letterSpacing: -0.5,
+                            fontFamily: 'HindSiliguri',
+                          ),
+                        ),
+                      ],
+                    )
+                    .animate()
+                    .fadeIn(duration: 400.ms)
+                    .slideY(
+                      begin: 0.1,
+                      duration: 400.ms,
+                      curve: Curves.easeOut,
+                    ),
           ),
         ),
 
@@ -134,76 +145,91 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                   childAspectRatio: 0.92,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    DashboardActionCard(
-                      title: 'মক পরীক্ষা',
-                      icon: LucideIcons.fileEdit,
-                      primaryColor: const Color(0xFF047857),
-                      lightColor: isDark
-                          ? const Color(0x33047857)
-                          : const Color(0xFFECFDF5),
-                      onTap: () => context.go('/setup'),
-                    ),
-                    DashboardActionCard(
-                      title: 'অনুশীলন',
-                      icon: LucideIcons.bookOpen,
-                      primaryColor: const Color(0xFF047857),
-                      lightColor: isDark
-                          ? const Color(0x33047857)
-                          : const Color(0xFFECFDF5),
-                      onTap: () => context.go('/practice'),
-                    ),
-                    DashboardActionCard(
-                      title: 'ইতিহাস',
-                      icon: LucideIcons.clock,
-                      primaryColor: const Color(0xFF525252),
-                      lightColor: isDark
-                          ? const Color(0x33525252)
-                          : const Color(0xFFF5F5F5),
-                      onTap: () => context.go('/history'),
-                    ),
-                    DashboardActionCard(
-                      title: 'লিডারবোর্ড',
-                      icon: LucideIcons.trophy,
-                      primaryColor: const Color(0xFF047857),
-                      lightColor: isDark
-                          ? const Color(0x33047857)
-                          : const Color(0xFFECFDF5),
-                      onTap: () => context.go('/leaderboard'),
-                    ),
-                    DashboardActionCard(
-                      title: 'এনালাইসিস',
-                      icon: LucideIcons.pieChart,
-                      primaryColor: const Color(0xFF047857),
-                      lightColor: isDark
-                          ? const Color(0x33047857)
-                          : const Color(0xFFECFDF5),
-                      onTap: () => context.go('/analysis'),
-                    ),
-                    DashboardActionCard(
-                      title: 'ব্লগ',
-                      icon: LucideIcons.newspaper,
-                      primaryColor: const Color(0xFF047857),
-                      lightColor: isDark
-                          ? const Color(0x33047857)
-                          : const Color(0xFFECFDF5),
-                      onTap: () => launchUrl(
-                        Uri.parse('https://obhyash.com/blog'),
-                        mode: LaunchMode.externalApplication,
-                      ),
-                    ),
-                  ],
+                  children:
+                      [
+                            DashboardActionCard(
+                              title: 'মক পরীক্ষা',
+                              icon: LucideIcons.fileEdit,
+                              primaryColor: const Color(0xFF047857),
+                              lightColor: isDark
+                                  ? const Color(0x33047857)
+                                  : const Color(0xFFECFDF5),
+                              onTap: () => context.go('/setup'),
+                            ),
+                            DashboardActionCard(
+                              title: 'অনুশীলন',
+                              icon: LucideIcons.bookOpen,
+                              primaryColor: const Color(0xFF047857),
+                              lightColor: isDark
+                                  ? const Color(0x33047857)
+                                  : const Color(0xFFECFDF5),
+                              onTap: () => context.go('/practice'),
+                            ),
+                            DashboardActionCard(
+                              title: 'ইতিহাস',
+                              icon: LucideIcons.clock,
+                              primaryColor: const Color(0xFF525252),
+                              lightColor: isDark
+                                  ? const Color(0x33525252)
+                                  : const Color(0xFFF5F5F5),
+                              onTap: () => context.go('/history'),
+                            ),
+                            DashboardActionCard(
+                              title: 'লিডারবোর্ড',
+                              icon: LucideIcons.trophy,
+                              primaryColor: const Color(0xFF047857),
+                              lightColor: isDark
+                                  ? const Color(0x33047857)
+                                  : const Color(0xFFECFDF5),
+                              onTap: () => context.go('/leaderboard'),
+                            ),
+                            DashboardActionCard(
+                              title: 'এনালাইসিস',
+                              icon: LucideIcons.pieChart,
+                              primaryColor: const Color(0xFF047857),
+                              lightColor: isDark
+                                  ? const Color(0x33047857)
+                                  : const Color(0xFFECFDF5),
+                              onTap: () => context.go('/analysis'),
+                            ),
+                            DashboardActionCard(
+                              title: 'ব্লগ',
+                              icon: LucideIcons.newspaper,
+                              primaryColor: const Color(0xFF047857),
+                              lightColor: isDark
+                                  ? const Color(0x33047857)
+                                  : const Color(0xFFECFDF5),
+                              onTap: () => launchUrl(
+                                Uri.parse('https://obhyash.com/blog'),
+                                mode: LaunchMode.externalApplication,
+                              ),
+                            ),
+                          ]
+                          .animate(interval: 50.ms)
+                          .fadeIn(duration: 400.ms)
+                          .slideY(
+                            begin: 0.1,
+                            duration: 400.ms,
+                            curve: Curves.easeOut,
+                          ),
                 ),
                 const SizedBox(height: 24),
 
                 // Subject Stats List
                 SubjectStatCard(
-                  data: subjects,
-                  isLoading: isLoading,
-                  onSubjectClick: (subjectId) {
-                    context.go('/subject/$subjectId');
-                  },
-                ),
+                      data: subjects,
+                      isLoading: isLoading,
+                      onSubjectClick: (subjectId) {
+                        context.go('/subject/$subjectId');
+                      },
+                    )
+                    .animate(delay: 200.ms)
+                    .fadeIn(duration: 400.ms)
+                    .slideY(
+                      begin: 0.05,
+                      duration: 400.ms,
+                      curve: Curves.easeOut,
+                    ),
 
                 const SizedBox(height: 40),
               ],

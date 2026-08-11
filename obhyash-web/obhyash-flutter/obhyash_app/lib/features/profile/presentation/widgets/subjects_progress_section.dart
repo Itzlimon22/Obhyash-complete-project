@@ -19,16 +19,16 @@ class SubjectsProgressSection extends StatelessWidget {
   }
 
   Color _getAccuracyColor(int accuracy) {
-    if (accuracy >= 80) return const Color(0xFF10B981); // emerald-500
+    if (accuracy >= 80) return const Color(0xFF047857); // emerald-500
     if (accuracy >= 50) return const Color(0xFFF59E0B); // amber-500
-    return const Color(0xFFEF4444); // red-500
+    return const Color(0xFFB91C1C); // red-500
   }
 
   Color _getAccuracyBgColor(int accuracy, bool isDark) {
     if (accuracy >= 80) {
       return isDark
           ? const Color(0x33064e3b)
-          : const Color(0xFFD1FAE5); // emerald-900/20 : emerald-100
+          : const Color(0xFFECFDF5); // emerald-900/20 : emerald-100
     }
     if (accuracy >= 50) {
       return isDark
@@ -43,8 +43,8 @@ class SubjectsProgressSection extends StatelessWidget {
   Color _getAccuracyTextColor(int accuracy, bool isDark) {
     if (accuracy >= 80) {
       return isDark
-          ? const Color(0xFF34D399)
-          : const Color(0xFF059669); // emerald-400 : emerald-600
+          ? const Color(0xFF047857)
+          : const Color(0xFF047857); // emerald-400 : emerald-600
     }
     if (accuracy >= 50) {
       return isDark
@@ -53,7 +53,7 @@ class SubjectsProgressSection extends StatelessWidget {
     }
     return isDark
         ? const Color(0xFFF87171)
-        : const Color(0xFFDC2626); // red-400 : red-600
+        : const Color(0xFFB91C1C); // red-400 : red-600
   }
 
   @override
@@ -64,7 +64,7 @@ class SubjectsProgressSection extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF171717) : Colors.white,
+          color: isDark ? const Color(0xFF0F172A) : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -78,7 +78,7 @@ class SubjectsProgressSection extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF171717),
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
                 fontFamily: 'HindSiliguri',
               ),
             ),
@@ -100,7 +100,7 @@ class SubjectsProgressSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20), // sm:p-8
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(24), // sm:rounded-3xl
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -114,7 +114,7 @@ class SubjectsProgressSection extends StatelessWidget {
             style: TextStyle(
               fontSize: 20, // text-xl
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF171717),
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
               fontFamily: 'HindSiliguri',
             ),
           ),
@@ -146,7 +146,7 @@ class SubjectsProgressSection extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               color: isDark
                                   ? Colors.white
-                                  : const Color(0xFF171717),
+                                  : const Color(0xFF0F172A),
                               fontFamily: 'HindSiliguri',
                             ),
                           ),

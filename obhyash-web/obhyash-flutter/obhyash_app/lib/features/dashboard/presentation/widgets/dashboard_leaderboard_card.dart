@@ -27,7 +27,9 @@ class DashboardLeaderboardCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF171717) : const Color(0xFF0F172A), // Deep rich color instead of white
+          color: isDark
+              ? const Color(0xFF0F172A)
+              : const Color(0xFF0F172A), // Deep rich color instead of white
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFF1E293B),
@@ -56,7 +58,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                     end: Alignment.bottomRight,
                     colors: isDark
                         ? [
-                            const Color(0xFF064E3B).withOpacity(0.15),
+                            const Color(0xFF047857).withOpacity(0.15),
                             Colors.transparent,
                           ]
                         : [
@@ -84,16 +86,16 @@ class DashboardLeaderboardCard extends StatelessWidget {
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF064E3B).withOpacity(0.3)
-                                : const Color(0xFFD1FAE5),
+                                ? const Color(0xFF047857).withOpacity(0.3)
+                                : const Color(0xFFECFDF5),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
                             LucideIcons.trophy,
                             size: 16,
                             color: isDark
-                                ? const Color(0xFF34D399)
-                                : const Color(0xFF059669),
+                                ? const Color(0xFF047857)
+                                : const Color(0xFF047857),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -117,7 +119,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? const Color(0xFF064E3B).withOpacity(0.2)
+                            ? const Color(0xFF047857).withOpacity(0.2)
                             : const Color(0xFFECFDF5),
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -130,8 +132,8 @@ class DashboardLeaderboardCard extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                               color: isDark
-                                  ? const Color(0xFF34D399)
-                                  : const Color(0xFF059669),
+                                  ? const Color(0xFF047857)
+                                  : const Color(0xFF047857),
                             ),
                           ),
                           const SizedBox(width: 4),
@@ -139,8 +141,8 @@ class DashboardLeaderboardCard extends StatelessWidget {
                             LucideIcons.chevronRight,
                             size: 12,
                             color: isDark
-                                ? const Color(0xFF34D399)
-                                : const Color(0xFF059669),
+                                ? const Color(0xFF047857)
+                                : const Color(0xFF047857),
                           ),
                         ],
                       ),
@@ -167,7 +169,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981), // Solid green
+                    color: const Color(0xFF047857), // Solid green
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
@@ -230,7 +232,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEF4444), // Solid red
+                    color: const Color(0xFFB91C1C), // Solid red
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
@@ -302,7 +304,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                         width: 4,
                         height: 4,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF34D399),
+                          color: Color(0xFF047857),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -354,10 +356,10 @@ class DashboardLeaderboardCard extends StatelessWidget {
       width: 28,
       height: 28,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF064E3B) : const Color(0xFFD1FAE5),
+        color: isDark ? const Color(0xFF047857) : const Color(0xFFECFDF5),
         shape: BoxShape.circle,
         border: Border.all(
-          color: isDark ? const Color(0xFF059669) : const Color(0xFF6EE7B7),
+          color: isDark ? const Color(0xFF047857) : const Color(0xFF6EE7B7),
           width: 2,
         ),
       ),
@@ -367,7 +369,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w900,
-            color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+            color: isDark ? const Color(0xFF047857) : const Color(0xFF047857),
           ),
         ),
       ),

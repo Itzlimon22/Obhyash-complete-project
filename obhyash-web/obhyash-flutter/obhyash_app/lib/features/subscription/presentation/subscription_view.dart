@@ -1,30 +1,27 @@
-﻿import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/providers/auth_provider.dart';
 import '../domain/models.dart';
 import 'payment_view.dart';
-import 'widgets/pricing_card.dart';
 
-class SubscriptionView extends ConsumerStatefulWidget {
+class SubscriptionView extends StatefulWidget {
   const SubscriptionView({super.key});
 
   @override
-  ConsumerState<SubscriptionView> createState() => _SubscriptionViewState();
+  State<SubscriptionView> createState() => _SubscriptionViewState();
 }
 
-class _SubscriptionViewState extends ConsumerState<SubscriptionView> {
+class _SubscriptionViewState extends State<SubscriptionView> {
   bool _isLoading = true;
   List<SubscriptionPlan> _plans = [];
-  String _currentPlanId = '';
   SubscriptionPlan? _activeSubscription;
-
+  String _currentPlanId = 'free';
   DateTime? _expiresAt;
 
   int get _daysRemaining {
     if (_expiresAt == null) return 0;
-    return _expiresAt!.difference(DateTime.now()).inDays.clamp(0, 9999);
+    final diff = _expiresAt!.difference(DateTime.now()).inDays;
+    return diff > 0 ? diff : 0;
   }
 
   @override
@@ -39,20 +36,22 @@ class _SubscriptionViewState extends ConsumerState<SubscriptionView> {
       final supabase = Supabase.instance.client;
       final userId = supabase.auth.currentUser?.id;
 
-      // Load active subscription plans
+      // 1. Fetch plans
       final plansData = await supabase
           .from('subscription_plans')
           .select()
           .eq('is_active', true)
-          .order('price');
+          .order('price', ascending: true);
+
       final plans = (plansData as List)
           .map((p) => SubscriptionPlan.fromJson(p as Map<String, dynamic>))
           .toList();
 
-      // Load user's active subscription
+      // 2. Fetch active subscription
       SubscriptionPlan? activeSub;
-      String currentPlanId = '';
+      String currentPlanId = 'free';
       DateTime? expiresAt;
+
       if (userId != null) {
         final histData = await supabase
             .from('subscription_history')
@@ -61,6 +60,7 @@ class _SubscriptionViewState extends ConsumerState<SubscriptionView> {
             .eq('is_active', true)
             .order('started_at', ascending: false)
             .limit(1);
+
         final hist = histData as List;
         if (hist.isNotEmpty) {
           final h = hist.first as Map<String, dynamic>;
@@ -88,325 +88,561 @@ class _SubscriptionViewState extends ConsumerState<SubscriptionView> {
           _isLoading = false;
         });
       }
-    } catch (_) {
+    } catch (e, stack) {
+      debugPrint('Error loading subscription data: $e\n$stack');
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
   void _handlePlanSelect(SubscriptionPlan plan) {
-    if (plan.id == _currentPlanId) return;
-    _openPaymentPage(plan);
-  }
-
-  Future<void> _openPaymentPage(SubscriptionPlan plan) async {
-    final submitted = await Navigator.push<bool>(
+    if (plan.id == _currentPlanId || plan.id == 'free') return;
+    Navigator.push(
       context,
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => PaymentView(plan: plan),
-      ),
+      MaterialPageRoute(builder: (_) => PaymentView(plan: plan)),
     );
-    if (submitted == true && mounted) {
-      _loadData(); // refresh billing history
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    // Retry when auth becomes available after cold-start session restore
-    ref.listen(authProvider, (prev, next) {
-      if (next != null && prev == null) _loadData();
-    });
+    final premiumPlans = _plans.where((p) => p.price > 0).toList();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Banner / Current Plan Section
+          // HERO BANNER
           if (_isLoading)
             Container(
               height: 200,
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF171717) : Colors.white,
+                color: isDark
+                    ? const Color(0xFF0F172A)
+                    : const Color(0xFF262626),
                 borderRadius: BorderRadius.circular(24),
               ),
-              // mock loading
             )
-          else ...[
-            // Top Banner for new users or upgrades
-            Container(
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.black
-                    : const Color(0xFF171717), // neutral-900
-                borderRadius: BorderRadius.circular(24), // rounded-3xl
-              ),
-              padding: const EdgeInsets.all(32), // p-8
-              child: Stack(
-                children: [
-                  // Decorative Blobs
-                  Positioned(
-                    top: -64,
-                    right: -64,
-                    child: Container(
-                      width: 160,
-                      height: 160,
-                      decoration: const BoxDecoration(
-                        color: Color(0x1a10b981), // emerald-500/10
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                  const Center(
-                    child: Text(
-                      'আপগ্রেড করো',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.5,
-                        fontFamily: 'HindSiliguri',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          else
+            _HeroBanner(isDark: isDark),
+
+          const SizedBox(height: 24),
+
+          // ACTIVE SUBSCRIPTION BANNER
+          if (!_isLoading && _activeSubscription != null) ...[
+            _ActiveSubscriptionBanner(
+              planName: _activeSubscription!.name,
+              daysRemaining: _daysRemaining,
+              expiresAt: _activeSubscription!.expiresAt,
             ),
+            const SizedBox(height: 24),
           ],
 
-          const SizedBox(height: 32),
-
-          // Pricing Plans Header
-          Center(
+          // PRICING HEADER
+          const Center(
             child: Text(
-              'আপনার প্ল্যান বেছে নিন',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w900,
-                color: isDark ? Colors.white : const Color(0xFF171717),
-                fontFamily: 'HindSiliguri',
-              ),
+              'তোমার প্ল্যান বেছে নাও',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
             ),
           ),
-          const SizedBox(height: 24), // mb-8
-          // Pricing Plans Grid
+          const SizedBox(height: 4),
+          const Center(
+            child: Text(
+              'যেকোনো সময় বাতিল করা যাবে',
+              style: TextStyle(fontSize: 13, color: Color(0xFF737373)),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // PRICING CARDS
           if (_isLoading)
             ...[1, 2].map(
               (i) => Container(
-                height: 300,
+                height: 250,
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF171717) : Colors.white,
+                  color: isDark ? const Color(0xFF0F172A) : Colors.white,
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
             )
+          else if (premiumPlans.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: const Center(
+                child: Text('কোনো প্রিমিয়াম প্ল্যান পাওয়া যায়নি।'),
+              ),
+            )
           else
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final isDesktop = constraints.maxWidth > 768;
-                final premiumPlans = _plans.where((p) => p.price > 0).toList()
-                  ..sort((a, b) => a.price.compareTo(b.price));
-
-                if (isDesktop) {
-                  return IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: premiumPlans
-                          .map(
-                            (plan) => Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                ),
-                                child: PricingCard(
-                                  plan: plan,
-                                  isCurrent: _currentPlanId == plan.id,
-                                  onSelect: () => _handlePlanSelect(plan),
-                                ),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  );
-                }
-
-                // Mobile
-                return Column(
-                  children: premiumPlans
-                      .map(
-                        (plan) => Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: PricingCard(
-                            plan: plan,
-                            isCurrent: _currentPlanId == plan.id,
-                            onSelect: () => _handlePlanSelect(plan),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                );
-              },
+            ...premiumPlans.map(
+              (plan) => Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: _PricingCard(
+                  plan: plan,
+                  isCurrent: _currentPlanId == plan.id,
+                  onSelect: () => _handlePlanSelect(plan),
+                  isDark: isDark,
+                ),
+              ),
             ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
 
-          // Trust Badges
-          Row(
+          // TRUST BADGES
+          GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            childAspectRatio: 2.2,
             children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF171717) : Colors.white,
-                    borderRadius: BorderRadius.circular(12), // rounded-xl
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF262626)
-                          : const Color(0xFFF5F5F5),
-                    ),
-                  ),
-                  child: const Column(
-                    children: [
-                      Icon(
-                        LucideIcons.headphones,
-                        color: Color(0xFFF43F5E),
-                        size: 24,
-                      ), // rose-500
-                      SizedBox(height: 8),
-                      Text(
-                        '২৪/৭ সাপোর্ট',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              _TrustBadge(
+                icon: LucideIcons.headphones,
+                label: '২৪/৭ সাপোর্ট',
+                iconColor: const Color(0xFFB91C1C),
+                bgColor: isDark
+                    ? const Color(0xFF1A0505)
+                    : const Color(0xFFFFF0F0),
+                isDark: isDark,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF171717) : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF262626)
-                          : const Color(0xFFF5F5F5),
-                    ),
-                  ),
-                  child: const Column(
-                    children: [
-                      Icon(
-                        LucideIcons.clock,
-                        color: Color(0xFF10B981),
-                        size: 24,
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'তাৎক্ষণিক অ্যাক্সেস',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              _TrustBadge(
+                icon: LucideIcons.clock,
+                label: 'তাৎক্ষণিক অ্যাক্সেস',
+                iconColor: const Color(0xFF16A34A),
+                bgColor: isDark
+                    ? const Color(0xFF051A0A)
+                    : const Color(0xFFF0FFF4),
+                isDark: isDark,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF171717) : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF262626)
-                          : const Color(0xFFF5F5F5),
-                    ),
-                  ),
-                  child: const Column(
-                    children: [
-                      Icon(
-                        LucideIcons.shieldCheck,
-                        color: Color(0xFF3B82F6),
-                        size: 24,
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'নিরাপদ পেমেন্ট',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              _TrustBadge(
+                icon: LucideIcons.shieldCheck,
+                label: 'নিরাপদ পেমেন্ট',
+                iconColor: const Color(0xFF0F172A),
+                bgColor: isDark
+                    ? const Color(0xFF050B1A)
+                    : const Color(0xFFF0F4FF),
+                isDark: isDark,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF171717) : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF262626)
-                          : const Color(0xFFF5F5F5),
-                    ),
-                  ),
-                  child: const Column(
-                    children: [
-                      Icon(
-                        LucideIcons.refreshCw,
-                        color: Color(0xFFA855F7),
-                        size: 24,
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'রিনিউ সহজ',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              _TrustBadge(
+                icon: LucideIcons.refreshCw,
+                label: 'রিনিউ সহজ',
+                iconColor: const Color(0xFF9333EA),
+                bgColor: isDark
+                    ? const Color(0xFF10051A)
+                    : const Color(0xFFF8F0FF),
+                isDark: isDark,
               ),
             ],
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 28),
 
-          // Comparison Table
+          // COMPARISON TABLE
           _ComparisonTable(isDark: isDark),
 
-          const SizedBox(height: 48), // Bottom padding
+          const SizedBox(height: 48),
         ],
       ),
     );
   }
 }
 
-// ─── Comparison Table ─────────────────────────────────────────────────────────
+class _HeroBanner extends StatelessWidget {
+  final bool isDark;
+  const _HeroBanner({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? Colors.black : const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0x1A10B981),
+              border: Border.all(color: const Color(0x8016A34A)),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(LucideIcons.zap, size: 12, color: Color(0xFF4ADE80)),
+                SizedBox(width: 6),
+                Text(
+                  'প্রিমিয়াম প্ল্যান',
+                  style: TextStyle(
+                    color: Color(0xFF4ADE80),
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'আরো বেশি পড়ো,\nআরো ভালো প্রস্তুতি নাও',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              height: 1.2,
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'সীমাহীন পরীক্ষা, AI সাজেশন, বিস্তারিত এনালাইসিস — সব কিছু এক প্ল্যানে',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Color(0xFFA3A3A3),
+              fontSize: 13,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActiveSubscriptionBanner extends StatelessWidget {
+  final String planName;
+  final int daysRemaining;
+  final String? expiresAt;
+
+  const _ActiveSubscriptionBanner({
+    required this.planName,
+    required this.daysRemaining,
+    this.expiresAt,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF14532D), Color(0xFF166534)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: const Color(0x3316A34A),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Center(
+              child: Icon(
+                LucideIcons.crown,
+                color: Color(0xFF4ADE80),
+                size: 22,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  planName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'মেয়াদ: $daysRemaining দিন বাকি${expiresAt != null ? ' ($expiresAt)' : ''}',
+                  style: const TextStyle(
+                    color: Color(0xFF86EFAC),
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFF4ADE80),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text(
+              'সক্রিয়',
+              style: TextStyle(
+                color: Color(0xFF14532D),
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PricingCard extends StatelessWidget {
+  final SubscriptionPlan plan;
+  final bool isCurrent;
+  final VoidCallback onSelect;
+  final bool isDark;
+
+  const _PricingCard({
+    required this.plan,
+    required this.isCurrent,
+    required this.onSelect,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isEmerald = plan.colorTheme == 'emerald';
+    final Color mainColor = isEmerald
+        ? const Color(0xFF047857)
+        : const Color(0xFFB91C1C);
+    final Color bgLight = isEmerald
+        ? const Color(0xFFF0FDF4)
+        : const Color(0xFFFFF1F2);
+    final Color bgDark = isEmerald
+        ? const Color(0xFF047857)
+        : const Color(0xFF881337);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: isDark ? bgDark.withValues(alpha: 0.2) : bgLight,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+              border: Border(
+                bottom: BorderSide(
+                  color: isDark
+                      ? const Color(0xFF262626)
+                      : const Color(0xFFE5E5E5),
+                ),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      plan.name,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
+                    if (plan.durationDays >= 90)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: mainColor,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Text(
+                          'জনপ্রিয়',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${plan.currency} ${plan.price}',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        height: 1,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '/ ${plan.durationDays} দিন',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF737373),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Features
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ...plan.features.map(
+                  (feature) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Row(
+                      children: [
+                        Icon(
+                          LucideIcons.checkCircle2,
+                          size: 18,
+                          color: mainColor,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            feature,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDark
+                                  ? const Color(0xFFD4D4D4)
+                                  : const Color(0xFF404040),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: isCurrent ? null : onSelect,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isCurrent
+                        ? (isDark
+                              ? const Color(0xFF262626)
+                              : const Color(0xFFE5E5E5))
+                        : mainColor,
+                    foregroundColor: isCurrent
+                        ? (isDark
+                              ? const Color(0xFFA3A3A3)
+                              : const Color(0xFF737373))
+                        : Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    isCurrent ? 'বর্তমান প্ল্যান' : 'আপগ্রেড করো',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TrustBadge extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color iconColor;
+  final Color bgColor;
+  final bool isDark;
+
+  const _TrustBadge({
+    required this.icon,
+    required this.label,
+    required this.iconColor,
+    required this.bgColor,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: isDark
+                    ? const Color(0xFFD4D4D4)
+                    : const Color(0xFF404040),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _ComparisonTable extends StatelessWidget {
   final bool isDark;
+
   const _ComparisonTable({required this.isDark});
 
   static const _features = [
@@ -425,150 +661,154 @@ class _ComparisonTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardBg = isDark ? const Color(0xFF171717) : Colors.white;
+    final cardBg = isDark ? const Color(0xFF0F172A) : Colors.white;
     final borderColor = isDark
         ? const Color(0xFF262626)
         : const Color(0xFFE5E5E5);
-    final textMain = isDark ? Colors.white : const Color(0xFF171717);
+    final textMain = isDark ? Colors.white : const Color(0xFF0F172A);
     final textSub = isDark ? const Color(0xFF737373) : const Color(0xFFA3A3A3);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Header row
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF5F5F5),
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
-              ),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Text(
-                    'ফিচার',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      color: textSub,
-                      fontFamily: 'HindSiliguri',
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      'ফ্রি',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                        color: textSub,
-                        fontFamily: 'HindSiliguri',
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      'প্রিমিয়াম',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                        color: Color(0xFF166534),
-                        fontFamily: 'HindSiliguri',
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Center(
+          child: Text(
+            'ফ্রি বনাম প্রিমিয়াম',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
           ),
-          // Feature rows
-          ..._features.asMap().entries.map((e) {
-            final idx = e.key;
-            final (label, freeVal, premiumVal, bothHave) = e.value;
-            final isLast = idx == _features.length - 1;
-            final hasFree = bothHave || (freeVal != null);
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                border: isLast
-                    ? null
-                    : Border(bottom: BorderSide(color: borderColor)),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: textMain,
-                        fontFamily: 'HindSiliguri',
+        ),
+        const SizedBox(height: 16),
+        Container(
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: borderColor),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Header row
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF000000)
+                      : const Color(0xFFF5F5F5),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        'ফিচার',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          color: textSub,
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: hasFree
-                          ? (freeVal != null
-                                ? Text(
-                                    freeVal,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: textSub,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'HindSiliguri',
-                                    ),
-                                  )
-                                : const Icon(
-                                    LucideIcons.check,
-                                    size: 14,
-                                    color: Color(0xFF166534),
-                                  ))
-                          : const Icon(
-                              LucideIcons.x,
-                              size: 14,
-                              color: Color(0xFFDC2626),
-                            ),
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          'ফ্রি',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                            color: textSub,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: premiumVal != null
-                          ? Text(
-                              premiumVal,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Color(0xFF166534),
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
-                              ),
-                            )
-                          : const Icon(
-                              LucideIcons.check,
-                              size: 14,
-                              color: Color(0xFF166534),
-                            ),
+                    Expanded(
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'প্রিমিয়াম',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                            color: const Color(0xFF047857),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            );
-          }),
-        ],
-      ),
+              // Feature rows
+              ..._features.map((feature) {
+                final String label = feature.$1;
+                final String? freeText = feature.$2;
+                final String? paidText = feature.$3;
+                final bool isBothTrue = feature.$4;
+
+                Widget buildCellContent(String? text, bool isTrue) {
+                  if (text != null) {
+                    return Text(
+                      text,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: textMain,
+                      ),
+                    );
+                  }
+                  if (isTrue) {
+                    return const Icon(
+                      LucideIcons.check,
+                      size: 16,
+                      color: Color(0xFF15803D),
+                    );
+                  }
+                  return Icon(
+                    LucideIcons.xCircle,
+                    size: 16,
+                    color: isDark
+                        ? const Color(0xFF404040)
+                        : const Color(0xFFD4D4D4),
+                  );
+                }
+
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border(top: BorderSide(color: borderColor)),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          label,
+                          style: TextStyle(fontSize: 13, color: textMain),
+                        ),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: buildCellContent(freeText, isBothTrue),
+                        ),
+                      ),
+                      Expanded(
+                        child: Center(child: buildCellContent(paidText, true)),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

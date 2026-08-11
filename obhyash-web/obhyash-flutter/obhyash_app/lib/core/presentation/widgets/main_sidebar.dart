@@ -34,12 +34,12 @@ class MainSidebar extends StatelessWidget {
       {'id': 'practice', 'label': 'অনুশীলন', 'icon': LucideIcons.penTool},
       {'id': 'leaderboard', 'label': 'লিডারবোর্ড', 'icon': LucideIcons.trophy},
       {'id': 'analysis', 'label': 'এনালাইসিস', 'icon': LucideIcons.barChart2},
-      {'id': 'blog', 'label': 'ব্লগ', 'icon': LucideIcons.newspaper},
+      {'id': 'profile/blog', 'label': 'ব্লগ', 'icon': LucideIcons.newspaper},
     ];
 
     return Drawer(
       backgroundColor: isDark
-          ? const Color(0xFF171717)
+          ? const Color(0xFF0F172A)
           : Colors.white, // neutral-900 : white
       elevation: 16,
       child: SafeArea(
@@ -75,7 +75,7 @@ class MainSidebar extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: const [
                           BoxShadow(
-                            color: Color(0x33059669),
+                            color: Color(0x33047857),
                             blurRadius: 4,
                             offset: Offset(0, 2),
                           ), // shadow-emerald-600/20
@@ -114,7 +114,7 @@ class MainSidebar extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF171717),
+                                : const Color(0xFF0F172A),
                             fontFamily: 'HindSiliguri',
                             height: 1.1,
                           ),
@@ -258,7 +258,7 @@ class MainSidebar extends StatelessWidget {
                           CircleAvatar(
                             radius: 16,
                             backgroundColor: const Color(
-                              0xFFE11D48,
+                              0xFFB91C1C,
                             ), // rose-600
                             child: Text(
                               userName.isNotEmpty
@@ -283,7 +283,7 @@ class MainSidebar extends StatelessWidget {
                                     fontWeight: FontWeight.bold,
                                     color: isDark
                                         ? Colors.white
-                                        : const Color(0xFF171717),
+                                        : const Color(0xFF0F172A),
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -359,7 +359,7 @@ class MainSidebar extends StatelessWidget {
                               ) {
                                 if (states.contains(WidgetState.hovered)) {
                                   return const Color(
-                                    0xFFE11D48,
+                                    0xFFB91C1C,
                                   ); // hover:text-rose-600
                                 }
                                 return null;

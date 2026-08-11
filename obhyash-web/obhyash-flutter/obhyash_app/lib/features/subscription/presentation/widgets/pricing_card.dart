@@ -38,8 +38,8 @@ class PricingCard extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xFFF43F5E),
-                  Color(0xFFEF4444),
+                  Color(0xFFB91C1C),
+                  Color(0xFFB91C1C),
                   Color(0xFFBE123C),
                 ], // rose-500, red-500, rose-700
               )
@@ -58,7 +58,7 @@ class PricingCard extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: isDark
-                  ? const Color(0xFF171717)
+                  ? const Color(0xFF0F172A)
                   : Colors.white, // neutral-900 : white
               borderRadius: BorderRadius.circular(20), // rounded-[22px]
             ),
@@ -115,8 +115,8 @@ class PricingCard extends StatelessWidget {
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                     colors: [
-                                      Color(0xFFF43F5E),
-                                      Color(0xFFDC2626),
+                                      Color(0xFFB91C1C),
+                                      Color(0xFFB91C1C),
                                     ], // rose-500 to red-600
                                   )
                                 : null,
@@ -196,7 +196,7 @@ class PricingCard extends StatelessWidget {
                                 fontWeight: FontWeight.w900, // font-black
                                 color: isDark
                                     ? Colors.white
-                                    : const Color(0xFF171717), // neutral-900
+                                    : const Color(0xFF0F172A), // neutral-900
                                 height: 1.0,
                                 letterSpacing: -1, // tracking-tighter
                               ),
@@ -248,7 +248,7 @@ class PricingCard extends StatelessWidget {
                                         ? (isDark
                                               ? const Color(0x4D881337)
                                               : const Color(
-                                                  0xFFFFE4E6,
+                                                  0xFFFEF2F2,
                                                 )) // rose-900/30 : rose-100
                                         : (isDark
                                               ? const Color(0xFF262626)
@@ -262,9 +262,9 @@ class PricingCard extends StatelessWidget {
                                       size: 12,
                                       color: isBestValue
                                           ? (isDark
-                                                ? const Color(0xFFFB7185)
+                                                ? const Color(0xFFB91C1C)
                                                 : const Color(
-                                                    0xFFE11D48,
+                                                    0xFFB91C1C,
                                                   )) // rose-400 : rose-600
                                           : (isDark
                                                 ? const Color(0xFFA3A3A3)
@@ -296,47 +296,27 @@ class PricingCard extends StatelessWidget {
                         const Spacer(),
                         const SizedBox(height: 16),
 
-                        // Action Button
+                        // CTA Button
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: isCurrent ? null : onSelect,
+                            onPressed: onSelect,
                             style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 16,
-                              ), // sm:py-4
-                              backgroundColor: isCurrent
-                                  ? (isDark
-                                        ? const Color(0xFF262626)
-                                        : const Color(
-                                            0xFFF5F5F5,
-                                          )) // neutral-800 : neutral-100
-                                  : (isDark
-                                        ? const Color(0xFF059669)
-                                        : const Color(
-                                            0xFF047857,
-                                          )), // emerald-600 : emerald-700
-                              foregroundColor: isCurrent
-                                  ? const Color(0xFFA3A3A3) // neutral-400
-                                  : Colors.white,
-                              elevation: isCurrent ? 0 : 4,
-                              shadowColor: isCurrent
-                                  ? Colors.transparent
-                                  : const Color(
-                                      0x4010B981,
-                                    ), // shadow-emerald-500/25
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              backgroundColor: const Color(0xFF166534),
+                              foregroundColor: Colors.white,
+                              elevation: 4,
+                              shadowColor: const Color(0x4016a34a),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  12,
-                                ), // rounded-xl
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
                             child: Text(
-                              isCurrent ? 'বর্তমান প্ল্যান' : 'পেমেন্ট করো',
+                              isCurrent ? 'রিনিউ করো' : 'পেমেন্ট করো',
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5, // tracking-wide
+                                letterSpacing: 0.5,
                               ),
                             ),
                           ),
@@ -364,8 +344,8 @@ class PricingCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [
-                        Color(0xFFE11D48),
-                        Color(0xFFDC2626),
+                        Color(0xFFB91C1C),
+                        Color(0xFFB91C1C),
                       ], // rose-600 to red-600
                     ),
                     borderRadius: BorderRadius.circular(24), // rounded-full

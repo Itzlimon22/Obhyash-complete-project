@@ -70,7 +70,7 @@ class MyProfileView extends ConsumerWidget {
             padding: const EdgeInsets.all(32), // p-8
             decoration: BoxDecoration(
               color: isDark
-                  ? const Color(0xFF171717)
+                  ? const Color(0xFF0F172A)
                   : Colors.white, // neutral-900 : white
               borderRadius: BorderRadius.circular(24), // rounded-3xl
               border: Border.all(
@@ -131,9 +131,9 @@ class MyProfileView extends ConsumerWidget {
                                   fontSize: 16, // text-base
                                   fontWeight: FontWeight.w900, // font-black
                                   color: isDark
-                                      ? const Color(0xFFFB7185)
+                                      ? const Color(0xFFB91C1C)
                                       : const Color(
-                                          0xFFE11D48,
+                                          0xFFB91C1C,
                                         ), // rose-400 : rose-600
                                   fontFamily: 'HindSiliguri',
                                   letterSpacing: 1, // tracking-wider
@@ -162,9 +162,9 @@ class MyProfileView extends ConsumerWidget {
                             fontSize: 36, // text-4xl
                             fontWeight: FontWeight.w900, // font-black
                             color: isDark
-                                ? const Color(0xFFFB7185)
+                                ? const Color(0xFFB91C1C)
                                 : const Color(
-                                    0xFFE11D48,
+                                    0xFFB91C1C,
                                   ), // rose-400 : rose-600
                             fontFamily: 'HindSiliguri',
                           ),
@@ -198,9 +198,9 @@ class MyProfileView extends ConsumerWidget {
                               decoration: const BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    Color(0xFFF43F5E),
-                                    Color(0xFFEF4444),
-                                    Color(0xFFE11D48),
+                                    Color(0xFFB91C1C),
+                                    Color(0xFFB91C1C),
+                                    Color(0xFFB91C1C),
                                   ], // rose-500, red-500, rose-600
                                 ),
                               ),
@@ -346,7 +346,7 @@ class _ExamTargetCardState extends State<_ExamTargetCard> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -375,7 +375,7 @@ class _ExamTargetCardState extends State<_ExamTargetCard> {
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       fontFamily: 'HindSiliguri',
-                      color: isDark ? Colors.white : const Color(0xFF171717),
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
                 ],
@@ -383,7 +383,7 @@ class _ExamTargetCardState extends State<_ExamTargetCard> {
               TextButton(
                 onPressed: openModal,
                 style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF059669),
+                  foregroundColor: const Color(0xFF047857),
                   backgroundColor: isDark
                       ? const Color(0x1A059669)
                       : const Color(0xFFECFDF5),
@@ -415,7 +415,7 @@ class _ExamTargetCardState extends State<_ExamTargetCard> {
                     ? const Color(0xFF0A1F17)
                     : const Color(0xFFECFDF5),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF059669), width: 2),
+                border: Border.all(color: const Color(0xFF047857), width: 2),
               ),
               child: Row(
                 children: [
@@ -431,7 +431,7 @@ class _ExamTargetCardState extends State<_ExamTargetCard> {
                       fontWeight: FontWeight.w800,
                       fontFamily: 'HindSiliguri',
                       color: isDark
-                          ? const Color(0xFF34D399)
+                          ? const Color(0xFF047857)
                           : const Color(0xFF047857),
                     ),
                   ),
@@ -502,7 +502,7 @@ class _UserProfileCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -523,7 +523,7 @@ class _UserProfileCard extends StatelessWidget {
             height: 64,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFE11D48),
+              color: const Color(0xFFB91C1C),
               image: user.avatarUrl != null
                   ? DecorationImage(
                       image: NetworkImage(user.avatarUrl!),
@@ -555,7 +555,7 @@ class _UserProfileCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : const Color(0xFF171717),
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                     fontFamily: 'HindSiliguri',
                   ),
                   overflow: TextOverflow.ellipsis,

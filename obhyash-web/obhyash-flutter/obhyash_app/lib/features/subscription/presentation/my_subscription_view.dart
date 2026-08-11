@@ -7,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../domain/models.dart';
+import 'package:obhyash_app/core/utils/app_popups.dart';
 
 class MySubscriptionView extends ConsumerStatefulWidget {
   const MySubscriptionView({super.key});
@@ -106,8 +107,8 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
       if (next != null && prev == null) _loadData();
     });
 
-    final bg = isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF5F5F5);
-    final cardBg = isDark ? const Color(0xFF171717) : Colors.white;
+    final bg = isDark ? const Color(0xFF000000) : const Color(0xFFF5F5F5);
+    final cardBg = isDark ? const Color(0xFF0F172A) : Colors.white;
 
     return Scaffold(
       backgroundColor: bg,
@@ -159,7 +160,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                   activePlan: _activePlan,
                   expiresAt: _expiresAt,
                   daysLeft: _daysLeft,
-                  onUpgrade: () => context.go('/subscription'),
+                  onUpgrade: () => context.go('/profile/subscription'),
                 ),
                 _HistoryTab(
                   isDark: isDark,
@@ -185,7 +186,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
       builder: (ctx) => Container(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF171717) : Colors.white,
+          color: isDark ? const Color(0xFF0F172A) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: SafeArea(
@@ -210,7 +211,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF0A0A0A)
+                      ? const Color(0xFF000000)
                       : const Color(0xFFFAFAFA),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
@@ -245,7 +246,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : const Color(0xFF171717),
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                     Text(
@@ -301,7 +302,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                             fontWeight: FontWeight.bold,
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF171717),
+                                : const Color(0xFF0F172A),
                           ),
                         ),
                         Text(
@@ -329,8 +330,10 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                       'স্ট্যাটাস: ${_statusLabel(invoice.status)}';
                   Clipboard.setData(ClipboardData(text: text));
                   Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('রিসিট কপি করা হয়েছে!')),
+                  AppPopups.show(
+                    context,
+                    message: 'রিসিট কপি করা হয়েছে!',
+                    isError: false,
                   );
                 },
                 icon: const Icon(LucideIcons.copy, size: 16),
@@ -375,7 +378,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
             fontSize: 13,
             fontWeight: FontWeight.bold,
             color:
-                valueColor ?? (isDark ? Colors.white : const Color(0xFF171717)),
+                valueColor ?? (isDark ? Colors.white : const Color(0xFF0F172A)),
           ),
         ),
       ],
@@ -536,10 +539,10 @@ class _OverviewTab extends StatelessWidget {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFDC2626).withOpacity(0.2),
+                    color: const Color(0xFFB91C1C).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: const Color(0xFFDC2626).withOpacity(0.4),
+                      color: const Color(0xFFB91C1C).withOpacity(0.4),
                     ),
                   ),
                   child: Row(
@@ -578,7 +581,7 @@ class _OverviewTab extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.w900,
               fontSize: 15,
-              color: isDark ? Colors.white : const Color(0xFF171717),
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
           ),
           const SizedBox(height: 10),
@@ -634,7 +637,7 @@ class _OverviewTab extends StatelessWidget {
                             fontSize: 13,
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF171717),
+                                : const Color(0xFF0F172A),
                           ),
                         ),
                       ),
@@ -709,7 +712,7 @@ class _FreePlanCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
-                color: isDark ? Colors.white : const Color(0xFF171717),
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
               textAlign: TextAlign.center,
             ),
@@ -810,7 +813,7 @@ class _HistoryTab extends StatelessWidget {
               label: 'মোট',
               value: '$total',
               color: isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5),
-              textColor: isDark ? Colors.white : const Color(0xFF171717),
+              textColor: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
             const SizedBox(width: 8),
             _SummaryChip(
@@ -823,7 +826,7 @@ class _HistoryTab extends StatelessWidget {
             _SummaryChip(
               label: 'অপেক্ষমান',
               value: '$pending',
-              color: const Color(0xFFDC2626),
+              color: const Color(0xFFB91C1C),
               textColor: Colors.white,
             ),
           ],
@@ -972,7 +975,7 @@ class _InvoiceRow extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF171717),
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -996,7 +999,7 @@ class _InvoiceRow extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 14,
-                    color: isDark ? Colors.white : const Color(0xFF171717),
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
                 const SizedBox(height: 3),
@@ -1079,7 +1082,7 @@ Color _statusColor(String status) {
       return const Color(0xFF166534);
     case 'pending':
     case 'checking':
-      return const Color(0xFFDC2626);
+      return const Color(0xFFB91C1C);
     case 'rejected':
     case 'failed':
       return const Color(0xFF525252);

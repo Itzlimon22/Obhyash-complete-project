@@ -31,9 +31,9 @@ final _unreadNotifCountProvider = FutureProvider.autoDispose<int>((ref) async {
 });
 
 class MainLayout extends ConsumerStatefulWidget {
-  final Widget child;
+  final StatefulNavigationShell navigationShell;
 
-  const MainLayout({super.key, required this.child});
+  const MainLayout({super.key, required this.navigationShell});
 
   @override
   ConsumerState<MainLayout> createState() => _MainLayoutState();
@@ -49,15 +49,19 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/leaderboard')) return 'leaderboard';
     if (location.startsWith('/analysis')) return 'analysis';
     if (location.startsWith('/my-reports')) return 'my-reports';
+    if (location.startsWith('/profile/my-subscription'))
+      return 'my-subscription';
+    if (location.startsWith('/profile/subscription')) return 'subscription';
+    if (location.startsWith('/profile/complaint')) return 'complaint';
+    if (location.startsWith('/profile/about')) return 'about';
+    if (location.startsWith('/profile/blog')) return 'blog';
+    if (location.startsWith('/profile/referral')) return 'referral';
     if (location.startsWith('/profile')) return 'profile';
-    if (location.startsWith('/my-subscription')) return 'my-subscription';
-    if (location.startsWith('/subscription')) return 'subscription';
-    if (location.startsWith('/complaint')) return 'complaint';
-    if (location.startsWith('/about')) return 'about';
-    if (location.startsWith('/user-profile')) return 'user_profile';
-    if (location.startsWith('/subject')) return 'subject_report';
-    if (location.startsWith('/blog')) return 'blog';
-    if (location.startsWith('/referral')) return 'referral';
+    if (location.startsWith('/user-profile') ||
+        location.contains('/user-profile'))
+      return 'user_profile';
+    if (location.startsWith('/subject') || location.contains('/subject'))
+      return 'subject_report';
     return 'dashboard';
   }
 
@@ -100,13 +104,37 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
 
   void _onTabChange(String tab) {
     if (tab == 'blog') {
-      context.go('/blog');
+      widget.navigationShell.goBranch(4);
+      context.go('/profile/blog');
       return;
     }
-    if (tab == 'dashboard') {
-      context.go('/');
+
+    int index = 0;
+    switch (tab) {
+      case 'dashboard':
+        index = 0;
+        break;
+      case 'history':
+        index = 1;
+        break;
+      case 'setup':
+        index = 2;
+        break;
+      case 'leaderboard':
+        index = 3;
+        break;
+      default:
+        index = 0;
+    }
+
+    // Check if we are already on this branch. If so, pop back to its root.
+    if (widget.navigationShell.currentIndex == index) {
+      context.go(tab == 'dashboard' ? '/' : '/$tab');
     } else {
-      context.go('/$tab');
+      widget.navigationShell.goBranch(
+        index,
+        initialLocation: index == widget.navigationShell.currentIndex,
+      );
     }
   }
 
@@ -122,12 +150,12 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     final Color bg, border, textColor;
     if (days <= 30) {
       bg = isDark
-          ? const Color(0xFFDC2626).withValues(alpha: 0.15)
+          ? const Color(0xFFB91C1C).withValues(alpha: 0.15)
           : const Color(0xFFFEF2F2);
       border = isDark
-          ? const Color(0xFFDC2626).withValues(alpha: 0.3)
+          ? const Color(0xFFB91C1C).withValues(alpha: 0.3)
           : const Color(0xFFFECACA);
-      textColor = isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626);
+      textColor = isDark ? const Color(0xFFF87171) : const Color(0xFFB91C1C);
     } else if (days <= 90) {
       bg = isDark
           ? const Color(0xFFD97706).withValues(alpha: 0.15)
@@ -138,12 +166,12 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       textColor = isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706);
     } else {
       bg = isDark
-          ? const Color(0xFF059669).withValues(alpha: 0.15)
+          ? const Color(0xFF047857).withValues(alpha: 0.15)
           : const Color(0xFFF0FDF4);
       border = isDark
-          ? const Color(0xFF059669).withValues(alpha: 0.3)
+          ? const Color(0xFF047857).withValues(alpha: 0.3)
           : const Color(0xFFBBF7D0);
-      textColor = isDark ? const Color(0xFF34D399) : const Color(0xFF059669);
+      textColor = isDark ? const Color(0xFF047857) : const Color(0xFF047857);
     }
 
     return Container(
@@ -186,7 +214,11 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         isDark: isDark,
         onNavigate: (route) {
           Navigator.pop(ctx);
-          context.go(route);
+          widget.navigationShell.goBranch(4);
+          // Small delay to allow branch switch before pushing
+          Future.delayed(const Duration(milliseconds: 50), () {
+            if (mounted) context.push(route);
+          });
         },
         onToggleTheme: () {
           ref.read(themeModeProvider.notifier).toggle();
@@ -282,7 +314,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
                                       colors: [
-                                        Color(0xFFDC2626),
+                                        Color(0xFFB91C1C),
                                         Color(0xFFB91C1C),
                                       ],
                                       begin: Alignment.topLeft,
@@ -292,7 +324,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                     boxShadow: [
                                       BoxShadow(
                                         color: const Color(
-                                          0xFFDC2626,
+                                          0xFFB91C1C,
                                         ).withValues(alpha: 0.3),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
@@ -320,7 +352,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                   fontFamily: 'HindSiliguri',
                                   color: isDark
                                       ? Colors.white
-                                      : const Color(0xFF171717),
+                                      : const Color(0xFF0F172A),
                                 ),
                               ),
                             ],
@@ -357,7 +389,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                 children: [
                                   const Icon(
                                     Icons.local_fire_department_rounded,
-                                    color: Color(0xFFF97316),
+                                    color: Color(0xFFF59E0B),
                                     size: 16,
                                   ),
                                   const SizedBox(width: 3),
@@ -400,7 +432,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) => const NotificationsView(),
+                                        builder: (_) =>
+                                            const NotificationsView(),
                                       ),
                                     );
                                   },
@@ -438,7 +471,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                               minHeight: 14,
                                             ),
                                             decoration: const BoxDecoration(
-                                              color: Color(0xFFF43F5E),
+                                              color: Color(0xFFB91C1C),
                                               shape: BoxShape.circle,
                                             ),
                                             child: Text(
@@ -480,8 +513,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                 decoration: BoxDecoration(
                                   gradient: const LinearGradient(
                                     colors: [
-                                      Color(0xFFF43F5E),
-                                      Color(0xFFE11D48),
+                                      Color(0xFFB91C1C),
+                                      Color(0xFFB91C1C),
                                     ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
@@ -490,7 +523,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                   boxShadow: [
                                     BoxShadow(
                                       color: const Color(
-                                        0xFFE11D48,
+                                        0xFFB91C1C,
                                       ).withValues(alpha: 0.3),
                                       blurRadius: 6,
                                       offset: const Offset(0, 2),
@@ -536,7 +569,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         userInstitute: userInst,
       ),
 
-      body: widget.child,
+      body: widget.navigationShell,
 
       bottomNavigationBar: MainBottomNav(
         activeTab: activeTab,
@@ -576,10 +609,10 @@ class _ProfileSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = isDark ? const Color(0xFF171717) : Colors.white;
+    final bg = isDark ? const Color(0xFF0F172A) : Colors.white;
     final surface = isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5);
     final border = isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5);
-    final textPrimary = isDark ? Colors.white : const Color(0xFF171717);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
     final textSecondary = isDark
         ? const Color(0xFFA3A3A3)
         : const Color(0xFF737373);
@@ -656,7 +689,7 @@ class _ProfileSheet extends StatelessWidget {
                     width: 48,
                     height: 48,
                     decoration: const BoxDecoration(
-                      color: Color(0xFFE11D48),
+                      color: Color(0xFFB91C1C),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
@@ -723,8 +756,8 @@ class _ProfileSheet extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF052E16)
-                          : const Color(0xFFD1FAE5),
+                          ? const Color(0xFF047857)
+                          : const Color(0xFFECFDF5),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -732,7 +765,7 @@ class _ProfileSheet extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF059669),
+                        color: Color(0xFF047857),
                       ),
                     ),
                   ),
@@ -887,7 +920,7 @@ class _ProfileSheet extends StatelessWidget {
                       child: const Icon(
                         LucideIcons.logOut,
                         size: 18,
-                        color: Color(0xFFE11D48),
+                        color: Color(0xFFB91C1C),
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -897,7 +930,7 @@ class _ProfileSheet extends StatelessWidget {
                         fontSize: 14,
                         fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFFE11D48),
+                        color: Color(0xFFB91C1C),
                       ),
                     ),
                   ],

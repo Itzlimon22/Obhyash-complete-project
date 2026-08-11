@@ -106,44 +106,55 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           ? null
           : config.chapters.split(',').map((c) => c.trim()).toList();
 
-      // 1. Try RPC with p_* param names (current live DB convention)
+      final topicsList =
+          (config.topics == 'General' ||
+              config.topics == 'All' ||
+              config.topics.isEmpty)
+          ? null
+          : config.topics.split(',').map((t) => t.trim()).toList();
+
+      final difficultiesList =
+          (config.difficulty == 'Mixed' ||
+              config.difficulty == 'All' ||
+              config.difficulty.isEmpty)
+          ? null
+          : config.difficulty.split('+').map((d) => d.trim()).toList();
+
+      final examTypesList =
+          (config.examType == 'Mixed' ||
+              config.examType == 'All' ||
+              config.examType.isEmpty)
+          ? null
+          : config.examType.split('+').map((e) => e.trim()).toList();
+
       List<dynamic> qList = [];
+
+      // 1. Try distributed RPC
       try {
         final data = await supabase.rpc(
-          'get_random_questions',
+          'get_distributed_exam_questions',
           params: {
+            'p_user_id': supabase.auth.currentUser?.id,
             'p_subject': config.subject,
+            'p_subject_name': config.subjectLabel,
+            'p_total': config.questionCount,
             'p_chapters': chaptersList,
-            'p_limit': config.questionCount,
+            'p_topics': topicsList,
+            'p_difficulties': difficultiesList,
+            'p_exam_types': examTypesList,
           },
         );
         qList = (data as List<dynamic>?) ?? [];
+        if (qList.isNotEmpty) {
+          qList.shuffle();
+        }
       } catch (rpcErr) {
         debugPrint(
-          '[ExamProvider] RPC get_random_questions (p_* params) error: $rpcErr',
+          '[ExamProvider] RPC get_distributed_exam_questions error: $rpcErr',
         );
       }
 
-      // 2. Fallback: Try RPC with legacy param names (subject_param, limit_param, chapter_params)
-      if (qList.isEmpty) {
-        try {
-          final data = await supabase.rpc(
-            'get_random_questions',
-            params: {
-              'subject_param': config.subject,
-              'chapter_params': chaptersList,
-              'limit_param': config.questionCount,
-            },
-          );
-          qList = (data as List<dynamic>?) ?? [];
-        } catch (rpcErr2) {
-          debugPrint(
-            '[ExamProvider] RPC get_random_questions (legacy params) error: $rpcErr2',
-          );
-        }
-      }
-
-      // 3. Fallback: Direct query from questions table
+      // 2. Fallback: Direct query from questions table
       if (qList.isEmpty) {
         debugPrint(
           '[ExamProvider] RPC failed, falling back to direct questions query',
@@ -152,9 +163,20 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
             .from('questions')
             .select('*')
             .eq('subject', config.subject);
+
         if (chaptersList != null && chaptersList.isNotEmpty) {
           query = query.inFilter('chapter', chaptersList);
         }
+        if (topicsList != null && topicsList.isNotEmpty) {
+          query = query.inFilter('topic', topicsList);
+        }
+        if (difficultiesList != null && difficultiesList.isNotEmpty) {
+          query = query.inFilter('difficulty', difficultiesList);
+        }
+        if (examTypesList != null && examTypesList.isNotEmpty) {
+          query = query.inFilter('exam_type', examTypesList);
+        }
+
         final fallbackData = await query.limit(config.questionCount * 3);
         final allRows = List<dynamic>.from(fallbackData as List);
         allRows.shuffle();

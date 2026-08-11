@@ -47,7 +47,7 @@ const List<PolicyContent> appPolicies = [
     title: 'আমাদের সম্পর্কে',
     subtitle: 'Obhyash: তোমার স্বপ্নের পথে সঙ্গী',
     icon: LucideIcons.flame,
-    iconColor: Color(0xFF10B981), // emerald-500
+    iconColor: Color(0xFF047857), // emerald-500
     description:
         'Obhyash একটি আধুনিক ও AI-চালিত প্ল্যাটফর্ম যা শিক্ষার্থীদের একাডেমিক ও ভর্তি পরীক্ষার প্রস্তুতিকে আরও সহজ এবং কার্যকর করতে তৈরি করা হয়েছে। আমাদের লক্ষ্য হলো সুলভ মূল্যে মানসম্মত শিক্ষা ও প্রযুক্তির সমন্বয় ঘটানো।',
     sections: [
@@ -66,11 +66,11 @@ const List<PolicyContent> appPolicies = [
   PolicyContent(
     id: 'privacy',
     title: 'গোপনীয়তা নীতি',
-    subtitle: 'আপনার তথ্যের সুরক্ষা আমাদের অগ্রাধিকার',
+    subtitle: 'তোমার তথ্যের সুরক্ষা আমাদের অগ্রাধিকার',
     icon: LucideIcons.shieldCheck,
-    iconColor: Color(0xFF10B981), // emerald-500
+    iconColor: Color(0xFF047857), // emerald-500
     description:
-        'আপনার তথ্যের সুরক্ষা আমাদের কাছে অত্যন্ত গুরুত্বপূর্ণ। আমরা কীভাবে তোমার তথ্য সংগ্রহ, ব্যবহার এবং সুরক্ষিত রাখি তা বিস্তারিত এখানে আলোচনা করা হলো।',
+        'তোমার তথ্যের সুরক্ষা আমাদের কাছে অত্যন্ত গুরুত্বপূর্ণ। আমরা কীভাবে তোমার তথ্য সংগ্রহ, ব্যবহার এবং সুরক্ষিত রাখি তা বিস্তারিত এখানে আলোচনা করা হলো।',
     sections: [
       PolicySection(
         id: 1,
@@ -83,9 +83,9 @@ const List<PolicyContent> appPolicies = [
       ),
       PolicySection(
         id: 2,
-        title: 'আপনার তথ্য কীভাবে ব্যবহার করা হয়?',
+        title: 'তোমার তথ্য কীভাবে ব্যবহার করা হয়?',
         content: [
-          'আপনার একাউন্ট পরিচালনা করতে।',
+          'তোমার একাউন্ট পরিচালনা করতে।',
           'আই-এর মাধ্যমে পারসোনালাইজড সাজেশন তৈরি করতে।',
           'লিডারবোর্ড এবং ফলাফল আপডেট করতে।',
         ],
@@ -99,7 +99,7 @@ const List<PolicyContent> appPolicies = [
     title: 'ব্যবহারের শর্তাবলী',
     subtitle: 'প্ল্যাটফর্ম ব্যবহারের নিয়ম ও শর্তাবলী',
     icon: LucideIcons.scale,
-    iconColor: Color(0xFF059669), // emerald-600
+    iconColor: Color(0xFF047857), // emerald-600
     description:
         'Obhyash প্ল্যাটফর্ম ব্যবহার করার মাধ্যমে তুমি আমাদের শর্তাবলীর সাথে একমত পোষণ করছেন। দয়া করে ব্যবহারের পূর্বে এই শর্তাবলী মনোযোগ সহকারে পড়ুন।',
     sections: [
@@ -125,21 +125,21 @@ const List<PolicyContent> appPolicies = [
     title: 'রিফান্ড পলিসি',
     subtitle: 'সাবস্ক্রিপশন ও রিফান্ড সংক্রান্ত নিয়মাবলী',
     icon: LucideIcons.refreshCw,
-    iconColor: Color(0xFF10B981), // emerald-500
+    iconColor: Color(0xFF047857), // emerald-500
     description:
         'Obhyash এর সাবস্ক্রিপশন এবং রিফান্ড সংক্রান্ত নিয়মাবলী নিচে পরিষ্কারভাবে উল্লেখ করা হলো।',
     sections: [
       PolicySection(
         title: 'সাধারণ রিফান্ড নিয়ম',
         icon: LucideIcons.alertCircle,
-        iconColor: Color(0xFFE11D48), // rose-600
+        iconColor: Color(0xFFB91C1C), // rose-600
         content:
             'যেহেতু এটি একটি ডিজিটাল সেবা, তাই সাধারণত কোনো সাবস্ক্রিপশন ক্রয় করার পর তার জন্য কোনো রিফান্ড প্রদান করা হয় না। তবে বিশেষ কারিগরি ত্রুটির ক্ষেত্রে আমরা এটি বিবেচনা করি।',
       ),
       PolicySection(
         title: 'রিফান্ডের ক্ষেত্রসমূহ',
         icon: LucideIcons.checkCircle2,
-        iconColor: Color(0xFF059669), // emerald-600
+        iconColor: Color(0xFF047857), // emerald-600
         content: [
           'ডাবল পেমেন্ট (বিনা কারণে দুবার টাকা কেটে নেওয়া)।',
           'পেমেন্টের পর ২৪ ঘন্টার মধ্যে প্রিমিয়াম এক্সেস না পাওয়া।',
@@ -212,14 +212,14 @@ class _AboutUsViewState extends State<AboutUsView> {
                             ),
                             decoration: BoxDecoration(
                               color: isActive
-                                  ? const Color(0xFF059669) // emerald-600
+                                  ? const Color(0xFF047857) // emerald-600
                                   : (isDark
                                         ? const Color(0xFF262626)
                                         : Colors.white),
                               borderRadius: BorderRadius.circular(24),
                               border: Border.all(
                                 color: isActive
-                                    ? const Color(0xFF059669)
+                                    ? const Color(0xFF047857)
                                     : (isDark
                                           ? const Color(0xFF404040)
                                           : const Color(0xFFF5F5F5)),
@@ -280,7 +280,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                           padding: const EdgeInsets.all(32),
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF171717)
+                                ? const Color(0xFF0F172A)
                                 : Colors.white,
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
@@ -310,7 +310,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                         ), // emerald-950/30 : emerald-50
                                   borderRadius: BorderRadius.circular(24),
                                   border: Border.all(
-                                    color: const Color(0x33059669),
+                                    color: const Color(0x33047857),
                                     width: 2,
                                   ), // emerald-600/20
                                 ),
@@ -331,7 +331,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                   fontWeight: FontWeight.w900, // font-black
                                   color: isDark
                                       ? Colors.white
-                                      : const Color(0xFF171717),
+                                      : const Color(0xFF0F172A),
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -358,7 +358,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF171717)
+                                ? const Color(0xFF0F172A)
                                 : Colors.white,
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
@@ -400,7 +400,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? const Color(0xFF171717)
+                                  ? const Color(0xFF0F172A)
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(24),
                               border: Border.all(
@@ -444,7 +444,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                 style: const TextStyle(
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.w900,
-                                                  color: Color(0xFF059669),
+                                                  color: Color(0xFF047857),
                                                 ),
                                               ),
                                       ),
@@ -462,7 +462,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                               fontWeight: FontWeight.w900,
                                               color: isDark
                                                   ? Colors.white
-                                                  : const Color(0xFF171717),
+                                                  : const Color(0xFF0F172A),
                                             ),
                                           ),
                                           const SizedBox(height: 16),
@@ -501,7 +501,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                             decoration:
                                                                 const BoxDecoration(
                                                                   color: Color(
-                                                                    0xFF34D399,
+                                                                    0xFF047857,
                                                                   ),
                                                                   shape: BoxShape
                                                                       .circle,
@@ -548,7 +548,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                 border: Border.all(
                                                   color: isDark
                                                       ? const Color(0x80064E3B)
-                                                      : const Color(0xFFD1FAE5),
+                                                      : const Color(0xFFECFDF5),
                                                 ), // emerald-900/50 : emerald-100
                                               ),
                                               child: Row(

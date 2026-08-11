@@ -61,21 +61,15 @@ class _DashboardActionCardState extends State<DashboardActionCard>
         onExit: (_) => setState(() => _isHovered = false),
         child: AnimatedBuilder(
           animation: _scaleAnimation,
-          builder: (context, child) => Transform.scale(
-            scale: _scaleAnimation.value,
-            child: child,
-          ),
+          builder: (context, child) =>
+              Transform.scale(scale: _scaleAnimation.value, child: child),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  widget.icon,
-                  color: widget.primaryColor,
-                  size: 32,
-                ),
+                Icon(widget.icon, color: widget.primaryColor, size: 32),
                 const SizedBox(height: 12),
                 Text(
                   widget.title,

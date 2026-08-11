@@ -1,10 +1,11 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/exam_provider.dart';
 import 'result_view.dart';
 import 'widgets/question_card.dart';
 import 'widgets/exam_grid_sheet.dart';
+import 'package:obhyash_app/core/utils/app_popups.dart';
 
 class ExamRunnerView extends ConsumerStatefulWidget {
   const ExamRunnerView({super.key});
@@ -59,9 +60,9 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('খাতা জমা দিতে চান?'),
+        title: const Text('খাতা জমা দিতে চাও?'),
         content: Text(
-          'আপনি $totalQuestions টি প্রশ্নের মধ্যে $answeredQuestions টির উত্তর দিয়েছেন। '
+          'তুমি $totalQuestions টি প্রশ্নের মধ্যে $answeredQuestions টির উত্তর দিয়েছো। '
           '${totalQuestions - answeredQuestions} টি প্রশ্নের উত্তর দেওয়া বাকি আছে।',
         ),
         actions: [
@@ -75,7 +76,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
               ref.read(examEngineProvider.notifier).submitExam();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF10B981),
+              backgroundColor: const Color(0xFF047857),
             ),
             child: const Text('হ্যাঁ, জমা দাও'),
           ),
@@ -141,7 +142,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
         backgroundColor: isDark ? Colors.black : const Color(0xFFF8FAFC),
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: isDark ? const Color(0xFF171717) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
           elevation: 1,
           leading: IconButton(
             icon: const Icon(Icons.close),
@@ -200,7 +201,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
                       Icons.timer_outlined,
                       size: 16,
                       color: state.timeLeft < 300
-                          ? const Color(0xFFEF4444)
+                          ? const Color(0xFFB91C1C)
                           : (isDark
                                 ? const Color(0xFFD4D4D4)
                                 : const Color(0xFF475569)),
@@ -213,7 +214,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
                         fontWeight: FontWeight.bold,
                         fontFamily: 'monospace',
                         color: state.timeLeft < 300
-                            ? const Color(0xFFEF4444)
+                            ? const Color(0xFFB91C1C)
                             : (isDark
                                   ? const Color(0xFFF5F5F5)
                                   : const Color(0xFF334155)),
@@ -248,8 +249,10 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
                 ref.read(examEngineProvider.notifier).toggleFlag(q.id);
               },
               onReport: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Report generated.')),
+                AppPopups.show(
+                  context,
+                  message: 'Report generated.',
+                  isError: false,
                 );
               },
               isBookmarked:
@@ -265,7 +268,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isDark
-                  ? const Color(0xFF171717).withValues(alpha: 0.9)
+                  ? const Color(0xFF0F172A).withValues(alpha: 0.9)
                   : Colors.white.withValues(alpha: 0.9),
               border: Border(
                 top: BorderSide(
@@ -318,7 +321,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> {
                     onPressed: () =>
                         _showSubmitConfirmation(totalCount, answeredCount),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE11D48), // rose-600
+                      backgroundColor: const Color(0xFFB91C1C), // rose-600
                       foregroundColor: Colors.white,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 14),

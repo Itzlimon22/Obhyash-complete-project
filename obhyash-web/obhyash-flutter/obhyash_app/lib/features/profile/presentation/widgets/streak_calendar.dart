@@ -52,9 +52,9 @@ class StreakCalendar extends StatelessWidget {
           : const Color(0xFF6EE7B7); // emerald-700 : emerald-300
     }
     if (examCount == 2) {
-      return const Color(0xFF059669); // emerald-600 : emerald-400
+      return const Color(0xFF047857); // emerald-600 : emerald-400
     }
-    return const Color(0xFF10B981); // emerald-500 : emerald-500
+    return const Color(0xFF047857); // emerald-500 : emerald-500
   }
 
   String _getMonthName() {
@@ -109,7 +109,7 @@ class StreakCalendar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20), // sm:p-8
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
         borderRadius: BorderRadius.circular(24), // sm:rounded-3xl
         border: Border.all(
           color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
@@ -136,7 +136,7 @@ class StreakCalendar extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: isDark
                       ? Colors.white
-                      : const Color(0xFF171717), // neutral-900
+                      : const Color(0xFF0F172A), // neutral-900
                   fontFamily: 'HindSiliguri',
                 ),
               ),
@@ -170,7 +170,7 @@ class StreakCalendar extends StatelessWidget {
                   children: [
                     const Icon(
                       Icons.local_fire_department_rounded,
-                      color: Color(0xFFF97316),
+                      color: Color(0xFFF59E0B),
                       size: 18,
                     ), // orange-500
                     const SizedBox(width: 8), // sm:gap-2.5
@@ -256,7 +256,7 @@ class StreakCalendar extends StatelessWidget {
                                           ? (isDark
                                                 ? const Color(0xFFF5F5F5)
                                                 : const Color(
-                                                    0xFF171717,
+                                                    0xFF0F172A,
                                                   )) // neutral-100 : neutral-900
                                           : (isDark
                                                 ? const Color(0xFF525252)

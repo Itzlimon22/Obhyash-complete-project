@@ -151,6 +151,39 @@ class AuthController extends AsyncNotifier<void> {
     });
   }
 
+  // ── Reset Password ────────────────────────────────────────────────────────
+
+  Future<void> resetPassword(String email) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      try {
+        await _supabase.auth.resetPasswordForEmail(
+          email,
+          redirectTo: 'io.supabase.obhyash://login-callback/', // Standard deep link pattern
+        );
+      } catch (e) {
+        throw Exception(
+          e is AuthException ? e.message : 'Something went wrong',
+        );
+      }
+    });
+  }
+
+  Future<void> updatePassword(String newPassword) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      try {
+        await _supabase.auth.updateUser(
+          UserAttributes(password: newPassword),
+        );
+      } catch (e) {
+        throw Exception(
+          e is AuthException ? e.message : 'Something went wrong',
+        );
+      }
+    });
+  }
+
   // ── Logout ────────────────────────────────────────────────────────────────
 
   /// [forced] — true when triggered by the session monitor (another device login).

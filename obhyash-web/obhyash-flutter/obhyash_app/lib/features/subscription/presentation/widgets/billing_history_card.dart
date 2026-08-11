@@ -22,9 +22,9 @@ class BillingHistoryCard extends StatelessWidget {
       case 'valid':
         bgColor = isDark
             ? const Color(0x4D064E3B)
-            : const Color(0xFFD1FAE5); // emerald-900/30 : emerald-100
+            : const Color(0xFFECFDF5); // emerald-900/30 : emerald-100
         textColor = isDark
-            ? const Color(0xFF34D399)
+            ? const Color(0xFF047857)
             : const Color(0xFF047857); // emerald-400 : emerald-700
         label = status == 'paid' ? 'পরিশোধিত' : 'Valid';
         break;
@@ -85,7 +85,7 @@ class BillingHistoryCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isDark
-            ? const Color(0xFF171717)
+            ? const Color(0xFF0F172A)
             : Colors.white, // neutral-900 : white
         borderRadius: BorderRadius.circular(16), // rounded-2xl
         border: Border.all(
@@ -184,7 +184,7 @@ class BillingHistoryCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'আপনার পেমেন্ট ইতিহাস এখানে দেখা যাবে।',
+                    'তোমার পেমেন্ট ইতিহাস এখানে দেখা যাবে।',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12,
@@ -233,7 +233,7 @@ class BillingHistoryCard extends StatelessWidget {
                                       color: isDark
                                           ? Colors.white
                                           : const Color(
-                                              0xFF171717,
+                                              0xFF0F172A,
                                             ), // white : neutral-900
                                     ),
                                     maxLines: 1,
@@ -271,7 +271,7 @@ class BillingHistoryCard extends StatelessWidget {
                               color: isDark
                                   ? Colors.white
                                   : const Color(
-                                      0xFF171717,
+                                      0xFF0F172A,
                                     ), // white : neutral-900
                             ),
                           ),
@@ -300,9 +300,9 @@ class BillingHistoryCard extends StatelessWidget {
                                             WidgetState.hovered,
                                           )) {
                                             return isDark
-                                                ? const Color(0xFF34D399)
+                                                ? const Color(0xFF047857)
                                                 : const Color(
-                                                    0xFF059669,
+                                                    0xFF047857,
                                                   ); // emerald-400 : emerald-600
                                           }
                                           return null;

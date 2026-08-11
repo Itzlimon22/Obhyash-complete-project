@@ -11,7 +11,10 @@ class LiveExamFilterNotifier extends Notifier<String> {
     state = newFilter;
   }
 }
-final liveExamFilterProvider = NotifierProvider<LiveExamFilterNotifier, String>(() => LiveExamFilterNotifier());
+
+final liveExamFilterProvider = NotifierProvider<LiveExamFilterNotifier, String>(
+  () => LiveExamFilterNotifier(),
+);
 
 // Provides the search query
 class LiveExamSearchNotifier extends Notifier<String> {
@@ -22,7 +25,10 @@ class LiveExamSearchNotifier extends Notifier<String> {
     state = newSearch;
   }
 }
-final liveExamSearchProvider = NotifierProvider<LiveExamSearchNotifier, String>(() => LiveExamSearchNotifier());
+
+final liveExamSearchProvider = NotifierProvider<LiveExamSearchNotifier, String>(
+  () => LiveExamSearchNotifier(),
+);
 
 // The category being viewed (e.g., BCS, Bank, Primary)
 class LiveExamCategoryNotifier extends Notifier<String> {
@@ -33,10 +39,16 @@ class LiveExamCategoryNotifier extends Notifier<String> {
     state = newCategory;
   }
 }
-final liveExamCategoryProvider = NotifierProvider<LiveExamCategoryNotifier, String>(() => LiveExamCategoryNotifier());
+
+final liveExamCategoryProvider =
+    NotifierProvider<LiveExamCategoryNotifier, String>(
+      () => LiveExamCategoryNotifier(),
+    );
 
 // Fetches the live exams from Supabase based on the category
-final liveExamsProvider = FutureProvider.autoDispose<List<LiveExam>>((ref) async {
+final liveExamsProvider = FutureProvider.autoDispose<List<LiveExam>>((
+  ref,
+) async {
   final category = ref.watch(liveExamCategoryProvider);
   if (category.isEmpty) return [];
 
@@ -65,10 +77,12 @@ final liveExamsProvider = FutureProvider.autoDispose<List<LiveExam>>((ref) async
         .inFilter('exam_id', examIds);
 
     final attempts = (attemptsResponse as List).cast<Map<String, dynamic>>();
-    
+
     // Map status back to the exams
     for (int i = 0; i < exams.length; i++) {
-      final attempt = attempts.where((a) => a['exam_id'] == exams[i].id).firstOrNull;
+      final attempt = attempts
+          .where((a) => a['exam_id'] == exams[i].id)
+          .firstOrNull;
       if (attempt != null) {
         // Recreate the model with userAttemptStatus
         exams[i] = LiveExam(
@@ -120,7 +134,7 @@ final liveExamsProvider = FutureProvider.autoDispose<List<LiveExam>>((ref) async
       negativeMarking: 0.25,
       status: 'published',
       userAttemptStatus: 'submitted',
-    )
+    ),
   ]);
 
   return exams;
