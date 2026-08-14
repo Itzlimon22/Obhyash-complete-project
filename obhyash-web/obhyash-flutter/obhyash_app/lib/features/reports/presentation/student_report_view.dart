@@ -684,12 +684,12 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                         bool boldText = false;
 
                         if (isCorrect) {
-                          boxBg = isDark ? const Color(0xFF047857).withValues(alpha: 0.15) : const Color(0xFFECFDF5).withValues(alpha: 0.4);
-                          boxBorder = isDark ? const Color(0xFF047857) : const Color(0xFFBBF7D0);
-                          bulletBg = const Color(0xFF047857);
-                          bulletBorder = const Color(0xFF047857);
+                          boxBg = isDark ? const Color(0xFF059669).withValues(alpha: 0.15) : const Color(0xFFECFDF5).withValues(alpha: 0.4);
+                          boxBorder = isDark ? const Color(0xFF059669) : const Color(0xFFBBF7D0);
+                          bulletBg = const Color(0xFF059669);
+                          bulletBorder = const Color(0xFF059669);
                           bulletText = Colors.white;
-                          optionTextColor = isDark ? const Color(0xFF047857) : const Color(0xFF047857);
+                          optionTextColor = isDark ? const Color(0xFF059669) : const Color(0xFF059669);
                           boldText = true;
                         }
 
@@ -744,7 +744,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                                 ),
                               ),
                               if (isCorrect)
-                                const Icon(Icons.check_circle_rounded, color: Color(0xFF047857), size: 22),
+                                const Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 22),
                             ],
                           ),
                         );

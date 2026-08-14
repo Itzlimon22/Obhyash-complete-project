@@ -73,7 +73,7 @@ class _BlogViewState extends State<BlogView> {
             value: _loadingProgress / 100,
             minHeight: 3,
             backgroundColor: Colors.transparent,
-            color: const Color(0xFF047857), // emerald-500
+            color: const Color(0xFF059669), // emerald-500
           )
         else
           const SizedBox(height: 3),

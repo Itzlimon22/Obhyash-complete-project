@@ -246,13 +246,13 @@ class _PaymentViewState extends State<PaymentView>
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF047857).withValues(alpha: 0.1),
+                          color: const Color(0xFF059669).withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           LucideIcons.checkCircle2,
                           size: 64,
-                          color: Color(0xFF047857),
+                          color: Color(0xFF059669),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -323,9 +323,9 @@ class _PaymentViewState extends State<PaymentView>
                       ),
                     ),
                   ],
-                  labelColor: const Color(0xFF047857),
+                  labelColor: const Color(0xFF059669),
                   unselectedLabelColor: const Color(0xFFA3A3A3),
-                  indicatorColor: const Color(0xFF047857),
+                  indicatorColor: const Color(0xFF059669),
                   indicatorWeight: 2,
                   labelStyle: const TextStyle(
                     fontWeight: FontWeight.bold,
@@ -409,7 +409,7 @@ class _PaymentViewState extends State<PaymentView>
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isDark
-                    ? const Color(0xFF047857)
+                    ? const Color(0xFF059669)
                     : const Color(0xFFA7F3D0), // emerald-200
                 width: 2,
               ),
@@ -566,13 +566,13 @@ class _PaymentViewState extends State<PaymentView>
                     decoration: BoxDecoration(
                       color: isSelected
                           ? (isDark
-                                ? const Color(0xFF047857).withValues(alpha: 0.2)
+                                ? const Color(0xFF059669).withValues(alpha: 0.2)
                                 : const Color(0xFFECFDF5))
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isSelected
-                            ? const Color(0xFF047857)
+                            ? const Color(0xFF059669)
                             : (isDark
                                   ? const Color(0xFF1C1C1E)
                                   : const Color(0xFFE5E5E5)),
@@ -707,17 +707,17 @@ class _PaymentViewState extends State<PaymentView>
             child: ElevatedButton(
               onPressed: _isSubmitting ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF047857),
+                backgroundColor: const Color(0xFF059669),
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: const Color(
-                  0xFF047857,
+                  0xFF059669,
                 ).withValues(alpha: 0.5),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
                 elevation: 4,
-                shadowColor: const Color(0xFF047857).withValues(alpha: 0.4),
+                shadowColor: const Color(0xFF059669).withValues(alpha: 0.4),
               ),
               child: _isSubmitting
                   ? Row(
@@ -766,7 +766,7 @@ class _PaymentViewState extends State<PaymentView>
         'কল করতে ক্লিক করো',
         'tel:+8801946855793',
         const Color(0xFFECFDF5),
-        const Color(0xFF047857),
+        const Color(0xFF059669),
       ),
       (
         '💬',
@@ -774,7 +774,7 @@ class _PaymentViewState extends State<PaymentView>
         'এখানে ক্লিক করো',
         'https://m.me/obhyash',
         const Color(0xFFECFDF5),
-        const Color(0xFF047857),
+        const Color(0xFF059669),
       ),
       (
         '📱',
@@ -782,7 +782,7 @@ class _PaymentViewState extends State<PaymentView>
         'এখানে ক্লিক করো',
         'https://wa.me/8801946855793',
         const Color(0xFFECFDF5),
-        const Color(0xFF047857),
+        const Color(0xFF059669),
       ),
       (
         '✉️',
@@ -870,7 +870,7 @@ class _PaymentViewState extends State<PaymentView>
             child: ElevatedButton(
               onPressed: () => _tabController.animateTo(0),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF047857),
+                backgroundColor: const Color(0xFF059669),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -931,7 +931,7 @@ class _PaymentViewState extends State<PaymentView>
             child: ElevatedButton(
               onPressed: () => _tabController.animateTo(0),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF047857),
+                backgroundColor: const Color(0xFF059669),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -1044,7 +1044,7 @@ class _PaymentViewState extends State<PaymentView>
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF047857), width: 1.5),
+          borderSide: const BorderSide(color: Color(0xFF059669), width: 1.5),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,

@@ -56,7 +56,7 @@ class SubjectStatCard extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF047857).withOpacity(0.25)
+                      ? const Color(0xFF059669).withOpacity(0.25)
                       : const Color(0xFFECFDF5),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -64,8 +64,8 @@ class SubjectStatCard extends StatelessWidget {
                   LucideIcons.barChart2,
                   size: 16,
                   color: isDark
-                      ? const Color(0xFF047857)
-                      : const Color(0xFF047857),
+                      ? const Color(0xFF059669)
+                      : const Color(0xFF059669),
                 ),
               ),
               const SizedBox(width: 10),
@@ -177,7 +177,7 @@ class _SubjectItemState extends State<_SubjectItem> {
     // Web-app matching colors (sleek, minimalist)
     Color accTextColor;
     if (accuracy >= 80) {
-      accTextColor = isDark ? const Color(0xFF047857) : const Color(0xFF047857);
+      accTextColor = isDark ? const Color(0xFF059669) : const Color(0xFF059669);
     } else if (accuracy >= 50) {
       accTextColor = isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706);
     } else {
@@ -195,8 +195,8 @@ class _SubjectItemState extends State<_SubjectItem> {
         border: Border.all(
           color: _isOpen
               ? (isDark
-                    ? const Color(0xFF047857)
-                    : const Color(0xFF047857)) // Green accent when open
+                    ? const Color(0xFF059669)
+                    : const Color(0xFF059669)) // Green accent when open
               : (isDark
                     ? const Color(0xFF333333)
                     : const Color(0xFFE5E5E5)), // Thin sleek border
@@ -226,7 +226,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                           height: 18, // Shorter and sleeker
                           decoration: BoxDecoration(
                             color: _isOpen
-                                ? const Color(0xFF047857) // emerald-500
+                                ? const Color(0xFF059669) // emerald-500
                                 : (accuracy > 0
                                       ? accTextColor
                                       : (isDark
@@ -246,8 +246,8 @@ class _SubjectItemState extends State<_SubjectItem> {
                               fontSize: 16, // Smaller font like webapp
                               color: _isOpen
                                   ? (isDark
-                                        ? const Color(0xFF047857)
-                                        : const Color(0xFF047857))
+                                        ? const Color(0xFF059669)
+                                        : const Color(0xFF059669))
                                   : (isDark
                                         ? Colors.white
                                         : const Color(0xFF1F2937)),
@@ -343,7 +343,7 @@ class _SubjectItemState extends State<_SubjectItem> {
               _StatBox(
                 label: 'সঠিক',
                 value: widget.subject.correct.toString(),
-                color: const Color(0xFF047857),
+                color: const Color(0xFF059669),
               ), // emerald-600
               const SizedBox(width: 8),
               _StatBox(
@@ -372,7 +372,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                   if (widget.subject.correct > 0)
                     Expanded(
                       flex: widget.subject.correct,
-                      child: Container(color: const Color(0xFF047857)),
+                      child: Container(color: const Color(0xFF059669)),
                     ),
                   if (widget.subject.wrong > 0)
                     Expanded(
@@ -402,12 +402,12 @@ class _SubjectItemState extends State<_SubjectItem> {
                   ),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF047857).withValues(alpha: 0.1)
-                        : const Color(0xFF047857).withValues(alpha: 0.06),
+                        ? const Color(0xFF059669).withValues(alpha: 0.1)
+                        : const Color(0xFF059669).withValues(alpha: 0.06),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF047857).withValues(alpha: 0.2)
-                          : const Color(0xFF047857).withValues(alpha: 0.15),
+                          ? const Color(0xFF059669).withValues(alpha: 0.2)
+                          : const Color(0xFF059669).withValues(alpha: 0.15),
                       width: 1,
                     ),
                     borderRadius: BorderRadius.circular(6),
@@ -422,8 +422,8 @@ class _SubjectItemState extends State<_SubjectItem> {
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Anek Bangla',
                           color: isDark
-                              ? const Color(0xFF047857)
-                              : const Color(0xFF047857),
+                              ? const Color(0xFF059669)
+                              : const Color(0xFF059669),
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -431,8 +431,8 @@ class _SubjectItemState extends State<_SubjectItem> {
                         LucideIcons.arrowRight,
                         size: 14,
                         color: isDark
-                            ? const Color(0xFF047857)
-                            : const Color(0xFF047857),
+                            ? const Color(0xFF059669)
+                            : const Color(0xFF059669),
                       ),
                     ],
                   ),

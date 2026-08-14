@@ -318,7 +318,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _filterDate != null
-                      ? (isDark ? const Color(0xFF047857) : const Color(0xFF34D399))
+                      ? (isDark ? const Color(0xFF059669) : const Color(0xFF34D399))
                       : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5)),
                 ),
               ),
@@ -329,7 +329,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                     LucideIcons.calendar,
                     size: 16,
                     color: _filterDate != null
-                        ? (isDark ? const Color(0xFF34D399) : const Color(0xFF047857))
+                        ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
                         : const Color(0xFFA3A3A3),
                   ),
                   const SizedBox(width: 6),
@@ -341,7 +341,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: _filterDate != null
-                          ? (isDark ? const Color(0xFF34D399) : const Color(0xFF047857))
+                          ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
                           : const Color(0xFFA3A3A3),
                     ),
                   ),
@@ -355,7 +355,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                       child: Icon(
                         LucideIcons.x,
                         size: 14,
-                        color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
+                        color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
                       ),
                     ),
                   ],

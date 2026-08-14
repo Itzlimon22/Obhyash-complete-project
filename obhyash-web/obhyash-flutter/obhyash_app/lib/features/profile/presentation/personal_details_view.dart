@@ -363,7 +363,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
               gradient: LinearGradient(
                 colors: isDark
                     ? [const Color(0xFF064E3B), const Color(0xFF022C22)] // Deep Teal
-                    : [const Color(0xFF059669), const Color(0xFF047857)], // Emerald
+                    : [const Color(0xFF059669), const Color(0xFF059669)], // Emerald
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -810,7 +810,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _handleSave,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF047857), // emerald-700
+                      backgroundColor: const Color(0xFF059669), // emerald-700
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(

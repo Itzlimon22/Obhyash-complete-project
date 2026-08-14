@@ -98,7 +98,7 @@ Color _upLevelColor(String id) {
     'Legend': Color(0xFFB91C1C),
     'Titan': Color(0xFF1E3A8A),
     'Warrior': Color(0xFFB91C1C),
-    'Scout': Color(0xFF047857),
+    'Scout': Color(0xFF059669),
     'Rookie': Color(0xFF94A3B8),
   };
   return colors[id] ?? const Color(0xFF94A3B8);
@@ -437,7 +437,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                             label: 'র‍্যাংক',
                             value: '#$_rank',
                             icon: LucideIcons.mapPin,
-                            color: const Color(0xFF047857),
+                            color: const Color(0xFF059669),
                             isDark: isDark,
                           ),
                           _UPStatBox(
@@ -501,7 +501,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                                 CircularProgressIndicator(
                                   value: analytics.totalExams > 0 ? (analytics.avgScore / 100.0) : 0,
                                   strokeWidth: 8,
-                                  color: const Color(0xFF047857),
+                                  color: const Color(0xFF059669),
                                   strokeCap: StrokeCap.round,
                                 ),
                                 Column(
@@ -540,7 +540,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                                   style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.w900,
-                                    color: isDark ? const Color(0xFF047857) : const Color(0xFF047857),
+                                    color: isDark ? const Color(0xFF059669) : const Color(0xFF059669),
                                   ),
                                 ),
                               ],
@@ -572,7 +572,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                               if (count > 1) opacity = 0.6;
                               if (count > 3) opacity = 0.8;
                               if (count > 5) opacity = 1.0;
-                              boxColor = const Color(0xFF047857).withOpacity(opacity);
+                              boxColor = const Color(0xFF059669).withOpacity(opacity);
                             }
                             return Container(
                               width: 12,
@@ -636,7 +636,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                             user.xp,
                             1,
                           ].reduce((a, b) => a > b ? a : b),
-                          color: const Color(0xFF047857),
+                          color: const Color(0xFF059669),
                           isDark: isDark,
                         ),
                         const SizedBox(height: 16),
@@ -734,7 +734,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                               const Icon(
                                 LucideIcons.barChart2,
                                 size: 16,
-                                color: Color(0xFF047857),
+                                color: Color(0xFF059669),
                               ),
                               const SizedBox(width: 8),
                               Text(
@@ -953,7 +953,7 @@ class _UPSubjectRow extends StatelessWidget {
     final s = subject;
     final accuracy = s.accuracy.round();
     final Color accColor = accuracy >= 80
-        ? const Color(0xFF047857)
+        ? const Color(0xFF059669)
         : accuracy >= 50
         ? const Color(0xFFB91C1C)
         : const Color(0xFF737373);
@@ -1045,7 +1045,7 @@ class _UPSubjectRow extends StatelessWidget {
                           _UPMini(
                             'সঠিক',
                             s.correct,
-                            const Color(0xFF047857),
+                            const Color(0xFF059669),
                             isDark,
                           ),
                           _UPMini(
@@ -1073,7 +1073,7 @@ class _UPSubjectRow extends StatelessWidget {
                                 Flexible(
                                   flex: s.correct.clamp(1, 9999),
                                   child: Container(
-                                    color: const Color(0xFF047857),
+                                    color: const Color(0xFF059669),
                                   ),
                                 ),
                                 if (s.wrong > 0)
@@ -1237,7 +1237,7 @@ class _UPActivityComparisonChart extends StatelessWidget {
                   LineChartBarData(
                     spots: List.generate(7, (i) => FlSpot(i.toDouble(), my7[i].toDouble())),
                     isCurved: true,
-                    color: const Color(0xFF047857),
+                    color: const Color(0xFF059669),
                     barWidth: 3,
                     isStrokeCapRound: true,
                     dotData: FlDotData(
@@ -1247,13 +1247,13 @@ class _UPActivityComparisonChart extends StatelessWidget {
                           radius: 4,
                           color: Colors.white,
                           strokeWidth: 2,
-                          strokeColor: const Color(0xFF047857),
+                          strokeColor: const Color(0xFF059669),
                         );
                       },
                     ),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: const Color(0xFF047857).withValues(alpha: 0.1),
+                      color: const Color(0xFF059669).withValues(alpha: 0.1),
                     ),
                   ),
                 ],
@@ -1265,7 +1265,7 @@ class _UPActivityComparisonChart extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(width: 12, height: 12, decoration: const BoxDecoration(color: Color(0xFF047857), shape: BoxShape.circle)),
+              Container(width: 12, height: 12, decoration: const BoxDecoration(color: Color(0xFF059669), shape: BoxShape.circle)),
               const SizedBox(width: 8),
               const Text('তুমি', style: TextStyle(fontSize: 12, color: Color(0xFF737373))),
               const SizedBox(width: 24),
@@ -1304,8 +1304,8 @@ class _UPCompareCell extends StatelessWidget {
     
     final bool iWon = myVal >= opponentVal;
     
-    final Color myColor = iWon ? const Color(0xFF047857) : const Color(0xFFB91C1C);
-    final Color opColor = !iWon ? const Color(0xFF047857) : const Color(0xFFB91C1C);
+    final Color myColor = iWon ? const Color(0xFF059669) : const Color(0xFFB91C1C);
+    final Color opColor = !iWon ? const Color(0xFF059669) : const Color(0xFFB91C1C);
     
     final Color trackColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5);
     final Color textColor = isDark ? Colors.white : const Color(0xFF000000);

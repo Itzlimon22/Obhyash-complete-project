@@ -744,11 +744,11 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: _shuffle
-                    ? const Color(0xFF047857).withValues(alpha: 0.1)
+                    ? const Color(0xFF059669).withValues(alpha: 0.1)
                     : (isDark ? const Color(0xFF1C1C1E) : Colors.white),
                 border: Border.all(
                   color: _shuffle
-                      ? const Color(0xFF047857).withValues(alpha: 0.3)
+                      ? const Color(0xFF059669).withValues(alpha: 0.3)
                       : (isDark
                             ? const Color(0xFF27272A)
                             : const Color(0xFFE5E5E5)),
@@ -761,7 +761,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                     LucideIcons.shuffle,
                     size: 14,
                     color: _shuffle
-                        ? const Color(0xFF047857)
+                        ? const Color(0xFF059669)
                         : const Color(0xFFA3A3A3),
                   ),
                   const SizedBox(width: 4),
@@ -773,7 +773,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: _shuffle
-                          ? const Color(0xFF047857)
+                          ? const Color(0xFF059669)
                           : const Color(0xFFA3A3A3),
                     ),
                   ),
@@ -786,7 +786,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
           ElevatedButton.icon(
             onPressed: _selectedIds.isEmpty ? null : _launchFlashcard,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF047857),
+              backgroundColor: const Color(0xFF059669),
               disabledBackgroundColor: isDark
                   ? const Color(0xFF1C1C1E)
                   : const Color(0xFFE5E5E5),
@@ -912,7 +912,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                         ? LucideIcons.bookmarkMinus
                         : LucideIcons.bookmark,
                     color: isBookmarked
-                        ? const Color(0xFF047857)
+                        ? const Color(0xFF059669)
                         : const Color(0xFFA3A3A3),
                   ),
                 ),
@@ -936,7 +936,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                 style: const TextStyle(
                   fontSize: 14,
                   fontFamily: 'Anek Bangla',
-                  color: Color(0xFF047857),
+                  color: Color(0xFF059669),
                 ),
               ),
             ],
@@ -1130,7 +1130,7 @@ class _TabBtn extends StatelessWidget {
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
-            color: active ? const Color(0xFF047857) : const Color(0xFFA3A3A3),
+            color: active ? const Color(0xFF059669) : const Color(0xFFA3A3A3),
           ),
         ),
       ),
@@ -1192,9 +1192,9 @@ class _FreqBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final (bg, border, text) = count >= 3
         ? (
-            const Color(0xFF047857).withValues(alpha: 0.15),
-            const Color(0xFF047857).withValues(alpha: 0.4),
-            const Color(0xFF047857),
+            const Color(0xFF059669).withValues(alpha: 0.15),
+            const Color(0xFF059669).withValues(alpha: 0.4),
+            const Color(0xFF059669),
           )
         : count == 2
         ? (

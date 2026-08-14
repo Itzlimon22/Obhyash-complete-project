@@ -47,7 +47,7 @@ const List<PolicyContent> appPolicies = [
     title: 'আমাদের সম্পর্কে',
     subtitle: 'Obhyash: তোমার স্বপ্নের পথে সঙ্গী',
     icon: LucideIcons.flame,
-    iconColor: Color(0xFF047857), // emerald-500
+    iconColor: Color(0xFF059669), // emerald-500
     description:
         'Obhyash একটি আধুনিক ও AI-চালিত প্ল্যাটফর্ম যা শিক্ষার্থীদের একাডেমিক ও ভর্তি পরীক্ষার প্রস্তুতিকে আরও সহজ এবং কার্যকর করতে তৈরি করা হয়েছে। আমাদের লক্ষ্য হলো সুলভ মূল্যে মানসম্মত শিক্ষা ও প্রযুক্তির সমন্বয় ঘটানো।',
     sections: [
@@ -68,7 +68,7 @@ const List<PolicyContent> appPolicies = [
     title: 'গোপনীয়তা নীতি',
     subtitle: 'তোমার তথ্যের সুরক্ষা আমাদের অগ্রাধিকার',
     icon: LucideIcons.shieldCheck,
-    iconColor: Color(0xFF047857), // emerald-500
+    iconColor: Color(0xFF059669), // emerald-500
     description:
         'তোমার তথ্যের সুরক্ষা আমাদের কাছে অত্যন্ত গুরুত্বপূর্ণ। আমরা কীভাবে তোমার তথ্য সংগ্রহ, ব্যবহার এবং সুরক্ষিত রাখি তা বিস্তারিত এখানে আলোচনা করা হলো।',
     sections: [
@@ -99,7 +99,7 @@ const List<PolicyContent> appPolicies = [
     title: 'ব্যবহারের শর্তাবলী',
     subtitle: 'প্ল্যাটফর্ম ব্যবহারের নিয়ম ও শর্তাবলী',
     icon: LucideIcons.scale,
-    iconColor: Color(0xFF047857), // emerald-600
+    iconColor: Color(0xFF059669), // emerald-600
     description:
         'Obhyash প্ল্যাটফর্ম ব্যবহার করার মাধ্যমে তুমি আমাদের শর্তাবলীর সাথে একমত পোষণ করছেন। দয়া করে ব্যবহারের পূর্বে এই শর্তাবলী মনোযোগ সহকারে পড়ুন।',
     sections: [
@@ -125,7 +125,7 @@ const List<PolicyContent> appPolicies = [
     title: 'রিফান্ড পলিসি',
     subtitle: 'সাবস্ক্রিপশন ও রিফান্ড সংক্রান্ত নিয়মাবলী',
     icon: LucideIcons.refreshCw,
-    iconColor: Color(0xFF047857), // emerald-500
+    iconColor: Color(0xFF059669), // emerald-500
     description:
         'Obhyash এর সাবস্ক্রিপশন এবং রিফান্ড সংক্রান্ত নিয়মাবলী নিচে পরিষ্কারভাবে উল্লেখ করা হলো।',
     sections: [
@@ -139,7 +139,7 @@ const List<PolicyContent> appPolicies = [
       PolicySection(
         title: 'রিফান্ডের ক্ষেত্রসমূহ',
         icon: LucideIcons.checkCircle2,
-        iconColor: Color(0xFF047857), // emerald-600
+        iconColor: Color(0xFF059669), // emerald-600
         content: [
           'ডাবল পেমেন্ট (বিনা কারণে দুবার টাকা কেটে নেওয়া)।',
           'পেমেন্টের পর ২৪ ঘন্টার মধ্যে প্রিমিয়াম এক্সেস না পাওয়া।',
@@ -223,14 +223,14 @@ class _AboutUsViewState extends State<AboutUsView> {
                             ),
                             decoration: BoxDecoration(
                               color: isActive
-                                  ? const Color(0xFF047857) // emerald-600
+                                  ? const Color(0xFF059669) // emerald-600
                                   : (isDark
                                         ? const Color(0xFF1C1C1E)
                                         : Colors.white),
                               borderRadius: BorderRadius.circular(24),
                               border: Border.all(
                                 color: isActive
-                                    ? const Color(0xFF047857)
+                                    ? const Color(0xFF059669)
                                     : (isDark
                                           ? const Color(0xFF27272A)
                                           : const Color(0xFFF5F5F5)),
@@ -455,7 +455,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                 style: const TextStyle(
                                                   fontSize: 22,
                                                   fontWeight: FontWeight.w900,
-                                                  color: Color(0xFF047857),
+                                                  color: Color(0xFF059669),
                                                 ),
                                               ),
                                       ),
@@ -512,7 +512,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                             decoration:
                                                                 const BoxDecoration(
                                                                   color: Color(
-                                                                    0xFF047857,
+                                                                    0xFF059669,
                                                                   ),
                                                                   shape: BoxShape
                                                                       .circle,
@@ -579,7 +579,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Color(
-                                                          0xFF047857,
+                                                          0xFF059669,
                                                         ), // emerald-700
                                                       ),
                                                     ),

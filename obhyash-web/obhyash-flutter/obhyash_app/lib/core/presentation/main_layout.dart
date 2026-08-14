@@ -237,12 +237,12 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       textColor = isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706);
     } else {
       bg = isDark
-          ? const Color(0xFF047857).withValues(alpha: 0.15)
+          ? const Color(0xFF059669).withValues(alpha: 0.15)
           : const Color(0xFFF0FDF4);
       border = isDark
-          ? const Color(0xFF047857).withValues(alpha: 0.3)
+          ? const Color(0xFF059669).withValues(alpha: 0.3)
           : const Color(0xFFBBF7D0);
-      textColor = isDark ? const Color(0xFF047857) : const Color(0xFF047857);
+      textColor = isDark ? const Color(0xFF059669) : const Color(0xFF059669);
     }
 
     return Container(
@@ -546,7 +546,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                 decoration: BoxDecoration(
                                   gradient: const LinearGradient(
                                     colors: [
-                                      Color(0xFF047857), 
+                                      Color(0xFF059669), 
                                       Color(0xFF065F46)
                                     ],
                                     begin: Alignment.topLeft,
@@ -555,7 +555,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: const Color(0xFF047857).withValues(alpha: 0.3),
+                                      color: const Color(0xFF059669).withValues(alpha: 0.3),
                                       blurRadius: 6,
                                       offset: const Offset(0, 2),
                                     ),
@@ -798,7 +798,7 @@ class _ProfileSheet extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF047857)
+                          ? const Color(0xFF059669)
                           : const Color(0xFFECFDF5),
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -807,7 +807,7 @@ class _ProfileSheet extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF047857),
+                        color: Color(0xFF059669),
                       ),
                     ),
                   ),
@@ -912,7 +912,7 @@ class _ProfileSheet extends StatelessWidget {
                       height: 24,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? const Color(0xFF047857)
+                            ? const Color(0xFF059669)
                             : const Color(0xFFD4D4D4),
                         borderRadius: BorderRadius.circular(12),
                       ),

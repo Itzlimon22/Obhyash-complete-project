@@ -143,7 +143,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
 
   Color _optionBorder(int idx, bool isDark) {
     if (_isRevealed) {
-      if (idx == current.correctAnswerIndex) return const Color(0xFF047857);
+      if (idx == current.correctAnswerIndex) return const Color(0xFF059669);
       if (idx == _selectedIdx) return const Color(0xFFB91C1C);
       return Colors.transparent;
     }
@@ -154,7 +154,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
   (Color, Color, String) _bulletStyle(int idx) {
     if (_isRevealed) {
       if (idx == current.correctAnswerIndex) {
-        return (const Color(0xFF047857), const Color(0xFF047857), '✓');
+        return (const Color(0xFF059669), const Color(0xFF059669), '✓');
       }
       if (idx == _selectedIdx) {
         return (const Color(0xFFB91C1C), const Color(0xFFB91C1C), '✕');
@@ -191,9 +191,9 @@ class _FlashcardModeState extends State<FlashcardMode> {
 
               Color dotColor;
               if (active) {
-                dotColor = const Color(0xFF047857);
+                dotColor = const Color(0xFF059669);
               } else if (correct) {
-                dotColor = const Color(0xFF047857);
+                dotColor = const Color(0xFF059669);
               } else if (wrong) {
                 dotColor = const Color(0xFFB91C1C);
               } else {
@@ -295,7 +295,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                     backgroundColor: isDark
                         ? const Color(0xFF1C1C1E)
                         : const Color(0xFFE5E5E5),
-                    color: const Color(0xFF047857),
+                    color: const Color(0xFF059669),
                     minHeight: 2,
                   ),
                 ],
@@ -336,7 +336,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
     final borderColor = !_isRevealed
         ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5))
         : isCorrect
-        ? const Color(0xFF047857)
+        ? const Color(0xFF059669)
         : const Color(0xFFB91C1C);
 
     return Container(
@@ -391,7 +391,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: isCorrect
-                            ? const Color(0xFF047857)
+                            ? const Color(0xFF059669)
                             : const Color(0xFFB91C1C),
                       ),
                     ),
@@ -540,13 +540,13 @@ class _FlashcardModeState extends State<FlashcardMode> {
       decoration: BoxDecoration(
         color: _isExplanationOpen
             ? (isDark
-                  ? const Color(0xFF047857).withValues(alpha: 0.08)
+                  ? const Color(0xFF059669).withValues(alpha: 0.08)
                   : const Color(0xFFECFDF5))
             : (isDark ? const Color(0xFF1C1C1C) : const Color(0xFFFAFAFA)),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: _isExplanationOpen
-              ? const Color(0xFF047857).withValues(alpha: 0.4)
+              ? const Color(0xFF059669).withValues(alpha: 0.4)
               : (isDark ? const Color(0xFF333333) : const Color(0xFFE5E5E5)),
         ),
       ),
@@ -565,7 +565,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                     width: 6,
                     height: 6,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF047857),
+                      color: Color(0xFF059669),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -575,7 +575,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF047857),
+                      color: Color(0xFF059669),
                     ),
                   ),
                   const Spacer(),
@@ -584,7 +584,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                     duration: const Duration(milliseconds: 200),
                     child: const Icon(
                       Icons.keyboard_arrow_down_rounded,
-                      color: Color(0xFF047857),
+                      color: Color(0xFF059669),
                       size: 20,
                     ),
                   ),
@@ -629,7 +629,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
 
     Color nextBg;
     if (_isRevealed) {
-      nextBg = isCorrect ? const Color(0xFF047857) : const Color(0xFFB91C1C);
+      nextBg = isCorrect ? const Color(0xFF059669) : const Color(0xFFB91C1C);
     } else {
       nextBg = isDark ? const Color(0xFF1C1C1E) : const Color(0xFF000000);
     }
@@ -698,7 +698,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: isCorrect
-                    ? const Color(0xFF047857).withValues(alpha: 0.12)
+                    ? const Color(0xFF059669).withValues(alpha: 0.12)
                     : const Color(0xFFB91C1C).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -708,7 +708,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: isCorrect
-                      ? const Color(0xFF047857)
+                      ? const Color(0xFF059669)
                       : const Color(0xFFB91C1C),
                 ),
               ),

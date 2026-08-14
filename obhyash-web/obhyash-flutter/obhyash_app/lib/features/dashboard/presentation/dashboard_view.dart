@@ -128,7 +128,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                             DashboardActionCard(
                               title: 'মক পরীক্ষা',
                               icon: LucideIcons.fileEdit,
-                              primaryColor: const Color(0xFF047857),
+                              primaryColor: const Color(0xFF059669),
                               lightColor: isDark
                                   ? const Color(0x33047857)
                                   : const Color(0xFFECFDF5),
@@ -137,7 +137,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                             DashboardActionCard(
                               title: 'অনুশীলন',
                               icon: LucideIcons.bookOpen,
-                              primaryColor: const Color(0xFF047857),
+                              primaryColor: const Color(0xFF059669),
                               lightColor: isDark
                                   ? const Color(0x33047857)
                                   : const Color(0xFFECFDF5),
@@ -155,7 +155,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                             DashboardActionCard(
                               title: 'লিডারবোর্ড',
                               icon: LucideIcons.trophy,
-                              primaryColor: const Color(0xFF047857),
+                              primaryColor: const Color(0xFF059669),
                               lightColor: isDark
                                   ? const Color(0x33047857)
                                   : const Color(0xFFECFDF5),
@@ -164,7 +164,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                             DashboardActionCard(
                               title: 'এনালাইসিস',
                               icon: LucideIcons.pieChart,
-                              primaryColor: const Color(0xFF047857),
+                              primaryColor: const Color(0xFF059669),
                               lightColor: isDark
                                   ? const Color(0x33047857)
                                   : const Color(0xFFECFDF5),
@@ -173,7 +173,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                             DashboardActionCard(
                               title: 'বুকমার্কস',
                               icon: LucideIcons.bookmark,
-                              primaryColor: const Color(0xFF047857),
+                              primaryColor: const Color(0xFF059669),
                               lightColor: isDark
                                   ? const Color(0x33047857)
                                   : const Color(0xFFECFDF5),

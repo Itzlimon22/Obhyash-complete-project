@@ -169,7 +169,7 @@ class RecentActivitySection extends StatelessWidget {
                       ? exam.correctCount / exam.totalQuestions
                       : 0.0;
                   final Color progressColor = pct >= 0.8
-                      ? const Color(0xFF047857)
+                      ? const Color(0xFF059669)
                       : pct >= 0.5
                       ? const Color(0xFF1E3A8A)
                       : const Color(0xFFB91C1C);

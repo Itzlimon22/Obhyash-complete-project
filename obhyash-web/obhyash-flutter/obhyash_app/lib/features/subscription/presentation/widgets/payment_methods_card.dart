@@ -160,9 +160,9 @@ class PaymentMethodsCard extends StatelessWidget {
                   style:
                       TextButton.styleFrom(
                         foregroundColor: isDark
-                            ? const Color(0xFF047857)
+                            ? const Color(0xFF059669)
                             : const Color(
-                                0xFF047857,
+                                0xFF059669,
                               ), // text-emerald-400 : text-emerald-600
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -345,9 +345,9 @@ class PaymentMethodsCard extends StatelessWidget {
                                           fontSize: 12, // text-[9px]
                                           fontWeight: FontWeight.bold,
                                           color: isDark
-                                              ? const Color(0xFF047857)
+                                              ? const Color(0xFF059669)
                                               : const Color(
-                                                  0xFF047857,
+                                                  0xFF059669,
                                                 ), // text-emerald-400 : text-emerald-600
                                         ),
                                       ),

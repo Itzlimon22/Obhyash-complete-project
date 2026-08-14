@@ -64,7 +64,7 @@ class ExamGridSheet extends StatelessWidget {
                     child: _StatChip(
                       label: 'Answered',
                       count: answeredCount,
-                      color: const Color(0xFF047857),
+                      color: const Color(0xFF059669),
                       isDark: isDark,
                     ),
                   ),
@@ -109,7 +109,7 @@ class ExamGridSheet extends StatelessWidget {
                   final isFlagged = flaggedQuestions.contains(qId);
 
                   Color getBgColor() {
-                    if (isAnswered) return const Color(0xFF047857);
+                    if (isAnswered) return const Color(0xFF059669);
                     if (isFlagged) return const Color(0xFF1E3A8A);
                     return isDark
                         ? const Color(0xFF1C1C1E)

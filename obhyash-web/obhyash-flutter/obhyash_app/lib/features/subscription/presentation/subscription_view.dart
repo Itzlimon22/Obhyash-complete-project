@@ -263,7 +263,7 @@ class _HeroBanner extends StatelessWidget {
         gradient: LinearGradient(
           colors: isDark
               ? [const Color(0xFF064E3B), const Color(0xFF022C22)] // Deep emerald gradient
-              : [const Color(0xFF059669), const Color(0xFF047857)],
+              : [const Color(0xFF059669), const Color(0xFF059669)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -763,7 +763,7 @@ class _ComparisonTable extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w900,
-                            color: const Color(0xFF047857),
+                            color: const Color(0xFF059669),
                           ),
                         ),
                       ),

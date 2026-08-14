@@ -46,7 +46,7 @@ class DailyGoalCard extends StatelessWidget {
         ? (isDark ? const Color(0xFF0A1F17) : const Color(0xFFF0FDF4))
         : (isDark ? const Color(0xFF000000) : Colors.white);
     final borderColor = isDone
-        ? (isDark ? const Color(0xFF047857) : const Color(0xFFA7F3D0))
+        ? (isDark ? const Color(0xFF059669) : const Color(0xFFA7F3D0))
         : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5));
 
     return Container(
@@ -76,8 +76,8 @@ class DailyGoalCard extends StatelessWidget {
                         : const Color(0xFFE5E5E5),
                     valueColor: AlwaysStoppedAnimation<Color>(
                       isDone
-                          ? const Color(0xFF047857) // emerald-500
-                          : const Color(0xFF047857), // emerald-700
+                          ? const Color(0xFF059669) // emerald-500
+                          : const Color(0xFF059669), // emerald-700
                     ),
                   ),
                 ),
@@ -104,7 +104,7 @@ class DailyGoalCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF047857),
+                    color: const Color(0xFF059669),
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -134,7 +134,7 @@ class DailyGoalCard extends StatelessWidget {
                   vertical: 7,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF047857),
+                  color: const Color(0xFF059669),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Text(

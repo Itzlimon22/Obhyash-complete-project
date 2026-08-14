@@ -156,14 +156,14 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                       duration: const Duration(milliseconds: 150),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? const Color(0xFF047857)
+                            ? const Color(0xFF059669)
                             : (isDark
                                   ? const Color(0xFF1C1C1E)
                                   : const Color(0xFFF5F5F5)),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isSelected
-                              ? const Color(0xFF047857)
+                              ? const Color(0xFF059669)
                               : borderColor,
                           width: isSelected ? 2 : 1,
                         ),
@@ -204,7 +204,7 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                     child: ElevatedButton(
                       onPressed: _selected == null || _saving ? null : _save,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF047857),
+                        backgroundColor: const Color(0xFF059669),
                         foregroundColor: Colors.white,
                         disabledBackgroundColor: isDark
                             ? const Color(0xFF1C1C1E)

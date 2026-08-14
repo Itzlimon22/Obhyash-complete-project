@@ -96,13 +96,13 @@ class _LoginViewState extends ConsumerState<LoginView>
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF047857).withValues(alpha: 0.1),
+                      color: const Color(0xFF059669).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Icon(
                       LucideIcons.fingerprint,
                       size: 48,
-                      color: Color(0xFF047857),
+                      color: Color(0xFF059669),
                     ),
                   ),
                 ),
@@ -180,7 +180,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                 ElevatedButton(
                   onPressed: isLoading ? null : _handleLogin,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF047857),
+                    backgroundColor: const Color(0xFF059669),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     elevation: 0,
@@ -300,7 +300,7 @@ class _LoginViewState extends ConsumerState<LoginView>
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFF047857), width: 2),
+              borderSide: const BorderSide(color: Color(0xFF059669), width: 2),
             ),
           ),
         ),

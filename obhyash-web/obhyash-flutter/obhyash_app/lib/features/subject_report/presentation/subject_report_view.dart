@@ -332,7 +332,7 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
                               label: 'নির্ভুলতা',
                               value: '${_stats!.accuracy}%',
                               icon: LucideIcons.checkCircle2,
-                              color: const Color(0xFF047857),
+                              color: const Color(0xFF059669),
                               isDark: isDark,
                             ),
                             _SRKpi(
@@ -440,7 +440,7 @@ class _SRDonut extends StatelessWidget {
     final sections = [
       PieChartSectionData(
         value: stats.correct.toDouble().clamp(0.001, double.infinity),
-        color: const Color(0xFF047857),
+        color: const Color(0xFF059669),
         title: '',
         radius: 20,
       ),
@@ -529,7 +529,7 @@ class _SRDonut extends StatelessWidget {
                     _SRLegend(
                       'সঠিক',
                       stats.correct,
-                      const Color(0xFF047857),
+                      const Color(0xFF059669),
                       isDark,
                     ),
                     const SizedBox(height: 8),
@@ -671,7 +671,7 @@ class _SRChapterRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = chapter;
     final Color bar = c.accuracy >= 80
-        ? const Color(0xFF047857)
+        ? const Color(0xFF059669)
         : c.accuracy >= 50
         ? const Color(0xFF1E3A8A)
         : const Color(0xFFB91C1C);
@@ -814,12 +814,12 @@ class _SRWeakness extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF047857)
+                          ? const Color(0xFF059669)
                           : const Color(0xFFECFDF5),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isDark
-                            ? const Color(0xFF047857)
+                            ? const Color(0xFF059669)
                             : const Color(0xFFECFDF5),
                       ),
                     ),
@@ -829,7 +829,7 @@ class _SRWeakness extends StatelessWidget {
                         Icon(
                           LucideIcons.checkCircle2,
                           size: 18,
-                          color: Color(0xFF047857),
+                          color: Color(0xFF059669),
                         ),
                         SizedBox(width: 8),
                         Text(
@@ -837,7 +837,7 @@ class _SRWeakness extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF047857),
+                            color: Color(0xFF059669),
                           ),
                         ),
                       ],

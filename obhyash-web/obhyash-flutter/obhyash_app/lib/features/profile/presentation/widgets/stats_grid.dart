@@ -46,7 +46,7 @@ class StatsGrid extends StatelessWidget {
               title: 'গড় স্কোর',
               value: '$avgScore%',
               icon: LucideIcons.crosshair,
-              color: const Color(0xFF047857), // emerald-600
+              color: const Color(0xFF059669), // emerald-600
               bgColor: Theme.of(context).brightness == Brightness.dark
                   ? const Color(0x33047857) // emerald-900/20
                   : const Color(0xFFECFDF5), // emerald-50

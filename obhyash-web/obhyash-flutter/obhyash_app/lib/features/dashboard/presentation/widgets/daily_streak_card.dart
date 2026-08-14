@@ -124,7 +124,7 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
             children: [
               Row(
                 children: [
-                  Icon(LucideIcons.flame, size: 28, color: widget.userStreak > 0 ? const Color(0xFF047857) : (isDark ? Colors.white54 : Colors.black54)),
+                  Icon(LucideIcons.flame, size: 28, color: widget.userStreak > 0 ? const Color(0xFF059669) : (isDark ? Colors.white54 : Colors.black54)),
                   const SizedBox(width: 12),
                   Text(
                     '${widget.userStreak} দিনের স্ট্রাইক',
@@ -140,7 +140,7 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF047857).withValues(alpha: 0.1),
+                    color: const Color(0xFF059669).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
@@ -148,7 +148,7 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF047857),
+                      color: Color(0xFF059669),
                     ),
                   ),
                 ),

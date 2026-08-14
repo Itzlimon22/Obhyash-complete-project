@@ -369,17 +369,17 @@ class _QuestionCardState extends State<QuestionCard>
                 if (widget.showFeedback) {
                   if (isCorrect) {
                     boxBg = isDark
-                        ? const Color(0xFF047857).withValues(alpha: 0.15)
+                        ? const Color(0xFF059669).withValues(alpha: 0.15)
                         : const Color(0xFFECFDF5).withValues(alpha: 0.4);
                     boxBorder = isDark
-                        ? const Color(0xFF047857)
+                        ? const Color(0xFF059669)
                         : const Color(0xFFBBF7D0);
-                    bulletBg = const Color(0xFF047857);
-                    bulletBorder = const Color(0xFF047857);
+                    bulletBg = const Color(0xFF059669);
+                    bulletBorder = const Color(0xFF059669);
                     bulletText = Colors.white;
                     optionTextColor = isDark
-                        ? const Color(0xFF047857)
-                        : const Color(0xFF047857);
+                        ? const Color(0xFF059669)
+                        : const Color(0xFF059669);
                     boldText = true;
                   } else if (isSelected) {
                     boxBg = isDark
@@ -400,17 +400,17 @@ class _QuestionCardState extends State<QuestionCard>
                   }
                 } else if (widget.showAnswer && isCorrect) {
                   boxBg = isDark
-                      ? const Color(0xFF047857).withValues(alpha: 0.15)
+                      ? const Color(0xFF059669).withValues(alpha: 0.15)
                       : const Color(0xFFECFDF5).withValues(alpha: 0.4);
                   boxBorder = isDark
-                      ? const Color(0xFF047857)
+                      ? const Color(0xFF059669)
                       : const Color(0xFFBBF7D0);
-                  bulletBg = const Color(0xFF047857);
-                  bulletBorder = const Color(0xFF047857);
+                  bulletBg = const Color(0xFF059669);
+                  bulletBorder = const Color(0xFF059669);
                   bulletText = Colors.white;
                   optionTextColor = isDark
-                      ? const Color(0xFF047857)
-                      : const Color(0xFF047857);
+                      ? const Color(0xFF059669)
+                      : const Color(0xFF059669);
                   boldText = true;
                 } else if (isSelected) {
                   // Web: neutral-200/neutral-700 for selected
@@ -574,14 +574,14 @@ class _ExplanationPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: isOpen
             ? (isDark
-                  ? const Color(0xFF047857).withValues(alpha: 0.1)
+                  ? const Color(0xFF059669).withValues(alpha: 0.1)
                   : const Color(0xFFECFDF5).withValues(alpha: 0.5))
             : (isDark ? const Color(0xFF1C1C1C) : const Color(0xFFFAFAFA)),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: isOpen
               ? (isDark
-                    ? const Color(0xFF047857).withValues(alpha: 0.4)
+                    ? const Color(0xFF059669).withValues(alpha: 0.4)
                     : const Color(0xFFBBF7D0))
               : (isDark ? const Color(0xFF333333) : const Color(0xFFE5E7EB)),
         ),
@@ -602,7 +602,7 @@ class _ExplanationPanel extends StatelessWidget {
                     width: 7,
                     height: 7,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF047857),
+                      color: Color(0xFF059669),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -613,8 +613,8 @@ class _ExplanationPanel extends StatelessWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: isDark
-                          ? const Color(0xFF047857)
-                          : const Color(0xFF047857),
+                          ? const Color(0xFF059669)
+                          : const Color(0xFF059669),
                     ),
                   ),
                   const Spacer(),
@@ -626,7 +626,7 @@ class _ExplanationPanel extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
                         color: isDark
-                            ? const Color(0xFF047857).withValues(alpha: 0.6)
+                            ? const Color(0xFF059669).withValues(alpha: 0.6)
                             : const Color(0xFFECFDF5),
                       ),
                     ),
@@ -636,8 +636,8 @@ class _ExplanationPanel extends StatelessWidget {
                         Icons.keyboard_arrow_down_rounded,
                         size: 18,
                         color: isDark
-                            ? const Color(0xFF047857)
-                            : const Color(0xFF047857),
+                            ? const Color(0xFF059669)
+                            : const Color(0xFF059669),
                       ),
                     ),
                   ),
@@ -659,7 +659,7 @@ class _ExplanationPanel extends StatelessWidget {
                 border: Border(
                   top: BorderSide(
                     color: isDark
-                        ? const Color(0xFF047857).withValues(alpha: 0.3)
+                        ? const Color(0xFF059669).withValues(alpha: 0.3)
                         : const Color(0xFFECFDF5),
                   ),
                 ),

@@ -57,7 +57,7 @@ const _levels = [
     'স্কাউট (Scout)',
     800,
     Color(0xFF10B981), // Emerald
-    Color(0xFF047857),
+    Color(0xFF059669),
     LucideIcons.compass, // Changed from eye
   ),
   _LevelInfo(
@@ -500,13 +500,13 @@ class _ViewModeTab extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: isActive
-                ? (isDark ? const Color(0xFF047857) : const Color(0xFF047857))
+                ? (isDark ? const Color(0xFF059669) : const Color(0xFF059669))
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
             boxShadow: isActive
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF047857).withValues(alpha: 0.3),
+                      color: const Color(0xFF059669).withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                       spreadRadius: -2,
@@ -597,7 +597,7 @@ class _CollegeLeaderboardBody extends StatelessWidget {
             color: isDark ? const Color(0xFF0A1F17) : const Color(0xFFECFDF5),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: isDark ? const Color(0xFF047857) : const Color(0xFFBBF7D0),
+              color: isDark ? const Color(0xFF059669) : const Color(0xFFBBF7D0),
             ),
           ),
           child: Row(
@@ -612,8 +612,8 @@ class _CollegeLeaderboardBody extends StatelessWidget {
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                     color: isDark
-                        ? const Color(0xFF047857)
-                        : const Color(0xFF047857),
+                        ? const Color(0xFF059669)
+                        : const Color(0xFF059669),
                   ),
                 ),
               ),
@@ -779,7 +779,7 @@ class _InstituteRankingsBody extends StatelessWidget {
               border: Border.all(
                 color: isMe
                     ? (isDark
-                          ? const Color(0xFF047857)
+                          ? const Color(0xFF059669)
                           : const Color(0xFFBBF7D0))
                     : (isDark
                           ? const Color(0xFF1C1C1E)
@@ -822,8 +822,8 @@ class _InstituteRankingsBody extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                           color: isMe
                               ? (isDark
-                                    ? const Color(0xFF047857)
-                                    : const Color(0xFF047857))
+                                    ? const Color(0xFF059669)
+                                    : const Color(0xFF059669))
                               : (isDark
                                     ? Colors.white
                                     : const Color(0xFF1C1C1E)),
@@ -854,7 +854,7 @@ class _InstituteRankingsBody extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isMe
                         ? (isDark
-                              ? const Color(0xFF047857)
+                              ? const Color(0xFF059669)
                               : const Color(0xFFECFDF5))
                         : (isDark
                               ? const Color(0xFF1A1A1A)
@@ -872,8 +872,8 @@ class _InstituteRankingsBody extends StatelessWidget {
                           fontWeight: FontWeight.w900,
                           color: isMe
                               ? (isDark
-                                    ? const Color(0xFF047857)
-                                    : const Color(0xFF047857))
+                                    ? const Color(0xFF059669)
+                                    : const Color(0xFF059669))
                               : (isDark
                                     ? Colors.white
                                     : const Color(0xFF1C1C1E)),
@@ -1673,7 +1673,7 @@ Color _avatarColor(String name) {
   const colors = <Color>[
     Color(0xFFB91C1C),
     Color(0xFF000000),
-    Color(0xFF047857),
+    Color(0xFF059669),
     Color(0xFF1E3A8A),
     Color(0xFF000000),
     Color(0xFF1E3A8A),

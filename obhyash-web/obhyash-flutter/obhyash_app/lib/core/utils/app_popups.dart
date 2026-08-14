@@ -99,7 +99,7 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
     // Solid Background Colors (Deep Green & Deep Red)
     final bgColor = widget.isError
         ? const Color(0xFFB91C1C) // Deep Red
-        : const Color(0xFF047857); // Deep Green
+        : const Color(0xFF059669); // Deep Green
 
     final icon = widget.isError ? LucideIcons.alertCircle : LucideIcons.checkCircle2;
 

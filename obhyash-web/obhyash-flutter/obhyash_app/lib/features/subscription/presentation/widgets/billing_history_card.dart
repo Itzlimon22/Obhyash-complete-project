@@ -24,8 +24,8 @@ class BillingHistoryCard extends StatelessWidget {
             ? const Color(0x4D064E3B)
             : const Color(0xFFECFDF5); // emerald-900/30 : emerald-100
         textColor = isDark
-            ? const Color(0xFF047857)
-            : const Color(0xFF047857); // emerald-400 : emerald-700
+            ? const Color(0xFF059669)
+            : const Color(0xFF059669); // emerald-400 : emerald-700
         label = status == 'paid' ? 'পরিশোধিত' : 'Valid';
         break;
       case 'pending':
@@ -300,9 +300,9 @@ class BillingHistoryCard extends StatelessWidget {
                                             WidgetState.hovered,
                                           )) {
                                             return isDark
-                                                ? const Color(0xFF047857)
+                                                ? const Color(0xFF059669)
                                                 : const Color(
-                                                    0xFF047857,
+                                                    0xFF059669,
                                                   ); // emerald-400 : emerald-600
                                           }
                                           return null;

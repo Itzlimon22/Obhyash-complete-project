@@ -57,8 +57,8 @@ class LiveExamSlider extends ConsumerWidget {
     final bgGradient = isOngoing
         ? LinearGradient(
             colors: isDark
-                ? [const Color(0xFF047857).withValues(alpha: 0.8), const Color(0xFF065F46).withValues(alpha: 0.8)]
-                : [const Color(0xFF10B981), const Color(0xFF047857)],
+                ? [const Color(0xFF059669).withValues(alpha: 0.8), const Color(0xFF065F46).withValues(alpha: 0.8)]
+                : [const Color(0xFF10B981), const Color(0xFF059669)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           )
@@ -78,7 +78,7 @@ class LiveExamSlider extends ConsumerWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: (isOngoing ? const Color(0xFF047857) : const Color(0xFFD97706))
+            color: (isOngoing ? const Color(0xFF059669) : const Color(0xFFD97706))
                 .withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
@@ -174,7 +174,7 @@ class LiveExamSlider extends ConsumerWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        foregroundColor: isOngoing ? const Color(0xFF047857) : const Color(0xFFD97706),
+                        foregroundColor: isOngoing ? const Color(0xFF059669) : const Color(0xFFD97706),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

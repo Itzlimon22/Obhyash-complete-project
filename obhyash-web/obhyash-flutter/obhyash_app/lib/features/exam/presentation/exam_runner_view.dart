@@ -124,7 +124,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
               ref.read(examEngineProvider.notifier).submitExam();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF047857),
+              backgroundColor: const Color(0xFF059669),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             child: const Text('জমা দাও', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -163,7 +163,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
               ref.read(examEngineProvider.notifier).submitExam();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF047857),
+              backgroundColor: const Color(0xFF059669),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             child: const Text('হ্যাঁ, জমা দাও', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -275,7 +275,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                   ref.read(examEngineProvider.notifier).beginTimer();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF047857),
+                  backgroundColor: const Color(0xFF059669),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -533,10 +533,10 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF047857), // Deep green
+                    backgroundColor: const Color(0xFF059669), // Deep green
                     foregroundColor: Colors.white,
                     elevation: 4,
-                    shadowColor: const Color(0xFF047857).withValues(alpha: 0.4),
+                    shadowColor: const Color(0xFF059669).withValues(alpha: 0.4),
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -581,7 +581,7 @@ class _InstructionRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857), size: 24),
+        Icon(icon, color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669), size: 24),
         const SizedBox(width: 16),
         Expanded(
           child: Text(

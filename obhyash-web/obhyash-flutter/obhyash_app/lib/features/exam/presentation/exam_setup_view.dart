@@ -428,7 +428,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                   ),
                   decoration: BoxDecoration(
                     color: const Color(
-                      0xFF047857,
+                      0xFF059669,
                     ).withValues(alpha: isDark ? 0.2 : 0.1),
                     borderRadius: BorderRadius.circular(100),
                   ),
@@ -438,8 +438,8 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                       fontSize: 13,
                       fontWeight: FontWeight.w900,
                       color: isDark
-                          ? const Color(0xFF047857)
-                          : const Color(0xFF047857),
+                          ? const Color(0xFF059669)
+                          : const Color(0xFF059669),
                       letterSpacing: 1.5,
                     ),
                   ),
@@ -481,7 +481,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: _selectedSubject != null
-                              ? const Color(0xFF047857)
+                              ? const Color(0xFF059669)
                               : (isDark
                                     ? const Color(0xFF27272A)
                                     : const Color(0xFFE5E5E5)),
@@ -496,7 +496,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                             decoration: BoxDecoration(
                               color: _selectedSubject != null
                                   ? const Color(
-                                      0xFF047857,
+                                      0xFF059669,
                                     ).withValues(alpha: 0.1)
                                   : (isDark
                                         ? const Color(0xFF1C1C1E)
@@ -507,7 +507,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                               LucideIcons.bookOpen,
                               size: 16,
                               color: _selectedSubject != null
-                                  ? const Color(0xFF047857)
+                                  ? const Color(0xFF059669)
                                   : const Color(0xFFA3A3A3),
                             ),
                           ),
@@ -669,7 +669,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF047857),
+                        color: Color(0xFF059669),
                       ),
                     ),
                   ],
@@ -679,7 +679,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                   min: 5,
                   max: 100,
                   divisions: 95,
-                  activeColor: const Color(0xFF047857),
+                  activeColor: const Color(0xFF059669),
                   onChanged: (v) => setState(() {
                     _questionCount = v.round();
                     _durationMinutes =
@@ -713,7 +713,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF047857),
+                        color: Color(0xFF059669),
                       ),
                     ),
                   ],
@@ -723,7 +723,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                   min: 5,
                   max: 180,
                   divisions: 175,
-                  activeColor: const Color(0xFF047857),
+                  activeColor: const Color(0xFF059669),
                   onChanged: (v) =>
                       setState(() => _durationMinutes = v.round()),
                 ),
@@ -759,7 +759,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                 ? null
                 : _startExam,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF047857),
+              backgroundColor: const Color(0xFF059669),
               disabledBackgroundColor: isDark
                   ? const Color(0xFF1C1C1E)
                   : const Color(0xFFE5E5E5),
@@ -843,7 +843,7 @@ class _CardContainer extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 20, color: const Color(0xFF047857)),
+              Icon(icon, size: 20, color: const Color(0xFF059669)),
               const SizedBox(width: 8),
               Text(
                 title,
@@ -884,11 +884,11 @@ class _ToggleBox extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: selected
-              ? const Color(0xFF047857).withValues(alpha: isDark ? 0.2 : 0.1)
+              ? const Color(0xFF059669).withValues(alpha: isDark ? 0.2 : 0.1)
               : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5)),
           border: Border.all(
             color: selected
-                ? const Color(0xFF047857)
+                ? const Color(0xFF059669)
                 : (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5)),
           ),
           borderRadius: BorderRadius.circular(16),
@@ -902,7 +902,7 @@ class _ToggleBox extends StatelessWidget {
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: selected
-                    ? const Color(0xFF047857)
+                    ? const Color(0xFF059669)
                     : (isDark
                           ? const Color(0xFFA3A3A3)
                           : const Color(0xFF525252)),
@@ -914,7 +914,7 @@ class _ToggleBox extends StatelessWidget {
                 width: 6,
                 height: 6,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF047857),
+                  color: Color(0xFF059669),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -1103,14 +1103,14 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? const Color(
-                                          0xFF047857,
+                                          0xFF059669,
                                         ).withValues(alpha: 0.1)
                                       : Colors.transparent,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
                                     color: isSelected
                                         ? const Color(
-                                            0xFF047857,
+                                            0xFF059669,
                                           ).withValues(alpha: 0.3)
                                         : Colors.transparent,
                                   ),
@@ -1123,7 +1123,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                                       decoration: BoxDecoration(
                                         color: isSelected
                                             ? const Color(
-                                                0xFF047857,
+                                                0xFF059669,
                                               ).withValues(alpha: 0.2)
                                             : (isDark
                                                   ? const Color(0xFF1C1C1E)
@@ -1134,7 +1134,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                                         LucideIcons.bookOpen,
                                         size: 18,
                                         color: isSelected
-                                            ? const Color(0xFF047857)
+                                            ? const Color(0xFF059669)
                                             : (isDark
                                                   ? const Color(0xFFA3A3A3)
                                                   : const Color(0xFF737373)),
@@ -1150,7 +1150,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                                               ? FontWeight.bold
                                               : FontWeight.w600,
                                           color: isSelected
-                                              ? const Color(0xFF047857)
+                                              ? const Color(0xFF059669)
                                               : (isDark
                                                     ? Colors.white
                                                     : const Color(0xFF000000)),
@@ -1160,7 +1160,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                                     if (isSelected)
                                       const Icon(
                                         LucideIcons.checkCircle,
-                                        color: Color(0xFF047857),
+                                        color: Color(0xFF059669),
                                         size: 20,
                                       ),
                                   ],
@@ -1438,14 +1438,14 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? const Color(
-                                          0xFF047857,
+                                          0xFF059669,
                                         ).withValues(alpha: 0.1)
                                       : Colors.transparent,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
                                     color: isSelected
                                         ? const Color(
-                                            0xFF047857,
+                                            0xFF059669,
                                           ).withValues(alpha: 0.3)
                                         : Colors.transparent,
                                   ),
@@ -1457,11 +1457,11 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                       height: 24,
                                       decoration: BoxDecoration(
                                         color: isSelected
-                                            ? const Color(0xFF047857)
+                                            ? const Color(0xFF059669)
                                             : Colors.transparent,
                                         border: Border.all(
                                           color: isSelected
-                                              ? const Color(0xFF047857)
+                                              ? const Color(0xFF059669)
                                               : (isDark
                                                     ? const Color(0xFF525252)
                                                     : const Color(0xFFA3A3A3)),
@@ -1487,7 +1487,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                               ? FontWeight.bold
                                               : FontWeight.w600,
                                           color: isSelected
-                                              ? const Color(0xFF047857)
+                                              ? const Color(0xFF059669)
                                               : (isDark
                                                     ? Colors.white
                                                     : const Color(0xFF000000)),
@@ -1515,7 +1515,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF047857),
+                        backgroundColor: const Color(0xFF059669),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(

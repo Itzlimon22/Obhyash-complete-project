@@ -83,8 +83,8 @@ class CountdownBanner extends StatelessWidget {
       case _Urgency.normal:
         borderColor = const Color(0xFFA7F3D0); // emerald-200
         bgColor = isDark ? const Color(0xFF0A1F17) : const Color(0xFFF0FDF4);
-        textColor = const Color(0xFF047857); // emerald-700
-        labelColor = const Color(0xFF047857); // emerald-500
+        textColor = const Color(0xFF059669); // emerald-700
+        labelColor = const Color(0xFF059669); // emerald-500
         statusText = '$days দিন বাকি';
         break;
       case _Urgency.past:

@@ -149,7 +149,7 @@ class _UpdatePasswordViewState extends ConsumerState<UpdatePasswordView> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleUpdate,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF047857), // Deep Green
+                    backgroundColor: const Color(0xFF059669), // Deep Green
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(

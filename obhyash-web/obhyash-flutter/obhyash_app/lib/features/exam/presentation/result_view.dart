@@ -307,7 +307,7 @@ class _ResultViewState extends State<ResultView> {
                     icon: const Icon(Icons.download_rounded, size: 16),
                     label: const Text('প্রশ্নপত্র'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF047857), // emerald-700
+                      foregroundColor: const Color(0xFF059669), // emerald-700
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
@@ -330,7 +330,7 @@ class _ResultViewState extends State<ResultView> {
                     label: const Text('ফলাফল ও ব্যাখ্যা'),
                     style: OutlinedButton.styleFrom(
                       backgroundColor: const Color(0xFFECFDF5), // emerald-50
-                      foregroundColor: const Color(0xFF047857), // emerald-600
+                      foregroundColor: const Color(0xFF059669), // emerald-600
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       side: const BorderSide(color: Color(0xFFE0E7FF)),
                     ),
@@ -448,7 +448,7 @@ class _ResultViewState extends State<ResultView> {
                 icon: const Icon(Icons.refresh_rounded),
                 label: const Text('আবার পরীক্ষা দিন', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF047857), // emerald-700
+                  backgroundColor: const Color(0xFF059669), // emerald-700
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

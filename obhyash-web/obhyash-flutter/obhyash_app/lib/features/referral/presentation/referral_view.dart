@@ -342,7 +342,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: _isCopied
-                                        ? const Color(0xFF047857)
+                                        ? const Color(0xFF059669)
                                         : (isDark
                                               ? const Color(0xFF27272A)
                                               : const Color(0xFFE5E5E5)),
@@ -649,7 +649,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                 ? _formatDate(date)
                                 : '';
                             final statusColor = status == 'Approved'
-                                ? const Color(0xFF047857)
+                                ? const Color(0xFF059669)
                                 : status == 'Rejected'
                                 ? const Color(0xFFB91C1C)
                                 : const Color(0xFF1E3A8A);

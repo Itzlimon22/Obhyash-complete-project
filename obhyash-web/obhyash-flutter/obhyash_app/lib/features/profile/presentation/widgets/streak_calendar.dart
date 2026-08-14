@@ -73,13 +73,13 @@ class _StreakCalendarState extends State<StreakCalendar> {
     }
     if (examCount == 1) {
       return isDark
-          ? const Color(0xFF047857)
+          ? const Color(0xFF059669)
           : const Color(0xFF6EE7B7); // emerald-700 : emerald-300
     }
     if (examCount == 2) {
-      return const Color(0xFF047857); // emerald-600 : emerald-400
+      return const Color(0xFF059669); // emerald-600 : emerald-400
     }
-    return const Color(0xFF047857); // emerald-500 : emerald-500
+    return const Color(0xFF059669); // emerald-500 : emerald-500
   }
 
   String _getMonthName(DateTime date) {

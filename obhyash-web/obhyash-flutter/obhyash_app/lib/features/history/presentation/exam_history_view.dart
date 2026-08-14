@@ -313,7 +313,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
             controller: _tab,
             indicator: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF047857), Color(0xFF10B981)],
+                colors: [Color(0xFF059669), Color(0xFF10B981)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -468,7 +468,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                             color: _filterDate != null
                                 ? (isDark
                                       ? const Color(0xFF34D399)
-                                      : const Color(0xFF047857))
+                                      : const Color(0xFF059669))
                                 : (isDark
                                       ? const Color(0xFFA3A3A3)
                                       : const Color(0xFF9CA3AF)),
@@ -485,7 +485,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                               color: _filterDate != null
                                   ? (isDark
                                         ? const Color(0xFF34D399)
-                                        : const Color(0xFF047857))
+                                        : const Color(0xFF059669))
                                   : (isDark
                                         ? const Color(0xFFA3A3A3)
                                         : const Color(0xFF9CA3AF)),
@@ -500,7 +500,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                                 size: 16,
                                 color: isDark
                                     ? const Color(0xFF34D399)
-                                    : const Color(0xFF047857),
+                                    : const Color(0xFF059669),
                               ),
                             ),
                           ],
@@ -692,7 +692,7 @@ class _ExamsTab extends StatelessWidget {
                 title: 'মোট প্রশ্ন',
                 value: '$totalQuestions',
                 icon: LucideIcons.layers,
-                gradient: const [Color(0xFF047857), Color(0xFF10B981)],
+                gradient: const [Color(0xFF059669), Color(0xFF10B981)],
                 textColor: Colors.white,
                 isDark: isDark,
               ),
@@ -1517,7 +1517,7 @@ Widget _errorState(bool isDark, VoidCallback onRetry) {
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF047857), Color(0xFF10B981)],
+                  colors: [Color(0xFF059669), Color(0xFF10B981)],
                 ),
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [

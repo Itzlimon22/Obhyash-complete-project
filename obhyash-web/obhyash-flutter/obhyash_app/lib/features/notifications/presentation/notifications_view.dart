@@ -49,7 +49,7 @@ Map<String, dynamic> getNotificationStyle(String type, bool isDark) {
         'bg': isDark
             ? const Color(0x33064E3B)
             : const Color(0xFFECFDF5), // emerald-900/20 : emerald-100
-        'color': const Color(0xFF047857), // emerald-500
+        'color': const Color(0xFF059669), // emerald-500
       };
     case 'warning':
       return {
@@ -293,7 +293,7 @@ class _NotificationsViewState extends State<NotificationsView> {
               ),
               OutlinedButton.icon(
                 onPressed: _markAllAsRead,
-                icon: const Icon(LucideIcons.checkCheck, size: 16, color: Color(0xFF047857)),
+                icon: const Icon(LucideIcons.checkCheck, size: 16, color: Color(0xFF059669)),
                 label: const Text('সব পড়ুন'),
                 style: OutlinedButton.styleFrom(
                   backgroundColor: isDark ? const Color(0xFF171717) : const Color(0xFFF4F4F5),

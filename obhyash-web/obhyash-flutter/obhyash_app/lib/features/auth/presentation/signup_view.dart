@@ -104,11 +104,22 @@ class _SignupViewState extends ConsumerState<SignupView>
     if (currentStep == 1) {
       if (_nameController.text.trim().isEmpty)
         return 'তোমার নাম উল্লেখ করা আবশ্যক';
-      if (_phoneController.text.trim().isEmpty)
-        return 'মোবাইল নম্বর উল্লেখ করা আবশ্যক';
-      if (!RegExp(r'^01\d{9}$').hasMatch(_phoneController.text.trim())) {
-        return 'সঠিক মোবাইল নম্বর দাও (যেমন: 01712345678)';
+
+      final phone = _phoneController.text.trim();
+      if (phone.isEmpty) return 'মোবাইল নম্বর উল্লেখ করা আবশ্যক';
+
+      if (!RegExp(r'^01[3-9]\d{8}$').hasMatch(phone)) {
+        return 'সঠিক মোবাইল নম্বর দাও (যেমন: 017XXXXXXXX)';
       }
+
+      // Restrict fake or sequential numbers intelligently
+      final mainPart = phone.substring(3);
+      if (mainPart.split('').toSet().length == 1 ||
+          phone.contains('123456') ||
+          phone.contains('987654')) {
+        return 'অনুগ্রহ করে একটি সঠিক ও সচল মোবাইল নম্বর দাও';
+      }
+
       if (_gender.isEmpty) return 'লিঙ্গ নির্বাচন করা আবশ্যক';
     } else if (currentStep == 2) {
       if (_instituteController.text.trim().isEmpty)
@@ -274,7 +285,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                             ? null
                             : (_step == 3 ? _handleSignup : _handleNext),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF047857),
+                          backgroundColor: const Color(0xFF059669),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 18),
                           elevation: 0,
@@ -372,7 +383,7 @@ class _SignupViewState extends ConsumerState<SignupView>
               height: 40,
               decoration: BoxDecoration(
                 color: isActive
-                    ? const Color(0xFF047857)
+                    ? const Color(0xFF059669)
                     : (isDark
                           ? const Color(0xFF1C1C1E)
                           : const Color(0xFFF5F5F5)),
@@ -399,7 +410,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                 margin: const EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
                   color: isLineActive
-                      ? const Color(0xFF047857)
+                      ? const Color(0xFF059669)
                       : (isDark
                             ? const Color(0xFF1C1C1E)
                             : const Color(0xFFF5F5F5)),
@@ -443,7 +454,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           label: 'ফোন নাম্বার',
           icon: LucideIcons.phone,
           controller: _phoneController,
-          hint: '017xxxxxxxx',
+          hint: '017XXXXXXXX',
           isDark: isDark,
           keyboardType: TextInputType.phone,
         ),
@@ -463,13 +474,13 @@ class _SignupViewState extends ConsumerState<SignupView>
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? const Color(0xFF047857).withValues(alpha: 0.1)
+                          ? const Color(0xFF059669).withValues(alpha: 0.1)
                           : (isDark
                                 ? const Color(0xFF1C1C1E)
                                 : const Color(0xFFF5F5F5)),
                       border: Border.all(
                         color: isSelected
-                            ? const Color(0xFF047857)
+                            ? const Color(0xFF059669)
                             : Colors.transparent,
                       ),
                       borderRadius: BorderRadius.circular(16),
@@ -481,7 +492,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                         fontFamily: 'Anek Bangla',
                         fontWeight: FontWeight.bold,
                         color: isSelected
-                            ? const Color(0xFF047857)
+                            ? const Color(0xFF059669)
                             : (isDark ? Colors.white70 : Colors.black87),
                       ),
                     ),
@@ -636,11 +647,11 @@ class _SignupViewState extends ConsumerState<SignupView>
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF047857).withValues(alpha: 0.1)
+              ? const Color(0xFF059669).withValues(alpha: 0.1)
               : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5)),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? const Color(0xFF047857) : Colors.transparent,
+            color: isSelected ? const Color(0xFF059669) : Colors.transparent,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -654,7 +665,7 @@ class _SignupViewState extends ConsumerState<SignupView>
             fontWeight: FontWeight.w700,
             fontFamily: 'Anek Bangla',
             color: isSelected
-                ? const Color(0xFF047857)
+                ? const Color(0xFF059669)
                 : (isDark ? Colors.white70 : Colors.black87),
           ),
         ),
@@ -675,11 +686,11 @@ class _SignupViewState extends ConsumerState<SignupView>
         duration: const Duration(milliseconds: 150),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF047857).withValues(alpha: 0.1)
+              ? const Color(0xFF059669).withValues(alpha: 0.1)
               : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5)),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? const Color(0xFF047857) : Colors.transparent,
+            color: isSelected ? const Color(0xFF059669) : Colors.transparent,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -695,7 +706,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                 fontWeight: FontWeight.w700,
                 fontFamily: 'Anek Bangla',
                 color: isSelected
-                    ? const Color(0xFF047857)
+                    ? const Color(0xFF059669)
                     : (isDark ? Colors.white70 : Colors.black87),
               ),
             ),
@@ -856,7 +867,7 @@ class _SignupViewState extends ConsumerState<SignupView>
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFF047857), width: 2),
+              borderSide: const BorderSide(color: Color(0xFF059669), width: 2),
             ),
           ),
         ),
@@ -878,13 +889,13 @@ class _SignupViewState extends ConsumerState<SignupView>
                   width: 96,
                   height: 96,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF047857).withValues(alpha: 0.1),
+                    color: const Color(0xFF059669).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Center(
                     child: Icon(
                       LucideIcons.checkCircle2,
-                      color: Color(0xFF047857),
+                      color: Color(0xFF059669),
                       size: 48,
                     ),
                   ),
@@ -915,7 +926,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   child: ElevatedButton(
                     onPressed: () => context.go('/'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF047857),
+                      backgroundColor: const Color(0xFF059669),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       shape: RoundedRectangleBorder(

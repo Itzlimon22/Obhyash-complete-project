@@ -113,7 +113,7 @@ final statusConfig = {
     'icon': LucideIcons.checkCheck,
     'color': const Color(0xFFECFDF5), // emerald-100
     'darkColor': const Color(0x33064E3B), // emerald-900/20
-    'iconColor': const Color(0xFF047857), // emerald-500
+    'iconColor': const Color(0xFF059669), // emerald-500
   },
   'Dismissed': {
     'label': 'বাতিল',
@@ -273,7 +273,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               child: const Icon(
                 LucideIcons.checkCircle2,
                 size: 48,
-                color: Color(0xFF047857),
+                color: Color(0xFF059669),
               ), // emerald-500
             ),
             const SizedBox(height: 24),
@@ -415,8 +415,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [
-                      Color(0xFF047857),
-                      Color(0xFF047857),
+                      Color(0xFF059669),
+                      Color(0xFF059669),
                     ], // emerald-600 to emerald-700
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -932,7 +932,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                       const Icon(
                                         LucideIcons.checkCheck,
                                         size: 14,
-                                        color: Color(0xFF047857),
+                                        color: Color(0xFF059669),
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
@@ -941,8 +941,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold,
                                           color: isDark
-                                              ? const Color(0xFF047857)
-                                              : const Color(0xFF047857),
+                                              ? const Color(0xFF059669)
+                                              : const Color(0xFF059669),
                                         ),
                                       ),
                                     ],
@@ -953,7 +953,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                     style: TextStyle(
                                       color: isDark
                                           ? const Color(0xFF6EE7B7)
-                                          : const Color(0xFF047857),
+                                          : const Color(0xFF059669),
                                     ),
                                   ),
                                 ],

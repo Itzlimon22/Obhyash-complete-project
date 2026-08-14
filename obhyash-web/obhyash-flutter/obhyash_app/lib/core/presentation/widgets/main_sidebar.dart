@@ -73,7 +73,7 @@ class MainSidebar extends StatelessWidget {
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF047857), // emerald-700
+                        color: const Color(0xFF059669), // emerald-700
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: const [
                           BoxShadow(
@@ -159,7 +159,7 @@ class MainSidebar extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: isActive
-                              ? const Color(0xFF047857) // emerald-700
+                              ? const Color(0xFF059669) // emerald-700
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: isActive

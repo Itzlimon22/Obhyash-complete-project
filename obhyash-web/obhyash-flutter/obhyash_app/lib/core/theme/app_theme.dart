@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   // Brand Strict Palette
-  static const Color brandGreen = Color(0xFF047857); // Deep Emerald Green
+  static const Color brandGreen = Color(0xFF059669); // Deep Emerald Green
   static const Color brandRed = Color(0xFFB91C1C); // Deep Crimson Red
   static const Color warningGold = Color(0xFF1E3A8A); // Warm Gold Accent
 

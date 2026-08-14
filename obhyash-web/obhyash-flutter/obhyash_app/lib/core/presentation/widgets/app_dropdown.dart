@@ -102,7 +102,7 @@ class AppDropdown<T> extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                           decoration: BoxDecoration(
                             color: isSelected 
-                                ? const Color(0xFF047857).withValues(alpha: isDark ? 0.2 : 0.1) 
+                                ? const Color(0xFF059669).withValues(alpha: isDark ? 0.2 : 0.1) 
                                 : Colors.transparent,
                           ),
                           child: Row(
@@ -115,7 +115,7 @@ class AppDropdown<T> extends StatelessWidget {
                                     fontSize: 18,
                                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                     color: isSelected 
-                                        ? (isDark ? const Color(0xFF34D399) : const Color(0xFF047857)) // Emerald 400 for dark mode selected
+                                        ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669)) // Emerald 400 for dark mode selected
                                         : (isDark ? const Color(0xFFE4E4E7) : Colors.black87), // Zinc 200
                                   ),
                                 ),
@@ -123,7 +123,7 @@ class AppDropdown<T> extends StatelessWidget {
                               if (isSelected)
                                 Icon(
                                   LucideIcons.checkCircle2,
-                                  color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
+                                  color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
                                   size: 20,
                                 ),
                             ],
