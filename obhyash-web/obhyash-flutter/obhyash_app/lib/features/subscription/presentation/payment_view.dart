@@ -207,7 +207,7 @@ class _PaymentViewState extends State<PaymentView>
                 border: Border(
                   bottom: BorderSide(
                     color: isDark
-                        ? const Color(0xFF262626)
+                        ? const Color(0xFF1C1C1E)
                         : const Color(0xFFF5F5F5),
                   ),
                 ),
@@ -228,9 +228,9 @@ class _PaymentViewState extends State<PaymentView>
                   Text(
                     'পেমেন্ট প্রসেসিং',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      color: isDark ? Colors.white : const Color(0xFF000000),
                     ),
                   ),
                 ],
@@ -259,11 +259,11 @@ class _PaymentViewState extends State<PaymentView>
                       Text(
                         'পেমেন্ট সফলভাবে জমা হয়েছে',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: isDark
                               ? Colors.white
-                              : const Color(0xFF0F172A),
+                              : const Color(0xFF000000),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -273,7 +273,7 @@ class _PaymentViewState extends State<PaymentView>
                           'আমাদের টিম যাচাই করার পর দ্রুত তোমার প্ল্যানটি চালু করে দিবে।',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             color: isDark
                                 ? const Color(0xFFA3A3A3)
                                 : const Color(0xFF737373),
@@ -329,11 +329,11 @@ class _PaymentViewState extends State<PaymentView>
                   indicatorWeight: 2,
                   labelStyle: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                    fontSize: 16,
                   ),
                   unselectedLabelStyle: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                    fontSize: 16,
                   ),
                 ),
               ),
@@ -373,9 +373,9 @@ class _PaymentViewState extends State<PaymentView>
                   label: 'প্যাকেজ',
                   value: widget.plan.name,
                   bgColor: isDark
-                      ? const Color(0xFF262626)
+                      ? const Color(0xFF1C1C1E)
                       : const Color(0xFFF5F5F5),
-                  valueColor: isDark ? Colors.white : const Color(0xFF0F172A),
+                  valueColor: isDark ? Colors.white : const Color(0xFF000000),
                 ),
               ),
               const SizedBox(width: 12),
@@ -422,11 +422,11 @@ class _PaymentViewState extends State<PaymentView>
                   'অনুগ্রহ করে নিচের নির্দেশনা অনুসরণ করো',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: isDark
                         ? const Color(0xFFD4D4D4)
-                        : const Color(0xFF404040),
+                        : const Color(0xFF27272A),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -441,7 +441,7 @@ class _PaymentViewState extends State<PaymentView>
                     ),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFF5F5F5),
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -451,7 +451,7 @@ class _PaymentViewState extends State<PaymentView>
                           child: Text(
                             'bKash/Nagad (Send Money)',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 15,
                               fontWeight: FontWeight.w500,
                               color: isDark
                                   ? const Color(0xFFA3A3A3)
@@ -462,13 +462,13 @@ class _PaymentViewState extends State<PaymentView>
                         Text(
                           '01946855793', // Web uses 01234567890 in display but let's put real one
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 2,
                             fontFamily: 'monospace',
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF0F172A),
+                                : const Color(0xFF000000),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -513,7 +513,7 @@ class _PaymentViewState extends State<PaymentView>
                           child: Text(
                             step,
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 15,
                               color: isDark
                                   ? const Color(0xFFA3A3A3)
                                   : const Color(0xFF737373),
@@ -534,7 +534,7 @@ class _PaymentViewState extends State<PaymentView>
             Text(
               'SAVED PAYMENT METHODS',
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
                 color: isDark
@@ -574,7 +574,7 @@ class _PaymentViewState extends State<PaymentView>
                         color: isSelected
                             ? const Color(0xFF047857)
                             : (isDark
-                                  ? const Color(0xFF262626)
+                                  ? const Color(0xFF1C1C1E)
                                   : const Color(0xFFE5E5E5)),
                         width: isSelected ? 1.5 : 1,
                       ),
@@ -602,7 +602,7 @@ class _PaymentViewState extends State<PaymentView>
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w900,
-                                fontSize: 10,
+                                fontSize: 13,
                               ),
                             ),
                           ),
@@ -616,16 +616,16 @@ class _PaymentViewState extends State<PaymentView>
                                 method.type,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 14,
+                                  fontSize: 16,
                                   color: isDark
                                       ? Colors.white
-                                      : const Color(0xFF0F172A),
+                                      : const Color(0xFF000000),
                                 ),
                               ),
                               Text(
                                 method.number,
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 15,
                                   fontFamily: 'monospace',
                                   color: isDark
                                       ? const Color(0xFFA3A3A3)
@@ -648,9 +648,9 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             'Payment Method',
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF404040),
+              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
             ),
           ),
           const SizedBox(height: 8),
@@ -669,9 +669,9 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             'Your Mobile Number',
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF404040),
+              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
             ),
           ),
           const SizedBox(height: 6),
@@ -687,9 +687,9 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             'Transaction ID (TrxID)',
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF404040),
+              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
             ),
           ),
           const SizedBox(height: 6),
@@ -735,7 +735,7 @@ class _PaymentViewState extends State<PaymentView>
                         Text(
                           'যাচাই করা হচ্ছে...',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 17,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -744,7 +744,7 @@ class _PaymentViewState extends State<PaymentView>
                   : const Text(
                       'Verify Payment',
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 17,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -806,11 +806,11 @@ class _PaymentViewState extends State<PaymentView>
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF262626) : Colors.white,
+                    color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF404040)
+                          ? const Color(0xFF27272A)
                           : const Color(0xFFE5E5E5),
                     ),
                   ),
@@ -828,7 +828,7 @@ class _PaymentViewState extends State<PaymentView>
                         child: Center(
                           child: Text(
                             item.$1,
-                            style: const TextStyle(fontSize: 20),
+                            style: const TextStyle(fontSize: 22),
                           ),
                         ),
                       ),
@@ -841,17 +841,17 @@ class _PaymentViewState extends State<PaymentView>
                               item.$2,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 15,
+                                fontSize: 17,
                                 color: isDark
                                     ? Colors.white
-                                    : const Color(0xFF0F172A),
+                                    : const Color(0xFF000000),
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               item.$3,
                               style: const TextStyle(
-                                fontSize: 12,
+                                fontSize: 15,
                                 color: Color(0xFFA3A3A3),
                               ),
                             ),
@@ -880,7 +880,7 @@ class _PaymentViewState extends State<PaymentView>
               ),
               child: const Text(
                 'Go to Payment',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
               ),
             ),
           ),
@@ -941,7 +941,7 @@ class _PaymentViewState extends State<PaymentView>
               ),
               child: const Text(
                 'Go to Payment',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
               ),
             ),
           ),
@@ -970,7 +970,7 @@ class _PaymentViewState extends State<PaymentView>
             ? Border.all(color: borderColor)
             : Border.all(
                 color: isDark
-                    ? const Color(0xFF262626)
+                    ? const Color(0xFF1C1C1E)
                     : const Color(0xFFE5E5E5),
               ),
       ),
@@ -980,7 +980,7 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             label.toUpperCase(),
             style: TextStyle(
-              fontSize: 10,
+              fontSize: 13,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
               color:
@@ -992,7 +992,7 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             value,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: valueColor,
             ),
@@ -1017,7 +1017,7 @@ class _PaymentViewState extends State<PaymentView>
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
       style: TextStyle(
-        color: isDark ? Colors.white : const Color(0xFF0F172A),
+        color: isDark ? Colors.white : const Color(0xFF000000),
         fontWeight: FontWeight.w600,
         fontFamily: 'monospace',
       ),
@@ -1029,17 +1029,17 @@ class _PaymentViewState extends State<PaymentView>
           fontWeight: FontWeight.normal,
         ),
         filled: true,
-        fillColor: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+        fillColor: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5),
+            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5),
+            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -1077,12 +1077,12 @@ class _FaqTileState extends State<_FaqTile> {
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         color: widget.isDark
-            ? const Color(0xFF262626)
+            ? const Color(0xFF1C1C1E)
             : const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: widget.isDark
-              ? const Color(0xFF404040)
+              ? const Color(0xFF27272A)
               : const Color(0xFFE5E5E5),
         ),
       ),
@@ -1101,10 +1101,10 @@ class _FaqTileState extends State<_FaqTile> {
                       widget.q,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 13,
+                        fontSize: 15,
                         color: widget.isDark
                             ? Colors.white
-                            : const Color(0xFF0F172A),
+                            : const Color(0xFF000000),
                       ),
                     ),
                   ),
@@ -1121,7 +1121,7 @@ class _FaqTileState extends State<_FaqTile> {
             Divider(
               height: 1,
               color: widget.isDark
-                  ? const Color(0xFF404040)
+                  ? const Color(0xFF27272A)
                   : const Color(0xFFE5E5E5),
             ),
             Padding(
@@ -1129,7 +1129,7 @@ class _FaqTileState extends State<_FaqTile> {
               child: Text(
                 widget.a,
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 15,
                   color: Color(0xFFA3A3A3),
                   height: 1.6,
                 ),

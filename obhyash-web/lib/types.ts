@@ -73,6 +73,7 @@ export interface Question {
   subjectId?: string; // Reference to subjects(id)
   subjectLabel?: string; // Human-readable display name (e.g. "পদার্থবিজ্ঞান (Physics)")
   chapter: string;
+  bookmarkedAt?: string;
   chapterId?: string; // Reference to chapters(id)
   topic?: string;
   topicId?: string; // Reference to topics(id)

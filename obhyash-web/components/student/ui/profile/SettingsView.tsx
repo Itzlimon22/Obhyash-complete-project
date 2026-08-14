@@ -18,6 +18,7 @@ import {
   ExternalLink,
   Sun,
   Moon,
+  Bookmark,
 } from 'lucide-react';
 import UserAvatar from '../common/UserAvatar';
 import { UserProfile } from '@/lib/types';
@@ -85,12 +86,18 @@ const GROUPS: SettingsGroup[] = [
         description: 'নাম, ছবি, একাডেমিক তথ্য',
         Icon: User,
       },
-
     ],
   },
   {
     title: 'কার্যকলাপ',
     items: [
+      {
+        type: 'internal',
+        tab: 'bookmarks',
+        label: 'আমার বুকমার্কস',
+        description: 'সংরক্ষণ করা প্রশ্নগুলো',
+        Icon: Bookmark,
+      },
       {
         type: 'panel',
         id: 'reports',

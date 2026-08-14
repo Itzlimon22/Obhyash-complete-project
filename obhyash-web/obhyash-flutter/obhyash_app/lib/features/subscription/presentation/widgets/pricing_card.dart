@@ -46,7 +46,7 @@ class PricingCard extends StatelessWidget {
             : null,
         color: !isBestValue
             ? (isDark
-                  ? const Color(0xFF262626)
+                  ? const Color(0xFF1C1C1E)
                   : const Color(0xFFE5E5E5)) // neutral-800 : neutral-200
             : null,
       ),
@@ -58,7 +58,7 @@ class PricingCard extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: isDark
-                  ? const Color(0xFF0F172A)
+                  ? const Color(0xFF000000)
                   : Colors.white, // neutral-900 : white
               borderRadius: BorderRadius.circular(20), // rounded-[22px]
             ),
@@ -122,7 +122,7 @@ class PricingCard extends StatelessWidget {
                                 : null,
                             color: !isBestValue
                                 ? (isDark
-                                      ? const Color(0xFF262626)
+                                      ? const Color(0xFF1C1C1E)
                                       : const Color(
                                           0xFFF5F5F5,
                                         )) // neutral-800 : neutral-100
@@ -162,7 +162,7 @@ class PricingCard extends StatelessWidget {
                         Text(
                           plan.name.toUpperCase(),
                           style: TextStyle(
-                            fontSize: 18, // sm:text-lg
+                            fontSize: 20, // sm:text-lg
                             fontWeight: FontWeight.bold,
                             color: isDark
                                 ? const Color(0xFFA3A3A3)
@@ -183,7 +183,7 @@ class PricingCard extends StatelessWidget {
                             Text(
                               plan.currency,
                               style: const TextStyle(
-                                fontSize: 30, // sm:text-3xl
+                                fontSize: 32, // sm:text-3xl
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFFA3A3A3), // neutral-400
                               ),
@@ -196,7 +196,7 @@ class PricingCard extends StatelessWidget {
                                 fontWeight: FontWeight.w900, // font-black
                                 color: isDark
                                     ? Colors.white
-                                    : const Color(0xFF0F172A), // neutral-900
+                                    : const Color(0xFF000000), // neutral-900
                                 height: 1.0,
                                 letterSpacing: -1, // tracking-tighter
                               ),
@@ -216,7 +216,7 @@ class PricingCard extends StatelessWidget {
                                       ? '/৩ মাস'
                                       : '/${plan.billingCycle}',
                                   style: TextStyle(
-                                    fontSize: 16, // sm:text-base
+                                    fontSize: 18, // sm:text-base
                                     fontWeight: FontWeight.bold,
                                     color: isDark
                                         ? const Color(0xFFA3A3A3)
@@ -251,7 +251,7 @@ class PricingCard extends StatelessWidget {
                                                   0xFFFEF2F2,
                                                 )) // rose-900/30 : rose-100
                                         : (isDark
-                                              ? const Color(0xFF262626)
+                                              ? const Color(0xFF1C1C1E)
                                               : const Color(
                                                   0xFFF5F5F5,
                                                 )), // neutral-800 : neutral-100
@@ -278,12 +278,12 @@ class PricingCard extends StatelessWidget {
                                   child: Text(
                                     feature,
                                     style: TextStyle(
-                                      fontSize: 14, // sm:text-sm
+                                      fontSize: 16, // sm:text-sm
                                       fontWeight: FontWeight.w500,
                                       color: isDark
                                           ? const Color(0xFFD4D4D4)
                                           : const Color(
-                                              0xFF404040,
+                                              0xFF27272A,
                                             ), // neutral-300 : neutral-700
                                     ),
                                   ),
@@ -314,7 +314,7 @@ class PricingCard extends StatelessWidget {
                             child: Text(
                               isCurrent ? 'রিনিউ করো' : 'পেমেন্ট করো',
                               style: const TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.5,
                               ),
@@ -361,7 +361,7 @@ class PricingCard extends StatelessWidget {
                     'সেরা অফার 🔥',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 12, // text-xs
+                      fontSize: 15, // text-xs
                       fontWeight: FontWeight.w900, // font-black
                       letterSpacing: 2, // tracking-widest
                     ),

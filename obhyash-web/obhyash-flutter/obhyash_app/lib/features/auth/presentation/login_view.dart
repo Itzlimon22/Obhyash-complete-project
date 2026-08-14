@@ -112,9 +112,9 @@ class _LoginViewState extends ConsumerState<LoginView>
                 Text(
                   'স্বাগতম!',
                   style: TextStyle(
-                    fontSize: 36,
+                    fontSize: 38,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'HindSiliguri',
+                    fontFamily: 'Anek Bangla',
                     height: 1.2,
                     letterSpacing: -0.5,
                     color: textColor,
@@ -124,8 +124,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                 Text(
                   'তোমার অ্যাকাউন্টে লগইন করো',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'HindSiliguri',
+                    fontSize: 18,
+                    fontFamily: 'Anek Bangla',
                     color: isDark ? Colors.white70 : Colors.black54,
                   ),
                 ),
@@ -157,6 +157,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                     onPressed: () {
                       showModalBottomSheet(
                         context: context,
+                        useRootNavigator: true,
                         isScrollControlled: true,
                         backgroundColor: Colors.transparent,
                         builder: (context) => const ForgotPasswordSheet(),
@@ -165,7 +166,7 @@ class _LoginViewState extends ConsumerState<LoginView>
                     child: const Text(
                       'পাসওয়ার্ড ভুলে গেছেন?',
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
+                        fontFamily: 'Anek Bangla',
                         color: Color(0xFFB91C1C),
                         fontWeight: FontWeight.bold,
                       ),
@@ -199,8 +200,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                       : const Text(
                           'লগইন করো',
                           style: TextStyle(
-                            fontSize: 18,
-                            fontFamily: 'HindSiliguri',
+                            fontSize: 20,
+                            fontFamily: 'Anek Bangla',
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -215,8 +216,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                     Text(
                       'অ্যাকাউন্ট নেই? ',
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
-                        fontSize: 15,
+                        fontFamily: 'Anek Bangla',
+                        fontSize: 17,
                         color: isDark ? Colors.white70 : Colors.black87,
                       ),
                     ),
@@ -225,8 +226,8 @@ class _LoginViewState extends ConsumerState<LoginView>
                       child: const Text(
                         'নতুন অ্যাকাউন্ট খুলুন',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontSize: 15,
+                          fontFamily: 'Anek Bangla',
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFFB91C1C),
                         ),
@@ -251,15 +252,15 @@ class _LoginViewState extends ConsumerState<LoginView>
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
   }) {
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5);
+    final bgColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: TextStyle(
-            fontSize: 14,
-            fontFamily: 'HindSiliguri',
+            fontSize: 16,
+            fontFamily: 'Anek Bangla',
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white70 : Colors.black87,
           ),
@@ -270,7 +271,7 @@ class _LoginViewState extends ConsumerState<LoginView>
           obscureText: obscureText,
           keyboardType: keyboardType,
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
+            fontFamily: 'Anek Bangla',
             fontWeight: FontWeight.w500,
             color: isDark ? Colors.white : Colors.black,
           ),

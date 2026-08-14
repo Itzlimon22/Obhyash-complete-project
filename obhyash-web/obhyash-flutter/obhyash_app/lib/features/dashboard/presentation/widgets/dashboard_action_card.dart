@@ -63,22 +63,45 @@ class _DashboardActionCardState extends State<DashboardActionCard>
           animation: _scaleAnimation,
           builder: (context, child) =>
               Transform.scale(scale: _scaleAnimation.value, child: child),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+          child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE5E7EB),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: isDark 
+                      ? Colors.black.withValues(alpha: 0.6) 
+                      : const Color(0xFFD1D5DB),
+                  blurRadius: 0,
+                  offset: const Offset(0, 4), // Solid 3D shadow effect
+                ),
+                BoxShadow(
+                  color: isDark 
+                      ? Colors.black.withValues(alpha: 0.2) 
+                      : Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(widget.icon, color: widget.primaryColor, size: 32),
-                const SizedBox(height: 12),
+                Icon(widget.icon, color: widget.primaryColor, size: 28),
+                const SizedBox(height: 8),
                 Text(
                   widget.title,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : const Color(0xFF1F2937),
-                    fontFamily: 'HindSiliguri',
+                    color: isDark ? Colors.white : const Color(0xFF374151),
+                    fontFamily: 'Anek Bangla',
                   ),
                 ),
               ],

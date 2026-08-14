@@ -28,11 +28,11 @@ class DashboardLeaderboardCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isDark
-              ? const Color(0xFF0F172A)
-              : const Color(0xFF0F172A), // Deep rich color instead of white
+              ? const Color(0xFF000000)
+              : const Color(0xFF000000), // Deep rich color instead of white
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFF1E293B),
+            color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFF1C1C1E),
           ),
           boxShadow: [
             BoxShadow(
@@ -102,12 +102,12 @@ class DashboardLeaderboardCard extends StatelessWidget {
                         Text(
                           'লিডারবোর্ড',
                           style: TextStyle(
-                            fontFamily: 'HindSiliguri',
+                            fontFamily: 'Anek Bangla',
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 18,
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF262626),
+                                : const Color(0xFF1C1C1E),
                           ),
                         ),
                       ],
@@ -128,9 +128,9 @@ class DashboardLeaderboardCard extends StatelessWidget {
                           Text(
                             'সব দেখো',
                             style: TextStyle(
-                              fontFamily: 'HindSiliguri',
+                              fontFamily: 'Anek Bangla',
                               fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                              fontSize: 15,
                               color: isDark
                                   ? const Color(0xFF047857)
                                   : const Color(0xFF047857),
@@ -176,7 +176,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                     children: [
                       SizedBox(
                         width: 36,
-                        child: const Text('🥇', style: TextStyle(fontSize: 16)),
+                        child: const Text('🥇', style: TextStyle(fontSize: 18)),
                       ),
                       const SizedBox(width: 8),
                       if (topUser != null) ...[
@@ -188,9 +188,9 @@ class DashboardLeaderboardCard extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              fontFamily: 'HindSiliguri',
+                              fontFamily: 'Anek Bangla',
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              fontSize: 16,
                               color: Colors.white,
                             ),
                           ),
@@ -202,7 +202,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                           height: 28,
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF404040)
+                                ? const Color(0xFF27272A)
                                 : const Color(0xFFE5E5E5),
                             shape: BoxShape.circle,
                           ),
@@ -213,7 +213,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                           height: 14,
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF404040)
+                                ? const Color(0xFF27272A)
                                 : const Color(0xFFE5E5E5),
                             borderRadius: BorderRadius.circular(7),
                           ),
@@ -242,9 +242,9 @@ class DashboardLeaderboardCard extends StatelessWidget {
                         child: Text(
                           '#$userRank',
                           style: const TextStyle(
-                            fontFamily: 'HindSiliguri',
+                            fontFamily: 'Anek Bangla',
                             fontWeight: FontWeight.w900,
-                            fontSize: 14,
+                            fontSize: 16,
                             color: Colors.white,
                           ),
                         ),
@@ -261,9 +261,9 @@ class DashboardLeaderboardCard extends StatelessWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  fontFamily: 'HindSiliguri',
+                                  fontFamily: 'Anek Bangla',
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 14,
+                                  fontSize: 16,
                                   color: Colors.white,
                                 ),
                               ),
@@ -281,9 +281,9 @@ class DashboardLeaderboardCard extends StatelessWidget {
                               child: const Text(
                                 'তুমি',
                                 style: TextStyle(
-                                  fontFamily: 'HindSiliguri',
+                                  fontFamily: 'Anek Bangla',
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 9,
+                                  fontSize: 12,
                                   color: Colors.white,
                                 ),
                               ),
@@ -312,8 +312,8 @@ class DashboardLeaderboardCard extends StatelessWidget {
                       Text(
                         'শীর্ষে পৌঁছাতে আরও ',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontSize: 11,
+                          fontFamily: 'Anek Bangla',
+                          fontSize: 14,
                           color: isDark
                               ? const Color(0xFFA3A3A3)
                               : const Color(0xFF737373),
@@ -322,19 +322,19 @@ class DashboardLeaderboardCard extends StatelessWidget {
                       Text(
                         '$xpDiff XP',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontSize: 11,
+                          fontFamily: 'Anek Bangla',
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: isDark
                               ? const Color(0xFFD4D4D4)
-                              : const Color(0xFF404040),
+                              : const Color(0xFF27272A),
                         ),
                       ),
                       Text(
                         ' লাগবে',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontSize: 11,
+                          fontFamily: 'Anek Bangla',
+                          fontSize: 14,
                           color: isDark
                               ? const Color(0xFFA3A3A3)
                               : const Color(0xFF737373),
@@ -367,7 +367,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
         child: Text(
           name.isNotEmpty ? name[0].toUpperCase() : '?',
           style: TextStyle(
-            fontSize: 11,
+            fontSize: 14,
             fontWeight: FontWeight.w900,
             color: isDark ? const Color(0xFF047857) : const Color(0xFF047857),
           ),
@@ -378,9 +378,9 @@ class DashboardLeaderboardCard extends StatelessWidget {
 }
 
 const _headerStyle = TextStyle(
-  fontFamily: 'HindSiliguri',
+  fontFamily: 'Anek Bangla',
   fontWeight: FontWeight.w900,
-  fontSize: 10,
+  fontSize: 13,
   color: Color(0xFFA3A3A3), // neutral-400
   letterSpacing: 0.5,
 );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,11 +8,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../dashboard/domain/models.dart';
 import '../../notifications/presentation/notifications_view.dart';
-import '../../subscription/presentation/my_subscription_view.dart';
 import '../../subscription/presentation/subscription_view.dart';
 import '../../../core/providers/theme_provider.dart';
 import 'personal_details_view.dart';
-import 'profile_stats_page.dart';
 
 // ─── Data model ──────────────────────────────────────────────────────────────
 
@@ -26,7 +25,6 @@ class _SettingsItem {
   final String? url;
   final String? actionId;
   final bool danger;
-  final Widget? destination;
 
   const _SettingsItem({
     required this.label,
@@ -37,7 +35,6 @@ class _SettingsItem {
     this.url,
     this.actionId,
     this.danger = false,
-    this.destination,
   });
 }
 
@@ -54,17 +51,24 @@ class SettingsView extends ConsumerWidget {
 
   const SettingsView({super.key, required this.user});
 
-  List<_SettingsGroup> _buildGroups(BuildContext context) {
+  List<_SettingsGroup> _buildGroups(BuildContext context, ThemeMode themeMode) {
     return [
       _SettingsGroup(
         title: 'কার্যকলাপ',
         items: [
           _SettingsItem(
-            label: 'পরিসংখ্যান',
-            description: 'এক্সাম ইতিহাস, বিষয়ভিত্তিক স্কোর',
-            icon: LucideIcons.barChart2,
+            label: 'আমার বুকমার্কস',
+            description: 'সংরক্ষণ করা প্রশ্নগুলো',
+            icon: LucideIcons.bookmark,
             type: _ItemType.navigate,
-            destination: const ProfileStatsPage(),
+            route: '/bookmarks',
+          ),
+          _SettingsItem(
+            label: 'আমার প্রোফাইল',
+            description: 'এক্সাম ইতিহাস, বিষয়ভিত্তিক স্কোর',
+            icon: LucideIcons.user,
+            type: _ItemType.navigate,
+            route: '/profile/stats',
           ),
           _SettingsItem(
             label: 'আমার রিপোর্ট',
@@ -78,7 +82,7 @@ class SettingsView extends ConsumerWidget {
             description: 'নতুন আপডেট ও বার্তা',
             icon: LucideIcons.bell,
             type: _ItemType.navigate,
-            destination: const NotificationsView(),
+            route: '/notifications',
           ),
         ],
       ),
@@ -90,29 +94,18 @@ class SettingsView extends ConsumerWidget {
             description: 'বর্তমান প্ল্যান, ইতিহাস ও লেনদেন',
             icon: LucideIcons.crown,
             type: _ItemType.navigate,
-            destination: const MySubscriptionView(),
+            route: '/profile/my-subscription',
           ),
           _SettingsItem(
             label: 'আপগ্রেড করো',
-            description: 'প্রিমিয়াম প্ল্যান দেখো ও আপগ্রেড করো',
-            icon: LucideIcons.creditCard,
+            description: 'নতুন প্ল্যান কিনুন',
+            icon: LucideIcons.trendingUp,
             type: _ItemType.navigate,
-            destination: const _UpgradePage(),
+            route: '/profile/subscription',
           ),
         ],
       ),
-      _SettingsGroup(
-        title: 'কন্টেন্ট',
-        items: [
-          _SettingsItem(
-            label: 'ব্লগ',
-            description: 'আর্টিকেল ও গাইড পড়ো',
-            icon: LucideIcons.bookOpen,
-            type: _ItemType.navigate,
-            route: '/profile/blog',
-          ),
-        ],
-      ),
+
       _SettingsGroup(
         title: 'অ্যাপ ও আইনি',
         items: [
@@ -127,28 +120,35 @@ class SettingsView extends ConsumerWidget {
             label: 'প্রাইভেসি পলিসি',
             description: 'তোমার ডেটা কীভাবে ব্যবহার হয়',
             icon: LucideIcons.shield,
-            type: _ItemType.external,
-            url: 'https://obhyash.com/privacy',
+            type: _ItemType.navigate,
+            route: '/profile/privacy',
           ),
           _SettingsItem(
             label: 'ব্যবহারের নিয়মাবলী',
             description: 'শর্ত ও বিধিমালা',
             icon: LucideIcons.fileText,
-            type: _ItemType.external,
-            url: 'https://obhyash.com/terms',
+            type: _ItemType.navigate,
+            route: '/profile/terms',
           ),
           _SettingsItem(
             label: 'সাহায্য ও FAQ',
             description: 'সাধারণ প্রশ্নের উত্তর',
             icon: LucideIcons.helpCircle,
-            type: _ItemType.external,
-            url: 'https://obhyash.com/faq',
+            type: _ItemType.navigate,
+            route: '/profile/faq',
           ),
         ],
       ),
       _SettingsGroup(
-        title: '',
+        title: 'অ্যাকাউন্ট ও সেটিংস',
         items: [
+          _SettingsItem(
+            label: themeMode == ThemeMode.dark ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো',
+            description: 'অ্যাপের কালার থিম পরিবর্তন করো',
+            icon: themeMode == ThemeMode.dark ? LucideIcons.sun : LucideIcons.moon,
+            type: _ItemType.action,
+            actionId: 'toggleTheme',
+          ),
           _SettingsItem(
             label: 'লগ আউট',
             description: 'অ্যাকাউন্ট থেকে বের হও',
@@ -169,13 +169,8 @@ class SettingsView extends ConsumerWidget {
   ) async {
     switch (item.type) {
       case _ItemType.navigate:
-        if (item.destination != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => item.destination!),
-          );
-        } else if (item.route != null) {
-          context.go(item.route!);
+        if (item.route != null) {
+          context.push(item.route!);
         }
       case _ItemType.external:
         if (item.url != null) {
@@ -185,7 +180,9 @@ class SettingsView extends ConsumerWidget {
           }
         }
       case _ItemType.action:
-        if (item.actionId == 'logout') {
+        if (item.actionId == 'toggleTheme') {
+          ref.read(themeModeProvider.notifier).toggle();
+        } else if (item.actionId == 'logout') {
           final confirmed = await showDialog<bool>(
             context: context,
             builder: (ctx) => AlertDialog(
@@ -221,9 +218,9 @@ class SettingsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeMode = ref.watch(themeModeProvider);
-    final bg = isDark ? const Color(0xFF000000) : const Color(0xFFF5F5F5);
-    final cardBg = isDark ? const Color(0xFF0F172A) : Colors.white;
-    final groups = _buildGroups(context);
+    final bg = isDark ? const Color(0xFF000000) : const Color(0xFFFAFAFA);
+    final cardBg = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final groups = _buildGroups(context, themeMode);
 
     final nameParts = user.name.trim().split(' ');
     final initials = nameParts.length >= 2
@@ -232,26 +229,6 @@ class SettingsView extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: bg,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF166534),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'সেটিংস',
-          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              themeMode == ThemeMode.dark ? LucideIcons.sun : LucideIcons.moon,
-              size: 18,
-            ),
-            onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
-            tooltip: themeMode == ThemeMode.dark ? 'লাইট মোড' : 'ডার্ক মোড',
-          ),
-          const SizedBox(width: 4),
-        ],
-      ),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 12),
         children: [
@@ -263,7 +240,7 @@ class SettingsView extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: isDark
-                      ? const Color(0xFF262626)
+                      ? const Color(0xFF1C1C1E)
                       : const Color(0xFFE5E5E5),
                 ),
                 boxShadow: const [
@@ -301,25 +278,34 @@ class SettingsView extends ConsumerWidget {
                               color: Colors.white.withOpacity(0.3),
                               width: 3,
                             ),
-                            image: user.avatarUrl != null
+                            image: (user.avatarUrl != null && user.avatarUrl!.isNotEmpty && !user.avatarUrl!.toLowerCase().contains('.svg'))
                                 ? DecorationImage(
                                     image: NetworkImage(user.avatarUrl!),
                                     fit: BoxFit.cover,
                                   )
                                 : null,
                           ),
-                          child: user.avatarUrl == null
+                          child: (user.avatarUrl == null || user.avatarUrl!.isEmpty || user.avatarUrl == 'null')
                               ? Center(
                                   child: Text(
                                     initials,
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 28,
+                                      fontSize: 30,
                                       fontWeight: FontWeight.w900,
                                     ),
                                   ),
                                 )
-                              : null,
+                              : (user.avatarUrl!.toLowerCase().contains('.svg')
+                                  ? ClipOval(
+                                      child: SvgPicture.network(
+                                        user.avatarUrl!,
+                                        fit: BoxFit.cover,
+                                        width: 80,
+                                        height: 80,
+                                      ),
+                                    )
+                                  : null),
                         ),
                         const SizedBox(height: 12),
                         // Name
@@ -327,10 +313,10 @@ class SettingsView extends ConsumerWidget {
                           user.name,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            fontSize: 20,
+                            fontSize: 22,
                             fontWeight: FontWeight.w900,
                             color: Colors.white,
-                            fontFamily: 'HindSiliguri',
+                            fontFamily: 'Anek Bangla',
                           ),
                         ),
                         if (user.email != null) ...[
@@ -339,7 +325,7 @@ class SettingsView extends ConsumerWidget {
                             user.email!,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 15,
                               color: Colors.white.withOpacity(0.7),
                             ),
                           ),
@@ -388,8 +374,7 @@ class SettingsView extends ConsumerWidget {
                               icon: LucideIcons.pencil,
                               label: 'এডিট',
                               isDark: isDark,
-                              onTap: () => Navigator.push(
-                                context,
+                              onTap: () => Navigator.of(context, rootNavigator: true).push(
                                 MaterialPageRoute(
                                   builder: (_) =>
                                       PersonalDetailsView(user: user),
@@ -400,25 +385,20 @@ class SettingsView extends ConsumerWidget {
                               icon: LucideIcons.bell,
                               label: 'নোটিফি',
                               isDark: isDark,
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const NotificationsView(),
-                                ),
-                              ),
+                              onTap: () => context.push('/notifications'),
                             ),
                             _ActionBtn(
                               icon: LucideIcons.alertTriangle,
                               label: 'রিপোর্ট',
                               isDark: isDark,
-                              onTap: () => context.go('/my-reports'),
+                              onTap: () => context.push('/my-reports'),
                             ),
                             _ActionBtn(
                               icon: LucideIcons.gift,
                               label: 'রেফার',
                               isDark: isDark,
                               isAccent: true,
-                              onTap: () {},
+                              onTap: () => context.push('/profile/referral'),
                             ),
                           ],
                         ),
@@ -443,7 +423,7 @@ class SettingsView extends ConsumerWidget {
                     child: Text(
                       group.title,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 15,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.5,
                         color: isDark
@@ -454,27 +434,17 @@ class SettingsView extends ConsumerWidget {
                   )
                 else
                   const SizedBox(height: 20),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: cardBg,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF262626)
-                          : const Color(0xFFE5E5E5),
-                    ),
-                  ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
-                    children: group.items.asMap().entries.map((e) {
-                      final idx = e.key;
-                      final item = e.value;
-                      final isLast = idx == group.items.length - 1;
-                      return _NavItem(
-                        item: item,
-                        isDark: isDark,
-                        isLast: isLast,
-                        onTap: () => _handleItem(context, ref, item),
+                    children: group.items.map((item) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _NavItem(
+                          item: item,
+                          isDark: isDark,
+                          onTap: () => _handleItem(context, ref, item),
+                        ),
                       );
                     }).toList(),
                   ),
@@ -493,13 +463,11 @@ class SettingsView extends ConsumerWidget {
 class _NavItem extends StatelessWidget {
   final _SettingsItem item;
   final bool isDark;
-  final bool isLast;
   final VoidCallback onTap;
 
   const _NavItem({
     required this.item,
     required this.isDark,
-    required this.isLast,
     required this.onTap,
   });
 
@@ -513,74 +481,74 @@ class _NavItem extends StatelessWidget {
         : const Color(0xFF166534).withOpacity(0.1);
     final labelColor = item.danger
         ? const Color(0xFFB91C1C)
-        : (isDark ? Colors.white : const Color(0xFF0F172A));
+        : (isDark ? Colors.white : const Color(0xFF000000));
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.vertical(
-        bottom: isLast ? const Radius.circular(16) : Radius.zero,
-      ),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          border: isLast
-              ? null
-              : Border(
-                  bottom: BorderSide(
-                    color: isDark
-                        ? const Color(0xFF262626)
-                        : const Color(0xFFE5E5E5),
-                  ),
-                ),
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF000000) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: iconBg,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(item.icon, color: iconColor, size: 16),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? Colors.transparent : const Color(0x08000000),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: iconBg,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(item.icon, color: iconColor, size: 20),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
                     item.label,
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
                       color: labelColor,
+                      fontFamily: 'Anek Bangla',
                     ),
                   ),
-                  Text(
-                    item.description,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: isDark
-                          ? const Color(0xFF737373)
-                          : const Color(0xFFA3A3A3),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                ),
             if (item.type != _ItemType.action)
-              Icon(
-                item.type == _ItemType.external
-                    ? LucideIcons.externalLink
-                    : LucideIcons.chevronRight,
-                size: 14,
-                color: isDark
-                    ? const Color(0xFF525252)
-                    : const Color(0xFFD4D4D4),
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  item.type == _ItemType.external
+                      ? LucideIcons.externalLink
+                      : LucideIcons.chevronRight,
+                  size: 16,
+                  color: isDark
+                      ? const Color(0xFFA3A3A3)
+                      : const Color(0xFF737373),
+                ),
               ),
           ],
         ),
+      ),
+    ),
       ),
     );
   }
@@ -604,24 +572,24 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+        color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 13)),
+          Text(emoji, style: const TextStyle(fontSize: 15)),
           const SizedBox(width: 5),
           Text(
             label,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 15,
               fontWeight: FontWeight.w600,
-              fontFamily: 'HindSiliguri',
-              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF404040),
+              fontFamily: 'Anek Bangla',
+              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
             ),
           ),
         ],
@@ -654,7 +622,7 @@ class _ActionBtn extends StatelessWidget {
         : (isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF5F5F5));
     final fg = isAccent
         ? (isDark ? const Color(0xFFB91C1C) : const Color(0xFFB91C1C))
-        : (isDark ? const Color(0xFFD4D4D4) : const Color(0xFF404040));
+        : (isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A));
 
     return Expanded(
       child: GestureDetector(
@@ -669,7 +637,7 @@ class _ActionBtn extends StatelessWidget {
               color: isAccent
                   ? (isDark ? const Color(0x887f1d1d) : const Color(0xFFfecdd3))
                   : (isDark
-                        ? const Color(0xFF262626)
+                        ? const Color(0xFF1C1C1E)
                         : const Color(0xFFE5E5E5)),
             ),
           ),
@@ -680,9 +648,9 @@ class _ActionBtn extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'HindSiliguri',
+                  fontFamily: 'Anek Bangla',
                   color: fg,
                 ),
               ),
@@ -694,32 +662,3 @@ class _ActionBtn extends StatelessWidget {
   }
 }
 
-// ─── Upgrade Page Wrapper ─────────────────────────────────────────────────────
-
-class _UpgradePage extends StatelessWidget {
-  const _UpgradePage();
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF000000)
-          : const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF166534),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'আপগ্রেড করো',
-          style: TextStyle(
-            fontWeight: FontWeight.w900,
-            fontSize: 18,
-            fontFamily: 'HindSiliguri',
-          ),
-        ),
-      ),
-      body: const SubscriptionView(),
-    );
-  }
-}

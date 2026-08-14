@@ -3,8 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/providers/auth_provider.dart';
 import '../domain/exam_models.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
+import '../../dashboard/services/streak_service.dart';
 
 enum AppState {
   idle,
@@ -26,6 +28,7 @@ class ExamEngineState {
   final List<Question> questions;
   final Map<String, int> userAnswers;
   final Set<String> flaggedQuestions;
+  final Set<String> bookmarkedQuestions;
   final int timeLeft;
   final int graceTimeLeft;
   final bool isOmrMode;
@@ -41,6 +44,7 @@ class ExamEngineState {
     this.questions = const [],
     this.userAnswers = const {},
     this.flaggedQuestions = const {},
+    this.bookmarkedQuestions = const {},
     this.timeLeft = 0,
     this.graceTimeLeft = 0,
     this.isOmrMode = false,
@@ -57,6 +61,7 @@ class ExamEngineState {
     List<Question>? questions,
     Map<String, int>? userAnswers,
     Set<String>? flaggedQuestions,
+    Set<String>? bookmarkedQuestions,
     int? timeLeft,
     int? graceTimeLeft,
     bool? isOmrMode,
@@ -72,6 +77,7 @@ class ExamEngineState {
       questions: questions ?? this.questions,
       userAnswers: userAnswers ?? this.userAnswers,
       flaggedQuestions: flaggedQuestions ?? this.flaggedQuestions,
+      bookmarkedQuestions: bookmarkedQuestions ?? this.bookmarkedQuestions,
       timeLeft: timeLeft ?? this.timeLeft,
       graceTimeLeft: graceTimeLeft ?? this.graceTimeLeft,
       isOmrMode: isOmrMode ?? this.isOmrMode,
@@ -85,6 +91,8 @@ class ExamEngineState {
 // Migrated from StateNotifier to Notifier (required for flutter_riverpod ^3.x)
 class ExamEngineNotifier extends Notifier<ExamEngineState> {
   Timer? _timer;
+  DateTime? _examStartTime;
+  int _totalDurationSeconds = 0;
 
   @override
   ExamEngineState build() {
@@ -226,12 +234,33 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
         }
       }
 
+      // Fetch bookmarks for the generated questions
+      Set<String> initialBookmarks = {};
+      if (authId != null && generatedQuestions.isNotEmpty) {
+        try {
+          final bRes = await supabase
+              .from('bookmarks')
+              .select('question_id')
+              .eq('user_id', authId)
+              .inFilter(
+                'question_id',
+                generatedQuestions.map((q) => q.id).toList(),
+              );
+          initialBookmarks = (bRes as List)
+              .map((row) => row['question_id'].toString())
+              .toSet();
+        } catch (e) {
+          debugPrint('[ExamProvider] Bookmark fetch error: $e');
+        }
+      }
+
       state = state.copyWith(
         appState: AppState.instructions,
         questions: generatedQuestions,
         examDetails: details,
         userAnswers: {},
         flaggedQuestions: {},
+        bookmarkedQuestions: initialBookmarks,
         dbSessionId: sessionId,
       );
       return true;
@@ -248,14 +277,20 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
     final duration =
         durationOverride ?? (state.examDetails?.durationMinutes ?? 0) * 60;
     if (duration > 0) {
+      _examStartTime = DateTime.now();
+      _totalDurationSeconds = duration;
       state = state.copyWith(timeLeft: duration, appState: AppState.active);
       _timer?.cancel();
       _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-        if (state.timeLeft <= 1) {
+        if (_examStartTime == null) return;
+        final elapsed = DateTime.now().difference(_examStartTime!).inSeconds;
+        final newTimeLeft = _totalDurationSeconds - elapsed;
+
+        if (newTimeLeft <= 0) {
           t.cancel();
           submitExam();
         } else {
-          state = state.copyWith(timeLeft: state.timeLeft - 1);
+          state = state.copyWith(timeLeft: newTimeLeft);
         }
       });
     }
@@ -275,6 +310,38 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       updated.add(questionId);
     }
     state = state.copyWith(flaggedQuestions: updated);
+  }
+
+  void toggleBookmark(String questionId) {
+    final updated = Set<String>.from(state.bookmarkedQuestions);
+    final wasBookmarked = updated.contains(questionId);
+    if (wasBookmarked) {
+      updated.remove(questionId);
+    } else {
+      updated.add(questionId);
+    }
+    state = state.copyWith(bookmarkedQuestions: updated);
+
+    // Persist to Supabase bookmarks table
+    final supabase = Supabase.instance.client;
+    final uid = supabase.auth.currentUser?.id;
+    if (uid != null) {
+      if (wasBookmarked) {
+        supabase
+            .from('bookmarks')
+            .delete()
+            .eq('user_id', uid)
+            .eq('question_id', questionId)
+            .then((_) {})
+            .catchError((_) {});
+      } else {
+        supabase
+            .from('bookmarks')
+            .insert({'user_id': uid, 'question_id': questionId})
+            .then((_) {})
+            .catchError((_) {});
+      }
+    }
   }
 
   void toggleOmrMode(bool isOmr) {
@@ -333,7 +400,11 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
 
     // Save to DB
     final supabase = Supabase.instance.client;
-    final authId = supabase.auth.currentUser?.id;
+    final session = await supabase.auth.getSession();
+    final authId =
+        ref.read(authProvider)?.id ??
+        supabase.auth.currentUser?.id ??
+      session?.user.id;
     if (authId != null) {
       try {
         // Build JSONB payloads for practice dashboard (mistakes tab)
@@ -373,6 +444,9 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           'status': 'evaluated',
         });
 
+        // Instantly force-sync streak so the UI is immediately correct
+        await StreakService.checkAndUpdateStreak(authId, forceSync: true);
+
         // Award XP: 10 per correct, -2 per wrong (min 0)
         final xpEarned = (result.correctCount * 10 - result.wrongCount * 2)
             .clamp(0, 9999);
@@ -404,15 +478,6 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
               );
             }
           }
-        }
-
-        // Increment streak
-        try {
-          await supabase.rpc('increment_user_streak', params: {'uid': authId});
-        } catch (streakRpcErr) {
-          debugPrint(
-            '[ExamProvider] increment_user_streak RPC failed: $streakRpcErr',
-          );
         }
       } catch (e) {
         debugPrint('[ExamProvider] submitExam DB error: $e');

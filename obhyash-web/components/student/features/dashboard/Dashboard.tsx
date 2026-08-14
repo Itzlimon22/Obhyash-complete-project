@@ -9,7 +9,7 @@ import { DashboardSkeleton } from "@/components/student/ui/common/Skeletons";
 import UserAvatar from "@/components/student/ui/common/UserAvatar";
 import { motion } from "framer-motion";
 import { staggerContainer, fadeInUp, hoverScale, tapScale } from "@/lib/animations";
-import { ClipboardList, Dumbbell, Clock3, Medal, TrendingUp, Rss } from "lucide-react";
+import { ClipboardList, Dumbbell, Clock3, Medal, TrendingUp, Bookmark } from "lucide-react";
 interface SubjectStats {
   id: string;
   name: string;
@@ -36,7 +36,7 @@ interface DashboardProps {
   onLeaderboardClick: () => void;
   onAnalysisClick: () => void;
   onPracticeClick: () => void;
-  onBlogClick: () => void;
+  onBookmarksClick: () => void;
   history: ExamResult[];
   examTarget?: string;
   onChangeTarget?: () => void;
@@ -103,7 +103,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   onLeaderboardClick,
   onAnalysisClick,
   onPracticeClick,
-  onBlogClick,
+  onBookmarksClick,
   history,
   examTarget,
   onChangeTarget,
@@ -333,19 +333,19 @@ const Dashboard: React.FC<DashboardProps> = ({
           </h3>
         </motion.button>
 
-        {/* ব্লগ */}
+        {/* বুকমার্কস */}
         <motion.button
           variants={fadeInUp}
           whileHover={hoverScale}
           whileTap={tapScale}
-          onClick={onBlogClick}
+          onClick={onBookmarksClick}
           className="group relative overflow-hidden bg-gradient-to-br from-teal-50 to-white dark:from-teal-950/20 dark:to-neutral-900 border border-teal-100 dark:border-teal-900/30 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center gap-1.5 sm:gap-2 hover:border-teal-300 dark:hover:border-teal-800 hover:shadow-md transition-all duration-200 text-center h-20 sm:h-24 md:h-28"
         >
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center text-teal-700 dark:text-teal-400 group-hover:scale-110 transition-transform shrink-0">
-            <Rss className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Bookmark className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <h3 className="text-xs font-bold text-neutral-900 dark:text-white group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors leading-tight">
-            ব্লগ
+            বুকমার্কস
           </h3>
         </motion.button>
       </motion.div>

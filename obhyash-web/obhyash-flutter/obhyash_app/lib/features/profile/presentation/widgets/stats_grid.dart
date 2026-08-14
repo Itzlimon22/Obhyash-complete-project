@@ -29,7 +29,7 @@ class StatsGrid extends StatelessWidget {
           mainAxisSpacing: 12,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          childAspectRatio: isMobile ? 1.4 : 1.2,
+          childAspectRatio: isMobile ? 1.05 : 1.2,
           children: [
             _buildStatCard(
               context,
@@ -90,11 +90,11 @@ class StatsGrid extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16), // sm:p-6
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white, // neutral-900
+        color: isDark ? const Color(0xFF000000) : Colors.white, // neutral-900
         borderRadius: BorderRadius.circular(20), // sm:rounded-3xl
         border: Border.all(
           color: isDark
-              ? const Color(0xFF262626)
+              ? const Color(0xFF1C1C1E)
               : const Color(0xFFE5E5E5), // neutral-800 : neutral-200
         ),
         boxShadow: const [
@@ -106,47 +106,44 @@ class StatsGrid extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8), // sm:p-2.5
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(10), // sm:rounded-xl
-                ),
-                child: Icon(icon, color: color, size: 20), // sm:w-6
-              ),
-              const SizedBox(width: 8), // gap-2
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 12, // sm:text-sm
-                    fontWeight: FontWeight.bold,
-                    color: isDark
-                        ? const Color(0xFFA3A3A3)
-                        : const Color(0xFF737373), // neutral-400 : neutral-500
-                    letterSpacing: 0.5,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
+          Container(
+            padding: const EdgeInsets.all(8), // sm:p-2.5
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(10), // sm:rounded-xl
+            ),
+            child: Icon(icon, color: color, size: 20), // sm:w-6
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 15, // sm:text-sm
+              fontWeight: FontWeight.bold,
+              color: isDark
+                  ? const Color(0xFFA3A3A3)
+                  : const Color(0xFF737373), // neutral-400 : neutral-500
+              letterSpacing: 0.5,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
           Text(
             value,
             style: TextStyle(
-              fontSize: 24, // sm:text-3xl
+              fontSize: 26, // sm:text-3xl
               fontWeight: FontWeight.w900, // font-black
               color: isDark
                   ? Colors.white
-                  : const Color(0xFF0F172A), // neutral-900
+                  : const Color(0xFF000000), // neutral-900
               letterSpacing: -0.5,
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

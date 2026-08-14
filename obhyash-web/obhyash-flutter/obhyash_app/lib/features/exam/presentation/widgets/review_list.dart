@@ -68,9 +68,9 @@ class _ReviewListState extends State<ReviewList> {
               Text(
                 'উত্তরপত্র পর্যালোচনা',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: isDark ? Colors.white : const Color(0xFF000000),
                 ),
               ),
               const SizedBox(height: 16),
@@ -182,7 +182,7 @@ class _FilterButton extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: isSelected
                     ? color

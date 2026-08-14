@@ -6,11 +6,14 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'widgets/dashboard_action_card.dart';
+import 'widgets/daily_streak_card.dart';
 import 'widgets/dashboard_leaderboard_card.dart';
 import 'widgets/subject_stat_card.dart';
 import 'widgets/exam_target_modal.dart';
+import 'widgets/live_exam_slider.dart';
 import '../providers/dashboard_providers.dart';
 import '../domain/models.dart';
+import '../services/streak_service.dart';
 
 class DashboardView extends ConsumerStatefulWidget {
   const DashboardView({super.key});
@@ -21,6 +24,7 @@ class DashboardView extends ConsumerStatefulWidget {
 
 class _DashboardViewState extends ConsumerState<DashboardView> {
   bool _hasCheckedExamTarget = false;
+  bool _hasCheckedStreak = false;
 
   @override
   void initState() {
@@ -41,6 +45,16 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     }
   }
 
+  void _checkStreak(UserProfile? user) {
+    if (_hasCheckedStreak || user == null) return;
+    _hasCheckedStreak = true;
+    StreakService.checkAndUpdateStreak(user.id).then((_) {
+      if (mounted) {
+        ref.invalidate(userProfileProvider);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final subjectStatsAsync = ref.watch(dashboardSubjectStatsProvider);
@@ -49,6 +63,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
 
     final userProfile = userProfileAsync.value;
     _checkExamTarget(userProfile);
+    _checkStreak(userProfile);
 
     final subjects = subjectStatsAsync.when(
       data: (data) => data,
@@ -88,46 +103,9 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
 
     return CustomScrollView(
       slivers: [
-        // 1. Clean Minimalist Header
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 10),
-            child:
-                Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "আজকের দিনটি শুভ হোক,",
-                          style: TextStyle(
-                            color: isDark ? Colors.grey[400] : Colors.grey[600],
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'HindSiliguri',
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'স্বাগতম, ${currentUser.name.split(' ').first}! 👋',
-                          style: TextStyle(
-                            color: isDark
-                                ? Colors.white
-                                : const Color(0xFF111827),
-                            fontWeight: FontWeight.w900,
-                            fontSize: 28,
-                            letterSpacing: -0.5,
-                            fontFamily: 'HindSiliguri',
-                          ),
-                        ),
-                      ],
-                    )
-                    .animate()
-                    .fadeIn(duration: 400.ms)
-                    .slideY(
-                      begin: 0.1,
-                      duration: 400.ms,
-                      curve: Curves.easeOut,
-                    ),
-          ),
+        // 1. Clean Minimalist Header (Live Exam Slider)
+        const SliverToBoxAdapter(
+          child: LiveExamSlider(),
         ),
 
         // 2. Main Content inside SliverToBoxAdapter
@@ -140,9 +118,9 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                 // Actions Grid
                 GridView.count(
                   crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 0.92,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.95,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children:
@@ -193,16 +171,13 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                               onTap: () => context.go('/analysis'),
                             ),
                             DashboardActionCard(
-                              title: 'ব্লগ',
-                              icon: LucideIcons.newspaper,
+                              title: 'বুকমার্কস',
+                              icon: LucideIcons.bookmark,
                               primaryColor: const Color(0xFF047857),
                               lightColor: isDark
                                   ? const Color(0x33047857)
                                   : const Color(0xFFECFDF5),
-                              onTap: () => launchUrl(
-                                Uri.parse('https://obhyash.com/blog'),
-                                mode: LaunchMode.externalApplication,
-                              ),
+                              onTap: () => context.go('/bookmarks'),
                             ),
                           ]
                           .animate(interval: 50.ms)
@@ -213,6 +188,17 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                             curve: Curves.easeOut,
                           ),
                 ),
+                const SizedBox(height: 24),
+
+                DailyStreakCard(userStreak: userProfile?.streakCount ?? 0)
+                    .animate(delay: 150.ms)
+                    .fadeIn(duration: 400.ms)
+                    .slideY(
+                      begin: 0.05,
+                      duration: 400.ms,
+                      curve: Curves.easeOut,
+                    ),
+
                 const SizedBox(height: 24),
 
                 // Subject Stats List

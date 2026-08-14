@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../dashboard/domain/models.dart';
 import 'widgets/stats_grid.dart';
@@ -65,39 +66,36 @@ class MyProfileView extends ConsumerWidget {
           // User Profile Card
           _UserProfileCard(user: user, isDark: isDark),
           const SizedBox(height: 24), // mb-6
-          // Level Progress Bar
+          // Level Progress Bar (Premium Design)
           Container(
-            padding: const EdgeInsets.all(32), // p-8
+            padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF0F172A)
-                  : Colors.white, // neutral-900 : white
-              borderRadius: BorderRadius.circular(24), // rounded-3xl
-              border: Border.all(
-                color: isDark
-                    ? const Color(0xFF262626)
-                    : const Color(0xFFE5E5E5),
-              ), // neutral-800 : neutral-200
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [const Color(0xFF1E1B4B), const Color(0xFF312E81)]
+                    : [const Color(0xFF312E81), const Color(0xFF4338CA)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(24),
               boxShadow: const [
                 BoxShadow(
-                  color: Color(0x05000000),
-                  blurRadius: 2,
-                  offset: Offset(0, 1),
+                  color: Color(0x4D312E81),
+                  blurRadius: 15,
+                  offset: Offset(0, 8),
                 ),
               ],
             ),
             child: Stack(
+              clipBehavior: Clip.none,
               children: [
                 Positioned(
-                  top: -64,
-                  right: -64, // -mr-24 -mt-24
-                  child: Container(
-                    width: 192,
-                    height: 192, // w-48 h-48
-                    decoration: BoxDecoration(
-                      color: const Color(0x0EF43F5E), // rose-500/5
-                      shape: BoxShape.circle,
-                    ),
+                  top: -60,
+                  right: -40,
+                  child: Icon(
+                    Icons.stars_rounded,
+                    size: 160,
+                    color: Colors.white.withValues(alpha: 0.05),
                   ),
                 ),
                 Column(
@@ -105,7 +103,7 @@ class MyProfileView extends ConsumerWidget {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,123 +111,120 @@ class MyProfileView extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
-                                vertical: 6,
-                              ), // px-4 py-1.5
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? const Color(0x66881337)
-                                    : const Color(
-                                        0xFFFFB4E6,
-                                      ), // rose-900/40 : rose-100
-                                borderRadius: BorderRadius.circular(
-                                  8,
-                                ), // rounded-lg
+                                vertical: 8,
                               ),
-                              child: Text(
-                                _getRankName(user.xp),
-                                style: TextStyle(
-                                  fontSize: 16, // text-base
-                                  fontWeight: FontWeight.w900, // font-black
-                                  color: isDark
-                                      ? const Color(0xFFB91C1C)
-                                      : const Color(
-                                          0xFFB91C1C,
-                                        ), // rose-400 : rose-600
-                                  fontFamily: 'HindSiliguri',
-                                  letterSpacing: 1, // tracking-wider
+                              decoration: BoxDecoration(
+                                color: const Color(0x33F59E0B),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: const Color(0x80F59E0B),
+                                  width: 1,
                                 ),
                               ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.emoji_events_rounded,
+                                    color: Color(0xFFFBBF24),
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    _getRankName(user.xp),
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w900,
+                                      color: Color(0xFFFBBF24),
+                                      fontFamily: 'Anek Bangla',
+                                      letterSpacing: 1.2,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(height: 8), // mb-2
-                            Text(
-                              'পরবর্তী লেভেল রিভার্ড',
+                            const SizedBox(height: 16),
+                            const Text(
+                              'পরবর্তী লেভেল রিওয়ার্ড',
                               style: TextStyle(
-                                fontSize: 24, // text-2xl
-                                fontWeight: FontWeight.w900, // font-black
-                                color: isDark
-                                    ? Colors.white
-                                    : const Color(
-                                        0xFF262626,
-                                      ), // white : neutral-800
-                                fontFamily: 'HindSiliguri',
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white70,
+                                fontFamily: 'Anek Bangla',
                               ),
                             ),
                           ],
                         ),
                         Text(
                           '${((user.xp % 1000) / 10).floor()}%',
-                          style: TextStyle(
-                            fontSize: 36, // text-4xl
-                            fontWeight: FontWeight.w900, // font-black
-                            color: isDark
-                                ? const Color(0xFFB91C1C)
-                                : const Color(
-                                    0xFFB91C1C,
-                                  ), // rose-400 : rose-600
-                            fontFamily: 'HindSiliguri',
+                          style: const TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            fontFamily: 'Anek Bangla',
+                            height: 1,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24), // mb-6
+                    const SizedBox(height: 24),
                     // The Bar
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8), // rounded-full
-                      child: Container(
-                        height: 16, // h-4
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF262626)
-                              : const Color(
-                                  0xFFF5F5F5,
-                                ), // neutral-800 : neutral-100
-                          border: Border.all(
-                            color: isDark
-                                ? const Color(0x80404040)
-                                : const Color(0x80E5E5E5),
-                          ), // neutral-700/50 : neutral-200/50
+                    Container(
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: Colors.black26,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white12,
                         ),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: FractionallySizedBox(
-                            widthFactor:
-                                ((user.xp % 1000) / 10) / 100, // Percentage
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color(0xFFB91C1C),
-                                    Color(0xFFB91C1C),
-                                    Color(0xFFB91C1C),
-                                  ], // rose-500, red-500, rose-600
-                                ),
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: FractionallySizedBox(
+                          widthFactor: ((user.xp % 1000) / 10) / 100,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF1E3A8A),
+                                  Color(0xFFFDE047),
+                                ],
                               ),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x66F59E0B),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
                             ),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16), // mt-4
+                    const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           _getRankName(user.xp),
                           style: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFFA3A3A3),
-                            letterSpacing: 2,
-                          ), // neutral-400
+                            color: Colors.white60,
+                            letterSpacing: 1.5,
+                            fontFamily: 'Anek Bangla',
+                          ),
                         ),
                         Text(
                           _getNextRankName(user.xp),
                           style: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFFA3A3A3),
-                            letterSpacing: 2,
-                          ), // neutral-400
+                            color: Colors.white60,
+                            letterSpacing: 1.5,
+                            fontFamily: 'Anek Bangla',
+                          ),
                         ),
                       ],
                     ),
@@ -267,11 +262,6 @@ class MyProfileView extends ConsumerWidget {
 
               final rightColumn = Column(
                 children: [
-                  _ExamTargetCard(
-                    initialTarget: user.examTarget,
-                    isDark: isDark,
-                  ),
-                  const SizedBox(height: 24),
                   StreakCalendar(
                     calendarData: calendarData,
                     streakCount: user.streakCount,
@@ -303,183 +293,6 @@ class MyProfileView extends ConsumerWidget {
   }
 }
 
-// ── Exam Target Card ──────────────────────────────────────────────────────────
-
-class _ExamTargetCard extends StatefulWidget {
-  final String? initialTarget;
-  final bool isDark;
-
-  const _ExamTargetCard({this.initialTarget, required this.isDark});
-
-  @override
-  State<_ExamTargetCard> createState() => _ExamTargetCardState();
-}
-
-class _ExamTargetCardState extends State<_ExamTargetCard> {
-  String? _localTarget;
-
-  @override
-  void initState() {
-    super.initState();
-    _localTarget = widget.initialTarget;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = widget.isDark;
-    final Map<String, String>? targetData = _localTarget != null
-        ? kExamTargets.cast<Map<String, String>>().firstWhere(
-            (t) => t['value'] == _localTarget,
-            orElse: () => {},
-          )
-        : null;
-    final hasTarget = targetData != null && targetData.isNotEmpty;
-
-    Future<void> openModal() async {
-      final result = await showExamTargetModal(
-        context,
-        initialTarget: _localTarget,
-      );
-      if (result != null && mounted) setState(() => _localTarget = result);
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x05000000),
-            blurRadius: 2,
-            offset: Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Text('🎯', style: TextStyle(fontSize: 18)),
-                  const SizedBox(width: 8),
-                  Text(
-                    'তোমার লক্ষ্য কী?',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      fontFamily: 'HindSiliguri',
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    ),
-                  ),
-                ],
-              ),
-              TextButton(
-                onPressed: openModal,
-                style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF047857),
-                  backgroundColor: isDark
-                      ? const Color(0x1A059669)
-                      : const Color(0xFFECFDF5),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  'পরিবর্তন করো',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'HindSiliguri',
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          if (hasTarget)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF0A1F17)
-                    : const Color(0xFFECFDF5),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF047857), width: 2),
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    targetData['icon']!,
-                    style: const TextStyle(fontSize: 22),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    targetData['label']!,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      fontFamily: 'HindSiliguri',
-                      color: isDark
-                          ? const Color(0xFF047857)
-                          : const Color(0xFF047857),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else
-            GestureDetector(
-              onTap: openModal,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isDark
-                        ? const Color(0xFF404040)
-                        : const Color(0xFFD4D4D4),
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  '+ লক্ষ্য নির্ধারণ করো',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontFamily: 'HindSiliguri',
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? const Color(0xFF737373)
-                        : const Color(0xFF525252),
-                  ),
-                ),
-              ),
-            ),
-          const SizedBox(height: 8),
-          Text(
-            'তোমার পরীক্ষার লক্ষ্য নির্বাচন করো — আমরা সেই অনুযায়ী তোমাকে সাহায্য করব',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 11,
-              fontFamily: 'HindSiliguri',
-              color: isDark ? const Color(0xFF525252) : const Color(0xFFA3A3A3),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // ── User Profile Card ─────────────────────────────────────────────────────────
 
@@ -502,10 +315,10 @@ class _UserProfileCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
         ),
         boxShadow: const [
           BoxShadow(
@@ -524,25 +337,34 @@ class _UserProfileCard extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: const Color(0xFFB91C1C),
-              image: user.avatarUrl != null
+              image: (user.avatarUrl != null && user.avatarUrl!.isNotEmpty && !user.avatarUrl!.toLowerCase().contains('.svg'))
                   ? DecorationImage(
                       image: NetworkImage(user.avatarUrl!),
                       fit: BoxFit.cover,
                     )
                   : null,
             ),
-            child: user.avatarUrl == null
+            child: (user.avatarUrl == null || user.avatarUrl!.isEmpty || user.avatarUrl == 'null')
                 ? Center(
                     child: Text(
                       _initials,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 22,
+                        fontSize: 24,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
                   )
-                : null,
+                : (user.avatarUrl!.toLowerCase().contains('.svg')
+                    ? ClipOval(
+                        child: SvgPicture.network(
+                          user.avatarUrl!,
+                          fit: BoxFit.cover,
+                          width: 64,
+                          height: 64,
+                        ),
+                      )
+                    : null),
           ),
           const SizedBox(width: 16),
           // Info
@@ -553,10 +375,10 @@ class _UserProfileCard extends StatelessWidget {
                 Text(
                   user.name,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    fontFamily: 'HindSiliguri',
+                    color: isDark ? Colors.white : const Color(0xFF000000),
+                    fontFamily: 'Anek Bangla',
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -565,7 +387,7 @@ class _UserProfileCard extends StatelessWidget {
                   Text(
                     user.email!,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 15,
                       color: isDark
                           ? const Color(0xFFA3A3A3)
                           : const Color(0xFF737373),
@@ -606,16 +428,16 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+        color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 11,
+          fontSize: 14,
           fontWeight: FontWeight.bold,
           color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
-          fontFamily: 'HindSiliguri',
+          fontFamily: 'Anek Bangla',
         ),
       ),
     );

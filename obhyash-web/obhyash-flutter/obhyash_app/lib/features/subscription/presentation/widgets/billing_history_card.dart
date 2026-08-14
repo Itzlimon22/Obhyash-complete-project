@@ -71,7 +71,7 @@ class BillingHistoryCard extends StatelessWidget {
         label.toUpperCase(),
         style: TextStyle(
           color: textColor,
-          fontSize: 10,
+          fontSize: 13,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -85,11 +85,11 @@ class BillingHistoryCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isDark
-            ? const Color(0xFF0F172A)
+            ? const Color(0xFF000000)
             : Colors.white, // neutral-900 : white
         borderRadius: BorderRadius.circular(16), // rounded-2xl
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
         ), // neutral-800 : neutral-100
         boxShadow: const [
           BoxShadow(
@@ -109,7 +109,7 @@ class BillingHistoryCard extends StatelessWidget {
               border: Border(
                 bottom: BorderSide(
                   color: isDark
-                      ? const Color(0xFF262626)
+                      ? const Color(0xFF1C1C1E)
                       : const Color(0xFFF5F5F5),
                 ),
               ),
@@ -127,11 +127,11 @@ class BillingHistoryCard extends StatelessWidget {
                 Text(
                   'বিলিং ইতিহাস',
                   style: TextStyle(
-                    fontSize: 16, // text-base
+                    fontSize: 18, // text-base
                     fontWeight: FontWeight.bold,
                     color: isDark
                         ? Colors.white
-                        : const Color(0xFF262626), // white : neutral-800
+                        : const Color(0xFF1C1C1E), // white : neutral-800
                   ),
                 ),
               ],
@@ -154,7 +154,7 @@ class BillingHistoryCard extends StatelessWidget {
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFFAFAFA), // neutral-800 : neutral-50
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -173,12 +173,12 @@ class BillingHistoryCard extends StatelessWidget {
                   Text(
                     'কোনো বিল নেই',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: isDark
                           ? const Color(0xFFD4D4D4)
                           : const Color(
-                              0xFF404040,
+                              0xFF27272A,
                             ), // neutral-300 : neutral-700
                     ),
                   ),
@@ -187,7 +187,7 @@ class BillingHistoryCard extends StatelessWidget {
                     'তোমার পেমেন্ট ইতিহাস এখানে দেখা যাবে।',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 15,
                       color: isDark
                           ? const Color(0xFFA3A3A3)
                           : const Color(
@@ -207,7 +207,7 @@ class BillingHistoryCard extends StatelessWidget {
                 height: 1,
                 thickness: 1,
                 color: isDark
-                    ? const Color(0xFF262626)
+                    ? const Color(0xFF1C1C1E)
                     : const Color(0xFFF5F5F5), // neutral-800 : neutral-100
               ),
               itemBuilder: (context, index) {
@@ -228,12 +228,12 @@ class BillingHistoryCard extends StatelessWidget {
                                   child: Text(
                                     inv.planName,
                                     style: TextStyle(
-                                      fontSize: 14, // text-sm
+                                      fontSize: 16, // text-sm
                                       fontWeight: FontWeight.bold,
                                       color: isDark
                                           ? Colors.white
                                           : const Color(
-                                              0xFF0F172A,
+                                              0xFF000000,
                                             ), // white : neutral-900
                                     ),
                                     maxLines: 1,
@@ -248,7 +248,7 @@ class BillingHistoryCard extends StatelessWidget {
                             Text(
                               inv.date,
                               style: TextStyle(
-                                fontSize: 12, // text-xs
+                                fontSize: 15, // text-xs
                                 color: isDark
                                     ? const Color(0xFFA3A3A3)
                                     : const Color(
@@ -266,12 +266,12 @@ class BillingHistoryCard extends StatelessWidget {
                           Text(
                             '${inv.currency}${inv.amount}',
                             style: TextStyle(
-                              fontSize: 14, // text-sm
+                              fontSize: 16, // text-sm
                               fontWeight: FontWeight.bold,
                               color: isDark
                                   ? Colors.white
                                   : const Color(
-                                      0xFF0F172A,
+                                      0xFF000000,
                                     ), // white : neutral-900
                             ),
                           ),

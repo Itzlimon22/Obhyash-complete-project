@@ -36,21 +36,36 @@ class _ExamRecord {
   });
 
   factory _ExamRecord.fromJson(Map<String, dynamic> j) {
-    final total = (j['total_questions'] as num?)?.toInt() ?? 0;
-    final correct = (j['correct_count'] as num?)?.toInt() ?? 0;
-    final wrong = (j['wrong_count'] as num?)?.toInt() ?? 0;
+    int toInt(dynamic v) {
+      if (v == null) return 0;
+      if (v is num) return v.toInt();
+      if (v is String) return int.tryParse(v) ?? 0;
+      return 0;
+    }
+
+    final total = toInt(j['total_questions']);
+    final correct = toInt(j['correct_count']);
+    final wrong = toInt(j['wrong_count']);
     final score = total > 0 ? (correct / total * 100) : 0.0;
+
+    // date and created_at can be null, try parsing
+    final dateStr = j['date']?.toString() ?? j['created_at']?.toString() ?? '';
+    final createdAt = DateTime.tryParse(dateStr) ?? DateTime.now();
+
     return _ExamRecord(
-      id: j['id'] ?? '',
-      subject: j['subject'] ?? 'general',
-      subjectLabel: j['subject_label'] ?? j['subject'] ?? 'পরীক্ষা',
+      id: j['id']?.toString() ?? '',
+      subject: j['subject']?.toString() ?? 'general',
+      subjectLabel:
+          j['subject_label']?.toString() ??
+          j['subject']?.toString() ??
+          'পরীক্ষা',
       correctCount: correct,
       wrongCount: wrong,
       totalQuestions: total,
-      timeTaken: (j['time_taken'] as num?)?.toInt(),
+      timeTaken: j['time_taken'] != null ? toInt(j['time_taken']) : null,
       score: score,
-      createdAt: DateTime.tryParse(j['created_at'] ?? '') ?? DateTime.now(),
-      examType: j['exam_type'] ?? 'mock',
+      createdAt: createdAt,
+      examType: j['exam_type']?.toString() ?? 'mock',
     );
   }
 }
@@ -79,7 +94,7 @@ String _formatDur(int secs) {
 
 Color _scoreColor(double s) {
   if (s >= 70) return const Color(0xFF059669);
-  if (s >= 40) return const Color(0xFFF59E0B);
+  if (s >= 40) return const Color(0xFF1E3A8A);
   return const Color(0xFFEF4444);
 }
 
@@ -118,7 +133,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 3, vsync: this);
+    _tab = TabController(length: 2, vsync: this);
     _fetch();
   }
 
@@ -135,7 +150,8 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     });
     try {
       final sb = Supabase.instance.client;
-      final uid = sb.auth.currentUser?.id;
+      final authResponse = await sb.auth.getSession();
+      final uid = sb.auth.currentUser?.id ?? authResponse?.user.id;
       if (uid == null) {
         setState(() => _isLoading = false);
         return;
@@ -144,10 +160,10 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       final data = await sb
           .from('exam_results')
           .select(
-            'id, subject, correct_count, wrong_count, total_questions, time_taken, created_at, exam_type',
+            'id, subject, subject_label, correct_count, wrong_count, total_questions, time_taken, created_at, date, exam_type',
           )
           .eq('user_id', uid)
-          .order('created_at', ascending: false)
+          .order('date', ascending: false)
           .limit(200);
 
       if (mounted) {
@@ -274,7 +290,6 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
   @override
   Widget build(BuildContext context) {
-    // Re-fetch if auth becomes available after cold-start session restoration
     ref.listen(authProvider, (prev, next) {
       if (next != null && prev == null) _fetch();
     });
@@ -283,34 +298,42 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
     return Column(
       children: [
-        // ── Tab Bar ─────────────────────────────────────────────────────────
+        // ── Custom Premium Tab Bar ──────────────────────────────────────────
         Container(
-          margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          margin: const EdgeInsets.fromLTRB(16, 16, 16, 12),
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
-            borderRadius: BorderRadius.circular(12),
+            color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF3F4F6),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? const Color(0xFF2E2E2E) : const Color(0xFFE5E7EB),
+            ),
           ),
           child: TabBar(
             controller: _tab,
             indicator: BoxDecoration(
-              color: isDark ? const Color(0xFF404040) : Colors.white,
-              borderRadius: BorderRadius.circular(8),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF047857), Color(0xFF10B981)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
               boxShadow: [
-                if (!isDark)
-                  const BoxShadow(
-                    color: Color(0x10000000),
-                    blurRadius: 4,
-                    offset: Offset(0, 1),
-                  ),
+                BoxShadow(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
               ],
             ),
             indicatorSize: TabBarIndicatorSize.tab,
-            labelColor: isDark ? const Color(0xFF34D399) : const Color(0xFF047857), // emerald-400 : emerald-700
-            unselectedLabelColor: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+            labelColor: Colors.white,
+            unselectedLabelColor: isDark
+                ? const Color(0xFFA3A3A3)
+                : const Color(0xFF6B7280),
             labelStyle: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 13,
+              fontSize: 16,
               fontFamily: 'HindSiliguri',
             ),
             dividerColor: Colors.transparent,
@@ -319,7 +342,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(LucideIcons.clipboardList, size: 16),
+                    Icon(LucideIcons.barChart2, size: 16),
                     SizedBox(width: 6),
                     Text('পরীক্ষা'),
                   ],
@@ -329,19 +352,9 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(LucideIcons.alertCircle, size: 16),
+                    Icon(LucideIcons.alertTriangle, size: 16),
                     SizedBox(width: 6),
                     Text('ভুলসমূহ'),
-                  ],
-                ),
-              ),
-              Tab(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(LucideIcons.bookmark, size: 16),
-                    SizedBox(width: 6),
-                    Text('বুকমার্ক'),
                   ],
                 ),
               ),
@@ -351,36 +364,44 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
         // ── Filters ─────────────────────────────────────────────────────────
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: Column(
             children: [
               // Search Bar
               Container(
-                height: 42,
-                margin: const EdgeInsets.only(bottom: 8),
+                height: 44,
+                margin: const EdgeInsets.only(bottom: 10),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+                    color: isDark
+                        ? const Color(0xFF2E2E2E)
+                        : const Color(0xFFE5E7EB),
                   ),
                 ),
                 child: TextField(
                   onChanged: (v) => setState(() => _searchText = v),
                   style: TextStyle(
-                    fontSize: 13,
-                    color: isDark ? Colors.white : const Color(0xFF171717),
+                    fontSize: 16,
+                    color: isDark ? Colors.white : const Color(0xFF111827),
+                    fontFamily: 'HindSiliguri',
                   ),
                   decoration: InputDecoration(
                     hintText: 'খুঁজুন...',
                     hintStyle: TextStyle(
-                      fontSize: 13,
-                      color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFFA3A3A3),
+                      fontSize: 16,
+                      color: isDark
+                          ? const Color(0xFFA3A3A3)
+                          : const Color(0xFF9CA3AF),
+                      fontFamily: 'HindSiliguri',
                     ),
                     prefixIcon: Icon(
                       LucideIcons.search,
-                      size: 16,
-                      color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFFA3A3A3),
+                      size: 18,
+                      color: isDark
+                          ? const Color(0xFFA3A3A3)
+                          : const Color(0xFF9CA3AF),
                     ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(vertical: 12),
@@ -390,21 +411,25 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
               // Subject & Date Row
               Row(
                 children: [
-                  // Subject filter
                   Expanded(
                     child: AppDropdown<String>(
                       value: _filterSubject.isEmpty ? '' : _filterSubject,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 11,
+                      ),
                       options: [
                         const AppDropdownOption(value: '', label: 'সকল বিষয়'),
                         ..._uniqueSubjects.map(
-                          (s) => AppDropdownOption(value: s.key, label: s.value),
+                          (s) =>
+                              AppDropdownOption(value: s.key, label: s.value),
                         ),
                       ],
-                      onChanged: (v) => setState(() => _filterSubject = v ?? ''),
+                      onChanged: (v) =>
+                          setState(() => _filterSubject = v ?? ''),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   // Date filter chip
                   GestureDetector(
                     onTap: () async {
@@ -417,17 +442,21 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                       setState(() => _filterDate = picked);
                     },
                     child: Container(
-                      height: 42,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      height: 44,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
                       decoration: BoxDecoration(
                         color: _filterDate != null
-                            ? (isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5))
-                            : (isDark ? const Color(0xFF1C1C1C) : Colors.white),
-                        borderRadius: BorderRadius.circular(12),
+                            ? (isDark
+                                  ? const Color(0xFF064E3B)
+                                  : const Color(0xFFECFDF5))
+                            : (isDark ? const Color(0xFF1E1E1E) : Colors.white),
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: _filterDate != null
                               ? const Color(0xFF10B981) // emerald-500
-                              : (isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
+                              : (isDark
+                                    ? const Color(0xFF2E2E2E)
+                                    : const Color(0xFFE5E7EB)),
                         ),
                       ),
                       child: Row(
@@ -435,23 +464,31 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                         children: [
                           Icon(
                             LucideIcons.calendar,
-                            size: 16,
+                            size: 18,
                             color: _filterDate != null
-                                ? (isDark ? const Color(0xFF34D399) : const Color(0xFF047857))
-                                : const Color(0xFFA3A3A3),
+                                ? (isDark
+                                      ? const Color(0xFF34D399)
+                                      : const Color(0xFF047857))
+                                : (isDark
+                                      ? const Color(0xFFA3A3A3)
+                                      : const Color(0xFF9CA3AF)),
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 8),
                           Text(
                             _filterDate != null
                                 ? DateFormat('d/M').format(_filterDate!)
                                 : 'তারিখ',
                             style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                               fontFamily: 'HindSiliguri',
                               color: _filterDate != null
-                                  ? (isDark ? const Color(0xFF34D399) : const Color(0xFF047857))
-                                  : const Color(0xFFA3A3A3),
+                                  ? (isDark
+                                        ? const Color(0xFF34D399)
+                                        : const Color(0xFF047857))
+                                  : (isDark
+                                        ? const Color(0xFFA3A3A3)
+                                        : const Color(0xFF9CA3AF)),
                             ),
                           ),
                           if (_filterDate != null) ...[
@@ -460,8 +497,10 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                               onTap: () => setState(() => _filterDate = null),
                               child: Icon(
                                 LucideIcons.x,
-                                size: 14,
-                                color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
+                                size: 16,
+                                color: isDark
+                                    ? const Color(0xFF34D399)
+                                    : const Color(0xFF047857),
                               ),
                             ),
                           ],
@@ -475,10 +514,14 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           ),
         ),
 
+        const SizedBox(height: 8),
+
         // ── Content ─────────────────────────────────────────────────────────
         Expanded(
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(
+                  child: CircularProgressIndicator(color: Color(0xFF10B981)),
+                )
               : _hasError
               ? _errorState(isDark, _fetch)
               : TabBarView(
@@ -494,7 +537,6 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                       onRefresh: _fetch,
                     ),
                     _MistakesTab(isDark: isDark),
-                    _BookmarksTab(isDark: isDark),
                   ],
                 ),
         ),
@@ -528,15 +570,16 @@ class _ExamsTab extends StatelessWidget {
     if (records.isEmpty) {
       return RefreshIndicator(
         onRefresh: onRefresh,
-        color: const Color(0xFF047857),
+        color: const Color(0xFF10B981),
         child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           children: [
             SizedBox(
-              height: 400,
+              height: MediaQuery.of(context).size.height * 0.5,
               child: _emptyState(
                 isDark,
-                'কোনো ফলাফল পাওয়া যায়নি',
-                'একটি মক পরীক্ষা দাও এবং ফলাফল এখানে দেখো।',
+                'কোনো পরীক্ষা দেওয়া হয়নি',
+                'একটি পরীক্ষা দাও এবং তোমার অগ্রগতি এখানে দেখো।',
               ),
             ),
           ],
@@ -547,23 +590,22 @@ class _ExamsTab extends StatelessWidget {
     int totalQuestions = 0;
     int totalCorrect = 0;
     int totalWrong = 0;
-    int totalTime = 0;
 
     for (final r in records) {
       totalQuestions += r.totalQuestions;
       totalCorrect += r.correctCount;
       totalWrong += r.wrongCount;
-      totalTime += r.timeTaken ?? 0;
     }
 
-    final avgScore = records.isEmpty ? 0.0 : records.map((r) => r.score).reduce((a, b) => a + b) / records.length;
-    final avgTime = records.isEmpty ? 0 : (totalTime / records.length).round();
-    final totalTimeMins = totalTime > 0 ? (totalTime / 60).round() : 0;
+    final avgScore = records.isEmpty
+        ? 0.0
+        : records.map((r) => r.score).reduce((a, b) => a + b) / records.length;
 
     return RefreshIndicator(
       onRefresh: onRefresh,
-      color: const Color(0xFF047857),
+      color: const Color(0xFF10B981),
       child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
           // Sort & Clear Header
@@ -572,11 +614,23 @@ class _ExamsTab extends StatelessWidget {
             children: [
               AppDropdown<_SortMode>(
                 value: sortBy,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 options: const [
-                  AppDropdownOption(value: _SortMode.date, label: 'তারিখ অনুযায়ী'),
-                  AppDropdownOption(value: _SortMode.scoreDesc, label: 'স্কোর: বেশি আগে'),
-                  AppDropdownOption(value: _SortMode.scoreAsc, label: 'স্কোর: কম আগে'),
+                  AppDropdownOption(
+                    value: _SortMode.date,
+                    label: 'তারিখ অনুযায়ী',
+                  ),
+                  AppDropdownOption(
+                    value: _SortMode.scoreDesc,
+                    label: 'স্কোর: বেশি আগে',
+                  ),
+                  AppDropdownOption(
+                    value: _SortMode.scoreAsc,
+                    label: 'স্কোর: কম আগে',
+                  ),
                 ],
                 onChanged: (v) {
                   if (v != null) onSortChange(v);
@@ -589,152 +643,173 @@ class _ExamsTab extends StatelessWidget {
                       ? const SizedBox(
                           width: 14,
                           height: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Color(0xFFEF4444),
+                          ),
                         )
-                      : const Icon(LucideIcons.trash2, size: 14, color: Colors.red),
+                      : const Icon(
+                          LucideIcons.trash2,
+                          size: 14,
+                          color: Color(0xFFEF4444),
+                        ),
                   label: const Text(
-                    'ইতিহাস মুছুন',
-                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12, fontFamily: 'HindSiliguri'),
+                    'মুছুন',
+                    style: TextStyle(
+                      color: Color(0xFFEF4444),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      fontFamily: 'HindSiliguri',
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    backgroundColor: const Color(
+                      0xFFEF4444,
+                    ).withValues(alpha: 0.1),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
             ],
           ),
           const SizedBox(height: 16),
 
-          // ── Stats Row 1 ──
-          Row(
+          // ── Stats Grid (Premium Glassmorphic) ──
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            childAspectRatio: 1.65,
             children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF047857), // emerald-700
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [const BoxShadow(color: Color(0x33047857), blurRadius: 8, offset: Offset(0, 4))],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('মোট প্রশ্ন', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white70, fontFamily: 'HindSiliguri')),
-                      const SizedBox(height: 4),
-                      Text('$totalQuestions', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white, height: 1)),
-                    ],
-                  ),
-                ),
+              _buildStatCard(
+                title: 'মোট প্রশ্ন',
+                value: '$totalQuestions',
+                icon: LucideIcons.layers,
+                gradient: const [Color(0xFF047857), Color(0xFF10B981)],
+                textColor: Colors.white,
+                isDark: isDark,
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('সঠিক', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF059669), fontFamily: 'HindSiliguri')),
-                      const SizedBox(height: 4),
-                      Text('$totalCorrect', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF059669), height: 1)),
-                    ],
-                  ),
-                ),
+              _buildStatCard(
+                title: 'সঠিক',
+                value: '$totalCorrect',
+                icon: LucideIcons.checkCircle2,
+                gradient: isDark
+                    ? const [Color(0xFF064E3B), Color(0xFF065F46)]
+                    : const [Color(0xFFECFDF5), Color(0xFFD1FAE5)],
+                textColor: isDark
+                    ? const Color(0xFF34D399)
+                    : const Color(0xFF059669),
+                isDark: isDark,
+              ),
+              _buildStatCard(
+                title: 'ভুল',
+                value: '$totalWrong',
+                icon: LucideIcons.xCircle,
+                gradient: isDark
+                    ? const [Color(0xFF450A0A), Color(0xFF7F1D1D)]
+                    : const [Color(0xFFFEF2F2), Color(0xFFFEE2E2)],
+                textColor: isDark
+                    ? const Color(0xFFF87171)
+                    : const Color(0xFFDC2626),
+                isDark: isDark,
+              ),
+              _buildStatCard(
+                title: 'গড় নম্বর',
+                value: '${avgScore.round()}%',
+                icon: LucideIcons.target,
+                gradient: isDark
+                    ? const [Color(0xFF1C1C1E), Color(0xFF333333)]
+                    : const [Color(0xFFF3F4F6), Color(0xFFE5E7EB)],
+                textColor: isDark ? Colors.white : const Color(0xFF111827),
+                isDark: isDark,
               ),
             ],
           ),
-          const SizedBox(height: 8),
-
-          // ── Stats Row 2 ──
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('ভুল', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFDC2626), fontFamily: 'HindSiliguri')),
-                      const SizedBox(height: 4),
-                      Text('$totalWrong', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFFDC2626), height: 1)),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('গড় নম্বর', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFA3A3A3), fontFamily: 'HindSiliguri')),
-                      const SizedBox(height: 4),
-                      Text('${avgScore.round()}%', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: isDark ? Colors.white : const Color(0xFF171717), height: 1)),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+          const SizedBox(height: 24),
+          Text(
+            'সাম্প্রতিক পরীক্ষাসমূহ',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'HindSiliguri',
+              color: isDark ? Colors.white : const Color(0xFF111827),
+            ),
           ),
-          const SizedBox(height: 8),
-
-          // ── Stats Row 3 ──
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('মোট সময় (মিনিট)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFA3A3A3), fontFamily: 'HindSiliguri')),
-                      const SizedBox(height: 4),
-                      Text('$totalTimeMins', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: isDark ? Colors.white : const Color(0xFF171717), height: 1)),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('গড় সময় (সেকেন্ড)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFA3A3A3), fontFamily: 'HindSiliguri')),
-                      const SizedBox(height: 4),
-                      Text('$avgTime', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF2563EB), height: 1)), // blue-600
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-
+          const SizedBox(height: 12),
           // Exam cards
           ...records.map((r) => _ExamCard(record: r, isDark: isDark)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    required List<Color> gradient,
+    required Color textColor,
+    required bool isDark,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: gradient,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: gradient.last.withValues(alpha: 0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+        ],
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.05)
+              : Colors.transparent,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 14, color: textColor.withValues(alpha: 0.8)),
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: textColor.withValues(alpha: 0.9),
+                  fontFamily: 'HindSiliguri',
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w900,
+              color: textColor,
+              height: 1,
+            ),
+          ),
         ],
       ),
     );
@@ -750,52 +825,77 @@ class _ExamCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _scoreColor(record.score);
-    final dateStr = DateFormat('d MMM yyyy').format(record.createdAt);
+    final dateStr = DateFormat('d MMM yyyy, h:mm a').format(record.createdAt);
     final label = record.subjectLabel.isNotEmpty
         ? record.subjectLabel
         : _subjectDisplay(record.subject);
-    final timeStr = record.timeTaken != null ? _formatDur(record.timeTaken!) : '--';
+    final timeStr = record.timeTaken != null
+        ? _formatDur(record.timeTaken!)
+        : '--';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: isDark
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : [
+                BoxShadow(
+                  color: const Color(0xFF000000).withValues(alpha: 0.04),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF2E2E2E) : const Color(0xFFF3F4F6),
         ),
       ),
       child: Row(
         children: [
-          // Score circle
+          // Score Ring (Premium look)
           SizedBox(
-            width: 36,
-            height: 36,
+            width: 52,
+            height: 52,
             child: Stack(
               fit: StackFit.expand,
               children: [
                 CircularProgressIndicator(
+                  value: 1.0,
+                  strokeWidth: 4.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isDark ? const Color(0xFF2E2E2E) : const Color(0xFFF3F4F6),
+                  ),
+                ),
+                CircularProgressIndicator(
                   value: record.score / 100,
-                  strokeWidth: 3,
-                  backgroundColor: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+                  strokeWidth: 4.5,
+                  strokeCap: StrokeCap.round,
+                  backgroundColor: Colors.transparent,
                   valueColor: AlwaysStoppedAnimation<Color>(color),
                 ),
                 Center(
                   child: Text(
                     '${record.score.round()}%',
                     style: TextStyle(
-                      fontSize: 9,
+                      fontSize: 15,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'HindSiliguri',
-                      color: isDark ? Colors.white : const Color(0xFF171717),
+                      color: isDark ? Colors.white : const Color(0xFF111827),
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           // Middle details
           Expanded(
             child: Column(
@@ -805,47 +905,102 @@ class _ExamCard extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 15,
+                    fontSize: 18,
                     fontFamily: 'HindSiliguri',
-                    color: isDark ? Colors.white : const Color(0xFF171717),
+                    color: isDark ? Colors.white : const Color(0xFF111827),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  dateStr,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'HindSiliguri',
-                    color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
-                  ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Icon(
+                      LucideIcons.calendar,
+                      size: 12,
+                      color: isDark
+                          ? const Color(0xFFA3A3A3)
+                          : const Color(0xFF6B7280),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      dateStr,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'HindSiliguri',
+                        color: isDark
+                            ? const Color(0xFFA3A3A3)
+                            : const Color(0xFF6B7280),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  '${record.score.toStringAsFixed(1)} / ${record.totalQuestions}  ·  $timeStr',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'HindSiliguri',
-                    color: isDark ? const Color(0xFF737373) : const Color(0xFFA3A3A3),
-                  ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF2E2E2E)
+                            : const Color(0xFFF3F4F6),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${record.correctCount} সঠিক, ${record.wrongCount} ভুল',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'HindSiliguri',
+                          color: isDark
+                              ? const Color(0xFFD4D4D4)
+                              : const Color(0xFF4B5563),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF2E2E2E)
+                            : const Color(0xFFF3F4F6),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            LucideIcons.timer,
+                            size: 11,
+                            color: isDark
+                                ? const Color(0xFFD4D4D4)
+                                : const Color(0xFF4B5563),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            timeStr,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'HindSiliguri',
+                              color: isDark
+                                  ? const Color(0xFFD4D4D4)
+                                  : const Color(0xFF4B5563),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          // Chevron button
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              LucideIcons.chevronRight,
-              size: 16,
-              color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
             ),
           ),
         ],
@@ -853,7 +1008,6 @@ class _ExamCard extends StatelessWidget {
     );
   }
 }
-
 // ─── Mistakes Tab ──────────────────────────────────────────────────────────────
 
 class _HistoryMistake {
@@ -904,7 +1058,6 @@ class _MistakesTabState extends State<_MistakesTab> {
         return;
       }
 
-      // Derive mistakes from exam_results JSONB — same approach as practice_dashboard.dart
       final data = await sb
           .from('exam_results')
           .select('questions, user_answers')
@@ -985,20 +1138,24 @@ class _MistakesTabState extends State<_MistakesTab> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_isLoading)
+      return const Center(
+        child: CircularProgressIndicator(color: Color(0xFF10B981)),
+      );
     if (_hasError) return _errorState(widget.isDark, _fetch);
     if (_mistakes.isEmpty) {
       return _emptyState(
         widget.isDark,
         'কোনো ভুল নেই! 🎉',
-        'পরীক্ষা দাও এবং ভুল উত্তরগুলো এখানে দেখো।',
+        'দারুণ! তোমার পরীক্ষায় কোনো ভুল উত্তর পাওয়া যায়নি।',
       );
     }
     return RefreshIndicator(
       onRefresh: () async => _fetch(),
-      color: const Color(0xFF047857),
+      color: const Color(0xFF10B981),
       child: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         itemCount: _mistakes.length,
         itemBuilder: (ctx, i) =>
             _MistakeCard(m: _mistakes[i], isDark: widget.isDark),
@@ -1016,21 +1173,27 @@ class _MistakeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF171717) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF2E2E2E) : const Color(0xFFE5E7EB),
         ),
         boxShadow: isDark
-            ? []
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.15),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ]
             : [
-                const BoxShadow(
-                  color: Color(0x06000000),
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
+                BoxShadow(
+                  color: const Color(0xFF000000).withValues(alpha: 0.04),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
                 ),
               ],
       ),
@@ -1043,30 +1206,31 @@ class _MistakeCard extends StatelessWidget {
               if (m.subjectLabel.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
+                    horizontal: 10,
+                    vertical: 4,
                   ),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF262626)
-                        : const Color(0xFFF5F5F5),
+                        ? const Color(0xFF2E2E2E)
+                        : const Color(0xFFF3F4F6),
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Text(
                     m.subjectLabel.toUpperCase(),
                     style: const TextStyle(
-                      fontSize: 9,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'HindSiliguri',
                       color: Color(0xFFA3A3A3),
                     ),
                   ),
                 ),
               if (m.frequency > 1) ...[
-                const SizedBox(width: 6),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
+                    horizontal: 8,
+                    vertical: 4,
                   ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF450A0A).withValues(alpha: 0.5),
@@ -1075,30 +1239,43 @@ class _MistakeCard extends StatelessWidget {
                       color: const Color(0xFF7F1D1D).withValues(alpha: 0.5),
                     ),
                   ),
-                  child: Text(
-                    '${m.frequency}× ভুল',
-                    style: const TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFF87171),
-                    ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        LucideIcons.alertCircle,
+                        size: 10,
+                        color: Color(0xFFF87171),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${m.frequency}× ভুল',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'HindSiliguri',
+                          color: Color(0xFFF87171),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           // Question text
           Text(
             m.questionText,
             style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : const Color(0xFF171717),
+              fontSize: 18,
+              height: 1.4,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'HindSiliguri',
+              color: isDark ? Colors.white : const Color(0xFF111827),
             ),
           ),
           if (m.options.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             // Options
             ...m.options.asMap().entries.map((e) {
               final idx = e.key;
@@ -1111,20 +1288,20 @@ class _MistakeCard extends StatelessWidget {
               Color? border;
               Color textColor = isDark
                   ? const Color(0xFFD4D4D4)
-                  : const Color(0xFF404040);
+                  : const Color(0xFF4B5563);
 
               if (isCorrect) {
-                bg = const Color(
-                  0xFF064E3B,
-                ).withValues(alpha: isDark ? 0.3 : 0.08);
-                border = const Color(0xFF059669).withValues(alpha: 0.5);
+                bg = isDark
+                    ? const Color(0xFF064E3B).withValues(alpha: 0.4)
+                    : const Color(0xFFECFDF5);
+                border = const Color(0xFF10B981).withValues(alpha: 0.5);
                 textColor = isDark
                     ? const Color(0xFF34D399)
-                    : const Color(0xFF047857);
+                    : const Color(0xFF059669);
               } else if (isUserWrong) {
-                bg = const Color(
-                  0xFF7F1D1D,
-                ).withValues(alpha: isDark ? 0.3 : 0.08);
+                bg = isDark
+                    ? const Color(0xFF7F1D1D).withValues(alpha: 0.4)
+                    : const Color(0xFFFEF2F2);
                 border = const Color(0xFFEF4444).withValues(alpha: 0.5);
                 textColor = isDark
                     ? const Color(0xFFF87171)
@@ -1132,60 +1309,83 @@ class _MistakeCard extends StatelessWidget {
               }
 
               return Container(
-                margin: const EdgeInsets.only(bottom: 6),
+                margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+                  horizontal: 14,
+                  vertical: 12,
                 ),
                 decoration: BoxDecoration(
                   color:
                       bg ??
                       (isDark
-                          ? const Color(0xFF262626).withValues(alpha: 0.3)
-                          : const Color(0xFFFAFAFA)),
-                  borderRadius: BorderRadius.circular(8),
+                          ? const Color(0xFF2E2E2E).withValues(alpha: 0.5)
+                          : const Color(0xFFF9FAFB)),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color:
                         border ??
                         (isDark
-                            ? const Color(0xFF404040)
-                            : const Color(0xFFE5E5E5)),
+                            ? const Color(0xFF27272A)
+                            : const Color(0xFFE5E7EB)),
                   ),
                 ),
                 child: Row(
                   children: [
-                    Text(
-                      '${['ক', 'খ', 'গ', 'ঘ'][idx < 4 ? idx : 0]}. ',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: textColor,
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: (isCorrect || isUserWrong)
+                            ? (isDark ? bg : bg)
+                            : (isDark
+                                  ? const Color(0xFF27272A)
+                                  : const Color(0xFFE5E7EB)),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color:
+                              border ??
+                              (isDark
+                                  ? const Color(0xFF525252)
+                                  : const Color(0xFFD1D5DB)),
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        ['ক', 'খ', 'গ', 'ঘ'][idx < 4 ? idx : 0],
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                          fontFamily: 'HindSiliguri',
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         opt,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 16,
                           fontWeight: isCorrect || isUserWrong
                               ? FontWeight.bold
                               : FontWeight.normal,
+                          fontFamily: 'HindSiliguri',
                           color: textColor,
                         ),
                       ),
                     ),
                     if (isCorrect)
                       Icon(
-                        Icons.check_circle_outline_rounded,
-                        size: 14,
+                        LucideIcons.checkCircle2,
+                        size: 18,
                         color: isDark
                             ? const Color(0xFF34D399)
-                            : const Color(0xFF047857),
+                            : const Color(0xFF059669),
                       ),
                     if (isUserWrong)
                       Icon(
-                        Icons.cancel_outlined,
-                        size: 14,
+                        LucideIcons.xCircle,
+                        size: 18,
                         color: isDark
                             ? const Color(0xFFF87171)
                             : const Color(0xFFDC2626),
@@ -1200,238 +1400,6 @@ class _MistakeCard extends StatelessWidget {
     );
   }
 }
-
-// ─── Bookmarks Tab ─────────────────────────────────────────────────────────────
-class _BookmarksTab extends StatefulWidget {
-  final bool isDark;
-  const _BookmarksTab({required this.isDark});
-
-  @override
-  State<_BookmarksTab> createState() => _BookmarksTabState();
-}
-
-class _BookmarksTabState extends State<_BookmarksTab> {
-  List<Map<String, dynamic>> _bookmarks = [];
-  bool _isLoading = true;
-  bool _hasError = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchBookmarks();
-  }
-
-  Future<void> _fetchBookmarks() async {
-    try {
-      final sb = Supabase.instance.client;
-      final uid = sb.auth.currentUser?.id;
-      if (uid == null) {
-        setState(() => _isLoading = false);
-        return;
-      }
-
-      final data = await sb
-          .from('bookmarks')
-          .select(
-            'question_id, questions(id, question, options, correct_answer_index, subject, subject_label)',
-          )
-          .eq('user_id', uid)
-          .order('created_at', ascending: false)
-          .limit(100);
-
-      setState(() {
-        _bookmarks = (data as List).cast<Map<String, dynamic>>();
-        _isLoading = false;
-      });
-    } catch (e) {
-      debugPrint('[BookmarksTab] _fetchBookmarks error: $e');
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _hasError = true;
-        });
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_isLoading) return const Center(child: CircularProgressIndicator());
-    if (_hasError) return _errorState(widget.isDark, _fetchBookmarks);
-    if (_bookmarks.isEmpty) {
-      return _emptyState(
-        widget.isDark,
-        'কোনো বুকমার্ক নেই',
-        'পরীক্ষার সময় প্রশ্নে বুকমার্ক করো এবং পরে এখানে দেখো।',
-      );
-    }
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _bookmarks.length,
-      itemBuilder: (ctx, i) {
-        final b = _bookmarks[i];
-        final q = b['questions'] as Map<String, dynamic>? ?? {};
-        final options = q['options'] is List
-            ? (q['options'] as List).map((o) => o.toString()).toList()
-            : <String>[];
-        final correctIdx = (q['correct_answer_index'] as num?)?.toInt() ?? 0;
-        final labels = ['ক', 'খ', 'গ', 'ঘ'];
-
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: widget.isDark ? const Color(0xFF171717) : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: widget.isDark
-                  ? const Color(0xFF262626)
-                  : const Color(0xFFE5E5E5),
-            ),
-            boxShadow: widget.isDark
-                ? []
-                : [
-                    const BoxShadow(
-                      color: Color(0x06000000),
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header: bookmark icon + subject
-              Row(
-                children: [
-                  Icon(
-                    LucideIcons.bookmark,
-                    size: 13,
-                    color: const Color(0xFF047857),
-                  ),
-                  const SizedBox(width: 6),
-                  if ((q['subject_label'] as String?)?.isNotEmpty == true ||
-                      (q['subject'] as String?)?.isNotEmpty == true)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: widget.isDark
-                            ? const Color(0xFF262626)
-                            : const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: Text(
-                        ((q['subject_label'] as String?) ??
-                                (q['subject'] as String?) ??
-                                '')
-                            .toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFFA3A3A3),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              // Question text
-              Text(
-                q['question']?.toString() ?? 'প্রশ্ন',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: widget.isDark ? Colors.white : const Color(0xFF171717),
-                ),
-              ),
-              if (options.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                ...options.asMap().entries.map((e) {
-                  final idx = e.key;
-                  final opt = e.value;
-                  final isCorrect = idx == correctIdx;
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 6),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isCorrect
-                          ? const Color(
-                              0xFF064E3B,
-                            ).withValues(alpha: widget.isDark ? 0.3 : 0.08)
-                          : (widget.isDark
-                                ? const Color(0xFF262626).withValues(alpha: 0.3)
-                                : const Color(0xFFFAFAFA)),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isCorrect
-                            ? const Color(0xFF059669).withValues(alpha: 0.5)
-                            : (widget.isDark
-                                  ? const Color(0xFF404040)
-                                  : const Color(0xFFE5E5E5)),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          '${labels[idx < 4 ? idx : 0]}. ',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: isCorrect
-                                ? (widget.isDark
-                                      ? const Color(0xFF34D399)
-                                      : const Color(0xFF047857))
-                                : (widget.isDark
-                                      ? const Color(0xFFD4D4D4)
-                                      : const Color(0xFF404040)),
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            opt,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: isCorrect
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: isCorrect
-                                  ? (widget.isDark
-                                        ? const Color(0xFF34D399)
-                                        : const Color(0xFF047857))
-                                  : (widget.isDark
-                                        ? const Color(0xFFD4D4D4)
-                                        : const Color(0xFF404040)),
-                            ),
-                          ),
-                        ),
-                        if (isCorrect)
-                          Icon(
-                            Icons.check_circle_outline_rounded,
-                            size: 14,
-                            color: widget.isDark
-                                ? const Color(0xFF34D399)
-                                : const Color(0xFF047857),
-                          ),
-                      ],
-                    ),
-                  );
-                }),
-              ],
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
 // ─── Shared Widgets ────────────────────────────────────────────────────────────
 
 Widget _emptyState(bool isDark, String title, String subtitle) {
@@ -1442,32 +1410,48 @@ Widget _emptyState(bool isDark, String title, String subtitle) {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 72,
-            height: 72,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF34D399), Color(0xFF10B981)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: const Icon(
-              LucideIcons.clipboardList,
-              size: 36,
-              color: Color(0xFFA3A3A3),
+              LucideIcons.flaskConical,
+              size: 40,
+              color: Colors.white,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Text(
             title,
             style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF171717),
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'HindSiliguri',
+              color: isDark ? Colors.white : const Color(0xFF111827),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13, color: Color(0xFFA3A3A3)),
+            style: const TextStyle(
+              fontSize: 16,
+              fontFamily: 'HindSiliguri',
+              color: Color(0xFFA3A3A3),
+            ),
           ),
         ],
       ),
@@ -1483,47 +1467,73 @@ Widget _errorState(bool isDark, VoidCallback onRetry) {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 72,
-            height: 72,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+              gradient: const LinearGradient(
+                colors: [Color(0xFFF87171), Color(0xFFEF4444)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFEF4444).withValues(alpha: 0.3),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: const Icon(
               LucideIcons.wifiOff,
-              size: 36,
-              color: Color(0xFFEF4444),
+              size: 40,
+              color: Colors.white,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Text(
             'ডেটা লোড হয়নি',
             style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF171717),
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'HindSiliguri',
+              color: isDark ? Colors.white : const Color(0xFF111827),
             ),
           ),
           const SizedBox(height: 8),
           const Text(
             'ইন্টারনেট সংযোগ পরীক্ষা করো এবং আবার চেষ্টা করো।',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Color(0xFFA3A3A3)),
+            style: TextStyle(
+              fontSize: 16,
+              fontFamily: 'HindSiliguri',
+              color: Color(0xFFA3A3A3),
+            ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           GestureDetector(
             onTap: onRetry,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFF047857),
-                borderRadius: BorderRadius.circular(10),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF047857), Color(0xFF10B981)],
+                ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
               child: const Text(
                 'আবার চেষ্টা করো',
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  fontFamily: 'HindSiliguri',
                   color: Colors.white,
                 ),
               ),
@@ -1534,5 +1544,3 @@ Widget _errorState(bool isDark, VoidCallback onRetry) {
     ),
   );
 }
-
-

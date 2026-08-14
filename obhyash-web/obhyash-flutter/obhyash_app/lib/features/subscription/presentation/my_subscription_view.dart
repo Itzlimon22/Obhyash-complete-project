@@ -108,46 +108,56 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
     });
 
     final bg = isDark ? const Color(0xFF000000) : const Color(0xFFF5F5F5);
-    final cardBg = isDark ? const Color(0xFF0F172A) : Colors.white;
+    final cardBg = isDark ? const Color(0xFF000000) : Colors.white;
 
     return Scaffold(
       backgroundColor: bg,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF166534),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'আমার সাবস্ক্রিপশন',
-          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
-        ),
-        leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft),
-          onPressed: () => context.canPop() ? context.pop() : context.go('/'),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(LucideIcons.refreshCw, size: 18),
-            onPressed: _loadData,
-            tooltip: 'রিফ্রেশ',
+      body: Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF4F4F5),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: TabBar(
+                controller: _tabController,
+                indicator: BoxDecoration(
+                  color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    if (!isDark)
+                      const BoxShadow(
+                        color: Color(0x1A000000),
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                  ],
+                ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                labelColor: isDark ? Colors.white : const Color(0xFF166534),
+                unselectedLabelColor: isDark
+                    ? const Color(0xFFA3A3A3)
+                    : const Color(0xFF71717A),
+                labelStyle: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+                tabs: const [
+                  Tab(text: 'বর্তমান প্ল্যান'),
+                  Tab(text: 'ইতিহাস'),
+                ],
+              ),
+            ),
           ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.white,
-          indicatorWeight: 3,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white60,
-          labelStyle: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 13,
-          ),
-          tabs: const [
-            Tab(text: 'বর্তমান প্ল্যান'),
-            Tab(text: 'ইতিহাস'),
-          ],
-        ),
-      ),
-      body: _isLoading
+          Expanded(
+            child: _isLoading
           ? const Center(
               child: CircularProgressIndicator(color: Color(0xFF166534)),
             )
@@ -160,7 +170,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                   activePlan: _activePlan,
                   expiresAt: _expiresAt,
                   daysLeft: _daysLeft,
-                  onUpgrade: () => context.go('/profile/subscription'),
+                  onUpgrade: () => context.push('/profile/subscription'),
                 ),
                 _HistoryTab(
                   isDark: isDark,
@@ -170,6 +180,9 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                 ),
               ],
             ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -182,11 +195,12 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F172A) : Colors.white,
+          color: isDark ? const Color(0xFF000000) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: SafeArea(
@@ -216,7 +230,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: isDark
-                        ? const Color(0xFF262626)
+                        ? const Color(0xFF1C1C1E)
                         : const Color(0xFFE5E5E5),
                   ),
                 ),
@@ -234,7 +248,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                           'O',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 28,
+                            fontSize: 30,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
@@ -244,15 +258,15 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                     Text(
                       'অভ্যাস',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 22,
                         fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? Colors.white : const Color(0xFF000000),
                       ),
                     ),
                     Text(
                       'পেমেন্ট রিসিট',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 15,
                         color: isDark
                             ? const Color(0xFFA3A3A3)
                             : const Color(0xFF737373),
@@ -261,7 +275,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                     const SizedBox(height: 20),
                     Divider(
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFE5E5E5),
                     ),
                     const SizedBox(height: 16),
@@ -288,7 +302,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                     const SizedBox(height: 16),
                     Divider(
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFE5E5E5),
                     ),
                     const SizedBox(height: 12),
@@ -298,17 +312,17 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                         Text(
                           'মোট পরিশোধ',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF0F172A),
+                                : const Color(0xFF000000),
                           ),
                         ),
                         Text(
                           '${invoice.currency} ${invoice.amount}.00',
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.w900,
                             color: Color(0xFF166534),
                           ),
@@ -368,17 +382,17 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
         Text(
           label,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 15,
             color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
           ),
         ),
         Text(
           value,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 15,
             fontWeight: FontWeight.bold,
             color:
-                valueColor ?? (isDark ? Colors.white : const Color(0xFF0F172A)),
+                valueColor ?? (isDark ? Colors.white : const Color(0xFF000000)),
           ),
         ),
       ],
@@ -452,7 +466,7 @@ class _OverviewTab extends StatelessWidget {
                             'সক্রিয় সাবস্ক্রিপশন',
                             style: TextStyle(
                               color: Colors.white70,
-                              fontSize: 11,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -463,7 +477,7 @@ class _OverviewTab extends StatelessWidget {
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w900,
-                            fontSize: 22,
+                            fontSize: 24,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -471,7 +485,7 @@ class _OverviewTab extends StatelessWidget {
                           '${activePlan!.currency} ${activePlan!.price} / ${activePlan!.billingCycle}',
                           style: const TextStyle(
                             color: Colors.white70,
-                            fontSize: 13,
+                            fontSize: 15,
                           ),
                         ),
                       ],
@@ -493,7 +507,7 @@ class _OverviewTab extends StatelessWidget {
                                 '$daysLeft',
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 18,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.w900,
                                 ),
                               ),
@@ -501,7 +515,7 @@ class _OverviewTab extends StatelessWidget {
                                 'দিন',
                                 style: TextStyle(
                                   color: Colors.white70,
-                                  fontSize: 10,
+                                  fontSize: 13,
                                 ),
                               ),
                             ],
@@ -527,7 +541,7 @@ class _OverviewTab extends StatelessWidget {
                     expiresAt != null
                         ? 'মেয়াদ শেষ: ${expiresAt!.toLocal().toString().substring(0, 10)}'
                         : 'মেয়াদ অনির্ধারিত',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                    style: const TextStyle(color: Colors.white70, fontSize: 15),
                   ),
                 ],
               ),
@@ -560,7 +574,7 @@ class _OverviewTab extends StatelessWidget {
                               : 'মাত্র $daysLeft দিন বাকি! শীঘ্রই নবায়ন করো।',
                           style: const TextStyle(
                             color: Color(0xFFFCA5A5),
-                            fontSize: 12,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -580,8 +594,8 @@ class _OverviewTab extends StatelessWidget {
             'অন্তর্ভুক্ত সুবিধা',
             style: TextStyle(
               fontWeight: FontWeight.w900,
-              fontSize: 15,
-              color: isDark ? Colors.white : const Color(0xFF0F172A),
+              fontSize: 17,
+              color: isDark ? Colors.white : const Color(0xFF000000),
             ),
           ),
           const SizedBox(height: 10),
@@ -591,7 +605,7 @@ class _OverviewTab extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isDark
-                    ? const Color(0xFF262626)
+                    ? const Color(0xFF1C1C1E)
                     : const Color(0xFFE5E5E5),
               ),
             ),
@@ -609,7 +623,7 @@ class _OverviewTab extends StatelessWidget {
                         : Border(
                             bottom: BorderSide(
                               color: isDark
-                                  ? const Color(0xFF262626)
+                                  ? const Color(0xFF1C1C1E)
                                   : const Color(0xFFE5E5E5),
                             ),
                           ),
@@ -634,10 +648,10 @@ class _OverviewTab extends StatelessWidget {
                         child: Text(
                           e.value,
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 15,
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF0F172A),
+                                : const Color(0xFF000000),
                           ),
                         ),
                       ),
@@ -710,9 +724,9 @@ class _FreePlanCard extends StatelessWidget {
             Text(
               'কোনো সক্রিয় সাবস্ক্রিপশন নেই',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.w900,
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                color: isDark ? Colors.white : const Color(0xFF000000),
               ),
               textAlign: TextAlign.center,
             ),
@@ -720,7 +734,7 @@ class _FreePlanCard extends StatelessWidget {
             Text(
               'প্রিমিয়াম প্ল্যান নাও এবং সীমাহীন পড়াশোনা উপভোগ করো',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 color: isDark
                     ? const Color(0xFFA3A3A3)
                     : const Color(0xFF737373),
@@ -785,7 +799,7 @@ class _HistoryTab extends StatelessWidget {
             Text(
               'কোনো পেমেন্ট ইতিহাস নেই',
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 17,
                 fontWeight: FontWeight.bold,
                 color: isDark
                     ? const Color(0xFF737373)
@@ -812,48 +826,39 @@ class _HistoryTab extends StatelessWidget {
             _SummaryChip(
               label: 'মোট',
               value: '$total',
-              color: isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5),
-              textColor: isDark ? Colors.white : const Color(0xFF0F172A),
+              color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF525252),
+              textColor: isDark ? Colors.white : const Color(0xFF000000), // Unused now but kept for interface
             ),
             const SizedBox(width: 8),
             _SummaryChip(
               label: 'সফল',
               value: '$success',
-              color: const Color(0xFF166534),
-              textColor: Colors.white,
+              color: const Color(0xFF16A34A),
+              textColor: Colors.white, // Unused
             ),
             const SizedBox(width: 8),
             _SummaryChip(
-              label: 'অপেক্ষমান',
+              label: 'অপেক্ষমাণ',
               value: '$pending',
-              color: const Color(0xFFB91C1C),
-              textColor: Colors.white,
+              color: const Color(0xFFDC2626),
+              textColor: Colors.white, // Unused
             ),
           ],
         ),
         const SizedBox(height: 16),
 
         // Invoice list
-        Container(
-          decoration: BoxDecoration(
-            color: cardBg,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
-            ),
-          ),
-          child: Column(
-            children: invoices.asMap().entries.map((e) {
-              final inv = e.value;
-              final isLast = e.key == invoices.length - 1;
-              return _InvoiceRow(
-                invoice: inv,
-                isDark: isDark,
-                isLast: isLast,
-                onTap: () => onShowReceipt(inv),
-              );
-            }).toList(),
-          ),
+        Column(
+          children: invoices.asMap().entries.map((e) {
+            final inv = e.value;
+            final isLast = e.key == invoices.length - 1;
+            return _InvoiceRow(
+              invoice: inv,
+              isDark: isDark,
+              isLast: isLast,
+              onTap: () => onShowReceipt(inv),
+            );
+          }).toList(),
         ),
         const SizedBox(height: 24),
       ],
@@ -876,29 +881,47 @@ class _SummaryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? const Color(0xFF000000) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5);
+    final shadowColor = isDark ? Colors.black.withValues(alpha: 0.2) : const Color(0x0A000000);
+    
+    // Total uses a neutral color, success/pending use their respective colors
+    final accentColor = label == 'মোট' ? (isDark ? Colors.white : const Color(0xFF000000)) : color;
+
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(12),
+          color: cardBg,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: borderColor),
+          boxShadow: [
+            BoxShadow(
+              color: shadowColor,
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           children: [
             Text(
               value,
               style: TextStyle(
-                color: textColor,
+                color: accentColor,
                 fontWeight: FontWeight.w900,
-                fontSize: 18,
+                fontSize: 26,
+                height: 1,
               ),
             ),
+            const SizedBox(height: 6),
             Text(
               label,
               style: TextStyle(
-                color: textColor.withOpacity(0.8),
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
+                color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -926,63 +949,66 @@ class _InvoiceRow extends StatelessWidget {
     final statusColor = _statusColor(invoice.status);
     final statusLabel = _statusLabel(invoice.status);
 
-    return InkWell(
-      onTap: invoice.status == 'paid' ? onTap : null,
-      borderRadius: BorderRadius.circular(isLast ? 0 : 0).copyWith(
-        bottomLeft: isLast ? const Radius.circular(16) : Radius.zero,
-        bottomRight: isLast ? const Radius.circular(16) : Radius.zero,
-      ),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          border: isLast
-              ? null
-              : Border(
-                  bottom: BorderSide(
-                    color: isDark
-                        ? const Color(0xFF262626)
-                        : const Color(0xFFE5E5E5),
-                  ),
-                ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF4F4F5),
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                invoice.status == 'paid'
-                    ? LucideIcons.checkCircle2
-                    : invoice.status == 'pending' ||
-                          invoice.status == 'checking'
-                    ? LucideIcons.clock
-                    : LucideIcons.xCircle,
-                color: statusColor,
-                size: 18,
-              ),
+        boxShadow: [
+          if (!isDark)
+            const BoxShadow(
+              color: Color(0x0A000000),
+              blurRadius: 8,
+              offset: Offset(0, 2),
             ),
-            const SizedBox(width: 12),
-            Expanded(
+        ],
+      ),
+      child: InkWell(
+        onTap: invoice.status == 'paid' ? onTap : null,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  invoice.status == 'paid'
+                      ? LucideIcons.checkCircle2
+                      : invoice.status == 'pending' ||
+                            invoice.status == 'checking'
+                      ? LucideIcons.clock
+                      : LucideIcons.xCircle,
+                  color: statusColor,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     invoice.planName,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      color: isDark ? Colors.white : const Color(0xFF000000),
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     invoice.date,
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 14,
                       color: isDark
                           ? const Color(0xFF737373)
                           : const Color(0xFFA3A3A3),
@@ -998,8 +1024,8 @@ class _InvoiceRow extends StatelessWidget {
                   '${invoice.currency} ${invoice.amount}',
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
-                    fontSize: 14,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    fontSize: 16,
+                    color: isDark ? Colors.white : const Color(0xFF000000),
                   ),
                 ),
                 const SizedBox(height: 3),
@@ -1016,7 +1042,7 @@ class _InvoiceRow extends StatelessWidget {
                     statusLabel,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 10,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1036,8 +1062,9 @@ class _InvoiceRow extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 // ─── Progress Ring Painter ────────────────────────────────────────────────────

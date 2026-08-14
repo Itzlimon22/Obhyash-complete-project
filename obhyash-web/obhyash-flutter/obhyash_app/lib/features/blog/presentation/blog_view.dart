@@ -82,11 +82,11 @@ class _BlogViewState extends State<BlogView> {
         Container(
           height: 44,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF0F172A) : Colors.white,
+            color: isDark ? const Color(0xFF000000) : Colors.white,
             border: Border(
               bottom: BorderSide(
                 color: isDark
-                    ? const Color(0xFF262626)
+                    ? const Color(0xFF1C1C1E)
                     : const Color(0xFFE5E5E5),
               ),
             ),
@@ -99,7 +99,7 @@ class _BlogViewState extends State<BlogView> {
                   LucideIcons.chevronLeft,
                   size: 20,
                   color: _canGoBack
-                      ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                      ? (isDark ? Colors.white : const Color(0xFF000000))
                       : (isDark
                             ? const Color(0xFF525252)
                             : const Color(0xFFD4D4D4)),
@@ -137,7 +137,7 @@ class _BlogViewState extends State<BlogView> {
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF262626)
+                        ? const Color(0xFF1C1C1E)
                         : const Color(0xFFF5F5F5),
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -145,7 +145,7 @@ class _BlogViewState extends State<BlogView> {
                   child: Text(
                     _pageTitle,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 15,
                       color: isDark
                           ? const Color(0xFFA3A3A3)
                           : const Color(0xFF737373),

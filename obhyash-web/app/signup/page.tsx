@@ -83,9 +83,12 @@ function SignupForm() {
   const [isReferralLocked, setIsReferralLocked] = useState(false);
 
   useEffect(() => {
-    const ref = searchParams.get('ref');
-    if (ref) {
-      setFormData((prev) => ({ ...prev, referralCode: ref }));
+    const refParam = searchParams.get('ref');
+    const savedRef = typeof window !== 'undefined' ? localStorage.getItem('referralCode') : null;
+    const finalRef = refParam || savedRef;
+
+    if (finalRef) {
+      setFormData((prev) => ({ ...prev, referralCode: finalRef }));
       setIsReferralLocked(true);
     }
   }, [searchParams]);
@@ -257,6 +260,7 @@ function SignupForm() {
             if (json.error) {
               toast.error(json.error);
             } else {
+              if (typeof window !== 'undefined') localStorage.removeItem('referralCode');
               toast.success(json.message || 'রেফারেল কোড গৃহীত হয়েছে!');
             }
           } catch (e) {

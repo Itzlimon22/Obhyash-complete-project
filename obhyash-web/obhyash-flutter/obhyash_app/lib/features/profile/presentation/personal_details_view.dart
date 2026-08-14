@@ -10,6 +10,7 @@ import '../../../core/presentation/widgets/app_dropdown.dart';
 import '../../../core/data/college_list.dart';
 import '../../dashboard/domain/models.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
+import '../../../core/providers/shared_prefs_provider.dart';
 
 class PersonalDetailsView extends ConsumerStatefulWidget {
   final UserProfile user;
@@ -125,7 +126,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
         _newPasswordController.text != _confirmPasswordController.text) {
       AppPopups.show(
         context,
-        message: 'à¦ªà¦¾à¦¸à¦“à§Ÿà¦¾à¦°à§ à¦¡ à¦¦à§ à¦Ÿà¦¿ à¦®à¦¿à¦²à¦›à§‡ à¦¨à¦¾!',
+        message: 'পাসওয়ার্ড দুটি মিলছে না!',
         isError: true,
       );
       return;
@@ -164,7 +165,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
         if (mounted) {
           AppPopups.show(
             context,
-            message: 'à¦ªà¦¾à¦¸à¦“à§Ÿà¦¾à¦°à§ à¦¡ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦ªà¦°à¦¿à¦¬à¦°à§ à¦¤à¦¨ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡!',
+            message: 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!',
             isError: false,
           );
         }
@@ -172,13 +173,17 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
 
       await supabase.from('users').update(updates).eq('id', widget.user.id);
 
+      // Clear cache so it fetches fresh data
+      final prefs = ref.read(sharedPreferencesProvider);
+      await prefs.remove('profile_${widget.user.id}');
+
       // Invalidate the provider to refetch user data
       ref.invalidate(userProfileProvider);
 
       if (mounted) {
         AppPopups.show(
           context,
-          message: 'à¦¸à§‡à¦Ÿà¦¿à¦‚à¦¸ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦¸à§‡à¦­ à¦•à¦°à¦¾ à¦¹à§Ÿà§‡à¦›à§‡!',
+          message: 'সেটিংস সফলভাবে সেভ করা হয়েছে!',
           isError: false,
         );
         _newPasswordController.clear();
@@ -207,7 +212,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+            color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
           ),
         ),
       ),
@@ -216,9 +221,9 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           Text(
             title,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF262626),
+              color: isDark ? Colors.white : const Color(0xFF1C1C1E),
             ),
           ),
         ],
@@ -232,7 +237,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 14,
+          fontSize: 16,
           fontWeight: FontWeight.w500,
           color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF525252),
         ),
@@ -295,13 +300,13 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
             ),
             filled: true,
             fillColor: readOnly
-                ? (isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5))
+                ? (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5))
                 : (isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: isDark
-                    ? const Color(0xFF262626)
+                    ? const Color(0xFF1C1C1E)
                     : const Color(0xFFE5E5E5),
               ),
             ),
@@ -309,7 +314,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: isDark
-                    ? const Color(0xFF262626)
+                    ? const Color(0xFF1C1C1E)
                     : const Color(0xFFE5E5E5),
               ),
             ),
@@ -318,7 +323,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
               borderSide: BorderSide(
                 color: readOnly
                     ? (isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFE5E5E5))
                     : const Color(0xFF10B981),
               ),
@@ -338,7 +343,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
       color: isDark ? const Color(0xFF171717) : Colors.white,
       borderRadius: BorderRadius.circular(16),
       border: Border.all(
-        color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+        color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
       ),
       boxShadow: const [
         BoxShadow(
@@ -348,17 +353,39 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
         ),
       ],
     );
-
     return Scaffold(
       backgroundColor: isDark ? Colors.black : const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        title: const Text(
-          '\u09ac\u09cd\u09af\u0995\u09cd\u09a4\u09bf\u0997\u09a4 \u09a4\u09a5\u09cd\u09af',
-          style: TextStyle(fontWeight: FontWeight.bold),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [const Color(0xFF064E3B), const Color(0xFF022C22)] // Deep Teal
+                    : [const Color(0xFF059669), const Color(0xFF047857)], // Emerald
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          leading: IconButton(
+            icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: const Text(
+            'ব্যক্তিগত তথ্য',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontSize: 22,
+            ),
+          ),
+          centerTitle: true,
+          elevation: 10,
+          shadowColor: Colors.black45,
+          backgroundColor: Colors.transparent,
         ),
-        backgroundColor: const Color(0xFF166534),
-        foregroundColor: Colors.white,
-        elevation: 0,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -375,7 +402,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _buildSectionHeader(
-                        'à¦¬à§à¦¯à¦•à§à¦¤à¦¿à¦—à¦¤ à¦¤à¦¥à§à¦¯',
+                        'ব্যক্তিগত তথ্য',
                         isDark,
                       ),
                       Padding(
@@ -383,29 +410,29 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                         child: Column(
                           children: [
                             _buildTextField(
-                              label: 'à¦¨à¦¾à¦®',
+                              label: 'নাম',
                               controller: _nameController,
                               isDark: isDark,
                               placeholder:
-                                  'à¦¤à§‹à¦®à¦¾à¦° à¦ªà§à¦°à§‹ à¦¨à¦¾à¦® à¦²à§‡à¦–à§‹',
+                                  'তোমার পুরো নাম লেখো',
                               validator: (val) =>
                                   val == null || val.trim().isEmpty
-                                  ? 'à¦¨à¦¾à¦® à¦²à§‡à¦–à¦¾ à¦†à¦¬à¦¶à§à¦¯à¦•!'
+                                  ? 'নাম লেখা আবশ্যক!'
                                   : null,
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
-                              label: 'à¦«à§‹à¦¨ à¦¨à¦®à§à¦¬à¦°',
+                              label: 'ফোন নম্বর',
                               controller: _phoneController,
                               isDark: isDark,
                               readOnly:
                                   widget.user.phone != null &&
                                   widget.user.phone!.isNotEmpty,
-                              placeholder: 'à§¦à§§à§­XXXXXXXX',
+                              placeholder: '০১৭১XXXXXXXX',
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
-                              label: 'à¦œà¦¨à§à¦® à¦¤à¦¾à¦°à¦¿à¦–',
+                              label: 'জন্ম তারিখ',
                               controller: _dobController,
                               isDark: isDark,
                               readOnly: true,
@@ -418,7 +445,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             const SizedBox(height: 16),
                             _buildDropdown(
                               label:
-                                  'à¦›à¦¾à¦¤à§à¦°/à¦›à¦¾à¦¤à§à¦°à§€ (Gender)',
+                                  'ছাত্র/ছাত্রী (Gender)',
                               value: _gender.isEmpty ? '' : _gender,
                               items: const ['', 'Male', 'Female'],
                               onChanged: (val) =>
@@ -427,11 +454,11 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
-                              label: 'à¦ à¦¿à¦•à¦¾à¦¨à¦¾',
+                              label: 'ঠিকানা',
                               controller: _addressController,
                               isDark: isDark,
                               placeholder:
-                                  'à¦¬à¦°à§à¦¤à¦®à¦¾à¦¨ à¦ à¦¿à¦•à¦¾à¦¨à¦¾...',
+                                  'বর্তমান ঠিকানা...',
                             ),
                           ],
                         ),
@@ -448,7 +475,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _buildSectionHeader(
-                        'à¦à¦•à¦¾à¦¡à§‡à¦®à¦¿à¦• à¦¤à¦¥à§à¦¯',
+                        'একাডেমিক তথ্য',
                         isDark,
                       ),
                       Padding(
@@ -460,11 +487,11 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                               children: [
                                 _buildTextField(
                                   label:
-                                      'à¦¶à¦¿à¦•à§à¦·à¦¾ à¦ªà§à¦°à¦¤à¦¿à¦·à§à¦ à¦¾à¦¨à§‡à¦° à¦¨à¦¾à¦®',
+                                      'শিক্ষা প্রতিষ্ঠানের নাম',
                                   controller: _instituteController,
                                   isDark: isDark,
                                   placeholder:
-                                      'à¦¤à§‹à¦®à¦¾à¦° à¦¶à¦¿à¦•à§à¦·à¦¾ à¦ªà§à¦°à¦¤à¦¿à¦·à§à¦ à¦¾à¦¨à§‡à¦° à¦¨à¦¾à¦® à¦²à¦¿à¦–à§‹...',
+                                      'তোমার শিক্ষা প্রতিষ্ঠানের নাম লিখো...',
                                 ),
                                 if (_showCollegeSuggestions)
                                   Container(
@@ -481,7 +508,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.08),
+                                          color: Colors.black.withValues(alpha: 0.08),
                                           blurRadius: 8,
                                           offset: const Offset(0, 4),
                                         ),
@@ -513,8 +540,8 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                                     name,
                                                     style: TextStyle(
                                                       fontFamily:
-                                                          'HindSiliguri',
-                                                      fontSize: 13,
+                                                          'Anek Bangla',
+                                                      fontSize: 15,
                                                       color: isDark
                                                           ? const Color(
                                                               0xFFE5E5E5,
@@ -536,7 +563,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             const SizedBox(height: 16),
                             _buildDropdown(
                               label:
-                                  'à¦•à§€ à¦¨à¦¿à§Ÿà§‡ à¦šà¦°à§à¦šà¦¾ à¦•à¦°à¦¤à§‡ à¦šà¦¾à¦“?',
+                                  'কী নিয়ে চর্চা করতে চাও?',
                               value: _stream,
                               items: const ['HSC', 'SSC', 'Admission'],
                               onChanged: (val) =>
@@ -548,7 +575,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                               children: [
                                 Expanded(
                                   child: _buildDropdown(
-                                    label: 'à¦¬à¦¿à¦­à¦¾à¦—',
+                                    label: 'বিভাগ',
                                     value: _group,
                                     items: const [
                                       'Science',
@@ -564,7 +591,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                 const SizedBox(width: 16),
                                 Expanded(
                                   child: _buildDropdown(
-                                    label: 'à¦¬à§à¦¯à¦¾à¦š',
+                                    label: 'ব্যাচ',
                                     value: _batch,
                                     items: const [
                                       'HSC 2024',
@@ -582,7 +609,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             ),
                             const SizedBox(height: 16),
                             _buildDropdown(
-                              label: 'à¦Ÿà¦¾à¦°à§à¦—à§‡à¦Ÿ',
+                              label: 'টার্গেট',
                               value: _target.isEmpty ? 'Medical' : _target,
                               items: const [
                                 'Medical',
@@ -596,27 +623,27 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             const SizedBox(height: 16),
                             _buildTextField(
                               label:
-                                  'à¦à¦¸à¦à¦¸à¦¸à¦¿ à¦°à§‹à¦² à¦¨à¦®à§à¦¬à¦°',
+                                  'এসএসসি রোল নম্বর',
                               controller: _sscRollController,
                               isDark: isDark,
                               placeholder:
-                                  'à¦°à§‹à¦² à¦¨à¦®à§à¦¬à¦° à¦²à§‡à¦–à§‹',
+                                  'রোল নম্বর লেখো',
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
                               label:
-                                  'à¦à¦¸à¦à¦¸à¦¸à¦¿ à¦°à§‡à¦œà¦¿à¦¸à§à¦Ÿà§à¦°à§‡à¦¶à¦¨ à¦¨à¦®à§à¦¬à¦°',
+                                  'এসএসসি রেজিস্ট্রেশন নম্বর',
                               controller: _sscRegController,
                               isDark: isDark,
                               placeholder:
-                                  'à¦°à§‡à¦œà¦¿à¦¸à§à¦Ÿà§à¦°à§‡à¦¶à¦¨ à¦¨à¦®à§à¦¬à¦° à¦²à§‡à¦–à§‹',
+                                  'রেজিস্ট্রেশন নম্বর লেখো',
                             ),
                             const SizedBox(height: 16),
                             Row(
                               children: [
                                 Expanded(
                                   child: _buildDropdown(
-                                    label: 'à¦à¦¸à¦à¦¸à¦¸à¦¿ à¦¬à§‹à¦°à§à¦¡',
+                                    label: 'এসএসসি বোর্ড',
                                     value: _sscBoard,
                                     items: const [
                                       'Dhaka',
@@ -640,7 +667,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                 Expanded(
                                   child: _buildDropdown(
                                     label:
-                                        'à¦à¦¸à¦à¦¸à¦¸à¦¿ à¦ªà¦¾à¦¸à¦¿à¦‚ à¦‡à§Ÿà¦¾à¦°',
+                                        'এসএসসি পাসিং ইয়ার',
                                     value: _sscYear,
                                     items: const [
                                       '2026',
@@ -683,7 +710,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _buildSectionHeader(
-                        'à¦…à§à¦¯à¦¾à¦•à¦¾à¦‰à¦¨à§à¦Ÿ à¦²à¦¿à¦‚à¦•à¦¿à¦‚',
+                        'অ্যাকাউন্ট লিংকিং',
                         isDark,
                       ),
                       Padding(
@@ -716,7 +743,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _buildSectionHeader(
-                        'à¦ªà¦¾à¦¸à¦“à§Ÿà¦¾à¦°à§à¦¡ à¦ªà¦°à¦¿à¦¬à¦°à§à¦¤à¦¨',
+                        'পাসওয়ার্ড পরিবর্তন',
                         isDark,
                       ),
                       Padding(
@@ -725,9 +752,9 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'à¦ªà¦°à¦¿à¦¬à¦°à§à¦¤à¦¨ à¦•à¦°à¦¤à§‡ à¦¨à¦¾ à¦šà¦¾à¦‡à¦²à§‡ à¦–à¦¾à¦²à¦¿ à¦°à¦¾à¦–à§‹',
+                              'পরিবর্তন করতে না চাইলে খালি রাখো',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 15,
                                 color: isDark
                                     ? const Color(0xFFA3A3A3)
                                     : const Color(0xFF737373),
@@ -735,7 +762,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
-                              label: 'à¦¨à¦¤à§à¦¨ à¦ªà¦¾à¦¸à¦“à§Ÿà¦¾à¦°à§à¦¡',
+                              label: 'নতুন পাসওয়ার্ড',
                               controller: _newPasswordController,
                               isDark: isDark,
                               isPassword: true,
@@ -754,7 +781,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             const SizedBox(height: 16),
                             _buildTextField(
                               label:
-                                  'à¦ªà¦¾à¦¸à¦“à§Ÿà¦¾à¦°à§à¦¡ à¦¨à¦¿à¦¶à§à¦šà¦¿à¦¤ à¦•à¦°à§‹',
+                                  'পাসওয়ার্ড নিশ্চিত করো',
                               controller: _confirmPasswordController,
                               isDark: isDark,
                               isPassword: true,
@@ -802,9 +829,9 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             ),
                           )
                         : const Text(
-                            'à¦¸à¦¬ à¦¸à§‡à¦­ à¦•à¦°à§‹',
+                            'সব সেভ করো',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

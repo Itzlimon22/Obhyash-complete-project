@@ -20,6 +20,7 @@ Future<String?> showExamTargetModal(
 }) {
   return showModalBottomSheet<String>(
     context: context,
+    useRootNavigator: true,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (ctx) => _ExamTargetSheet(initialTarget: initialTarget),
@@ -74,9 +75,9 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final sheetBg = isDark ? const Color(0xFF0F172A) : Colors.white;
+    final sheetBg = isDark ? const Color(0xFF000000) : Colors.white;
     final borderColor = isDark
-        ? const Color(0xFF262626)
+        ? const Color(0xFF1C1C1E)
         : const Color(0xFFE5E5E5);
 
     return DraggableScrollableSheet(
@@ -98,7 +99,7 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
               height: 4,
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF404040)
+                    ? const Color(0xFF27272A)
                     : const Color(0xFFD4D4D4),
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -111,9 +112,9 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                   Text(
                     'তোমার লক্ষ্য কী?',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      color: isDark ? Colors.white : const Color(0xFF000000),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -121,7 +122,7 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                     'সঠিক কাউন্টডাউন ও পরিকল্পনা পেতে তোমার পরীক্ষা বেছে নাও',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 15,
                       color: isDark
                           ? const Color(0xFF737373)
                           : const Color(0xFF525252),
@@ -157,7 +158,7 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                         color: isSelected
                             ? const Color(0xFF047857)
                             : (isDark
-                                  ? const Color(0xFF262626)
+                                  ? const Color(0xFF1C1C1E)
                                   : const Color(0xFFF5F5F5)),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
@@ -172,13 +173,13 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                           t['label']!,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: isSelected
                                 ? Colors.white
                                 : (isDark
                                       ? const Color(0xFFD4D4D4)
-                                      : const Color(0xFF0F172A)),
+                                      : const Color(0xFF000000)),
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -206,7 +207,7 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                         backgroundColor: const Color(0xFF047857),
                         foregroundColor: Colors.white,
                         disabledBackgroundColor: isDark
-                            ? const Color(0xFF262626)
+                            ? const Color(0xFF1C1C1E)
                             : const Color(0xFFE5E5E5),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
@@ -225,7 +226,7 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                           : const Text(
                               'সংরক্ষণ করো',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 17,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),

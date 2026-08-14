@@ -25,7 +25,7 @@ class ExamGridSheet extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: const [
           BoxShadow(
@@ -82,7 +82,7 @@ class ExamGridSheet extends StatelessWidget {
                     child: _StatChip(
                       label: 'Review',
                       count: reviewCount,
-                      color: const Color(0xFFF59E0B), // amber-500
+                      color: const Color(0xFF1E3A8A), // amber-500
                       isDark: isDark,
                     ),
                   ),
@@ -110,9 +110,9 @@ class ExamGridSheet extends StatelessWidget {
 
                   Color getBgColor() {
                     if (isAnswered) return const Color(0xFF047857);
-                    if (isFlagged) return const Color(0xFFF59E0B);
+                    if (isFlagged) return const Color(0xFF1E3A8A);
                     return isDark
-                        ? const Color(0xFF262626)
+                        ? const Color(0xFF1C1C1E)
                         : const Color(0xFFF1F5F9); // neutral-800 : slate-100
                   }
 
@@ -132,7 +132,7 @@ class ExamGridSheet extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: isFlagged && isAnswered
-                              ? const Color(0xFFF59E0B)
+                              ? const Color(0xFF1E3A8A)
                               : Colors.transparent,
                           width: 2,
                         ),
@@ -184,7 +184,7 @@ class _StatChip extends StatelessWidget {
           Text(
             count.toString(),
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -192,7 +192,7 @@ class _StatChip extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: 10,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
               color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF64748B),
             ),

@@ -75,32 +75,33 @@ export const getBookmarkedQuestions = async (
   if (!isSupabaseConfigured() || !supabase) return [];
 
   try {
-    const idsSet = await getUserBookmarks(userId);
-    if (idsSet.size === 0) return [];
-    
-    const ids = Array.from(idsSet).map(String);
-
     const { data: rows, error: qErr } = await supabase
-      .from('questions')
-      .select('*')
-      .in('id', ids);
+      .from('bookmarks')
+      .select('created_at, questions(*)')
+      .eq('user_id', userId);
 
     if (qErr || !rows) return [];
 
-    return (rows as Record<string, unknown>[])
-      .map((d) => ({
-        ...(d as object),
-        id: String(d.id),
-        correctAnswer: d.correct_answer as string,
-        correctAnswerIndex: d.correct_answer_index as number,
-        correctAnswerIndices: (d.correct_answer_indices as number[]) || [],
-        subjectId: d.subject_id as string,
-        chapterId: d.chapter_id as string,
-        topicId: d.topic_id as string,
-        imageUrl: d.image_url as string | undefined,
-        optionImages: (d.option_images as string[]) || [],
-        explanationImageUrl: d.explanation_image_url as string | undefined,
-      })) as unknown as Question[];
+    return (rows as any[])
+      .map((row) => {
+        const d = row.questions;
+        if (!d) return null;
+        return {
+          ...d,
+          id: String(d.id),
+          correctAnswer: d.correct_answer as string,
+          correctAnswerIndex: d.correct_answer_index as number,
+          correctAnswerIndices: (d.correct_answer_indices as number[]) || [],
+          subjectId: d.subject_id as string,
+          chapterId: d.chapter_id as string,
+          topicId: d.topic_id as string,
+          imageUrl: d.image_url as string | undefined,
+          optionImages: (d.option_images as string[]) || [],
+          explanationImageUrl: d.explanation_image_url as string | undefined,
+          bookmarkedAt: row.created_at,
+        } as unknown as Question;
+      })
+      .filter((q) => q !== null) as Question[];
   } catch (error) {
     console.error('Get Bookmarked Questions Error:', error);
     return [];

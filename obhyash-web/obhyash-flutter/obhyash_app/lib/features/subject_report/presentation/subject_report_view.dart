@@ -1,6 +1,7 @@
-﻿import 'package:fl_chart/fl_chart.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
@@ -254,7 +255,7 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
             border: Border(
               bottom: BorderSide(
                 color: isDark
-                    ? const Color(0xFF262626)
+                    ? const Color(0xFF1C1C1E)
                     : const Color(0xFFE5E5E5),
               ),
             ),
@@ -282,7 +283,7 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
                         color: _filter == f.$1
                             ? const Color(0xFFB91C1C)
                             : (isDark
-                                  ? const Color(0xFF262626)
+                                  ? const Color(0xFF1C1C1E)
                                   : const Color(0xFFF5F5F5)),
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -290,7 +291,7 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
                         f.$2,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: _filter == f.$1
                               ? Colors.white
@@ -391,10 +392,10 @@ class _SRKpi extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 3),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
         ),
       ),
       child: Column(
@@ -411,14 +412,14 @@ class _SRKpi extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.w900,
-              color: isDark ? Colors.white : const Color(0xFF0F172A),
+              color: isDark ? Colors.white : const Color(0xFF000000),
             ),
           ),
           Text(
             label,
-            style: const TextStyle(fontSize: 10, color: Color(0xFFA3A3A3)),
+            style: const TextStyle(fontSize: 13, color: Color(0xFFA3A3A3)),
             textAlign: TextAlign.center,
           ),
         ],
@@ -441,29 +442,29 @@ class _SRDonut extends StatelessWidget {
         value: stats.correct.toDouble().clamp(0.001, double.infinity),
         color: const Color(0xFF047857),
         title: '',
-        radius: 48,
+        radius: 20,
       ),
       PieChartSectionData(
         value: stats.wrong.toDouble().clamp(0.001, double.infinity),
         color: const Color(0xFFB91C1C),
         title: '',
-        radius: 48,
+        radius: 20,
       ),
       PieChartSectionData(
         value: stats.skipped.toDouble().clamp(0.001, double.infinity),
-        color: const Color(0xFFF59E0B),
+        color: const Color(0xFF1E3A8A),
         title: '',
-        radius: 48,
+        radius: 20,
       ),
     ];
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
         ),
       ),
       child: Column(
@@ -472,9 +473,9 @@ class _SRDonut extends StatelessWidget {
           Text(
             'ফলাফল বিশ্লেষণ',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 17,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF0F172A),
+              color: isDark ? Colors.white : const Color(0xFF000000),
             ),
           ),
           const SizedBox(height: 16),
@@ -489,8 +490,8 @@ class _SRDonut extends StatelessWidget {
                     PieChart(
                       PieChartData(
                         sections: sections,
-                        centerSpaceRadius: 50,
-                        sectionsSpace: 2,
+                        centerSpaceRadius: 42,
+                        sectionsSpace: 4,
                       ),
                     ),
                     Column(
@@ -499,17 +500,20 @@ class _SRDonut extends StatelessWidget {
                         Text(
                           '${stats.accuracy}%',
                           style: TextStyle(
-                            fontSize: 22,
+                            fontSize: 26,
                             fontWeight: FontWeight.w900,
+                            fontFamily: 'Anek Bangla',
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF0F172A),
+                                : const Color(0xFF000000),
                           ),
                         ),
                         const Text(
                           'সঠিকতা',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 13,
+                            fontFamily: 'Anek Bangla',
+                            fontWeight: FontWeight.w600,
                             color: Color(0xFFA3A3A3),
                           ),
                         ),
@@ -521,7 +525,6 @@ class _SRDonut extends StatelessWidget {
               const SizedBox(width: 20),
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _SRLegend(
                       'সঠিক',
@@ -529,18 +532,18 @@ class _SRDonut extends StatelessWidget {
                       const Color(0xFF047857),
                       isDark,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     _SRLegend(
                       'ভুল',
                       stats.wrong,
                       const Color(0xFFB91C1C),
                       isDark,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     _SRLegend(
                       'স্কিপড',
                       stats.skipped,
-                      const Color(0xFFF59E0B),
+                      const Color(0xFF1E3A8A),
                       isDark,
                     ),
                   ],
@@ -563,35 +566,59 @@ class _SRLegend extends StatelessWidget {
   const _SRLegend(this.label, this.value, this.color, this.isDark);
 
   @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      Container(
-        width: 10,
-        height: 10,
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      ),
-      const SizedBox(width: 8),
-      Expanded(
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF404040),
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isDark
+              ? color.withValues(alpha: 0.1)
+              : color.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: color.withValues(alpha: 0.2),
           ),
         ),
-      ),
-      Text(
-        value.toString(),
-        style: TextStyle(
-          fontSize: 13,
-          fontFamily: 'monospace',
-          fontWeight: FontWeight.bold,
-          color: isDark ? Colors.white : const Color(0xFF0F172A),
+        child: Row(
+          children: [
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.4),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Anek Bangla',
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? const Color(0xFFD4D4D4)
+                      : const Color(0xFF27272A),
+                ),
+              ),
+            ),
+            Text(
+              value.toString(),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: isDark ? Colors.white : const Color(0xFF000000),
+              ),
+            ),
+          ],
         ),
-      ),
-    ],
-  );
+      );
 }
 
 // ─── Chapter List ────────────────────────────────────────────────────────────────
@@ -605,10 +632,10 @@ class _SRChapterList extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
-      color: isDark ? const Color(0xFF0F172A) : Colors.white,
+      color: isDark ? const Color(0xFF000000) : Colors.white,
       borderRadius: BorderRadius.circular(20),
       border: Border.all(
-        color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+        color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
       ),
     ),
     child: Column(
@@ -617,9 +644,9 @@ class _SRChapterList extends StatelessWidget {
         Text(
           'অধ্যায়ভিত্তিক দক্ষতা',
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 17,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : const Color(0xFF0F172A),
+            color: isDark ? Colors.white : const Color(0xFF000000),
           ),
         ),
         const SizedBox(height: 14),
@@ -646,7 +673,7 @@ class _SRChapterRow extends StatelessWidget {
     final Color bar = c.accuracy >= 80
         ? const Color(0xFF047857)
         : c.accuracy >= 50
-        ? const Color(0xFFF59E0B)
+        ? const Color(0xFF1E3A8A)
         : const Color(0xFFB91C1C);
     final pct = c.total > 0 ? (c.accuracy / 100.0).clamp(0.0, 1.0) : 0.0;
 
@@ -660,11 +687,11 @@ class _SRChapterRow extends StatelessWidget {
               child: Text(
                 c.name,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: isDark
                       ? const Color(0xFFD4D4D4)
-                      : const Color(0xFF404040),
+                      : const Color(0xFF27272A),
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -673,7 +700,7 @@ class _SRChapterRow extends StatelessWidget {
             Text(
               '${c.accuracy}%',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: bar,
               ),
@@ -687,14 +714,14 @@ class _SRChapterRow extends StatelessWidget {
             value: pct,
             minHeight: 8,
             backgroundColor: isDark
-                ? const Color(0xFF262626)
+                ? const Color(0xFF1C1C1E)
                 : const Color(0xFFF0F0F0),
             valueColor: AlwaysStoppedAnimation<Color>(bar),
           ),
         ),
         Text(
           '${c.total} প্রশ্ন',
-          style: const TextStyle(fontSize: 10, color: Color(0xFFA3A3A3)),
+          style: const TextStyle(fontSize: 13, color: Color(0xFFA3A3A3)),
         ),
       ],
     );
@@ -725,10 +752,10 @@ class _SRWeakness extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
         ),
       ),
       child: Column(
@@ -738,7 +765,7 @@ class _SRWeakness extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
               color: isDark
-                  ? const Color(0xFF262626).withValues(alpha: 0.3)
+                  ? const Color(0xFF1C1C1E).withValues(alpha: 0.3)
                   : const Color(0xFFFAFAFA),
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(20),
@@ -746,7 +773,7 @@ class _SRWeakness extends StatelessWidget {
               border: Border(
                 bottom: BorderSide(
                   color: isDark
-                      ? const Color(0xFF262626)
+                      ? const Color(0xFF1C1C1E)
                       : const Color(0xFFF0F0F0),
                 ),
               ),
@@ -772,9 +799,9 @@ class _SRWeakness extends StatelessWidget {
                 Text(
                   'দুর্বলতা ও ভুলের ধরণ',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 17,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    color: isDark ? Colors.white : const Color(0xFF000000),
                   ),
                 ),
               ],
@@ -808,7 +835,7 @@ class _SRWeakness extends StatelessWidget {
                         Text(
                           'কোনো দুর্বলতা নেই! চমৎকার।',
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF047857),
                           ),
@@ -817,134 +844,160 @@ class _SRWeakness extends StatelessWidget {
                     ),
                   )
                 : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? const Color(0xFF1A0508)
-                                    : const Color(0xFFFFF1F2),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: isDark
-                                      ? const Color(0xFF3F0F17)
-                                      : const Color(0xFFFEF2F2),
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: isDark
+                                ? [const Color(0xFF4C0519), const Color(0xFF22030B)]
+                                : [const Color(0xFFFFF1F2), const Color(0xFFFEF2F2)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isDark ? const Color(0xFF881337) : const Color(0xFFFECDD3),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: isDark ? const Color(0x33E11D48) : const Color(0x33F43F5E),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: isDark ? const Color(0x33E11D48) : const Color(0xFFFFE4E6),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(LucideIcons.target, size: 18, color: Color(0xFFE11D48)),
                                 ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'সর্বাধিক ভুল',
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.w900,
-                                      color: Color(0xFFB91C1C),
-                                      letterSpacing: 1.0,
-                                    ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'সর্বাধিক ভুল',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w900,
+                                          color: Color(0xFFE11D48),
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                      Text(
+                                        weak.first.name == 'General' ? 'সাধারণ প্রশ্ন' : weak.first.name,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark ? Colors.white : const Color(0xFF000000),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    weak.first.name == 'General'
-                                        ? 'অজানা টপিক'
-                                        : weak.first.name,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark
-                                          ? Colors.white
-                                          : const Color(0xFF0F172A),
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFE11D48),
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
+                                  child: Text(
                                     '${weak.first.wrong}টি ভুল',
                                     style: const TextStyle(
-                                      fontSize: 11,
-                                      color: Color(0xFFB91C1C),
-                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? const Color(0xFF047857)
-                                    : const Color(0xFFECFDF5),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: isDark
-                                      ? const Color(0xFF047857)
-                                      : const Color(0xFFECFDF5),
                                 ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0x33000000) : Colors.white,
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Column(
+                              child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'পরামর্শ',
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.w900,
-                                      color: Color(0xFF047857),
-                                      letterSpacing: 1.0,
+                                  const Icon(LucideIcons.lightbulb, size: 16, color: Color(0xFF1E3A8A)),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      '"${weak.first.name == 'General' ? 'সাধারণ প্রশ্ন' : weak.first.name}" অধ্যায়টি পুনরায় রিভিশন ও অনুশীলন করলে তোমার স্কোর উল্লেখযোগ্যভাবে বাড়বে।',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
+                                        height: 1.4,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    '"${weak.first.name == 'General' ? 'সাধারণ প্রশ্ন' : weak.first.name}" অধ্যায়টি আরও অনুশীলন করো।',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: isDark
-                                          ? const Color(0xFF6EE7B7)
-                                          : const Color(0xFF047857),
-                                      height: 1.4,
-                                    ),
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  context.go('/setup');
+                                },
+                                icon: const Icon(LucideIcons.playCircle, size: 18),
+                                label: const Text('এখনই অনুশীলন করো'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFE11D48),
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  textStyle: const TextStyle(fontSize: 16, fontFamily: 'Anek Bangla', fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       if (weak.length > 1) ...[
-                        const SizedBox(height: 12),
-                        ...weak
-                            .skip(1)
-                            .take(5)
-                            .map(
-                              (w) => Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: Row(
+                        const SizedBox(height: 24),
+                        Text(
+                          'অন্যান্য দুর্বল বিষয়সমূহ',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ...weak.skip(1).take(5).map((w) {
+                          final double ratio = weak.first.wrong > 0 ? (w.wrong / weak.first.wrong).clamp(0.0, 1.0) : 0.0;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const Icon(
-                                      LucideIcons.alertTriangle,
-                                      size: 12,
-                                      color: Color(0xFFB91C1C),
-                                    ),
-                                    const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
-                                        w.name,
+                                        w.name == 'General' ? 'সাধারণ প্রশ্ন' : w.name,
                                         style: TextStyle(
-                                          fontSize: 12,
-                                          color: isDark
-                                              ? const Color(0xFFD4D4D4)
-                                              : const Color(0xFF404040),
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -952,15 +1005,27 @@ class _SRWeakness extends StatelessWidget {
                                     Text(
                                       '${w.wrong}টি ভুল',
                                       style: const TextStyle(
-                                        fontSize: 11,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFFB91C1C),
+                                        color: Color(0xFFE11D48),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
+                                const SizedBox(height: 6),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: LinearProgressIndicator(
+                                    value: ratio,
+                                    backgroundColor: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
+                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFE11D48)),
+                                    minHeight: 6,
+                                  ),
+                                ),
+                              ],
                             ),
+                          );
+                        }),
                       ],
                     ],
                   ),
@@ -999,16 +1064,16 @@ class _SREmpty extends StatelessWidget {
           Text(
             'এখনও পর্যাপ্ত ডাটা নেই',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF0F172A),
+              color: isDark ? Colors.white : const Color(0xFF000000),
             ),
           ),
           const SizedBox(height: 8),
           const Text(
             'এই বিষয়ে পরীক্ষা দিলে বিস্তারিত রিপোর্ট দেখা যাবে।',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Color(0xFFA3A3A3)),
+            style: TextStyle(fontSize: 15, color: Color(0xFFA3A3A3)),
           ),
         ],
       ),

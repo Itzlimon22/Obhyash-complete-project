@@ -50,9 +50,9 @@ final complaintTypes = [
     'icon': LucideIcons.zap,
     'color': const Color(0xFFEFF6FF), // blue-50
     'darkColor': const Color(0x4D1E3A8A), // blue-900/30
-    'iconColor': const Color(0xFF0F172A), // blue-600
-    'darkIconColor': const Color(0xFF334155), // blue-400
-    'borderColor': const Color(0xFF0F172A), // blue-500
+    'iconColor': const Color(0xFF000000), // blue-600
+    'darkIconColor': const Color(0xFF27272A), // blue-400
+    'borderColor': const Color(0xFF000000), // blue-500
     'description': 'অ্যাপ ক্র্যাশ, লোডিং সমস্যা বা এরর',
   },
   {
@@ -64,7 +64,7 @@ final complaintTypes = [
     'darkColor': const Color(0x4D581C87), // purple-900/30
     'iconColor': const Color(0xFF9333EA), // purple-600
     'darkIconColor': const Color(0xFFC084FC), // purple-400
-    'borderColor': const Color(0xFF0F172A), // purple-500
+    'borderColor': const Color(0xFF000000), // purple-500
     'description': 'ইন্টারফেস বা ব্যবহারের সুবিধা নিয়ে পরামর্শ',
   },
   {
@@ -88,7 +88,7 @@ final complaintTypes = [
     'darkColor': const Color(0x4D78350F), // amber-900/30
     'iconColor': const Color(0xFFD97706), // amber-600
     'darkIconColor': const Color(0xFFFBBF24), // amber-400
-    'borderColor': const Color(0xFFF59E0B), // amber-500
+    'borderColor': const Color(0xFF1E3A8A), // amber-500
     'description': 'নতুন কোনো সুবিধা বা ফিচার চাও?',
   },
 ];
@@ -99,14 +99,14 @@ final statusConfig = {
     'icon': LucideIcons.clock,
     'color': const Color(0xFFFEF3C7), // amber-100
     'darkColor': const Color(0x3378350F), // amber-900/20
-    'iconColor': const Color(0xFFF59E0B), // amber-500
+    'iconColor': const Color(0xFF1E3A8A), // amber-500
   },
   'In Progress': {
     'label': 'প্রক্রিয়াধীন',
     'icon': LucideIcons.refreshCcw,
     'color': const Color(0xFFDBEAFE), // blue-100
     'darkColor': const Color(0x331E3A8A), // blue-900/20
-    'iconColor': const Color(0xFF0F172A), // blue-500
+    'iconColor': const Color(0xFF000000), // blue-500
   },
   'Resolved': {
     'label': 'সমাধান হয়েছে',
@@ -119,7 +119,7 @@ final statusConfig = {
     'label': 'বাতিল',
     'icon': LucideIcons.xCircle,
     'color': const Color(0xFFF5F5F5), // neutral-100
-    'darkColor': const Color(0xFF262626), // neutral-800
+    'darkColor': const Color(0xFF1C1C1E), // neutral-800
     'iconColor': const Color(0xFF737373), // neutral-500
   },
 };
@@ -245,10 +245,10 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
         padding: const EdgeInsets.all(32),
         margin: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F172A) : Colors.white,
+          color: isDark ? const Color(0xFF000000) : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+            color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
           ),
           boxShadow: const [
             BoxShadow(
@@ -280,9 +280,9 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             Text(
               'বার্তা গৃহীত হয়েছে!',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 26,
                 fontWeight: FontWeight.w900,
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                color: isDark ? Colors.white : const Color(0xFF000000),
               ),
             ),
             const SizedBox(height: 8),
@@ -290,7 +290,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               'আমাদের টিম বিষয়টি দেখছে। তোমার মতামতের জন্য ধন্যবাদ।',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 color: isDark
                     ? const Color(0xFFA3A3A3)
                     : const Color(0xFF737373),
@@ -305,11 +305,11 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: isDark
-                        ? const Color(0xFF262626)
+                        ? const Color(0xFF1C1C1E)
                         : const Color(0xFFF5F5F5),
                     foregroundColor: isDark
                         ? Colors.white
-                        : const Color(0xFF0F172A),
+                        : const Color(0xFF000000),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -362,21 +362,12 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
     if (_isSuccess) {
       return Scaffold(
         backgroundColor: isDark ? Colors.black : const Color(0xFFFAFAFA),
-        appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
         body: _buildSuccessState(isDark),
       );
     }
 
     return Scaffold(
       backgroundColor: isDark ? Colors.black : const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        title: const Text(
-          'অভিযোগ ও পরামর্শ',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -386,7 +377,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF262626)
+                    ? const Color(0xFF1C1C1E)
                     : const Color(0xFFF5F5F5),
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -467,7 +458,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                             'ফিডব্যাক সেন্টার',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 10,
+                              fontSize: 13,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -479,7 +470,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                       'কিছু বলতে চাও?\nআমরা শুনছি।',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 32,
+                        fontSize: 34,
                         fontWeight: FontWeight.w900,
                         height: 1.2,
                       ),
@@ -489,7 +480,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                       '\'অভ্যাস\' প্ল্যাটফর্মকে আরও উন্নত করতে তোমার মতামত বা অভিযোগ আমাদের জানান।',
                       style: TextStyle(
                         color: Color(0xFFE0E7FF),
-                        fontSize: 16,
+                        fontSize: 18,
                       ), // indigo-100
                     ),
                   ],
@@ -503,9 +494,9 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 child: Text(
                   '১. অভিযোগের ধরণ নির্বাচন করো',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    color: isDark ? Colors.white : const Color(0xFF000000),
                   ),
                 ),
               ),
@@ -527,8 +518,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? (isDark ? const Color(0xFF262626) : Colors.white)
-                            : (isDark ? const Color(0xFF0F172A) : Colors.white),
+                            ? (isDark ? const Color(0xFF1C1C1E) : Colors.white)
+                            : (isDark ? const Color(0xFF000000) : Colors.white),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isSelected
@@ -572,7 +563,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                     Text(
                                       type['label'] as String,
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: isSelected
                                             ? const Color(
@@ -580,13 +571,13 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                               ) // rose-600
                                             : (isDark
                                                   ? Colors.white
-                                                  : const Color(0xFF0F172A)),
+                                                  : const Color(0xFF000000)),
                                       ),
                                     ),
                                     Text(
                                       type['subLabel'] as String,
                                       style: const TextStyle(
-                                        fontSize: 10,
+                                        fontSize: 13,
                                         fontWeight: FontWeight.bold,
                                         color: Color(0xFFA3A3A3),
                                       ),
@@ -595,7 +586,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                     Text(
                                       type['description'] as String,
                                       style: TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 15,
                                         color: isDark
                                             ? const Color(0xFFA3A3A3)
                                             : const Color(0xFF737373),
@@ -631,9 +622,9 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 child: Text(
                   '২. বিস্তারিত লেখো',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    color: isDark ? Colors.white : const Color(0xFF000000),
                   ),
                 ),
               ),
@@ -642,19 +633,19 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                 controller: _descriptionController,
                 maxLines: 8,
                 style: TextStyle(
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: isDark ? Colors.white : const Color(0xFF000000),
                 ),
                 decoration: InputDecoration(
                   hintText:
                       'তোমার সমস্যা বা পরামর্শ সম্পর্কে বিস্তারিত লেখো...',
                   hintStyle: const TextStyle(color: Color(0xFFA3A3A3)),
                   filled: true,
-                  fillColor: isDark ? const Color(0xFF0F172A) : Colors.white,
+                  fillColor: isDark ? const Color(0xFF000000) : Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide(
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFF5F5F5),
                       width: 2,
                     ),
@@ -679,7 +670,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                   ),
                   backgroundColor: isDark
                       ? const Color(0xFFB91C1C)
-                      : const Color(0xFF0F172A),
+                      : const Color(0xFF000000),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -703,7 +694,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                             'পাঠানো হচ্ছে...',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: 18,
                             ),
                           ),
                         ],
@@ -715,7 +706,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                             'জমা দাও',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: 18,
                             ),
                           ),
                           SizedBox(width: 12),
@@ -726,7 +717,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               const SizedBox(height: 16),
               const Text(
                 'তোমার ফিডব্যাক আমাদের জন্য অত্যন্ত গুরুত্বপূর্ণ ❤️',
-                style: TextStyle(color: Color(0xFFA3A3A3), fontSize: 14),
+                style: TextStyle(color: Color(0xFFA3A3A3), fontSize: 16),
               ),
             ] else ...[
               // My Complaints List
@@ -742,12 +733,12 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                   padding: const EdgeInsets.all(40),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF0F172A)
+                        ? const Color(0xFF000000)
                         : const Color(0xFFFAFAFA),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFF5F5F5),
                     ),
                   ),
@@ -762,11 +753,11 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                       Text(
                         'কোনো অভিযোগ নেই',
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: isDark
                               ? const Color(0xFFD4D4D4)
-                              : const Color(0xFF404040),
+                              : const Color(0xFF27272A),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -816,11 +807,11 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     return Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                        color: isDark ? const Color(0xFF000000) : Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isDark
-                              ? const Color(0xFF262626)
+                              ? const Color(0xFF1C1C1E)
                               : const Color(0xFFF5F5F5),
                         ),
                       ),
@@ -859,7 +850,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                           fontWeight: FontWeight.bold,
                                           color: isDark
                                               ? Colors.white
-                                              : const Color(0xFF0F172A),
+                                              : const Color(0xFF000000),
                                         ),
                                       ),
                                       Text(
@@ -867,7 +858,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                           'dd MMMM yyyy',
                                         ).format(complaint.createdAt),
                                         style: const TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 15,
                                           color: Color(0xFFA3A3A3),
                                         ),
                                       ),
@@ -897,7 +888,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                     Text(
                                       statusInfo['label'] as String,
                                       style: TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                         color: statusInfo['iconColor'] as Color,
                                       ),
@@ -947,7 +938,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                       Text(
                                         'অ্যাডমিন এর মন্তব্য',
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.bold,
                                           color: isDark
                                               ? const Color(0xFF047857)
@@ -995,7 +986,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
           color: isActive
-              ? (isDark ? const Color(0xFF0F172A) : Colors.white)
+              ? (isDark ? const Color(0xFF000000) : Colors.white)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           boxShadow: isActive
@@ -1015,7 +1006,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: isActive
                     ? const Color(0xFFB91C1C) // rose-600

@@ -12,25 +12,35 @@ interface ReferralInfo {
     redeemed_by: { name: string; email: string };
     admin_status: string;
   }>;
+  totalApproved: number;
+  scratchCards: Array<{
+    id: string;
+    is_scratched: boolean;
+    reward_type?: string;
+  }>;
 }
+
+import { ScratchCardWeb } from './ScratchCardWeb';
+import { ReferralLeaderboardWeb } from './ReferralLeaderboardWeb';
 
 export const ReferralDashboard: React.FC = () => {
   const [data, setData] = useState<ReferralInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [copySuccess, setCopySuccess] = useState(false);
 
+  const fetchData = async () => {
+    try {
+      const res = await fetch('/api/referral/me');
+      const json = await res.json();
+      setData(json);
+    } catch (e) {
+      console.error('Failed to load referral data', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch('/api/referral/me');
-        const json = await res.json();
-        setData(json);
-      } catch (e) {
-        console.error('Failed to load referral data', e);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
 
@@ -82,6 +92,55 @@ export const ReferralDashboard: React.FC = () => {
       ) : (
         <p className={styles.noCode}>আপনি এখনও কোনো রেফারেল কোড তৈরি করেননি।</p>
       )}
+
+      {data?.referral && (
+        <>
+          {/* Gamification Progress Section */}
+          <div className="mt-8 bg-white dark:bg-[#121212] p-6 rounded-2xl border border-neutral-200 dark:border-[#2b2b2b]">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold font-anek text-slate-900 dark:text-slate-100">
+                স্ক্র্যাচ কার্ড প্রগ্রেস
+              </h2>
+              <div className="px-3 py-1 bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 rounded-full font-bold font-anek">
+                {data.totalApproved || 0} / {Math.max((((data.totalApproved || 0) / 3) | 0) + 1, 1) * 3}
+              </div>
+            </div>
+            
+            <div className="h-3 w-full bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-yellow-500 transition-all duration-500"
+                style={{ width: `${(((data.totalApproved || 0) % 3) / 3) * 100}%` }}
+              />
+            </div>
+            <p className="mt-3 text-sm text-slate-500 font-anek">
+              {3 - ((data.totalApproved || 0) % 3) === 3 && (data.totalApproved || 0) > 0
+                ? 'অভিনন্দন! আপনি একটি নতুন স্ক্র্যাচ কার্ড পেয়েছেন!'
+                : `আর মাত্র ${3 - ((data.totalApproved || 0) % 3)} টি সফল রেফারেল করলে পাবেন একটি স্ক্র্যাচ কার্ড!`}
+            </p>
+          </div>
+
+          {/* Scratch Cards Section */}
+          {data.scratchCards?.length > 0 && (
+            <div className="mt-8">
+              <h2 className="text-xl font-bold font-anek text-slate-900 dark:text-slate-100 mb-4">
+                আপনার স্ক্র্যাচ কার্ডসমূহ
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {data.scratchCards.map((card) => (
+                  <ScratchCardWeb 
+                    key={card.id} 
+                    card={card} 
+                    onRevealed={() => fetchData()} 
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      <ReferralLeaderboardWeb />
+
       <h2 className={styles.subTitle}>ইতিহাস</h2>
       {data?.history?.length ? (
         <ul className={styles.historyList}>

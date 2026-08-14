@@ -26,21 +26,27 @@ class Question {
   final String id;
   final String subject;
   final String? subjectLabel;
+  final String chapter;
   final String question;
   final String? explanation;
   final List<String> options;
   final int correctAnswerIndex;
   final int points;
+  final List<String> institutes;
+  final List<int> years;
 
   const Question({
     required this.id,
     required this.subject,
     this.subjectLabel,
+    this.chapter = '',
     required this.question,
     this.explanation,
     required this.options,
     required this.correctAnswerIndex,
     required this.points,
+    this.institutes = const [],
+    this.years = const [],
   });
 
   factory Question.fromJson(Map<String, dynamic> j) {
@@ -48,15 +54,32 @@ class Question {
     if (j['options'] is List) {
       validOptions = (j['options'] as List).map((e) => e.toString()).toList();
     }
+    List<String> validInstitutes = [];
+    if (j['institutes'] is List) {
+      validInstitutes = (j['institutes'] as List).map((e) => e.toString()).toList();
+    } else if (j['institute'] != null && j['institute'].toString().isNotEmpty) {
+      validInstitutes = [j['institute'].toString()];
+    }
+    
+    List<int> validYears = [];
+    if (j['years'] is List) {
+      validYears = (j['years'] as List).map((e) => (e as num).toInt()).toList();
+    } else if (j['year'] != null && j['year'].toString().isNotEmpty) {
+      final y = int.tryParse(j['year'].toString());
+      if (y != null) validYears = [y];
+    }
     return Question(
       id: j['id']?.toString() ?? '',
       subject: j['subject']?.toString() ?? 'general',
       subjectLabel: j['subject_label']?.toString() ?? j['subject']?.toString(),
+      chapter: j['chapter']?.toString() ?? '',
       question: j['question']?.toString() ?? '',
       explanation: j['explanation']?.toString(),
       options: validOptions,
       correctAnswerIndex: (j['correct_answer_index'] as num?)?.toInt() ?? 0,
       points: (j['points'] as num?)?.toInt() ?? 1,
+      institutes: validInstitutes,
+      years: validYears,
     );
   }
 
@@ -64,11 +87,14 @@ class Question {
     'id': id,
     'subject': subject,
     'subject_label': subjectLabel,
+    'chapter': chapter,
     'question': question,
     'explanation': explanation,
     'options': options,
     'correct_answer_index': correctAnswerIndex,
     'points': points,
+    'institutes': institutes,
+    'years': years,
   };
 }
 

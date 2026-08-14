@@ -34,7 +34,7 @@ class PaymentMethodsCard extends StatelessWidget {
             'bK',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 10,
+              fontSize: 13,
               fontWeight: FontWeight.w900,
             ), // font-black
           ),
@@ -49,7 +49,7 @@ class PaymentMethodsCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(8), // rounded-lg
           gradient: const LinearGradient(
             colors: [
-              Color(0xFFF59E0B),
+              Color(0xFF1E3A8A),
               Color(0xFFEA580C),
             ], // orange-500 to orange-600
           ),
@@ -60,7 +60,7 @@ class PaymentMethodsCard extends StatelessWidget {
             'N',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 10,
+              fontSize: 13,
               fontWeight: FontWeight.w900,
             ), // font-black
           ),
@@ -72,7 +72,7 @@ class PaymentMethodsCard extends StatelessWidget {
       height: 32, // w-8 h-8
       decoration: BoxDecoration(
         color: isDark
-            ? const Color(0xFF262626)
+            ? const Color(0xFF1C1C1E)
             : const Color(0xFFF5F5F5), // neutral-800 : neutral-100
         borderRadius: BorderRadius.circular(8), // rounded-lg
       ),
@@ -93,11 +93,11 @@ class PaymentMethodsCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isDark
-            ? const Color(0xFF0F172A)
+            ? const Color(0xFF000000)
             : Colors.white, // neutral-900 : white
         borderRadius: BorderRadius.circular(16), // rounded-2xl
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
         ), // neutral-800 : neutral-100
         boxShadow: const [
           BoxShadow(
@@ -117,7 +117,7 @@ class PaymentMethodsCard extends StatelessWidget {
               border: Border(
                 bottom: BorderSide(
                   color: isDark
-                      ? const Color(0xFF262626)
+                      ? const Color(0xFF1C1C1E)
                       : const Color(0xFFF5F5F5),
                 ),
               ),
@@ -138,11 +138,11 @@ class PaymentMethodsCard extends StatelessWidget {
                     Text(
                       'পেমেন্ট মেথড',
                       style: TextStyle(
-                        fontSize: 16, // text-base
+                        fontSize: 18, // text-base
                         fontWeight: FontWeight.bold,
                         color: isDark
                             ? Colors.white
-                            : const Color(0xFF262626), // white : neutral-800
+                            : const Color(0xFF1C1C1E), // white : neutral-800
                       ),
                     ),
                   ],
@@ -155,7 +155,7 @@ class PaymentMethodsCard extends StatelessWidget {
                   ), // hover:text-emerald-600
                   label: const Text(
                     'যুক্ত করো',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   style:
                       TextButton.styleFrom(
@@ -202,7 +202,7 @@ class PaymentMethodsCard extends StatelessWidget {
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFFAFAFA), // neutral-800 : neutral-50
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -221,12 +221,12 @@ class PaymentMethodsCard extends StatelessWidget {
                   Text(
                     'কোনো মেথড নেই',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: isDark
                           ? const Color(0xFFD4D4D4)
                           : const Color(
-                              0xFF404040,
+                              0xFF27272A,
                             ), // neutral-300 : neutral-700
                     ),
                   ),
@@ -235,7 +235,7 @@ class PaymentMethodsCard extends StatelessWidget {
                     'bKash বা Nagad যুক্ত করো সহজ পেমেন্টের জন্য।',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 15,
                       color: isDark
                           ? const Color(0xFFA3A3A3)
                           : const Color(
@@ -269,7 +269,7 @@ class PaymentMethodsCard extends StatelessWidget {
                             ), // rounded-xl
                             border: Border.all(
                               color: isDark
-                                  ? const Color(0xFF262626)
+                                  ? const Color(0xFF1C1C1E)
                                   : const Color(0xFFF5F5F5),
                             ), // border-neutral-800 : border-neutral-100
                           ),
@@ -292,12 +292,12 @@ class PaymentMethodsCard extends StatelessWidget {
                                                   ? 'bKash'
                                                   : 'Nagad'),
                                         style: TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                           color: isDark
                                               ? Colors.white
                                               : const Color(
-                                                  0xFF262626,
+                                                  0xFF1C1C1E,
                                                 ), // white : neutral-800
                                         ),
                                       ),
@@ -307,7 +307,7 @@ class PaymentMethodsCard extends StatelessWidget {
                                           method.number ??
                                               'Exp: ${method.expiry}',
                                           style: TextStyle(
-                                            fontSize: 12,
+                                            fontSize: 15,
                                             color: isDark
                                                 ? const Color(0xFFA3A3A3)
                                                 : const Color(
@@ -342,7 +342,7 @@ class PaymentMethodsCard extends StatelessWidget {
                                       child: Text(
                                         'DEFAULT',
                                         style: TextStyle(
-                                          fontSize: 9, // text-[9px]
+                                          fontSize: 12, // text-[9px]
                                           fontWeight: FontWeight.bold,
                                           color: isDark
                                               ? const Color(0xFF047857)

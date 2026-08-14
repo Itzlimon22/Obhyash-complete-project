@@ -1,6 +1,7 @@
 ﻿import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -54,12 +55,14 @@ class _UPSubject {
 class _UPAnalytics {
   final int totalExams, totalCorrect, avgScore;
   final List<_UPSubject> subjects;
+  final List<int> last30DaysActivity;
 
   const _UPAnalytics({
     required this.totalExams,
     required this.totalCorrect,
     required this.avgScore,
     required this.subjects,
+    this.last30DaysActivity = const [],
   });
 
   static const empty = _UPAnalytics(
@@ -67,6 +70,7 @@ class _UPAnalytics {
     totalCorrect: 0,
     avgScore: 0,
     subjects: [],
+    last30DaysActivity: [],
   );
 }
 
@@ -92,7 +96,7 @@ String _upSubjName(String key) {
 Color _upLevelColor(String id) {
   const colors = {
     'Legend': Color(0xFFB91C1C),
-    'Titan': Color(0xFFF59E0B),
+    'Titan': Color(0xFF1E3A8A),
     'Warrior': Color(0xFFB91C1C),
     'Scout': Color(0xFF047857),
     'Rookie': Color(0xFF94A3B8),
@@ -312,7 +316,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFE5E5E5),
                     ),
                     boxShadow: isDark
@@ -426,7 +430,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                             label: 'পয়েন্ট',
                             value: _upFmt.format(user.xp),
                             icon: LucideIcons.star,
-                            color: const Color(0xFFF59E0B),
+                            color: const Color(0xFF1E3A8A),
                             isDark: isDark,
                           ),
                           _UPStatBox(
@@ -447,7 +451,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                             label: 'স্ট্রিক',
                             value: user.streakCount.toString(),
                             icon: LucideIcons.flame,
-                            color: const Color(0xFFF59E0B),
+                            color: const Color(0xFF1E3A8A),
                             isDark: isDark,
                           ),
                         ],
@@ -457,98 +461,134 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                 ),
                 const SizedBox(height: 12),
 
-                // ── Correct answers badge ──────────────────────────────────
+                // ── Premium Performance Gauge & Heatmap ─────────────────────
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF047857)
-                        : const Color(0xFFECFDF5),
+                    color: isDark ? const Color(0xFF0F172A) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF047857)
-                          : const Color(0xFFECFDF5),
+                      color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
                     ),
                   ),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF047857)
-                              : Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(
-                                0xFF047857,
-                              ).withValues(alpha: 0.2),
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          LucideIcons.checkCircle2,
-                          size: 26,
-                          color: Color(0xFF047857),
+                      Text(
+                        'পারফরম্যান্স',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      const SizedBox(height: 20),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            _upFmt.format(analytics.totalCorrect),
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w900,
-                              color: isDark
-                                  ? const Color(0xFF047857)
-                                  : const Color(0xFF047857),
+                          // Circular Gauge
+                          SizedBox(
+                            width: 80,
+                            height: 80,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  value: 1.0,
+                                  strokeWidth: 8,
+                                  color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
+                                ),
+                                CircularProgressIndicator(
+                                  value: analytics.totalExams > 0 ? (analytics.avgScore / 100.0) : 0,
+                                  strokeWidth: 8,
+                                  color: const Color(0xFF047857),
+                                  strokeCap: StrokeCap.round,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      '${analytics.avgScore}%',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                          const Text(
-                            'সঠিক উত্তর',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF047857),
-                              fontWeight: FontWeight.w600,
+                          const SizedBox(width: 24),
+                          // Stats
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'মোট সঠিক উত্তর',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF737373),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _upFmt.format(analytics.totalCorrect),
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w900,
+                                    color: isDark ? const Color(0xFF047857) : const Color(0xFF047857),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                      const Spacer(),
-                      if (analytics.totalExams > 0)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '${analytics.avgScore}%',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: isDark
-                                    ? const Color(0xFF047857)
-                                    : const Color(0xFF047857),
-                              ),
-                            ),
-                            const Text(
-                              'গড় স্কোর',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Color(0xFF6EE7B7),
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: 24),
+                      Text(
+                        'গত ৩০ দিনের অ্যাক্টিভিটি',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF737373),
                         ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Heatmap
+                      SizedBox(
+                        width: double.infinity,
+                        child: Wrap(
+                          spacing: 4,
+                          runSpacing: 4,
+                          children: List.generate(30, (index) {
+                            final count = analytics.last30DaysActivity.isNotEmpty ? analytics.last30DaysActivity[index] : 0;
+                            Color boxColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9);
+                            if (count > 0) {
+                              double opacity = 0.3;
+                              if (count > 1) opacity = 0.6;
+                              if (count > 3) opacity = 0.8;
+                              if (count > 5) opacity = 1.0;
+                              boxColor = const Color(0xFF047857).withOpacity(opacity);
+                            }
+                            return Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: boxColor,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 12),
-
                 // ── XP Comparison ──────────────────────────────────────────
                 if (!isViewingSelf && myProfile != null) ...[
                   Container(
@@ -558,7 +598,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isDark
-                            ? const Color(0xFF262626)
+                            ? const Color(0xFF1C1C1E)
                             : const Color(0xFFE5E5E5),
                       ),
                     ),
@@ -600,43 +640,69 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                           isDark: isDark,
                         ),
                         const SizedBox(height: 16),
-                        GridView.count(
-                          crossAxisCount: 2,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                          childAspectRatio: 2.4,
+                        _UPActivityComparisonChart(
+                          myActivity: _myA.last30DaysActivity,
+                          opActivity: analytics.last30DaysActivity,
+                          opName: user.name ?? 'Opponent',
+                          isDark: isDark,
+                        ),
+                        const SizedBox(height: 16),
+                        Column(
                           children: [
-                            _UPCompareCell(
-                              label: 'পরীক্ষা',
-                              myVal: _myA.totalExams.toString(),
-                              opponentVal: user.examsTaken.toString(),
-                              opponentName: user.name.split(' ').first,
-                              isDark: isDark,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _UPCompareCell(
+                                    label: 'মোট পরীক্ষা',
+                                    myValStr: _upFmt.format(_myA.totalExams),
+                                    opponentValStr: _upFmt.format(analytics.totalExams),
+                                    myVal: _myA.totalExams.toDouble(),
+                                    opponentVal: analytics.totalExams.toDouble(),
+                                    opponentName: user.name ?? 'Opponent',
+                                    isDark: isDark,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _UPCompareCell(
+                                    label: 'গড় স্কোর',
+                                    myValStr: '${_myA.avgScore}%',
+                                    opponentValStr: '${analytics.avgScore}%',
+                                    myVal: _myA.avgScore.toDouble(),
+                                    opponentVal: analytics.avgScore.toDouble(),
+                                    opponentName: user.name ?? 'Opponent',
+                                    isDark: isDark,
+                                  ),
+                                ),
+                              ],
                             ),
-                            _UPCompareCell(
-                              label: 'স্ট্রিক',
-                              myVal: myProfile.streakCount.toString(),
-                              opponentVal: user.streakCount.toString(),
-                              opponentName: user.name.split(' ').first,
-                              isDark: isDark,
-                            ),
-                            _UPCompareCell(
-                              label: 'গড় স্কোর',
-                              myVal: '${_myA.avgScore}%',
-                              opponentVal: '${analytics.avgScore}%',
-                              opponentName: user.name.split(' ').first,
-                              isDark: isDark,
-                            ),
-                            _UPCompareCell(
-                              label: 'সঠিক উত্তর',
-                              myVal: _upFmt.format(_myA.totalCorrect),
-                              opponentVal: _upFmt.format(
-                                analytics.totalCorrect,
-                              ),
-                              opponentName: user.name.split(' ').first,
-                              isDark: isDark,
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _UPCompareCell(
+                                    label: 'সঠিক উত্তর',
+                                    myValStr: _upFmt.format(_myA.totalCorrect),
+                                    opponentValStr: _upFmt.format(analytics.totalCorrect),
+                                    myVal: _myA.totalCorrect.toDouble(),
+                                    opponentVal: analytics.totalCorrect.toDouble(),
+                                    opponentName: user.name ?? 'Opponent',
+                                    isDark: isDark,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: _UPCompareCell(
+                                    label: 'মোট XP',
+                                    myValStr: _upFmt.format(myProfile.xp),
+                                    opponentValStr: _upFmt.format(user.xp),
+                                    myVal: myProfile.xp.toDouble(),
+                                    opponentVal: user.xp.toDouble(),
+                                    opponentName: user.name ?? 'Opponent',
+                                    isDark: isDark,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -654,7 +720,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isDark
-                            ? const Color(0xFF262626)
+                            ? const Color(0xFF1C1C1E)
                             : const Color(0xFFE5E5E5),
                       ),
                     ),
@@ -687,7 +753,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                         Divider(
                           height: 1,
                           color: isDark
-                              ? const Color(0xFF262626)
+                              ? const Color(0xFF1C1C1E)
                               : const Color(0xFFF0F0F0),
                         ),
                         ...analytics.subjects.asMap().entries.map((e) {
@@ -857,7 +923,7 @@ class _UPXPBar extends StatelessWidget {
             value: pct,
             minHeight: 10,
             backgroundColor: isDark
-                ? const Color(0xFF262626)
+                ? const Color(0xFF1C1C1E)
                 : const Color(0xFFF5F5F5),
             valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
@@ -868,92 +934,6 @@ class _UPXPBar extends StatelessWidget {
 }
 
 // ─── Compare Cell ────────────────────────────────────────────────────────────────
-class _UPCompareCell extends StatelessWidget {
-  final String label, myVal, opponentVal, opponentName;
-  final bool isDark;
-
-  const _UPCompareCell({
-    required this.label,
-    required this.myVal,
-    required this.opponentVal,
-    required this.opponentName,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-    decoration: BoxDecoration(
-      color: isDark
-          ? const Color(0xFF262626).withValues(alpha: 0.5)
-          : const Color(0xFFF5F5F5),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 9,
-            fontWeight: FontWeight.w900,
-            color: Color(0xFFA3A3A3),
-            letterSpacing: 1.0,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              myVal,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: isDark
-                    ? const Color(0xFFD4D4D4)
-                    : const Color(0xFF404040),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 6),
-              width: 1,
-              height: 16,
-              color: isDark ? const Color(0xFF404040) : const Color(0xFFD4D4D4),
-            ),
-            Text(
-              opponentVal,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF047857),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 2),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'তুমি',
-              style: TextStyle(fontSize: 9, color: Color(0xFFA3A3A3)),
-            ),
-            const SizedBox(width: 16),
-            Flexible(
-              child: Text(
-                opponentName,
-                style: const TextStyle(fontSize: 9, color: Color(0xFF047857)),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
-
 // ─── Subject Row (collapsible) ──────────────────────────────────────────────────
 class _UPSubjectRow extends StatelessWidget {
   final _UPSubject subject;
@@ -994,7 +974,7 @@ class _UPSubjectRow extends StatelessWidget {
                     color: isOpen
                         ? const Color(0xFFB91C1C)
                         : (isDark
-                              ? const Color(0xFF404040)
+                              ? const Color(0xFF27272A)
                               : const Color(0xFFE5E5E5)),
                     borderRadius: BorderRadius.circular(2),
                   ),
@@ -1010,7 +990,7 @@ class _UPSubjectRow extends StatelessWidget {
                           ? (isDark
                                 ? const Color(0xFFB91C1C)
                                 : const Color(0xFFB91C1C))
-                          : (isDark ? Colors.white : const Color(0xFF262626)),
+                          : (isDark ? Colors.white : const Color(0xFF1C1C1E)),
                     ),
                   ),
                 ),
@@ -1123,7 +1103,7 @@ class _UPSubjectRow extends StatelessWidget {
         if (!isLast)
           Divider(
             height: 1,
-            color: isDark ? const Color(0xFF262626) : const Color(0xFFF0F0F0),
+            color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF0F0F0),
           ),
       ],
     );
@@ -1160,4 +1140,239 @@ class _UPMini extends StatelessWidget {
       ],
     ),
   );
+}
+
+
+// ─── Activity Comparison Chart ─────────────────────────────────────────────────
+class _UPActivityComparisonChart extends StatelessWidget {
+  final List<int> myActivity;
+  final List<int> opActivity;
+  final String opName;
+  final bool isDark;
+
+  const _UPActivityComparisonChart({
+    required this.myActivity,
+    required this.opActivity,
+    required this.opName,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // We only want the last 7 days
+    final my7 = myActivity.length >= 7 ? myActivity.sublist(myActivity.length - 7) : List.filled(7, 0);
+    final op7 = opActivity.length >= 7 ? opActivity.sublist(opActivity.length - 7) : List.filled(7, 0);
+
+    final maxVal = [...my7, ...op7].fold<int>(1, (a, b) => a > b ? a : b).toDouble();
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'অ্যাক্টিভিটি গ্রাফ (গত ৭ দিন)',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
+            ),
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 180,
+            child: LineChart(
+              LineChartData(
+                gridData: FlGridData(
+                  show: true, 
+                  drawVerticalLine: false, 
+                  getDrawingHorizontalLine: (val) => FlLine(color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5), strokeWidth: 1),
+                ),
+                titlesData: FlTitlesData(
+                  show: true,
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 22,
+                      getTitlesWidget: (value, meta) {
+                        const days = ['-6', '-5', '-4', '-3', '-2', '-1', 'আজ'];
+                        final int idx = value.toInt();
+                        if (idx < 0 || idx > 6) return const SizedBox();
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(days[idx], style: const TextStyle(fontSize: 10, color: Color(0xFF737373))),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                borderData: FlBorderData(show: false),
+                minX: 0,
+                maxX: 6,
+                minY: 0,
+                maxY: maxVal == 0 ? 5 : maxVal + (maxVal * 0.2), // Avoid zero max
+                lineBarsData: [
+                  // Opponent line
+                  LineChartBarData(
+                    spots: List.generate(7, (i) => FlSpot(i.toDouble(), op7[i].toDouble())),
+                    isCurved: true,
+                    color: const Color(0xFF1E3A8A),
+                    barWidth: 3,
+                    isStrokeCapRound: true,
+                    dotData: const FlDotData(show: false),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      color: const Color(0xFF1E3A8A).withValues(alpha: 0.1),
+                    ),
+                  ),
+                  // My line
+                  LineChartBarData(
+                    spots: List.generate(7, (i) => FlSpot(i.toDouble(), my7[i].toDouble())),
+                    isCurved: true,
+                    color: const Color(0xFF047857),
+                    barWidth: 3,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) {
+                        return FlDotCirclePainter(
+                          radius: 4,
+                          color: Colors.white,
+                          strokeWidth: 2,
+                          strokeColor: const Color(0xFF047857),
+                        );
+                      },
+                    ),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      color: const Color(0xFF047857).withValues(alpha: 0.1),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Legend
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(width: 12, height: 12, decoration: const BoxDecoration(color: Color(0xFF047857), shape: BoxShape.circle)),
+              const SizedBox(width: 8),
+              const Text('তুমি', style: TextStyle(fontSize: 12, color: Color(0xFF737373))),
+              const SizedBox(width: 24),
+              Container(width: 12, height: 12, decoration: const BoxDecoration(color: Color(0xFF1E3A8A), shape: BoxShape.circle)),
+              const SizedBox(width: 8),
+              Text(opName.split(' ')[0], style: const TextStyle(fontSize: 12, color: Color(0xFF737373))),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Premium Compare Cell ──────────────────────────────────────────────────────────
+class _UPCompareCell extends StatelessWidget {
+  final String label, myValStr, opponentValStr, opponentName;
+  final double myVal, opponentVal;
+  final bool isDark;
+
+  const _UPCompareCell({
+    required this.label,
+    required this.myValStr,
+    required this.opponentValStr,
+    required this.myVal,
+    required this.opponentVal,
+    required this.opponentName,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final double maxVal = myVal > opponentVal ? myVal : opponentVal;
+    final double myPct = maxVal > 0 ? (myVal / maxVal) : 0.0;
+    final double opPct = maxVal > 0 ? (opponentVal / maxVal) : 0.0;
+    
+    final bool iWon = myVal >= opponentVal;
+    
+    final Color myColor = iWon ? const Color(0xFF047857) : const Color(0xFFB91C1C);
+    final Color opColor = !iWon ? const Color(0xFF047857) : const Color(0xFFB91C1C);
+    
+    final Color trackColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5);
+    final Color textColor = isDark ? Colors.white : const Color(0xFF000000);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF000000) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFFA3A3A3),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('তুমি', style: TextStyle(fontSize: 12, color: Color(0xFF737373))),
+              Text(myValStr, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Stack(
+            children: [
+              Container(height: 6, decoration: BoxDecoration(color: trackColor, borderRadius: BorderRadius.circular(3))),
+              FractionallySizedBox(
+                widthFactor: myPct,
+                child: Container(height: 6, decoration: BoxDecoration(color: myColor, borderRadius: BorderRadius.circular(3))),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Text(
+                  opponentName.split(' ')[0],
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF737373)),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(opponentValStr, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textColor)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Stack(
+            children: [
+              Container(height: 6, decoration: BoxDecoration(color: trackColor, borderRadius: BorderRadius.circular(3))),
+              FractionallySizedBox(
+                widthFactor: opPct,
+                child: Container(height: 6, decoration: BoxDecoration(color: opColor, borderRadius: BorderRadius.circular(3))),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

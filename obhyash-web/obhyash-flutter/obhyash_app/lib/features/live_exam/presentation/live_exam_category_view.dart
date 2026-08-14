@@ -37,25 +37,6 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
       backgroundColor: isDark
           ? const Color(0xFF0C0A09)
           : const Color(0xFFFAFAFA),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            LucideIcons.arrowLeft,
-            color: isDark ? Colors.white : const Color(0xFF0F172A),
-          ),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          widget.category,
-          style: TextStyle(
-            color: isDark ? Colors.white : const Color(0xFF0F172A),
-            fontWeight: FontWeight.w900,
-            fontSize: 22,
-          ),
-        ),
-      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Column(
@@ -64,11 +45,11 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
             // Search Bar
             Container(
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF262626) : Colors.white,
+                color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(
                   color: isDark
-                      ? const Color(0xFF404040)
+                      ? const Color(0xFF27272A)
                       : const Color(0xFFE5E5E5),
                 ),
                 boxShadow: [
@@ -85,7 +66,7 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
                   ref.read(liveExamSearchProvider.notifier).updateSearch(val);
                 },
                 style: TextStyle(
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: isDark ? Colors.white : const Color(0xFF000000),
                 ),
                 decoration: InputDecoration(
                   hintText: 'Search for exams...',
@@ -112,11 +93,11 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
                 Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF262626) : Colors.white,
+                    color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF404040)
+                          ? const Color(0xFF27272A)
                           : const Color(0xFFE5E5E5),
                     ),
                   ),
@@ -156,7 +137,7 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
                           child: Text(
                             f,
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: isActive
                                   ? Colors.white
@@ -190,17 +171,17 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
                             LucideIcons.calendar,
                             size: 14,
                             color: isDark
-                                ? const Color(0xFF334155)
+                                ? const Color(0xFF27272A)
                                 : const Color(0xFF1A73E8),
                           ),
                           const SizedBox(width: 6),
                           Text(
                             'Routine',
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: isDark
-                                  ? const Color(0xFF334155)
+                                  ? const Color(0xFF27272A)
                                   : const Color(0xFF1A73E8),
                             ),
                           ),
@@ -270,8 +251,8 @@ class _LiveExamCard extends StatelessWidget {
 
     String statusText = "Upcoming";
     Color statusColor = isDark
-        ? const Color(0xFF334155)
-        : const Color(0xFF0F172A); // blue
+        ? const Color(0xFF27272A)
+        : const Color(0xFF000000); // blue
     Color statusBg = isDark
         ? const Color(0xFF1E3A8A).withOpacity(0.3)
         : const Color(0xFFEFF6FF);
@@ -289,7 +270,7 @@ class _LiveExamCard extends StatelessWidget {
       statusColor = isDark
           ? const Color(0xFFA3A3A3)
           : const Color(0xFF737373); // gray
-      statusBg = isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5);
+      statusBg = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5);
     }
 
     final now = DateTime.now();
@@ -307,10 +288,10 @@ class _LiveExamCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF262626) : Colors.white,
+          color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? const Color(0xFF404040) : const Color(0xFFF5F5F5),
+            color: isDark ? const Color(0xFF27272A) : const Color(0xFFF5F5F5),
           ),
           boxShadow: [
             if (!isDark)
@@ -327,9 +308,9 @@ class _LiveExamCard extends StatelessWidget {
             Text(
               exam.title,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                color: isDark ? Colors.white : const Color(0xFF000000),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -348,7 +329,7 @@ class _LiveExamCard extends StatelessWidget {
                 Text(
                   '${exam.durationMinutes} মিনিট',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 15,
                     fontWeight: FontWeight.w500,
                     color: isDark
                         ? const Color(0xFFA3A3A3)
@@ -367,7 +348,7 @@ class _LiveExamCard extends StatelessWidget {
                 Text(
                   '${exam.totalQuestions} টি প্রশ্ন',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 15,
                     fontWeight: FontWeight.w500,
                     color: isDark
                         ? const Color(0xFFA3A3A3)
@@ -397,7 +378,7 @@ class _LiveExamCard extends StatelessWidget {
                       Text(
                         isTaken ? 'Taken' : statusText,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: statusColor,
                         ),
@@ -407,11 +388,11 @@ class _LiveExamCard extends StatelessWidget {
                   Text(
                     timeDisplay,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: isDark
                           ? const Color(0xFFE5E5E5)
-                          : const Color(0xFF262626),
+                          : const Color(0xFF1C1C1E),
                     ),
                   ),
                 ],

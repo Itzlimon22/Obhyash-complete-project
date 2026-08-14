@@ -8,6 +8,7 @@ class MainSidebar extends StatelessWidget {
   final VoidCallback toggleTheme;
   final String userName;
   final String userInstitute;
+  final String? avatarUrl;
 
   const MainSidebar({
     super.key,
@@ -17,6 +18,7 @@ class MainSidebar extends StatelessWidget {
     required this.toggleTheme,
     required this.userName,
     required this.userInstitute,
+    this.avatarUrl,
   });
 
   @override
@@ -39,7 +41,7 @@ class MainSidebar extends StatelessWidget {
 
     return Drawer(
       backgroundColor: isDark
-          ? const Color(0xFF0F172A)
+          ? const Color(0xFF000000)
           : Colors.white, // neutral-900 : white
       elevation: 16,
       child: SafeArea(
@@ -58,7 +60,7 @@ class MainSidebar extends StatelessWidget {
                   border: Border(
                     bottom: BorderSide(
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(
                               0xFFF5F5F5,
                             ), // neutral-800 : neutral-100
@@ -97,7 +99,7 @@ class MainSidebar extends StatelessWidget {
                         Text(
                           'OBHYASH',
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 13,
                             fontWeight: FontWeight.bold,
                             color: isDark
                                 ? const Color(0xFF737373)
@@ -110,12 +112,12 @@ class MainSidebar extends StatelessWidget {
                         Text(
                           'অভ্যাস',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF0F172A),
-                            fontFamily: 'HindSiliguri',
+                                : const Color(0xFF000000),
+                            fontFamily: 'Anek Bangla',
                             height: 1.1,
                           ),
                         ),
@@ -187,8 +189,8 @@ class MainSidebar extends StatelessWidget {
                             Text(
                               label,
                               style: TextStyle(
-                                fontSize: 14,
-                                fontFamily: 'HindSiliguri',
+                                fontSize: 16,
+                                fontFamily: 'Anek Bangla',
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 0.2,
                                 color: isActive
@@ -219,7 +221,7 @@ class MainSidebar extends StatelessWidget {
                 border: Border(
                   top: BorderSide(
                     color: isDark
-                        ? const Color(0xFF262626)
+                        ? const Color(0xFF1C1C1E)
                         : const Color(0xFFF5F5F5),
                   ), // neutral-800 : neutral-100
                 ),
@@ -237,12 +239,12 @@ class MainSidebar extends StatelessWidget {
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? const Color(0xFF262626)
+                            ? const Color(0xFF1C1C1E)
                             : Colors.white, // neutral-800
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isDark
-                              ? const Color(0xFF404040)
+                              ? const Color(0xFF27272A)
                               : const Color(0xFFE5E5E5),
                         ), // neutral-700 : neutral-200
                         boxShadow: const [
@@ -255,21 +257,33 @@ class MainSidebar extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          CircleAvatar(
-                            radius: 16,
-                            backgroundColor: const Color(
-                              0xFFB91C1C,
-                            ), // rose-600
-                            child: Text(
-                              userName.isNotEmpty
-                                  ? userName[0].toUpperCase()
-                                  : 'U',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(0xFFB91C1C),
+                              image: avatarUrl != null
+                                  ? DecorationImage(
+                                      image: NetworkImage(avatarUrl!),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
                             ),
+                            child: avatarUrl == null
+                                ? Center(
+                                    child: Text(
+                                      userName.isNotEmpty
+                                          ? userName[0].toUpperCase()
+                                          : 'U',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  )
+                                : null,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -279,11 +293,11 @@ class MainSidebar extends StatelessWidget {
                                 Text(
                                   userName,
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: isDark
                                         ? Colors.white
-                                        : const Color(0xFF0F172A),
+                                        : const Color(0xFF000000),
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -291,7 +305,7 @@ class MainSidebar extends StatelessWidget {
                                 Text(
                                   'Settings & Profile',
                                   style: TextStyle(
-                                    fontSize: 10,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w500,
                                     color: isDark
                                         ? const Color(0xFFA3A3A3)
@@ -327,7 +341,7 @@ class MainSidebar extends StatelessWidget {
                         tooltip: isDark ? 'Light Mode' : 'Dark Mode',
                         style: IconButton.styleFrom(
                           backgroundColor: isDark
-                              ? const Color(0xFF262626)
+                              ? const Color(0xFF1C1C1E)
                               : Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -348,7 +362,7 @@ class MainSidebar extends StatelessWidget {
                                 0x33E11D48,
                               ), // rose-600/20
                               backgroundColor: isDark
-                                  ? const Color(0xFF262626)
+                                  ? const Color(0xFF1C1C1E)
                                   : Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),

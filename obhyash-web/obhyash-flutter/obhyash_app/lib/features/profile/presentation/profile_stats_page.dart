@@ -103,30 +103,18 @@ class ProfileStatsPage extends ConsumerWidget {
     return userAsync.when(
       data: (user) {
         if (user == null) {
-          return const Scaffold(body: Center(child: Text('User not found.')));
+          return const Center(child: Text('User not found.'));
         }
         final history = historyAsync.value ?? [];
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: const Color(0xFF166534),
-            foregroundColor: Colors.white,
-            elevation: 0,
-            title: const Text(
-              'পরিসংখ্যান',
-              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
-            ),
-          ),
-          body: MyProfileView(
-            user: user,
-            history: history,
-            subjectStats: _computeSubjectStats(history),
-            calendarData: _buildCalendarData(history),
-          ),
+        return MyProfileView(
+          user: user,
+          history: history,
+          subjectStats: _computeSubjectStats(history),
+          calendarData: _buildCalendarData(history),
         );
       },
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, s) => Scaffold(body: Center(child: Text('Error: $e'))),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, s) => Center(child: Text('Error: $e')),
     );
   }
 }

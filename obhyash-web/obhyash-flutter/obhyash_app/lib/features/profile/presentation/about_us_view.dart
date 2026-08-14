@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:go_router/go_router.dart';
 
 // --- Domain Models ---
 class PolicySection {
@@ -151,122 +152,37 @@ const List<PolicyContent> appPolicies = [
 
 // --- View ---
 class AboutUsView extends StatefulWidget {
-  const AboutUsView({super.key});
+  final String initialPolicyId;
+  
+  const AboutUsView({
+    super.key, 
+    this.initialPolicyId = 'about',
+  });
 
   @override
   State<AboutUsView> createState() => _AboutUsViewState();
 }
 
 class _AboutUsViewState extends State<AboutUsView> {
-  String _activePolicyId = 'about';
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final activePolicy = appPolicies.firstWhere((p) => p.id == _activePolicyId);
+    final activePolicy = appPolicies.firstWhere((p) => p.id == widget.initialPolicyId);
+    final bgColor = isDark ? const Color(0xFF000000) : const Color(0xFFFAFAFA);
 
     return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFFFAFAFA)
-          : const Color(
-              0xFFFAFAFA,
-            ), // We'll keep it slightly off-white on light similar to web
-      body: Builder(
-        builder: (context) {
-          // Adjust background for dark mode properly
-          final bgColor = isDark ? Colors.black : const Color(0xFFFAFAFA);
+      backgroundColor: bgColor,
+      body: Container(
+        color: bgColor,
+        child: Column(
+          children: [
 
-          return Container(
-            color: bgColor,
-            child: Column(
-              children: [
-                AppBar(
-                  title: const Text(
-                    'আমাদের সম্পর্কে',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  scrolledUnderElevation: 0,
-                ),
-                // Mobile Tabs (Chips)
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: Row(
-                    children: appPolicies.map((policy) {
-                      final isActive = policy.id == _activePolicyId;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: GestureDetector(
-                          onTap: () =>
-                              setState(() => _activePolicyId = policy.id),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isActive
-                                  ? const Color(0xFF047857) // emerald-600
-                                  : (isDark
-                                        ? const Color(0xFF262626)
-                                        : Colors.white),
-                              borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                color: isActive
-                                    ? const Color(0xFF047857)
-                                    : (isDark
-                                          ? const Color(0xFF404040)
-                                          : const Color(0xFFF5F5F5)),
-                              ),
-                              boxShadow: isActive
-                                  ? [
-                                      const BoxShadow(
-                                        color: Color(0x66A7F3D0),
-                                        blurRadius: 4,
-                                        offset: Offset(0, 2),
-                                      ), // shadow-emerald-200
-                                    ]
-                                  : [],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  policy.icon,
-                                  size: 16,
-                                  color: isActive
-                                      ? Colors.white
-                                      : (isDark
-                                            ? Colors.white
-                                            : policy.iconColor),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  policy.title,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: isActive
-                                        ? Colors.white
-                                        : (isDark
-                                              ? const Color(0xFFA3A3A3)
-                                              : const Color(0xFF525252)),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
 
                 // Content Area
                 Expanded(
@@ -280,12 +196,12 @@ class _AboutUsViewState extends State<AboutUsView> {
                           padding: const EdgeInsets.all(32),
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF0F172A)
+                                ? const Color(0xFF000000)
                                 : Colors.white,
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
                               color: isDark
-                                  ? const Color(0xFF262626)
+                                  ? const Color(0xFF1C1C1E)
                                   : const Color(0xFFF5F5F5),
                             ),
                             boxShadow: [
@@ -327,11 +243,11 @@ class _AboutUsViewState extends State<AboutUsView> {
                                 activePolicy.title,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 24, // text-3xl
+                                  fontSize: 26, // text-3xl
                                   fontWeight: FontWeight.w900, // font-black
                                   color: isDark
                                       ? Colors.white
-                                      : const Color(0xFF0F172A),
+                                      : const Color(0xFF000000),
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -339,7 +255,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                 activePolicy.subtitle,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 16, // text-lg
+                                  fontSize: 18, // text-lg
                                   fontStyle: FontStyle.italic,
                                   fontWeight: FontWeight.bold,
                                   color: isDark
@@ -358,12 +274,12 @@ class _AboutUsViewState extends State<AboutUsView> {
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF0F172A)
+                                ? const Color(0xFF000000)
                                 : Colors.white,
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
                               color: isDark
-                                  ? const Color(0xFF262626)
+                                  ? const Color(0xFF1C1C1E)
                                   : const Color(0xFFF5F5F5),
                             ),
                             boxShadow: [
@@ -378,7 +294,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                           child: Text(
                             activePolicy.description,
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 18,
                               height: 1.5,
                               fontWeight: FontWeight.w500,
                               color: isDark
@@ -400,12 +316,12 @@ class _AboutUsViewState extends State<AboutUsView> {
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? const Color(0xFF0F172A)
+                                  ? const Color(0xFF000000)
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(24),
                               border: Border.all(
                                 color: isDark
-                                    ? const Color(0xFF262626)
+                                    ? const Color(0xFF1C1C1E)
                                     : const Color(0xFFF5F5F5),
                               ),
                               boxShadow: [
@@ -442,7 +358,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                             : Text(
                                                 '${section.id ?? idx + 1}',
                                                 style: const TextStyle(
-                                                  fontSize: 20,
+                                                  fontSize: 22,
                                                   fontWeight: FontWeight.w900,
                                                   color: Color(0xFF047857),
                                                 ),
@@ -458,11 +374,11 @@ class _AboutUsViewState extends State<AboutUsView> {
                                           Text(
                                             section.title,
                                             style: TextStyle(
-                                              fontSize: 18,
+                                              fontSize: 20,
                                               fontWeight: FontWeight.w900,
                                               color: isDark
                                                   ? Colors.white
-                                                  : const Color(0xFF0F172A),
+                                                  : const Color(0xFF000000),
                                             ),
                                           ),
                                           const SizedBox(height: 16),
@@ -470,7 +386,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                             Text(
                                               section.content,
                                               style: TextStyle(
-                                                fontSize: 14,
+                                                fontSize: 16,
                                                 height: 1.5,
                                                 color: isDark
                                                     ? const Color(0xFFA3A3A3)
@@ -514,7 +430,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                             child: Text(
                                                               val,
                                                               style: TextStyle(
-                                                                fontSize: 14,
+                                                                fontSize: 16,
                                                                 height: 1.5,
                                                                 color: isDark
                                                                     ? const Color(
@@ -556,7 +472,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                   const Text(
                                                     '⚠️',
                                                     style: TextStyle(
-                                                      fontSize: 18,
+                                                      fontSize: 20,
                                                     ),
                                                   ),
                                                   const SizedBox(width: 8),
@@ -564,7 +480,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                     child: Text(
                                                       section.warning!,
                                                       style: const TextStyle(
-                                                        fontSize: 14,
+                                                        fontSize: 16,
                                                         fontWeight:
                                                             FontWeight.bold,
                                                         color: Color(
@@ -595,7 +511,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                               const Text(
                                 '© ${2026} Obhyash Exam Platform - Built for Excellence',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFFA3A3A3),
                                 ),
@@ -605,7 +521,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                               const Text(
                                 'সর্বশেষ আপডেট: ০৪ ফেব্রুয়ারি, ২০২৬',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFFA3A3A3),
                                 ),
@@ -621,9 +537,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                 ),
               ],
             ),
-          );
-        },
-      ),
+          ),
     );
   }
 }

@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Question, ExamResult, ExamDetails, UserProfile } from "@/lib/types";
-import { getUserBookmarks, toggleBookmark } from "@/services/bookmark-service";
+import { getUserBookmarks, toggleBookmark, getBookmarkedQuestions } from "@/services/bookmark-service";
 import { getQuestionsByIds } from "@/services/question-service";
 import { toast } from "sonner";
 import FlashcardMode, { FlashcardResult } from "./FlashcardMode";
@@ -18,6 +18,7 @@ interface PracticeDashboardProps {
   onNavigateToMock: () => void;
   subjects?: string[];
   currentUser?: UserProfile | null;
+  initialTab?: "mistakes" | "bookmarks";
 }
 
 type Tab = "mistakes" | "bookmarks";
@@ -60,12 +61,14 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   onStartPractice,
   onNavigateToMock,
   currentUser,
+  initialTab = "mistakes",
 }) => {
-  const [activeTab, setActiveTab] = useState<Tab>("mistakes");
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(
     new Set(),
   );
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
+  const [dateFilter, setDateFilter] = useState<string>("");
   const [shuffle, setShuffle] = useState(false);
   const [viewState, setViewState] = useState<ViewState>("list");
   const [flashcardQuestions, setFlashcardQuestions] = useState<Question[]>([]);
@@ -129,7 +132,12 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
         const ids = Array.from(idsSet).map(String);
         setBookmarkedIds(new Set(ids));
         if (ids.length > 0) {
-          const questions = await getQuestionsByIds(ids);
+          const questions = await getBookmarkedQuestions(currentUser.id);
+          // Sort by bookmarkedAt descending
+          questions.sort((a, b) => {
+            if (!a.bookmarkedAt || !b.bookmarkedAt) return 0;
+            return new Date(b.bookmarkedAt).getTime() - new Date(a.bookmarkedAt).getTime();
+          });
           setGlobalBookmarks(questions);
         } else {
           setGlobalBookmarks([]);
@@ -199,21 +207,33 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
   // Reset filter when tab changes
   useEffect(() => {
     setSubjectFilter("all");
+    setDateFilter("");
     setSelectedQuestions(new Set());
+    setCurrentPage(1);
   }, [activeTab]);
 
   // ── Filtered list ───────────────────────────────────────────────────────────
   const currentList = useMemo(() => {
-    if (subjectFilter === "all") return baseList;
-    // Find the display label associated with the selected subject ID (the "code")
-    const targetLabel = allSubjects.find(([id]) => id === subjectFilter)?.[1];
+    let list = baseList;
 
-    // Filter questions by their display label so that all underlying IDs for the same
-    // display name (e.g. "Chemistry Ch 1") are shown together.
-    return baseList.filter(
-      (q) => (q.subjectLabel || q.subject) === targetLabel,
-    );
-  }, [baseList, subjectFilter, allSubjects]);
+    if (subjectFilter !== "all") {
+      const targetLabel = allSubjects.find(([id]) => id === subjectFilter)?.[1];
+      list = list.filter((q) => (q.subjectLabel || q.subject) === targetLabel);
+    }
+
+    if (activeTab === "bookmarks" && dateFilter) {
+      list = list.filter((q) => {
+        if (!q.bookmarkedAt) return false;
+        const bDate = new Date(q.bookmarkedAt).toISOString().split('T')[0];
+        return bDate === dateFilter;
+      });
+    }
+
+    if (shuffle) {
+      list = [...list].sort(() => Math.random() - 0.5);
+    }
+    return list;
+  }, [baseList, subjectFilter, allSubjects, dateFilter, activeTab, shuffle]);
 
   // Reset pagination when list changes
   useEffect(() => {
@@ -422,24 +442,47 @@ export const PracticeDashboard: React.FC<PracticeDashboardProps> = ({
         </button>
       </div>
 
-      {/* ── Subject filter pills ── */}
-      {allSubjects.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-          {([["all", "সব বিষয়"]] as [string, string][])
-            .concat(allSubjects)
-            .map(([code, label]) => (
-              <button
-                key={code}
-                onClick={() => setSubjectFilter(code)}
-                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
-                  subjectFilter === code
-                    ? "bg-red-600 text-white border-red-600 shadow"
-                    : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-red-400"
+      {/* ── Filters ── */}
+      {(allSubjects.length > 0 || activeTab === "bookmarks") && (
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex-1 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {([["all", "সব বিষয়"]] as [string, string][])
+              .concat(allSubjects)
+              .map(([code, label]) => (
+                <button
+                  key={code}
+                  onClick={() => setSubjectFilter(code)}
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                    subjectFilter === code
+                      ? "bg-red-600 text-white border-red-600 shadow"
+                      : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-red-400"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+          </div>
+
+          {activeTab === "bookmarks" && (
+            <div className="relative">
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                  dateFilter
+                    ? "bg-emerald-600 text-white border-emerald-600 shadow"
+                    : "bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-emerald-400"
                 }`}
-              >
-                {label}
-              </button>
-            ))}
+                style={{ colorScheme: 'dark' }}
+              />
+              {!dateFilter && (
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs font-bold text-neutral-400">
+                  তারিখ
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 

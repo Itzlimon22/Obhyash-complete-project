@@ -115,19 +115,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
     _loadReviewedDates().then((_) => _fetchData());
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
-      if (_activeTab == 'mistakes') {
-        _loadMoreMistakes();
-      } else {
-        _loadMoreBookmarks();
-      }
-    }
   }
 
   @override
@@ -218,33 +206,51 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
         }
       }
 
-      final bData = await sb
-          .from('bookmarks')
-          .select('question_id')
-          .eq('user_id', uid)
-          .range(_bOffset, _bOffset + _limit - 1);
-
       final bList = <PracticeQuestion>[];
       final bIds = <String>{};
+      int orphanedCount = 0;
 
-      if ((bData as List).isNotEmpty) {
-        final questionIds = bData
-            .map((b) => b['question_id'] as String)
-            .toList();
-        final qData = await sb
-            .from('questions')
-            .select('*')
-            .inFilter('id', questionIds);
+      while (bList.length < _limit && _bHasMore) {
+        final bData = await sb
+            .from('bookmarks')
+            .select('question_id')
+            .eq('user_id', uid)
+            .range(_bOffset, _bOffset + _limit - 1);
 
-        for (final row in (qData as List)) {
-          final q = PracticeQuestion.fromJson(row as Map<String, dynamic>);
-          bList.add(q);
-          bIds.add(q.id);
+        if ((bData as List).isNotEmpty) {
+          final questionIds = bData
+              .map((b) => b['question_id'] as String)
+              .toList();
+          final qData = await sb
+              .from('questions')
+              .select('*')
+              .inFilter('id', questionIds);
+
+          final qList = (qData as List).map((row) => PracticeQuestion.fromJson(row as Map<String, dynamic>)).toList();
+          final qMap = {for (final q in qList) q.id: q};
+
+          for (final qid in questionIds) {
+            final q = qMap[qid];
+            if (q != null) {
+              bList.add(q);
+              bIds.add(q.id);
+            } else {
+              orphanedCount++;
+            }
+          }
         }
+
+        if (bData.length < _limit) {
+          _bHasMore = false;
+        }
+        _bOffset += bData.length;
       }
 
       if (mounted) {
         setState(() {
+          if (orphanedCount > 0) {
+             _totalBookmarks = (_totalBookmarks - orphanedCount).clamp(0, 999999);
+          }
           if (isRefresh) {
             _bookmarks = bList;
             _bookmarkedIds = bIds;
@@ -252,10 +258,6 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             _bookmarks.addAll(bList);
             _bookmarkedIds.addAll(bIds);
           }
-          if (bData.length < _limit) {
-            _bHasMore = false;
-          }
-          _bOffset += bData.length;
         });
       }
     } catch (e) {
@@ -283,36 +285,43 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
       final uid = sb.auth.currentUser?.id;
       if (uid == null) return;
 
-      final mData = await sb
-          .from('exam_results')
-          .select('questions, user_answers')
-          .eq('user_id', uid)
-          .not('questions', 'is', null)
-          .not('user_answers', 'is', null)
-          .order('created_at', ascending: false)
-          .range(_mOffset, _mOffset + _limit - 1);
+      int initialCount = _mistakeMap.length;
 
-      for (final result in (mData as List)) {
-        final questionsRaw = result['questions'];
-        final userAnswersRaw = result['user_answers'];
-        if (questionsRaw is! List || userAnswersRaw is! Map) continue;
+      while ((_mistakeMap.length - initialCount) < _limit && _mHasMore) {
+        final mData = await sb
+            .from('exam_results')
+            .select('questions, user_answers')
+            .eq('user_id', uid)
+            .not('questions', 'is', null)
+            .not('user_answers', 'is', null)
+            .order('created_at', ascending: false)
+            .range(_mOffset, _mOffset + _limit - 1);
 
-        final userAnswers = Map<String, dynamic>.from(userAnswersRaw);
+        for (final result in (mData as List)) {
+          final questionsRaw = result['questions'];
+          final userAnswersRaw = result['user_answers'];
+          if (questionsRaw is! List || userAnswersRaw is! Map) continue;
 
-        for (final qData in questionsRaw) {
-          if (qData is! Map<String, dynamic>) continue;
-          final q = PracticeQuestion.fromJson(qData);
-          if (q.id.isEmpty) continue;
+          final userAnswers = Map<String, dynamic>.from(userAnswersRaw);
 
-          final raw = userAnswers[q.id];
-          if (raw == null) continue;
-          final userAnswer = (raw as num).toInt();
-          if (userAnswer == -1) continue;
-          if (userAnswer != q.correctAnswerIndex) {
-            _mistakeMap[q.id] = q;
-            _mistakeFreq[q.id] = (_mistakeFreq[q.id] ?? 0) + 1;
+          for (final qData in questionsRaw) {
+            if (qData is! Map<String, dynamic>) continue;
+            final q = PracticeQuestion.fromJson(qData);
+            if (q.id.isEmpty) continue;
+
+            final raw = userAnswers[q.id];
+            if (raw == null) continue;
+            final userAnswer = (raw as num).toInt();
+            if (userAnswer == -1) continue;
+            if (userAnswer != q.correctAnswerIndex) {
+              _mistakeMap[q.id] = q;
+              _mistakeFreq[q.id] = (_mistakeFreq[q.id] ?? 0) + 1;
+            }
           }
         }
+
+        if (mData.length < _limit) _mHasMore = false;
+        _mOffset += mData.length;
       }
 
       final sortedMistakes = _mistakeMap.values.toList()
@@ -324,8 +333,6 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
       if (mounted) {
         setState(() {
           _mistakes = sortedMistakes;
-          if (mData.length < _limit) _mHasMore = false;
-          _mOffset += mData.length;
           _dueCount = _computeDueCount();
         });
       }
@@ -343,7 +350,8 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
 
   // ── Bookmark toggle ─────────────────────────────────────────────────────────
 
-  Future<void> _toggleBookmark(String qid) async {
+  Future<void> _toggleBookmark(PracticeQuestion q) async {
+    final qid = q.id;
     final sb = Supabase.instance.client;
     final uid = sb.auth.currentUser?.id;
     if (uid == null) return;
@@ -352,14 +360,10 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     setState(() {
       if (isMarked) {
         _bookmarkedIds.remove(qid);
-        _bookmarks.removeWhere((q) => q.id == qid);
+        _bookmarks.removeWhere((b) => b.id == qid);
         _totalBookmarks = (_totalBookmarks - 1).clamp(0, _totalBookmarks);
       } else {
         _bookmarkedIds.add(qid);
-        final q = _mistakes.firstWhere(
-          (q) => q.id == qid,
-          orElse: () => _bookmarks.firstWhere((b) => b.id == qid),
-        );
         if (!_bookmarks.any((b) => b.id == qid)) _bookmarks.add(q);
         _totalBookmarks++;
       }
@@ -478,199 +482,217 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final list = _currentList;
 
-    return Column(
-      children: [
-        Expanded(
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Column(
-                  children: [
-                    // ── Stats bar ─────────────────────────────────────────
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
-                      child: Row(
-                        children: [
-                          _StatBox(
-                            label: 'মোট ভুল',
-                            value: _mistakes.length,
-                            color: const Color(0xFFB91C1C),
-                            isDark: isDark,
-                          ),
-                          const SizedBox(width: 8),
-                          _StatBox(
-                            label: 'বুকমার্ক',
-                            value: _totalBookmarks,
-                            color: const Color(0xFF047857),
-                            isDark: isDark,
-                          ),
-                          const SizedBox(width: 8),
-                          _StatBox(
-                            label: 'রিভিউ বাকি',
-                            value: _dueCount,
-                            color: const Color(0xFF818CF8),
-                            isDark: isDark,
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: _fetchData,
-                            child: Container(
-                              width: 44,
-                              height: 44,
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? const Color(0xFF1C1C1C)
-                                    : const Color(0xFFF5F5F5),
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color: isDark
-                                      ? const Color(0xFF333333)
-                                      : const Color(0xFFE5E5E5),
-                                ),
-                              ),
-                              child: Icon(
-                                LucideIcons.refreshCw,
-                                size: 16,
-                                color: isDark
-                                    ? const Color(0xFF737373)
-                                    : const Color(0xFFA3A3A3),
-                              ),
-                            ),
-                          ),
-                        ],
+    return _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+                  child: Row(
+                    children: [
+                      _StatBox(
+                        label: 'মোট ভুল',
+                        value: _mistakes.length,
+                        color: const Color(0xFFDC2626),
+                        isDark: isDark,
+                        icon: LucideIcons.xOctagon,
                       ),
-                    ),
-
-                    // ── Tab switcher ──────────────────────────────────────
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                      const SizedBox(width: 8),
+                      _StatBox(
+                        label: 'বুকমার্ক',
+                        value: _totalBookmarks,
+                        color: const Color(0xFF16A34A),
+                        isDark: isDark,
+                        icon: LucideIcons.bookmark,
                       ),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF0F172A)
-                                : const Color(0xFFF5F5F5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
+                      const SizedBox(width: 8),
+                      _StatBox(
+                        label: 'রিভিউ বাকি',
+                        value: _dueCount,
+                        color: const Color(0xFF4F46E5),
+                        isDark: isDark,
+                        icon: LucideIcons.rotateCcw,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _StickyHeaderDelegate(
+                  isDark: isDark,
+                  height: 82.0 +
+                      (_availableSubjects.isNotEmpty ? 48.0 : 0.0) +
+                      (list.isNotEmpty ? 44.0 : 8.0),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
                               color: isDark
-                                  ? const Color(0xFF262626)
-                                  : const Color(0xFFE5E5E5),
+                                  ? const Color(0xFF000000)
+                                  : const Color(0xFFF5F5F5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isDark
+                                    ? const Color(0xFF1C1C1E)
+                                    : const Color(0xFFE5E5E5),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _TabBtn(
+                                  label: 'ভুল সমূহ (${_mistakes.length})',
+                                  active: _activeTab == 'mistakes',
+                                  isDark: isDark,
+                                  onTap: () => setState(() {
+                                    _activeTab = 'mistakes';
+                                    _subjectFilter = 'all';
+                                    _selectedIds.clear();
+                                  }),
+                                ),
+                                _TabBtn(
+                                  label: 'বুকমার্ক ($_totalBookmarks)',
+                                  active: _activeTab == 'bookmarks',
+                                  isDark: isDark,
+                                  onTap: () => setState(() {
+                                    _activeTab = 'bookmarks';
+                                    _subjectFilter = 'all';
+                                    _selectedIds.clear();
+                                  }),
+                                ),
+                              ],
                             ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                        ),
+                      ),
+                      if (_availableSubjects.isNotEmpty)
+                        SizedBox(
+                          height: 48,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             children: [
-                              _TabBtn(
-                                label: 'ভুল সমূহ (${_mistakes.length})',
-                                active: _activeTab == 'mistakes',
+                              _Pill(
+                                label: 'সব বিষয়',
+                                active: _subjectFilter == 'all',
                                 isDark: isDark,
                                 onTap: () => setState(() {
-                                  _activeTab = 'mistakes';
                                   _subjectFilter = 'all';
-                                  _selectedIds.clear();
                                 }),
                               ),
-                              _TabBtn(
-                                label: 'বুকমার্ক ($_totalBookmarks)',
-                                active: _activeTab == 'bookmarks',
-                                isDark: isDark,
-                                onTap: () => setState(() {
-                                  _activeTab = 'bookmarks';
-                                  _subjectFilter = 'all';
-                                  _selectedIds.clear();
-                                }),
+                              ..._availableSubjects.map(
+                                (s) => _Pill(
+                                  label: s.value,
+                                  active: _subjectFilter == s.key,
+                                  isDark: isDark,
+                                  onTap: () => setState(() {
+                                    _subjectFilter = s.key;
+                                  }),
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    ),
-
-                    // ── Subject filter pills ──────────────────────────────
-                    if (_availableSubjects.isNotEmpty)
-                      SizedBox(
-                        height: 48,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          children: [
-                            _Pill(
-                              label: 'সব বিষয়',
-                              active: _subjectFilter == 'all',
-                              isDark: isDark,
-                              onTap: () =>
-                                  setState(() => _subjectFilter = 'all'),
-                            ),
-                            ..._availableSubjects.map(
-                              (s) => _Pill(
-                                label: s.value,
-                                active: _subjectFilter == s.key,
-                                isDark: isDark,
-                                onTap: () =>
-                                    setState(() => _subjectFilter = s.key),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                    // ── Main content card ─────────────────────────────────
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF0F172A)
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: isDark
-                                ? const Color(0xFF262626)
-                                : const Color(0xFFE5E5E5),
-                          ),
-                          boxShadow: isDark
-                              ? []
-                              : [
-                                  const BoxShadow(
-                                    color: Color(0x08000000),
-                                    blurRadius: 4,
-                                  ),
-                                ],
-                        ),
-                        child: list.isEmpty
-                            ? _emptyState(isDark)
-                            : Column(
-                                children: [
-                                  _buildToolbar(list, isDark),
-                                  Expanded(
-                                    child: ListView.separated(
-                                      padding: const EdgeInsets.all(12),
-                                      itemCount: list.length,
-                                      separatorBuilder: (_, _) =>
-                                          const SizedBox(height: 10),
-                                      itemBuilder: (ctx, i) =>
-                                          _buildQuestionCard(
-                                            list[i],
-                                            i,
-                                            isDark,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                      ),
-                    ),
-                  ],
+                      if (list.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: _buildToolbar(list, isDark),
+                        )
+                      else
+                        const SizedBox(height: 8),
+                    ],
+                  ),
                 ),
+              ),
+              if (list.isEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: _emptyState(isDark),
+                  ),
+                )
+              else ...[
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _buildQuestionCard(list[index], index, isDark),
+                        );
+                      },
+                      childCount: list.length,
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: _buildLoadMoreButton(isDark),
+                ),
+              ],
+            ],
+          );
+  }
+
+  Widget _buildLoadMoreButton(bool isDark) {
+    final hasMore = _activeTab == 'mistakes' ? _mHasMore : _bHasMore;
+    final isLoadingMore = _activeTab == 'mistakes' ? _mIsLoadingMore : _bIsLoadingMore;
+
+    if (!hasMore) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+      child: Center(
+        child: SizedBox(
+          width: 200,
+          child: ElevatedButton(
+            onPressed: isLoadingMore
+                ? null
+                : () {
+                    if (_activeTab == 'mistakes') {
+                      _loadMoreMistakes();
+                    } else {
+                      _loadMoreBookmarks();
+                    }
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+              foregroundColor: isDark ? Colors.white : const Color(0xFF000000),
+              side: BorderSide(
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: isLoadingMore
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text(
+                    'Load More',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+          ),
         ),
-      ],
+      ),
     );
   }
 
@@ -680,19 +702,8 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     final allSelected =
         list.isNotEmpty && list.every((q) => _selectedIds.contains(q.id));
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF262626).withValues(alpha: 0.5)
-            : const Color(0xFFFAFAFA),
-        border: Border(
-          bottom: BorderSide(
-            color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
-          ),
-        ),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
           GestureDetector(
@@ -720,7 +731,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
           Text(
             '${_selectedIds.length} নির্বাচিত',
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
               color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF525252),
             ),
@@ -734,12 +745,12 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               decoration: BoxDecoration(
                 color: _shuffle
                     ? const Color(0xFF047857).withValues(alpha: 0.1)
-                    : (isDark ? const Color(0xFF262626) : Colors.white),
+                    : (isDark ? const Color(0xFF1C1C1E) : Colors.white),
                 border: Border.all(
                   color: _shuffle
                       ? const Color(0xFF047857).withValues(alpha: 0.3)
                       : (isDark
-                            ? const Color(0xFF404040)
+                            ? const Color(0xFF27272A)
                             : const Color(0xFFE5E5E5)),
                 ),
                 borderRadius: BorderRadius.circular(8),
@@ -756,10 +767,10 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                   const SizedBox(width: 4),
                   Text(
                     _shuffle
-                        ? 'র\u200d\u09cd\u09af\u09be\u09a8\u09cd\u09a1\u09ae \u0985\u09a8'
-                        : '\u09b0\u09cd\u200d\u09af\u09be\u09a8\u09cd\u09a1\u09ae',
+                        ? 'র‍্যান্ডম অন'
+                        : 'র‍্যান্ডম',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: _shuffle
                           ? const Color(0xFF047857)
@@ -777,7 +788,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF047857),
               disabledBackgroundColor: isDark
-                  ? const Color(0xFF262626)
+                  ? const Color(0xFF1C1C1E)
                   : const Color(0xFFE5E5E5),
               elevation: 0,
               shape: RoundedRectangleBorder(
@@ -796,7 +807,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 13,
+                fontSize: 15,
               ),
             ),
           ),
@@ -821,112 +832,114 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
         }
       }),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1C1C1C) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSel
                 ? const Color(0xFFB91C1C)
-                : (isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)),
+                : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF4F4F5)),
+            width: isSel ? 2 : 1,
           ),
+          boxShadow: isDark
+              ? []
+              : [
+                  const BoxShadow(
+                    color: Color(0x0A000000),
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
         ),
-        child: Row(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              margin: const EdgeInsets.only(top: 2, right: 12),
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: isSel ? const Color(0xFFB91C1C) : Colors.transparent,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(
-                  color: isSel
-                      ? const Color(0xFFB91C1C)
-                      : const Color(0xFFA3A3A3),
+            Row(
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(right: 12),
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    color: isSel ? const Color(0xFFB91C1C) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: isSel
+                          ? const Color(0xFFB91C1C)
+                          : const Color(0xFFA3A3A3),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: isSel
+                      ? const Icon(Icons.check, size: 16, color: Colors.white)
+                      : null,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF1C1C1E)
+                        : const Color(0xFFF5F5F5),
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: Text(
+                    q.subjectLabel.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFA3A3A3),
+                    ),
+                  ),
+                ),
+                if (freq != null &&
+                    freq > 0 &&
+                    _activeTab == 'mistakes') ...[
+                  const SizedBox(width: 6),
+                  _FreqBadge(count: freq),
+                ],
+                const Spacer(),
+                IconButton(
+                  onPressed: () => _toggleBookmark(q),
+                  iconSize: 16,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  icon: Icon(
+                    isBookmarked
+                        ? LucideIcons.bookmarkMinus
+                        : LucideIcons.bookmark,
+                    color: isBookmarked
+                        ? const Color(0xFF047857)
+                        : const Color(0xFFA3A3A3),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            LatexText(
+              text: '${i + 1}. ${q.questionText}',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'Anek Bangla',
+                color: isDark ? Colors.white : const Color(0xFF000000),
+              ),
+            ),
+            if (q.options.isNotEmpty &&
+                q.correctAnswerIndex < q.options.length) ...[
+              const SizedBox(height: 6),
+              LatexText(
+                text: '✓ ${q.options[q.correctAnswerIndex]}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Anek Bangla',
+                  color: Color(0xFF047857),
                 ),
               ),
-              child: isSel
-                  ? const Icon(Icons.check, size: 14, color: Colors.white)
-                  : null,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF262626)
-                              : const Color(0xFFF5F5F5),
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        child: Text(
-                          q.subjectLabel.toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFA3A3A3),
-                          ),
-                        ),
-                      ),
-                      if (freq != null &&
-                          freq > 0 &&
-                          _activeTab == 'mistakes') ...[
-                        const SizedBox(width: 6),
-                        _FreqBadge(count: freq),
-                      ],
-                      const Spacer(),
-                      GestureDetector(
-                        onTap: () => _toggleBookmark(q.id),
-                        behavior: HitTestBehavior.opaque,
-                        child: Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: Icon(
-                            isBookmarked
-                                ? LucideIcons.bookmarkMinus
-                                : LucideIcons.bookmark,
-                            size: 16,
-                            color: isBookmarked
-                                ? const Color(0xFF047857)
-                                : const Color(0xFFA3A3A3),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  LatexText(
-                    text: '${i + 1}. ${q.questionText}',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'HindSiliguri',
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    ),
-                  ),
-                  if (q.options.isNotEmpty &&
-                      q.correctAnswerIndex < q.options.length) ...[
-                    const SizedBox(height: 4),
-                    LatexText(
-                      text: '✓ ${q.options[q.correctAnswerIndex]}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontFamily: 'HindSiliguri',
-                        color: Color(0xFF047857),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
+            ],
           ],
         ),
       ),
@@ -947,7 +960,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               height: 64,
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF262626)
+                    ? const Color(0xFF1C1C1E)
                     : const Color(0xFFF5F5F5),
                 shape: BoxShape.circle,
               ),
@@ -961,9 +974,9 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             Text(
               '\u06a4\u09cb\u09a8\u09cb \u09a4\u09a5\u09cd\u09af \u09aa\u09be\u0993\u09af\u09bc\u09be \u09af\u09be\u09af\u09bc\u09a8\u09bf',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                color: isDark ? Colors.white : const Color(0xFF000000),
               ),
             ),
             const SizedBox(height: 8),
@@ -972,7 +985,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                   ? '\u0986\u09aa\u09a8\u09bf \u098f\u0996\u09a8\u09cb \u06a4\u09cb\u09a8\u09cb \u09aa\u09b0\u09c0\u0995\u09cd\u09b7\u09be\u09af\u09bc \u09ad\u09c1\u09b2 \u06a4\u09b0\u09c7\u09a8\u09a8\u09bf\u0964'
                   : '\u0986\u09aa\u09a8\u09bf \u098f\u0996\u09a8\u09cb \u06a4\u09cb\u09a8\u09cb \u09aa\u09cd\u09b0\u09b6\u09cd\u09a8 \u09ac\u09c1\u06a4\u09ae\u09be\u09b0\u09cd\u06a4 \u06a4\u09b0\u09c7\u09a8\u09a8\u09bf\u0964',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 13, color: Color(0xFFA3A3A3)),
+              style: const TextStyle(fontSize: 15, color: Color(0xFFA3A3A3)),
             ),
             const SizedBox(height: 24),
             GestureDetector(
@@ -989,7 +1002,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                 child: const Text(
                   '\u09a8\u09a4\u09c1\u09a8 \u09aa\u09b0\u09c0\u0995\u09cd\u09b7\u09be \u09a6\u09be\u0993',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -1010,42 +1023,64 @@ class _StatBox extends StatelessWidget {
   final int value;
   final Color color;
   final bool isDark;
+  final IconData icon;
 
   const _StatBox({
     required this.label,
     required this.value,
     required this.color,
     required this.isDark,
+    required this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F172A) : Colors.white,
+          color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+            color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF4F4F5),
           ),
+          boxShadow: isDark
+              ? []
+              : [
+                  const BoxShadow(
+                    color: Color(0x0A000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF4F4F5),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 18),
+            ),
+            const SizedBox(height: 8),
             Text(
               '$value',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
-                color: color,
+                color: isDark ? Colors.white : const Color(0xFF000000),
               ),
             ),
             const SizedBox(height: 2),
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 11,
-                color: Color(0xFFA3A3A3),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -1074,18 +1109,18 @@ class _TabBtn extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           color: active
-              ? (isDark ? const Color(0xFF262626) : Colors.white)
+              ? (isDark ? const Color(0xFF1C1C1E) : Colors.white)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
           boxShadow: active && !isDark
               ? [
                   const BoxShadow(
-                    color: Color(0x10000000),
-                    blurRadius: 2,
-                    offset: Offset(0, 1),
+                    color: Color(0x0F000000),
+                    blurRadius: 10,
+                    offset: Offset(0, 2),
                   ),
                 ]
               : [],
@@ -1093,7 +1128,7 @@ class _TabBtn extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 15,
             fontWeight: FontWeight.bold,
             color: active ? const Color(0xFF047857) : const Color(0xFFA3A3A3),
           ),
@@ -1126,18 +1161,18 @@ class _Pill extends StatelessWidget {
         decoration: BoxDecoration(
           color: active
               ? const Color(0xFFB91C1C)
-              : (isDark ? const Color(0xFF0F172A) : Colors.white),
+              : (isDark ? const Color(0xFF000000) : Colors.white),
           borderRadius: BorderRadius.circular(100),
           border: Border.all(
             color: active
                 ? const Color(0xFFB91C1C)
-                : (isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5)),
+                : (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5)),
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 11,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: active
                 ? Colors.white
@@ -1168,7 +1203,7 @@ class _FreqBadge extends StatelessWidget {
             const Color(0xFFB91C1C),
           )
         : (
-            const Color(0xFF404040).withValues(alpha: 0.3),
+            const Color(0xFF27272A).withValues(alpha: 0.3),
             const Color(0xFF525252).withValues(alpha: 0.4),
             const Color(0xFFA3A3A3),
           );
@@ -1181,9 +1216,48 @@ class _FreqBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(100),
       ),
       child: Text(
-        '${count}x \u09ad\u09c1\u09b2',
-        style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: text),
+        '${count}x ভুল',
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: text),
       ),
     );
+  }
+}
+
+// ── Sticky Header Delegate ────────────────────────────────────────────────────
+
+class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  final double height;
+  final bool isDark;
+
+  _StickyHeaderDelegate({
+    required this.child,
+    required this.height,
+    required this.isDark,
+  });
+
+  @override
+  double get minExtent => height;
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      color: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAFA),
+      child: child,
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _StickyHeaderDelegate oldDelegate) {
+    return oldDelegate.child != child ||
+        oldDelegate.height != height ||
+        oldDelegate.isDark != isDark;
   }
 }

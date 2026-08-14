@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:audioplayers/audioplayers.dart';
 import '../../../core/presentation/widgets/latex_text.dart';
 import 'practice_dashboard.dart';
 
@@ -43,8 +44,21 @@ class _FlashcardModeState extends State<FlashcardMode> {
   int? _selectedIdx;
   bool _isExplanationOpen = false;
   final List<FlashcardResult> _results = [];
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   static const _banglaIndices = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ'];
+
+  @override
+  void initState() {
+    super.initState();
+    _results.clear();
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
 
   PracticeQuestion get current => widget.questions[_currentIndex];
   int get total => widget.questions.length;
@@ -53,13 +67,23 @@ class _FlashcardModeState extends State<FlashcardMode> {
   int get correctSoFar =>
       _results.where((r) => r.grade == FlashcardGrade.gotIt).length;
 
-  void _handleSelect(int idx) {
+  void _handleSelect(int idx) async {
     if (_isRevealed) return;
     HapticFeedback.lightImpact();
     setState(() {
       _selectedIdx = idx;
       _isRevealed = true;
     });
+
+    try {
+      if (idx == current.correctAnswerIndex) {
+        await _audioPlayer.play(AssetSource('audio/correct.wav'));
+      } else {
+        await _audioPlayer.play(AssetSource('audio/wrong.wav'));
+      }
+    } catch (e) {
+      debugPrint('[FlashcardMode] Error playing sound: $e');
+    }
   }
 
   void _handleNext() {
@@ -111,10 +135,10 @@ class _FlashcardModeState extends State<FlashcardMode> {
         return isDark ? const Color(0x33EF4444) : const Color(0xFFFEF2F2);
       }
       return isDark
-          ? const Color(0xFF262626).withValues(alpha: 0.6)
+          ? const Color(0xFF1C1C1E).withValues(alpha: 0.6)
           : const Color(0xFFF5F5F5).withValues(alpha: 0.6);
     }
-    return isDark ? const Color(0xFF262626) : const Color(0xFFFAFAFA);
+    return isDark ? const Color(0xFF1C1C1E) : const Color(0xFFFAFAFA);
   }
 
   Color _optionBorder(int idx, bool isDark) {
@@ -123,7 +147,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
       if (idx == _selectedIdx) return const Color(0xFFB91C1C);
       return Colors.transparent;
     }
-    return isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5);
+    return isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5);
   }
 
   // Returns (bg, borderColor, text) for the option bullet circle
@@ -174,7 +198,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                 dotColor = const Color(0xFFB91C1C);
               } else {
                 dotColor = isDark
-                    ? const Color(0xFF404040)
+                    ? const Color(0xFF27272A)
                     : const Color(0xFFE5E5E5);
               }
 
@@ -237,7 +261,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                               Text(
                                 'বাতিল',
                                 style: TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   color: isDark
                                       ? const Color(0xFFA3A3A3)
@@ -255,7 +279,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                         Text(
                           '$correctSoFar/$total সঠিক',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: isDark
                                 ? const Color(0xFF737373)
@@ -269,7 +293,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                   LinearProgressIndicator(
                     value: _currentIndex / total,
                     backgroundColor: isDark
-                        ? const Color(0xFF262626)
+                        ? const Color(0xFF1C1C1E)
                         : const Color(0xFFE5E5E5),
                     color: const Color(0xFF047857),
                     minHeight: 2,
@@ -310,7 +334,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
   Widget _buildCard(PracticeQuestion q, bool isDark) {
     final correctQuestionIndex = _currentIndex + 1;
     final borderColor = !_isRevealed
-        ? (isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5))
+        ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5))
         : isCorrect
         ? const Color(0xFF047857)
         : const Color(0xFFB91C1C);
@@ -318,7 +342,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
     return Container(
       key: ValueKey(_currentIndex),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor, width: _isRevealed ? 2 : 1),
         boxShadow: isDark
@@ -342,7 +366,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                 Text(
                   'প্রশ্ন $correctQuestionIndex',
                   style: const TextStyle(
-                    fontSize: 11,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
                     color: Color(0xFFA3A3A3),
@@ -364,7 +388,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                     child: Text(
                       isCorrect ? 'সঠিক' : 'ভুল',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: isCorrect
                             ? const Color(0xFF047857)
@@ -382,14 +406,14 @@ class _FlashcardModeState extends State<FlashcardMode> {
                     ),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFF5F5F5),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       q.subjectLabel,
                       style: const TextStyle(
-                        fontSize: 10,
+                        fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFFA3A3A3),
                       ),
@@ -406,11 +430,11 @@ class _FlashcardModeState extends State<FlashcardMode> {
             child: LatexText(
               text: q.questionText,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'HindSiliguri',
+                fontFamily: 'Anek Bangla',
                 height: 1.5,
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                color: isDark ? Colors.white : const Color(0xFF000000),
               ),
             ),
           ),
@@ -464,7 +488,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                               child: Text(
                                 bulletText,
                                 style: TextStyle(
-                                  fontSize: 11,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: bulletBg == Colors.transparent
                                       ? bulletBorder
@@ -479,13 +503,13 @@ class _FlashcardModeState extends State<FlashcardMode> {
                             child: LatexText(
                               text: q.options[idx],
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w500,
-                                fontFamily: 'HindSiliguri',
+                                fontFamily: 'Anek Bangla',
                                 height: 1.4,
                                 color: isDark
                                     ? const Color(0xFFE5E5E5)
-                                    : const Color(0xFF0F172A),
+                                    : const Color(0xFF000000),
                               ),
                             ),
                           ),
@@ -549,7 +573,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                   Text(
                     'সঠিক উত্তর : $correctLabel',
                     style: const TextStyle(
-                      fontSize: 13,
+                      fontSize: 15,
                       fontWeight: FontWeight.w800,
                       color: Color(0xFF047857),
                     ),
@@ -580,12 +604,12 @@ class _FlashcardModeState extends State<FlashcardMode> {
               child: LatexText(
                 text: q.explanation!,
                 style: TextStyle(
-                  fontSize: 13,
-                  fontFamily: 'HindSiliguri',
+                  fontSize: 15,
+                  fontFamily: 'Anek Bangla',
                   height: 1.6,
                   color: isDark
                       ? const Color(0xFFD4D4D4)
-                      : const Color(0xFF404040),
+                      : const Color(0xFF27272A),
                 ),
               ),
             ),
@@ -607,7 +631,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
     if (_isRevealed) {
       nextBg = isCorrect ? const Color(0xFF047857) : const Color(0xFFB91C1C);
     } else {
-      nextBg = isDark ? const Color(0xFF262626) : const Color(0xFF0F172A);
+      nextBg = isDark ? const Color(0xFF1C1C1E) : const Color(0xFF000000);
     }
 
     return Container(
@@ -623,7 +647,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
             : Colors.white.withValues(alpha: 0.95),
         border: Border(
           top: BorderSide(
-            color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+            color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
           ),
         ),
         boxShadow: [
@@ -648,11 +672,11 @@ class _FlashcardModeState extends State<FlashcardMode> {
                     ? (isDark
                           ? const Color(0xFF1C1C1C)
                           : const Color(0xFFF5F5F5))
-                    : (isDark ? const Color(0xFF262626) : Colors.white),
+                    : (isDark ? const Color(0xFF1C1C1E) : Colors.white),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isDark
-                      ? const Color(0xFF404040)
+                      ? const Color(0xFF27272A)
                       : const Color(0xFFE5E5E5),
                 ),
               ),
@@ -661,7 +685,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                 size: 16,
                 color: _currentIndex == 0
                     ? const Color(0xFFA3A3A3)
-                    : (isDark ? Colors.white : const Color(0xFF0F172A)),
+                    : (isDark ? Colors.white : const Color(0xFF000000)),
               ),
             ),
           ),
@@ -681,7 +705,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
               child: Text(
                 isCorrect ? '✓ সঠিক' : '✗ ভুল',
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: isCorrect
                       ? const Color(0xFF047857)
@@ -719,7 +743,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                   Text(
                     nextLabel,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),

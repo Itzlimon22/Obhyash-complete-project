@@ -8,6 +8,7 @@ import AuthProvider from '@/components/auth/AuthProvider';
 import SWRProvider from '@/components/providers/SWRProvider';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import ReferralCatcher from '@/components/ReferralCatcher';
 
 // ✅ Configure Inter (English text)
 const inter = Inter({
@@ -82,6 +83,7 @@ export default function RootLayout({
       <body className="antialiased overflow-x-hidden selection:bg-brand-500/30 bg-paper-50 text-paper-900 dark:bg-paper-900 dark:text-paper-50 font-sans">
         <Suspense fallback={null}>
           <AuthProvider>
+            <ReferralCatcher />
             <SWRProvider>
               {children}
 

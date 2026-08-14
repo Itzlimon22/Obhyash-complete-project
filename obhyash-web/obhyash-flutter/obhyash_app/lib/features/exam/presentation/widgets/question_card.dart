@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../../core/presentation/widgets/latex_text.dart';
 import '../../domain/exam_models.dart';
 
@@ -15,6 +16,7 @@ class QuestionCard extends StatefulWidget {
   final bool readOnly;
   final bool showAnswer;
   final bool isBookmarked;
+  final bool initiallyExpanded;
   final VoidCallback? onToggleBookmark;
 
   const QuestionCard({
@@ -31,6 +33,7 @@ class QuestionCard extends StatefulWidget {
     this.readOnly = false,
     this.showAnswer = false,
     this.isBookmarked = false,
+    this.initiallyExpanded = true,
     this.onToggleBookmark,
   });
 
@@ -47,7 +50,7 @@ class _QuestionCardState extends State<QuestionCard>
   @override
   void initState() {
     super.initState();
-    _isExplanationOpen = widget.showFeedback;
+    _isExplanationOpen = widget.showFeedback && widget.initiallyExpanded;
     _animCtrl = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
@@ -66,6 +69,7 @@ class _QuestionCardState extends State<QuestionCard>
   }
 
   void _toggleExplanation() {
+    HapticFeedback.lightImpact();
     setState(() {
       _isExplanationOpen = !_isExplanationOpen;
       if (_isExplanationOpen) {
@@ -123,16 +127,16 @@ class _QuestionCardState extends State<QuestionCard>
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: isDark ? const Color(0xFF000000) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor, width: borderWidth),
         boxShadow: isDark
             ? []
             : [
                 const BoxShadow(
                   color: Color(0x0A000000),
-                  blurRadius: 6,
-                  offset: Offset(0, 2),
+                  blurRadius: 12,
+                  offset: Offset(0, 4),
                 ),
               ],
       ),
@@ -152,7 +156,7 @@ class _QuestionCardState extends State<QuestionCard>
                     Text(
                       '${_toBengaliNumeral(widget.serialNumber)}. ',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: isDark
                             ? const Color(0xFFE5E5E5)
@@ -164,7 +168,7 @@ class _QuestionCardState extends State<QuestionCard>
                       child: LatexText(
                         text: widget.question.question,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 18,
                           fontWeight: FontWeight.w500,
                           fontFamily: 'HindSiliguri',
                           color: isDark
@@ -183,7 +187,7 @@ class _QuestionCardState extends State<QuestionCard>
                 Row(
                   children: [
                     // Subject tag (if present)
-                    if (widget.question.subjectLabel?.isNotEmpty == true) ...[
+                    if (widget.readOnly && widget.question.subjectLabel?.isNotEmpty == true) ...[
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -198,9 +202,61 @@ class _QuestionCardState extends State<QuestionCard>
                         child: Text(
                           widget.question.subjectLabel!.toUpperCase(),
                           style: const TextStyle(
-                            fontSize: 10,
+                            fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF1A7A5A),
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                    ],
+
+                    // Institute tag (if present)
+                    if (widget.readOnly && widget.question.institutes.isNotEmpty) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF1E3A8A).withValues(alpha: 0.3)
+                              : const Color(0xFFDBEAFE),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          widget.question.institutes.join(', '),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF1D4ED8),
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                    ],
+
+                    // Year tag (if present)
+                    if (widget.readOnly && widget.question.years.isNotEmpty) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF4C1D95).withValues(alpha: 0.3)
+                              : const Color(0xFFF3E8FF),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          widget.question.years.join(', '),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: isDark ? const Color(0xFFA78BFA) : const Color(0xFF6D28D9),
                             letterSpacing: 0.3,
                           ),
                         ),
@@ -224,7 +280,7 @@ class _QuestionCardState extends State<QuestionCard>
                         child: Text(
                           'চিহ্নিত',
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: isDark
                                 ? const Color(0xFFFBBF24)
@@ -249,27 +305,29 @@ class _QuestionCardState extends State<QuestionCard>
                             : Icons.bookmark_border_rounded,
                         size: 18,
                         color: widget.isBookmarked
-                            ? const Color(0xFFF59E0B) // amber-500
+                            ? const Color(0xFF1E3A8A) // amber-500
                             : (isDark
                                   ? const Color(0xFF525252)
                                   : const Color(0xFF9CA3AF)),
                       ),
                     ),
 
-                    const SizedBox(width: 2),
+                    if (widget.readOnly) ...[
+                      const SizedBox(width: 2),
 
-                    // Report button
-                    _IconBtn(
-                      onTap: widget.onReport,
-                      tooltip: 'রিপোর্ট করো',
-                      child: Icon(
-                        Icons.warning_amber_rounded,
-                        size: 18,
-                        color: isDark
-                            ? const Color(0xFF525252)
-                            : const Color(0xFF9CA3AF),
+                      // Report button
+                      _IconBtn(
+                        onTap: widget.onReport,
+                        tooltip: 'রিপোর্ট করো',
+                        child: Icon(
+                          Icons.warning_amber_rounded,
+                          size: 18,
+                          color: isDark
+                              ? const Color(0xFF525252)
+                              : const Color(0xFF9CA3AF),
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ],
@@ -357,7 +415,7 @@ class _QuestionCardState extends State<QuestionCard>
                 } else if (isSelected) {
                   // Web: neutral-200/neutral-700 for selected
                   boxBg = isDark
-                      ? const Color(0xFF404040)
+                      ? const Color(0xFF27272A)
                       : const Color(0xFFE5E7EB);
                   boxBorder = isDark
                       ? const Color(0xFF525252)
@@ -375,82 +433,90 @@ class _QuestionCardState extends State<QuestionCard>
                   boldText = true;
                 }
 
-                return GestureDetector(
-                  onTap: () {
-                    if (!isAnswered && !widget.isOmrMode && !widget.readOnly) {
-                      widget.onSelectOption(idx);
-                    }
-                  },
-                  behavior: HitTestBehavior.opaque,
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
                   child: Opacity(
                     opacity: opacity,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: boxBg,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: boxBorder),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // Circular badge (letter)
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            width: 24,
-                            height: 24,
-                            margin: const EdgeInsets.only(right: 10),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: bulletBg,
-                              border: Border.all(
-                                color: bulletBorder,
-                                width: 1.5,
-                              ),
-                              boxShadow:
-                                  bulletBg == Colors.transparent && !isDark
-                                  ? [
-                                      const BoxShadow(
-                                        color: Color(0x0D000000),
-                                        blurRadius: 2,
-                                        offset: Offset(0, 1),
-                                      ),
-                                    ]
-                                  : [],
+                    child: Material(
+                      color: Colors.transparent,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: boxBg,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: boxBorder),
+                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () {
+                            if (!isAnswered && !widget.isOmrMode && !widget.readOnly) {
+                              HapticFeedback.lightImpact();
+                              widget.onSelectOption(idx);
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
                             ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              banglaIndex,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: bulletText,
-                                height: 1.0,
-                              ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                // Circular badge (letter)
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  width: 24,
+                                  height: 24,
+                                  margin: const EdgeInsets.only(right: 10),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: bulletBg,
+                                    border: Border.all(
+                                      color: bulletBorder,
+                                      width: 1.5,
+                                    ),
+                                    boxShadow:
+                                        bulletBg == Colors.transparent && !isDark
+                                        ? [
+                                            const BoxShadow(
+                                              color: Color(0x0D000000),
+                                              blurRadius: 2,
+                                              offset: Offset(0, 1),
+                                            ),
+                                          ]
+                                        : [],
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    banglaIndex,
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold,
+                                      color: bulletText,
+                                      height: 1.0,
+                                    ),
+                                  ),
+                                ),
+                                // Option text
+                                Expanded(
+                                  child: LatexText(
+                                    text: option,
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontFamily: 'HindSiliguri',
+                                      fontWeight: boldText
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                      color: optionTextColor,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          // Option text
-                          Expanded(
-                            child: LatexText(
-                              text: option,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontFamily: 'HindSiliguri',
-                                fontWeight: boldText
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: optionTextColor,
-                                height: 1.4,
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
@@ -544,7 +610,7 @@ class _ExplanationPanel extends StatelessWidget {
                   Text(
                     'সঠিক উত্তর : $correctLabel',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: isDark
                           ? const Color(0xFF047857)
@@ -603,7 +669,7 @@ class _ExplanationPanel extends StatelessWidget {
                 child: LatexText(
                   text: question.explanation!,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 16,
                     fontFamily: 'HindSiliguri',
                     height: 1.6,
                     color: isDark
@@ -637,10 +703,19 @@ class _IconBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: tooltip,
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Padding(padding: const EdgeInsets.all(6), child: child),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap != null ? () {
+            HapticFeedback.lightImpact();
+            onTap!();
+          } : null,
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.all(8), 
+            child: child,
+          ),
+        ),
       ),
     );
   }

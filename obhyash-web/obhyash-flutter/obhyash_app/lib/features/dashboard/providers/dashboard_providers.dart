@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../domain/dashboard_repository.dart';
 import '../domain/models.dart';
+import '../../live_exam/domain/models.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/shared_prefs_provider.dart';
 
@@ -220,3 +221,38 @@ final dashboardSubjectStatsProvider =
         return DashboardSubjectStatsNotifier();
       },
     );
+
+class DashboardLiveExamsNotifier extends AsyncNotifier<List<LiveExam>> {
+  @override
+  FutureOr<List<LiveExam>> build() async {
+    final profile = await ref.watch(userProfileProvider.future);
+    if (profile == null) return [];
+
+    final supabase = ref.watch(supabaseClientProvider);
+    final category = profile.level ?? 'HSC';
+
+    try {
+      final examsResponse = await supabase
+          .from('live_exams')
+          .select()
+          .eq('category', category)
+          .eq('status', 'published')
+          .order('start_time', ascending: false);
+
+      final List<LiveExam> exams = (examsResponse as List)
+          .map((e) => LiveExam.fromJson(e as Map<String, dynamic>))
+          .toList();
+
+      // Only return exams that are ongoing or upcoming (not past)
+      return exams.where((e) => e.isOngoing || e.isUpcoming).toList();
+    } catch (e) {
+      debugPrint('[DashboardLiveExamsNotifier] failed: $e');
+      return [];
+    }
+  }
+}
+
+final dashboardLiveExamsProvider =
+    AsyncNotifierProvider<DashboardLiveExamsNotifier, List<LiveExam>>(() {
+  return DashboardLiveExamsNotifier();
+});

@@ -219,6 +219,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
   void _showChapterDropdown() {
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _MultiSelectDropdownModal(
@@ -242,6 +243,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
   void _showTopicDropdown() {
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _MultiSelectDropdownModal(
@@ -320,6 +322,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
   void _showSubjectDropdown() {
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _SubjectDropdownModal(
@@ -348,7 +351,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
           label,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 13,
+            fontSize: 15,
             color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
           ),
         ),
@@ -362,12 +365,12 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF262626)
+                    ? const Color(0xFF1C1C1E)
                     : const Color(0xFFF5F5F5),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isDark
-                      ? const Color(0xFF404040)
+                      ? const Color(0xFF27272A)
                       : const Color(0xFFE5E5E5),
                 ),
               ),
@@ -377,13 +380,13 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     child: Text(
                       value.isEmpty ? hint : value,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: value.isEmpty
                             ? FontWeight.normal
                             : FontWeight.bold,
                         color: value.isEmpty
                             ? const Color(0xFFA3A3A3)
-                            : (isDark ? Colors.white : const Color(0xFF0F172A)),
+                            : (isDark ? Colors.white : const Color(0xFF000000)),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -432,7 +435,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                   child: Text(
                     'EXAM CONFIGURATION',
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: 13,
                       fontWeight: FontWeight.w900,
                       color: isDark
                           ? const Color(0xFF047857)
@@ -445,9 +448,9 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                 Text(
                   'পরীক্ষা সেটআপ করো',
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 34,
                     fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    color: isDark ? Colors.white : const Color(0xFF000000),
                   ),
                 ),
               ],
@@ -474,13 +477,13 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                         vertical: 14,
                       ),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                        color: isDark ? const Color(0xFF000000) : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: _selectedSubject != null
                               ? const Color(0xFF047857)
                               : (isDark
-                                    ? const Color(0xFF404040)
+                                    ? const Color(0xFF27272A)
                                     : const Color(0xFFE5E5E5)),
                           width: _selectedSubject != null ? 2 : 1,
                         ),
@@ -496,7 +499,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                                       0xFF047857,
                                     ).withValues(alpha: 0.1)
                                   : (isDark
-                                        ? const Color(0xFF262626)
+                                        ? const Color(0xFF1C1C1E)
                                         : const Color(0xFFF5F5F5)),
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -519,12 +522,12 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                                         .label
                                   : 'বিষয় নির্বাচন করো...',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: _selectedSubject != null
                                     ? (isDark
                                           ? Colors.white
-                                          : const Color(0xFF0F172A))
+                                          : const Color(0xFF000000))
                                     : const Color(0xFFA3A3A3),
                               ),
                               maxLines: 1,
@@ -656,15 +659,15 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     Text(
                       'মোট প্রশ্ন:',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? Colors.white : const Color(0xFF000000),
                       ),
                     ),
                     Text(
                       '$_questionCount',
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 22,
                         fontWeight: FontWeight.w900,
                         color: Color(0xFF047857),
                       ),
@@ -700,15 +703,15 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     Text(
                       'মোট সময়:',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? Colors.white : const Color(0xFF000000),
                       ),
                     ),
                     Text(
                       '$_durationMinutes মি',
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 22,
                         fontWeight: FontWeight.w900,
                         color: Color(0xFF047857),
                       ),
@@ -758,7 +761,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF047857),
               disabledBackgroundColor: isDark
-                  ? const Color(0xFF262626)
+                  ? const Color(0xFF1C1C1E)
                   : const Color(0xFFE5E5E5),
               padding: const EdgeInsets.symmetric(vertical: 20),
               shape: RoundedRectangleBorder(
@@ -782,7 +785,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                         'পরীক্ষা শুরু করো',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
@@ -820,10 +823,10 @@ class _CardContainer extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
         ),
         boxShadow: isDark
             ? []
@@ -845,9 +848,9 @@ class _CardContainer extends StatelessWidget {
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.w900,
-                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  color: isDark ? Colors.white : const Color(0xFF000000),
                 ),
               ),
             ],
@@ -882,11 +885,11 @@ class _ToggleBox extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected
               ? const Color(0xFF047857).withValues(alpha: isDark ? 0.2 : 0.1)
-              : (isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5)),
+              : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5)),
           border: Border.all(
             color: selected
                 ? const Color(0xFF047857)
-                : (isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5)),
+                : (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5)),
           ),
           borderRadius: BorderRadius.circular(16),
         ),
@@ -896,7 +899,7 @@ class _ToggleBox extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: selected
                     ? const Color(0xFF047857)
@@ -966,7 +969,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
         color: Colors.transparent,
         child: Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF0F172A) : Colors.white,
+            color: isDark ? const Color(0xFF000000) : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -979,7 +982,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                   height: 4,
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF404040)
+                        ? const Color(0xFF27272A)
                         : const Color(0xFFE5E5E5),
                     borderRadius: BorderRadius.circular(2),
                   ),
@@ -998,9 +1001,9 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                     Text(
                       'বিষয় নির্বাচন করো',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? Colors.white : const Color(0xFF000000),
                       ),
                     ),
                     IconButton(
@@ -1023,12 +1026,12 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF262626)
+                        ? const Color(0xFF1C1C1E)
                         : const Color(0xFFF5F5F5),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF404040)
+                          ? const Color(0xFF27272A)
                           : const Color(0xFFE5E5E5),
                     ),
                   ),
@@ -1036,8 +1039,8 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                     controller: _searchController,
                     onChanged: (val) => setState(() => _searchQuery = val),
                     style: TextStyle(
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      fontSize: 14,
+                      color: isDark ? Colors.white : const Color(0xFF000000),
+                      fontSize: 16,
                     ),
                     decoration: InputDecoration(
                       hintText: 'বিষয় খুঁজুন...',
@@ -1075,7 +1078,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                             color: isDark
                                 ? const Color(0xFFA3A3A3)
                                 : const Color(0xFF737373),
-                            fontSize: 15,
+                            fontSize: 17,
                           ),
                         ),
                       )
@@ -1123,7 +1126,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                                                 0xFF047857,
                                               ).withValues(alpha: 0.2)
                                             : (isDark
-                                                  ? const Color(0xFF262626)
+                                                  ? const Color(0xFF1C1C1E)
                                                   : const Color(0xFFF5F5F5)),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
@@ -1142,7 +1145,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                                       child: Text(
                                         subject.label,
                                         style: TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 16,
                                           fontWeight: isSelected
                                               ? FontWeight.bold
                                               : FontWeight.w600,
@@ -1150,7 +1153,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                                               ? const Color(0xFF047857)
                                               : (isDark
                                                     ? Colors.white
-                                                    : const Color(0xFF0F172A)),
+                                                    : const Color(0xFF000000)),
                                         ),
                                       ),
                                     ),
@@ -1258,7 +1261,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
         color: Colors.transparent,
         child: Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF0F172A) : Colors.white,
+            color: isDark ? const Color(0xFF000000) : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -1271,7 +1274,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                   height: 4,
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF404040)
+                        ? const Color(0xFF27272A)
                         : const Color(0xFFE5E5E5),
                     borderRadius: BorderRadius.circular(2),
                   ),
@@ -1290,9 +1293,9 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                     Text(
                       widget.title,
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? Colors.white : const Color(0xFF000000),
                       ),
                     ),
                     IconButton(
@@ -1318,12 +1321,12 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                       child: Container(
                         decoration: BoxDecoration(
                           color: isDark
-                              ? const Color(0xFF262626)
+                              ? const Color(0xFF1C1C1E)
                               : const Color(0xFFF5F5F5),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: isDark
-                                ? const Color(0xFF404040)
+                                ? const Color(0xFF27272A)
                                 : const Color(0xFFE5E5E5),
                           ),
                         ),
@@ -1334,8 +1337,8 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                           style: TextStyle(
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF0F172A),
-                            fontSize: 14,
+                                : const Color(0xFF000000),
+                            fontSize: 16,
                           ),
                           decoration: InputDecoration(
                             hintText: widget.searchHint,
@@ -1371,23 +1374,23 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                         ),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? const Color(0xFF262626)
+                              ? const Color(0xFF1C1C1E)
                               : const Color(0xFFF5F5F5),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: isDark
-                                ? const Color(0xFF404040)
+                                ? const Color(0xFF27272A)
                                 : const Color(0xFFE5E5E5),
                           ),
                         ),
                         child: Text(
                           'সবগুলো',
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF0F172A),
+                                : const Color(0xFF000000),
                           ),
                         ),
                       ),
@@ -1408,7 +1411,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                             color: isDark
                                 ? const Color(0xFFA3A3A3)
                                 : const Color(0xFF737373),
-                            fontSize: 15,
+                            fontSize: 17,
                           ),
                         ),
                       )
@@ -1479,7 +1482,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                       child: Text(
                                         name,
                                         style: TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 16,
                                           fontWeight: isSelected
                                               ? FontWeight.bold
                                               : FontWeight.w600,
@@ -1487,7 +1490,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                               ? const Color(0xFF047857)
                                               : (isDark
                                                     ? Colors.white
-                                                    : const Color(0xFF0F172A)),
+                                                    : const Color(0xFF000000)),
                                         ),
                                       ),
                                     ),
@@ -1523,7 +1526,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                       child: Text(
                         'সংরক্ষণ করো (${_currentSelected.length})',
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

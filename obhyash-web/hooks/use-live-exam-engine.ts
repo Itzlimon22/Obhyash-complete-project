@@ -72,10 +72,9 @@ export const useLiveExamEngine = () => {
       
       const duration = exam.duration_minutes * 60;
       if (duration > 0) {
-        targetEndTimeRef.current = Date.now() + duration * 1000;
         setTimeLeft(duration);
       }
-      setAppState(AppState.ACTIVE);
+      setAppState(AppState.INSTRUCTIONS);
       return true;
     } catch (e: unknown) {
       console.error(e);

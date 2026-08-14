@@ -10,6 +10,7 @@ import '../features/auth/presentation/update_password_view.dart';
 
 import '../features/auth/presentation/signup_view.dart';
 import '../features/profile/presentation/profile_route_view.dart';
+import '../features/profile/presentation/profile_stats_page.dart';
 import '../features/subscription/presentation/subscription_view.dart';
 import '../features/subscription/presentation/my_subscription_view.dart';
 import '../features/complaint/presentation/complaint_view.dart';
@@ -17,6 +18,7 @@ import '../features/reports/presentation/student_report_view.dart';
 import '../features/user_profile/presentation/user_profile_view.dart';
 import '../features/subject_report/presentation/subject_report_view.dart';
 import '../features/profile/presentation/about_us_view.dart';
+import '../features/profile/presentation/faq_view.dart';
 import '../features/leaderboard/presentation/leaderboard_view.dart';
 import '../features/analysis/presentation/analysis_view.dart';
 import '../features/history/presentation/exam_history_view.dart';
@@ -27,16 +29,28 @@ import '../features/notifications/presentation/notifications_view.dart';
 import '../features/blog/presentation/blog_view.dart';
 import '../features/referral/presentation/referral_view.dart';
 import '../features/live_exam/presentation/live_exam_category_view.dart';
+import '../features/profile/presentation/bookmarks_view.dart';
 import 'presentation/main_layout.dart';
+import 'services/deep_link_service.dart';
 
 CustomTransitionPage _fadeRoute(Widget child, GoRouterState state) {
   return CustomTransitionPage(
     key: state.pageKey,
     child: child,
+    transitionDuration: const Duration(milliseconds: 300),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return FadeTransition(
         opacity: CurveTween(curve: Curves.easeOut).animate(animation),
-        child: child,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0.03, 0.0),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          )),
+          child: child,
+        ),
       );
     },
   );
@@ -100,13 +114,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) =>
             _fadeRoute(const ExamRunnerView(), state),
       ),
-      GoRoute(
-        path: '/notifications',
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) =>
-            _fadeRoute(const NotificationsView(), state),
-      ),
-
       // Stateful shell route for bottom tabs and drawer items
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -121,6 +128,14 @@ final routerProvider = Provider<GoRouter>((ref) {
                 pageBuilder: (context, state) =>
                     _fadeRoute(const DashboardView(), state),
                 routes: [
+                  GoRoute(
+                    path: 'notifications',
+                    builder: (context, state) => const NotificationsView(),
+                  ),
+                  GoRoute(
+                    path: 'bookmarks',
+                    builder: (context, state) => const BookmarksView(),
+                  ),
                   GoRoute(
                     path: 'practice',
                     builder: (context, state) => const PracticeDashboard(),
@@ -203,6 +218,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                     _fadeRoute(const ProfileRouteView(), state),
                 routes: [
                   GoRoute(
+                    path: 'stats',
+                    builder: (context, state) => const ProfileStatsPage(),
+                  ),
+                  GoRoute(
                     path: 'subscription',
                     builder: (context, state) => const SubscriptionView(),
                   ),
@@ -217,6 +236,18 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'about',
                     builder: (context, state) => const AboutUsView(),
+                  ),
+                  GoRoute(
+                    path: 'privacy',
+                    builder: (context, state) => const AboutUsView(initialPolicyId: 'privacy'),
+                  ),
+                  GoRoute(
+                    path: 'terms',
+                    builder: (context, state) => const AboutUsView(initialPolicyId: 'terms'),
+                  ),
+                  GoRoute(
+                    path: 'faq',
+                    builder: (context, state) => const FaqView(),
                   ),
                   GoRoute(
                     path: 'blog',
@@ -234,6 +265,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+
+  // Initialize DeepLinkService after router is created
+  DeepLinkService().init(router);
+
   return router;
 });
 

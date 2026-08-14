@@ -90,8 +90,9 @@ class _DisplayMathSyntax extends md.InlineSyntax {
 
 class _InlineMathBuilder extends MarkdownElementBuilder {
   final TextStyle? textStyle;
+  final double maxWidth;
 
-  _InlineMathBuilder({this.textStyle});
+  _InlineMathBuilder({this.textStyle, required this.maxWidth});
 
   @override
   Widget? visitElementAfterWithContext(
@@ -102,13 +103,25 @@ class _InlineMathBuilder extends MarkdownElementBuilder {
   ) {
     final latex = element.textContent;
     final style = textStyle ?? preferredStyle ?? const TextStyle();
-    return Math.tex(
-      latex,
-      mathStyle: MathStyle.text,
-      textStyle: style,
-      onErrorFallback: (_) =>
-          Text('\$$latex\$', style: style.copyWith(color: Colors.red)),
-    );
+    return Text.rich(TextSpan(
+      children: [
+        WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxWidth),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Math.tex(
+                latex,
+                mathStyle: MathStyle.text,
+                textStyle: style,
+                onErrorFallback: (_) => Text('\$$latex\$', style: style.copyWith(color: Colors.red)),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ));
   }
 }
 
@@ -126,7 +139,8 @@ class _DisplayMathBuilder extends MarkdownElementBuilder {
   ) {
     final latex = element.textContent;
     final style = textStyle ?? preferredStyle ?? const TextStyle();
-    return Center(
+    return Align(
+      alignment: Alignment.centerLeft,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Padding(
@@ -174,61 +188,65 @@ class LatexText extends StatelessWidget {
           fontSize: style?.fontSize,
           color:
               style?.color ??
-              (isDark ? const Color(0xFFF5F5F5) : const Color(0xFF0F172A)),
+              (isDark ? const Color(0xFFF5F5F5) : const Color(0xFF000000)),
           height: style?.height ?? 1.6,
         );
 
-    return MarkdownBody(
-      data: processed,
-      // plug in $$...$$ BEFORE $...$ so the longer pattern matches first
-      inlineSyntaxes: [_DisplayMathSyntax(), _InlineMathSyntax()],
-      builders: {
-        _kInlineMath: _InlineMathBuilder(textStyle: effectiveStyle),
-        _kDisplayMath: _DisplayMathBuilder(textStyle: effectiveStyle),
-      },
-      styleSheet: MarkdownStyleSheet(
-        p: effectiveStyle,
-        strong: effectiveStyle.copyWith(fontWeight: FontWeight.bold),
-        em: effectiveStyle.copyWith(fontStyle: FontStyle.italic),
-        code: effectiveStyle.copyWith(
-          fontFamily: 'monospace',
-          backgroundColor: isDark
-              ? const Color(0xFF262626)
-              : const Color(0xFFF5F5F5),
-        ),
-        codeblockDecoration: BoxDecoration(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        listBullet: effectiveStyle,
-        blockquote: effectiveStyle.copyWith(
-          color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
-          fontStyle: FontStyle.italic,
-        ),
-        blockquoteDecoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(
-              color: isDark ? const Color(0xFF404040) : const Color(0xFFD4D4D4),
-              width: 3,
+    return LayoutBuilder(builder: (context, constraints) {
+      final maxWidth = constraints.maxWidth;
+      return MarkdownBody(
+        data: processed,
+        // plug in $$...$$ BEFORE $...$ so the longer pattern matches first
+        inlineSyntaxes: [_DisplayMathSyntax(), _InlineMathSyntax()],
+        builders: {
+          _kInlineMath: _InlineMathBuilder(textStyle: effectiveStyle, maxWidth: maxWidth),
+          _kDisplayMath: _DisplayMathBuilder(textStyle: effectiveStyle),
+        },
+        styleSheet: MarkdownStyleSheet(
+          textAlign: WrapAlignment.start,
+          p: effectiveStyle,
+          strong: effectiveStyle.copyWith(fontWeight: FontWeight.bold),
+          em: effectiveStyle.copyWith(fontStyle: FontStyle.italic),
+          code: effectiveStyle.copyWith(
+            fontFamily: 'monospace',
+            backgroundColor: isDark
+                ? const Color(0xFF1C1C1E)
+                : const Color(0xFFF5F5F5),
+          ),
+          codeblockDecoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          listBullet: effectiveStyle,
+          blockquote: effectiveStyle.copyWith(
+            color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+            fontStyle: FontStyle.italic,
+          ),
+          blockquoteDecoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(
+                color: isDark ? const Color(0xFF27272A) : const Color(0xFFD4D4D4),
+                width: 3,
+              ),
             ),
           ),
+          h1: effectiveStyle.copyWith(
+            fontSize: (effectiveStyle.fontSize ?? 14) * 1.5,
+            fontWeight: FontWeight.bold,
+          ),
+          h2: effectiveStyle.copyWith(
+            fontSize: (effectiveStyle.fontSize ?? 14) * 1.3,
+            fontWeight: FontWeight.bold,
+          ),
+          h3: effectiveStyle.copyWith(
+            fontSize: (effectiveStyle.fontSize ?? 14) * 1.1,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        h1: effectiveStyle.copyWith(
-          fontSize: (effectiveStyle.fontSize ?? 14) * 1.5,
-          fontWeight: FontWeight.bold,
-        ),
-        h2: effectiveStyle.copyWith(
-          fontSize: (effectiveStyle.fontSize ?? 14) * 1.3,
-          fontWeight: FontWeight.bold,
-        ),
-        h3: effectiveStyle.copyWith(
-          fontSize: (effectiveStyle.fontSize ?? 14) * 1.1,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      softLineBreak: true,
-      selectable: false,
-      shrinkWrap: true,
-    );
+        softLineBreak: true,
+        selectable: false,
+        shrinkWrap: true,
+      );
+    });
   }
 }

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -31,41 +32,41 @@ const _levels = [
     'Legend',
     'লিজেন্ড (Legend)',
     5000,
-    Color(0xFFB91C1C),
-    Color(0xFF881337),
-    LucideIcons.flame,
+    Color(0xFF9333EA), // Amethyst
+    Color(0xFF4C1D95),
+    LucideIcons.award, // Changed from flame
   ),
   _LevelInfo(
     'Titan',
     'টাইটান (Titan)',
     3500,
-    Color(0xFFF59E0B),
-    Color(0xFFEA580C),
-    LucideIcons.zap,
+    Color(0xFFF97316), // Coral / Orange
+    Color(0xFFB91C1C),
+    LucideIcons.shield, // Changed from zap
   ),
   _LevelInfo(
     'Warrior',
     'ওয়ারিয়র (Warrior)',
     2000,
-    Color(0xFFB91C1C),
-    Color(0xFFB91C1C),
-    LucideIcons.users,
+    Color(0xFF1E3A8A), // Electric Blue
+    Color(0xFF1D4ED8),
+    LucideIcons.target, // Changed from swords
   ),
   _LevelInfo(
     'Scout',
     'স্কাউট (Scout)',
     800,
+    Color(0xFF10B981), // Emerald
     Color(0xFF047857),
-    Color(0xFF14B8A6),
-    LucideIcons.eye,
+    LucideIcons.compass, // Changed from eye
   ),
   _LevelInfo(
     'Rookie',
     'রুকি (Rookie)',
     0,
-    Color(0xFF94A3B8),
-    Color(0xFF475569),
-    LucideIcons.mapPin,
+    Color(0xFF64748B), // Slate
+    Color(0xFF334155),
+    LucideIcons.flag, // Changed from mapPin
   ),
 ];
 
@@ -145,6 +146,12 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
   List<_InstituteRank> _instituteRankings = [];
   bool _isLoadingRankings = false;
 
+  // Pagination state for level rankings
+  int _offset = 0;
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
+  static const int _limit = 20;
+
   @override
   void initState() {
     super.initState();
@@ -172,8 +179,17 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
     }
   }
 
-  Future<void> _fetch() async {
-    setState(() => _isLoading = true);
+  Future<void> _fetch({bool isLoadMore = false}) async {
+    if (isLoadMore) {
+      setState(() => _isLoadingMore = true);
+    } else {
+      setState(() {
+        _isLoading = true;
+        _offset = 0;
+        _hasMore = true;
+      });
+    }
+
     try {
       final supabase = Supabase.instance.client;
       final me = supabase.auth.currentUser?.id;
@@ -182,19 +198,36 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
           .select('id, name, institute, xp, level, exams_taken, avatar_url')
           .eq('level', _selectedLevel)
           .order('xp', ascending: false)
-          .limit(50);
+          .range(_offset, _offset + _limit - 1);
 
       if (mounted) {
         setState(() {
-          _users = (data as List)
+          final fetchedUsers = (data as List)
               .map((u) => _LBUser.fromJson(u as Map<String, dynamic>, me: me))
               .toList();
-          _isLoading = false;
+              
+          if (fetchedUsers.length < _limit) {
+            _hasMore = false;
+          }
+
+          if (isLoadMore) {
+            _users.addAll(fetchedUsers);
+            _isLoadingMore = false;
+          } else {
+            _users = fetchedUsers;
+            _isLoading = false;
+          }
+          _offset += fetchedUsers.length;
         });
       }
     } catch (e) {
       debugPrint('[LeaderboardView] _fetch error: $e');
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _isLoadingMore = false;
+        });
+      }
     }
   }
 
@@ -343,20 +376,6 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
           ),
         ),
 
-        // ── Level Selector (level mode only) ───────────────────────────────
-        if (_viewMode == 'level')
-          _LevelSelector(
-            levels: _levels,
-            selectedLevel: _selectedLevel,
-            myLevel: myProfile?.level,
-            levelCounts: _levelCounts,
-            onSelect: (id) {
-              setState(() => _selectedLevel = id);
-              _fetch();
-            },
-            isDark: isDark,
-          ),
-
         // ── Body ────────────────────────────────────────────────────────────
         Expanded(
           child: _viewMode == 'rankings'
@@ -369,29 +388,77 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
               ? (_isLoading && _users.isEmpty
                     ? const Center(child: CircularProgressIndicator())
                     : ListView(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+                        padding: const EdgeInsets.only(bottom: 80),
                         children: [
-                          if (myProfile != null && isOnOwnLevel)
-                            _UserProgressCard(
-                              level: myProfile.level ?? 'Rookie',
-                              xp: myProfile.xp,
-                              rank: myRank,
-                              isDark: isDark,
-                            ),
-                          if (!_isLoading && _users.length >= 3)
-                            _PodiumSection(
-                              users: _users.take(3).toList(),
-                              isDark: isDark,
-                              onTap: (id) =>
-                                  context.push('/leaderboard/user-profile/$id'),
-                            ),
-                          _LeaderboardTable(
-                            users: _users,
-                            levelLabel: lvl.label.split(' ').first,
-                            isLoading: _isLoading,
+                          _LevelSelector(
+                            levels: _levels,
+                            selectedLevel: _selectedLevel,
+                            myLevel: myProfile?.level,
+                            levelCounts: _levelCounts,
+                            onSelect: (id) {
+                              setState(() => _selectedLevel = id);
+                              _fetch();
+                            },
                             isDark: isDark,
-                            onUserTap: (id) =>
-                                context.push('/leaderboard/user-profile/$id'),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                if (myProfile != null && isOnOwnLevel)
+                                  _UserProgressCard(
+                                    level: myProfile.level ?? 'Rookie',
+                                    xp: myProfile.xp,
+                                    rank: myRank,
+                                    isDark: isDark,
+                                  ),
+                                if (!_isLoading && _users.length >= 3)
+                                  _PodiumSection(
+                                    users: _users.take(3).toList(),
+                                    isDark: isDark,
+                                    onTap: (id) =>
+                                        context.push('/leaderboard/user-profile/$id'),
+                                  ),
+                                _LeaderboardTable(
+                                  users: _users,
+                                  levelLabel: lvl.label.split(' ').first,
+                                  isLoading: _isLoading,
+                                  isDark: isDark,
+                                  onUserTap: (id) =>
+                                      context.push('/leaderboard/user-profile/$id'),
+                                ),
+                                if (_hasMore && !_isLoading)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16),
+                                    child: ElevatedButton(
+                                      onPressed: _isLoadingMore ? null : () => _fetch(isLoadMore: true),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: isDark ? const Color(0xFF141414) : const Color(0xFFFAFAFA),
+                                        foregroundColor: isDark ? Colors.white : Colors.black,
+                                        side: BorderSide(color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5)),
+                                        padding: const EdgeInsets.symmetric(vertical: 14),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                        elevation: 0,
+                                      ),
+                                      child: _isLoadingMore
+                                          ? const SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                            )
+                                          : const Text(
+                                              'আরও লোড করুন',
+                                              style: TextStyle(
+                                                fontFamily: 'Anek Bangla',
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 17,
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
                         ],
                       ))
@@ -448,17 +515,20 @@ class _ViewModeTab extends StatelessWidget {
                 : [],
           ),
           alignment: Alignment.center,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'HindSiliguri',
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: isActive
-                  ? Colors.white
-                  : (isDark
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Anek Bangla',
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: isActive
+                    ? Colors.white
+                    : (isDark
                         ? const Color(0xFF6B7280)
                         : const Color(0xFF9CA3AF)),
+              ),
             ),
           ),
         ),
@@ -492,15 +562,15 @@ class _CollegeLeaderboardBody extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('🏫', style: TextStyle(fontSize: 40)),
+              const Text('🏫', style: TextStyle(fontSize: 42)),
               const SizedBox(height: 12),
               Text(
                 'তোমার প্রোফাইলে কলেজের নাম যোগ করো',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
+                  fontFamily: 'Anek Bangla',
                   fontWeight: FontWeight.w700,
-                  fontSize: 14,
+                  fontSize: 16,
                   color: isDark
                       ? const Color(0xFF737373)
                       : const Color(0xFF9CA3AF),
@@ -532,14 +602,14 @@ class _CollegeLeaderboardBody extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const Text('🏫', style: TextStyle(fontSize: 18)),
+              const Text('🏫', style: TextStyle(fontSize: 20)),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   institute,
                   style: TextStyle(
-                    fontFamily: 'HindSiliguri',
-                    fontSize: 13,
+                    fontFamily: 'Anek Bangla',
+                    fontSize: 15,
                     fontWeight: FontWeight.w800,
                     color: isDark
                         ? const Color(0xFF047857)
@@ -557,15 +627,15 @@ class _CollegeLeaderboardBody extends StatelessWidget {
             child: Center(
               child: Column(
                 children: [
-                  const Text('🏫', style: TextStyle(fontSize: 36)),
+                  const Text('🏫', style: TextStyle(fontSize: 38)),
                   const SizedBox(height: 10),
                   Text(
                     'তোমার কলেজ থেকে এখনো কেউ যোগ দেয়নি',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
+                      fontFamily: 'Anek Bangla',
                       fontWeight: FontWeight.w700,
-                      fontSize: 13,
+                      fontSize: 15,
                       color: isDark
                           ? const Color(0xFF737373)
                           : const Color(0xFF9CA3AF),
@@ -576,8 +646,8 @@ class _CollegeLeaderboardBody extends StatelessWidget {
                     'বন্ধুদের আমন্ত্রণ জানাও!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
-                      fontSize: 12,
+                      fontFamily: 'Anek Bangla',
+                      fontSize: 15,
                       color: isDark
                           ? const Color(0xFF525252)
                           : const Color(0xFFBBBBBB),
@@ -638,15 +708,15 @@ class _InstituteRankingsBody extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('🏆', style: TextStyle(fontSize: 40)),
+              const Text('🏆', style: TextStyle(fontSize: 42)),
               const SizedBox(height: 12),
               Text(
                 'এখনো যথেষ্ট ডেটা নেই',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
+                  fontFamily: 'Anek Bangla',
                   fontWeight: FontWeight.w700,
-                  fontSize: 14,
+                  fontSize: 16,
                   color: isDark
                       ? const Color(0xFF737373)
                       : const Color(0xFF9CA3AF),
@@ -657,8 +727,8 @@ class _InstituteRankingsBody extends StatelessWidget {
                 'প্রতিটি কলেজ থেকে কমপক্ষে ৫ জন শিক্ষার্থী লাগবে',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
-                  fontSize: 12,
+                  fontFamily: 'Anek Bangla',
+                  fontSize: 15,
                   color: isDark
                       ? const Color(0xFF525252)
                       : const Color(0xFFBBBBBB),
@@ -678,8 +748,8 @@ class _InstituteRankingsBody extends StatelessWidget {
           child: Text(
             'র‍্যাংকিং: প্রতিটি কলেজের শীর্ষ ৫ শিক্ষার্থীর গড় XP অনুযায়ী',
             style: TextStyle(
-              fontFamily: 'HindSiliguri',
-              fontSize: 11,
+              fontFamily: 'Anek Bangla',
+              fontSize: 14,
               fontWeight: FontWeight.w600,
               color: isDark ? const Color(0xFF525252) : const Color(0xFF9CA3AF),
             ),
@@ -704,7 +774,7 @@ class _InstituteRankingsBody extends StatelessWidget {
             decoration: BoxDecoration(
               color: isMe
                   ? (isDark ? const Color(0xFF0A1F17) : const Color(0xFFECFDF5))
-                  : (isDark ? const Color(0xFF111111) : Colors.white),
+                  : (isDark ? const Color(0xFF1C1C1E) : Colors.white),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isMe
@@ -712,7 +782,7 @@ class _InstituteRankingsBody extends StatelessWidget {
                           ? const Color(0xFF047857)
                           : const Color(0xFFBBF7D0))
                     : (isDark
-                          ? const Color(0xFF1E1E1E)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFF0F0F0)),
               ),
             ),
@@ -723,12 +793,12 @@ class _InstituteRankingsBody extends StatelessWidget {
                   width: 32,
                   child: Center(
                     child: medal != null
-                        ? Text(medal, style: const TextStyle(fontSize: 20))
+                        ? Text(medal, style: const TextStyle(fontSize: 22))
                         : Text(
                             '$rank',
                             style: TextStyle(
-                              fontFamily: 'HindSiliguri',
-                              fontSize: 13,
+                              fontFamily: 'Anek Bangla',
+                              fontSize: 15,
                               fontWeight: FontWeight.w900,
                               color: isDark
                                   ? const Color(0xFF4A4A4A)
@@ -747,8 +817,8 @@ class _InstituteRankingsBody extends StatelessWidget {
                         entry.institute,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontSize: 13,
+                          fontFamily: 'Anek Bangla',
+                          fontSize: 15,
                           fontWeight: FontWeight.w800,
                           color: isMe
                               ? (isDark
@@ -756,7 +826,7 @@ class _InstituteRankingsBody extends StatelessWidget {
                                     : const Color(0xFF047857))
                               : (isDark
                                     ? Colors.white
-                                    : const Color(0xFF111111)),
+                                    : const Color(0xFF1C1C1E)),
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -765,8 +835,8 @@ class _InstituteRankingsBody extends StatelessWidget {
                             ? 'তোমার কলেজ • ${entry.studentCount} শিক্ষার্থী'
                             : '${entry.studentCount} জন শিক্ষার্থী',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontSize: 11,
+                          fontFamily: 'Anek Bangla',
+                          fontSize: 14,
                           color: isDark
                               ? const Color(0xFF525252)
                               : const Color(0xFF9CA3AF),
@@ -797,8 +867,8 @@ class _InstituteRankingsBody extends StatelessWidget {
                       Text(
                         '${_numFmt.format(entry.avgXp)} XP',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontSize: 12,
+                          fontFamily: 'Anek Bangla',
+                          fontSize: 15,
                           fontWeight: FontWeight.w900,
                           color: isMe
                               ? (isDark
@@ -806,14 +876,14 @@ class _InstituteRankingsBody extends StatelessWidget {
                                     : const Color(0xFF047857))
                               : (isDark
                                     ? Colors.white
-                                    : const Color(0xFF111111)),
+                                    : const Color(0xFF1C1C1E)),
                         ),
                       ),
                       Text(
                         'গড় স্কোর',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontSize: 9,
+                          fontFamily: 'Anek Bangla',
+                          fontSize: 12,
                           color: isDark
                               ? const Color(0xFF525252)
                               : const Color(0xFF9CA3AF),
@@ -853,18 +923,18 @@ class _LevelSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF080808) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         border: Border(
           bottom: BorderSide(
-            color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF0F0F0),
+            color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
           ),
         ),
       ),
       child: SizedBox(
-        height: 112,
+        height: 144, // Increased height to prevent overflow and ensure perfect centering
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
           itemCount: levels.length,
           itemBuilder: (ctx, i) {
             final l = levels[i];
@@ -873,12 +943,13 @@ class _LevelSelector extends StatelessWidget {
             final count = levelCounts[l.id];
 
             return Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(right: 12),
               child: GestureDetector(
                 onTap: () => onSelect(l.id),
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  width: 92,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutCubic,
+                  width: 96,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -886,103 +957,100 @@ class _LevelSelector extends StatelessWidget {
                       colors: isActive
                           ? [l.start, l.end]
                           : [
-                              l.start.withValues(alpha: isDark ? 0.13 : 0.07),
-                              l.end.withValues(alpha: isDark ? 0.07 : 0.04),
+                              isDark ? const Color(0xFF141414) : const Color(0xFFFAFAFA),
+                              isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF5F5F5),
                             ],
                     ),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(24),
                     border: Border.all(
                       color: isActive
-                          ? Colors.transparent
-                          : l.start.withValues(alpha: isDark ? 0.22 : 0.15),
-                      width: 1.5,
+                          ? l.start.withValues(alpha: 0.8)
+                          : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5)),
+                      width: isActive ? 2.0 : 1.0,
                     ),
                     boxShadow: isActive
                         ? [
                             BoxShadow(
-                              color: l.start.withValues(alpha: 0.45),
-                              blurRadius: 22,
-                              offset: const Offset(0, 8),
-                              spreadRadius: -4,
+                              color: l.start.withValues(alpha: isDark ? 0.4 : 0.3),
+                              blurRadius: 16,
+                              offset: const Offset(0, 6),
+                              spreadRadius: -2,
                             ),
                           ]
                         : [],
                   ),
                   child: Stack(
+                    alignment: Alignment.center,
                     clipBehavior: Clip.none,
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 6,
+                          vertical: 12,
+                          horizontal: 4,
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             // Icon in a soft circle
-                            Container(
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
                               width: 38,
                               height: 38,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: isActive
-                                    ? Colors.white.withValues(alpha: 0.22)
-                                    : l.start.withValues(
-                                        alpha: isDark ? 0.16 : 0.10,
-                                      ),
+                                    ? Colors.white.withValues(alpha: 0.2)
+                                    : l.start.withValues(alpha: isDark ? 0.15 : 0.1),
+                                border: isActive
+                                    ? Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1)
+                                    : null,
                               ),
                               child: Icon(
                                 l.icon,
                                 size: 18,
                                 color: isActive
                                     ? Colors.white
-                                    : l.start.withValues(
-                                        alpha: isDark ? 0.65 : 0.55,
-                                      ),
+                                    : l.start,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 8),
                             Text(
                               l.label.split(' ').first,
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
+                                fontFamily: 'Anek Bangla',
                                 fontWeight: FontWeight.w900,
-                                fontSize: 11,
+                                fontSize: 15,
+                                height: 1.1, // Constrain vertical height
                                 color: isActive
                                     ? Colors.white
-                                    : l.start.withValues(
-                                        alpha: isDark ? 0.72 : 0.62,
-                                      ),
+                                    : (isDark ? const Color(0xFFE5E5E5) : const Color(0xFF1F2937)),
                               ),
                               textAlign: TextAlign.center,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             if (count != null) ...[
-                              const SizedBox(height: 3),
+                              const SizedBox(height: 4),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 7,
-                                  vertical: 1.5,
+                                  horizontal: 8,
+                                  vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
                                   color: isActive
                                       ? Colors.white.withValues(alpha: 0.25)
-                                      : l.start.withValues(
-                                          alpha: isDark ? 0.18 : 0.10,
-                                        ),
-                                  borderRadius: BorderRadius.circular(8),
+                                      : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5)),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
                                   '$count',
                                   style: TextStyle(
-                                    fontSize: 9,
+                                    fontSize: 13,
+                                    height: 1.1,
                                     fontWeight: FontWeight.w900,
                                     color: isActive
                                         ? Colors.white
-                                        : l.start.withValues(
-                                            alpha: isDark ? 0.80 : 0.65,
-                                          ),
+                                        : (isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563)),
                                   ),
                                 ),
                               ),
@@ -992,36 +1060,37 @@ class _LevelSelector extends StatelessWidget {
                       ),
                       if (isMyLevel)
                         Positioned(
-                          top: -6,
+                          top: -8,
                           left: 0,
                           right: 0,
                           child: Center(
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
+                                horizontal: 8,
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: isActive
-                                    ? Colors.white
-                                    : const Color(0xFFB91C1C),
+                                gradient: LinearGradient(
+                                  colors: [l.start, l.end],
+                                ),
                                 borderRadius: BorderRadius.circular(100),
+                                border: Border.all(color: isDark ? const Color(0xFF000000) : Colors.white, width: 1.5),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.18),
+                                    color: l.start.withValues(alpha: 0.4),
                                     blurRadius: 4,
-                                    offset: const Offset(0, 1),
+                                    offset: const Offset(0, 2),
                                   ),
                                 ],
                               ),
-                              child: Text(
+                              child: const Text(
                                 'তোমার',
                                 style: TextStyle(
-                                  fontFamily: 'HindSiliguri',
-                                  fontSize: 7,
+                                  fontFamily: 'Anek Bangla',
+                                  fontSize: 8,
                                   fontWeight: FontWeight.w900,
-                                  color: isActive ? l.start : Colors.white,
-                                  letterSpacing: 0.5,
+                                  color: Colors.white,
+                                  height: 1.1,
                                 ),
                               ),
                             ),
@@ -1042,7 +1111,8 @@ class _LevelSelector extends StatelessWidget {
 // ─── UserProgress Card ──────────────────────────────────────────────────────────
 class _UserProgressCard extends StatelessWidget {
   final String level;
-  final int xp, rank;
+  final int xp;
+  final int rank;
   final bool isDark;
 
   const _UserProgressCard({
@@ -1054,186 +1124,193 @@ class _UserProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lvlInfo = _levelById(level);
-    final nxt = _nextLevel(level);
-    final progressPct = nxt == null
-        ? 1.0
-        : ((xp - lvlInfo.minXP) / (nxt.minXP - lvlInfo.minXP)).clamp(0.0, 1.0);
-    final xpNeeded = nxt != null ? (nxt.minXP - xp).clamp(0, nxt.minXP) : 0;
+    final lvl = _levelById(level);
+    final nextLvl = _nextLevel(level);
+
+    double progress = 1.0;
+    if (nextLvl != null) {
+      final denom = (nextLvl.minXP - lvl.minXP).toDouble();
+      if (denom > 0) {
+        progress = ((xp - lvl.minXP) / denom).clamp(0.0, 1.0);
+      }
+    }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark 
+              ? [const Color(0xFF1F2937), const Color(0xFF111827)]
+              : [const Color(0xFFFFFFFF), const Color(0xFFF3F4F6)],
+        ),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E5E5),
+          width: 1,
         ),
         boxShadow: isDark
-            ? []
-            : [const BoxShadow(color: Color(0x08000000), blurRadius: 4)],
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.4),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
+                )
+              ]
+            : [
+                BoxShadow(
+                  color: const Color(0xFF000000).withValues(alpha: 0.05),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
+                )
+              ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
         children: [
-          // Rank box
-          if (rank > 0) ...[
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF3F0F17)
-                    : const Color(0xFFFFF1F2),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isDark
-                      ? const Color(0xFF7F1D2A)
-                      : const Color(0xFFFECDD3),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [lvl.start, lvl.end],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: lvl.start.withValues(alpha: 0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
                 ),
+                child: Icon(lvl.icon, color: Colors.white, size: 28),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Rank',
-                    style: TextStyle(
-                      fontSize: 8,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.5,
-                      color: isDark
-                          ? const Color(0xFFB91C1C)
-                          : const Color(0xFFB91C1C),
-                    ),
-                  ),
-                  Text(
-                    '$rank',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      height: 1.1,
-                      color: isDark
-                          ? const Color(0xFFB91C1C)
-                          : const Color(0xFFB91C1C),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 14),
-          ],
-
-          // Center: level text + XP needed
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Wrap(
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'তুমি বর্তমানে ',
+                      lvl.label,
                       style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        fontWeight: FontWeight.w900,
+                        fontSize: 22,
+                        fontFamily: 'Anek Bangla',
+                        color: isDark ? Colors.white : const Color(0xFF111827),
                       ),
                     ),
+                    const SizedBox(height: 4),
                     Text(
-                      lvlInfo.label.split(' ').first,
+                      '${_numFmt.format(xp)} XP',
                       style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? const Color(0xFFB91C1C)
-                            : const Color(0xFFB91C1C),
-                      ),
-                    ),
-                    Text(
-                      ' লেভেলে আছেন',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: lvl.start,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 18,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                if (nxt != null)
-                  Text(
-                    'আর $xpNeeded XP লাগবে পরের লেভেলে',
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFFA3A3A3),
-                    ),
-                  )
-                else
-                  const Text(
-                    'অভিনন্দন! সর্বোচ্চ লেভেলে পৌঁছেছেন!',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF047857),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: 14),
-
-          // Right: XP + progress bar
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _numFmt.format(xp),
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'monospace',
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'XP',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: isDark
-                          ? const Color(0xFF737373)
-                          : const Color(0xFFA3A3A3),
-                    ),
-                  ),
-                ],
               ),
-              if (nxt != null) ...[
-                const SizedBox(height: 6),
-                SizedBox(
-                  width: 80,
-                  height: 8,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: progressPct.toDouble(),
-                      backgroundColor: isDark
-                          ? const Color(0xFF262626)
-                          : const Color(0xFFF5F5F5),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        isDark
-                            ? const Color(0xFFB91C1C)
-                            : const Color(0xFFB91C1C),
-                      ),
+              if (rank > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF374151) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isDark ? const Color(0xFF4B5563) : const Color(0xFFE5E5E5),
                     ),
+                    boxShadow: [
+                      if (!isDark)
+                        const BoxShadow(
+                          color: Color(0x0A000000),
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        )
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        '#$rank',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 22,
+                          color: isDark ? Colors.white : const Color(0xFF111827),
+                        ),
+                      ),
+                      Text(
+                        'তোমার র‍্যাঙ্ক',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          if (nextLvl != null) ...[
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'পরবর্তী লেভেল: ${nextLvl.label.split(' ').first}',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563),
+                  ),
+                ),
+                Text(
+                  '${_numFmt.format(nextLvl.minXP - xp)} XP প্রয়োজন',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563),
                   ),
                 ),
               ],
-            ],
-          ),
+            ),
+            const SizedBox(height: 10),
+            Stack(
+              children: [
+                Container(
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E5E5),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 800),
+                  curve: Curves.easeOutCubic,
+                  height: 12,
+                  width: MediaQuery.of(context).size.width * progress,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [lvl.start, lvl.end],
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: lvl.start.withValues(alpha: 0.5),
+                        blurRadius: 8,
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -1260,33 +1337,26 @@ class _LeaderboardTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: isDark ? const Color(0xFF000000) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
         ),
         boxShadow: isDark
             ? []
-            : [const BoxShadow(color: Color(0x08000000), blurRadius: 4)],
+            : [const BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 4))],
       ),
       child: Column(
         children: [
           // ── Card title ────────────────────────────────────────────────────
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
               color: isDark
-                  ? const Color(0xFF262626).withValues(alpha: 0.5)
+                  ? const Color(0xFF141414)
                   : const Color(0xFFFAFAFA),
-              border: Border(
-                bottom: BorderSide(
-                  color: isDark
-                      ? const Color(0xFF262626)
-                      : const Color(0xFFE5E5E5),
-                ),
-              ),
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
+                top: Radius.circular(24),
               ),
             ),
             child: Row(
@@ -1294,106 +1364,78 @@ class _LeaderboardTable extends StatelessWidget {
                 Text(
                   '$levelLabel র‍্যাঙ্কিং',
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
                     color: isDark
                         ? const Color(0xFFE5E5E5)
-                        : const Color(0xFF404040),
+                        : const Color(0xFF1F2937),
+                    fontFamily: 'Anek Bangla',
                   ),
                 ),
-              ],
-            ),
-          ),
-
-          // ── Column headers ────────────────────────────────────────────────
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF5F5F5),
-              border: Border(
-                bottom: BorderSide(
+                const Spacer(),
+                Icon(
+                  LucideIcons.barChart2,
+                  size: 18,
                   color: isDark
-                      ? const Color(0xFF262626)
-                      : const Color(0xFFE5E5E5),
+                      ? const Color(0xFFA3A3A3)
+                      : const Color(0xFF737373),
                 ),
-              ),
-            ),
-            child: const Row(
-              children: [
-                SizedBox(width: 36, child: Text('RANK', style: _hdr)),
-                SizedBox(width: 62),
-                Expanded(child: Text('STUDENT', style: _hdr)),
-                Text('TOTAL XP', style: _hdr),
-                SizedBox(width: 20),
               ],
             ),
           ),
 
-          // ── Rows ─────────────────────────────────────────────────────────
+          // ── List items ──────────────────────────────────────────────────
           if (isLoading && users.isEmpty)
             _skeleton()
           else if (users.isEmpty)
             _empty()
           else
-            ...users.asMap().entries.map((e) {
-              final i = e.key;
-              final u = e.value;
+            ...users.asMap().entries.map((entry) {
+              final i = entry.key;
+              final u = entry.value;
               final isMe = u.isCurrentUser;
-              final isTop3 = i < 3;
-              final isLast = i == users.length - 1;
-              final top3Color = i == 0
-                  ? const Color(0xFFB91C1C)
-                  : i == 1
-                  ? const Color(0xFFF59E0B)
-                  : const Color(0xFF94A3B8);
-
-              return GestureDetector(
-                behavior: HitTestBehavior.opaque,
+              return InkWell(
                 onTap: onUserTap != null ? () => onUserTap!(u.id) : null,
-                child: Container(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: isMe
-                        ? (isDark
-                              ? const Color(0xFFB91C1C).withValues(alpha: 0.04)
-                              : const Color(0xFFFFF1F2))
-                        : Colors.transparent,
-                    border: Border(
-                      left: isTop3
-                          ? BorderSide(
-                              color: top3Color.withValues(alpha: 0.5),
-                              width: 3,
-                            )
-                          : BorderSide.none,
-                      bottom: !isLast
-                          ? BorderSide(
-                              color: isDark
-                                  ? const Color(0xFF262626)
-                                  : const Color(0xFFF5F5F5),
-                            )
-                          : BorderSide.none,
+                    color: isMe 
+                        ? (isDark ? const Color(0xFF450a0a).withValues(alpha: 0.4) : const Color(0xFFFEF2F2))
+                        : (isDark ? const Color(0xFF000000) : Colors.white),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isMe 
+                          ? const Color(0xFFEF4444).withValues(alpha: 0.5) 
+                          : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5)),
+                      width: isMe ? 1.5 : 1,
                     ),
-                    borderRadius: isLast
-                        ? const BorderRadius.vertical(
-                            bottom: Radius.circular(20),
-                          )
-                        : null,
+                    boxShadow: isMe 
+                        ? [
+                            BoxShadow(
+                              color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                              blurRadius: 8,
+                              spreadRadius: 1,
+                            )
+                          ]
+                        : [],
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 14,
-                      vertical: 10,
+                      vertical: 12,
                     ),
                     child: Row(
                       children: [
-                        SizedBox(width: 36, child: _rankBadge(i + 1)),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 40, child: _rankBadge(i + 1, isDark)),
+                        const SizedBox(width: 12),
                         _ColorAvatar(
                           name: u.name,
                           avatarUrl: u.avatarUrl,
-                          size: 42,
+                          size: 46,
                           highlighted: isMe,
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1405,46 +1447,53 @@ class _LeaderboardTable extends StatelessWidget {
                                     child: Text(
                                       u.name,
                                       style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                        fontFamily: 'HindSiliguri',
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 17,
+                                        fontFamily: 'Anek Bangla',
                                         color: isMe
                                             ? (isDark
-                                                  ? const Color(0xFFB91C1C)
+                                                  ? const Color(0xFFFCA5A5)
                                                   : const Color(0xFFB91C1C))
                                             : (isDark
                                                   ? Colors.white
-                                                  : const Color(0xFF0F172A)),
+                                                  : const Color(0xFF000000)),
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                   if (isMe) ...[
-                                    const SizedBox(width: 5),
+                                    const SizedBox(width: 8),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 5,
-                                        vertical: 1,
+                                        horizontal: 8,
+                                        vertical: 2,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFFEF2F2),
-                                        borderRadius: BorderRadius.circular(
-                                          100,
+                                        gradient: const LinearGradient(
+                                          colors: [Color(0xFFEF4444), Color(0xFFB91C1C)],
                                         ),
+                                        borderRadius: BorderRadius.circular(100),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0xFFEF4444).withValues(alpha: 0.4),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          )
+                                        ],
                                       ),
                                       child: const Text(
                                         'তুমি',
                                         style: TextStyle(
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFFB91C1C),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w900,
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ),
                                   ],
                                 ],
                               ),
-                              const SizedBox(height: 2),
+                              const SizedBox(height: 4),
                               Row(
                                 children: [
                                   if (u.institute.isNotEmpty)
@@ -1452,9 +1501,9 @@ class _LeaderboardTable extends StatelessWidget {
                                       child: Text(
                                         u.institute,
                                         style: const TextStyle(
-                                          fontSize: 11,
+                                          fontSize: 15,
                                           color: Color(0xFFA3A3A3),
-                                          fontFamily: 'HindSiliguri',
+                                          fontFamily: 'Anek Bangla',
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -1464,28 +1513,33 @@ class _LeaderboardTable extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Text(
-                          _numFmt.format(u.xp),
-                          style: const TextStyle(
-                            fontFamily: 'monospace',
-                            fontWeight: FontWeight.w900,
-                            fontSize: 14,
-                            color: Color(0xFF047857),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          LucideIcons.chevronRight,
-                          size: 14,
-                          color: isDark
-                              ? const Color(0xFF404040)
-                              : const Color(0xFFD4D4D4),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${_numFmt.format(u.xp)}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 18,
+                                color: isMe 
+                                    ? const Color(0xFFEF4444)
+                                    : (isDark ? const Color(0xFFE5E5E5) : const Color(0xFF1F2937)),
+                              ),
+                            ),
+                            const Text('XP', style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFFA3A3A3),
+                              letterSpacing: 1.0,
+                            )),
+                          ],
                         ),
                       ],
                     ),
                   ),
                 ),
-              );
+              ).animate().fade(delay: (i * 50).ms, duration: 400.ms).slideY(begin: 0.1, end: 0.0);
             }),
         ],
       ),
@@ -1493,26 +1547,26 @@ class _LeaderboardTable extends StatelessWidget {
   }
 
   Widget _empty() => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 48),
+    padding: const EdgeInsets.symmetric(vertical: 40),
     child: Column(
       children: [
         Container(
-          width: 64,
-          height: 64,
+          width: 72,
+          height: 72,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+            color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
             shape: BoxShape.circle,
           ),
           child: const Icon(
             LucideIcons.users,
-            size: 30,
+            size: 36,
             color: Color(0xFFA3A3A3),
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
         const Text(
           'এই লেভেলে এখনও কোনো শিক্ষার্থী নেই।',
-          style: TextStyle(fontSize: 14, color: Color(0xFFA3A3A3)),
+          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: Color(0xFFA3A3A3)),
         ),
       ],
     ),
@@ -1526,22 +1580,22 @@ class _LeaderboardTable extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 28,
-              height: 28,
+              width: 32,
+              height: 32,
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF404040)
+                    ? const Color(0xFF27272A)
                     : const Color(0xFFE5E5E5),
                 shape: BoxShape.circle,
               ),
             ),
             const SizedBox(width: 18),
             Container(
-              width: 42,
-              height: 42,
+              width: 46,
+              height: 46,
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF404040)
+                    ? const Color(0xFF27272A)
                     : const Color(0xFFE5E5E5),
                 shape: BoxShape.circle,
               ),
@@ -1552,22 +1606,22 @@ class _LeaderboardTable extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    height: 12,
-                    width: 120,
+                    height: 14,
+                    width: 140,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF404040)
+                          ? const Color(0xFF27272A)
                           : const Color(0xFFE5E5E5),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   Container(
-                    height: 10,
-                    width: 80,
+                    height: 12,
+                    width: 90,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF404040)
+                          ? const Color(0xFF27272A)
                           : const Color(0xFFE5E5E5),
                       borderRadius: BorderRadius.circular(4),
                     ),
@@ -1576,11 +1630,11 @@ class _LeaderboardTable extends StatelessWidget {
               ),
             ),
             Container(
-              height: 14,
-              width: 56,
+              height: 16,
+              width: 60,
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF404040)
+                    ? const Color(0xFF27272A)
                     : const Color(0xFFE5E5E5),
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -1591,37 +1645,38 @@ class _LeaderboardTable extends StatelessWidget {
     ),
   );
 
-  Widget _rankBadge(int rank) {
-    if (rank == 1) return const Text('🥇', style: TextStyle(fontSize: 20));
-    if (rank == 2) return const Text('🥈', style: TextStyle(fontSize: 20));
-    if (rank == 3) return const Text('🥉', style: TextStyle(fontSize: 20));
-    return Text(
-      '$rank',
-      style: const TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
-        color: Color(0xFFA3A3A3),
+  Widget _rankBadge(int rank, bool isDark) {
+    if (rank == 1) return const Center(child: Text('🥇', style: TextStyle(fontSize: 28)));
+    if (rank == 2) return const Center(child: Text('🥈', style: TextStyle(fontSize: 28)));
+    if (rank == 3) return const Center(child: Text('🥉', style: TextStyle(fontSize: 28)));
+    return Container(
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF3F4F6),
+        shape: BoxShape.circle,
+      ),
+      width: 32,
+      height: 32,
+      child: Text(
+        '$rank',
+        style: TextStyle(
+          fontWeight: FontWeight.w900,
+          fontSize: 16,
+          color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+        ),
       ),
     );
   }
 }
-
-const _hdr = TextStyle(
-  fontSize: 10,
-  fontWeight: FontWeight.w900,
-  color: Color(0xFFA3A3A3),
-  letterSpacing: 1.0,
-);
-
-// ─── Avatar Color ─────────────────────────────────────────────────────────────────────────
+// ─── Avatar Color ─────────────────────────────────────────────────────────────────────────// ─── Avatar Color ─────────────────────────────────────────────────────────────────────────
 Color _avatarColor(String name) {
   const colors = <Color>[
     Color(0xFFB91C1C),
-    Color(0xFF0F172A),
+    Color(0xFF000000),
     Color(0xFF047857),
-    Color(0xFFF59E0B),
-    Color(0xFF0F172A),
-    Color(0xFFF59E0B),
+    Color(0xFF1E3A8A),
+    Color(0xFF000000),
+    Color(0xFF1E3A8A),
     Color(0xFF06B6D4),
     Color(0xFFEC4899),
   ];
@@ -1675,21 +1730,40 @@ class _ColorAvatar extends StatelessWidget {
         ],
       ),
       child: ClipOval(
-        child: avatarUrl != null && avatarUrl!.isNotEmpty
-            ? CachedNetworkImage(
-                imageUrl: avatarUrl!,
-                fit: BoxFit.cover,
-                errorWidget: (_, _, _) => Center(
-                  child: Text(
-                    initial,
-                    style: TextStyle(
-                      fontSize: size * 0.4,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+        child: (avatarUrl != null && avatarUrl!.isNotEmpty && avatarUrl != 'null')
+            ? (avatarUrl!.toLowerCase().contains('.svg')
+                ? SvgPicture.network(
+                    avatarUrl!,
+                    fit: BoxFit.cover,
+                    width: size,
+                    height: size,
+                    placeholderBuilder: (context) => Center(
+                      child: Text(
+                        initial,
+                        style: TextStyle(
+                          fontSize: size * 0.4,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              )
+                  )
+                : Image.network(
+                    avatarUrl!,
+                    fit: BoxFit.cover,
+                    width: size,
+                    height: size,
+                    errorBuilder: (context, error, stackTrace) => Center(
+                      child: Text(
+                        initial,
+                        style: TextStyle(
+                          fontSize: size * 0.4,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ))
             : Center(
                 child: Text(
                   initial,
@@ -1734,7 +1808,7 @@ class _PodiumSection extends StatelessWidget {
               rank: 2,
               avatarSize: 52.0,
               platformH: 60.0,
-              accentColor: const Color(0xFFF59E0B),
+              accentColor: const Color(0xFF1E3A8A),
               medal: '🥈',
             ),
           (
@@ -1759,10 +1833,10 @@ class _PodiumSection extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
         ),
         boxShadow: isDark
             ? []
@@ -1774,15 +1848,15 @@ class _PodiumSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
             child: Row(
               children: [
-                const Text('🏆', style: TextStyle(fontSize: 16)),
+                const Text('🏆', style: TextStyle(fontSize: 18)),
                 const SizedBox(width: 8),
                 Text(
                   'শীর্ষ ৩',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'HindSiliguri',
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    fontFamily: 'Anek Bangla',
+                    color: isDark ? Colors.white : const Color(0xFF000000),
                   ),
                 ),
               ],
@@ -1809,7 +1883,7 @@ class _PodiumSection extends StatelessWidget {
                                 top: -12,
                                 child: Text(
                                   '👑',
-                                  style: TextStyle(fontSize: 16),
+                                  style: TextStyle(fontSize: 18),
                                 ),
                               ),
                             Padding(
@@ -1833,10 +1907,10 @@ class _PodiumSection extends StatelessWidget {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: slot.rank == 1 ? 13 : 12,
-                              fontFamily: 'HindSiliguri',
+                              fontFamily: 'Anek Bangla',
                               color: isDark
                                   ? Colors.white
-                                  : const Color(0xFF0F172A),
+                                  : const Color(0xFF000000),
                             ),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
@@ -1847,7 +1921,7 @@ class _PodiumSection extends StatelessWidget {
                         Text(
                           '${_numFmt.format(slot.user.xp)} XP',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: slot.accentColor,
                           ),

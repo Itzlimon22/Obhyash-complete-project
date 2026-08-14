@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../services/secure_storage_service.dart';
 import '../../../services/session_monitor_service.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
@@ -111,6 +112,7 @@ class AuthController extends AsyncNotifier<void> {
     String? examTarget,
     required String email,
     required String password,
+    String? referralCode,
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
@@ -142,6 +144,42 @@ class AuthController extends AsyncNotifier<void> {
             'enrolled_exams': 0,
             'last_active': DateTime.now().toIso8601String(),
           });
+
+          // Handle referral code if provided
+          if (referralCode != null && referralCode.isNotEmpty) {
+            try {
+              // Lookup referral
+              final referral = await _supabase
+                  .from('referrals')
+                  .select('*')
+                  .eq('code', referralCode.trim().toUpperCase())
+                  .maybeSingle();
+
+              if (referral != null) {
+                // Redeem via RPC
+                await _supabase.rpc('redeem_referral_tx', params: {
+                  'p_referral_id': referral['id'],
+                  'p_redeemer_id': response.user!.id,
+                });
+
+                // Record history
+                await _supabase.from('referral_history').insert({
+                  'referral_id': referral['id'],
+                  'redeemed_by': response.user!.id,
+                  'redeemed_at': DateTime.now().toIso8601String(),
+                  'admin_status': 'Pending',
+                  'reward_given': false,
+                });
+
+                // Clear saved referral code
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.remove('referralCode');
+              }
+            } catch (refErr) {
+              debugPrint('[AuthController] Referral error: $refErr');
+              // Proceed with signup even if referral fails
+            }
+          }
         }
       } catch (e) {
         throw Exception(

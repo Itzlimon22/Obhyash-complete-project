@@ -81,10 +81,10 @@ class ResultStats extends StatelessWidget {
         // Summary Table
         Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF0F172A) : Colors.white,
+            color: isDark ? const Color(0xFF000000) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+              color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
             ),
           ),
           child: Column(
@@ -93,7 +93,7 @@ class ResultStats extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF262626).withValues(alpha: 0.5)
+                      ? const Color(0xFF1C1C1E).withValues(alpha: 0.5)
                       : const Color(0xFFF9FAFB),
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(16),
@@ -101,7 +101,7 @@ class ResultStats extends StatelessWidget {
                   border: Border(
                     bottom: BorderSide(
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFE5E5E5),
                     ),
                   ),
@@ -111,7 +111,7 @@ class ResultStats extends StatelessWidget {
                     Text(
                       'ফলাফল বিস্তারিত',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : Colors.black87,
                       ),
@@ -149,7 +149,7 @@ class ResultStats extends StatelessWidget {
                       width: 1,
                       thickness: 1,
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFE5E5E5),
                     ),
                     // Right Column
@@ -186,7 +186,7 @@ class ResultStats extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF262626).withValues(alpha: 0.5)
+                      ? const Color(0xFF1C1C1E).withValues(alpha: 0.5)
                       : const Color(0xFFF9FAFB),
                   borderRadius: const BorderRadius.vertical(
                     bottom: Radius.circular(16),
@@ -194,7 +194,7 @@ class ResultStats extends StatelessWidget {
                   border: Border(
                     top: BorderSide(
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFE5E5E5),
                     ),
                   ),
@@ -205,7 +205,7 @@ class ResultStats extends StatelessWidget {
                     Text(
                       'মোট প্রাপ্ত নম্বর',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : Colors.black87,
                       ),
@@ -213,7 +213,7 @@ class ResultStats extends StatelessWidget {
                     Text(
                       '${finalScore.toStringAsFixed(2)} / $totalPoints',
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.green,
                       ),
@@ -251,10 +251,10 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
         ),
       ),
       child: Column(
@@ -271,21 +271,21 @@ class _StatCard extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF0F172A),
+              color: isDark ? Colors.white : const Color(0xFF000000),
             ),
           ),
           if (subtitle != null)
             Text(
               subtitle!,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              style: const TextStyle(fontSize: 15, color: Colors.grey),
             ),
           const SizedBox(height: 4),
           Text(
             title,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
               color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
             ),
@@ -319,17 +319,20 @@ class _TableRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF404040),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
+              ),
             ),
           ),
+          const SizedBox(width: 8),
           Text(
             value,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: valueColor ?? (isDark ? Colors.white : Colors.black),
             ),
@@ -362,10 +365,10 @@ class _CircularAccuracyCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
         ),
       ),
       child: Column(
@@ -381,7 +384,7 @@ class _CircularAccuracyCard extends StatelessWidget {
                   strokeWidth: 6,
                   color: color,
                   backgroundColor: isDark
-                      ? const Color(0xFF262626)
+                      ? const Color(0xFF1C1C1E)
                       : const Color(0xFFF3F4F6),
                   strokeCap: StrokeCap.round,
                 ),
@@ -389,9 +392,9 @@ class _CircularAccuracyCard extends StatelessWidget {
                   child: Text(
                     '${percentage.round()}%',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      color: isDark ? Colors.white : const Color(0xFF000000),
                     ),
                   ),
                 ),
@@ -402,7 +405,7 @@ class _CircularAccuracyCard extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
               color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
             ),

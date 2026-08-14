@@ -118,8 +118,8 @@ class _SubscriptionViewState extends State<SubscriptionView> {
               height: 200,
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF0F172A)
-                    : const Color(0xFF262626),
+                    ? const Color(0xFF000000)
+                    : const Color(0xFF1C1C1E),
                 borderRadius: BorderRadius.circular(24),
               ),
             )
@@ -142,14 +142,14 @@ class _SubscriptionViewState extends State<SubscriptionView> {
           const Center(
             child: Text(
               'তোমার প্ল্যান বেছে নাও',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
             ),
           ),
           const SizedBox(height: 4),
           const Center(
             child: Text(
               'যেকোনো সময় বাতিল করা যাবে',
-              style: TextStyle(fontSize: 13, color: Color(0xFF737373)),
+              style: TextStyle(fontSize: 15, color: Color(0xFF737373)),
             ),
           ),
           const SizedBox(height: 24),
@@ -161,7 +161,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
                 height: 250,
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                  color: isDark ? const Color(0xFF000000) : Colors.white,
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
@@ -170,7 +170,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                color: isDark ? const Color(0xFF000000) : Colors.white,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: const Center(
@@ -222,7 +222,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
               _TrustBadge(
                 icon: LucideIcons.shieldCheck,
                 label: 'নিরাপদ পেমেন্ট',
-                iconColor: const Color(0xFF0F172A),
+                iconColor: const Color(0xFF000000),
                 bgColor: isDark
                     ? const Color(0xFF050B1A)
                     : const Color(0xFFF0F4FF),
@@ -260,13 +260,19 @@ class _HeroBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? Colors.black : const Color(0xFF0F172A),
+        gradient: LinearGradient(
+          colors: isDark
+              ? [const Color(0xFF064E3B), const Color(0xFF022C22)] // Deep emerald gradient
+              : [const Color(0xFF059669), const Color(0xFF047857)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            color: const Color(0xFF059669).withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -275,46 +281,48 @@ class _HeroBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0x1A10B981),
-              border: Border.all(color: const Color(0x8016A34A)),
-              borderRadius: BorderRadius.circular(20),
+              color: Colors.white.withValues(alpha: 0.15),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+              borderRadius: BorderRadius.circular(30),
             ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(LucideIcons.zap, size: 12, color: Color(0xFF4ADE80)),
-                SizedBox(width: 6),
+                Icon(LucideIcons.zap, size: 14, color: Color(0xFF6EE7B7)),
+                SizedBox(width: 8),
                 Text(
                   'প্রিমিয়াম প্ল্যান',
                   style: TextStyle(
-                    color: Color(0xFF4ADE80),
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           const Text(
             'আরো বেশি পড়ো,\nআরো ভালো প্রস্তুতি নাও',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 26,
+              fontSize: 30,
               fontWeight: FontWeight.w900,
               height: 1.2,
+              letterSpacing: -0.5,
             ),
           ),
-          const SizedBox(height: 12),
-          const Text(
+          const SizedBox(height: 16),
+          Text(
             'সীমাহীন পরীক্ষা, AI সাজেশন, বিস্তারিত এনালাইসিস — সব কিছু এক প্ল্যানে',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Color(0xFFA3A3A3),
-              fontSize: 13,
+              color: Colors.white.withValues(alpha: 0.85),
+              fontSize: 15,
               height: 1.5,
             ),
           ),
@@ -373,7 +381,7 @@ class _ActiveSubscriptionBanner extends StatelessWidget {
                   planName,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -381,7 +389,7 @@ class _ActiveSubscriptionBanner extends StatelessWidget {
                   'মেয়াদ: $daysRemaining দিন বাকি${expiresAt != null ? ' ($expiresAt)' : ''}',
                   style: const TextStyle(
                     color: Color(0xFF86EFAC),
-                    fontSize: 12,
+                    fontSize: 15,
                   ),
                 ),
               ],
@@ -397,7 +405,7 @@ class _ActiveSubscriptionBanner extends StatelessWidget {
               'সক্রিয়',
               style: TextStyle(
                 color: Color(0xFF14532D),
-                fontSize: 11,
+                fontSize: 14,
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -424,88 +432,86 @@ class _PricingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isEmerald = plan.colorTheme == 'emerald';
-    final Color mainColor = isEmerald
-        ? const Color(0xFF047857)
-        : const Color(0xFFB91C1C);
-    final Color bgLight = isEmerald
-        ? const Color(0xFFF0FDF4)
-        : const Color(0xFFFFF1F2);
-    final Color bgDark = isEmerald
-        ? const Color(0xFF047857)
-        : const Color(0xFF881337);
+    final bool isPopular = plan.durationDays >= 90;
+    
+    // Premium deep colors replacing light blocky colors
+    final Color primaryColor = isEmerald ? const Color(0xFF10B981) : const Color(0xFFF43F5E);
+    final Color cardBg = isDark ? const Color(0xFF000000) : Colors.white;
+    final Color glowColor = primaryColor.withValues(alpha: 0.15);
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isPopular ? primaryColor.withValues(alpha: 0.5) : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5)),
+          width: isPopular ? 1.5 : 1.0,
         ),
+        boxShadow: [
+          if (isPopular)
+            BoxShadow(
+              color: glowColor,
+              blurRadius: 24,
+              offset: const Offset(0, 8),
+            ),
+          if (!isDark && !isPopular)
+            const BoxShadow(
+              color: Color(0x0A000000),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Stack(
         children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: isDark ? bgDark.withValues(alpha: 0.2) : bgLight,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
-              border: Border(
-                bottom: BorderSide(
-                  color: isDark
-                      ? const Color(0xFF262626)
-                      : const Color(0xFFE5E5E5),
+          if (isPopular)
+            Positioned(
+              top: 0,
+              right: 24,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(8),
+                    bottomRight: Radius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'জনপ্রিয়',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
+          Padding(
+            padding: const EdgeInsets.all(24),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      plan.name,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                    ),
-                    if (plan.durationDays >= 90)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: mainColor,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Text(
-                          'জনপ্রিয়',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                  ],
+                const SizedBox(height: 8),
+                Text(
+                  plan.name,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    color: isDark ? Colors.white : const Color(0xFF000000),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
                   children: [
                     Text(
                       '${plan.currency} ${plan.price}',
                       style: TextStyle(
-                        fontSize: 32,
+                        fontSize: 36,
                         fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? Colors.white : const Color(0xFF000000),
                         height: 1,
                       ),
                     ),
@@ -513,41 +519,47 @@ class _PricingCard extends StatelessWidget {
                     Text(
                       '/ ${plan.durationDays} দিন',
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 15,
                         color: Color(0xFF737373),
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          // Features
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+                const SizedBox(height: 24),
+                Divider(
+                  color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+                ),
+                const SizedBox(height: 24),
                 ...plan.features.map(
                   (feature) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.only(bottom: 14),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          LucideIcons.checkCircle2,
-                          size: 18,
-                          color: mainColor,
+                        Container(
+                          margin: const EdgeInsets.only(top: 2),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          padding: const EdgeInsets.all(2),
+                          child: Icon(
+                            LucideIcons.check,
+                            size: 14,
+                            color: primaryColor,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             feature,
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 15,
+                              height: 1.4,
                               color: isDark
                                   ? const Color(0xFFD4D4D4)
-                                  : const Color(0xFF404040),
+                                  : const Color(0xFF27272A),
                             ),
                           ),
                         ),
@@ -561,25 +573,27 @@ class _PricingCard extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isCurrent
                         ? (isDark
-                              ? const Color(0xFF262626)
+                              ? const Color(0xFF1C1C1E)
                               : const Color(0xFFE5E5E5))
-                        : mainColor,
+                        : (isPopular ? primaryColor : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFF000000))),
                     foregroundColor: isCurrent
                         ? (isDark
                               ? const Color(0xFFA3A3A3)
                               : const Color(0xFF737373))
                         : Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    elevation: 0,
+                    elevation: isPopular ? 4 : 0,
+                    shadowColor: isPopular ? primaryColor.withValues(alpha: 0.4) : Colors.transparent,
                   ),
                   child: Text(
                     isCurrent ? 'বর্তমান প্ল্যান' : 'আপগ্রেড করো',
                     style: const TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
@@ -610,27 +624,42 @@ class _TrustBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(12),
+        color: isDark ? bgColor.withValues(alpha: 0.5) : bgColor,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: iconColor.withValues(alpha: isDark ? 0.2 : 0.1),
         ),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: iconColor.withValues(alpha: 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+        ],
       ),
       child: Row(
         children: [
-          Icon(icon, color: iconColor, size: 20),
-          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: iconColor, size: 16),
+          ),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
                 color: isDark
-                    ? const Color(0xFFD4D4D4)
-                    : const Color(0xFF404040),
+                    ? const Color(0xFFE5E5E5)
+                    : const Color(0xFF171717),
               ),
             ),
           ),
@@ -661,11 +690,11 @@ class _ComparisonTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardBg = isDark ? const Color(0xFF0F172A) : Colors.white;
+    final cardBg = isDark ? const Color(0xFF000000) : Colors.white;
     final borderColor = isDark
-        ? const Color(0xFF262626)
+        ? const Color(0xFF1C1C1E)
         : const Color(0xFFE5E5E5);
-    final textMain = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textMain = isDark ? Colors.white : const Color(0xFF000000);
     final textSub = isDark ? const Color(0xFF737373) : const Color(0xFFA3A3A3);
 
     return Column(
@@ -674,7 +703,7 @@ class _ComparisonTable extends StatelessWidget {
         const Center(
           child: Text(
             'ফ্রি বনাম প্রিমিয়াম',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
           ),
         ),
         const SizedBox(height: 16),
@@ -708,7 +737,7 @@ class _ComparisonTable extends StatelessWidget {
                       child: Text(
                         'ফিচার',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 15,
                           fontWeight: FontWeight.w900,
                           color: textSub,
                         ),
@@ -719,7 +748,7 @@ class _ComparisonTable extends StatelessWidget {
                         child: Text(
                           'ফ্রি',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 15,
                             fontWeight: FontWeight.w900,
                             color: textSub,
                           ),
@@ -732,7 +761,7 @@ class _ComparisonTable extends StatelessWidget {
                         child: Text(
                           'প্রিমিয়াম',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 15,
                             fontWeight: FontWeight.w900,
                             color: const Color(0xFF047857),
                           ),
@@ -754,7 +783,7 @@ class _ComparisonTable extends StatelessWidget {
                     return Text(
                       text,
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: textMain,
                       ),
@@ -771,7 +800,7 @@ class _ComparisonTable extends StatelessWidget {
                     LucideIcons.xCircle,
                     size: 16,
                     color: isDark
-                        ? const Color(0xFF404040)
+                        ? const Color(0xFF27272A)
                         : const Color(0xFFD4D4D4),
                   );
                 }
@@ -790,7 +819,7 @@ class _ComparisonTable extends StatelessWidget {
                         flex: 3,
                         child: Text(
                           label,
-                          style: TextStyle(fontSize: 13, color: textMain),
+                          style: TextStyle(fontSize: 15, color: textMain),
                         ),
                       ),
                       Expanded(

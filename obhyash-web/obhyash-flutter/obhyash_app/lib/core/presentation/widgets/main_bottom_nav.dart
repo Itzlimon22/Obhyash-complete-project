@@ -44,7 +44,7 @@ class MainBottomNav extends StatelessWidget {
         : const Color(0xFF9CA3AF);
     final bgColor = isDark ? const Color(0xFF000000) : Colors.white;
     final borderColor = isDark
-        ? const Color(0xFF262626)
+        ? const Color(0xFF1C1C1E)
         : const Color(0xFFE5E5E5);
 
     final bottomPadding = MediaQuery.of(context).padding.bottom;
@@ -83,7 +83,7 @@ class MainBottomNav extends StatelessWidget {
               left: 0,
               right: 0,
               child: SizedBox(
-                height: 80,
+                height: 85,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -124,7 +124,7 @@ class MainBottomNav extends StatelessWidget {
                                       ? activeColor
                                       : (isDark
                                             ? Colors.white
-                                            : const Color(0xFF0F172A)),
+                                            : const Color(0xFF000000)),
                                   borderRadius: BorderRadius.circular(
                                     16,
                                   ), // Web uses rounded-2xl
@@ -150,7 +150,7 @@ class MainBottomNav extends StatelessWidget {
                                   color: isActive
                                       ? Colors.white
                                       : (isDark
-                                            ? const Color(0xFF0F172A)
+                                            ? const Color(0xFF000000)
                                             : Colors.white),
                                 ),
                               ),
@@ -158,8 +158,8 @@ class MainBottomNav extends StatelessWidget {
                               Text(
                                 label,
                                 style: TextStyle(
-                                  fontSize: 10,
-                                  fontFamily: 'HindSiliguri',
+                                  fontSize: 15,
+                                  fontFamily: 'Anek Bangla',
                                   fontWeight: FontWeight.bold,
                                   color: isActive ? activeColor : inactiveColor,
                                 ),
@@ -206,8 +206,8 @@ class MainBottomNav extends StatelessWidget {
                               Text(
                                 label,
                                 style: TextStyle(
-                                  fontSize: 10,
-                                  fontFamily: 'HindSiliguri',
+                                  fontSize: 15,
+                                  fontFamily: 'Anek Bangla',
                                   fontWeight: isRealActive
                                       ? FontWeight.bold
                                       : FontWeight.w500,

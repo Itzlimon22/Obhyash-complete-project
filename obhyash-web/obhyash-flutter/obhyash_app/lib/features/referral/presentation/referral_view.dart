@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/providers/auth_provider.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
+import 'widgets/scratch_card_dialog.dart';
 
 class ReferralView extends ConsumerStatefulWidget {
   const ReferralView({super.key});
@@ -19,6 +20,9 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
   bool _isLoading = true;
   bool _isCopied = false;
   List<Map<String, dynamic>> _history = [];
+  List<Map<String, dynamic>> _scratchCards = [];
+  List<Map<String, dynamic>> _leaderboard = [];
+  int _totalReferrals = 0;
 
   @override
   void initState() {
@@ -103,10 +107,31 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
         };
       }).toList();
 
+      // Fetch scratch cards
+      final cards = await sb
+          .from('scratch_cards')
+          .select('*')
+          .eq('user_id', uid)
+          .order('created_at', ascending: false);
+
+      // Get exact count of successful referrals
+      final countRes = await sb
+          .from('referral_history')
+          .select('id')
+          .eq('referral_id', referralId)
+          .eq('admin_status', 'Approved')
+          .count(CountOption.exact);
+
+      // Get leaderboard
+      final leaderboardRes = await sb.rpc('get_monthly_leaderboard');
+
       if (mounted) {
         setState(() {
           _code = code;
           _history = enriched;
+          _scratchCards = (cards as List).cast<Map<String, dynamic>>();
+          _leaderboard = (leaderboardRes as List).cast<Map<String, dynamic>>();
+          _totalReferrals = countRes.count ?? 0;
           _isLoading = false;
         });
       }
@@ -127,7 +152,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
   void _shareCode() async {
     if (_code == null) return;
     final text =
-        'অভ্যাস অ্যাপে আমার রেফারেল কোড ব্যবহার করে দুজনেই পাও ১ মাসের ফ্রি প্রিমিয়াম! 🎉\n\nকোড: $_code\n\nএখানে রেজিস্টার করো: https://obhyash.com/signup';
+        'অভ্যাস অ্যাপে আমার রেফারেল কোড ব্যবহার করে ফ্রি তে পাও ১ মাসের প্রিমিয়াম সাবস্ক্রিপশন! 🎉\n\nকোড: $_code\n\nএখানে রেজিস্টার করো: https://obhyash.com/signup?ref=$_code';
     final encoded = Uri.encodeComponent(text);
     final whatsappUrl = Uri.parse('https://wa.me/?text=$encoded');
     if (await canLaunchUrl(whatsappUrl)) {
@@ -153,9 +178,9 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
       if (next != null && prev == null) _loadReferral();
     });
     final bg = isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9);
-    final card = isDark ? const Color(0xFF0F172A) : Colors.white;
-    final border = isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5);
-    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final card = isDark ? const Color(0xFF000000) : Colors.white;
+    final border = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF000000);
     final textSecondary = isDark
         ? const Color(0xFFA3A3A3)
         : const Color(0xFF737373);
@@ -211,31 +236,31 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                               'রেফারেল প্রোগ্রাম',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 16,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
+                                fontFamily: 'Anek Bangla',
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 14),
                         const Text(
-                          'বন্ধুদের আমন্ত্রণ জানাও,\nদুজনেই পাও প্রিমিয়াম!',
+                          'বন্ধুদের আমন্ত্রণ জানাও,\nপ্রতি ৩ রেফারে পাও একটি স্ক্র্যাচ কার্ড!',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 22,
+                            fontSize: 24,
                             fontWeight: FontWeight.w900,
-                            fontFamily: 'HindSiliguri',
+                            fontFamily: 'Anek Bangla',
                             height: 1.3,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'তোমার কোড দিয়ে কোনো বন্ধু যুক্ত হলে তুমি ও তোমার বন্ধু—দুজনেই পেয়ে যাবে ১ মাসের ফ্রি প্রিমিয়াম।',
+                          'তোমার কোড দিয়ে কোনো বন্ধু যুক্ত হলে সে পাবে ১ মাসের ফ্রি প্রিমিয়াম, আর তুমি প্রতি ৩ জন বন্ধুর জন্য পাবে একটি দারুণ স্ক্র্যাচ কার্ড!',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.85),
-                            fontSize: 13,
-                            fontFamily: 'HindSiliguri',
+                            color: Colors.white70,
+                            fontSize: 15,
+                            fontFamily: 'Anek Bangla',
                             height: 1.5,
                           ),
                         ),
@@ -268,11 +293,11 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                         Text(
                           'তোমার রেফারেল কোড',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: textSecondary,
                             letterSpacing: 0.5,
-                            fontFamily: 'HindSiliguri',
+                            fontFamily: 'Anek Bangla',
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -283,12 +308,12 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                           ),
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF262626)
+                                ? const Color(0xFF1C1C1E)
                                 : const Color(0xFFFAFAF9),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isDark
-                                  ? const Color(0xFF404040)
+                                  ? const Color(0xFF27272A)
                                   : const Color(0xFFE5E5E5),
                               width: 1.5,
                             ),
@@ -299,7 +324,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                 child: Text(
                                   _code ?? '— — — — — — — —',
                                   style: TextStyle(
-                                    fontSize: 24,
+                                    fontSize: 26,
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: 4,
                                     color: textPrimary,
@@ -319,7 +344,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                     color: _isCopied
                                         ? const Color(0xFF047857)
                                         : (isDark
-                                              ? const Color(0xFF404040)
+                                              ? const Color(0xFF27272A)
                                               : const Color(0xFFE5E5E5)),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -339,9 +364,9 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                       Text(
                                         _isCopied ? 'কপি হয়েছে' : 'কপি করো',
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.bold,
-                                          fontFamily: 'HindSiliguri',
+                                          fontFamily: 'Anek Bangla',
                                           color: _isCopied
                                               ? Colors.white
                                               : textSecondary,
@@ -364,9 +389,9 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                             label: const Text(
                               'বন্ধুদের সাথে শেয়ার করো',
                               style: TextStyle(
-                                fontFamily: 'HindSiliguri',
+                                fontFamily: 'Anek Bangla',
                                 fontWeight: FontWeight.bold,
-                                fontSize: 14,
+                                fontSize: 16,
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
@@ -386,6 +411,19 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
 
                   const SizedBox(height: 16),
 
+                  // ── Gamification ─────────────────────────────────────────
+                  _buildProgressSection(isDark),
+                  const SizedBox(height: 16),
+                  
+                  if (_scratchCards.isNotEmpty) ...[
+                    _buildScratchCardsSection(isDark),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // Always show leaderboard (with empty state if no one is on it yet)
+                  _buildLeaderboardSection(isDark),
+                  const SizedBox(height: 16),
+
                   // ── Benefits ─────────────────────────────────────────────
                   Container(
                     padding: const EdgeInsets.all(20),
@@ -401,16 +439,16 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                           children: [
                             const Icon(
                               Icons.auto_awesome_rounded,
-                              color: Color(0xFFF59E0B),
+                              color: Color(0xFF1E3A8A),
                               size: 18,
                             ),
                             const SizedBox(width: 8),
                             Text(
                               'রেফারেল প্রোগ্রামের সুবিধা',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 17,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
+                                fontFamily: 'Anek Bangla',
                                 color: textPrimary,
                               ),
                             ),
@@ -420,18 +458,18 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                         ...[
                           (
                             '১',
-                            '১ মাস ফ্রি প্রিমিয়াম',
-                            'তোমার রেফার করা প্রতিটি সফল সাইনআপের জন্য ১ মাসের প্রিমিয়াম সম্পূর্ণ ফ্রি।',
+                            'বন্ধুর জন্য ১ মাস ফ্রি প্রিমিয়াম',
+                            'তোমার রেফারেল কোড দিয়ে যুক্ত হলেই তোমার বন্ধু পাবে ১ মাসের প্রিমিয়াম সম্পূর্ণ ফ্রি।',
                           ),
                           (
                             '২',
-                            'তোমার বন্ধুর জন্যও উপহার',
-                            'তোমার লিংকের মাধ্যমে যে যুক্ত হবে, সে নিজেও পাবে দারুণ পুরস্কার।',
+                            'তোমার জন্য স্ক্র্যাচ কার্ড',
+                            'প্রতি ৩ জন বন্ধুকে সফলভাবে যুক্ত করলে তুমি পাবে একটি স্ক্র্যাচ কার্ড, যেখানে থাকতে পারে ফ্রি প্রিমিয়াম।',
                           ),
                           (
                             '৩',
                             'আনলিমিটেড রেফারেল',
-                            'যত বেশি বন্ধুকে ইনভাইট করবে, তত বেশি মাসের প্রিমিয়াম অর্জন করবে।',
+                            'যত বেশি বন্ধুকে ইনভাইট করবে, তত বেশি স্ক্র্যাচ কার্ড জেতার সুযোগ পাবে।',
                           ),
                         ].map(
                           (item) => Container(
@@ -439,12 +477,12 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? const Color(0xFF262626)
+                                  ? const Color(0xFF1C1C1E)
                                   : const Color(0xFFFAFAF9),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: isDark
-                                    ? const Color(0xFF404040)
+                                    ? const Color(0xFF27272A)
                                     : const Color(0xFFF5F5F5),
                               ),
                             ),
@@ -466,10 +504,10 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                     child: Text(
                                       item.$1,
                                       style: const TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.w900,
                                         color: Color(0xFFB91C1C),
-                                        fontFamily: 'HindSiliguri',
+                                        fontFamily: 'Anek Bangla',
                                       ),
                                     ),
                                   ),
@@ -483,9 +521,9 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                       Text(
                                         item.$2,
                                         style: TextStyle(
-                                          fontSize: 13,
+                                          fontSize: 15,
                                           fontWeight: FontWeight.bold,
-                                          fontFamily: 'HindSiliguri',
+                                          fontFamily: 'Anek Bangla',
                                           color: textPrimary,
                                         ),
                                       ),
@@ -493,8 +531,8 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                       Text(
                                         item.$3,
                                         style: TextStyle(
-                                          fontSize: 12,
-                                          fontFamily: 'HindSiliguri',
+                                          fontSize: 15,
+                                          fontFamily: 'Anek Bangla',
                                           color: textSecondary,
                                           height: 1.5,
                                         ),
@@ -526,10 +564,10 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                         Text(
                           'কীভাবে শুরু করবে?',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 15,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 1,
-                            fontFamily: 'HindSiliguri',
+                            fontFamily: 'Anek Bangla',
                             color: textSecondary,
                           ),
                         ),
@@ -558,7 +596,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                             _StepBubble(
                               icon: '🎉',
                               title: 'পুরস্কার পাও',
-                              desc: 'দুজনেই প্রিমিয়াম পাবে।',
+                              desc: 'বন্ধু পাবে প্রিমিয়াম, তুমি পাবে কার্ড।',
                               isDark: isDark,
                               textPrimary: textPrimary,
                               textSecondary: textSecondary,
@@ -593,9 +631,9 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                               Text(
                                 'রেফারেল ইতিহাস (${_history.length} জন)',
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'HindSiliguri',
+                                  fontFamily: 'Anek Bangla',
                                   color: textPrimary,
                                 ),
                               ),
@@ -614,7 +652,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                 ? const Color(0xFF047857)
                                 : status == 'Rejected'
                                 ? const Color(0xFFB91C1C)
-                                : const Color(0xFFF59E0B);
+                                : const Color(0xFF1E3A8A);
                             final statusLabel = status == 'Approved'
                                 ? 'অনুমোদিত'
                                 : status == 'Rejected'
@@ -629,12 +667,12 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                               ),
                               decoration: BoxDecoration(
                                 color: isDark
-                                    ? const Color(0xFF262626)
+                                    ? const Color(0xFF1C1C1E)
                                     : const Color(0xFFFAFAF9),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
                                   color: isDark
-                                      ? const Color(0xFF404040)
+                                      ? const Color(0xFF27272A)
                                       : const Color(0xFFF5F5F5),
                                 ),
                               ),
@@ -650,7 +688,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                           ? name[0].toUpperCase()
                                           : 'U',
                                       style: const TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                         color: Color(0xFFB91C1C),
                                       ),
@@ -665,9 +703,9 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                         Text(
                                           name,
                                           style: TextStyle(
-                                            fontSize: 13,
+                                            fontSize: 15,
                                             fontWeight: FontWeight.w600,
-                                            fontFamily: 'HindSiliguri',
+                                            fontFamily: 'Anek Bangla',
                                             color: textPrimary,
                                           ),
                                         ),
@@ -675,7 +713,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                           Text(
                                             dateStr,
                                             style: TextStyle(
-                                              fontSize: 11,
+                                              fontSize: 14,
                                               color: textSecondary,
                                             ),
                                           ),
@@ -701,9 +739,9 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                     child: Text(
                                       statusLabel,
                                       style: TextStyle(
-                                        fontSize: 10,
+                                        fontSize: 13,
                                         fontWeight: FontWeight.bold,
-                                        fontFamily: 'HindSiliguri',
+                                        fontFamily: 'Anek Bangla',
                                         color: statusColor,
                                       ),
                                     ),
@@ -732,6 +770,383 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
       return '';
     }
   }
+
+  Widget _buildProgressSection(bool isDark) {
+    final nextMilestone = ((_totalReferrals ~/ 3) + 1) * 3;
+    final progress = (_totalReferrals % 3) / 3.0;
+    final needed = 3 - (_totalReferrals % 3);
+
+    final bg = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final border = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5);
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'স্ক্র্যাচ কার্ড প্রগ্রেস',
+                style: TextStyle(
+                  fontFamily: 'Anek Bangla',
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '$_totalReferrals / $nextMilestone',
+                  style: const TextStyle(
+                    fontFamily: 'Anek Bangla',
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFF59E0B),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: LinearProgressIndicator(
+              value: progress == 0 && _totalReferrals > 0 && _totalReferrals % 3 == 0 ? 1.0 : progress,
+              minHeight: 12,
+              backgroundColor: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
+              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFF59E0B)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            needed == 3 && _totalReferrals > 0
+                ? 'অভিনন্দন! আপনি একটি নতুন স্ক্র্যাচ কার্ড পেয়েছেন!'
+                : 'আর মাত্র $needed টি সফল রেফারেল করলে পাবেন একটি স্ক্র্যাচ কার্ড!',
+            style: TextStyle(
+              fontFamily: 'Anek Bangla',
+              fontSize: 14,
+              color: isDark ? Colors.white70 : Colors.black54,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScratchCardsSection(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'আপনার স্ক্র্যাচ কার্ডসমূহ',
+          style: TextStyle(
+            fontFamily: 'Anek Bangla',
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 12),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.5,
+          ),
+          itemCount: _scratchCards.length,
+          itemBuilder: (context, index) {
+            final card = _scratchCards[index];
+            final isScratched = card['is_scratched'] == true;
+
+            return InkWell(
+              onTap: isScratched
+                  ? null
+                  : () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (ctx) => ScratchCardDialog(
+                          cardId: card['id'],
+                          onScratched: () {
+                            _loadReferral(); // reload to update UI
+                          },
+                        ),
+                      );
+                    },
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: isScratched
+                      ? LinearGradient(
+                          colors: isDark
+                              ? [const Color(0xFF1C1C1E), const Color(0xFF1C1C1E)]
+                              : [const Color(0xFFF3F4F6), const Color(0xFFE5E7EB)],
+                        )
+                      : const LinearGradient(
+                          colors: [Color(0xFFFBBF24), Color(0xFFF59E0B)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark ? Colors.white10 : Colors.black12,
+                  ),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isScratched ? LucideIcons.checkCircle2 : LucideIcons.gift,
+                        color: isScratched
+                            ? (isDark ? Colors.white54 : Colors.black54)
+                            : Colors.white,
+                        size: 32,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        isScratched ? 'ব্যবহৃত' : 'খুলতে ক্লিক করুন',
+                        style: TextStyle(
+                          fontFamily: 'Anek Bangla',
+                          fontWeight: FontWeight.bold,
+                          color: isScratched
+                              ? (isDark ? Colors.white54 : Colors.black54)
+                              : Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLeaderboardSection(bool isDark) {
+    final bg = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final border = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5);
+
+    String getPrizeText(int rank) {
+      if (rank == 1) return 'টি-শার্ট + ১০০০ টাকা';
+      if (rank == 2) return 'টি-শার্ট + ৫০০ টাকা';
+      if (rank == 3) return 'টি-শার্ট + ১০০ টাকা';
+      return 'টি-শার্ট';
+    }
+
+    Widget getRankIcon(int rank) {
+      if (rank == 1) return const Icon(Icons.emoji_events, color: Color(0xFFEAB308), size: 24);
+      if (rank == 2) return const Icon(Icons.emoji_events, color: Color(0xFF9CA3AF), size: 24);
+      if (rank == 3) return const Icon(Icons.emoji_events, color: Color(0xFFB45309), size: 24);
+      return const Icon(LucideIcons.award, color: Color(0xFFFB7185), size: 20);
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFE11D48), Color(0xFFBE123C)],
+              ),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
+            ),
+            child: const Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.emoji_events, color: Color(0xFFFDE047), size: 28),
+                    SizedBox(width: 8),
+                    Text(
+                      'এই মাসের সেরা রেফারার',
+                      style: TextStyle(
+                        fontFamily: 'Anek Bangla',
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'সবচেয়ে বেশি বন্ধুদের ইনভাইট করুন এবং জিতে নিন দারুণ সব পুরস্কার!',
+                  style: TextStyle(
+                    fontFamily: 'Anek Bangla',
+                    fontSize: 13,
+                    color: Color(0xFFFFE4E6),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: _leaderboard.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    child: Column(
+                      children: [
+                        Icon(LucideIcons.trophy, size: 48, color: isDark ? Colors.white24 : Colors.black12),
+                        const SizedBox(height: 12),
+                        Text(
+                          'এই মাসে এখনও কেউ লিডারবোর্ডে নেই!\nপ্রথম হওয়ার সুযোগ তোমারই!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Anek Bangla',
+                            fontSize: 16,
+                            color: isDark ? Colors.white54 : Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _leaderboard.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final user = _leaderboard[index];
+                      final rank = index + 1;
+                      final isTop3 = rank <= 3;
+                      
+                      return Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: rank == 1 ? const Color(0xFFFEF9C3).withValues(alpha: isDark ? 0.1 : 1) :
+                                 rank == 2 ? const Color(0xFFF3F4F6).withValues(alpha: isDark ? 0.1 : 1) :
+                                 rank == 3 ? const Color(0xFFFEF3C7).withValues(alpha: isDark ? 0.1 : 1) :
+                                 (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFFAFAFA)),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: rank == 1 ? const Color(0xFFFDE047) :
+                                   rank == 2 ? const Color(0xFFD1D5DB) :
+                                   rank == 3 ? const Color(0xFFFDE68A) :
+                                   (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5)),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: isTop3 ? (isDark ? Colors.black : Colors.white) : (isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5)),
+                                shape: BoxShape.circle,
+                                boxShadow: isTop3 && !isDark ? [
+                                  BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))
+                                ] : [],
+                              ),
+                              child: Center(
+                                child: isTop3 ? getRankIcon(rank) : Text(
+                                  '$rank',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: isDark ? Colors.white70 : Colors.black54,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    user['name'] ?? 'ব্যবহারকারী',
+                                    style: TextStyle(
+                                      fontFamily: 'Anek Bangla',
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: isTop3 ? 16 : 15,
+                                      color: isDark ? Colors.white : Colors.black87,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(LucideIcons.gift, size: 12, color: Color(0xFF64748B)),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          getPrizeText(rank),
+                                          style: const TextStyle(
+                                            fontFamily: 'Anek Bangla',
+                                            fontSize: 12,
+                                            color: Color(0xFF64748B),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  '${user['total_referrals']}',
+                                  style: const TextStyle(
+                                    fontFamily: 'Anek Bangla',
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 20,
+                                    color: Color(0xFFE11D48),
+                                  ),
+                                ),
+                                const Text(
+                                  'রেফারেল',
+                                  style: TextStyle(
+                                    fontFamily: 'Anek Bangla',
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF94A3B8),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // ── Helper Widgets ─────────────────────────────────────────────────────────────
@@ -759,17 +1174,17 @@ class _StepBubble extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5),
+              color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
               shape: BoxShape.circle,
               border: Border.all(
                 color: isDark
-                    ? const Color(0xFF404040)
+                    ? const Color(0xFF27272A)
                     : const Color(0xFFE5E5E5),
                 width: 2,
               ),
             ),
             child: Center(
-              child: Text(icon, style: const TextStyle(fontSize: 20)),
+              child: Text(icon, style: const TextStyle(fontSize: 22)),
             ),
           ),
           const SizedBox(height: 8),
@@ -777,9 +1192,9 @@ class _StepBubble extends StatelessWidget {
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
-              fontFamily: 'HindSiliguri',
+              fontFamily: 'Anek Bangla',
               color: textPrimary,
             ),
           ),
@@ -788,8 +1203,8 @@ class _StepBubble extends StatelessWidget {
             desc,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 10,
-              fontFamily: 'HindSiliguri',
+              fontSize: 13,
+              fontFamily: 'Anek Bangla',
               color: textSecondary,
               height: 1.4,
             ),
@@ -811,7 +1226,7 @@ class _Arrow extends StatelessWidget {
       child: Icon(
         Icons.arrow_forward_rounded,
         size: 16,
-        color: isDark ? const Color(0xFF404040) : const Color(0xFFD4D4D4),
+        color: isDark ? const Color(0xFF27272A) : const Color(0xFFD4D4D4),
       ),
     );
   }

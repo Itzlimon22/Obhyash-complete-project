@@ -145,6 +145,7 @@ class UserProfile {
   final String? examTarget;
   final int dailyExamsGoal;
   final bool admissionTrackInterest;
+  final String? lastStreakDate;
 
   UserProfile({
     required this.id,
@@ -171,6 +172,7 @@ class UserProfile {
     this.examTarget,
     this.dailyExamsGoal = 3,
     this.admissionTrackInterest = false,
+    this.lastStreakDate,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -203,6 +205,7 @@ class UserProfile {
       dailyExamsGoal: (json['daily_exams_goal'] as num?)?.toInt() ?? 3,
       admissionTrackInterest:
           json['admission_track_interest'] as bool? ?? false,
+      lastStreakDate: json['last_streak_date'] as String?,
     );
   }
 }

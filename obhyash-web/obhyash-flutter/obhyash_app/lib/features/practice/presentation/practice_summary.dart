@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'flashcard_mode.dart';
 import 'practice_dashboard.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class PracticeSummary extends StatefulWidget {
   final List<FlashcardResult> results;
@@ -51,16 +52,16 @@ class _PracticeSummaryState extends State<PracticeSummary>
 
     _ringController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
+      duration: const Duration(milliseconds: 1200),
     );
     _ringAnimation = Tween<double>(
       begin: 0,
       end: _percentage / 100.0,
-    ).animate(CurvedAnimation(parent: _ringController, curve: Curves.easeOut));
+    ).animate(CurvedAnimation(parent: _ringController, curve: Curves.easeOutCubic));
 
     _fadeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 600),
     );
     _fadeAnimation = CurvedAnimation(
       parent: _fadeController,
@@ -83,278 +84,364 @@ class _PracticeSummaryState extends State<PracticeSummary>
   }
 
   String get _feedbackEmoji => _percentage >= 80
-      ? '🎉'
+      ? '🏆'
       : _percentage >= 50
-      ? '💪'
-      : '📚';
+      ? '🔥'
+      : '💡';
+
+  String get _feedbackTitle => _percentage >= 80
+      ? 'অসাধারণ!'
+      : _percentage >= 50
+      ? 'ভালো প্রচেষ্টা!'
+      : 'অনুশীলন শেষ!';
 
   String get _feedbackText => _percentage >= 80
-      ? 'দারুণ! অনুশীলন চমৎকার হয়েছে।'
+      ? 'তুমি চমৎকার ফলাফল করেছো, চালিয়ে যাও!'
       : _percentage >= 50
-      ? 'ভালো প্রচেষ্টা! আরও একটু অনুশীলন করো।'
-      : 'চিন্তা নেই, আবার চেষ্টা করো।';
+      ? 'খুব কাছাকাছি! একটু জোর দিলেই আরও ভালো হবে।'
+      : 'হতাশ হওয়ার কিছু নেই, আরেকবার চেষ্টা করো।';
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF000000)
-          : const Color(0xFFF5F5F5),
+      backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFF9FAFB),
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ── Emoji + title ──────────────────────────────────────────
-                Column(
-                  children: [
-                    Text(_feedbackEmoji, style: const TextStyle(fontSize: 52)),
-                    const SizedBox(height: 12),
-                    Text(
-                      'অনুশীলন শেষ!',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _feedbackText,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Color(0xFFA3A3A3),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 32),
-
-                // ── Score ring ──────────────────────────────────────────────
-                Center(
-                  child: SizedBox(
-                    width: 140,
-                    height: 140,
-                    child: AnimatedBuilder(
-                      animation: _ringAnimation,
-                      builder: (context, _) => CustomPaint(
-                        painter: _ScoreRingPainter(
-                          progress: _ringAnimation.value,
-                          isDark: isDark,
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '$_percentage%',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark
-                                      ? Colors.white
-                                      : const Color(0xFF0F172A),
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // ── Emoji + title ──────────────────────────────────────────
+                      Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF1F2937) : Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: isDark ? Colors.black26 : const Color(0x14000000),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
                                 ),
-                              ),
-                              const Text(
-                                'পারলাম',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Color(0xFFA3A3A3),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
+                            child: Text(_feedbackEmoji, style: const TextStyle(fontSize: 40)),
                           ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 28),
-
-                // ── Stats grid ──────────────────────────────────────────────
-                Row(
-                  children: [
-                    _StatCard(
-                      label: 'মোট',
-                      value: _total,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      isDark: isDark,
-                    ),
-                    const SizedBox(width: 12),
-                    _StatCard(
-                      label: 'পারলাম',
-                      value: _gotItCount,
-                      color: const Color(0xFF047857),
-                      isDark: isDark,
-                    ),
-                    const SizedBox(width: 12),
-                    _StatCard(
-                      label: 'কঠিন',
-                      value: _strugglingCount,
-                      color: const Color(0xFFB91C1C),
-                      isDark: isDark,
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 20),
-
-                // ── Struggling list ─────────────────────────────────────────
-                if (_struggling.isNotEmpty) ...[
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF1C0A0A)
-                          : const Color(0xFFFFF5F5),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isDark
-                            ? const Color(0xFF3D1515)
-                            : const Color(0xFFFECACA),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.warning_amber_rounded,
-                              size: 16,
-                              color: Color(0xFFB91C1C),
+                          const SizedBox(height: 16),
+                          Text(
+                            _feedbackTitle,
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
+                              color: isDark ? Colors.white : const Color(0xFF111827),
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'যেগুলো আরও পড়া দরকার (${_struggling.length})',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFB91C1C),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _feedbackText,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              height: 1.5,
+                              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const Spacer(),
+
+                      // ── Score ring ──────────────────────────────────────────────
+                      Center(
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Outer glow
+                            Container(
+                              width: 150,
+                              height: 150,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                                    blurRadius: 40,
+                                    spreadRadius: 10,
+                                  )
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        ..._struggling
-                            .take(3)
-                            .toList()
-                            .asMap()
-                            .entries
-                            .map(
-                              (e) => Padding(
-                                padding: const EdgeInsets.only(bottom: 4),
-                                child: Text(
-                                  '${e.key + 1}. ${e.value.questionText}',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDark
-                                        ? const Color(0xFFFCA5A5)
-                                        : const Color(0xFF991B1B),
+                            SizedBox(
+                              width: 140,
+                              height: 140,
+                              child: AnimatedBuilder(
+                                animation: _ringAnimation,
+                                builder: (context, _) => CustomPaint(
+                                  painter: _ScoreRingPainter(
+                                    progress: _ringAnimation.value,
+                                    isDark: isDark,
                                   ),
                                 ),
                               ),
                             ),
-                        if (_struggling.length > 3)
-                          Text(
-                            'এবং আরও ${_struggling.length - 3}টি...',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontStyle: FontStyle.italic,
-                              color: Color(0xFFA3A3A3),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '$_percentage%',
+                                  style: TextStyle(
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.w900,
+                                    height: 1.1,
+                                    color: isDark ? Colors.white : const Color(0xFF111827),
+                                  ),
+                                ),
+                                Text(
+                                  'সঠিক',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-
-                // ── Action buttons ──────────────────────────────────────────
-                if (_struggling.isNotEmpty)
-                  GestureDetector(
-                    onTap: () => widget.onPracticeStruggling(_struggling),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFB91C1C),
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(
-                              0xFFB91C1C,
-                            ).withValues(alpha: 0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.refresh_rounded,
-                            size: 18,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'কঠিনগুলো আবার পড়ুন (${_struggling.length}টি)',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                const SizedBox(height: 12),
-
-                GestureDetector(
-                  onTap: widget.onBack,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF262626) : Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: isDark
-                            ? const Color(0xFF404040)
-                            : const Color(0xFFE5E5E5),
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'অনুশীলনে ফিরে যাও',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: isDark
-                              ? Colors.white
-                              : const Color(0xFF0F172A),
+                          ],
                         ),
                       ),
-                    ),
+
+                      const Spacer(),
+
+                      // ── Stats grid ──────────────────────────────────────────────
+                      Row(
+                        children: [
+                          _StatCard(
+                            label: 'মোট প্রশ্ন',
+                            value: _total,
+                            color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF3B82F6),
+                            bgColor: isDark ? const Color(0xFF1E3A8A).withValues(alpha: 0.3) : const Color(0xFFEFF6FF),
+                            isDark: isDark,
+                          ),
+                          const SizedBox(width: 12),
+                          _StatCard(
+                            label: 'পেরেছি',
+                            value: _gotItCount,
+                            color: const Color(0xFF10B981),
+                            bgColor: isDark ? const Color(0xFF064E3B).withValues(alpha: 0.3) : const Color(0xFFECFDF5),
+                            isDark: isDark,
+                          ),
+                          const SizedBox(width: 12),
+                          _StatCard(
+                            label: 'ভুল হয়েছে',
+                            value: _strugglingCount,
+                            color: const Color(0xFFEF4444),
+                            bgColor: isDark ? const Color(0xFF7F1D1D).withValues(alpha: 0.3) : const Color(0xFFFEF2F2),
+                            isDark: isDark,
+                          ),
+                        ],
+                      ),
+
+                      const Spacer(),
+
+                      // ── Struggling list ─────────────────────────────────────────
+                      if (_struggling.isNotEmpty) ...[
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: isDark ? Colors.black45 : const Color(0x0A000000),
+                                blurRadius: 24,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFEF2F2),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(
+                                      LucideIcons.alertCircle,
+                                      size: 16,
+                                      color: Color(0xFFDC2626),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      'ভুল করা প্রশ্নসমূহ (${_struggling.length})',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDark ? Colors.white : const Color(0xFF111827),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              ..._struggling
+                                  .take(2)
+                                  .toList()
+                                  .asMap()
+                                  .entries
+                                  .map(
+                                    (e) => Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${e.key + 1}.',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              e.value.questionText,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                height: 1.4,
+                                                color: isDark ? const Color(0xFFD1D5DB) : const Color(0xFF374151),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                              if (_struggling.length > 2)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 2),
+                                  child: Text(
+                                    'এবং আরও ${_struggling.length - 2}টি...',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: isDark ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        const Spacer(),
+                      ],
+
+                      // ── Action buttons ──────────────────────────────────────────
+                      if (_struggling.isNotEmpty)
+                        GestureDetector(
+                          onTap: () => widget.onPracticeStruggling(_struggling),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFFDC2626), Color(0xFF991B1B)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFDC2626).withValues(alpha: 0.3),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  LucideIcons.rotateCcw,
+                                  size: 18,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'ভুলগুলো আবার পড়ুন (${_struggling.length})',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                      const SizedBox(height: 12),
+
+                      GestureDetector(
+                        onTap: widget.onBack,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF27272A) : Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E7EB),
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              if (!isDark)
+                                const BoxShadow(
+                                  color: Color(0x0A000000),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 2),
+                                ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              'অনুশীলনে ফিরে যান',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: isDark ? Colors.white : const Color(0xFF111827),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-
-                const SizedBox(height: 16),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -374,11 +461,11 @@ class _ScoreRingPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - 16) / 2;
-    const strokeWidth = 10.0;
+    const strokeWidth = 12.0;
 
     // Background ring
     final bgPaint = Paint()
-      ..color = isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5)
+      ..color = isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6)
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -388,8 +475,10 @@ class _ScoreRingPainter extends CustomPainter {
 
     // Foreground arc
     final fgPaint = Paint()
-      ..shader = LinearGradient(
-        colors: const [Color(0xFF15803D), Color(0xFF22C55E)],
+      ..shader = const SweepGradient(
+        colors: [Color(0xFF34D399), Color(0xFF059669)],
+        startAngle: -pi / 2,
+        endAngle: 3 * pi / 2,
       ).createShader(Rect.fromCircle(center: center, radius: radius))
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke
@@ -415,12 +504,14 @@ class _StatCard extends StatelessWidget {
   final String label;
   final int value;
   final Color color;
+  final Color bgColor;
   final bool isDark;
 
   const _StatCard({
     required this.label,
     required this.value,
     required this.color,
+    required this.bgColor,
     required this.isDark,
   });
 
@@ -428,12 +519,13 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F172A) : Colors.white,
+          color: bgColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+            color: color.withValues(alpha: 0.2),
+            width: 1.5,
           ),
         ),
         child: Column(
@@ -443,16 +535,17 @@ class _StatCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w900,
+                height: 1.0,
                 color: color,
               ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 11,
-                color: Color(0xFFA3A3A3),
-                fontWeight: FontWeight.bold,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: isDark ? const Color(0xFFD1D5DB) : const Color(0xFF4B5563),
               ),
             ),
           ],

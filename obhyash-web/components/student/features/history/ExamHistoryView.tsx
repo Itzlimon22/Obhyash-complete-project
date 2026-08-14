@@ -251,11 +251,12 @@ const ExamHistoryView: React.FC<ExamHistoryViewProps> = ({
   const uniqueSubjects = useMemo(() => {
     const map = new Map<string, string>();
     history.forEach((item) => {
-      if (!map.has(item.subject))
+      if (!map.has(item.subject)) {
         map.set(
           item.subject,
-          item.subjectLabel || getSubjectDisplayName(item.subject),
+          getSubjectDisplayName(item.subject)
         );
+      }
     });
     return Array.from(map.entries()).sort((a, b) => a[1].localeCompare(b[1]));
   }, [history]);
@@ -478,26 +479,6 @@ const formatDuration = (seconds: number) => {
             strokeLinecap="round"
             strokeLinejoin="round"
             d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-          />
-        </svg>
-      ),
-    },
-    {
-      id: 'marked',
-      label: 'বুকমার্ক',
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="currentColor"
-          className="w-5 h-5"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 11.186 0Z"
           />
         </svg>
       ),
@@ -974,61 +955,6 @@ const formatDuration = (seconds: number) => {
                   ))}
                 </div>
                 {hasMoreMistakes && (
-                  <div className="flex justify-center pt-2">
-                    <button
-                      onClick={() => setVisibleCount((p) => p + 9)}
-                      className="px-6 py-2.5 bg-white dark:bg-[#1c1c1c] border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl font-semibold text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-                    >
-                      আরও দেখো
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {/* ══════════════ BOOKMARKS TAB ══════════════ */}
-        {activeTab === 'marked' && (
-          <div className="animate-fade-in space-y-4">
-            {displayedBookmarks.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#1c1c1c] rounded-2xl border border-dashed border-neutral-200 dark:border-neutral-700">
-                <div className="w-16 h-16 bg-amber-50 dark:bg-amber-900/20 rounded-full flex items-center justify-center mb-4 text-amber-500">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-8 h-8"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 11.186 0Z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-1">
-                  কোনো বুকমার্ক নেই
-                </h3>
-                <p className="text-neutral-400 dark:text-neutral-500 text-sm text-center max-w-xs">
-                  গুরুত্বপূর্ণ প্রশ্ন বুকমার্ক করে এখানে জমিয়ে রাখো।
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="space-y-2">
-                  {displayedBookmarks.map((item, idx) => (
-                    <PracticeRow
-                      key={`${item.examDate}-${item.question.id}-${idx}`}
-                      item={item}
-                      index={idx + 1}
-                      onToggleBookmark={handleToggleBookmark}
-                    />
-                  ))}
-                </div>
-                {hasMoreBookmarks && (
                   <div className="flex justify-center pt-2">
                     <button
                       onClick={() => setVisibleCount((p) => p + 9)}

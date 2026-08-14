@@ -5,9 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import 'widgets/main_sidebar.dart';
 import 'widgets/main_bottom_nav.dart';
+import '../../features/dashboard/presentation/dashboard_view.dart';
+import '../../features/dashboard/services/streak_service.dart';
 import '../../features/dashboard/providers/dashboard_providers.dart';
 import '../../features/auth/providers/auth_controller.dart';
 import '../providers/auth_provider.dart';
@@ -41,11 +44,19 @@ class MainLayout extends ConsumerStatefulWidget {
 
 class _MainLayoutState extends ConsumerState<MainLayout> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int _streakAnimKey = 0;
+
+  void _triggerStreakAnimation() {
+    setState(() {
+      _streakAnimKey++;
+    });
+  }
 
   String _getActiveTab(String location) {
     if (location.startsWith('/history')) return 'history';
     if (location.startsWith('/setup')) return 'setup';
     if (location.startsWith('/practice')) return 'practice';
+    if (location.contains('/user-profile')) return 'user_profile';
     if (location.startsWith('/leaderboard')) return 'leaderboard';
     if (location.startsWith('/analysis')) return 'analysis';
     if (location.startsWith('/my-reports')) return 'my-reports';
@@ -54,51 +65,111 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/profile/subscription')) return 'subscription';
     if (location.startsWith('/profile/complaint')) return 'complaint';
     if (location.startsWith('/profile/about')) return 'about';
+    if (location.startsWith('/profile/privacy')) return 'privacy';
+    if (location.startsWith('/profile/terms')) return 'terms';
+    if (location.startsWith('/profile/faq')) return 'faq';
     if (location.startsWith('/profile/blog')) return 'blog';
     if (location.startsWith('/profile/referral')) return 'referral';
-    if (location.startsWith('/profile')) return 'profile';
-    if (location.startsWith('/user-profile') ||
-        location.contains('/user-profile'))
-      return 'user_profile';
-    if (location.startsWith('/subject') || location.contains('/subject'))
+    if (location.startsWith('/profile/stats')) return 'stats';
+    if (location.startsWith('/profile')) return 'settings';
+    if (location.startsWith('/subject') || location.contains('/subject')) {
+      try {
+        final uri = Uri.parse(location);
+        final idx = uri.pathSegments.indexOf('subject');
+        if (idx != -1 && idx + 1 < uri.pathSegments.length) {
+          return 'subject_${uri.pathSegments[idx + 1]}';
+        }
+        final user = ref.read(authProvider);
+        if (user != null && mounted) {
+          StreakService.checkAndUpdateStreak(user.id);
+          ref.invalidate(userProfileProvider);
+        }
+      } catch (e) {}
       return 'subject_report';
+    }
+    if (location.startsWith('/notifications')) return 'notifications';
+    if (location.startsWith('/bookmarks')) return 'bookmarks';
     return 'dashboard';
   }
 
   String _getTitle(String tab) {
+    if (tab.startsWith('subject_') && tab != 'subject_report') {
+      final subj = tab.replaceFirst('subject_', '');
+      const names = {
+        'physics': 'পদার্থবিজ্ঞান',
+        'chemistry': 'রসায়ন',
+        'biology': 'জীববিজ্ঞান',
+        'math': 'গণিত',
+        'bangla': 'বাংলা',
+        'english': 'ইংরেজি',
+        'ict': 'আইসিটি',
+        'general_knowledge': 'সাধারণ জ্ঞান',
+        'gk': 'সাধারণ জ্ঞান',
+        'general': 'সাধারণ',
+        'hsc_bangla_1': 'বাংলা ১ম পত্র',
+        'hsc_bangla_2': 'বাংলা ২য় পত্র',
+        'hsc_english_1': 'English 1st Paper',
+        'hsc_english_2': 'English 2nd Paper',
+        'hsc_ict': 'তথ্য ও যোগাযোগ প্রযুক্তি',
+        'hsc_physics_1': 'পদার্থবিজ্ঞান ১ম পত্র',
+        'hsc_physics_2': 'পদার্থবিজ্ঞান ২য় পত্র',
+        'hsc_chemistry_1': 'রসায়ন ১ম পত্র',
+        'hsc_chemistry_2': 'রসায়ন ২য় পত্র',
+        'hsc_biology_1': 'জীববিজ্ঞান ১ম পত্র',
+        'hsc_biology_2': 'জীববিজ্ঞান ২য় পত্র',
+        'hsc_math_1': 'উচ্চতর গণিত ১ম পত্র',
+        'hsc_math_2': 'উচ্চতর গণিত ২য় পত্র',
+      };
+      return names[subj.toLowerCase()] ?? 'বিষয় রিপোর্ট';
+    }
+
     switch (tab) {
+      case 'notifications':
+        return 'নোটিফিকেশন';
+      case 'bookmarks':
+        return 'আমার বুকমার্কস';
       case 'dashboard':
-        return '\u09a1\u09cd\u09af\u09be\u09b6\u09ac\u09cb\u09b0\u09cd\u09a1';
+        return 'ড্যাশবোর্ড';
       case 'setup':
-        return '\u09ae\u0995 \u09aa\u09b0\u09c0\u0995\u09cd\u09b7\u09be \u09b6\u09c1\u09b0\u09c1';
+        return 'মক পরীক্ষা শুরু';
       case 'history':
-        return '\u09aa\u09c2\u09b0\u09cd\u09ac\u09c7\u09b0 \u09aa\u09b0\u09c0\u0995\u09cd\u09b7\u09be \u09b8\u09ae\u09c2\u09b9';
+        return 'পূর্বের পরীক্ষা সমূহ';
       case 'practice':
-        return '\u0985\u09a8\u09c1\u09b6\u09c0\u09b2\u09a8 \u09ac\u09cb\u09b0\u09cd\u09a1';
+        return 'অনুশীলন বোর্ড';
       case 'leaderboard':
-        return '\u09b2\u09bf\u09a1\u09be\u09b0\u09ac\u09cb\u09b0\u09cd\u09a1';
+        return 'লিডারবোর্ড';
       case 'analysis':
-        return '\u09ac\u09bf\u09b7\u09af\u09bc\u09ad\u09bf\u09a4\u09cd\u09a4\u09bf\u0995 \u098f\u09a8\u09be\u09b2\u09be\u0987\u09b8\u09bf\u09b8';
+        return 'এনালাইসিস';
       case 'my-reports':
-        return '\u0986\u09ae\u09be\u09b0 \u09b0\u09bf\u09aa\u09cb\u09b0\u09cd\u099f';
-      case 'profile':
-        return '\u0986\u09ae\u09be\u09b0 \u09aa\u09cd\u09b0\u09cb\u09ab\u09be\u0987\u09b2';
+        return 'আমার রিপোর্ট';
+      case 'stats':
+        return 'আমার প্রোফাইল';
+      case 'settings':
+        return 'সেটিংস';
       case 'subscription':
-        return '\u09b8\u09be\u09ac\u09b8\u09cd\u0995\u09cd\u09b0\u09bf\u09aa\u09b6\u09a8 \u0993 \u09ac\u09bf\u09b2\u09bf\u0982';
+        return 'আপগ্রেড';
+      case 'my-subscription':
+        return 'সাবস্ক্রিপশন';
       case 'complaint':
-        return '\u0985\u09ad\u09bf\u09af\u09cb\u0997 \u0993 \u09aa\u09b0\u09be\u09ae\u09b0\u09cd\u09b6';
+        return 'অভিযোগ ও পরামর্শ';
       case 'about':
-        return '\u0986\u09ae\u09be\u09a6\u09c7\u09b0 \u09b8\u09ae\u09cd\u09aa\u09b0\u09cd\u0995\u09c7';
+        return 'আমাদের সম্পর্কে';
+      case 'privacy':
+        return 'প্রাইভেসি পলিসি';
+      case 'terms':
+        return 'ব্যবহারের নিয়মাবলী';
+      case 'faq':
+        return 'সাহায্য ও FAQ';
       case 'user_profile':
-        return '\u09aa\u09cd\u09b0\u09cb\u09ab\u09be\u0987\u09b2';
+        return 'প্রোফাইল';
       case 'subject_report':
-        return '\u09ac\u09bf\u09b7\u09af\u09bc \u09b0\u09bf\u09aa\u09cb\u09b0\u09cd\u099f';
+        return 'বিষয় রিপোর্ট';
       case 'blog':
-        return '\u09ac\u09cd\u09b2\u0997';
+        return 'ব্লগ';
       case 'referral':
-        return '\u09b0\u09c7\u09ab\u09be\u09b0\u09c7\u09b2 \u09aa\u09cd\u09b0\u09cb\u0997\u09cd\u09b0\u09be\u09ae';
+        return 'রেফারেল প্রোগ্রাম';
       default:
-        return '\u09a1\u09cd\u09af\u09be\u09b6\u09ac\u09cb\u09b0\u09cd\u09a1';
+        return 'Obhyash';
     }
   }
 
@@ -184,15 +255,15 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('🎯', style: TextStyle(fontSize: 10)),
+          const Text('🎯', style: TextStyle(fontSize: 13)),
           const SizedBox(width: 3),
           Text(
             '$days দিন',
             style: TextStyle(
-              fontSize: 10,
+              fontSize: 13,
               fontWeight: FontWeight.bold,
               color: textColor,
-              fontFamily: 'HindSiliguri',
+              fontFamily: 'Anek Bangla',
             ),
           ),
         ],
@@ -204,6 +275,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     final isDark = Theme.of(ctx).brightness == Brightness.dark;
     showModalBottomSheet(
       context: ctx,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _ProfileSheet(
@@ -250,20 +322,20 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
           ? const Color(0xFF0C0A09)
           : const Color(0xFFFAFAF9),
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(56),
+        preferredSize: const Size.fromHeight(68),
         child: ClipRect(
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
             child: Container(
               decoration: BoxDecoration(
                 color: isDark
                     ? const Color(0xFF0C0A09).withValues(alpha: 0.85)
-                    : Colors.white.withValues(alpha: 0.85),
+                    : Colors.white.withValues(alpha: 0.9),
                 border: Border(
                   bottom: BorderSide(
                     color: isDark
-                        ? const Color(0xFF262626).withValues(alpha: 0.6)
-                        : const Color(0xFFE5E5E5).withValues(alpha: 0.6),
+                        ? const Color(0xFF1C1C1E).withValues(alpha: 0.8)
+                        : const Color(0xFFF3F4F6),
                     width: 1,
                   ),
                 ),
@@ -271,219 +343,180 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
               child: SafeArea(
                 bottom: false,
                 child: SizedBox(
-                  height: 56,
+                  height: 68,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         // Left: Logo + back button + title
-                        Flexible(
+                        Expanded(
                           child: Row(
-                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              if (activeTab == 'user_profile' ||
-                                  activeTab == 'subject_report') ...[
+                              if (activeTab != 'dashboard' &&
+                                  activeTab != 'history' &&
+                                  activeTab != 'setup' &&
+                                  activeTab != 'leaderboard') ...[
                                 GestureDetector(
-                                  onTap: () => context.pop(),
+                                  onTap: () {
+                                    if (context.canPop()) {
+                                      context.pop();
+                                    } else {
+                                      context.go('/');
+                                    }
+                                  },
                                   child: Container(
-                                    width: 32,
-                                    height: 32,
-                                    margin: const EdgeInsets.only(right: 8),
+                                    width: 40,
+                                    height: 40,
+                                    margin: const EdgeInsets.only(right: 12),
                                     decoration: BoxDecoration(
                                       color: isDark
-                                          ? const Color(0xFF262626)
-                                          : const Color(0xFFF5F5F5),
-                                      borderRadius: BorderRadius.circular(10),
+                                          ? const Color(0xFF1C1C1E)
+                                          : const Color(0xFFF3F4F6),
+                                      shape: BoxShape.circle,
                                     ),
                                     child: Icon(
-                                      LucideIcons.chevronLeft,
-                                      size: 18,
+                                      LucideIcons.arrowLeft,
+                                      size: 20,
                                       color: isDark
-                                          ? const Color(0xFFD4D4D4)
-                                          : const Color(0xFF404040),
-                                    ),
-                                  ),
-                                ),
-                              ] else ...[
-                                // Brand logo — always shown except sub-pages
-                                Container(
-                                  width: 30,
-                                  height: 30,
-                                  margin: const EdgeInsets.only(right: 8),
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFFB91C1C),
-                                        Color(0xFFB91C1C),
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    ),
-                                    borderRadius: BorderRadius.circular(9),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color(
-                                          0xFFB91C1C,
-                                        ).withValues(alpha: 0.3),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Center(
-                                    child: Text(
-                                      'O',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w900,
-                                        height: 1,
-                                      ),
+                                          ? const Color(0xFFE5E5E5)
+                                          : const Color(0xFF1F2937),
                                     ),
                                   ),
                                 ),
                               ],
-                              Text(
-                                _getTitle(activeTab),
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w800,
-                                  fontFamily: 'HindSiliguri',
-                                  color: isDark
-                                      ? Colors.white
-                                      : const Color(0xFF0F172A),
+                              Expanded(
+                                child: Text(
+                                  _getTitle(activeTab),
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Anek Bangla',
+                                    color: isDark
+                                        ? Colors.white
+                                        : const Color(0xFF111827),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
                           ),
                         ),
 
-                        // Right: Streak + Bell + divider + Avatar
+                        // Right: Streak + Notification + Divider + Avatar
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Streak Badge
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 9,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? const Color(
-                                        0xFF7C2D12,
-                                      ).withValues(alpha: 0.15)
-                                    : const Color(0xFFFFF7ED),
-                                border: Border.all(
-                                  color: isDark
-                                      ? const Color(
-                                          0xFF7C2D12,
-                                        ).withValues(alpha: 0.3)
-                                      : const Color(0xFFFFEDD5),
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
+                            // Streak Badge (No background, slightly bigger, with animation)
+                            GestureDetector(
+                              onTap: _triggerStreakAnimation,
+                              behavior: HitTestBehavior.opaque,
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(
-                                    Icons.local_fire_department_rounded,
-                                    color: Color(0xFFF59E0B),
-                                    size: 16,
+                                  Animate(
+                                    key: ValueKey(_streakAnimKey),
+                                    effects: _streakAnimKey > 0
+                                        ? [
+                                            ScaleEffect(
+                                                begin: const Offset(1, 1),
+                                                end: const Offset(1.4, 1.4),
+                                                duration: 250.ms,
+                                                curve: Curves.easeOutBack),
+                                            ShakeEffect(
+                                              hz: 4,
+                                              duration: 400.ms,
+                                              delay: 200.ms,
+                                            ),
+                                            ScaleEffect(
+                                                begin: const Offset(1.4, 1.4),
+                                                end: const Offset(1, 1),
+                                                duration: 250.ms,
+                                                delay: 600.ms,
+                                                curve: Curves.easeIn),
+                                          ]
+                                        : [],
+                                    child: const Icon(
+                                      Icons.local_fire_department_rounded,
+                                      color: Color(0xFFF97316),
+                                      size: 24,
+                                    ),
                                   ),
-                                  const SizedBox(width: 3),
+                                  const SizedBox(width: 4),
                                   isLoading
                                       ? Container(
-                                          width: 14,
-                                          height: 10,
+                                          width: 16,
+                                          height: 12,
                                           decoration: BoxDecoration(
-                                            color: isDark
-                                                ? const Color(0xFF3F3F46)
-                                                : const Color(0xFFE5E7EB),
-                                            borderRadius: BorderRadius.circular(
-                                              3,
-                                            ),
+                                            color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E7EB),
+                                            borderRadius: BorderRadius.circular(4),
                                           ),
                                         )
-                                      : Text(
-                                          streak.toString(),
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFFEA580C),
+                                      : Animate(
+                                          key: ValueKey('text_$_streakAnimKey'),
+                                          effects: _streakAnimKey > 0
+                                              ? [
+                                                  ShimmerEffect(
+                                                    color: const Color(0xFFFDE047),
+                                                    duration: 600.ms,
+                                                  ),
+                                                ]
+                                              : [],
+                                          child: Text(
+                                            streak.toString(),
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFFEA580C),
+                                            ),
                                           ),
                                         ),
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 12),
 
-                            // Notification Bell
+                            // Notification Bell (No background, slightly bigger)
                             Builder(
                               builder: (context) {
-                                final unreadAsync = ref.watch(
-                                  _unreadNotifCountProvider,
-                                );
-                                final unread =
-                                    unreadAsync.whenOrNull(data: (c) => c) ?? 0;
+                                final unreadAsync = ref.watch(_unreadNotifCountProvider);
+                                final unread = unreadAsync.whenOrNull(data: (c) => c) ?? 0;
                                 return GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) =>
-                                            const NotificationsView(),
-                                      ),
-                                    );
-                                  },
+                                  onTap: () => context.push('/notifications'),
                                   behavior: HitTestBehavior.opaque,
                                   child: Stack(
                                     clipBehavior: Clip.none,
+                                    alignment: Alignment.center,
                                     children: [
-                                      Container(
-                                        width: 34,
-                                        height: 34,
-                                        decoration: BoxDecoration(
-                                          color: isDark
-                                              ? const Color(0xFF262626)
-                                              : const Color(0xFFF5F5F5),
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
                                         child: Icon(
                                           LucideIcons.bell,
-                                          size: 16,
-                                          color: isDark
-                                              ? const Color(0xFFA3A3A3)
-                                              : const Color(0xFF525252),
+                                          size: 24,
+                                          color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF4B5563),
                                         ),
                                       ),
                                       if (unread > 0)
                                         Positioned(
-                                          top: -3,
-                                          right: -3,
+                                          top: -4,
+                                          right: -2,
                                           child: Container(
-                                            padding: const EdgeInsets.all(2),
-                                            constraints: const BoxConstraints(
-                                              minWidth: 14,
-                                              minHeight: 14,
-                                            ),
-                                            decoration: const BoxDecoration(
-                                              color: Color(0xFFB91C1C),
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFEF4444),
                                               shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: isDark ? const Color(0xFF0C0A09) : Colors.white,
+                                                width: 1.5,
+                                              ),
                                             ),
                                             child: Text(
-                                              unread > 99
-                                                  ? '99+'
-                                                  : unread.toString(),
-                                              textAlign: TextAlign.center,
+                                              unread > 99 ? '99+' : unread.toString(),
                                               style: const TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 8,
-                                                fontWeight: FontWeight.bold,
-                                                height: 1.2,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w900,
                                               ),
                                             ),
                                           ),
@@ -497,10 +530,10 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                             // Divider
                             Container(
                               width: 1,
-                              height: 20,
-                              margin: const EdgeInsets.symmetric(horizontal: 8),
+                              height: 24,
+                              margin: const EdgeInsets.symmetric(horizontal: 10),
                               color: isDark
-                                  ? const Color(0xFF404040)
+                                  ? const Color(0xFF27272A)
                                   : const Color(0xFFE5E5E5),
                             ),
 
@@ -508,13 +541,13 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                             GestureDetector(
                               onTap: () => context.go('/profile'),
                               child: Container(
-                                width: 34,
-                                height: 34,
+                                width: 40,
+                                height: 40,
                                 decoration: BoxDecoration(
                                   gradient: const LinearGradient(
                                     colors: [
-                                      Color(0xFFB91C1C),
-                                      Color(0xFFB91C1C),
+                                      Color(0xFF047857), 
+                                      Color(0xFF065F46)
                                     ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
@@ -522,26 +555,34 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: const Color(
-                                        0xFFB91C1C,
-                                      ).withValues(alpha: 0.3),
+                                      color: const Color(0xFF047857).withValues(alpha: 0.3),
                                       blurRadius: 6,
                                       offset: const Offset(0, 2),
                                     ),
                                   ],
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    userName.isNotEmpty
-                                        ? userName[0].toUpperCase()
-                                        : 'U',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  border: Border.all(
+                                    color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                                    width: 1.5,
                                   ),
+                                  image: user?.avatarUrl != null
+                                      ? DecorationImage(
+                                          image: NetworkImage(user!.avatarUrl!),
+                                          fit: BoxFit.cover,
+                                        )
+                                      : null,
                                 ),
+                                child: user?.avatarUrl == null
+                                    ? Center(
+                                        child: Text(
+                                          userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      )
+                                    : null,
                               ),
                             ),
                           ],
@@ -567,6 +608,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         },
         userName: userName,
         userInstitute: userInst,
+        avatarUrl: user?.avatarUrl,
       ),
 
       body: widget.navigationShell,
@@ -609,10 +651,10 @@ class _ProfileSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = isDark ? const Color(0xFF0F172A) : Colors.white;
-    final surface = isDark ? const Color(0xFF262626) : const Color(0xFFF5F5F5);
-    final border = isDark ? const Color(0xFF404040) : const Color(0xFFE5E5E5);
-    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final bg = isDark ? const Color(0xFF000000) : Colors.white;
+    final surface = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5);
+    final border = isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF000000);
     final textSecondary = isDark
         ? const Color(0xFFA3A3A3)
         : const Color(0xFF737373);
@@ -673,7 +715,7 @@ class _ProfileSheet extends StatelessWidget {
               height: 4,
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF404040)
+                    ? const Color(0xFF27272A)
                     : const Color(0xFFD4D4D4),
                 borderRadius: BorderRadius.circular(2),
               ),
@@ -697,7 +739,7 @@ class _ProfileSheet extends StatelessWidget {
                         userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -713,9 +755,9 @@ class _ProfileSheet extends StatelessWidget {
                               ? userName
                               : '\u09b2\u09cb\u09a1 \u09b9\u099a\u09cd\u099b\u09c7...',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
+                            fontFamily: 'Anek Bangla',
                             color: textPrimary,
                           ),
                           maxLines: 1,
@@ -726,7 +768,7 @@ class _ProfileSheet extends StatelessWidget {
                           Text(
                             userEmail,
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 15,
                               color: textSecondary,
                             ),
                             maxLines: 1,
@@ -738,9 +780,9 @@ class _ProfileSheet extends StatelessWidget {
                           Text(
                             userInstitute,
                             style: TextStyle(
-                              fontSize: 11,
+                              fontSize: 14,
                               color: textSecondary,
-                              fontFamily: 'HindSiliguri',
+                              fontFamily: 'Anek Bangla',
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -763,7 +805,7 @@ class _ProfileSheet extends StatelessWidget {
                     child: Text(
                       '$xp XP',
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF047857),
                       ),
@@ -807,8 +849,8 @@ class _ProfileSheet extends StatelessWidget {
                       Text(
                         item['label'] as String,
                         style: TextStyle(
-                          fontSize: 14,
-                          fontFamily: 'HindSiliguri',
+                          fontSize: 16,
+                          fontFamily: 'Anek Bangla',
                           fontWeight: FontWeight.w600,
                           color: textPrimary,
                         ),
@@ -855,8 +897,8 @@ class _ProfileSheet extends StatelessWidget {
                           ? '\u09b2\u09be\u0987\u099f \u09ae\u09cb\u09a1'
                           : '\u09a1\u09be\u09b0\u09cd\u0995 \u09ae\u09cb\u09a1',
                       style: TextStyle(
-                        fontSize: 14,
-                        fontFamily: 'HindSiliguri',
+                        fontSize: 16,
+                        fontFamily: 'Anek Bangla',
                         fontWeight: FontWeight.w600,
                         color: textPrimary,
                       ),
@@ -927,8 +969,8 @@ class _ProfileSheet extends StatelessWidget {
                     const Text(
                       '\u09b2\u0997\u0986\u0989\u099f',
                       style: TextStyle(
-                        fontSize: 14,
-                        fontFamily: 'HindSiliguri',
+                        fontSize: 16,
+                        fontFamily: 'Anek Bangla',
                         fontWeight: FontWeight.w600,
                         color: Color(0xFFB91C1C),
                       ),

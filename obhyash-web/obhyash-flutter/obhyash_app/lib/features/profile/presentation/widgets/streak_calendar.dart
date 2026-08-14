@@ -15,7 +15,7 @@ class MonthCalendarDay {
   });
 }
 
-class StreakCalendar extends StatelessWidget {
+class StreakCalendar extends StatefulWidget {
   final List<MonthCalendarDay> calendarData;
   final int streakCount;
 
@@ -24,6 +24,31 @@ class StreakCalendar extends StatelessWidget {
     required this.calendarData,
     required this.streakCount,
   });
+
+  @override
+  State<StreakCalendar> createState() => _StreakCalendarState();
+}
+
+class _StreakCalendarState extends State<StreakCalendar> {
+  late DateTime _displayedMonth;
+
+  @override
+  void initState() {
+    super.initState();
+    _displayedMonth = DateTime.now();
+  }
+
+  void _goToPreviousMonth() {
+    setState(() {
+      _displayedMonth = DateTime(_displayedMonth.year, _displayedMonth.month - 1, 1);
+    });
+  }
+
+  void _goToNextMonth() {
+    setState(() {
+      _displayedMonth = DateTime(_displayedMonth.year, _displayedMonth.month + 1, 1);
+    });
+  }
 
   static const List<String> weekdays = [
     'রবি',
@@ -43,7 +68,7 @@ class StreakCalendar extends StatelessWidget {
     }
     if (examCount == 0) {
       return isDark
-          ? const Color(0xFF404040)
+          ? const Color(0xFF27272A)
           : const Color(0xFFE5E5E5); // neutral-700 : neutral-200
     }
     if (examCount == 1) {
@@ -57,7 +82,7 @@ class StreakCalendar extends StatelessWidget {
     return const Color(0xFF047857); // emerald-500 : emerald-500
   }
 
-  String _getMonthName() {
+  String _getMonthName(DateTime date) {
     const months = [
       'জানুয়ারি',
       'ফেব্রুয়ারি',
@@ -72,22 +97,25 @@ class StreakCalendar extends StatelessWidget {
       'নভেম্বর',
       'ডিসেম্বর',
     ];
-    return months[DateTime.now().month - 1];
+    return '${months[date.month - 1]}';
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Default dummy data if empty to render the exact grid
-    List<MonthCalendarDay> dataToRender = calendarData;
+    // Filter calendarData for the displayed month
+    List<MonthCalendarDay> dataToRender = widget.calendarData.where((day) =>
+        day.date.year == _displayedMonth.year &&
+        day.date.month == _displayedMonth.month).toList();
+
+    // Fill with dummy data if not enough records (like empty)
     if (dataToRender.isEmpty) {
-      final now = DateTime.now();
-      final daysInMonth = DateUtils.getDaysInMonth(now.year, now.month);
+      final daysInMonth = DateUtils.getDaysInMonth(_displayedMonth.year, _displayedMonth.month);
       dataToRender = List.generate(
         daysInMonth,
         (i) => MonthCalendarDay(
-          date: DateTime(now.year, now.month, i + 1),
+          date: DateTime(_displayedMonth.year, _displayedMonth.month, i + 1),
           dayOfMonth: i + 1,
           examCount: 0,
           isCurrentMonth: true,
@@ -95,24 +123,47 @@ class StreakCalendar extends StatelessWidget {
       );
     }
 
+    // Determine leading empty days to align to Sunday (0)
+    int firstWeekday = DateTime(_displayedMonth.year, _displayedMonth.month, 1).weekday;
+    if (firstWeekday == 7) firstWeekday = 0; // Dart says Sunday is 7, we want 0
+
+    List<MonthCalendarDay> paddedData = [];
+    for (int i = 0; i < firstWeekday; i++) {
+      paddedData.add(MonthCalendarDay(
+        date: DateTime(_displayedMonth.year, _displayedMonth.month, 0),
+        dayOfMonth: 0,
+        examCount: 0,
+        isCurrentMonth: false,
+      ));
+    }
+    paddedData.addAll(dataToRender);
+
     // Chunk into weeks (7 days)
     List<List<MonthCalendarDay>> weeks = [];
-    for (int i = 0; i < dataToRender.length; i += 7) {
+    for (int i = 0; i < paddedData.length; i += 7) {
       weeks.add(
-        dataToRender.sublist(
+        paddedData.sublist(
           i,
-          i + 7 > dataToRender.length ? dataToRender.length : i + 7,
+          i + 7 > paddedData.length ? paddedData.length : i + 7,
         ),
       );
     }
 
+    final now = DateTime.now();
+    bool isCurrentOrFutureMonth = _displayedMonth.year > now.year ||
+        (_displayedMonth.year == now.year && _displayedMonth.month >= now.month);
+
+    final prevMonthDate = DateTime(now.year, now.month - 1, 1);
+    bool isPreviousOrOlderMonth = _displayedMonth.year < prevMonthDate.year ||
+        (_displayedMonth.year == prevMonthDate.year && _displayedMonth.month <= prevMonthDate.month);
+
     return Container(
       padding: const EdgeInsets.all(20), // sm:p-8
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(24), // sm:rounded-3xl
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
         ),
         boxShadow: const [
           BoxShadow(
@@ -129,18 +180,49 @@ class StreakCalendar extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '${_getMonthName()} কার্যক্রম',
-                style: TextStyle(
-                  fontSize: 20, // sm:text-2xl
-                  fontWeight: FontWeight.bold,
-                  color: isDark
-                      ? Colors.white
-                      : const Color(0xFF0F172A), // neutral-900
-                  fontFamily: 'HindSiliguri',
+              Expanded(
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: isPreviousOrOlderMonth ? null : _goToPreviousMonth,
+                      icon: const Icon(Icons.chevron_left_rounded),
+                      splashRadius: 24,
+                      color: isPreviousOrOlderMonth
+                          ? (isDark ? Colors.white24 : Colors.black26)
+                          : (isDark ? Colors.white70 : Colors.black87),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        '${_getMonthName(_displayedMonth)} কার্যক্রম',
+                        style: TextStyle(
+                          fontSize: 20, // sm:text-2xl
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF000000), // neutral-900
+                          fontFamily: 'Anek Bangla',
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      onPressed: isCurrentOrFutureMonth ? null : _goToNextMonth,
+                      icon: const Icon(Icons.chevron_right_rounded),
+                      splashRadius: 24,
+                      color: isCurrentOrFutureMonth
+                          ? (isDark ? Colors.white24 : Colors.black26)
+                          : (isDark ? Colors.white70 : Colors.black87),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
                 ),
               ),
-
+              const SizedBox(width: 8),
               // Streak Badge
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -170,17 +252,17 @@ class StreakCalendar extends StatelessWidget {
                   children: [
                     const Icon(
                       Icons.local_fire_department_rounded,
-                      color: Color(0xFFF59E0B),
+                      color: Color(0xFF1E3A8A),
                       size: 18,
                     ), // orange-500
                     const SizedBox(width: 8), // sm:gap-2.5
                     Text(
-                      '$streakCount দিন স্ট্রিক',
+                      '${widget.streakCount} দিন স্ট্রিক',
                       style: const TextStyle(
-                        fontSize: 14, // sm:text-base
+                        fontSize: 16, // sm:text-base
                         fontWeight: FontWeight.w900, // font-black
                         color: Color(0xFFEA580C), // orange-600 : orange-400
-                        fontFamily: 'HindSiliguri',
+                        fontFamily: 'Anek Bangla',
                       ),
                     ),
                   ],
@@ -199,14 +281,14 @@ class StreakCalendar extends StatelessWidget {
                       child: Text(
                         day,
                         style: TextStyle(
-                          fontSize: 12, // sm:text-sm
+                          fontSize: 15, // sm:text-sm
                           fontWeight: FontWeight.bold,
                           color: isDark
                               ? const Color(0xFFA3A3A3)
                               : const Color(
                                   0xFF737373,
                                 ), // neutral-400 : neutral-500
-                          fontFamily: 'HindSiliguri',
+                          fontFamily: 'Anek Bangla',
                         ),
                       ),
                     ),
@@ -229,46 +311,55 @@ class StreakCalendar extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                             horizontal: 3,
                           ), // sm:gap-1.5
-                          child: Tooltip(
-                            // Native tooltip handles the hover state elegantly
-                            message:
-                                '${week[i].examCount > 0 ? '${week[i].examCount}টি পরীক্ষা' : 'কোনো পরীক্ষা নেই'}\n${'${week[i].date.day}/${week[i].date.month}'}',
-                            child: AspectRatio(
-                              aspectRatio: 1,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: _getColorClass(
-                                    week[i].examCount,
-                                    week[i].isCurrentMonth,
-                                    isDark,
+                          child: !week[i].isCurrentMonth
+                              ? AspectRatio(
+                                  aspectRatio: 1,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: _getColorClass(0, false, isDark),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
-                                  borderRadius: BorderRadius.circular(
-                                    10,
-                                  ), // sm:rounded-xl
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    week[i].dayOfMonth.toString(),
-                                    style: TextStyle(
-                                      fontSize: 14, // text-sm
-                                      fontWeight: FontWeight.w900, // font-black
-                                      color: week[i].isCurrentMonth
-                                          ? (isDark
-                                                ? const Color(0xFFF5F5F5)
-                                                : const Color(
-                                                    0xFF0F172A,
-                                                  )) // neutral-100 : neutral-900
-                                          : (isDark
-                                                ? const Color(0xFF525252)
-                                                : const Color(
-                                                    0xFFA3A3A3,
-                                                  )), // neutral-600 : neutral-400
+                                )
+                              : Tooltip(
+                                  message:
+                                      '${week[i].examCount > 0 ? '${week[i].examCount}টি পরীক্ষা' : 'কোনো পরীক্ষা নেই'}\n${'${week[i].date.day}/${week[i].date.month}'}',
+                                  child: AspectRatio(
+                                    aspectRatio: 1,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: _getColorClass(
+                                          week[i].examCount,
+                                          week[i].isCurrentMonth,
+                                          isDark,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          10,
+                                        ), // sm:rounded-xl
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          week[i].dayOfMonth.toString(),
+                                          style: TextStyle(
+                                            fontSize: 16, // text-sm
+                                            fontWeight: FontWeight.w900, // font-black
+                                            color: week[i].isCurrentMonth
+                                                ? (isDark
+                                                      ? const Color(0xFFF5F5F5)
+                                                      : const Color(
+                                                          0xFF000000,
+                                                        )) // neutral-100 : neutral-900
+                                                : (isDark
+                                                      ? const Color(0xFF525252)
+                                                      : const Color(
+                                                          0xFFA3A3A3,
+                                                        )), // neutral-600 : neutral-400
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
                         ),
                       )
                     else
@@ -338,7 +429,7 @@ class StreakCalendar extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 15,
             color: isDark
                 ? const Color(0xFFA3A3A3)
                 : const Color(0xFF737373), // neutral-400 : neutral-500

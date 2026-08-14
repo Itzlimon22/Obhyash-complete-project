@@ -26,7 +26,7 @@ class SubjectStatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEEEEEE),
@@ -72,9 +72,9 @@ class SubjectStatCard extends StatelessWidget {
               Text(
                 'সাবজেক্ট ভিত্তিক রিপোর্ট',
                 style: TextStyle(
-                  fontFamily: 'HindSiliguri',
+                  fontFamily: 'Anek Bangla',
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: 18,
                   color: isDark ? Colors.white : const Color(0xFF1A1A1A),
                 ),
               ),
@@ -87,12 +87,12 @@ class SubjectStatCard extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF262626).withOpacity(0.5)
+                    ? const Color(0xFF1C1C1E).withOpacity(0.5)
                     : const Color(0xFFFAFAFA),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isDark
-                      ? const Color(0xFF404040)
+                      ? const Color(0xFF27272A)
                       : const Color(0xFFE5E5E5),
                   style: BorderStyle.solid,
                 ),
@@ -102,7 +102,7 @@ class SubjectStatCard extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Color(0xFFA3A3A3),
-                  fontFamily: 'HindSiliguri',
+                  fontFamily: 'Anek Bangla',
                 ),
               ),
             )
@@ -133,7 +133,7 @@ class SubjectStatCard extends StatelessWidget {
         children: [
           const Text(
             'সাবজেক্ট ভিত্তিক রিপোর্ট',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
           ),
           const SizedBox(height: 24),
           ...List.generate(
@@ -230,7 +230,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                                 : (accuracy > 0
                                       ? accTextColor
                                       : (isDark
-                                            ? const Color(0xFF404040)
+                                            ? const Color(0xFF27272A)
                                             : const Color(0xFFD4D4D4))),
                             borderRadius: BorderRadius.circular(2),
                           ),
@@ -240,10 +240,10 @@ class _SubjectItemState extends State<_SubjectItem> {
                           child: AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 300),
                             style: TextStyle(
-                              fontFamily: 'HindSiliguri',
+                              fontFamily: 'Anek Bangla',
                               fontWeight:
                                   FontWeight.w600, // Medium weight like webapp
-                              fontSize: 14, // Smaller font like webapp
+                              fontSize: 16, // Smaller font like webapp
                               color: _isOpen
                                   ? (isDark
                                         ? const Color(0xFF047857)
@@ -270,7 +270,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                         ),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? const Color(0xFF262626)
+                              ? const Color(0xFF1C1C1E)
                               : const Color(0xFFF3F4F6),
                           borderRadius: BorderRadius.circular(6),
                         ),
@@ -281,7 +281,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                                 ? const Color(0xFFA3A3A3)
                                 : const Color(0xFF4B5563),
                             fontWeight: FontWeight.w700,
-                            fontSize: 11,
+                            fontSize: 14,
                           ),
                         ),
                       ),
@@ -293,7 +293,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF262626)
+                                ? const Color(0xFF1C1C1E)
                                 : const Color(0xFFF3F4F6),
                             shape: BoxShape.circle,
                           ),
@@ -359,14 +359,14 @@ class _SubjectItemState extends State<_SubjectItem> {
               ), // amber-600
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           // Sleek minimalist Progress Bar Component
           ClipRRect(
             borderRadius: BorderRadius.circular(4), // sleek radius
             child: Container(
               height: 6, // ultra-thin sleek bar
               width: double.infinity,
-              color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+              color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
               child: Row(
                 children: [
                   if (widget.subject.correct > 0)
@@ -382,7 +382,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                   if (widget.subject.skipped > 0)
                     Expanded(
                       flex: widget.subject.skipped,
-                      child: Container(color: const Color(0xFFF59E0B)),
+                      child: Container(color: const Color(0xFF1E3A8A)),
                     ),
                 ],
               ),
@@ -418,9 +418,9 @@ class _SubjectItemState extends State<_SubjectItem> {
                       Text(
                         'বিস্তারিত রিপোর্ট',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
+                          fontFamily: 'Anek Bangla',
                           color: isDark
                               ? const Color(0xFF047857)
                               : const Color(0xFF047857),
@@ -463,26 +463,14 @@ class _StatBox extends StatelessWidget {
 
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: color.withValues(
-            alpha: isDark ? 0.08 : 0.05,
-          ), // Subtle premium tint
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: color.withValues(
-              alpha: isDark ? 0.2 : 0.15,
-            ), // Tinted border
-            width: 1,
-          ),
-        ),
+        padding: EdgeInsets.zero,
         child: Column(
           children: [
             Text(
               label,
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
-                fontSize: 11,
+                fontFamily: 'Anek Bangla',
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: isDark
                     ? const Color(0xFFA3A3A3)
@@ -493,7 +481,7 @@ class _StatBox extends StatelessWidget {
             Text(
               value,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight
                     .bold, // Replaced w900 which can fail on some fonts
                 color: color,

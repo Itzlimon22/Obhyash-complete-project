@@ -53,7 +53,7 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF0F172A) : Colors.white;
+    final bgColor = isDark ? const Color(0xFF000000) : Colors.white;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -77,7 +77,7 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white24 : Colors.black12,
+                  color: isDark ? const Color(0xFF2C2C2E) : Colors.black12,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -86,8 +86,8 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
             Text(
               'পাসওয়ার্ড ভুলে গেছেন?',
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
-                fontSize: 20,
+                fontFamily: 'Anek Bangla',
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: isDark ? Colors.white : Colors.black,
               ),
@@ -96,8 +96,8 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
             Text(
               'তোমার ইমেইল ঠিকানা দাও। আমরা একটি পাসওয়ার্ড রিসেট লিংক পাঠাবো।',
               style: TextStyle(
-                fontFamily: 'HindSiliguri',
-                fontSize: 14,
+                fontFamily: 'Anek Bangla',
+                fontSize: 16,
                 color: isDark ? Colors.white70 : Colors.black54,
               ),
             ),
@@ -116,7 +116,7 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
                   color: isDark ? Colors.white54 : Colors.black54,
                 ),
                 filled: true,
-                fillColor: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5),
+                fillColor: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -149,9 +149,9 @@ class _ForgotPasswordSheetState extends ConsumerState<ForgotPasswordSheet> {
                     : const Text(
                         'লিংক পাঠান',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'HindSiliguri',
+                          fontFamily: 'Anek Bangla',
                         ),
                       ),
               ),

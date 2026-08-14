@@ -716,7 +716,7 @@ export default function StudentRoot({
               onLeaderboardClick={() => handleTabChange("leaderboard")}
               onAnalysisClick={() => handleTabChange("analysis")}
               onPracticeClick={() => handleTabChange("practice")}
-              onBlogClick={() => router.push("/blog")}
+              onBookmarksClick={() => handleTabChange("bookmarks")}
               history={examHistory}
               examTarget={currentUser.exam_target}
               onChangeTarget={() => setShowTargetModal(true)}
@@ -873,12 +873,12 @@ export default function StudentRoot({
         );
       }
 
-      if (activeTab === "practice") {
+      if (activeTab === "practice" || activeTab === "bookmarks") {
         return (
           <AppLayout
             activeTab={activeTab}
             {...commonLayoutProps}
-            title="অনুশীলন"
+            title={activeTab === "bookmarks" ? "আমার বুকমার্কস" : "অনুশীলন"}
           >
             <PracticeDashboard
               history={examHistory}
@@ -886,6 +886,7 @@ export default function StudentRoot({
               onNavigateToMock={() => handleTabChange("setup")}
               subjects={subjects.map((s) => s.id)}
               currentUser={currentUser}
+              initialTab={activeTab === "bookmarks" ? "bookmarks" : "mistakes"}
             />
           </AppLayout>
         );

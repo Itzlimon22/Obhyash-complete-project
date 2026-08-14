@@ -32,10 +32,12 @@ class AppDropdown<T> extends StatelessWidget {
     if (onChanged == null) return;
     
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF0F172A) : Colors.white;
+    final bgColor = isDark ? const Color(0xFF000000) : Colors.white; // Zinc 950
+    final borderColor = isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0); // Zinc 800
 
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (BuildContext ctx) {
@@ -49,6 +51,9 @@ class AppDropdown<T> extends StatelessWidget {
               topLeft: Radius.circular(24),
               topRight: Radius.circular(24),
             ),
+            border: Border(
+              top: BorderSide(color: borderColor, width: 1),
+            ),
           ),
           padding: const EdgeInsets.only(top: 12, bottom: 24),
           child: SafeArea(
@@ -60,7 +65,7 @@ class AppDropdown<T> extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.white24 : Colors.black12,
+                    color: isDark ? const Color(0xFF3F3F46) : Colors.black12, // Zinc 700
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -71,10 +76,10 @@ class AppDropdown<T> extends StatelessWidget {
                     child: Text(
                       label,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
-                        fontSize: 18,
+                        fontFamily: 'Anek Bangla',
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black,
+                        color: isDark ? const Color(0xFFFAFAFA) : Colors.black, // Zinc 50
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -97,7 +102,7 @@ class AppDropdown<T> extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                           decoration: BoxDecoration(
                             color: isSelected 
-                                ? const Color(0xFF047857).withValues(alpha: 0.1) 
+                                ? const Color(0xFF047857).withValues(alpha: isDark ? 0.2 : 0.1) 
                                 : Colors.transparent,
                           ),
                           child: Row(
@@ -106,19 +111,19 @@ class AppDropdown<T> extends StatelessWidget {
                                 child: Text(
                                   option.label,
                                   style: TextStyle(
-                                    fontFamily: 'HindSiliguri',
-                                    fontSize: 16,
+                                    fontFamily: 'Anek Bangla',
+                                    fontSize: 18,
                                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                     color: isSelected 
-                                        ? const Color(0xFF047857) 
-                                        : (isDark ? Colors.white : Colors.black87),
+                                        ? (isDark ? const Color(0xFF34D399) : const Color(0xFF047857)) // Emerald 400 for dark mode selected
+                                        : (isDark ? const Color(0xFFE4E4E7) : Colors.black87), // Zinc 200
                                   ),
                                 ),
                               ),
                               if (isSelected)
-                                const Icon(
+                                Icon(
                                   LucideIcons.checkCircle2,
-                                  color: Color(0xFF047857),
+                                  color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
                                   size: 20,
                                 ),
                             ],
@@ -139,7 +144,8 @@ class AppDropdown<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5);
+    final bgColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5); // Zinc 900
+    final borderColor = isDark ? const Color(0xFF27272A) : Colors.black.withValues(alpha: 0.05); // Zinc 800
 
     String? displayLabel;
     if (value != null) {
@@ -159,10 +165,10 @@ class AppDropdown<T> extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 14,
-                fontFamily: 'HindSiliguri',
+                fontSize: 16,
+                fontFamily: 'Anek Bangla',
                 fontWeight: FontWeight.w700,
-                color: isDark ? Colors.white70 : Colors.black87,
+                color: isDark ? const Color(0xFFA1A1AA) : Colors.black87, // Zinc 400
               ),
             ),
           ),
@@ -175,32 +181,32 @@ class AppDropdown<T> extends StatelessWidget {
               color: bgColor,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: isDark ? Colors.transparent : Colors.black.withValues(alpha: 0.05),
+                color: borderColor,
               ),
             ),
             padding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: Row(
               children: [
                 if (icon != null) ...[
-                  Icon(icon, color: isDark ? Colors.white54 : Colors.black54, size: 20),
+                  Icon(icon, color: isDark ? const Color(0xFFA1A1AA) : Colors.black54, size: 20), // Zinc 400
                   const SizedBox(width: 12),
                 ],
                 Expanded(
                   child: Text(
                     displayLabel ?? hint ?? 'Select an option',
                     style: TextStyle(
-                      fontFamily: 'HindSiliguri',
-                      fontSize: 15,
+                      fontFamily: 'Anek Bangla',
+                      fontSize: 17,
                       fontWeight: displayLabel != null ? FontWeight.w600 : FontWeight.normal,
                       color: displayLabel != null
-                          ? (isDark ? Colors.white : Colors.black)
-                          : (isDark ? Colors.white38 : Colors.black38),
+                          ? (isDark ? const Color(0xFFFAFAFA) : Colors.black) // Zinc 50
+                          : (isDark ? const Color(0xFF52525B) : Colors.black38), // Zinc 600
                     ),
                   ),
                 ),
                 Icon(
                   LucideIcons.chevronDown,
-                  color: isDark ? Colors.white54 : Colors.black54,
+                  color: isDark ? const Color(0xFFA1A1AA) : Colors.black54, // Zinc 400
                   size: 20,
                 ),
               ],

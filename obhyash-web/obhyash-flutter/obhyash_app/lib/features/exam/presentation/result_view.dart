@@ -5,6 +5,7 @@ import '../domain/exam_models.dart';
 import 'widgets/result_stats.dart';
 import 'widgets/review_list.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
+import '../services/pdf_download_service.dart';
 
 class ResultView extends StatefulWidget {
   final ExamResult result;
@@ -42,6 +43,30 @@ class _ResultViewState extends State<ResultView> {
         _confettiController.play();
       }
     });
+
+    _fetchBookmarks();
+  }
+
+  Future<void> _fetchBookmarks() async {
+    final supabase = Supabase.instance.client;
+    final uid = supabase.auth.currentUser?.id;
+    if (uid != null && widget.result.questions.isNotEmpty) {
+      try {
+        final bRes = await supabase
+            .from('bookmarks')
+            .select('question_id')
+            .eq('user_id', uid)
+            .inFilter('question_id', widget.result.questions.map((q) => q.id).toList());
+        
+        if (mounted) {
+          setState(() {
+            _bookmarkedIds.addAll((bRes as List).map((row) => row['question_id'].toString()));
+          });
+        }
+      } catch (e) {
+        debugPrint('[ResultView] Bookmark fetch error: $e');
+      }
+    }
   }
 
   @override
@@ -85,6 +110,7 @@ class _ResultViewState extends State<ResultView> {
     // Show a bottom sheet or dialog to report an issue
     showModalBottomSheet(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
@@ -96,7 +122,7 @@ class _ResultViewState extends State<ResultView> {
         ),
         decoration: BoxDecoration(
           color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF0F172A)
+              ? const Color(0xFF000000)
               : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
@@ -108,14 +134,14 @@ class _ResultViewState extends State<ResultView> {
               Text(
                 'প্রশ্ন $questionId রিপোর্ট করো',
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
               const Text(
                 'সমস্যাটির কারণ লেখুন:',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(fontSize: 15, color: Colors.grey),
               ),
               const SizedBox(height: 16),
               TextField(
@@ -182,25 +208,7 @@ class _ResultViewState extends State<ResultView> {
         ? (widget.result.score / widget.result.totalMarks) * 100
         : 0.0;
 
-    // Feedback Logic
-    String feedbackTitle;
-    String feedbackText;
-    if (widget.isHistoryMode) {
-      feedbackTitle = 'ফলাফল পর্যালোচনা';
-      feedbackText = 'তোমার পূর্ববর্তী পরীক্ষার বিস্তারিত ফলাফল';
-    } else if (percentage >= 90) {
-      feedbackTitle = 'অসাধারণ!';
-      feedbackText = 'তুমি এই বিষয়টি খুব ভালো আয়ত্ত করেছো।';
-    } else if (percentage >= 70) {
-      feedbackTitle = 'খুব ভালো!';
-      feedbackText = 'ভালো ধারণা আছে, চালিয়ে যাও।';
-    } else if (percentage >= 50) {
-      feedbackTitle = 'ভালো প্রচেষ্টা';
-      feedbackText = 'তুমি সঠিক পথে আছেন।';
-    } else {
-      feedbackTitle = 'আরও ভালো করতে হবে';
-      feedbackText = 'বিষয়টি পুনরায় পড়ে আবার চেষ্টা করো।';
-    }
+    // Feedback logic removed since it is no longer shown
 
     return Scaffold(
       backgroundColor: isDark ? Colors.black : const Color(0xFFFAFAFA),
@@ -224,26 +232,6 @@ class _ResultViewState extends State<ResultView> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Column(
           children: [
-            // Dynamic Header
-            Text(
-              feedbackTitle,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              feedbackText,
-              style: TextStyle(
-                fontSize: 14,
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
 
             // Banner for OMR review
             if (widget.result.submissionType == 'script' &&
@@ -279,7 +267,7 @@ class _ResultViewState extends State<ResultView> {
                           Text(
                             'যান্ত্রিক ত্রুটির কারণে ফলাফল ভুল হতে পারে।',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 15,
                               color: const Color(
                                 0xFFB45309,
                               ).withValues(alpha: 0.8),
@@ -305,7 +293,17 @@ class _ResultViewState extends State<ResultView> {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () {},
+                    onPressed: () async {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...'),
+                          behavior: SnackBarBehavior.floating,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                      await PdfDownloadService.downloadQuestionPaper(
+                          widget.result, context);
+                    },
                     icon: const Icon(Icons.download_rounded, size: 16),
                     label: const Text('প্রশ্নপত্র'),
                     style: OutlinedButton.styleFrom(
@@ -317,7 +315,17 @@ class _ResultViewState extends State<ResultView> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () {},
+                    onPressed: () async {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...'),
+                          behavior: SnackBarBehavior.floating,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                      await PdfDownloadService.downloadResultWithExplanations(
+                          widget.result, context);
+                    },
                     icon: const Icon(Icons.download_done_rounded, size: 16),
                     label: const Text('ফলাফল ও ব্যাখ্যা'),
                     style: OutlinedButton.styleFrom(
@@ -337,19 +345,22 @@ class _ResultViewState extends State<ResultView> {
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF262626).withValues(alpha: 0.4)
+                    ? const Color(0xFF1C1C1E).withValues(alpha: 0.4)
                     : const Color(0xFFF9FAFB),
                 border: Border.all(
                   color: isDark
-                      ? const Color(0xFF404040)
+                      ? const Color(0xFF27272A)
                       : const Color(0xFFF3F4F6),
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 12,
+                runSpacing: 12,
                 children: [
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(
                         Icons.menu_book_rounded,
@@ -360,13 +371,14 @@ class _ResultViewState extends State<ResultView> {
                       Text(
                         widget.result.subjectLabel ?? widget.result.subject,
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(
                         Icons.history_rounded,
@@ -377,13 +389,14 @@ class _ResultViewState extends State<ResultView> {
                       Text(
                         widget.isHistoryMode ? 'ইতিহাস' : 'আজকের পরীক্ষা',
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(
                         Icons.help_outline_rounded,
@@ -394,7 +407,7 @@ class _ResultViewState extends State<ResultView> {
                       Text(
                         'মোট প্রশ্ন: ${widget.result.totalQuestions}',
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -426,6 +439,23 @@ class _ResultViewState extends State<ResultView> {
               onToggleBookmark: _toggleBookmark,
               onReport: _showReportModal,
             ),
+            
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: widget.onRestart,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('আবার পরীক্ষা দিন', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF047857), // emerald-700
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

@@ -47,5 +47,24 @@ export const GET = async () => {
     }),
   );
 
-  return NextResponse.json({ referral, history: enriched });
+  // Get exact count of successful referrals
+  const { count: totalApproved } = await supabase
+    .from('referral_history')
+    .select('id', { count: 'exact', head: true })
+    .eq('referral_id', referral.id)
+    .eq('admin_status', 'Approved');
+
+  // Get scratch cards
+  const { data: scratchCards } = await supabase
+    .from('scratch_cards')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  return NextResponse.json({ 
+    referral, 
+    history: enriched,
+    totalApproved: totalApproved || 0,
+    scratchCards: scratchCards || []
+  });
 };

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/presentation/widgets/app_dropdown.dart';
 import '../../../core/utils/app_popups.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/auth_controller.dart';
 import '../../../core/data/college_list.dart';
@@ -37,6 +38,7 @@ class _SignupViewState extends ConsumerState<SignupView>
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _referralController = TextEditingController();
 
   bool _showPassword = false;
 
@@ -60,6 +62,19 @@ class _SignupViewState extends ConsumerState<SignupView>
     ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeIn));
     _animController.forward();
     _instituteController.addListener(_onInstituteChanged);
+    _loadReferralCode();
+  }
+
+  Future<void> _loadReferralCode() async {
+    final prefs = await SharedPreferences.getInstance();
+    final code = prefs.getString('referralCode');
+    if (code != null && code.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _referralController.text = code;
+        });
+      }
+    }
   }
 
   @override
@@ -71,6 +86,7 @@ class _SignupViewState extends ConsumerState<SignupView>
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _referralController.dispose();
     _animController.dispose();
     super.dispose();
   }
@@ -153,6 +169,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           examTarget: _examTarget.isEmpty ? null : _examTarget,
           email: _emailController.text.trim(),
           password: _passwordController.text,
+          referralCode: _referralController.text.trim(),
         );
 
     if (!mounted) return;
@@ -197,9 +214,9 @@ class _SignupViewState extends ConsumerState<SignupView>
                 Text(
                   'রেজিস্ট্রেশন',
                   style: TextStyle(
-                    fontSize: 32,
+                    fontSize: 34,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'HindSiliguri',
+                    fontFamily: 'Anek Bangla',
                     color: textColor,
                   ),
                 ),
@@ -207,8 +224,8 @@ class _SignupViewState extends ConsumerState<SignupView>
                 Text(
                   'মাত্র ৩টি ধাপে সম্পন্ন করো তোমার রেজিস্ট্রেশন',
                   style: TextStyle(
-                    fontSize: 15,
-                    fontFamily: 'HindSiliguri',
+                    fontSize: 17,
+                    fontFamily: 'Anek Bangla',
                     color: isDark ? Colors.white70 : Colors.black54,
                   ),
                 ),
@@ -238,7 +255,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                           height: 56,
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF1E1E1E)
+                                ? const Color(0xFF1C1C1E)
                                 : const Color(0xFFF5F5F5),
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -278,8 +295,8 @@ class _SignupViewState extends ConsumerState<SignupView>
                             ? const Text(
                                 'অ্যাকাউন্ট তৈরি করো',
                                 style: TextStyle(
-                                  fontSize: 18,
-                                  fontFamily: 'HindSiliguri',
+                                  fontSize: 20,
+                                  fontFamily: 'Anek Bangla',
                                   fontWeight: FontWeight.bold,
                                 ),
                               )
@@ -289,8 +306,8 @@ class _SignupViewState extends ConsumerState<SignupView>
                                   Text(
                                     'পরবর্তী ধাপ',
                                     style: TextStyle(
-                                      fontSize: 18,
-                                      fontFamily: 'HindSiliguri',
+                                      fontSize: 20,
+                                      fontFamily: 'Anek Bangla',
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -314,8 +331,8 @@ class _SignupViewState extends ConsumerState<SignupView>
                     Text(
                       'আগেই অ্যাকাউন্ট আছে? ',
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
-                        fontSize: 15,
+                        fontFamily: 'Anek Bangla',
+                        fontSize: 17,
                         color: isDark ? Colors.white70 : Colors.black87,
                       ),
                     ),
@@ -324,8 +341,8 @@ class _SignupViewState extends ConsumerState<SignupView>
                       child: const Text(
                         'লগইন করো',
                         style: TextStyle(
-                          fontFamily: 'HindSiliguri',
-                          fontSize: 15,
+                          fontFamily: 'Anek Bangla',
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFFB91C1C),
                         ),
@@ -357,7 +374,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                 color: isActive
                     ? const Color(0xFF047857)
                     : (isDark
-                          ? const Color(0xFF1E1E1E)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFF5F5F5)),
                 shape: BoxShape.circle,
               ),
@@ -365,7 +382,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                 child: Text(
                   s.toString(),
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: isActive
                         ? Colors.white
@@ -384,7 +401,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   color: isLineActive
                       ? const Color(0xFF047857)
                       : (isDark
-                            ? const Color(0xFF1E1E1E)
+                            ? const Color(0xFF1C1C1E)
                             : const Color(0xFFF5F5F5)),
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -401,8 +418,8 @@ class _SignupViewState extends ConsumerState<SignupView>
       child: Text(
         text,
         style: TextStyle(
-          fontSize: 14,
-          fontFamily: 'HindSiliguri',
+          fontSize: 16,
+          fontFamily: 'Anek Bangla',
           fontWeight: FontWeight.w700,
           color: isDark ? Colors.white70 : Colors.black87,
         ),
@@ -448,7 +465,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                       color: isSelected
                           ? const Color(0xFF047857).withValues(alpha: 0.1)
                           : (isDark
-                                ? const Color(0xFF1E1E1E)
+                                ? const Color(0xFF1C1C1E)
                                 : const Color(0xFFF5F5F5)),
                       border: Border.all(
                         color: isSelected
@@ -461,7 +478,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                     child: Text(
                       g == 'Male' ? 'পুরুষ' : 'মহিলা',
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
+                        fontFamily: 'Anek Bangla',
                         fontWeight: FontWeight.bold,
                         color: isSelected
                             ? const Color(0xFF047857)
@@ -496,7 +513,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           const SizedBox(height: 4),
           Container(
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+              color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
@@ -534,8 +551,8 @@ class _SignupViewState extends ConsumerState<SignupView>
                     child: Text(
                       name,
                       style: TextStyle(
-                        fontFamily: 'HindSiliguri',
-                        fontSize: 14,
+                        fontFamily: 'Anek Bangla',
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: isDark ? Colors.white : Colors.black87,
                       ),
@@ -620,7 +637,7 @@ class _SignupViewState extends ConsumerState<SignupView>
         decoration: BoxDecoration(
           color: isSelected
               ? const Color(0xFF047857).withValues(alpha: 0.1)
-              : (isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5)),
+              : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5)),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? const Color(0xFF047857) : Colors.transparent,
@@ -633,9 +650,9 @@ class _SignupViewState extends ConsumerState<SignupView>
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 15,
             fontWeight: FontWeight.w700,
-            fontFamily: 'HindSiliguri',
+            fontFamily: 'Anek Bangla',
             color: isSelected
                 ? const Color(0xFF047857)
                 : (isDark ? Colors.white70 : Colors.black87),
@@ -659,7 +676,7 @@ class _SignupViewState extends ConsumerState<SignupView>
         decoration: BoxDecoration(
           color: isSelected
               ? const Color(0xFF047857).withValues(alpha: 0.1)
-              : (isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5)),
+              : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5)),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? const Color(0xFF047857) : Colors.transparent,
@@ -674,9 +691,9 @@ class _SignupViewState extends ConsumerState<SignupView>
             Text(
               label,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.w700,
-                fontFamily: 'HindSiliguri',
+                fontFamily: 'Anek Bangla',
                 color: isSelected
                     ? const Color(0xFF047857)
                     : (isDark ? Colors.white70 : Colors.black87),
@@ -761,6 +778,14 @@ class _SignupViewState extends ConsumerState<SignupView>
           isDark: isDark,
           obscureText: !_showPassword,
         ),
+        const SizedBox(height: 20),
+        _buildInputField(
+          label: 'রেফারেল কোড (ঐচ্ছিক)',
+          icon: LucideIcons.gift,
+          controller: _referralController,
+          hint: 'কোড থাকলে এখানে লেখো',
+          isDark: isDark,
+        ),
       ],
     );
   }
@@ -790,7 +815,7 @@ class _SignupViewState extends ConsumerState<SignupView>
     Widget? suffixIcon,
     TextInputType keyboardType = TextInputType.text,
   }) {
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5);
+    final bgColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -801,7 +826,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           obscureText: obscureText,
           keyboardType: keyboardType,
           style: TextStyle(
-            fontFamily: 'HindSiliguri',
+            fontFamily: 'Anek Bangla',
             fontWeight: FontWeight.w500,
             color: isDark ? Colors.white : Colors.black,
           ),
@@ -868,9 +893,9 @@ class _SignupViewState extends ConsumerState<SignupView>
                 Text(
                   'রেজিস্ট্রেশন সফল!',
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 30,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'HindSiliguri',
+                    fontFamily: 'Anek Bangla',
                     color: textColor,
                   ),
                 ),
@@ -879,8 +904,8 @@ class _SignupViewState extends ConsumerState<SignupView>
                   'তোমার অ্যাকাউন্টটি সফলভাবে তৈরি হয়েছে। লগইন করে তোমার প্রস্তুতি শুরু করো।',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'HindSiliguri',
+                    fontSize: 18,
+                    fontFamily: 'Anek Bangla',
                     color: isDark ? Colors.white70 : Colors.black54,
                   ),
                 ),
@@ -901,8 +926,8 @@ class _SignupViewState extends ConsumerState<SignupView>
                     child: const Text(
                       'ড্যাশবোর্ডে যান',
                       style: TextStyle(
-                        fontSize: 18,
-                        fontFamily: 'HindSiliguri',
+                        fontSize: 20,
+                        fontFamily: 'Anek Bangla',
                         fontWeight: FontWeight.bold,
                       ),
                     ),

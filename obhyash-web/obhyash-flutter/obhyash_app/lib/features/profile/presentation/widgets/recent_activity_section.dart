@@ -10,7 +10,42 @@ class RecentActivitySection extends StatelessWidget {
 
   String _formatDate(DateTime? dt) {
     if (dt == null) return '';
-    return DateFormat('d MMM, yyyy', 'bn').format(dt);
+    return DateFormat('d MMM, yyyy').format(dt);
+  }
+
+  String _formatSubjectName(String name) {
+    if (name.isEmpty) return name;
+    final l = name.toLowerCase();
+
+    String subjectPart = name;
+    if (l.contains('physics')) subjectPart = 'পদার্থবিজ্ঞান';
+    else if (l.contains('chemistry')) subjectPart = 'রসায়ন';
+    else if (l.contains('biology') || l.contains('botany') || l.contains('zoology')) subjectPart = 'জীববিজ্ঞান';
+    else if (l.contains('math') || l.contains('higher_math')) subjectPart = 'উচ্চতর গণিত';
+    else if (l.contains('bangla')) subjectPart = 'বাংলা';
+    else if (l.contains('english')) subjectPart = 'ইংরেজি';
+    else if (l.contains('ict')) subjectPart = 'আইসিটি';
+    else if (l.contains('accounting')) subjectPart = 'হিসাববিজ্ঞান';
+    else if (l.contains('finance')) subjectPart = 'ফাইনান্স';
+    else if (l.contains('management')) subjectPart = 'ব্যবসায় সংগঠন';
+    else if (l.contains('general_science')) subjectPart = 'সাধারণ বিজ্ঞান';
+    else if (l.contains('bgs') || l.contains('bangladesh_and_global_studies')) subjectPart = 'বাংলাদেশ ও বিশ্বপরিচয়';
+    else if (l.contains('general_knowledge') || l.contains('gk')) subjectPart = 'সাধারণ জ্ঞান';
+    else if (l.contains('general')) subjectPart = 'সাধারণ';
+    else {
+      if (!name.contains('_')) return name;
+      return name.split('_').map((word) {
+        if (word.isEmpty) return word;
+        if (word.toLowerCase() == 'hsc' || word.toLowerCase() == 'ssc') return word.toUpperCase();
+        return word[0].toUpperCase() + word.substring(1).toLowerCase();
+      }).join(' ');
+    }
+
+    String suffix = '';
+    if (l.endsWith('_1')) suffix = ' ১ম পত্র';
+    else if (l.endsWith('_2')) suffix = ' ২য় পত্র';
+
+    return '$subjectPart$suffix';
   }
 
   @override
@@ -20,10 +55,10 @@ class RecentActivitySection extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF262626) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
         ),
         boxShadow: const [
           BoxShadow(
@@ -51,7 +86,7 @@ class RecentActivitySection extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: const Center(
-                    child: Text('⚡', style: TextStyle(fontSize: 16)),
+                    child: Text('⚡', style: TextStyle(fontSize: 18)),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -59,40 +94,13 @@ class RecentActivitySection extends StatelessWidget {
                   child: Text(
                     'সর্বশেষ কার্যক্রম',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF262626),
-                      fontFamily: 'HindSiliguri',
+                      color: isDark ? Colors.white : const Color(0xFF1C1C1E),
+                      fontFamily: 'Anek Bangla',
                     ),
                   ),
                 ),
-                if (history.length > 5)
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      backgroundColor: isDark
-                          ? const Color(0x33E11D48)
-                          : const Color(0xFFFFF1F2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Text(
-                      'সব দেখো',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? const Color(0xFFB91C1C)
-                            : const Color(0xFFB91C1C),
-                        fontFamily: 'HindSiliguri',
-                      ),
-                    ),
-                  ),
               ],
             ),
           ),
@@ -107,7 +115,7 @@ class RecentActivitySection extends StatelessWidget {
                     height: 56,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? const Color(0xFF262626)
+                          ? const Color(0xFF1C1C1E)
                           : const Color(0xFFF5F5F5),
                       shape: BoxShape.circle,
                     ),
@@ -123,12 +131,12 @@ class RecentActivitySection extends StatelessWidget {
                     'এখনও কোনো পরীক্ষা দেওয়া হয়নি।',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 17,
                       fontWeight: FontWeight.w500,
                       color: isDark
                           ? const Color(0xFFA3A3A3)
                           : const Color(0xFF737373),
-                      fontFamily: 'HindSiliguri',
+                      fontFamily: 'Anek Bangla',
                     ),
                   ),
                 ],
@@ -152,7 +160,7 @@ class RecentActivitySection extends StatelessWidget {
                   indent: 12,
                   endIndent: 12,
                   color: isDark
-                      ? const Color(0xFF262626)
+                      ? const Color(0xFF1C1C1E)
                       : const Color(0xFFE5E5E5),
                 ),
                 itemBuilder: (context, index) {
@@ -163,7 +171,7 @@ class RecentActivitySection extends StatelessWidget {
                   final Color progressColor = pct >= 0.8
                       ? const Color(0xFF047857)
                       : pct >= 0.5
-                      ? const Color(0xFFF59E0B)
+                      ? const Color(0xFF1E3A8A)
                       : const Color(0xFFB91C1C);
 
                   return Padding(
@@ -184,7 +192,7 @@ class RecentActivitySection extends StatelessWidget {
                                 value: pct,
                                 strokeWidth: 3.5,
                                 backgroundColor: isDark
-                                    ? const Color(0xFF404040)
+                                    ? const Color(0xFF27272A)
                                     : const Color(0xFFE5E5E5),
                                 valueColor: AlwaysStoppedAnimation(
                                   progressColor,
@@ -195,7 +203,7 @@ class RecentActivitySection extends StatelessWidget {
                                 child: Text(
                                   '${(pct * 100).round()}%',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w900,
                                     color: progressColor,
                                   ),
@@ -210,14 +218,14 @@ class RecentActivitySection extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                exam.subjectLabel ?? exam.subject,
+                                _formatSubjectName(exam.subjectLabel ?? exam.subject),
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 17,
                                   fontWeight: FontWeight.bold,
                                   color: isDark
                                       ? Colors.white
-                                      : const Color(0xFF0F172A),
-                                  fontFamily: 'HindSiliguri',
+                                      : const Color(0xFF000000),
+                                  fontFamily: 'Anek Bangla',
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -229,7 +237,7 @@ class RecentActivitySection extends StatelessWidget {
                                     Text(
                                       _formatDate(exam.createdAt),
                                       style: TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 15,
                                         color: isDark
                                             ? const Color(0xFFA3A3A3)
                                             : const Color(0xFF737373),
@@ -238,7 +246,7 @@ class RecentActivitySection extends StatelessWidget {
                                   Text(
                                     '${exam.totalQuestions} প্রশ্ন',
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 15,
                                       color: isDark
                                           ? const Color(0xFFA3A3A3)
                                           : const Color(0xFF737373),
@@ -257,14 +265,14 @@ class RecentActivitySection extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF262626)
+                                ? const Color(0xFF1C1C1E)
                                 : const Color(0xFFF5F5F5),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             'Practice',
                             style: TextStyle(
-                              fontSize: 11,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: isDark
                                   ? const Color(0xFFA3A3A3)

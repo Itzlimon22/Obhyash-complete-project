@@ -77,7 +77,7 @@ class CountdownBanner extends StatelessWidget {
         borderColor = const Color(0xFFFDE68A); // amber-200
         bgColor = isDark ? const Color(0xFF221A00) : const Color(0xFFFFFBEB);
         textColor = const Color(0xFFD97706); // amber-600
-        labelColor = const Color(0xFFF59E0B); // amber-500
+        labelColor = const Color(0xFF1E3A8A); // amber-500
         statusText = '$days দিন বাকি';
         break;
       case _Urgency.normal:
@@ -89,9 +89,9 @@ class CountdownBanner extends StatelessWidget {
         break;
       case _Urgency.past:
         borderColor = isDark
-            ? const Color(0xFF404040)
+            ? const Color(0xFF27272A)
             : const Color(0xFFE5E5E5);
-        bgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFFAFAFA);
+        bgColor = isDark ? const Color(0xFF000000) : const Color(0xFFFAFAFA);
         textColor = const Color(0xFF737373); // neutral-500
         labelColor = const Color(0xFF737373);
         statusText = 'পরীক্ষা শেষ';
@@ -126,7 +126,7 @@ class CountdownBanner extends StatelessWidget {
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: labelColor,
                     letterSpacing: 0.5,
@@ -136,7 +136,7 @@ class CountdownBanner extends StatelessWidget {
                 Text(
                   statusText,
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 17,
                     fontWeight: FontWeight.w800,
                     color: textColor,
                   ),
@@ -160,7 +160,7 @@ class CountdownBanner extends StatelessWidget {
                 child: Text(
                   'পরিবর্তন',
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: textColor,
                   ),

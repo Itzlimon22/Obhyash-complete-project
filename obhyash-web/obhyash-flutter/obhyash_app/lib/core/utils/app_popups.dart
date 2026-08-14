@@ -135,9 +135,9 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
                       widget.message,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
+                        fontFamily: 'Anek Bangla',
                       ),
                     ),
                   ),
