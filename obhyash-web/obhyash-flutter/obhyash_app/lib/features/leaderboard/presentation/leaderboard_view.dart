@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
+import '../../../core/data/college_list.dart';
 
 // ─── Level Data ────────────────────────────────────────────────────────────────
 class _LevelInfo {
@@ -266,7 +267,8 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       final myProfile = ref
           .read(userProfileProvider)
           .whenOrNull(data: (u) => u);
-      final myInstitute = myProfile?.institute;
+      final rawMyInstitute = myProfile?.institute;
+      final myInstitute = rawMyInstitute != null ? normalizeCollegeName(rawMyInstitute) : null;
 
       final data = await supabase
           .from('public_profiles')
@@ -279,8 +281,9 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
       // Group by institute
       final groups = <String, List<int>>{};
       for (final row in (data as List).cast<Map<String, dynamic>>()) {
-        final inst = row['institute'] as String?;
-        if (inst == null || inst.isEmpty) continue;
+        final rawInst = row['institute'] as String?;
+        if (rawInst == null || rawInst.isEmpty) continue;
+        final inst = normalizeCollegeName(rawInst);
         groups
             .putIfAbsent(inst, () => [])
             .add((row['xp'] as num?)?.toInt() ?? 0);
@@ -615,7 +618,7 @@ class _CollegeLeaderboardBody extends StatelessWidget {
                         ? const Color(0xFF059669)
                         : const Color(0xFF059669),
                   ),
-                ),
+                 maxLines: 1, overflow: TextOverflow.ellipsis),
               ),
             ],
           ),
@@ -931,10 +934,10 @@ class _LevelSelector extends StatelessWidget {
         ),
       ),
       child: SizedBox(
-        height: 144, // Increased height to prevent overflow and ensure perfect centering
+        height: 128, // Reduced height to match compact padding
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           itemCount: levels.length,
           itemBuilder: (ctx, i) {
             final l = levels[i];

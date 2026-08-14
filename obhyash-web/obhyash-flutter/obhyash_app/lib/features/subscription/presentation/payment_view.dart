@@ -457,7 +457,7 @@ class _PaymentViewState extends State<PaymentView>
                                   ? const Color(0xFFA3A3A3)
                                   : const Color(0xFF737373),
                             ),
-                          ),
+                           maxLines: 1, overflow: TextOverflow.ellipsis),
                         ),
                         Text(
                           '01946855793', // Web uses 01234567890 in display but let's put real one
@@ -518,7 +518,7 @@ class _PaymentViewState extends State<PaymentView>
                                   ? const Color(0xFFA3A3A3)
                                   : const Color(0xFF737373),
                             ),
-                          ),
+                           maxLines: 1, overflow: TextOverflow.ellipsis),
                         ),
                       ],
                     ),
@@ -1106,7 +1106,7 @@ class _FaqTileState extends State<_FaqTile> {
                             ? Colors.white
                             : const Color(0xFF000000),
                       ),
-                    ),
+                     maxLines: 1, overflow: TextOverflow.ellipsis),
                   ),
                   Icon(
                     _open ? LucideIcons.chevronUp : LucideIcons.chevronDown,

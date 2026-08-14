@@ -102,8 +102,9 @@ class AppDropdown<T> extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                           decoration: BoxDecoration(
                             color: isSelected 
-                                ? const Color(0xFF059669).withValues(alpha: isDark ? 0.2 : 0.1) 
+                                ? (isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5)) // Zinc 800 / Zinc 100
                                 : Colors.transparent,
+                            borderRadius: BorderRadius.circular(12), // Add subtle rounding to the highlight
                           ),
                           child: Row(
                             children: [
@@ -113,17 +114,17 @@ class AppDropdown<T> extends StatelessWidget {
                                   style: TextStyle(
                                     fontFamily: 'Anek Bangla',
                                     fontSize: 18,
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                                     color: isSelected 
-                                        ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669)) // Emerald 400 for dark mode selected
-                                        : (isDark ? const Color(0xFFE4E4E7) : Colors.black87), // Zinc 200
+                                        ? (isDark ? Colors.white : Colors.black) // High contrast for selected
+                                        : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF52525B)), // Zinc 400 / Zinc 600
                                   ),
-                                ),
+                                 maxLines: 1, overflow: TextOverflow.ellipsis),
                               ),
                               if (isSelected)
                                 Icon(
-                                  LucideIcons.checkCircle2,
-                                  color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                                  LucideIcons.check, // Use the more elegant check icon instead of checkCircle2
+                                  color: isDark ? Colors.white : Colors.black,
                                   size: 20,
                                 ),
                             ],
@@ -194,6 +195,8 @@ class AppDropdown<T> extends StatelessWidget {
                 Expanded(
                   child: Text(
                     displayLabel ?? hint ?? 'Select an option',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontFamily: 'Anek Bangla',
                       fontSize: 17,

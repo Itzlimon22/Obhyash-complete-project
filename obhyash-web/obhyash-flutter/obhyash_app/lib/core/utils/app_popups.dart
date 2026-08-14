@@ -139,7 +139,7 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
                         fontWeight: FontWeight.w600,
                         fontFamily: 'Anek Bangla',
                       ),
-                    ),
+                     maxLines: 1, overflow: TextOverflow.ellipsis),
                   ),
                 ],
               ),

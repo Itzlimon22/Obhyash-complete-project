@@ -311,7 +311,8 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -459,7 +460,7 @@ class _SRDonut extends StatelessWidget {
     ];
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF000000) : Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -606,7 +607,7 @@ class _SRLegend extends StatelessWidget {
                       ? const Color(0xFFD4D4D4)
                       : const Color(0xFF27272A),
                 ),
-              ),
+               maxLines: 1, overflow: TextOverflow.ellipsis),
             ),
             Text(
               value.toString(),
@@ -630,7 +631,7 @@ class _SRChapterList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(20),
+    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
     decoration: BoxDecoration(
       color: isDark ? const Color(0xFF000000) : Colors.white,
       borderRadius: BorderRadius.circular(20),
@@ -943,7 +944,7 @@ class _SRWeakness extends StatelessWidget {
                                         color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
                                         height: 1.4,
                                       ),
-                                    ),
+                                     maxLines: 1, overflow: TextOverflow.ellipsis),
                                   ),
                                 ],
                               ),

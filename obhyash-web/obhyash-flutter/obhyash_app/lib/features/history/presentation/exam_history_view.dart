@@ -1372,7 +1372,7 @@ class _MistakeCard extends StatelessWidget {
                           fontFamily: 'HindSiliguri',
                           color: textColor,
                         ),
-                      ),
+                       maxLines: 1, overflow: TextOverflow.ellipsis),
                     ),
                     if (isCorrect)
                       Icon(

@@ -11,6 +11,7 @@ import 'widgets/main_sidebar.dart';
 import 'widgets/main_bottom_nav.dart';
 import '../../features/dashboard/presentation/dashboard_view.dart';
 import '../../features/dashboard/services/streak_service.dart';
+import 'widgets/streak_dialog.dart';
 import '../../features/dashboard/providers/dashboard_providers.dart';
 import '../../features/auth/providers/auth_controller.dart';
 import '../providers/auth_provider.dart';
@@ -45,11 +46,21 @@ class MainLayout extends ConsumerStatefulWidget {
 class _MainLayoutState extends ConsumerState<MainLayout> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _streakAnimKey = 0;
+  
+  void _showStreakDialog(int currentStreak, String userId) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StreakDialog(currentStreak: currentStreak, userId: userId),
+    );
+  }
 
-  void _triggerStreakAnimation() {
+  void _triggerStreakAnimation(int currentStreak, String userId) {
     setState(() {
       _streakAnimKey++;
     });
+    _showStreakDialog(currentStreak, userId);
   }
 
   String _getActiveTab(String location) {
@@ -410,7 +421,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                           children: [
                             // Streak Badge (No background, slightly bigger, with animation)
                             GestureDetector(
-                              onTap: _triggerStreakAnimation,
+                              onTap: user != null ? () => _triggerStreakAnimation(streak, user.id) : null,
                               behavior: HitTestBehavior.opaque,
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -902,7 +913,7 @@ class _ProfileSheet extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color: textPrimary,
                       ),
-                    ),
+                     maxLines: 1, overflow: TextOverflow.ellipsis),
                   ),
                   GestureDetector(
                     onTap: onToggleTheme,

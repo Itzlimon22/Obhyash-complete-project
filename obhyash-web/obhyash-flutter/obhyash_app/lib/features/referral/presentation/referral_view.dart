@@ -330,7 +330,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                     color: textPrimary,
                                     fontFamily: 'monospace',
                                   ),
-                                ),
+                                 maxLines: 1, overflow: TextOverflow.ellipsis),
                               ),
                               GestureDetector(
                                 onTap: _copyCode,

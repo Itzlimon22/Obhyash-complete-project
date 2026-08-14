@@ -173,7 +173,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           name: _nameController.text.trim(),
           phone: _phoneController.text.trim(),
           gender: _gender,
-          institute: _instituteController.text.trim(),
+          institute: normalizeCollegeName(_instituteController.text.trim()),
           stream: _stream,
           group: _group,
           batch: _batch,
@@ -224,6 +224,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                 // Header
                 Text(
                   'রেজিস্ট্রেশন',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 34,
                     fontWeight: FontWeight.w900,
@@ -231,16 +232,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                     color: textColor,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'মাত্র ৩টি ধাপে সম্পন্ন করো তোমার রেজিস্ট্রেশন',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontFamily: 'Anek Bangla',
-                    color: isDark ? Colors.white70 : Colors.black54,
-                  ),
-                ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
 
                 _buildProgressBar(isDark),
                 const SizedBox(height: 32),
@@ -306,7 +298,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                             ? const Text(
                                 'অ্যাকাউন্ট তৈরি করো',
                                 style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 16,
                                   fontFamily: 'Anek Bangla',
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -317,7 +309,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                                   Text(
                                     'পরবর্তী ধাপ',
                                     style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 16,
                                       fontFamily: 'Anek Bangla',
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -343,7 +335,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                       'আগেই অ্যাকাউন্ট আছে? ',
                       style: TextStyle(
                         fontFamily: 'Anek Bangla',
-                        fontSize: 17,
+                        fontSize: 15,
                         color: isDark ? Colors.white70 : Colors.black87,
                       ),
                     ),
@@ -353,7 +345,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                         'লগইন করো',
                         style: TextStyle(
                           fontFamily: 'Anek Bangla',
-                          fontSize: 17,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFFB91C1C),
                         ),
@@ -372,49 +364,75 @@ class _SignupViewState extends ConsumerState<SignupView>
   Widget _buildProgressBar(bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [1, 2, 3].map((s) {
         final isActive = _step >= s;
         final isLineActive = _step > s;
+        
+        String stepName = '';
+        if (s == 1) stepName = 'বেসিক তথ্য';
+        if (s == 2) stepName = 'একাডেমিক';
+        if (s == 3) stepName = 'অ্যাকাউন্ট';
+
         return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: isActive
-                    ? const Color(0xFF059669)
-                    : (isDark
-                          ? const Color(0xFF1C1C1E)
-                          : const Color(0xFFF5F5F5)),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  s.toString(),
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+            Column(
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
                     color: isActive
-                        ? Colors.white
+                        ? const Color(0xFF059669)
+                        : (isDark
+                            ? const Color(0xFF1C1C1E)
+                            : const Color(0xFFF5F5F5)),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      s.toString(),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isActive
+                            ? Colors.white
+                            : (isDark ? Colors.white54 : Colors.black54),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  stepName,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                    color: isActive
+                        ? (isDark ? Colors.white : Colors.black87)
                         : (isDark ? Colors.white54 : Colors.black54),
                   ),
                 ),
-              ),
+              ],
             ),
             if (s < 3)
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 500),
-                width: 48,
-                height: 4,
-                margin: const EdgeInsets.symmetric(horizontal: 8),
-                decoration: BoxDecoration(
-                  color: isLineActive
-                      ? const Color(0xFF059669)
-                      : (isDark
+              Container(
+                margin: const EdgeInsets.only(top: 18),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  width: 32,
+                  height: 4,
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: isLineActive
+                        ? const Color(0xFF059669)
+                        : (isDark
                             ? const Color(0xFF1C1C1E)
                             : const Color(0xFFF5F5F5)),
-                  borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
           ],
@@ -423,18 +441,48 @@ class _SignupViewState extends ConsumerState<SignupView>
     );
   }
 
-  Widget _buildLabel(String text, bool isDark) {
+  Widget _buildLabel(String text, bool isDark, {String? tooltip}) {
+    final labelText = Text(
+      text,
+      style: TextStyle(
+        fontSize: 16,
+        fontFamily: 'Anek Bangla',
+        fontWeight: FontWeight.w700,
+        color: isDark ? Colors.white70 : Colors.black87,
+      ),
+    );
+
     return Padding(
       padding: const EdgeInsets.only(left: 4),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 16,
-          fontFamily: 'Anek Bangla',
-          fontWeight: FontWeight.w700,
-          color: isDark ? Colors.white70 : Colors.black87,
-        ),
-      ),
+      child: tooltip != null
+          ? Row(
+              children: [
+                labelText,
+                const SizedBox(width: 8),
+                Tooltip(
+                  message: tooltip,
+                  triggerMode: TooltipTriggerMode.tap,
+                  showDuration: const Duration(seconds: 4),
+                  margin: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: const EdgeInsets.all(12),
+                  textStyle: const TextStyle(
+                    fontFamily: 'Anek Bangla',
+                    fontSize: 13,
+                    color: Colors.white,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    LucideIcons.info,
+                    size: 16,
+                    color: isDark ? Colors.white54 : Colors.black45,
+                  ),
+                ),
+              ],
+            )
+          : labelText,
     );
   }
 
@@ -519,6 +567,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           controller: _instituteController,
           hint: 'কলেজ / স্কুলের নাম',
           isDark: isDark,
+          tooltip: 'লিস্টে না থাকলে তোমার প্রতিষ্ঠানের পুরো নাম লিখে পরবর্তী ধাপে যাও।',
         ),
         if (_showCollegeSuggestions) ...[
           const SizedBox(height: 4),
@@ -573,10 +622,12 @@ class _SignupViewState extends ConsumerState<SignupView>
               }).toList(),
             ),
           ),
+        ] else if (_instituteController.text.isNotEmpty) ...[
+          const SizedBox(height: 8),
         ],
         const SizedBox(height: 20),
 
-        _buildLabel('স্ট্রিম (Stream)', isDark),
+        _buildLabel('স্ট্রিম (Stream)', isDark, tooltip: 'তুমি যে ক্লাসে বা প্রোগ্রামে আছো'),
         const SizedBox(height: 8),
         _buildDropdown(
           icon: LucideIcons.bookOpen,
@@ -600,7 +651,7 @@ class _SignupViewState extends ConsumerState<SignupView>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLabel('বিভাগ (Division)', isDark),
+                  _buildLabel('বিভাগ (Division)', isDark, tooltip: 'তোমার পঠিত বিষয়সমূহ'),
                   const SizedBox(height: 8),
                   _buildDropdown(
                     icon: LucideIcons.graduationCap,
@@ -791,7 +842,8 @@ class _SignupViewState extends ConsumerState<SignupView>
         ),
         const SizedBox(height: 20),
         _buildInputField(
-          label: 'রেফারেল কোড (ঐচ্ছিক)',
+          label: 'রেফারেল কোড (অপশনাল)',
+          tooltip: 'বন্ধুর দেয়া কোড ব্যবহার করে ডিসকাউন্ট পেতে পারো',
           icon: LucideIcons.gift,
           controller: _referralController,
           hint: 'কোড থাকলে এখানে লেখো',
@@ -803,10 +855,11 @@ class _SignupViewState extends ConsumerState<SignupView>
 
   Widget _buildDropdown({
     required IconData icon,
-    required String value,
+    required String? value,
     required List<String> options,
+    required Function(String?) onChanged,
     required bool isDark,
-    required void Function(String?) onChanged,
+    String? tooltip,
   }) {
     return AppDropdown<String>(
       value: value,
@@ -825,12 +878,13 @@ class _SignupViewState extends ConsumerState<SignupView>
     bool obscureText = false,
     Widget? suffixIcon,
     TextInputType keyboardType = TextInputType.text,
+    String? tooltip,
   }) {
     final bgColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildLabel(label, isDark),
+        _buildLabel(label, isDark, tooltip: tooltip),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
@@ -904,7 +958,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                 Text(
                   'রেজিস্ট্রেশন সফল!',
                   style: TextStyle(
-                    fontSize: 30,
+                    fontSize: 26,
                     fontWeight: FontWeight.w900,
                     fontFamily: 'Anek Bangla',
                     color: textColor,
@@ -915,7 +969,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                   'তোমার অ্যাকাউন্টটি সফলভাবে তৈরি হয়েছে। লগইন করে তোমার প্রস্তুতি শুরু করো।',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontFamily: 'Anek Bangla',
                     color: isDark ? Colors.white70 : Colors.black54,
                   ),
@@ -937,7 +991,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                     child: const Text(
                       'ড্যাশবোর্ডে যান',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 16,
                         fontFamily: 'Anek Bangla',
                         fontWeight: FontWeight.bold,
                       ),

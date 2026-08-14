@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { getCanonicalCollegeName } from '@/lib/college-mapping';
 
 export async function POST(request: Request) {
   try {
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
         name: profileData.name,
         phone: profileData.phone,
         gender: profileData.gender || null,
-        institute: profileData.institute,
+        institute: profileData.institute ? getCanonicalCollegeName(profileData.institute) : null,
         stream: profileData.stream,
         division: profileData.group,
         batch: profileData.batch,

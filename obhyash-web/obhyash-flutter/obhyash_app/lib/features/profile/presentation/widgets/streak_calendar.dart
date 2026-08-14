@@ -290,7 +290,7 @@ class _StreakCalendarState extends State<StreakCalendar> {
                                 ), // neutral-400 : neutral-500
                           fontFamily: 'Anek Bangla',
                         ),
-                      ),
+                       maxLines: 1, overflow: TextOverflow.ellipsis),
                     ),
                   ),
                 )

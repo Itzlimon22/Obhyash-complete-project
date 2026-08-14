@@ -5,6 +5,7 @@ import { Menu, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Sidebar from './Sidebar';
 import MobileBottomNav from './MobileBottomNav';
+import StreakDialog from '../common/StreakDialog';
 import { UserProfile, Notification } from '@/lib/types';
 import {
   getNotifications,
@@ -61,6 +62,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   // Dropdown States
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isStreakDialogOpen, setIsStreakDialogOpen] = useState(false);
 
   // Notification State
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -240,11 +242,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({
               {/* Streak Icon */}
               <motion.button
                 whileTap={{ scale: 0.9 }}
-                className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 bg-red-50 dark:bg-red-900/10 rounded-full border border-red-100 dark:border-red-900/20 group cursor-pointer transition-all hover:border-red-200 hover:bg-red-100/50 dark:hover:bg-red-900/20 shadow-sm"
+                className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/10 rounded-full border border-emerald-100 dark:border-emerald-900/20 group cursor-pointer transition-all hover:border-emerald-200 hover:bg-emerald-100/50 dark:hover:bg-emerald-900/20 shadow-sm"
                 title="ডেইলি স্ট্রিক"
-                onClick={() => {
-                  // Optional: Add logic here if needed (e.g. show streak details)
-                }}
+                onClick={() => setIsStreakDialogOpen(true)}
               >
                 <div className="relative">
                   <motion.svg
@@ -265,8 +265,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                     }}
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="w-5 h-5 md:w-5 md:h-5 text-red-500 transition-transform"
+                    className="w-5 h-5 md:w-5 md:h-5 text-emerald-500 transition-transform"
                   >
                     <path
                       fillRule="evenodd"
@@ -275,7 +274,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
                     />
                   </motion.svg>
                 </div>
-                <span className="text-xs md:text-sm font-bold text-red-600 dark:text-red-400 tabular-nums">
+                <span className="text-xs md:text-sm font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
                   {user?.streakCount || 0}
                 </span>
               </motion.button>
@@ -336,6 +335,16 @@ const AppLayout: React.FC<AppLayoutProps> = ({
           />
         )}
       </div>
+      
+      {/* Streak Dialog */}
+      {user && (
+        <StreakDialog
+          isOpen={isStreakDialogOpen}
+          onClose={() => setIsStreakDialogOpen(false)}
+          currentStreak={user.streakCount || 0}
+          userId={user.id}
+        />
+      )}
     </div>
   );
 };

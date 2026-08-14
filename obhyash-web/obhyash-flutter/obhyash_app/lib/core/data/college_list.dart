@@ -1069,3 +1069,93 @@ List<String> searchColleges(String query) {
 
   return results;
 }
+
+int _levenshtein(String s, String t) {
+  if (s == t) return 0;
+  if (s.isEmpty) return t.length;
+  if (t.isEmpty) return s.length;
+
+  List<int> v0 = List<int>.filled(t.length + 1, 0);
+  List<int> v1 = List<int>.filled(t.length + 1, 0);
+
+  for (int i = 0; i < t.length + 1; i++) {
+    v0[i] = i;
+  }
+
+  for (int i = 0; i < s.length; i++) {
+    v1[0] = i + 1;
+
+    for (int j = 0; j < t.length; j++) {
+      int cost = (s[i] == t[j]) ? 0 : 1;
+      v1[j + 1] = [v1[j] + 1, v0[j + 1] + 1, v0[j] + cost].reduce((a, b) => a < b ? a : b);
+    }
+
+    for (int j = 0; j < t.length + 1; j++) {
+      v0[j] = v1[j];
+    }
+  }
+
+  return v1[t.length];
+}
+
+String _toTitleCase(String text) {
+  if (text.isEmpty) return text;
+  return text.split(' ').map((word) {
+    if (word.isEmpty) return word;
+    return word[0].toUpperCase() + word.substring(1).toLowerCase();
+  }).join(' ');
+}
+
+/// Attempts to find the closest official college name for a given raw input.
+/// Uses exact matching, alias matching, and Levenshtein distance for typo tolerance.
+String normalizeCollegeName(String input) {
+  final raw = input.trim();
+  if (raw.isEmpty) return raw;
+  final q = raw.toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+
+  // 1. Check for exact match in name or search aliases
+  for (final entry in _collegeData) {
+    final name = entry['name'] as String;
+    if (name.toLowerCase() == q) return name;
+    
+    for (final alias in (entry['search'] as List<String>)) {
+      if (alias.toLowerCase() == q) return name;
+    }
+  }
+
+  // 2. Levenshtein fuzzy match
+  String? bestMatch;
+  int minDistance = 9999;
+  
+  if (q.length > 4) {
+    for (final entry in _collegeData) {
+      final name = entry['name'] as String;
+      
+      for (final alias in (entry['search'] as List<String>)) {
+        if ((alias.length - q.length).abs() > 4) continue;
+        
+        final dist = _levenshtein(q, alias.toLowerCase());
+        if (dist < minDistance) {
+          minDistance = dist;
+          bestMatch = name;
+        }
+      }
+      
+      if ((name.length - q.length).abs() <= 4) {
+         final dist = _levenshtein(q, name.toLowerCase());
+         if (dist < minDistance) {
+            minDistance = dist;
+            bestMatch = name;
+         }
+      }
+    }
+  }
+
+  // For strings ~10 chars, distance 3 is reasonable.
+  if (bestMatch != null && minDistance <= 3) {
+    return bestMatch;
+  }
+
+  // Fallback: title case the raw string if it's English, otherwise keep original
+  return _toTitleCase(raw);
+}

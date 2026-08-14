@@ -298,7 +298,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                       children: [
                         // ── Premium Header ─────────────────────────────
                         Container(
-                          padding: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: isDark
@@ -741,7 +741,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                                     fontFamily: 'Anek Bangla',
                                     height: 1.4,
                                   ),
-                                ),
+                                 maxLines: 1, overflow: TextOverflow.ellipsis),
                               ),
                               if (isCorrect)
                                 const Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 22),

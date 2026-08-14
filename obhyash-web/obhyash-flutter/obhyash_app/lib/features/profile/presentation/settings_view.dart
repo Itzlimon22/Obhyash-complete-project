@@ -526,7 +526,7 @@ class _NavItem extends StatelessWidget {
                       color: labelColor,
                       fontFamily: 'Anek Bangla',
                     ),
-                  ),
+                   maxLines: 1, overflow: TextOverflow.ellipsis),
                 ),
             if (item.type != _ItemType.action)
               Container(

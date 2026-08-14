@@ -440,7 +440,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                                         0xFF525252,
                                                                       ),
                                                               ),
-                                                            ),
+                                                             maxLines: 1, overflow: TextOverflow.ellipsis),
                                                           ),
                                                         ],
                                                       ),
@@ -487,7 +487,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                                                           0xFF059669,
                                                         ), // emerald-700
                                                       ),
-                                                    ),
+                                                     maxLines: 1, overflow: TextOverflow.ellipsis),
                                                   ),
                                                 ],
                                               ),

@@ -259,12 +259,12 @@ const Dashboard: React.FC<DashboardProps> = ({
           whileHover={hoverScale}
           whileTap={tapScale}
           onClick={onMockExamClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/30 dark:to-neutral-900 border border-emerald-100 dark:border-emerald-900/40 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center gap-1.5 sm:gap-2 hover:border-emerald-300 dark:hover:border-emerald-800 hover:shadow-md dark:hover:shadow-emerald-950/30 transition-all duration-200 text-center h-20 sm:h-24 md:h-28"
+          className="group relative overflow-hidden bg-gradient-to-br from-zinc-50 to-white dark:from-zinc-900/40 dark:to-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center gap-1.5 sm:gap-2 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-md dark:shadow-none transition-all duration-200 text-center h-[4.5rem] sm:h-20 md:h-24"
         >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-700 dark:text-emerald-400 group-hover:scale-110 transition-transform shrink-0">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 group-hover:scale-110 transition-transform shrink-0">
             <ClipboardList className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <h3 className="text-xs font-bold text-neutral-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors leading-tight">
+          <h3 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors leading-tight">
             মক পরীক্ষা
           </h3>
         </motion.button>
@@ -275,12 +275,12 @@ const Dashboard: React.FC<DashboardProps> = ({
           whileHover={hoverScale}
           whileTap={tapScale}
           onClick={onPracticeClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-sky-50 to-white dark:from-sky-950/30 dark:to-neutral-900 border border-sky-100 dark:border-sky-900/40 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center gap-1.5 sm:gap-2 hover:border-sky-300 dark:hover:border-sky-800 hover:shadow-md transition-all duration-200 text-center h-20 sm:h-24 md:h-28"
+          className="group relative overflow-hidden bg-gradient-to-br from-zinc-50 to-white dark:from-zinc-900/40 dark:to-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center gap-1.5 sm:gap-2 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-md dark:shadow-none transition-all duration-200 text-center h-[4.5rem] sm:h-20 md:h-24"
         >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center text-sky-700 dark:text-sky-400 group-hover:scale-110 transition-transform shrink-0">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 group-hover:scale-110 transition-transform shrink-0">
             <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <h3 className="text-xs font-bold text-neutral-900 dark:text-white group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors leading-tight">
+          <h3 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors leading-tight">
             অনুশীলন
           </h3>
         </motion.button>
@@ -291,12 +291,12 @@ const Dashboard: React.FC<DashboardProps> = ({
           whileHover={hoverScale}
           whileTap={tapScale}
           onClick={onHistoryClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/20 dark:to-neutral-900 border border-amber-100 dark:border-amber-900/30 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center gap-1.5 sm:gap-2 hover:border-amber-300 dark:hover:border-amber-800 hover:shadow-md transition-all duration-200 text-center h-20 sm:h-24 md:h-28"
+          className="group relative overflow-hidden bg-gradient-to-br from-zinc-50 to-white dark:from-zinc-900/40 dark:to-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center gap-1.5 sm:gap-2 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-md dark:shadow-none transition-all duration-200 text-center h-[4.5rem] sm:h-20 md:h-24"
         >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-700 dark:text-amber-400 group-hover:scale-110 transition-transform shrink-0">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 group-hover:scale-110 transition-transform shrink-0">
             <Clock3 className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <h3 className="text-xs font-bold text-neutral-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors leading-tight">
+          <h3 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors leading-tight">
             ইতিহাস
           </h3>
         </motion.button>
@@ -307,12 +307,12 @@ const Dashboard: React.FC<DashboardProps> = ({
           whileHover={hoverScale}
           whileTap={tapScale}
           onClick={onLeaderboardClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-violet-50 to-white dark:from-violet-950/20 dark:to-neutral-900 border border-violet-100 dark:border-violet-900/30 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center gap-1.5 sm:gap-2 hover:border-violet-300 dark:hover:border-violet-800 hover:shadow-md transition-all duration-200 text-center h-20 sm:h-24 md:h-28"
+          className="group relative overflow-hidden bg-gradient-to-br from-zinc-50 to-white dark:from-zinc-900/40 dark:to-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center gap-1.5 sm:gap-2 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-md dark:shadow-none transition-all duration-200 text-center h-[4.5rem] sm:h-20 md:h-24"
         >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-700 dark:text-violet-400 group-hover:scale-110 transition-transform shrink-0">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 group-hover:scale-110 transition-transform shrink-0">
             <Medal className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <h3 className="text-xs font-bold text-neutral-900 dark:text-white group-hover:text-violet-700 dark:group-hover:text-violet-400 transition-colors leading-tight">
+          <h3 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors leading-tight">
             লিডারবোর্ড
           </h3>
         </motion.button>
@@ -323,12 +323,12 @@ const Dashboard: React.FC<DashboardProps> = ({
           whileHover={hoverScale}
           whileTap={tapScale}
           onClick={onAnalysisClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/20 dark:to-neutral-900 border border-rose-100 dark:border-rose-900/30 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center gap-1.5 sm:gap-2 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-md transition-all duration-200 text-center h-20 sm:h-24 md:h-28"
+          className="group relative overflow-hidden bg-gradient-to-br from-zinc-50 to-white dark:from-zinc-900/40 dark:to-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center gap-1.5 sm:gap-2 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-md dark:shadow-none transition-all duration-200 text-center h-[4.5rem] sm:h-20 md:h-24"
         >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform shrink-0">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 group-hover:scale-110 transition-transform shrink-0">
             <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <h3 className="text-xs font-bold text-neutral-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors leading-tight">
+          <h3 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors leading-tight">
             এনালাইসিস
           </h3>
         </motion.button>
@@ -339,12 +339,12 @@ const Dashboard: React.FC<DashboardProps> = ({
           whileHover={hoverScale}
           whileTap={tapScale}
           onClick={onBookmarksClick}
-          className="group relative overflow-hidden bg-gradient-to-br from-teal-50 to-white dark:from-teal-950/20 dark:to-neutral-900 border border-teal-100 dark:border-teal-900/30 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center gap-1.5 sm:gap-2 hover:border-teal-300 dark:hover:border-teal-800 hover:shadow-md transition-all duration-200 text-center h-20 sm:h-24 md:h-28"
+          className="group relative overflow-hidden bg-gradient-to-br from-zinc-50 to-white dark:from-zinc-900/40 dark:to-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl sm:rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center gap-1.5 sm:gap-2 hover:border-zinc-300 dark:hover:border-zinc-700 shadow-sm hover:shadow-md dark:shadow-none transition-all duration-200 text-center h-[4.5rem] sm:h-20 md:h-24"
         >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center text-teal-700 dark:text-teal-400 group-hover:scale-110 transition-transform shrink-0">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300 group-hover:scale-110 transition-transform shrink-0">
             <Bookmark className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <h3 className="text-xs font-bold text-neutral-900 dark:text-white group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors leading-tight">
+          <h3 className="text-xs font-bold text-zinc-900 dark:text-white group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors leading-tight">
             বুকমার্কস
           </h3>
         </motion.button>

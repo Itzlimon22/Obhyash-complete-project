@@ -1,4 +1,4 @@
-﻿import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -262,7 +262,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
     if (_user == null) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -310,7 +310,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
               children: [
                 // ── Profile Header Card ────────────────────────────────────
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF0F172A) : Colors.white,
                     borderRadius: BorderRadius.circular(24),
@@ -463,7 +463,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
 
                 // ── Premium Performance Gauge & Heatmap ─────────────────────
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF0F172A) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -592,7 +592,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                 // ── XP Comparison ──────────────────────────────────────────
                 if (!isViewingSelf && myProfile != null) ...[
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     decoration: BoxDecoration(
                       color: isDark ? const Color(0xFF0F172A) : Colors.white,
                       borderRadius: BorderRadius.circular(20),
@@ -992,7 +992,7 @@ class _UPSubjectRow extends StatelessWidget {
                                 : const Color(0xFFB91C1C))
                           : (isDark ? Colors.white : const Color(0xFF1C1C1E)),
                     ),
-                  ),
+                   maxLines: 1, overflow: TextOverflow.ellipsis),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(

@@ -728,13 +728,78 @@ export function searchColleges(query: string): string[] {
 }
 
 /**
+ * Computes Levenshtein distance between two strings
+ */
+function levenshtein(a: string, b: string): number {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+
+  const matrix: number[][] = [];
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          Math.min(
+            matrix[i][j - 1] + 1, // insertion
+            matrix[i - 1][j] + 1 // deletion
+          )
+        );
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
+}
+
+/**
  * Returns the canonical college name for a raw user input.
- * Falls back to the input itself if no exact match is found.
+ * Uses exact match first, then fuzzy matching with Levenshtein distance <= 3.
+ * Falls back to the input itself if no exact or close match is found.
  */
 export function getCanonicalCollegeName(input: string): string {
   const q = input.toLowerCase().trim();
-  const match = COLLEGE_DATA.find(
-    (c) => c.name.toLowerCase() === q || c.search.some((s) => s === q),
+  if (q.length === 0) return input;
+  
+  // 1. Exact Match
+  const exactMatch = COLLEGE_DATA.find(
+    (c) => c.name.toLowerCase() === q || c.search.some((s) => s === q)
   );
-  return match ? match.name : input;
+  if (exactMatch) return exactMatch.name;
+  
+  // 2. Fuzzy Match (Levenshtein distance)
+  let bestMatch = '';
+  let minDistance = Infinity;
+
+  for (const entry of COLLEGE_DATA) {
+    // Check main name
+    const d1 = levenshtein(q, entry.name.toLowerCase());
+    if (d1 < minDistance) {
+      minDistance = d1;
+      bestMatch = entry.name;
+    }
+
+    // Check aliases
+    for (const s of entry.search) {
+      const d2 = levenshtein(q, s.toLowerCase());
+      if (d2 < minDistance) {
+        minDistance = d2;
+        bestMatch = entry.name;
+      }
+    }
+  }
+
+  // Threshold depends on length. If query is very short, threshold must be very strict.
+  const threshold = q.length < 5 ? 1 : 3;
+  
+  return minDistance <= threshold ? bestMatch : input;
 }

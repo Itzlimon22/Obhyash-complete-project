@@ -300,7 +300,7 @@ class _PracticeSummaryState extends State<PracticeSummary>
                                         fontWeight: FontWeight.bold,
                                         color: isDark ? Colors.white : const Color(0xFF111827),
                                       ),
-                                    ),
+                                     maxLines: 1, overflow: TextOverflow.ellipsis),
                                   ),
                                 ],
                               ),

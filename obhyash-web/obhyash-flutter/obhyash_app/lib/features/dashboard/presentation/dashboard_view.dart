@@ -120,7 +120,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                   crossAxisCount: 3,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
-                  childAspectRatio: 0.95,
+                  childAspectRatio: 1.15, // Increased aspect ratio to reduce box height
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children:
@@ -128,55 +128,55 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                             DashboardActionCard(
                               title: 'মক পরীক্ষা',
                               icon: LucideIcons.fileEdit,
-                              primaryColor: const Color(0xFF059669),
+                              primaryColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
                               lightColor: isDark
-                                  ? const Color(0x33047857)
-                                  : const Color(0xFFECFDF5),
+                                  ? const Color(0x3327272A)
+                                  : const Color(0xFFF4F4F5),
                               onTap: () => context.go('/setup'),
                             ),
                             DashboardActionCard(
                               title: 'অনুশীলন',
                               icon: LucideIcons.bookOpen,
-                              primaryColor: const Color(0xFF059669),
+                              primaryColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
                               lightColor: isDark
-                                  ? const Color(0x33047857)
-                                  : const Color(0xFFECFDF5),
+                                  ? const Color(0x3327272A)
+                                  : const Color(0xFFF4F4F5),
                               onTap: () => context.go('/practice'),
                             ),
                             DashboardActionCard(
                               title: 'ইতিহাস',
                               icon: LucideIcons.clock,
-                              primaryColor: const Color(0xFF525252),
+                              primaryColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
                               lightColor: isDark
-                                  ? const Color(0x33525252)
-                                  : const Color(0xFFF5F5F5),
+                                  ? const Color(0x3327272A)
+                                  : const Color(0xFFF4F4F5),
                               onTap: () => context.go('/history'),
                             ),
                             DashboardActionCard(
                               title: 'লিডারবোর্ড',
                               icon: LucideIcons.trophy,
-                              primaryColor: const Color(0xFF059669),
+                              primaryColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
                               lightColor: isDark
-                                  ? const Color(0x33047857)
-                                  : const Color(0xFFECFDF5),
+                                  ? const Color(0x3327272A)
+                                  : const Color(0xFFF4F4F5),
                               onTap: () => context.go('/leaderboard'),
                             ),
                             DashboardActionCard(
                               title: 'এনালাইসিস',
                               icon: LucideIcons.pieChart,
-                              primaryColor: const Color(0xFF059669),
+                              primaryColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
                               lightColor: isDark
-                                  ? const Color(0x33047857)
-                                  : const Color(0xFFECFDF5),
+                                  ? const Color(0x3327272A)
+                                  : const Color(0xFFF4F4F5),
                               onTap: () => context.go('/analysis'),
                             ),
                             DashboardActionCard(
                               title: 'বুকমার্কস',
                               icon: LucideIcons.bookmark,
-                              primaryColor: const Color(0xFF059669),
+                              primaryColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
                               lightColor: isDark
-                                  ? const Color(0x33047857)
-                                  : const Color(0xFFECFDF5),
+                                  ? const Color(0x3327272A)
+                                  : const Color(0xFFF4F4F5),
                               onTap: () => context.go('/bookmarks'),
                             ),
                           ]

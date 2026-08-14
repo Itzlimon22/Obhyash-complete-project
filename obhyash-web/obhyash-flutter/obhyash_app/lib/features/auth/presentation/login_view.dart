@@ -89,28 +89,28 @@ class _LoginViewState extends ConsumerState<LoginView>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 20),
-                // Logo or Icon placeholder
-                Container(
-                  alignment: Alignment.centerLeft,
+                const SizedBox(height: 40),
+                // Logo Section
+                Center(
                   child: Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: const Color(0xFF059669).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
+                      shape: BoxShape.circle,
                     ),
                     child: const Icon(
-                      LucideIcons.fingerprint,
-                      size: 48,
+                      LucideIcons.graduationCap,
+                      size: 64,
                       color: Color(0xFF059669),
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
 
                 // Welcome Text
                 Text(
                   'স্বাগতম!',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 38,
                     fontWeight: FontWeight.w900,
@@ -123,13 +123,14 @@ class _LoginViewState extends ConsumerState<LoginView>
                 const SizedBox(height: 8),
                 Text(
                   'তোমার অ্যাকাউন্টে লগইন করো',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 18,
                     fontFamily: 'Anek Bangla',
                     color: isDark ? Colors.white70 : Colors.black54,
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 48),
 
                 // Form
                 _buildInputField(

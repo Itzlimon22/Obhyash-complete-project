@@ -1155,7 +1155,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                                                     ? Colors.white
                                                     : const Color(0xFF000000)),
                                         ),
-                                      ),
+                                       maxLines: 1, overflow: TextOverflow.ellipsis),
                                     ),
                                     if (isSelected)
                                       const Icon(
@@ -1492,7 +1492,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                                     ? Colors.white
                                                     : const Color(0xFF000000)),
                                         ),
-                                      ),
+                                       maxLines: 1, overflow: TextOverflow.ellipsis),
                                     ),
                                   ],
                                 ),

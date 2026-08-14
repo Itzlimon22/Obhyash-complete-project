@@ -24,7 +24,7 @@ import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/error-utils';
 import { getRandomAvatar } from '@/lib/avatar-utils';
 import { EXAM_TARGETS } from '@/components/student/features/dashboard/ExamTargetModal';
-import { searchColleges } from '@/lib/college-mapping';
+import { searchColleges, getCanonicalCollegeName } from '@/lib/college-mapping';
 
 const AUTH_TIMEOUT_MS = 30000;
 
@@ -206,7 +206,7 @@ function SignupForm() {
               name: formData.name,
               phone: formData.phone,
               gender: formData.gender || null,
-              institute: formData.institute,
+              institute: getCanonicalCollegeName(formData.institute),
               stream: formData.stream,
               division: formData.group, // Mapping group -> division
               batch: formData.batch,

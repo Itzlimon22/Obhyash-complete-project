@@ -252,7 +252,7 @@ class _NotificationsViewState extends State<NotificationsView> {
       children: [
         // Premium Header with Filters
         Container(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF000000) : Colors.white,
             border: Border(
@@ -301,7 +301,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                   side: BorderSide.none,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                  minimumSize: const Size(0, 36),
+                  minimumSize: const Size(0, 32),
                 ),
               ),
             ],

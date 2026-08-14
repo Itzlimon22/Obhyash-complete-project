@@ -326,7 +326,7 @@ class _TableRow extends StatelessWidget {
                 fontSize: 16,
                 color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
               ),
-            ),
+             maxLines: 1, overflow: TextOverflow.ellipsis),
           ),
           const SizedBox(width: 8),
           Text(

@@ -146,7 +146,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
         'address': _addressController.text.isEmpty
             ? null
             : _addressController.text,
-        'institute': _instituteController.text,
+        'institute': normalizeCollegeName(_instituteController.text),
         'stream': _stream,
         'division': _group,
         'batch': _batch,

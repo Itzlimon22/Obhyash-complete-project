@@ -170,7 +170,7 @@ const UserProfileView: React.FC<UserProfileViewProps> = ({
               <span className="inline-block px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold rounded-full mb-1">
                 {user.level || 'Rookie'}
               </span>
-              <p className="text-neutral-500 dark:text-neutral-400 text-sm font-medium">
+              <p className="text-neutral-500 dark:text-neutral-400 text-sm font-medium truncate">
                 {user.institute}
               </p>
             </div>

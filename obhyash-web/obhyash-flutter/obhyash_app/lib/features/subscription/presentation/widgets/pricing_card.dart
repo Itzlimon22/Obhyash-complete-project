@@ -286,7 +286,7 @@ class PricingCard extends StatelessWidget {
                                               0xFF27272A,
                                             ), // neutral-300 : neutral-700
                                     ),
-                                  ),
+                                   maxLines: 1, overflow: TextOverflow.ellipsis),
                                 ),
                               ],
                             ),

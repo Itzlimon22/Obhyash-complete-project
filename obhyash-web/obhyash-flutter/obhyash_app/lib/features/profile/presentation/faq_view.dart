@@ -279,7 +279,7 @@ class _FaqViewState extends State<FaqView> {
                                           ? const Color(0xFFE11D48)
                                           : (isDark ? Colors.white : const Color(0xFF000000)),
                                     ),
-                                  ),
+                                   maxLines: 1, overflow: TextOverflow.ellipsis),
                                 ),
                                 const SizedBox(width: 16),
                                 Icon(

@@ -157,7 +157,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                     SizedBox(width: 36, child: Text('#', style: _headerStyle)),
                     const SizedBox(width: 8),
                     const SizedBox(width: 28),
-                    const Expanded(child: Text('নাম', style: _headerStyle)),
+                    const Expanded(child: Text('নাম', style: _headerStyle, maxLines: 1, overflow: TextOverflow.ellipsis)),
                   ],
                 ),
                 const SizedBox(height: 8),

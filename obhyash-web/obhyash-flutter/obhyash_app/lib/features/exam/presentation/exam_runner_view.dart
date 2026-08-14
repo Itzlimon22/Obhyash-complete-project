@@ -60,7 +60,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
             const Icon(Icons.warning_rounded, color: Colors.red, size: 32),
             const SizedBox(width: 8),
             const Expanded(
-              child: Text('সতর্কতা!', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+              child: Text('সতর্কতা!', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red), maxLines: 1, overflow: TextOverflow.ellipsis),
             ),
           ],
         ),
@@ -590,7 +590,7 @@ class _InstructionRow extends StatelessWidget {
               fontSize: 18,
               color: isDark ? Colors.white70 : Colors.black87,
             ),
-          ),
+           maxLines: 1, overflow: TextOverflow.ellipsis),
         ),
       ],
     );

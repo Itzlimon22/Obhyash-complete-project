@@ -435,7 +435,7 @@ class _OverviewTab extends StatelessWidget {
         : 0.0;
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       children: [
         // Hero card
         Container(
@@ -577,7 +577,7 @@ class _OverviewTab extends StatelessWidget {
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
-                        ),
+                         maxLines: 1, overflow: TextOverflow.ellipsis),
                       ),
                     ],
                   ),
@@ -653,7 +653,7 @@ class _OverviewTab extends StatelessWidget {
                                 ? Colors.white
                                 : const Color(0xFF000000),
                           ),
-                        ),
+                         maxLines: 1, overflow: TextOverflow.ellipsis),
                       ),
                     ],
                   ),
@@ -818,7 +818,7 @@ class _HistoryTab extends StatelessWidget {
         .length;
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       children: [
         // Summary row
         Row(
@@ -970,7 +970,7 @@ class _InvoiceRow extends StatelessWidget {
         onTap: invoice.status == 'paid' ? onTap : null,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: [
               Container(

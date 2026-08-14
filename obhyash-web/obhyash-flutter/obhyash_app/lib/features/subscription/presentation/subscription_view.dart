@@ -561,7 +561,7 @@ class _PricingCard extends StatelessWidget {
                                   ? const Color(0xFFD4D4D4)
                                   : const Color(0xFF27272A),
                             ),
-                          ),
+                           maxLines: 1, overflow: TextOverflow.ellipsis),
                         ),
                       ],
                     ),
@@ -661,7 +661,7 @@ class _TrustBadge extends StatelessWidget {
                     ? const Color(0xFFE5E5E5)
                     : const Color(0xFF171717),
               ),
-            ),
+             maxLines: 1, overflow: TextOverflow.ellipsis),
           ),
         ],
       ),
@@ -741,7 +741,7 @@ class _ComparisonTable extends StatelessWidget {
                           fontWeight: FontWeight.w900,
                           color: textSub,
                         ),
-                      ),
+                       maxLines: 1, overflow: TextOverflow.ellipsis),
                     ),
                     Expanded(
                       child: Center(
@@ -752,7 +752,7 @@ class _ComparisonTable extends StatelessWidget {
                             fontWeight: FontWeight.w900,
                             color: textSub,
                           ),
-                        ),
+                         maxLines: 1, overflow: TextOverflow.ellipsis),
                       ),
                     ),
                     Expanded(
@@ -820,7 +820,7 @@ class _ComparisonTable extends StatelessWidget {
                         child: Text(
                           label,
                           style: TextStyle(fontSize: 15, color: textMain),
-                        ),
+                         maxLines: 1, overflow: TextOverflow.ellipsis),
                       ),
                       Expanded(
                         child: Center(

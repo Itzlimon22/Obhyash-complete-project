@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getCanonicalCollegeName } from '@/lib/college-mapping';
 
 const PAGE_SIZE = 20;
 
@@ -17,13 +18,15 @@ interface LeaderboardUserRow {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const institute = searchParams.get('institute');
+  const rawInstitute = searchParams.get('institute');
   const offset = Math.max(0, parseInt(searchParams.get('offset') ?? '0', 10));
   const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') ?? String(PAGE_SIZE), 10)));
-
-  if (!institute) {
+  
+  if (!rawInstitute) {
     return NextResponse.json({ error: 'institute param required' }, { status: 400 });
   }
+
+  const institute = getCanonicalCollegeName(rawInstitute);
 
   const supabase = await createClient();
 

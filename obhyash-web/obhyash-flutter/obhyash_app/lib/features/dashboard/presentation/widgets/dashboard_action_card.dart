@@ -75,16 +75,16 @@ class _DashboardActionCardState extends State<DashboardActionCard>
               boxShadow: [
                 BoxShadow(
                   color: isDark 
-                      ? Colors.black.withValues(alpha: 0.6) 
-                      : const Color(0xFFD1D5DB),
+                      ? Colors.black.withValues(alpha: 0.4) 
+                      : const Color(0xFFE4E4E7), // Premium Zinc 200 for bottom shadow
                   blurRadius: 0,
-                  offset: const Offset(0, 4), // Solid 3D shadow effect
+                  offset: const Offset(0, 3), // Subtle 3D effect
                 ),
                 BoxShadow(
                   color: isDark 
-                      ? Colors.black.withValues(alpha: 0.2) 
-                      : Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 4,
+                      ? Colors.black.withValues(alpha: 0.15) 
+                      : const Color(0xFF27272A).withValues(alpha: 0.04), // Zinc tint soft shadow
+                  blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
               ],

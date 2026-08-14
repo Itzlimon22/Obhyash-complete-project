@@ -99,7 +99,7 @@ class RecentActivitySection extends StatelessWidget {
                       color: isDark ? Colors.white : const Color(0xFF1C1C1E),
                       fontFamily: 'Anek Bangla',
                     ),
-                  ),
+                   maxLines: 1, overflow: TextOverflow.ellipsis),
                 ),
               ],
             ),
