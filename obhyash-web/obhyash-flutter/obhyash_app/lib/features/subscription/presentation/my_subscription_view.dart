@@ -76,6 +76,52 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
         }
       }
 
+      // If no active plan found in subscription_history, check user profile (e.g. Referral Rewards)
+      if (activePlan == null) {
+        try {
+          final userRes = await supabase
+              .from('users')
+              .select('subscription, subscription_status, subscription_expires_at, is_subscribed')
+              .eq('id', userId)
+              .maybeSingle();
+          if (userRes != null) {
+            final subJson = userRes['subscription'] as Map<String, dynamic>?;
+            final status = subJson?['status'] ?? userRes['subscription_status'];
+            final rawExp = subJson?['expiry'] ?? userRes['subscription_expires_at'];
+            final isSub = userRes['is_subscribed'] == true ||
+                status?.toString().toLowerCase() == 'active';
+
+            if (isSub) {
+              DateTime? parsedExp;
+              if (rawExp != null) parsedExp = DateTime.tryParse(rawExp.toString());
+              if (parsedExp == null || parsedExp.isAfter(DateTime.now())) {
+                expiresAt = parsedExp;
+                final days = parsedExp != null
+                    ? parsedExp.difference(DateTime.now()).inDays.clamp(1, 999)
+                    : 30;
+                activePlan = SubscriptionPlan(
+                  id: 'referral_reward',
+                  name: (subJson?['plan'] ?? 'রেফারেল রিওয়ার্ড প্ল্যান').toString(),
+                  price: 0,
+                  billingCycle: 'Referral Bonus',
+                  durationDays: days,
+                  currency: '৳',
+                  features: const [
+                    'সকল প্রিমিয়াম ফিচার আনলকড',
+                    'লাইভ এক্সাম ও আনলিমিটেড প্র্যাকটিস',
+                    'পূর্ণাঙ্গ এনালাইসিস ও র‍্যাঙ্ক প্রেডিকশন',
+                  ],
+                  colorTheme: 'emerald',
+                  expiresAt: rawExp != null && rawExp.toString().length >= 10
+                      ? rawExp.toString().substring(0, 10)
+                      : null,
+                );
+              }
+            }
+          }
+        } catch (_) {}
+      }
+
       // Payment history
       final reqData = await supabase
           .from('payment_requests')
@@ -86,6 +132,41 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
       final invoices = (reqData as List)
           .map((r) => Invoice.fromJson(r as Map<String, dynamic>))
           .toList();
+
+      // Referral rewards history
+      try {
+        final myReferralRes = await supabase
+            .from('referrals')
+            .select('id')
+            .eq('owner_id', userId)
+            .maybeSingle();
+        final myReferralId = myReferralRes?['id'] as String?;
+
+        final query = supabase
+            .from('referral_history')
+            .select('id, redeemed_at, admin_status, reward_given, redeemed_by, referral_id');
+        
+        final refHistList = myReferralId != null
+            ? await query.or('redeemed_by.eq.$userId,referral_id.eq.$myReferralId').eq('reward_given', true).limit(20)
+            : await query.eq('redeemed_by', userId).eq('reward_given', true).limit(20);
+
+        for (final r in refHistList) {
+          final m = r as Map<String, dynamic>;
+          final rawDate = m['redeemed_at']?.toString() ?? '';
+          final dateStr = rawDate.length >= 10 ? rawDate.substring(0, 10) : rawDate;
+          invoices.add(Invoice(
+            id: m['id']?.toString() ?? '',
+            date: dateStr,
+            amount: 0,
+            currency: '৳',
+            status: 'paid',
+            planName: '🎁 রেফারেল রিওয়ার্ড বোনাস (১ মাস)',
+          ));
+        }
+      } catch (_) {}
+
+      // Sort all invoices by date descending
+      invoices.sort((a, b) => b.date.compareTo(a.date));
 
       if (mounted) {
         setState(() {

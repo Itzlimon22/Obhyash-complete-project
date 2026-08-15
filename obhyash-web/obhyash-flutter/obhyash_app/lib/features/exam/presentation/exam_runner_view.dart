@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../providers/exam_provider.dart';
 import '../services/pdf_download_service.dart';
@@ -49,41 +50,122 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
     }
   }
 
+  String _toBn(int n) {
+    const m = {
+      '0': '০',
+      '1': '১',
+      '2': '২',
+      '3': '৩',
+      '4': '৪',
+      '5': '৫',
+      '6': '৬',
+      '7': '৭',
+      '8': '৮',
+      '9': '৯',
+    };
+    return n.toString().split('').map((c) => m[c] ?? c).join();
+  }
+
   void _showCheatingWarning() {
     showDialog(
       context: context,
-      barrierDismissible: false, // Must click the button
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            const Icon(Icons.warning_rounded, color: Colors.red, size: 32),
-            const SizedBox(width: 8),
-            const Expanded(
-              child: Text('সতর্কতা!', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red), maxLines: 1, overflow: TextOverflow.ellipsis),
-            ),
-          ],
-        ),
-        content: const Text(
-          'আপনি পরীক্ষা চলাকালীন অ্যাপ থেকে বের হয়ে গিয়েছিলেন। এটি পরীক্ষার নিয়ম-বহির্ভূত কাজ। এরপর পুনরায় অ্যাপ থেকে বের হলে আপনার পরীক্ষাটি স্বয়ংক্রিয়ভাবে বাতিল ও সাবমিট হয়ে যাবে।',
-          style: TextStyle(fontSize: 16, height: 1.4),
-        ),
-        actionsPadding: const EdgeInsets.all(16),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              child: const Text('আমি বুঝতে পেরেছি', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      barrierDismissible: false,
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return Dialog(
+          backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(
+              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
+              width: 1,
             ),
           ),
-        ],
-      ),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFDC2626).withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFFDC2626).withValues(alpha: 0.3),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: const Icon(
+                      LucideIcons.alertOctagon,
+                      color: Color(0xFFEF4444),
+                      size: 28,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'সতর্কতা!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'Anek Bangla',
+                    color: isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'আপনি পরীক্ষা চলাকালীন অ্যাপ থেকে বের হয়ে গিয়েছিলেন। এটি পরীক্ষার নিয়ম-বহির্ভূত কাজ। এরপর পুনরায় অ্যাপ থেকে বের হলে আপনার পরীক্ষাটি স্বয়ংক্রিয়ভাবে বাতিল ও সাবমিট হয়ে যাবে।',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.5,
+                    fontFamily: 'HindSiliguri',
+                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () => Navigator.pop(ctx),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFDC2626), Color(0xFFB91C1C)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFDC2626).withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'আমি বুঝতে পেরেছি',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'HindSiliguri',
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -99,77 +181,366 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
   void _showNavigationWarning() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
-            const SizedBox(width: 8),
-            const Text('সতর্কতা', style: TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: const Text(
-          'পরীক্ষা চলাকালীন অবস্থায় বের হওয়া যাবে না। বের হতে চাইলে পরীক্ষাটি জমা দিন। আপনি কি পরীক্ষা জমা দিয়ে বের হতে চান?',
-          style: TextStyle(fontSize: 16, height: 1.4),
-        ),
-        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('চালিয়ে যাও', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ref.read(examEngineProvider.notifier).submitExam();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF059669),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return Dialog(
+          backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(
+              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
+              width: 1,
             ),
-            child: const Text('জমা দাও', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
-        ],
-      ),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEA580C).withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFFEA580C).withValues(alpha: 0.3),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: const Icon(
+                      LucideIcons.alertTriangle,
+                      color: Color(0xFFF97316),
+                      size: 28,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'সতর্কতা',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'Anek Bangla',
+                    color: isDark ? Colors.white : const Color(0xFF111827),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'পরীক্ষা চলাকালীন অবস্থায় বের হওয়া যাবে না। বের হতে চাইলে পরীক্ষাটি জমা দিন। আপনি কি পরীক্ষা জমা দিয়ে বের হতে চান?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.5,
+                    fontFamily: 'HindSiliguri',
+                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(ctx),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E7EB),
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'চালিয়ে যাও',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'HindSiliguri',
+                              color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF4B5563),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          ref.read(examEngineProvider.notifier).submitExam();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF004633), Color(0xFF00664B)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF004633).withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'জমা দাও',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'HindSiliguri',
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
   void _showSubmitConfirmation(int totalQuestions, int answeredQuestions) {
+    final remaining = totalQuestions - answeredQuestions;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            const Icon(Icons.help_outline_rounded, color: Colors.blue, size: 28),
-            const SizedBox(width: 8),
-            const Text('খাতা জমা দিবে?', style: TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: Text(
-          'তুমি $totalQuestions টি প্রশ্নের মধ্যে মাত্র $answeredQuestions টির উত্তর দিয়েছো। '
-          'এখনো ${totalQuestions - answeredQuestions} টি প্রশ্ন বাকি আছে। নিশ্চিত জমা দিতে চাও?',
-          style: const TextStyle(fontSize: 16, height: 1.4),
-        ),
-        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('না, পরীক্ষা দিবো', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ref.read(examEngineProvider.notifier).submitExam();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF059669),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      barrierDismissible: true,
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return Dialog(
+          backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(
+              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
+              width: 1,
             ),
-            child: const Text('হ্যাঁ, জমা দাও', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
-        ],
-      ),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Icon Header with glowing badge
+                Center(
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF004633).withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF004633).withValues(alpha: 0.3),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: const Icon(
+                      LucideIcons.helpCircle,
+                      color: Color(0xFF10B981),
+                      size: 28,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Title
+                Text(
+                  'খাতা জমা দিবে?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'Anek Bangla',
+                    color: isDark ? Colors.white : const Color(0xFF111827),
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // Summary Text
+                Text(
+                  'তুমি ${_toBn(totalQuestions)} টি প্রশ্নের মধ্যে ${_toBn(answeredQuestions)} টির উত্তর দিয়েছো। ${remaining > 0 ? "এখনো ${_toBn(remaining)} টি প্রশ্ন বাকি আছে।" : "সবগুলোর উত্তর দেওয়া সম্পন্ন হয়েছে!"}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.5,
+                    fontFamily: 'HindSiliguri',
+                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Stats Snapshot Row
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF27272A).withValues(alpha: 0.5)
+                        : const Color(0xFFF4F4F5),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: isDark
+                          ? const Color(0xFF3F3F46).withValues(alpha: 0.4)
+                          : const Color(0xFFE4E4E7),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Column(
+                        children: [
+                          Text(
+                            'উত্তর দেওয়া',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: 'HindSiliguri',
+                              color: isDark
+                                  ? const Color(0xFFA1A1AA)
+                                  : const Color(0xFF71717A),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${_toBn(answeredQuestions)}/${_toBn(totalQuestions)}',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF10B981),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        width: 1,
+                        height: 28,
+                        color: isDark
+                            ? const Color(0xFF3F3F46)
+                            : const Color(0xFFE4E4E7),
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            'বাকি আছে',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: 'HindSiliguri',
+                              color: isDark
+                                  ? const Color(0xFFA1A1AA)
+                                  : const Color(0xFF71717A),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _toBn(remaining),
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: remaining > 0
+                                  ? const Color(0xFFEF4444)
+                                  : const Color(0xFF10B981),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Action Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(ctx),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF27272A)
+                                : const Color(0xFFF3F4F6),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isDark
+                                  ? const Color(0xFF3F3F46)
+                                  : const Color(0xFFE5E7EB),
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'না, পরীক্ষা দিবো',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'HindSiliguri',
+                              color: isDark
+                                  ? const Color(0xFFD4D4D8)
+                                  : const Color(0xFF4B5563),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          ref.read(examEngineProvider.notifier).submitExam();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF004633), Color(0xFF00664B)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF004633).withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'হ্যাঁ, জমা দাও',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'HindSiliguri',
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

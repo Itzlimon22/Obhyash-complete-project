@@ -353,11 +353,31 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     final streak = user?.streakCount ?? 0;
     final isLoading = userProfileAsync.isLoading;
 
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: isDark
-          ? const Color(0xFF0C0A09)
-          : const Color(0xFFFAFAF9),
+    final isDrawerOpen = _scaffoldKey.currentState?.isDrawerOpen ?? false;
+    final isAtDashboardRoot = widget.navigationShell.currentIndex == 0 &&
+        (location == '/' || location.isEmpty) &&
+        !context.canPop();
+
+    return PopScope(
+      canPop: isAtDashboardRoot && !isDrawerOpen,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_scaffoldKey.currentState?.isDrawerOpen == true) {
+          _scaffoldKey.currentState?.closeDrawer();
+          return;
+        }
+        if (context.canPop()) {
+          context.pop();
+        } else if (widget.navigationShell.currentIndex != 0 || location != '/') {
+          widget.navigationShell.goBranch(0);
+          context.go('/');
+        }
+      },
+      child: Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: isDark
+            ? const Color(0xFF0C0A09)
+            : const Color(0xFFFAFAF9),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(68),
         child: ClipRect(
@@ -634,7 +654,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
           _scaffoldKey.currentState?.openDrawer();
         },
       ),
-    );
+    ),
+  );
   }
 }
 

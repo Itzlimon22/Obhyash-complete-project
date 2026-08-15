@@ -292,6 +292,48 @@ export const getUserActiveSubscription =
         expiresAt: data.expires_at, // Include expiry date from subscription_history
       };
     }
+
+    // Fallback: Check user profile for referral rewards or direct subscriptions
+    try {
+      const { data: userProfile } = await supabase
+        .from('users')
+        .select('subscription, subscription_status, subscription_expires_at, is_subscribed')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (userProfile) {
+        const sub = userProfile.subscription as any;
+        const status = sub?.status || userProfile.subscription_status;
+        const expiry = sub?.expiry || userProfile.subscription_expires_at;
+        const isSub =
+          userProfile.is_subscribed ||
+          (status && String(status).toLowerCase() === 'active');
+
+        if (isSub) {
+          const expDate = expiry ? new Date(expiry) : null;
+          if (!expDate || expDate > new Date()) {
+            return {
+              id: 'referral_reward',
+              name: sub?.plan || 'রেফারেল রিওয়ার্ড প্ল্যান',
+              price: 0,
+              currency: '৳',
+              billingCycle: 'Referral Bonus',
+              features: [
+                'সকল প্রিমিয়াম ফিচার আনলকড',
+                'লাইভ এক্সাম ও আনলিমিটেড প্র্যাকটিস',
+                'পূর্ণাঙ্গ এনালাইসিস ও র‍্যাঙ্ক প্রেডিকশন',
+              ],
+              colorTheme: 'emerald',
+              isPopular: true,
+              expiresAt: expiry || undefined,
+            };
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Fallback subscription check failed:', e);
+    }
+
     return null;
   };
 

@@ -149,36 +149,18 @@ class _QuestionCardState extends State<QuestionCard>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Serial number + question text (inline)
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${_toBengaliNumeral(widget.serialNumber)}. ',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? const Color(0xFFE5E5E5)
-                            : const Color(0xFF1F2937),
-                        height: 1.4,
-                      ),
-                    ),
-                    Expanded(
-                      child: LatexText(
-                        text: widget.question.question,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'HindSiliguri',
-                          color: isDark
-                              ? const Color(0xFFF5F5F5)
-                              : const Color(0xFF111827),
-                          height: 1.4,
-                        ),
-                      ),
-                    ),
-                  ],
+                // Serial number + question text (seamless continuous wrapping & baseline)
+                LatexText(
+                  text: '**${_toBengaliNumeral(widget.serialNumber)}.** ${widget.question.question}',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'HindSiliguri',
+                    color: isDark
+                        ? const Color(0xFFF5F5F5)
+                        : const Color(0xFF111827),
+                    height: 1.45,
+                  ),
                 ),
 
                 const SizedBox(height: 8),
@@ -458,7 +440,7 @@ class _QuestionCardState extends State<QuestionCard>
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
-                              vertical: 10,
+                              vertical: 8,
                             ),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -490,11 +472,13 @@ class _QuestionCardState extends State<QuestionCard>
                                   alignment: Alignment.center,
                                   child: Text(
                                     banglaIndex,
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontSize: 17,
+                                      fontSize: 13.5,
                                       fontWeight: FontWeight.bold,
+                                      fontFamily: 'HindSiliguri',
                                       color: bulletText,
-                                      height: 1.0,
+                                      height: 1.1,
                                     ),
                                   ),
                                 ),
@@ -503,13 +487,13 @@ class _QuestionCardState extends State<QuestionCard>
                                   child: LatexText(
                                     text: option,
                                     style: TextStyle(
-                                      fontSize: 17,
+                                      fontSize: 16.5,
                                       fontFamily: 'HindSiliguri',
                                       fontWeight: boldText
                                           ? FontWeight.bold
                                           : FontWeight.normal,
                                       color: optionTextColor,
-                                      height: 1.4,
+                                      height: 1.35,
                                     ),
                                   ),
                                 ),

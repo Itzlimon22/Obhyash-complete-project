@@ -127,6 +127,35 @@ export const POST = async (req: Request) => {
         },
       })
       .eq('id', userId);
+
+    // Also record in subscription_history for full history tracking
+    try {
+      // Find standard/monthly plan if available
+      const { data: planData } = await supabaseAdmin
+        .from('subscription_plans')
+        .select('id')
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle();
+
+      // Deactivate old active records
+      await supabaseAdmin
+        .from('subscription_history')
+        .update({ is_active: false })
+        .eq('user_id', userId)
+        .eq('is_active', true);
+
+      // Insert new active subscription record
+      await supabaseAdmin.from('subscription_history').insert({
+        user_id: userId,
+        plan_id: planData?.id || null,
+        started_at: new Date().toISOString(),
+        expires_at: currentExpiry.toISOString(),
+        is_active: true,
+      });
+    } catch (subHistErr) {
+      console.warn('Could not insert subscription_history record:', subHistErr);
+    }
   };
 
   // Extend both users

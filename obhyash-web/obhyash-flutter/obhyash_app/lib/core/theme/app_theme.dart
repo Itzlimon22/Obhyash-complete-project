@@ -3,29 +3,31 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   // Brand Strict Palette
-  static const Color brandGreen = Color(0xFF059669); // Deep Emerald Green
+  static const Color brandGreen = Color(0xFF004633); // Main Brand Green (#004633)
+  static const Color brandGreenLight = Color(0xFF00664B); // Secondary Green
+  static const Color brandGreenDark = Color(0xFF003325); // Deep Pine Green
   static const Color brandRed = Color(0xFFB91C1C); // Deep Crimson Red
   static const Color warningGold = Color(0xFF1E3A8A); // Warm Gold Accent
 
   // Backgrounds
   static const Color pureWhite = Color(0xFFFFFFFF);
-  static const Color softMint = Color(0xFFECFDF5);
+  static const Color softMint = Color(0xFFE6F0EC);
   
   // Premium Dark Mode Colors (Chorcha / Apple style)
-  static const Color deepSlate = Color(0xFF000000); // True OLED Black
-  static const Color darkSlate = Color(0xFF1C1C1E); // Elevated Surface (Very Dark Gray)
+  static const Color deepSlate = Color(0xFF0C0A09); // True OLED/Neutral Black
+  static const Color darkSlate = Color(0xFF18181B); // Elevated Surface
   static const Color higherSurface = Color(0xFF1C1C1E); // Apple style elevated card
 
   // Borders & Dividers
-  static const Color coolGreyLight = Color(0xFFE2E8F0);
+  static const Color coolGreyLight = Color(0xFFE5E7EB);
   static const Color coolGreyDark = Color(0xFF27272A); // Zinc 800 (for borders)
 
   // Text
-  static const Color textPrimaryLight = Color(0xFF000000); // deep slate
-  static const Color textSecondaryLight = Color(0xFF64748B); // slate 500
+  static const Color textPrimaryLight = Color(0xFF111827); // Deep slate
+  static const Color textSecondaryLight = Color(0xFF6B7280); // Slate 500
 
   // Softened Dark Mode Text (Easier on eyes, premium feel)
-  static const Color textPrimaryDark = Color(0xFFE5E5E5); // Off-white for primary text
+  static const Color textPrimaryDark = Color(0xFFF4F4F5); // Off-white for primary text
   static const Color textSecondaryDark = Color(0xFFA1A1AA); // Zinc 400 for secondary text
 
   // Semantic
@@ -38,7 +40,7 @@ class AppTheme {
     return ThemeData(
       brightness: Brightness.light,
       primaryColor: AppColors.brandGreen,
-      scaffoldBackgroundColor: AppColors.pureWhite,
+      scaffoldBackgroundColor: const Color(0xFFFAFAF9),
       textTheme: GoogleFonts.anekBanglaTextTheme(ThemeData.light().textTheme),
       colorScheme: const ColorScheme.light(
         primary: AppColors.brandGreen,
@@ -60,6 +62,32 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: AppColors.coolGreyLight),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: AppColors.brandGreen,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: AppColors.coolGreyLight, width: 1),
+        ),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
       ),
     );
@@ -121,7 +149,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -143,11 +171,11 @@ class AppTheme {
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: AppColors.higherSurface,
+        backgroundColor: AppColors.darkSlate,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: AppColors.coolGreyDark, width: 0.5),
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: AppColors.coolGreyDark, width: 1),
         ),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
@@ -160,4 +188,3 @@ class AppTheme {
     );
   }
 }
-

@@ -37,8 +37,8 @@ class MainBottomNav extends StatelessWidget {
     ];
 
     final activeColor = isDark
-        ? const Color(0xFF059669)
-        : const Color(0xFF059669);
+        ? const Color(0xFF10B981)
+        : const Color(0xFF004633);
     final inactiveColor = isDark
         ? const Color(0xFF737373)
         : const Color(0xFF9CA3AF);

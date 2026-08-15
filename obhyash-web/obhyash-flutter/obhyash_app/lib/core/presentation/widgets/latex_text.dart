@@ -103,25 +103,21 @@ class _InlineMathBuilder extends MarkdownElementBuilder {
   ) {
     final latex = element.textContent;
     final style = textStyle ?? preferredStyle ?? const TextStyle();
-    return Text.rich(TextSpan(
-      children: [
-        WidgetSpan(
-          alignment: PlaceholderAlignment.middle,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: maxWidth),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Math.tex(
-                latex,
-                mathStyle: MathStyle.text,
-                textStyle: style,
-                onErrorFallback: (_) => Text('\$$latex\$', style: style.copyWith(color: Colors.red)),
-              ),
-            ),
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Math.tex(
+          latex,
+          mathStyle: MathStyle.text,
+          textStyle: style,
+          onErrorFallback: (_) => Text(
+            '\$$latex\$',
+            style: style.copyWith(color: Colors.red),
           ),
         ),
-      ],
-    ));
+      ),
+    );
   }
 }
 
@@ -144,7 +140,7 @@ class _DisplayMathBuilder extends MarkdownElementBuilder {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 4),
           child: Math.tex(
             latex,
             mathStyle: MathStyle.display,
@@ -184,12 +180,12 @@ class LatexText extends StatelessWidget {
     // Effective text color (for markdown body text)
     final effectiveStyle = (style ?? DefaultTextStyle.of(context).style)
         .copyWith(
-          fontFamily: style?.fontFamily,
+          fontFamily: style?.fontFamily ?? 'HindSiliguri',
           fontSize: style?.fontSize,
           color:
               style?.color ??
-              (isDark ? const Color(0xFFF5F5F5) : const Color(0xFF000000)),
-          height: style?.height ?? 1.6,
+              (isDark ? const Color(0xFFF5F5F5) : const Color(0xFF111827)),
+          height: style?.height ?? 1.5,
         );
 
     return LayoutBuilder(builder: (context, constraints) {
@@ -205,6 +201,8 @@ class LatexText extends StatelessWidget {
         styleSheet: MarkdownStyleSheet(
           textAlign: WrapAlignment.start,
           p: effectiveStyle,
+          pPadding: EdgeInsets.zero,
+          blockSpacing: 6.0,
           strong: effectiveStyle.copyWith(fontWeight: FontWeight.bold),
           em: effectiveStyle.copyWith(fontStyle: FontStyle.italic),
           code: effectiveStyle.copyWith(

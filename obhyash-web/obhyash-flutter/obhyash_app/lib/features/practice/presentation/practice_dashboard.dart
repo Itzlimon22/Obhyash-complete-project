@@ -816,6 +816,11 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     );
   }
 
+  String _toBn(int n) {
+    const m = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
+    return n.toString().split('').map((c) => m[c] ?? c).join();
+  }
+
   // ── Question card ─────────────────────────────────────────────────────────
 
   Widget _buildQuestionCard(PracticeQuestion q, int i, bool isDark) {
@@ -920,12 +925,12 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             ),
             const SizedBox(height: 10),
             LatexText(
-              text: '${i + 1}. ${q.questionText}',
+              text: '**${_toBn(i + 1)}.** ${q.questionText}',
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: FontWeight.w500,
-                fontFamily: 'Anek Bangla',
-                color: isDark ? Colors.white : const Color(0xFF000000),
+                fontFamily: 'HindSiliguri',
+                color: isDark ? Colors.white : const Color(0xFF111827),
               ),
             ),
             if (q.options.isNotEmpty &&
@@ -934,9 +939,9 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               LatexText(
                 text: '✓ ${q.options[q.correctAnswerIndex]}',
                 style: const TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Anek Bangla',
-                  color: Color(0xFF059669),
+                  fontSize: 14.5,
+                  fontFamily: 'HindSiliguri',
+                  color: Color(0xFF004633),
                 ),
               ),
             ],
