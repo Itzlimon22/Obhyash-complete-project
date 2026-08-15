@@ -5,6 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../domain/exam_models.dart';
+import '../services/local_exam_cache_service.dart';
+import '../services/offline_question_bank_service.dart';
+import '../services/offline_exam_sync_queue.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../dashboard/services/streak_service.dart';
 
@@ -164,41 +167,59 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
 
       // 2. Fallback: Direct query from questions table
       if (qList.isEmpty) {
-        debugPrint(
-          '[ExamProvider] RPC failed, falling back to direct questions query',
+        try {
+          debugPrint(
+            '[ExamProvider] RPC failed, falling back to direct questions query',
+          );
+          var query = supabase
+              .from('questions')
+              .select('*')
+              .eq('subject', config.subject);
+
+          if (chaptersList != null && chaptersList.isNotEmpty) {
+            query = query.inFilter('chapter', chaptersList);
+          }
+          if (topicsList != null && topicsList.isNotEmpty) {
+            query = query.inFilter('topic', topicsList);
+          }
+          if (difficultiesList != null && difficultiesList.isNotEmpty) {
+            query = query.inFilter('difficulty', difficultiesList);
+          }
+          if (examTypesList != null && examTypesList.isNotEmpty) {
+            query = query.inFilter('exam_type', examTypesList);
+          }
+
+          final fallbackData = await query.limit(config.questionCount * 3);
+          final allRows = List<dynamic>.from(fallbackData as List);
+          allRows.shuffle();
+          qList = allRows.take(config.questionCount).toList();
+        } catch (directErr) {
+          debugPrint('[ExamProvider] Direct questions query error (likely offline): $directErr');
+        }
+      }
+
+      List<Question> generatedQuestions = [];
+
+      if (qList.isNotEmpty) {
+        generatedQuestions = qList
+            .map((e) => Question.fromJson(e as Map<String, dynamic>))
+            .toList();
+        // Automatically cache these questions for offline availability
+        OfflineQuestionBankService.cacheQuestions(generatedQuestions);
+      } else {
+        // 3. Fallback: Load from local offline question bank
+        debugPrint('[ExamProvider] Trying offline question bank fallback...');
+        generatedQuestions = await OfflineQuestionBankService.getQuestions(
+          subject: config.subject,
+          chapters: chaptersList,
+          count: config.questionCount,
         );
-        var query = supabase
-            .from('questions')
-            .select('*')
-            .eq('subject', config.subject);
-
-        if (chaptersList != null && chaptersList.isNotEmpty) {
-          query = query.inFilter('chapter', chaptersList);
-        }
-        if (topicsList != null && topicsList.isNotEmpty) {
-          query = query.inFilter('topic', topicsList);
-        }
-        if (difficultiesList != null && difficultiesList.isNotEmpty) {
-          query = query.inFilter('difficulty', difficultiesList);
-        }
-        if (examTypesList != null && examTypesList.isNotEmpty) {
-          query = query.inFilter('exam_type', examTypesList);
-        }
-
-        final fallbackData = await query.limit(config.questionCount * 3);
-        final allRows = List<dynamic>.from(fallbackData as List);
-        allRows.shuffle();
-        qList = allRows.take(config.questionCount).toList();
       }
 
-      if (qList.isEmpty) {
+      if (generatedQuestions.isEmpty) {
         state = state.copyWith(appState: AppState.idle);
-        throw Exception('No questions found for the selected criteria.');
+        throw Exception('কোনো প্রশ্ন পাওয়া যায়নি। ইন্টারনেট সংযোগ অথবা অফলাইন ডাটা চেক করুন।');
       }
-
-      final generatedQuestions = qList
-          .map((e) => Question.fromJson(e as Map<String, dynamic>))
-          .toList();
 
       final details = ExamDetails(
         subject: config.subject,
@@ -398,7 +419,10 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       status: 'evaluated',
     );
 
-    // Save to DB
+    // 1. Immediately cache result locally for 100% offline access
+    await LocalExamCacheService.saveExamResult(result);
+
+    // 2. Save to DB
     final supabase = Supabase.instance.client;
     final session = await supabase.auth.getSession();
     final authId =
@@ -480,7 +504,11 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           }
         }
       } catch (e) {
-        debugPrint('[ExamProvider] submitExam DB error: $e');
+        debugPrint('[ExamProvider] submitExam DB error (offline): $e. Queuing for auto-sync...');
+        await OfflineExamSyncQueueService.queueOfflineExam(
+          result: result,
+          userId: authId,
+        );
       }
 
       // Invalidate dashboard cache so updated stats show immediately

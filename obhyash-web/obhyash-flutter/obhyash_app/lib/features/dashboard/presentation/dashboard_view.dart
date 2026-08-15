@@ -10,6 +10,8 @@ import 'widgets/live_exam_slider.dart';
 import '../providers/dashboard_providers.dart';
 import '../domain/models.dart';
 import '../services/streak_service.dart';
+import '../../exam/services/offline_exam_sync_queue.dart';
+import '../../exam/services/offline_question_bank_service.dart';
 
 class DashboardView extends ConsumerStatefulWidget {
   const DashboardView({super.key});
@@ -25,6 +27,15 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   @override
   void initState() {
     super.initState();
+    // 1. Silently sync any pending offline exam results in background
+    OfflineExamSyncQueueService.syncPendingExams();
+    // 2. Silently pre-fetch questions in background so user always has questions offline
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      OfflineQuestionBankService.prefetchQuestionsInBackground('physics');
+      OfflineQuestionBankService.prefetchQuestionsInBackground('chemistry');
+      OfflineQuestionBankService.prefetchQuestionsInBackground('biology');
+      OfflineQuestionBankService.prefetchQuestionsInBackground('higher_math');
+    });
   }
 
   void _checkExamTarget(UserProfile? user) {

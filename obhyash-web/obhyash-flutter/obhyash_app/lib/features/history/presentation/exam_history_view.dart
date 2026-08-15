@@ -7,7 +7,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/utils/app_popups.dart';
 import '../../exam/domain/exam_models.dart';
+import '../../exam/presentation/result_view.dart';
 import '../../exam/presentation/widgets/question_card.dart';
+import '../../exam/services/local_exam_cache_service.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
 class _ExamRecord {
@@ -339,6 +341,11 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
             .map((r) => _ExamRecord.fromJson(r as Map<String, dynamic>))
             .toList();
 
+        // Cache history list for offline usage
+        await LocalExamCacheService.cacheHistoryList(
+          (data as List).map((e) => e as Map<String, dynamic>).toList(),
+        );
+
         // If subject list was empty, extract from history
         if (_subjectList.isEmpty) {
           final seen = <String, String>{};
@@ -360,6 +367,18 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       }
     } catch (e) {
       debugPrint('[ExamHistoryView] _fetchExams error: $e');
+      final cached = await LocalExamCacheService.getCachedHistoryList();
+      if (cached != null && cached.isNotEmpty && mounted) {
+        final records = cached
+            .map((r) => _ExamRecord.fromJson(r))
+            .toList();
+        setState(() {
+          _history = records;
+          _isLoadingExams = false;
+          _hasErrorExams = false;
+        });
+        return;
+      }
       if (mounted) {
         setState(() {
           _isLoadingExams = false;
@@ -1266,15 +1285,90 @@ class _ExamsTab extends StatelessWidget {
   }
 }
 
-// ─── Compact Exam Card ─────────────────────────────────────────────────────────
-class _ExamCard extends StatelessWidget {
+// ─── Compact Clickable Exam Card ───────────────────────────────────────────────
+class _ExamCard extends StatefulWidget {
   final _ExamRecord record;
   final bool isDark;
 
   const _ExamCard({required this.record, required this.isDark});
 
   @override
+  State<_ExamCard> createState() => _ExamCardState();
+}
+
+class _ExamCardState extends State<_ExamCard> {
+  bool _isLoading = false;
+
+  Future<void> _handleTap() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+
+    try {
+      // 1. Try loading from local cache first (instant offline response)
+      final cached = await LocalExamCacheService.getExamResult(widget.record.id);
+      if (cached != null && cached.questions.isNotEmpty) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ResultView(
+                result: cached,
+                isHistoryMode: true,
+                onRestart: () => Navigator.pop(context),
+              ),
+            ),
+          );
+        }
+        return;
+      }
+
+      // 2. Fetch full evaluated record from Supabase
+      final sb = Supabase.instance.client;
+      final row = await sb
+          .from('exam_results')
+          .select('*')
+          .eq('id', widget.record.id)
+          .maybeSingle();
+
+      if (row != null) {
+        final examResult = ExamResult.fromJson(row);
+        // Cache locally for future instant offline access
+        await LocalExamCacheService.saveExamResult(examResult);
+
+        if (mounted) {
+          setState(() => _isLoading = false);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ResultView(
+                result: examResult,
+                isHistoryMode: true,
+                onRestart: () => Navigator.pop(context),
+              ),
+            ),
+          );
+        }
+        return;
+      }
+    } catch (e) {
+      debugPrint('[ExamCard] Error fetching exam details: $e');
+    }
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+      AppPopups.show(
+        context,
+        message: 'এই পরীক্ষার বিস্তারিত ডাটা লোড করা সম্ভব হয়নি। ইন্টারনেট সংযোগ চেক করুন।',
+        isError: true,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final record = widget.record;
+    final isDark = widget.isDark;
     final color = _scoreColor(record.score);
     final dateStr = DateFormat('d MMM yyyy, h:mm a').format(record.createdAt);
     final label = record.subjectLabel.isNotEmpty
@@ -1286,7 +1380,6 @@ class _ExamCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(14),
@@ -1301,156 +1394,187 @@ class _ExamCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Compact Score Ring
-          SizedBox(
-            width: 42,
-            height: 42,
-            child: Stack(
-              fit: StackFit.expand,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _handleTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                CircularProgressIndicator(
-                  value: 1.0,
-                  strokeWidth: 3.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    isDark ? const Color(0xFF2E2E2E) : const Color(0xFFF3F4F6),
-                  ),
-                ),
-                CircularProgressIndicator(
-                  value: record.score / 100,
-                  strokeWidth: 3.5,
-                  strokeCap: StrokeCap.round,
-                  backgroundColor: Colors.transparent,
-                  valueColor: AlwaysStoppedAnimation<Color>(color),
-                ),
-                Center(
-                  child: Text(
-                    '${record.score.round()}%',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'HindSiliguri',
-                      color: isDark ? Colors.white : const Color(0xFF111827),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // Details Center Aligned vertically
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    fontFamily: 'HindSiliguri',
-                    color: isDark ? Colors.white : const Color(0xFF111827),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 3),
-                Row(
-                  children: [
-                    Icon(
-                      LucideIcons.calendar,
-                      size: 11,
-                      color: isDark
-                          ? const Color(0xFFA3A3A3)
-                          : const Color(0xFF6B7280),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      dateStr,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: 'HindSiliguri',
-                        color: isDark
-                            ? const Color(0xFFA3A3A3)
-                            : const Color(0xFF6B7280),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF2A2A2A)
-                            : const Color(0xFFF3F4F6),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        '${record.correctCount} সঠিক, ${record.wrongCount} ভুল',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'HindSiliguri',
-                          color: isDark
-                              ? const Color(0xFFD4D4D4)
-                              : const Color(0xFF4B5563),
+                // Compact Score Ring
+                SizedBox(
+                  width: 42,
+                  height: 42,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      CircularProgressIndicator(
+                        value: 1.0,
+                        strokeWidth: 3.5,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          isDark ? const Color(0xFF2E2E2E) : const Color(0xFFF3F4F6),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
+                      CircularProgressIndicator(
+                        value: record.score / 100,
+                        strokeWidth: 3.5,
+                        strokeCap: StrokeCap.round,
+                        backgroundColor: Colors.transparent,
+                        valueColor: AlwaysStoppedAnimation<Color>(color),
                       ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF2A2A2A)
-                            : const Color(0xFFF3F4F6),
-                        borderRadius: BorderRadius.circular(6),
+                      Center(
+                        child: Text(
+                          '${record.score.round()}%',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'HindSiliguri',
+                            color: isDark ? Colors.white : const Color(0xFF111827),
+                          ),
+                        ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+
+                // Details Center Aligned vertically
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          fontFamily: 'HindSiliguri',
+                          color: isDark ? Colors.white : const Color(0xFF111827),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 3),
+                      Row(
                         children: [
                           Icon(
-                            LucideIcons.timer,
-                            size: 10,
+                            LucideIcons.calendar,
+                            size: 11,
                             color: isDark
-                                ? const Color(0xFFD4D4D4)
-                                : const Color(0xFF4B5563),
+                                ? const Color(0xFFA3A3A3)
+                                : const Color(0xFF6B7280),
                           ),
-                          const SizedBox(width: 3),
+                          const SizedBox(width: 4),
                           Text(
-                            timeStr,
+                            dateStr,
                             style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
                               fontFamily: 'HindSiliguri',
                               color: isDark
-                                  ? const Color(0xFFD4D4D4)
-                                  : const Color(0xFF4B5563),
+                                  ? const Color(0xFFA3A3A3)
+                                  : const Color(0xFF6B7280),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF2A2A2A)
+                                  : const Color(0xFFF3F4F6),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '${record.correctCount} সঠিক, ${record.wrongCount} ভুল',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'HindSiliguri',
+                                color: isDark
+                                    ? const Color(0xFFD4D4D4)
+                                    : const Color(0xFF4B5563),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF2A2A2A)
+                                  : const Color(0xFFF3F4F6),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  LucideIcons.timer,
+                                  size: 10,
+                                  color: isDark
+                                      ? const Color(0xFFD4D4D4)
+                                      : const Color(0xFF4B5563),
+                                ),
+                                const SizedBox(width: 3),
+                                Text(
+                                  timeStr,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'HindSiliguri',
+                                    color: isDark
+                                        ? const Color(0xFFD4D4D4)
+                                        : const Color(0xFF4B5563),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
+
+                const SizedBox(width: 8),
+
+                // Right Action / Loading indicator
+                if (_isLoading)
+                  const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF004633)),
+                    ),
+                  )
+                else
+                  Icon(
+                    LucideIcons.chevronRight,
+                    size: 16,
+                    color: isDark
+                        ? const Color(0xFF525252)
+                        : const Color(0xFFD1D5DB),
+                  ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

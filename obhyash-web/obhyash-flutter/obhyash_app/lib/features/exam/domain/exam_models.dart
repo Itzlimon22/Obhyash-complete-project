@@ -160,4 +160,66 @@ class ExamResult {
     required this.userAnswers,
     required this.status,
   });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'subject': subject,
+    'subject_label': subjectLabel,
+    'exam_type': examType,
+    'date': date,
+    'score': score,
+    'total_marks': totalMarks,
+    'total_questions': totalQuestions,
+    'correct_count': correctCount,
+    'wrong_count': wrongCount,
+    'time_taken': timeTaken,
+    'negative_marking': negativeMarking,
+    'questions': questions.map((q) => q.toJson()).toList(),
+    'flagged_questions': flaggedQuestions,
+    'submission_type': submissionType,
+    'user_answers': userAnswers,
+    'status': status,
+  };
+
+  factory ExamResult.fromJson(Map<String, dynamic> j) {
+    List<Question> qList = [];
+    if (j['questions'] is List) {
+      qList = (j['questions'] as List)
+          .map((e) => Question.fromJson(e as Map<String, dynamic>))
+          .toList();
+    }
+    Map<String, int> answers = {};
+    if (j['user_answers'] is Map) {
+      (j['user_answers'] as Map).forEach((k, v) {
+        if (v != null) {
+          final intVal = int.tryParse(v.toString());
+          if (intVal != null) answers[k.toString()] = intVal;
+        }
+      });
+    }
+    List<String> flagged = [];
+    if (j['flagged_questions'] is List) {
+      flagged = (j['flagged_questions'] as List).map((e) => e.toString()).toList();
+    }
+    return ExamResult(
+      id: j['id']?.toString() ?? '',
+      subject: j['subject']?.toString() ?? '',
+      subjectLabel: j['subject_label']?.toString() ?? j['subject']?.toString(),
+      examType: j['exam_type']?.toString(),
+      date: j['date']?.toString() ?? j['created_at']?.toString() ?? DateTime.now().toIso8601String(),
+      score: (j['score'] as num?) ?? 0,
+      totalMarks: (j['total_marks'] as num?) ?? (j['total_questions'] as num?) ?? 0,
+      totalQuestions: (j['total_questions'] as num?)?.toInt() ?? qList.length,
+      correctCount: (j['correct_count'] as num?)?.toInt() ?? 0,
+      wrongCount: (j['wrong_count'] as num?)?.toInt() ?? 0,
+      timeTaken: (j['time_taken'] as num?)?.toInt() ?? 0,
+      negativeMarking: (j['negative_marking'] as num?)?.toDouble() ?? 0.25,
+      questions: qList,
+      flaggedQuestions: flagged,
+      submissionType: j['submission_type']?.toString() ?? 'digital',
+      userAnswers: answers,
+      status: j['status']?.toString() ?? 'evaluated',
+    );
+  }
 }
+
