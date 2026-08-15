@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/presentation/widgets/latex_text.dart';
 import 'flashcard_mode.dart';
@@ -396,7 +396,9 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     final base = _activeTab == 'mistakes' ? _mistakes : _bookmarks;
     final map = <String, String>{};
     for (final q in base) {
-      if (!map.containsKey(q.subject)) map[q.subject] = q.subjectLabel;
+      if (!map.containsKey(q.subject)) {
+        map[q.subject] = BanglaNameHelper.formatSubject(q.subject, q.subjectLabel);
+      }
     }
     return map.entries.toList();
   }
@@ -879,26 +881,6 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                   child: isSel
                       ? const Icon(Icons.check, size: 16, color: Colors.white)
                       : null,
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF1C1C1E)
-                        : const Color(0xFFF5F5F5),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Text(
-                    q.subjectLabel.toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFA3A3A3),
-                    ),
-                  ),
                 ),
                 if (freq != null &&
                     freq > 0 &&

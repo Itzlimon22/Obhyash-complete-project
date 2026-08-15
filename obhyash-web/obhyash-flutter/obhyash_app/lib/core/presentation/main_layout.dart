@@ -6,14 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-
 import 'widgets/main_sidebar.dart';
 import 'widgets/facebook_refresh_indicator.dart';
 import '../utils/global_refresh.dart';
 import 'widgets/main_bottom_nav.dart';
 import 'widgets/user_avatar.dart';
-import '../../features/dashboard/presentation/dashboard_view.dart';
 import '../../features/dashboard/services/streak_service.dart';
 import 'widgets/streak_dialog.dart';
 import '../../features/dashboard/providers/dashboard_providers.dart';
@@ -22,7 +19,6 @@ import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/title_provider.dart';
 import '../../features/dashboard/presentation/widgets/countdown_banner.dart';
-import '../../features/notifications/presentation/notifications_view.dart';
 
 final _unreadNotifCountProvider = FutureProvider.autoDispose<int>((ref) async {
   final user = ref.watch(authProvider);
@@ -469,7 +465,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                         ),
 
                         // Right: Streak + Notification + Divider + Avatar
-                        if (!activeTab.startsWith('formula'))
+                        if (activeTab != 'setup' && !activeTab.startsWith('formula'))
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [

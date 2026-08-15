@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/presentation/widgets/latex_text.dart';
 import '../../domain/exam_models.dart';
 
@@ -33,7 +34,7 @@ class QuestionCard extends StatefulWidget {
     this.readOnly = false,
     this.showAnswer = false,
     this.isBookmarked = false,
-    this.initiallyExpanded = true,
+    this.initiallyExpanded = false,
     this.onToggleBookmark,
   });
 
@@ -168,32 +169,6 @@ class _QuestionCardState extends State<QuestionCard>
                 // Tags + action buttons row
                 Row(
                   children: [
-                    // Subject tag (if present)
-                    if (widget.readOnly && widget.question.subjectLabel?.isNotEmpty == true) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF0D3326)
-                              : const Color(0xFFE8F4F0),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          widget.question.subjectLabel!.toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1A7A5A),
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                    ],
-
                     // Institute tag (if present)
                     if (widget.readOnly && widget.question.institutes.isNotEmpty) ...[
                       Container(
@@ -328,7 +303,7 @@ class _QuestionCardState extends State<QuestionCard>
                     ? _banglaIndices[idx]
                     : (idx + 1).toString();
 
-                // ── State colours (matches web exactly) ──
+                // ── State colours (Clean, Premium, High-Contrast) ──
                 Color boxBg = isDark
                     ? const Color(0xFF1F1F1F)
                     : const Color(0xFFF8F9FA);
@@ -347,55 +322,80 @@ class _QuestionCardState extends State<QuestionCard>
                     : const Color(0xFF1F2937);
                 bool boldText = false;
                 double opacity = 1.0;
+                Widget? trailingBadge;
 
                 if (widget.showFeedback) {
                   if (isCorrect) {
+                    // Premium High-Contrast Correct Styling (No harsh green)
                     boxBg = isDark
-                        ? const Color(0xFF059669).withValues(alpha: 0.15)
-                        : const Color(0xFFECFDF5).withValues(alpha: 0.4);
+                        ? const Color(0xFF27272A)
+                        : const Color(0xFFF1F5F9);
                     boxBorder = isDark
-                        ? const Color(0xFF059669)
-                        : const Color(0xFFBBF7D0);
-                    bulletBg = const Color(0xFF059669);
-                    bulletBorder = const Color(0xFF059669);
-                    bulletText = Colors.white;
+                        ? const Color(0xFFF8FAFC)
+                        : const Color(0xFF1E293B);
+                    bulletBg = isDark
+                        ? const Color(0xFFF8FAFC)
+                        : const Color(0xFF1E293B);
+                    bulletBorder = bulletBg;
+                    bulletText = isDark
+                        ? const Color(0xFF0F172A)
+                        : Colors.white;
                     optionTextColor = isDark
-                        ? const Color(0xFF059669)
-                        : const Color(0xFF059669);
+                        ? const Color(0xFFFFFFFF)
+                        : const Color(0xFF0F172A);
                     boldText = true;
+                    trailingBadge = Icon(
+                      Icons.check_circle_rounded,
+                      size: 20,
+                      color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF1E293B),
+                    );
                   } else if (isSelected) {
+                    // Refined Crimson for Wrong Selected
                     boxBg = isDark
-                        ? const Color(0xFF7F1D1D).withValues(alpha: 0.15)
-                        : const Color(0xFFFEF2F2).withValues(alpha: 0.4);
+                        ? const Color(0x337F1D1D)
+                        : const Color(0xFFFEF2F2);
                     boxBorder = isDark
-                        ? const Color(0xFF991B1B)
-                        : const Color(0xFFFECACA);
-                    bulletBg = const Color(0xFFB91C1C);
-                    bulletBorder = const Color(0xFFB91C1C);
+                        ? const Color(0xFFB91C1C)
+                        : const Color(0xFFFCA5A5);
+                    bulletBg = const Color(0xFFDC2626);
+                    bulletBorder = const Color(0xFFDC2626);
                     bulletText = Colors.white;
                     optionTextColor = isDark
-                        ? const Color(0xFFF87171)
-                        : const Color(0xFFB91C1C);
+                        ? const Color(0xFFFCA5A5)
+                        : const Color(0xFF991B1B);
                     boldText = true;
+                    trailingBadge = Icon(
+                      Icons.cancel_rounded,
+                      size: 20,
+                      color: isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626),
+                    );
                   } else {
-                    opacity = 0.6;
+                    opacity = 0.5;
                   }
                 } else if (widget.showAnswer && isCorrect) {
                   boxBg = isDark
-                      ? const Color(0xFF059669).withValues(alpha: 0.15)
-                      : const Color(0xFFECFDF5).withValues(alpha: 0.4);
+                      ? const Color(0xFF27272A)
+                      : const Color(0xFFF1F5F9);
                   boxBorder = isDark
-                      ? const Color(0xFF059669)
-                      : const Color(0xFFBBF7D0);
-                  bulletBg = const Color(0xFF059669);
-                  bulletBorder = const Color(0xFF059669);
-                  bulletText = Colors.white;
+                      ? const Color(0xFFF8FAFC)
+                      : const Color(0xFF1E293B);
+                  bulletBg = isDark
+                      ? const Color(0xFFF8FAFC)
+                      : const Color(0xFF1E293B);
+                  bulletBorder = bulletBg;
+                  bulletText = isDark
+                      ? const Color(0xFF0F172A)
+                      : Colors.white;
                   optionTextColor = isDark
-                      ? const Color(0xFF059669)
-                      : const Color(0xFF059669);
+                      ? const Color(0xFFFFFFFF)
+                      : const Color(0xFF0F172A);
                   boldText = true;
+                  trailingBadge = Icon(
+                    Icons.check_circle_rounded,
+                    size: 20,
+                    color: isDark ? const Color(0xFFF8FAFC) : const Color(0xFF1E293B),
+                  );
                 } else if (isSelected) {
-                  // Web: neutral-200/neutral-700 for selected
                   boxBg = isDark
                       ? const Color(0xFF27272A)
                       : const Color(0xFFE5E7EB);
@@ -427,7 +427,10 @@ class _QuestionCardState extends State<QuestionCard>
                         decoration: BoxDecoration(
                           color: boxBg,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: boxBorder),
+                          border: Border.all(
+                            color: boxBorder,
+                            width: (widget.showFeedback || widget.showAnswer) && isCorrect ? 1.6 : 1.0,
+                          ),
                         ),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
@@ -497,6 +500,10 @@ class _QuestionCardState extends State<QuestionCard>
                                     ),
                                   ),
                                 ),
+                                if (trailingBadge != null) ...[
+                                  const SizedBox(width: 8),
+                                  trailingBadge,
+                                ],
                               ],
                             ),
                           ),
@@ -527,7 +534,7 @@ class _QuestionCardState extends State<QuestionCard>
   }
 }
 
-// ── Explanation Panel ─────────────────────────────────────────────────────────
+// ── Explanation Panel (Warm Book Page Theme) ──────────────────────────────────
 
 class _ExplanationPanel extends StatelessWidget {
   final Question question;
@@ -548,80 +555,90 @@ class _ExplanationPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final correctLabel = question.correctAnswerIndex < banglaIndices.length
-        ? banglaIndices[question.correctAnswerIndex]
-        : '${question.correctAnswerIndex + 1}';
+    // ── Book Page Theme Color Tokens ──
+    // Header (deeper tone)
+    final headerBg = isDark
+        ? const Color(0xFF28221D)
+        : const Color(0xFFF3ECE4);
+    final headerTextColor = isDark
+        ? const Color(0xFFEADFCF)
+        : const Color(0xFF42352B);
+    final headerBorderColor = isDark
+        ? const Color(0xFF3D332B)
+        : const Color(0xFFE2D7C9);
+    final chevronBg = isDark
+        ? const Color(0xFF362C25)
+        : const Color(0xFFE7DDD0);
+
+    // Below body (lighter tone)
+    final bodyBg = isDark
+        ? const Color(0xFF1B1614)
+        : const Color(0xFFFAF7F2);
+    final bodyTextColor = isDark
+        ? const Color(0xFFD6CDC3)
+        : const Color(0xFF2E2621);
+    final dividerColor = isDark
+        ? const Color(0xFF332922)
+        : const Color(0xFFE8DFD3);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       margin: const EdgeInsets.fromLTRB(10, 0, 10, 12),
       decoration: BoxDecoration(
-        color: isOpen
-            ? (isDark
-                  ? const Color(0xFF059669).withValues(alpha: 0.1)
-                  : const Color(0xFFECFDF5).withValues(alpha: 0.5))
-            : (isDark ? const Color(0xFF1C1C1C) : const Color(0xFFFAFAFA)),
+        color: isOpen ? bodyBg : headerBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: isOpen
-              ? (isDark
-                    ? const Color(0xFF059669).withValues(alpha: 0.4)
-                    : const Color(0xFFBBF7D0))
-              : (isDark ? const Color(0xFF333333) : const Color(0xFFE5E7EB)),
-        ),
+        border: Border.all(color: headerBorderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Toggle header
+          // Toggle Header (Deeper Book Page Color)
           GestureDetector(
             onTap: onToggle,
             behavior: HitTestBehavior.opaque,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: headerBg,
+                borderRadius: isOpen
+                    ? const BorderRadius.vertical(top: Radius.circular(9))
+                    : BorderRadius.circular(9),
+              ),
               child: Row(
                 children: [
-                  // Pulsing dot
-                  Container(
-                    width: 7,
-                    height: 7,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF059669),
-                      shape: BoxShape.circle,
-                    ),
+                  Icon(
+                    LucideIcons.bookOpen,
+                    size: 16,
+                    color: headerTextColor,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'সঠিক উত্তর : $correctLabel',
+                    'ব্যাখ্যা',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.w800,
-                      color: isDark
-                          ? const Color(0xFF059669)
-                          : const Color(0xFF059669),
+                      fontFamily: 'HindSiliguri',
+                      color: headerTextColor,
                     ),
                   ),
                   const Spacer(),
-                  // Animated chevron
+                  // Animated Chevron Button
                   Container(
                     padding: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1F2937) : Colors.white,
+                      color: chevronBg,
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(
-                        color: isDark
-                            ? const Color(0xFF059669).withValues(alpha: 0.6)
-                            : const Color(0xFFECFDF5),
+                        color: headerBorderColor,
+                        width: 0.8,
                       ),
                     ),
                     child: RotationTransition(
                       turns: arrowTurns,
                       child: Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        size: 18,
-                        color: isDark
-                            ? const Color(0xFF059669)
-                            : const Color(0xFF059669),
+                        size: 17,
+                        color: headerTextColor,
                       ),
                     ),
                   ),
@@ -630,7 +647,7 @@ class _ExplanationPanel extends StatelessWidget {
             ),
           ),
 
-          // Collapsible content
+          // Collapsible Content (Lighter Book Page Color)
           AnimatedCrossFade(
             duration: const Duration(milliseconds: 200),
             crossFadeState: isOpen
@@ -638,28 +655,24 @@ class _ExplanationPanel extends StatelessWidget {
                 : CrossFadeState.showFirst,
             firstChild: const SizedBox.shrink(),
             secondChild: Container(
-              padding: const EdgeInsets.fromLTRB(14, 4, 14, 14),
+              padding: const EdgeInsets.fromLTRB(14, 8, 14, 14),
               decoration: BoxDecoration(
+                color: bodyBg,
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(9)),
                 border: Border(
                   top: BorderSide(
-                    color: isDark
-                        ? const Color(0xFF059669).withValues(alpha: 0.3)
-                        : const Color(0xFFECFDF5),
+                    color: dividerColor,
+                    width: 1,
                   ),
                 ),
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: LatexText(
-                  text: question.explanation!,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'HindSiliguri',
-                    height: 1.6,
-                    color: isDark
-                        ? const Color(0xFFD4D4D4)
-                        : const Color(0xFF374151),
-                  ),
+              child: LatexText(
+                text: question.explanation!,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'HindSiliguri',
+                  height: 1.6,
+                  color: bodyTextColor,
                 ),
               ),
             ),

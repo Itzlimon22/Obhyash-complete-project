@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 import '../domain/exam_models.dart';
 import 'widgets/result_stats.dart';
-import 'widgets/review_list.dart';
-import 'package:obhyash_app/core/utils/app_popups.dart';
+import 'widgets/question_card.dart';
+import 'widgets/question_report_dialog.dart';
 import '../services/pdf_download_service.dart';
 
 class ResultView extends StatefulWidget {
@@ -26,6 +27,7 @@ class ResultView extends StatefulWidget {
 class _ResultViewState extends State<ResultView> {
   final Set<String> _bookmarkedIds = {};
   late final ConfettiController _confettiController;
+  String _reviewFilter = 'all'; // 'all', 'correct', 'wrong', 'skipped'
 
   @override
   void initState() {
@@ -34,16 +36,7 @@ class _ResultViewState extends State<ResultView> {
       duration: const Duration(seconds: 3),
     );
 
-    // Trigger confetti if score > 80%
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final percentage = widget.result.totalMarks > 0
-          ? (widget.result.score / widget.result.totalMarks) * 100
-          : 0.0;
-      if (percentage >= 80.0) {
-        _confettiController.play();
-      }
-    });
-
+    _confettiController.play();
     _fetchBookmarks();
   }
 
@@ -107,91 +100,7 @@ class _ResultViewState extends State<ResultView> {
   }
 
   void _showReportModal(String questionId) {
-    // Show a bottom sheet or dialog to report an issue
-    showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-          left: 16,
-          right: 16,
-          top: 24,
-        ),
-        decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF000000)
-              : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'প্রশ্ন $questionId রিপোর্ট করো',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'সমস্যাটির কারণ লেখুন:',
-                style: TextStyle(fontSize: 15, color: Colors.grey),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                maxLines: 4,
-                decoration: InputDecoration(
-                  hintText:
-                      'যেমন: সঠিক উত্তরটি ভুল, অথবা প্রশ্নে বানান ভুল আছে...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.black
-                      : const Color(0xFFFAFAFA),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    child: const Text(
-                      'বাতিল',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      AppPopups.show(
-                        context,
-                        message: 'রিপোর্ট সফলভাবে জমা দেওয়া হয়েছে!',
-                        isError: false,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                    ),
-                    child: const Text('জমা দাও'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
-        ),
-      ),
-    );
+    QuestionReportDialog.show(context, questionId);
   }
 
   @override
@@ -208,7 +117,33 @@ class _ResultViewState extends State<ResultView> {
         ? (widget.result.score / widget.result.totalMarks) * 100
         : 0.0;
 
-    // Feedback logic removed since it is no longer shown
+    // Filter counts
+    int correctCount = 0;
+    int wrongCount = 0;
+    int skipCount = 0;
+
+    for (var q in widget.result.questions) {
+      final ua = widget.result.userAnswers[q.id];
+      if (ua == null) {
+        skipCount++;
+      } else if (ua == q.correctAnswerIndex) {
+        correctCount++;
+      } else {
+        wrongCount++;
+      }
+    }
+
+    final filteredQuestions = widget.result.questions.where((q) {
+      final ua = widget.result.userAnswers[q.id];
+      final isSkipped = ua == null;
+      final isCorrect = !isSkipped && (ua == q.correctAnswerIndex);
+      final isWrong = !isSkipped && !isCorrect;
+
+      if (_reviewFilter == 'correct' && !isCorrect) return false;
+      if (_reviewFilter == 'wrong' && !isWrong) return false;
+      if (_reviewFilter == 'skipped' && !isSkipped) return false;
+      return true;
+    }).toList();
 
     return Scaffold(
       backgroundColor: isDark ? Colors.black : const Color(0xFFFAFAFA),
@@ -228,237 +163,352 @@ class _ResultViewState extends State<ResultView> {
                 onPressed: widget.onRestart,
               ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        child: Column(
-          children: [
-
-            // Banner for OMR review
-            if (widget.result.submissionType == 'script' &&
-                !widget.isHistoryMode)
-              Container(
-                margin: const EdgeInsets.only(bottom: 24),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFEF3C7), // amber-50
-                  border: Border.all(
-                    color: const Color(0xFFFCD34D),
-                  ), // amber-300
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.warning_amber_rounded,
-                      color: Color(0xFFD97706),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+      body: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          // ── Top Summary & Stats Section ──
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+              child: Column(
+                children: [
+                  // Banner for OMR review
+                  if (widget.result.submissionType == 'script' &&
+                      !widget.isHistoryMode)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 20),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF3C7),
+                        border: Border.all(color: const Color(0xFFFCD34D)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
                         children: [
-                          const Text(
-                            'OMR মূল্যায়ন নিয়ে খুশি নন?',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF92400E),
+                          const Icon(
+                            Icons.warning_amber_rounded,
+                            color: Color(0xFFD97706),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'OMR মূল্যায়ন নিয়ে খুশি নন?',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF92400E),
+                                  ),
+                                ),
+                                Text(
+                                  'যান্ত্রিক ত্রুটির কারণে ফলাফল ভুল হতে পারে।',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: const Color(0xFFB45309).withValues(alpha: 0.8),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          Text(
-                            'যান্ত্রিক ত্রুটির কারণে ফলাফল ভুল হতে পারে।',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: const Color(
-                                0xFFB45309,
-                              ).withValues(alpha: 0.8),
+                          ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: const Color(0xFFB45309),
                             ),
+                            child: const Text('আবার যাচাই করো'),
                           ),
                         ],
                       ),
                     ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFFB45309),
-                      ),
-                      child: const Text('আবার যাচাই করো'),
-                    ),
-                  ],
-                ),
-              ),
 
-            // Top Action buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...'),
-                          behavior: SnackBarBehavior.floating,
-                          duration: Duration(seconds: 2),
+                  // Top Action buttons (PDF)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () async {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...'),
+                                behavior: SnackBarBehavior.floating,
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            await PdfDownloadService.downloadQuestionPaper(
+                                widget.result, context);
+                          },
+                          icon: const Icon(Icons.download_rounded, size: 16),
+                          label: const Text('প্রশ্নপত্র'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF004633),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            side: const BorderSide(color: Color(0xFF004633)),
+                          ),
                         ),
-                      );
-                      await PdfDownloadService.downloadQuestionPaper(
-                          widget.result, context);
-                    },
-                    icon: const Icon(Icons.download_rounded, size: 16),
-                    label: const Text('প্রশ্নপত্র'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF004633),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: const BorderSide(color: Color(0xFF004633)),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...'),
-                          behavior: SnackBarBehavior.floating,
-                          duration: Duration(seconds: 2),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () async {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...'),
+                                behavior: SnackBarBehavior.floating,
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            await PdfDownloadService.downloadResultWithExplanations(
+                                widget.result, context);
+                          },
+                          icon: const Icon(Icons.download_done_rounded, size: 16),
+                          label: const Text('ফলাফল ও ব্যাখ্যা'),
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: const Color(0xFF004633).withValues(alpha: 0.1),
+                            foregroundColor: const Color(0xFF004633),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            side: const BorderSide(color: Color(0xFF004633)),
+                          ),
                         ),
-                      );
-                      await PdfDownloadService.downloadResultWithExplanations(
-                          widget.result, context);
-                    },
-                    icon: const Icon(Icons.download_done_rounded, size: 16),
-                    label: const Text('ফলাফল ও ব্যাখ্যা'),
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: const Color(0xFF004633).withValues(alpha: 0.1),
-                      foregroundColor: const Color(0xFF004633),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: const BorderSide(color: Color(0xFF004633)),
-                    ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
 
-            // Exam Details Ribbon
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 24),
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF1C1C1E).withValues(alpha: 0.4)
-                    : const Color(0xFFF9FAFB),
-                border: Border.all(
-                  color: isDark
-                      ? const Color(0xFF27272A)
-                      : const Color(0xFFF3F4F6),
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.menu_book_rounded,
-                        size: 16,
-                        color: Colors.green,
+                  // Exam Details Ribbon
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF1C1C1E).withValues(alpha: 0.4)
+                          : const Color(0xFFF9FAFB),
+                      border: Border.all(
+                        color: isDark
+                            ? const Color(0xFF27272A)
+                            : const Color(0xFFF3F4F6),
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        widget.result.subjectLabel ?? widget.result.subject,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.menu_book_rounded,
+                              size: 16,
+                              color: Color(0xFF004633),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              BanglaNameHelper.formatSubject(
+                                widget.result.subject,
+                                widget.result.subjectLabel,
+                              ),
+                              style: const TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'HindSiliguri',
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.history_rounded,
+                              size: 16,
+                              color: Color(0xFF004633),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              widget.isHistoryMode ? 'ইতিহাস' : 'আজকের পরীক্ষা',
+                              style: const TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'HindSiliguri',
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.help_outline_rounded,
+                              size: 16,
+                              color: Color(0xFF004633),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'মোট প্রশ্ন: ${widget.result.totalQuestions}',
+                              style: const TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'HindSiliguri',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.history_rounded,
-                        size: 16,
-                        color: Colors.green,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        widget.isHistoryMode ? 'ইতিহাস' : 'আজকের পরীক্ষা',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.help_outline_rounded,
-                        size: 16,
-                        color: Colors.red,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'মোট প্রশ্ন: ${widget.result.totalQuestions}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+
+                  ResultStats(
+                    percentage: percentage,
+                    finalScore: widget.result.score.toDouble(),
+                    totalPoints: widget.result.totalMarks.toInt(),
+                    timeTaken: widget.result.timeTaken,
+                    totalQuestions: widget.result.totalQuestions,
+                    correctCount: widget.result.correctCount,
+                    wrongCount: widget.result.wrongCount,
+                    skippedCount: skippedCount,
+                    negativeMarking: widget.result.negativeMarking,
+                    negativeMarksDeduction: negativeMarksDeduction,
                   ),
                 ],
               ),
             ),
+          ),
 
-            ResultStats(
-              percentage: percentage,
-              finalScore: widget.result.score.toDouble(),
-              totalPoints: widget.result.totalMarks.toInt(),
-              timeTaken: widget.result.timeTaken,
-              totalQuestions: widget.result.totalQuestions,
-              correctCount: widget.result.correctCount,
-              wrongCount: widget.result.wrongCount,
-              skippedCount: skippedCount,
-              negativeMarking: widget.result.negativeMarking,
-              negativeMarksDeduction: negativeMarksDeduction,
-            ),
-
-            const SizedBox(height: 32),
-
-            ReviewList(
-              questions: widget.result.questions,
-              userAnswers: widget.result.userAnswers,
-              bookmarked: _bookmarkedIds,
-              onToggleBookmark: _toggleBookmark,
-              onReport: _showReportModal,
-            ),
-            
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: widget.onRestart,
-                icon: const Icon(Icons.refresh_rounded),
-                label: const Text('আবার পরীক্ষা দিন', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF059669), // emerald-700
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          // ── Section Title ──
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 28, 16, 8),
+              child: Text(
+                'উত্তরপত্র পর্যালোচনা',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'HindSiliguri',
+                  color: isDark ? Colors.white : const Color(0xFF111827),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-          ],
-        ),
+          ),
+
+          // ── Sticky Filter Header (Pinned on Scroll) ──
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _StickyFilterDelegate(
+              isDark: isDark,
+              child: Container(
+                color: isDark ? Colors.black : const Color(0xFFFAFAFA),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                alignment: Alignment.centerLeft,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    children: [
+                      _ResultFilterChip(
+                        label: 'সব (${widget.result.questions.length})',
+                        isSelected: _reviewFilter == 'all',
+                        onTap: () => setState(() => _reviewFilter = 'all'),
+                        isDark: isDark,
+                      ),
+                      const SizedBox(width: 8),
+                      _ResultFilterChip(
+                        label: 'সঠিক ($correctCount)',
+                        dotColor: const Color(0xFF10B981),
+                        isSelected: _reviewFilter == 'correct',
+                        onTap: () => setState(() => _reviewFilter = 'correct'),
+                        isDark: isDark,
+                      ),
+                      const SizedBox(width: 8),
+                      _ResultFilterChip(
+                        label: 'ভুল ($wrongCount)',
+                        dotColor: const Color(0xFFEF4444),
+                        isSelected: _reviewFilter == 'wrong',
+                        onTap: () => setState(() => _reviewFilter = 'wrong'),
+                        isDark: isDark,
+                      ),
+                      const SizedBox(width: 8),
+                      _ResultFilterChip(
+                        label: 'স্কিপ ($skipCount)',
+                        dotColor: const Color(0xFF9CA3AF),
+                        isSelected: _reviewFilter == 'skipped',
+                        onTap: () => setState(() => _reviewFilter = 'skipped'),
+                        isDark: isDark,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 6),
+          ),
+
+          // ── Virtualized Question Cards ──
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverList.builder(
+              itemCount: filteredQuestions.length,
+              itemBuilder: (context, index) {
+                final q = filteredQuestions[index];
+                final originalIndex = widget.result.questions.indexOf(q);
+                return RepaintBoundary(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: QuestionCard(
+                      key: ValueKey(q.id),
+                      question: q,
+                      serialNumber: originalIndex + 1,
+                      selectedOptionIndex: widget.result.userAnswers[q.id],
+                      isFlagged: false,
+                      isBookmarked: _bookmarkedIds.contains(q.id),
+                      onToggleBookmark: () => _toggleBookmark(q.id),
+                      onReport: () => _showReportModal(q.id),
+                      onSelectOption: (_) {},
+                      onToggleFlag: () {},
+                      showFeedback: true,
+                      readOnly: true,
+                      initiallyExpanded: false,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // ── Bottom Action (Restart Exam Button) ──
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: widget.onRestart,
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text(
+                    'আবার পরীক্ষা দিন',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF004633),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 20),
+          ),
+        ],
       ),
       floatingActionButton: Align(
         alignment: Alignment.topCenter,
@@ -498,11 +548,9 @@ class _ResultViewState extends State<ResultView> {
         halfWidth +
             externalRadius *
                 1.5 *
-                1.0, // Used for offset in actual math mapping (simplified here)
+                1.0, 
         halfWidth + externalRadius * 1.5 * 1.0,
       );
-      // Just consuming the unused local to satisfy lint and keep the path safe.
-      // In a real math formula we use `math.cos`/`math.sin`.
       final dummyVar = halfDegreesPerStep;
       path.lineTo(
         halfWidth + internalRadius * 1.0 + dummyVar * 0.0,
@@ -513,3 +561,113 @@ class _ResultViewState extends State<ResultView> {
     return path;
   }
 }
+
+// ── Filter Button Chip (Borderless & Bold when Selected) ──────────────────────
+
+class _ResultFilterChip extends StatelessWidget {
+  final String label;
+  final Color? dotColor;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final bool isDark;
+
+  const _ResultFilterChip({
+    required this.label,
+    this.dotColor,
+    required this.isSelected,
+    required this.onTap,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = isSelected
+        ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB))
+        : (isDark ? const Color(0xFF18181B) : const Color(0xFFF4F4F5));
+
+    final textColor = isSelected
+        ? (isDark ? Colors.white : const Color(0xFF111827))
+        : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280));
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(20),
+          // No border as requested
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (dotColor != null) ...[
+              Container(
+                width: 7,
+                height: 7,
+                decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.normal,
+                fontFamily: 'HindSiliguri',
+                color: textColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Sticky Filter Header Delegate ─────────────────────────────────────────────
+
+class _StickyFilterDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  final bool isDark;
+
+  _StickyFilterDelegate({required this.child, required this.isDark});
+
+  @override
+  double get minExtent => 52.0;
+
+  @override
+  double get maxExtent => 52.0;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? Colors.black : const Color(0xFFFAFAFA),
+        border: shrinkOffset > 0
+            ? Border(
+                bottom: BorderSide(
+                  color: isDark
+                      ? const Color(0xFF27272A)
+                      : const Color(0xFFE5E7EB),
+                  width: 1,
+                ),
+              )
+            : null,
+      ),
+      child: child,
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _StickyFilterDelegate oldDelegate) {
+    return true;
+  }
+}
+
+

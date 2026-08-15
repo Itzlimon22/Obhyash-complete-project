@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import '../../../../core/utils/bangla_name_helper.dart';
 import '../../../dashboard/domain/models.dart';
 
 class RecentActivitySection extends StatelessWidget {
@@ -14,38 +14,7 @@ class RecentActivitySection extends StatelessWidget {
   }
 
   String _formatSubjectName(String name) {
-    if (name.isEmpty) return name;
-    final l = name.toLowerCase();
-
-    String subjectPart = name;
-    if (l.contains('physics')) subjectPart = 'পদার্থবিজ্ঞান';
-    else if (l.contains('chemistry')) subjectPart = 'রসায়ন';
-    else if (l.contains('biology') || l.contains('botany') || l.contains('zoology')) subjectPart = 'জীববিজ্ঞান';
-    else if (l.contains('math') || l.contains('higher_math')) subjectPart = 'উচ্চতর গণিত';
-    else if (l.contains('bangla')) subjectPart = 'বাংলা';
-    else if (l.contains('english')) subjectPart = 'ইংরেজি';
-    else if (l.contains('ict')) subjectPart = 'আইসিটি';
-    else if (l.contains('accounting')) subjectPart = 'হিসাববিজ্ঞান';
-    else if (l.contains('finance')) subjectPart = 'ফাইনান্স';
-    else if (l.contains('management')) subjectPart = 'ব্যবসায় সংগঠন';
-    else if (l.contains('general_science')) subjectPart = 'সাধারণ বিজ্ঞান';
-    else if (l.contains('bgs') || l.contains('bangladesh_and_global_studies')) subjectPart = 'বাংলাদেশ ও বিশ্বপরিচয়';
-    else if (l.contains('general_knowledge') || l.contains('gk')) subjectPart = 'সাধারণ জ্ঞান';
-    else if (l.contains('general')) subjectPart = 'সাধারণ';
-    else {
-      if (!name.contains('_')) return name;
-      return name.split('_').map((word) {
-        if (word.isEmpty) return word;
-        if (word.toLowerCase() == 'hsc' || word.toLowerCase() == 'ssc') return word.toUpperCase();
-        return word[0].toUpperCase() + word.substring(1).toLowerCase();
-      }).join(' ');
-    }
-
-    String suffix = '';
-    if (l.endsWith('_1')) suffix = ' ১ম পত্র';
-    else if (l.endsWith('_2')) suffix = ' ২য় পত্র';
-
-    return '$subjectPart$suffix';
+    return BanglaNameHelper.formatSubject(name);
   }
 
   @override

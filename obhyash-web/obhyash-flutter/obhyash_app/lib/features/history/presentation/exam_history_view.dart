@@ -6,9 +6,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/utils/app_popups.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/presentation/result_view.dart';
 import '../../exam/presentation/widgets/question_card.dart';
+import '../../exam/presentation/widgets/question_report_dialog.dart';
 import '../../exam/services/local_exam_cache_service.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
@@ -72,34 +74,8 @@ class _ExamRecord {
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
-String _subjectDisplay(String key) {
-  const map = {
-    'physics': 'পদার্থবিজ্ঞান',
-    'chemistry': 'রসায়ন',
-    'biology': 'জীববিজ্ঞান',
-    'math': 'গণিত',
-    'higher_math': 'উচ্চতর গণিত',
-    'bangla': 'বাংলা',
-    'english': 'ইংরেজি',
-    'ict': 'আইসিটি',
-    'general_knowledge': 'সাধারণ জ্ঞান',
-    'gk': 'সাধারণ জ্ঞান',
-    'general': 'সাধারণ',
-    'hsc_bangla_1': 'বাংলা ১ম পত্র',
-    'hsc_bangla_2': 'বাংলা ২য় পত্র',
-    'hsc_english_1': 'ইংরেজি ১ম পত্র',
-    'hsc_english_2': 'ইংরেজি ২য় পত্র',
-    'hsc_ict': 'আইসিটি',
-    'hsc_physics_1': 'পদার্থবিজ্ঞান ১ম পত্র',
-    'hsc_physics_2': 'পদার্থবিজ্ঞান ২য় পত্র',
-    'hsc_chemistry_1': 'রসায়ন ১ম পত্র',
-    'hsc_chemistry_2': 'রসায়ন ২য় পত্র',
-    'hsc_biology_1': 'জীববিজ্ঞান ১ম পত্র',
-    'hsc_biology_2': 'জীববিজ্ঞান ২য় পত্র',
-    'hsc_math_1': 'উচ্চতর গণিত ১ম পত্র',
-    'hsc_math_2': 'উচ্চতর গণিত ২য় পত্র',
-  };
-  return map[key.toLowerCase()] ?? key;
+String _subjectDisplay(String key, [String? label]) {
+  return BanglaNameHelper.formatSubject(key, label);
 }
 
 String _formatDur(int secs) {
@@ -251,33 +227,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   }
 
   void _showReportDialog(String questionId) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('প্রশ্ন রিপোর্ট করুন'),
-        content: const Text('এই প্রশ্নে কোনো ভুল বা ত্রুটি থাকলে রিপোর্ট জমা দিন।'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('বাতিল'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF004633),
-            ),
-            onPressed: () {
-              Navigator.pop(ctx);
-              AppPopups.show(
-                context,
-                message: 'রিপোর্ট সফলভাবে জমা হয়েছে',
-                isError: false,
-              );
-            },
-            child: const Text('জমা দিন', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
+    QuestionReportDialog.show(context, questionId);
   }
 
   Future<void> _fetchChaptersForSubject(String subjectId) async {
@@ -1309,8 +1259,7 @@ class _ExamCardState extends State<_ExamCard> {
       if (cached != null && cached.questions.isNotEmpty) {
         if (mounted) {
           setState(() => _isLoading = false);
-          Navigator.push(
-            context,
+          Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (_) => ResultView(
                 result: cached,
@@ -1338,8 +1287,7 @@ class _ExamCardState extends State<_ExamCard> {
 
         if (mounted) {
           setState(() => _isLoading = false);
-          Navigator.push(
-            context,
+          Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (_) => ResultView(
                 result: examResult,

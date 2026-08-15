@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../../../core/utils/bangla_name_helper.dart';
 import '../../domain/models.dart';
 
 class SubjectStatCard extends StatelessWidget {
@@ -254,7 +255,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            child: Text(widget.subject.name),
+                            child: Text(BanglaNameHelper.formatSubject(widget.subject.name)),
                           ),
                         ),
                       ],

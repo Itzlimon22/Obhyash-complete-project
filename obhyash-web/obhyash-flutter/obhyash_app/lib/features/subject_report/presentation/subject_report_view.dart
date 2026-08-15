@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
 class _Chapter {
@@ -46,19 +47,7 @@ class _SRStats {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 String _srSubjName(String key) {
-  const m = {
-    'physics': 'পদার্থবিজ্ঞান',
-    'chemistry': 'রসায়ন',
-    'biology': 'জীববিজ্ঞান',
-    'math': 'গণিত',
-    'bangla': 'বাংলা',
-    'english': 'ইংরেজি',
-    'ict': 'আইসিটি',
-    'general_knowledge': 'সাধারণ জ্ঞান',
-    'gk': 'সাধারণ জ্ঞান',
-    'general': 'সাধারণ',
-  };
-  return m[key.toLowerCase()] ?? key;
+  return BanglaNameHelper.formatSubject(key);
 }
 
 bool _srSubjMatches(String stored, String target) {
@@ -686,10 +675,11 @@ class _SRChapterRow extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                c.name,
+                BanglaNameHelper.formatChapter(c.name),
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
+                  fontFamily: 'HindSiliguri',
                   color: isDark
                       ? const Color(0xFFD4D4D4)
                       : const Color(0xFF27272A),

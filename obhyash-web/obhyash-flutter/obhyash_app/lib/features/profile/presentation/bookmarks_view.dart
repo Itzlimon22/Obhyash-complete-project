@@ -3,8 +3,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/utils/bangla_name_helper.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/presentation/widgets/question_card.dart';
+import '../../exam/presentation/widgets/question_report_dialog.dart';
 
 
 class BookmarksView extends StatefulWidget {
@@ -221,12 +223,16 @@ class _BookmarksViewState extends State<BookmarksView> {
                   items: [
                     const DropdownMenuItem<String>(
                       value: '',
-                      child: Text('সব বিষয়', style: TextStyle(fontSize: 15)),
+                      child: Text('সব বিষয়', style: TextStyle(fontSize: 15, fontFamily: 'HindSiliguri')),
                     ),
                     ...subjects.map(
                       (s) => DropdownMenuItem<String>(
                         value: s,
-                        child: Text(s.toUpperCase(), style: const TextStyle(fontSize: 15), overflow: TextOverflow.ellipsis),
+                        child: Text(
+                          BanglaNameHelper.formatSubject(s),
+                          style: const TextStyle(fontSize: 15, fontFamily: 'HindSiliguri'),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                   ],
@@ -261,6 +267,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                     'অধ্যায়',
                     style: TextStyle(
                       fontSize: 15,
+                      fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFFA3A3A3),
                     ),
                   ),
@@ -274,12 +281,16 @@ class _BookmarksViewState extends State<BookmarksView> {
                   items: [
                     const DropdownMenuItem<String>(
                       value: '',
-                      child: Text('সব অধ্যায়', style: TextStyle(fontSize: 15)),
+                      child: Text('সব অধ্যায়', style: TextStyle(fontSize: 15, fontFamily: 'HindSiliguri')),
                     ),
                     ...chapters.map(
                       (c) => DropdownMenuItem<String>(
                         value: c,
-                        child: Text(c, style: const TextStyle(fontSize: 15), overflow: TextOverflow.ellipsis),
+                        child: Text(
+                          BanglaNameHelper.formatChapter(c),
+                          style: const TextStyle(fontSize: 15, fontFamily: 'HindSiliguri'),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
                   ],
@@ -482,7 +493,7 @@ class _BookmarksViewState extends State<BookmarksView> {
               isBookmarked: true,
               onSelectOption: (_) {},
               onToggleFlag: () {},
-              onReport: () {},
+              onReport: () => QuestionReportDialog.show(context, q.id),
               onToggleBookmark: () => _removeBookmark(q.id),
             ),
           ),

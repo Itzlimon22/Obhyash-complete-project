@@ -96,8 +96,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
 
   void _handlePlanSelect(SubscriptionPlan plan) {
     if (plan.id == _currentPlanId || plan.id == 'free') return;
-    Navigator.push(
-      context,
+    Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(builder: (_) => PaymentView(plan: plan)),
     );
   }

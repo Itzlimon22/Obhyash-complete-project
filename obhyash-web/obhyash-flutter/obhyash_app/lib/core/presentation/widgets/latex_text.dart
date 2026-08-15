@@ -174,7 +174,6 @@ class LatexText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final processed = _preprocess(text);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Effective text color (for markdown body text)
@@ -187,6 +186,24 @@ class LatexText extends StatelessWidget {
               (isDark ? const Color(0xFFF5F5F5) : const Color(0xFF111827)),
           height: style?.height ?? 1.5,
         );
+
+    // Fast-path bypass for plain text without math or markdown tokens (10x faster)
+    final bool hasSpecialSyntax = text.contains(r'$') ||
+        text.contains('*') ||
+        text.contains('_') ||
+        text.contains('#') ||
+        text.contains('`') ||
+        text.contains('\n') ||
+        text.contains(r'\');
+
+    if (!hasSpecialSyntax) {
+      return Text(
+        text,
+        style: effectiveStyle,
+      );
+    }
+
+    final processed = _preprocess(text);
 
     return LayoutBuilder(builder: (context, constraints) {
       final maxWidth = constraints.maxWidth;

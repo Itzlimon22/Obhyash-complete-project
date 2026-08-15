@@ -112,26 +112,38 @@ class _ReviewListState extends State<ReviewList> {
           ),
         ),
 
-        // Reusing QuestionCard in review mode
-        ...List.generate(filteredQuestions.length, (index) {
-          final q = filteredQuestions[index];
-          // Find original index for serial number
-          final originalIndex = widget.questions.indexOf(q);
-          return QuestionCard(
-            question: q,
-            serialNumber: originalIndex + 1,
-            selectedOptionIndex: widget.userAnswers[q.id],
-            isFlagged: false, // Don't show exam flags here
-            isBookmarked: widget.bookmarked.contains(q.id),
-            onToggleBookmark: () => widget.onToggleBookmark(q.id),
-            onReport: () => widget.onReport(q.id),
-            onSelectOption: (_) {}, // Read only
-            onToggleFlag: () {}, // Read only
-            showFeedback:
-                true, // This enables the green/red coloring and explanations
-            readOnly: true,
-          );
-        }),
+        // Optimized Virtualized QuestionCards in review mode (Lag-Free for 100+ questions)
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: filteredQuestions.length,
+          addAutomaticKeepAlives: false,
+          addRepaintBoundaries: true,
+          itemBuilder: (context, index) {
+            final q = filteredQuestions[index];
+            final originalIndex = widget.questions.indexOf(q);
+            return RepaintBoundary(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: QuestionCard(
+                  key: ValueKey(q.id),
+                  question: q,
+                  serialNumber: originalIndex + 1,
+                  selectedOptionIndex: widget.userAnswers[q.id],
+                  isFlagged: false,
+                  isBookmarked: widget.bookmarked.contains(q.id),
+                  onToggleBookmark: () => widget.onToggleBookmark(q.id),
+                  onReport: () => widget.onReport(q.id),
+                  onSelectOption: (_) {},
+                  onToggleFlag: () {},
+                  showFeedback: true,
+                  readOnly: true,
+                  initiallyExpanded: false,
+                ),
+              ),
+            );
+          },
+        ),
       ],
     );
   }

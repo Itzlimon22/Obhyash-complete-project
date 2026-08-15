@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../dashboard/domain/models.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../../core/providers/auth_provider.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 import 'my_profile_view.dart';
 import 'widgets/streak_calendar.dart';
 
@@ -18,7 +19,7 @@ final _statsExamHistoryProvider = FutureProvider.autoDispose<List<ExamResult>>((
   final data = await Supabase.instance.client
       .from('exam_results')
       .select(
-        'id, subject, correct_count, wrong_count, total_questions, created_at',
+        'id, subject, correct_count, wrong_count, total_questions, created_at, subject_label',
       )
       .eq('user_id', uid)
       .order('created_at', ascending: false)
@@ -44,7 +45,7 @@ List<SubjectStats> _computeSubjectStats(List<ExamResult> history) {
   for (final e in history) {
     final acc = map.putIfAbsent(
       e.subject,
-      () => _SubjectAccum(label: e.subjectLabel ?? e.subject),
+      () => _SubjectAccum(label: BanglaNameHelper.formatSubject(e.subject, e.subjectLabel)),
     );
     acc.correct += e.correctCount;
     acc.wrong += e.wrongCount;

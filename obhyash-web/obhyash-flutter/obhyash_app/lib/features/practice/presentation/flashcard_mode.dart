@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:audioplayers/audioplayers.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 import '../../../core/presentation/widgets/latex_text.dart';
 import 'practice_dashboard.dart';
 
@@ -411,10 +412,11 @@ class _FlashcardModeState extends State<FlashcardMode> {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      q.subjectLabel,
+                      BanglaNameHelper.formatSubject(q.subject, q.subjectLabel),
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
+                        fontFamily: 'HindSiliguri',
                         color: Color(0xFFA3A3A3),
                       ),
                     ),

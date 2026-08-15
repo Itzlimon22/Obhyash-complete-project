@@ -216,8 +216,8 @@ class SettingsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeMode = ref.watch(themeModeProvider);
-    final bg = isDark ? const Color(0xFF000000) : const Color(0xFFFAFAFA);
-    final cardBg = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+    final bg = isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAFA);
+    final cardBg = isDark ? const Color(0xFF18181B) : Colors.white;
     final groups = _buildGroups(context, themeMode);
 
     final nameParts = user.name.trim().split(' ');
@@ -238,7 +238,7 @@ class SettingsView extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: isDark
-                      ? const Color(0xFF1C1C1E)
+                      ? const Color(0xFF27272A)
                       : const Color(0xFFE5E5E5),
                 ),
                 boxShadow: const [
@@ -273,7 +273,7 @@ class SettingsView extends ConsumerWidget {
                           gender: user.gender,
                           size: 80,
                           showBorder: true,
-                          borderColor: Colors.white.withOpacity(0.3),
+                          borderColor: Colors.white.withValues(alpha: 0.3),
                           borderWidth: 3,
                         ),
                         const SizedBox(height: 12),
@@ -295,7 +295,7 @@ class SettingsView extends ConsumerWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 15,
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                             ),
                           ),
                         ],
@@ -458,25 +458,27 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iconColor = item.danger
-        ? const Color(0xFFB91C1C)
-        : const Color(0xFF166534);
+        ? const Color(0xFFEF4444)
+        : (isDark ? const Color(0xFF34D399) : const Color(0xFF166534));
     final iconBg = item.danger
-        ? const Color(0xFFB91C1C).withOpacity(0.1)
-        : const Color(0xFF166534).withOpacity(0.1);
+        ? const Color(0xFFEF4444).withValues(alpha: isDark ? 0.2 : 0.1)
+        : (isDark
+            ? const Color(0xFF059669).withValues(alpha: 0.2)
+            : const Color(0xFF166534).withValues(alpha: 0.1));
     final labelColor = item.danger
-        ? const Color(0xFFB91C1C)
+        ? const Color(0xFFEF4444)
         : (isDark ? Colors.white : const Color(0xFF000000));
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFF0F0F0),
         ),
         boxShadow: [
           BoxShadow(
-            color: isDark ? Colors.transparent : const Color(0x08000000),
+            color: isDark ? const Color(0x1A000000) : const Color(0x08000000),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -488,7 +490,7 @@ class _NavItem extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
                 Container(
@@ -505,34 +507,36 @@ class _NavItem extends StatelessWidget {
                   child: Text(
                     item.label,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: FontWeight.w700,
                       color: labelColor,
                       fontFamily: 'Anek Bangla',
                     ),
-                   maxLines: 1, overflow: TextOverflow.ellipsis),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-            if (item.type != _ItemType.action)
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  item.type == _ItemType.external
-                      ? LucideIcons.externalLink
-                      : LucideIcons.chevronRight,
-                  size: 16,
-                  color: isDark
-                      ? const Color(0xFFA3A3A3)
-                      : const Color(0xFF737373),
-                ),
-              ),
-          ],
+                if (item.type != _ItemType.action)
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF27272A) : const Color(0xFFF5F5F5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      item.type == _ItemType.external
+                          ? LucideIcons.externalLink
+                          : LucideIcons.chevronRight,
+                      size: 15,
+                      color: isDark
+                          ? const Color(0xFFA1A1AA)
+                          : const Color(0xFF737373),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
-      ),
-    ),
       ),
     );
   }
@@ -556,10 +560,10 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6.5),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
+        color: isDark ? const Color(0xFF27272A) : const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E5E5),
         ),
       ),
       child: Row(
@@ -577,7 +581,7 @@ class _InfoChip extends StatelessWidget {
                 fontSize: 13.5,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Anek Bangla',
-                color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
+                color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
               ),
             ),
           ),
@@ -608,10 +612,10 @@ class _ActionBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     final bg = isAccent
         ? (isDark ? const Color(0x33881337) : const Color(0xFFFFF1F2))
-        : (isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF5F5F5));
+        : (isDark ? const Color(0xFF27272A) : const Color(0xFFF5F5F5));
     final fg = isAccent
-        ? (isDark ? const Color(0xFFB91C1C) : const Color(0xFFB91C1C))
-        : (isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A));
+        ? const Color(0xFFEF4444)
+        : (isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A));
 
     return Expanded(
       child: GestureDetector(
@@ -626,7 +630,7 @@ class _ActionBtn extends StatelessWidget {
               color: isAccent
                   ? (isDark ? const Color(0x887f1d1d) : const Color(0xFFfecdd3))
                   : (isDark
-                        ? const Color(0xFF1C1C1E)
+                        ? const Color(0xFF3F3F46)
                         : const Color(0xFFE5E5E5)),
             ),
           ),

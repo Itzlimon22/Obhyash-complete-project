@@ -8,6 +8,8 @@ import '../providers/exam_provider.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 
+import '../../../core/utils/bangla_name_helper.dart';
+
 // --- Domain Models ---
 class SubjectItem {
   final String id;
@@ -38,6 +40,50 @@ class TopicItem {
     required this.name,
     required this.chapterId,
   });
+}
+
+// --- Subject Serial Comparator ---
+int _getSubjectSortPriority(String name, String id) {
+  final l = '$name $id'.toLowerCase();
+  int base = 100;
+
+  if (l.contains('bangla') || l.contains('বাংলা')) {
+    base = 10;
+  } else if (l.contains('english') || l.contains('ইংরেজি')) {
+    base = 20;
+  } else if (l.contains('ict') || l.contains('তথ্য') || l.contains('information')) {
+    base = 30;
+  } else if (l.contains('physics') || l.contains('পদার্থ')) {
+    base = 40;
+  } else if (l.contains('chemistry') || l.contains('রসায়ন') || l.contains('রসায়ন')) {
+    base = 50;
+  } else if (l.contains('math') || l.contains('গণিত')) {
+    base = 60;
+  } else if (l.contains('biology') || l.contains('botany') || l.contains('zoology') || l.contains('জীববিজ্ঞান')) {
+    base = 70;
+  } else if (l.contains('accounting') || l.contains('হিসাব')) {
+    base = 80;
+  } else if (l.contains('finance') || l.contains('ফিন্যান্স') || l.contains('ব্যাংকিং')) {
+    base = 82;
+  } else if (l.contains('management') || l.contains('ব্যবসায়') || l.contains('ব্যবস্থাপনা')) {
+    base = 84;
+  } else if (l.contains('marketing') || l.contains('বিপণন')) {
+    base = 86;
+  } else if (l.contains('economics') || l.contains('অর্থনীতি')) {
+    base = 88;
+  } else if (l.contains('statistics') || l.contains('পরিসংখ্যান')) {
+    base = 90;
+  } else if (l.contains('civics') || l.contains('পৌরনীতি')) {
+    base = 92;
+  } else if (l.contains('history') || l.contains('ইতিহাস')) {
+    base = 94;
+  }
+
+  // 1st paper comes before 2nd paper
+  if (l.contains('2nd') || l.contains('_2') || l.contains('২য়') || l.contains('২য়') || l.contains('zoology') || l.contains('প্রাণি')) {
+    return base + 1;
+  }
+  return base;
 }
 
 // --- View ---
@@ -77,38 +123,52 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     setState(() => _isLoadingData = true);
     try {
       final profile = ref.read(userProfileProvider).value;
-      final division = profile?.division;
-      final stream = profile?.stream;
-      final optionalSubject = profile?.optionalSubject;
+      final level = profile?.level?.trim();
+      final division = profile?.division?.trim();
+      final stream = profile?.stream?.trim();
+      final optionalSubject = profile?.optionalSubject?.trim();
 
       final supabase = Supabase.instance.client;
       var query = supabase.from('subjects').select('*');
 
-      if (division != null && division != 'General') {
-        query = query.or('division.eq.$division,division.eq.General');
+      // Filter by Level (HSC vs SSC)
+      if (level != null && level.isNotEmpty) {
+        query = query.or('level.eq.$level,level.is.null,level.eq.all');
       }
-      if (stream != null) {
+
+      // Filter by Division
+      if (division != null && division != 'General' && division.isNotEmpty) {
+        query = query.or('division.eq.$division,division.eq.General,division.is.null');
+      }
+
+      // Filter by Stream
+      if (stream != null && stream.isNotEmpty) {
         query = query.or('stream.ilike.%$stream%,stream.is.null');
       }
 
-      final data = await query.limit(100);
+      final data = await query.limit(150);
 
       final filteredData = (data as List).where((e) {
-        final subName = (e['name'] ?? e['name_en'] ?? '')
-            .toString()
-            .toLowerCase();
+        final subName = (e['name'] ?? e['name_en'] ?? '').toString().toLowerCase();
         final subId = e['id'].toString().toLowerCase();
 
-        final isBiology =
-            subName.contains('biology') || subId.contains('biology');
-        final isStatistics =
-            subName.contains('statistics') || subId.contains('statistics');
+        // Level safety check
+        if (level != null && level.toUpperCase() == 'SSC') {
+          if (subId.startsWith('hsc_') || subName.contains('hsc')) return false;
+        } else if (level != null && level.toUpperCase() == 'HSC') {
+          if (subId.startsWith('ssc_') || subName.contains('ssc')) return false;
+        }
 
-        if (optionalSubject == 'Statistics') {
-          if (isBiology) return false;
-        } else {
-          // If Optional is Biology (or undefined), hide Statistics
-          if (isStatistics) return false;
+        // Optional Subject filtering
+        final isBiology = subName.contains('biology') || subId.contains('biology') || subName.contains('জীববিজ্ঞান');
+        final isStatistics = subName.contains('statistics') || subId.contains('statistics') || subName.contains('পরিসংখ্যান');
+
+        if (optionalSubject != null && optionalSubject.isNotEmpty) {
+          if (optionalSubject.toLowerCase().contains('stat')) {
+            if (isBiology) return false;
+          } else if (optionalSubject.toLowerCase().contains('bio')) {
+            if (isStatistics) return false;
+          }
         }
         return true;
       });
@@ -116,15 +176,29 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
       final seen = <String>{};
       final list = <SubjectItem>[];
       for (final e in filteredData) {
-        final name = (e['name'] ?? e['name_en'] ?? '').toString();
-        if (name.isEmpty || seen.contains(name)) continue;
-        seen.add(name);
-        final nameEn = (e['name_en'] ?? '').toString();
-        final label = nameEn.isNotEmpty && nameEn != name
-            ? '$name ($nameEn)'
-            : name;
-        list.add(SubjectItem(id: e['id'].toString(), name: name, label: label));
+        final rawName = (e['name'] ?? e['name_en'] ?? '').toString();
+        final rawNameEn = (e['name_en'] ?? '').toString();
+        final formattedName = BanglaNameHelper.formatSubject(rawNameEn.isNotEmpty ? rawNameEn : rawName, rawName);
+        
+        if (formattedName.isEmpty || seen.contains(formattedName)) continue;
+        seen.add(formattedName);
+
+        list.add(SubjectItem(
+          id: e['id'].toString(),
+          name: formattedName,
+          label: formattedName,
+        ));
       }
+
+      // Sort with custom serial: bangla, eng, ict, phy, che, math, bio, other
+      list.sort((a, b) {
+        final priorityA = _getSubjectSortPriority(a.name, a.id);
+        final priorityB = _getSubjectSortPriority(b.name, b.id);
+        if (priorityA != priorityB) {
+          return priorityA.compareTo(priorityB);
+        }
+        return a.name.compareTo(b.name);
+      });
 
       if (mounted) {
         setState(() {
@@ -351,18 +425,19 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
           label,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 15,
+            fontSize: 14.5,
+            fontFamily: 'HindSiliguri',
             color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         InkWell(
           onTap: disabled ? null : onTap,
           borderRadius: BorderRadius.circular(12),
           child: Opacity(
             opacity: disabled ? 0.5 : 1.0,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: isDark
                     ? const Color(0xFF1C1C1E)
@@ -380,7 +455,8 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     child: Text(
                       value.isEmpty ? hint : value,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
+                        fontFamily: 'HindSiliguri',
                         fontWeight: value.isEmpty
                             ? FontWeight.normal
                             : FontWeight.bold,
@@ -394,7 +470,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                   ),
                   const Icon(
                     LucideIcons.chevronDown,
-                    size: 20,
+                    size: 18,
                     color: Color(0xFFA3A3A3),
                   ),
                 ],
@@ -411,49 +487,25 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+      physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Header
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(
-                      0xFF059669,
-                    ).withValues(alpha: isDark ? 0.2 : 0.1),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: Text(
-                    'EXAM CONFIGURATION',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w900,
-                      color: isDark
-                          ? const Color(0xFF059669)
-                          : const Color(0xFF059669),
-                      letterSpacing: 1.5,
-                    ),
-                  ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
+            child: Center(
+              child: Text(
+                'পরীক্ষা সেটআপ করো',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'HindSiliguri',
+                  color: isDark ? Colors.white : const Color(0xFF000000),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'পরীক্ষা সেটআপ করো',
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : const Color(0xFF000000),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
 
@@ -473,8 +525,8 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     onTap: _showSubjectDropdown,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
+                        horizontal: 14,
+                        vertical: 12,
                       ),
                       decoration: BoxDecoration(
                         color: isDark ? const Color(0xFF000000) : Colors.white,
@@ -485,7 +537,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                               : (isDark
                                     ? const Color(0xFF27272A)
                                     : const Color(0xFFE5E5E5)),
-                          width: _selectedSubject != null ? 2 : 1,
+                          width: _selectedSubject != null ? 1.5 : 1,
                         ),
                       ),
                       child: Row(
@@ -522,7 +574,8 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                                         .label
                                   : 'বিষয় নির্বাচন করো...',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 15,
+                                fontFamily: 'HindSiliguri',
                                 fontWeight: FontWeight.bold,
                                 color: _selectedSubject != null
                                     ? (isDark
@@ -536,7 +589,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                           ),
                           const Icon(
                             LucideIcons.chevronDown,
-                            size: 20,
+                            size: 18,
                             color: Color(0xFFA3A3A3),
                           ),
                         ],
@@ -544,7 +597,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     ),
                   ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // 2. Chapters & Topics
           Opacity(
@@ -570,7 +623,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                       onTap: _showChapterDropdown,
                       disabled: _chapters.isEmpty && _selectedSubject != null,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     _buildDropdownSelector(
                       label: 'টপিক',
                       hint: 'সব টপিক',
@@ -588,7 +641,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // 3. Exam Tools (Type, Difficulty, Mark, etc)
           _CardContainer(
@@ -616,7 +669,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                   .toList(),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           _CardContainer(
             isDark: isDark,
@@ -644,7 +697,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                   .toList(),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // 4. Sliders (Questions & Time)
           _CardContainer(
@@ -659,7 +712,8 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     Text(
                       'মোট প্রশ্ন:',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
+                        fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : const Color(0xFF000000),
                       ),
@@ -667,7 +721,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     Text(
                       '$_questionCount',
                       style: const TextStyle(
-                        fontSize: 22,
+                        fontSize: 20,
                         fontWeight: FontWeight.w900,
                         color: Color(0xFF059669),
                       ),
@@ -689,7 +743,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           _CardContainer(
             isDark: isDark,
@@ -703,7 +757,8 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     Text(
                       'মোট সময়:',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
+                        fontFamily: 'HindSiliguri',
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : const Color(0xFF000000),
                       ),
@@ -711,8 +766,9 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     Text(
                       '$_durationMinutes মি',
                       style: const TextStyle(
-                        fontSize: 22,
+                        fontSize: 20,
                         fontWeight: FontWeight.w900,
+                        fontFamily: 'HindSiliguri',
                         color: Color(0xFF059669),
                       ),
                     ),
@@ -730,7 +786,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           _CardContainer(
             isDark: isDark,
@@ -751,7 +807,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                   .toList(),
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
           // Start Button
           ElevatedButton(
@@ -763,16 +819,16 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               disabledBackgroundColor: isDark
                   ? const Color(0xFF1C1C1E)
                   : const Color(0xFFE5E5E5),
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
               ),
               elevation: 0,
             ),
             child: _isStarting
                 ? const SizedBox(
-                    width: 24,
-                    height: 24,
+                    width: 22,
+                    height: 22,
                     child: CircularProgressIndicator(
                       color: Colors.white,
                       strokeWidth: 2,
@@ -785,20 +841,21 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                         'পরীক্ষা শুরু করো',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 17,
                           fontWeight: FontWeight.w900,
+                          fontFamily: 'HindSiliguri',
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       const Icon(
                         LucideIcons.sparkles,
-                        size: 20,
+                        size: 18,
                         color: Colors.white,
                       ),
                     ],
                   ),
           ),
-          const SizedBox(height: 60),
+          const SizedBox(height: 40),
         ],
       ),
     );
@@ -821,10 +878,10 @@ class _CardContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF000000) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
         ),
@@ -832,9 +889,9 @@ class _CardContainer extends StatelessWidget {
             ? []
             : [
                 const BoxShadow(
-                  color: Color(0x05000000),
-                  blurRadius: 10,
-                  offset: Offset(0, 4),
+                  color: Color(0x04000000),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
                 ),
               ],
       ),
@@ -843,19 +900,20 @@ class _CardContainer extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 20, color: const Color(0xFF059669)),
+              Icon(icon, size: 18, color: const Color(0xFF059669)),
               const SizedBox(width: 8),
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16.5,
                   fontWeight: FontWeight.w900,
+                  fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF000000),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
           child,
         ],
       ),
@@ -881,7 +939,7 @@ class _ToggleBox extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
         decoration: BoxDecoration(
           color: selected
               ? const Color(0xFF059669).withValues(alpha: isDark ? 0.2 : 0.1)
@@ -891,7 +949,7 @@ class _ToggleBox extends StatelessWidget {
                 ? const Color(0xFF059669)
                 : (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5)),
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -899,8 +957,9 @@ class _ToggleBox extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 14.5,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'HindSiliguri',
                 color: selected
                     ? const Color(0xFF059669)
                     : (isDark
@@ -909,7 +968,7 @@ class _ToggleBox extends StatelessWidget {
               ),
             ),
             if (selected) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Container(
                 width: 6,
                 height: 6,
@@ -926,7 +985,8 @@ class _ToggleBox extends StatelessWidget {
   }
 }
 
-class _SubjectDropdownModal extends StatefulWidget {
+
+class _SubjectDropdownModal extends StatelessWidget {
   final List<SubjectItem> subjects;
   final String? selectedId;
   final void Function(String id) onSelect;
@@ -938,27 +998,8 @@ class _SubjectDropdownModal extends StatefulWidget {
   });
 
   @override
-  State<_SubjectDropdownModal> createState() => _SubjectDropdownModalState();
-}
-
-class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
-  String _searchQuery = '';
-  final _searchController = TextEditingController();
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final filteredSubjects = widget.subjects.where((s) {
-      return s.label.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          s.name.toLowerCase().contains(_searchQuery.toLowerCase());
-    }).toList();
 
     return DraggableScrollableSheet(
       initialChildSize: 0.65,
@@ -969,7 +1010,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
         color: Colors.transparent,
         child: Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF000000) : Colors.white,
+            color: isDark ? const Color(0xFF0D0D0E) : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -991,10 +1032,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
 
               // Header
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.fromLTRB(20, 8, 12, 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -1003,6 +1041,7 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
+                        fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF000000),
                       ),
                     ),
@@ -1017,60 +1056,11 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                 ),
               ),
 
-              // Search Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 8,
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF1C1C1E)
-                        : const Color(0xFFF5F5F5),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF27272A)
-                          : const Color(0xFFE5E5E5),
-                    ),
-                  ),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: (val) => setState(() => _searchQuery = val),
-                    style: TextStyle(
-                      color: isDark ? Colors.white : const Color(0xFF000000),
-                      fontSize: 16,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'বিষয় খুঁজুন...',
-                      hintStyle: TextStyle(
-                        color: isDark
-                            ? const Color(0xFFA3A3A3)
-                            : const Color(0xFFA3A3A3),
-                      ),
-                      prefixIcon: Icon(
-                        LucideIcons.search,
-                        size: 18,
-                        color: isDark
-                            ? const Color(0xFFA3A3A3)
-                            : const Color(0xFFA3A3A3),
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              const Divider(height: 1, thickness: 0.8),
 
-              const SizedBox(height: 8),
-
-              // List
+              // List of Subjects
               Expanded(
-                child: filteredSubjects.isEmpty
+                child: subjects.isEmpty
                     ? Center(
                         child: Text(
                           'কোনো বিষয় পাওয়া যায়নি',
@@ -1078,89 +1068,93 @@ class _SubjectDropdownModalState extends State<_SubjectDropdownModal> {
                             color: isDark
                                 ? const Color(0xFFA3A3A3)
                                 : const Color(0xFF737373),
-                            fontSize: 17,
+                            fontSize: 16,
+                            fontFamily: 'HindSiliguri',
                           ),
                         ),
                       )
                     : ListView.builder(
                         controller: scrollController,
+                        physics: const BouncingScrollPhysics(),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
-                          vertical: 8,
+                          vertical: 14,
                         ),
-                        itemCount: filteredSubjects.length,
+                        itemCount: subjects.length,
                         itemBuilder: (context, index) {
-                          final subject = filteredSubjects[index];
-                          final isSelected = subject.id == widget.selectedId;
+                          final subject = subjects[index];
+                          final isSelected = subject.id == selectedId;
+
+                          final bg = isSelected
+                              ? (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9))
+                              : (isDark ? const Color(0xFF18181B) : const Color(0xFFFAFAFA));
+
+                          final border = isSelected
+                              ? (isDark ? const Color(0xFF475569) : const Color(0xFF0F172A))
+                              : (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB));
+
+                          final textColor = isSelected
+                              ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                              : (isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155));
+
+                          final iconBg = isSelected
+                              ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                              : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0));
+
+                          final iconColor = isSelected
+                              ? (isDark ? const Color(0xFF0F172A) : Colors.white)
+                              : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B));
 
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: InkWell(
-                              onTap: () => widget.onSelect(subject.id),
-                              borderRadius: BorderRadius.circular(12),
+                              onTap: () => onSelect(subject.id),
+                              borderRadius: BorderRadius.circular(14),
                               child: Container(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? const Color(
-                                          0xFF059669,
-                                        ).withValues(alpha: 0.1)
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(12),
+                                  color: bg,
+                                  borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
-                                    color: isSelected
-                                        ? const Color(
-                                            0xFF059669,
-                                          ).withValues(alpha: 0.3)
-                                        : Colors.transparent,
+                                    color: border,
+                                    width: isSelected ? 1.4 : 1.0,
                                   ),
                                 ),
                                 child: Row(
                                   children: [
                                     Container(
-                                      width: 40,
-                                      height: 40,
+                                      width: 38,
+                                      height: 38,
                                       decoration: BoxDecoration(
-                                        color: isSelected
-                                            ? const Color(
-                                                0xFF059669,
-                                              ).withValues(alpha: 0.2)
-                                            : (isDark
-                                                  ? const Color(0xFF1C1C1E)
-                                                  : const Color(0xFFF5F5F5)),
+                                        color: iconBg,
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Icon(
                                         LucideIcons.bookOpen,
                                         size: 18,
-                                        color: isSelected
-                                            ? const Color(0xFF059669)
-                                            : (isDark
-                                                  ? const Color(0xFFA3A3A3)
-                                                  : const Color(0xFF737373)),
+                                        color: iconColor,
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
+                                    const SizedBox(width: 14),
                                     Expanded(
                                       child: Text(
                                         subject.label,
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: isSelected
-                                              ? FontWeight.bold
+                                              ? FontWeight.w900
                                               : FontWeight.w600,
-                                          color: isSelected
-                                              ? const Color(0xFF059669)
-                                              : (isDark
-                                                    ? Colors.white
-                                                    : const Color(0xFF000000)),
+                                          fontFamily: 'HindSiliguri',
+                                          color: textColor,
                                         ),
-                                       maxLines: 1, overflow: TextOverflow.ellipsis),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
                                     if (isSelected)
-                                      const Icon(
-                                        LucideIcons.checkCircle,
-                                        color: Color(0xFF059669),
+                                      Icon(
+                                        Icons.check_circle_rounded,
+                                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                                         size: 20,
                                       ),
                                   ],
@@ -1492,7 +1486,9 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                                     ? Colors.white
                                                     : const Color(0xFF000000)),
                                         ),
-                                       maxLines: 1, overflow: TextOverflow.ellipsis),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
                                   ],
                                 ),
