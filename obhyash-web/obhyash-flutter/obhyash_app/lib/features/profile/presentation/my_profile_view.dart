@@ -8,6 +8,7 @@ import 'widgets/subjects_progress_section.dart';
 import 'widgets/recent_activity_section.dart';
 import 'widgets/streak_calendar.dart';
 import '../../dashboard/presentation/widgets/exam_target_modal.dart';
+import '../../../core/presentation/widgets/user_avatar.dart';
 
 class MyProfileView extends ConsumerWidget {
   final UserProfile user;
@@ -331,40 +332,15 @@ class _UserProfileCard extends StatelessWidget {
       child: Row(
         children: [
           // Avatar
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: const Color(0xFFB91C1C),
-              image: (user.avatarUrl != null && user.avatarUrl!.isNotEmpty && !user.avatarUrl!.toLowerCase().contains('.svg'))
-                  ? DecorationImage(
-                      image: NetworkImage(user.avatarUrl!),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
-            ),
-            child: (user.avatarUrl == null || user.avatarUrl!.isEmpty || user.avatarUrl == 'null')
-                ? Center(
-                    child: Text(
-                      _initials,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  )
-                : (user.avatarUrl!.toLowerCase().contains('.svg')
-                    ? ClipOval(
-                        child: SvgPicture.network(
-                          user.avatarUrl!,
-                          fit: BoxFit.cover,
-                          width: 64,
-                          height: 64,
-                        ),
-                      )
-                    : null),
+          UserAvatar(
+            id: user.id,
+            name: user.name,
+            avatarUrl: user.avatarUrl,
+            gender: user.gender,
+            size: 64,
+            showBorder: true,
+            borderColor: Colors.white,
+            borderWidth: 2,
           ),
           const SizedBox(width: 16),
           // Info

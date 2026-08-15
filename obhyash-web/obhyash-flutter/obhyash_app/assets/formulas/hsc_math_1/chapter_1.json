@@ -1,0 +1,12 @@
+[
+  {
+    "title": "2×2 নির্ণায়ক",
+    "latex": "\\det(A) = \\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix} = ad - bc",
+    "description": "2×2 ম্যাট্রিক্সের নির্ণায়ক"
+  },
+  {
+    "title": "2×2 বিপরীত ম্যাট্রিক্স",
+    "latex": "A^{-1} = \\frac{1}{ad-bc}\\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}",
+    "description": "বিপরীত ম্যাট্রিক্স বিদ্যমান যদি det(A) ≠ 0"
+  }
+]

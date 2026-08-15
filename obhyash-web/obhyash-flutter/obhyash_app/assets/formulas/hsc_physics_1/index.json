@@ -1,0 +1,56 @@
+{
+  "subjectId": "hsc_physics_1",
+  "subjectName": "পদার্থবিজ্ঞান ১ম পত্র",
+  "chapters": [
+    {
+      "chapterId": "chapter_1",
+      "chapterName": "ভৌত জগৎ ও পরিমাপ",
+      "chapterNumber": 1
+    },
+    {
+      "chapterId": "chapter_2",
+      "chapterName": "ভেক্টর",
+      "chapterNumber": 2
+    },
+    {
+      "chapterId": "chapter_3",
+      "chapterName": "গতিবিদ্যা",
+      "chapterNumber": 3
+    },
+    {
+      "chapterId": "chapter_4",
+      "chapterName": "নিউটনিয়ান বলবিদ্যা",
+      "chapterNumber": 4
+    },
+    {
+      "chapterId": "chapter_5",
+      "chapterName": "কাজ, শক্তি ও ক্ষমতা",
+      "chapterNumber": 5
+    },
+    {
+      "chapterId": "chapter_6",
+      "chapterName": "মহাকর্ষ ও অভিকর্ষ",
+      "chapterNumber": 6
+    },
+    {
+      "chapterId": "chapter_7",
+      "chapterName": "পদার্থের গাঠনিক ধর্ম",
+      "chapterNumber": 7
+    },
+    {
+      "chapterId": "chapter_8",
+      "chapterName": "পর্যাবৃত্ত গতি",
+      "chapterNumber": 8
+    },
+    {
+      "chapterId": "chapter_9",
+      "chapterName": "তরঙ্গ",
+      "chapterNumber": 9
+    },
+    {
+      "chapterId": "chapter_10",
+      "chapterName": "আদর্শ গ্যাস ও গ্যাসের গতিতত্ত্ব",
+      "chapterNumber": 10
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+[
+  {
+    "title": "pH সংজ্ঞা",
+    "latex": "pH = -\\log[H^+]",
+    "description": "H⁺ আয়নের মোলার ঘনমাত্রার ঋণাত্মক লগারিদম"
+  },
+  {
+    "title": "pOH সংজ্ঞা",
+    "latex": "pOH = -\\log[OH^-]",
+    "description": "OH⁻ আয়নের মোলার ঘনমাত্রার ঋণাত্মক লগারিদম"
+  },
+  {
+    "title": "pH ও pOH সম্পর্ক",
+    "latex": "pH + pOH = 14",
+    "description": "২৫°C তাপমাত্রায়"
+  }
+]

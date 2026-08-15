@@ -6,9 +6,13 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'widgets/main_sidebar.dart';
+import 'widgets/facebook_refresh_indicator.dart';
+import '../utils/global_refresh.dart';
 import 'widgets/main_bottom_nav.dart';
+import 'widgets/user_avatar.dart';
 import '../../features/dashboard/presentation/dashboard_view.dart';
 import '../../features/dashboard/services/streak_service.dart';
 import 'widgets/streak_dialog.dart';
@@ -16,6 +20,7 @@ import '../../features/dashboard/providers/dashboard_providers.dart';
 import '../../features/auth/providers/auth_controller.dart';
 import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/title_provider.dart';
 import '../../features/dashboard/presentation/widgets/countdown_banner.dart';
 import '../../features/notifications/presentation/notifications_view.dart';
 
@@ -100,6 +105,9 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     }
     if (location.startsWith('/notifications')) return 'notifications';
     if (location.startsWith('/bookmarks')) return 'bookmarks';
+    if (location.contains('/formulas/') && location.split('/').length >= 5) return 'formula_detail';
+    if (location.contains('/formulas/') && location.split('/').length >= 4) return 'formula_chapters';
+    if (location.startsWith('/formulas')) return 'formulas';
     return 'dashboard';
   }
 
@@ -138,23 +146,23 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       case 'notifications':
         return 'নোটিফিকেশন';
       case 'bookmarks':
-        return 'আমার বুকমার্কস';
+        return 'বুকমার্ক';
       case 'dashboard':
         return 'ড্যাশবোর্ড';
       case 'setup':
-        return 'মক পরীক্ষা শুরু';
+        return 'পরীক্ষা';
       case 'history':
-        return 'পূর্বের পরীক্ষা সমূহ';
+        return 'ইতিহাস';
       case 'practice':
-        return 'অনুশীলন বোর্ড';
+        return 'অনুশীলন';
       case 'leaderboard':
         return 'লিডারবোর্ড';
       case 'analysis':
         return 'এনালাইসিস';
       case 'my-reports':
-        return 'আমার রিপোর্ট';
+        return 'রিপোর্ট';
       case 'stats':
-        return 'আমার প্রোফাইল';
+        return 'প্রোফাইল';
       case 'settings':
         return 'সেটিংস';
       case 'subscription':
@@ -162,23 +170,29 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       case 'my-subscription':
         return 'সাবস্ক্রিপশন';
       case 'complaint':
-        return 'অভিযোগ ও পরামর্শ';
+        return 'অভিযোগ';
       case 'about':
-        return 'আমাদের সম্পর্কে';
+        return 'পরিচিতি';
       case 'privacy':
-        return 'প্রাইভেসি পলিসি';
+        return 'প্রাইভেসি';
       case 'terms':
-        return 'ব্যবহারের নিয়মাবলী';
+        return 'শর্তাবলী';
       case 'faq':
-        return 'সাহায্য ও FAQ';
+        return 'সাহায্য';
       case 'user_profile':
         return 'প্রোফাইল';
       case 'subject_report':
-        return 'বিষয় রিপোর্ট';
+        return 'রিপোর্ট';
       case 'blog':
         return 'ব্লগ';
       case 'referral':
-        return 'রেফারেল প্রোগ্রাম';
+        return 'রেফারেল';
+      case 'formulas':
+        return 'ফর্মুলা';
+      case 'formula_chapters':
+        return 'অধ্যায়';
+      case 'formula_detail':
+        return 'সূত্র';
       default:
         return 'Obhyash';
     }
@@ -188,6 +202,18 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (tab == 'blog') {
       widget.navigationShell.goBranch(4);
       context.go('/profile/blog');
+      return;
+    }
+
+    if (tab == 'formulas') {
+      widget.navigationShell.goBranch(0);
+      context.push('/formulas');
+      return;
+    }
+
+    if (tab == 'practice' || tab == 'analysis' || tab == 'my-reports') {
+      widget.navigationShell.goBranch(0);
+      context.push('/$tab');
       return;
     }
 
@@ -398,17 +424,24 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                 ),
                               ],
                               Expanded(
-                                child: Text(
-                                  _getTitle(activeTab),
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Anek Bangla',
-                                    color: isDark
-                                        ? Colors.white
-                                        : const Color(0xFF111827),
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
+                                child: Consumer(
+                                  builder: (context, ref, child) {
+                                    final currentLoc = GoRouterState.of(context).uri.toString();
+                                    final dynamicTitle = ref.watch(locationTitleProvider)[currentLoc];
+                                    
+                                    return Text(
+                                      dynamicTitle ?? _getTitle(activeTab),
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w900,
+                                        fontFamily: 'Anek Bangla',
+                                        color: isDark
+                                            ? Colors.white
+                                            : const Color(0xFF111827),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    );
+                                  },
                                 ),
                               ),
                             ],
@@ -416,12 +449,13 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                         ),
 
                         // Right: Streak + Notification + Divider + Avatar
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Streak Badge (No background, slightly bigger, with animation)
-                            GestureDetector(
-                              onTap: user != null ? () => _triggerStreakAnimation(streak, user.id) : null,
+                        if (!activeTab.startsWith('formula'))
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Streak Badge (No background, slightly bigger, with animation)
+                              GestureDetector(
+                                onTap: user != null ? () => _triggerStreakAnimation(streak, user.id) : null,
                               behavior: HitTestBehavior.opaque,
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -551,49 +585,15 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                             // Profile Avatar
                             GestureDetector(
                               onTap: () => context.go('/profile'),
-                              child: Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xFF059669), 
-                                      Color(0xFF065F46)
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFF059669).withValues(alpha: 0.3),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                  border: Border.all(
-                                    color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-                                    width: 1.5,
-                                  ),
-                                  image: user?.avatarUrl != null
-                                      ? DecorationImage(
-                                          image: NetworkImage(user!.avatarUrl!),
-                                          fit: BoxFit.cover,
-                                        )
-                                      : null,
-                                ),
-                                child: user?.avatarUrl == null
-                                    ? Center(
-                                        child: Text(
-                                          userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      )
-                                    : null,
+                              child: UserAvatar(
+                                name: userName,
+                                avatarUrl: user?.avatarUrl,
+                                gender: user?.gender,
+                                id: user?.id,
+                                size: 40,
+                                showBorder: true,
+                                borderColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                                borderWidth: 1.5,
                               ),
                             ),
                           ],
@@ -622,7 +622,10 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         avatarUrl: user?.avatarUrl,
       ),
 
-      body: widget.navigationShell,
+      body: FacebookRefreshIndicator(
+        onRefresh: () => globalRefresh(ref),
+        child: widget.navigationShell,
+      ),
 
       bottomNavigationBar: MainBottomNav(
         activeTab: activeTab,

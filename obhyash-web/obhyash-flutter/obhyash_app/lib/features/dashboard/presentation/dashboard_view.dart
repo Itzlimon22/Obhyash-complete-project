@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import 'widgets/dashboard_action_card.dart';
 import 'widgets/daily_streak_card.dart';
-import 'widgets/dashboard_leaderboard_card.dart';
 import 'widgets/subject_stat_card.dart';
 import 'widgets/exam_target_modal.dart';
 import 'widgets/live_exam_slider.dart';
@@ -58,7 +54,6 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   @override
   Widget build(BuildContext context) {
     final subjectStatsAsync = ref.watch(dashboardSubjectStatsProvider);
-    final leaderboardAsync = ref.watch(leaderboardProvider);
     final userProfileAsync = ref.watch(userProfileProvider);
 
     final userProfile = userProfileAsync.value;
@@ -71,35 +66,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       error: (_, _) => <SubjectStats>[],
     );
 
-    final leaderboard = leaderboardAsync.when(
-      data: (data) => data,
-      loading: () => <LeaderboardUser>[],
-      error: (_, _) => <LeaderboardUser>[],
-    );
-
-    final currentUser = userProfileAsync.when(
-      data: (user) => LeaderboardUser(
-        id: user?.id ?? '',
-        name: user?.name ?? 'Loading...',
-        xp: user?.xp ?? 0,
-      ),
-      loading: () => LeaderboardUser(id: '', name: 'Loading...', xp: 0),
-      error: (_, _) => LeaderboardUser(id: '', name: 'Error', xp: 0),
-    );
-
-    int userRank = 0;
-    if (leaderboard.isNotEmpty && currentUser.id.isNotEmpty) {
-      userRank = leaderboard.indexWhere((u) => u.id == currentUser.id) + 1;
-    }
-
-    LeaderboardUser? topUser = leaderboard.isNotEmpty
-        ? leaderboard.first
-        : null;
-    int xpDiff = topUser != null
-        ? (topUser.xp - currentUser.xp).clamp(0, 999999)
-        : 0;
     final isLoading = subjectStatsAsync.isLoading;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return CustomScrollView(
       slivers: [
@@ -118,75 +85,55 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                 // Actions Grid
                 GridView.count(
                   crossAxisCount: 3,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.15, // Increased aspect ratio to reduce box height
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 1.05,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  children:
-                      [
-                            DashboardActionCard(
-                              title: 'মক পরীক্ষা',
-                              icon: LucideIcons.fileEdit,
-                              primaryColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
-                              lightColor: isDark
-                                  ? const Color(0x3327272A)
-                                  : const Color(0xFFF4F4F5),
-                              onTap: () => context.go('/setup'),
-                            ),
-                            DashboardActionCard(
-                              title: 'অনুশীলন',
-                              icon: LucideIcons.bookOpen,
-                              primaryColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
-                              lightColor: isDark
-                                  ? const Color(0x3327272A)
-                                  : const Color(0xFFF4F4F5),
-                              onTap: () => context.go('/practice'),
-                            ),
-                            DashboardActionCard(
-                              title: 'ইতিহাস',
-                              icon: LucideIcons.clock,
-                              primaryColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
-                              lightColor: isDark
-                                  ? const Color(0x3327272A)
-                                  : const Color(0xFFF4F4F5),
-                              onTap: () => context.go('/history'),
-                            ),
-                            DashboardActionCard(
-                              title: 'লিডারবোর্ড',
-                              icon: LucideIcons.trophy,
-                              primaryColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
-                              lightColor: isDark
-                                  ? const Color(0x3327272A)
-                                  : const Color(0xFFF4F4F5),
-                              onTap: () => context.go('/leaderboard'),
-                            ),
-                            DashboardActionCard(
-                              title: 'এনালাইসিস',
-                              icon: LucideIcons.pieChart,
-                              primaryColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
-                              lightColor: isDark
-                                  ? const Color(0x3327272A)
-                                  : const Color(0xFFF4F4F5),
-                              onTap: () => context.go('/analysis'),
-                            ),
-                            DashboardActionCard(
-                              title: 'বুকমার্কস',
-                              icon: LucideIcons.bookmark,
-                              primaryColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
-                              lightColor: isDark
-                                  ? const Color(0x3327272A)
-                                  : const Color(0xFFF4F4F5),
-                              onTap: () => context.go('/bookmarks'),
-                            ),
-                          ]
-                          .animate(interval: 50.ms)
-                          .fadeIn(duration: 400.ms)
-                          .slideY(
-                            begin: 0.1,
-                            duration: 400.ms,
-                            curve: Curves.easeOut,
-                          ),
+                  children: [
+                    DashboardActionCard(
+                      title: 'পরীক্ষা',
+                      icon: Icons.quiz_rounded,
+                      primaryColor: const Color(0xFF059669),
+                      lightColor: const Color(0xFFECFDF5),
+                      onTap: () => context.go('/setup'),
+                    ),
+                    DashboardActionCard(
+                      title: 'ফর্মুলা',
+                      icon: Icons.functions_rounded,
+                      primaryColor: const Color(0xFF6366F1),
+                      lightColor: const Color(0xFFEEF2FF),
+                      onTap: () => context.push('/formulas'),
+                    ),
+                    DashboardActionCard(
+                      title: 'ইতিহাস',
+                      icon: Icons.history_rounded,
+                      primaryColor: const Color(0xFF0284C7),
+                      lightColor: const Color(0xFFF0F9FF),
+                      onTap: () => context.go('/history'),
+                    ),
+                    DashboardActionCard(
+                      title: 'লিডারবোর্ড',
+                      icon: Icons.emoji_events_rounded,
+                      primaryColor: const Color(0xFFD97706),
+                      lightColor: const Color(0xFFFFFBEB),
+                      onTap: () => context.go('/leaderboard'),
+                    ),
+                    DashboardActionCard(
+                      title: 'এনালাইসিস',
+                      icon: Icons.insights_rounded,
+                      primaryColor: const Color(0xFF9333EA),
+                      lightColor: const Color(0xFFFAF5FF),
+                      onTap: () => context.go('/analysis'),
+                    ),
+                    DashboardActionCard(
+                      title: 'বুকমার্ক',
+                      icon: Icons.bookmark_rounded,
+                      primaryColor: const Color(0xFFE11D48),
+                      lightColor: const Color(0xFFFFF1F2),
+                      onTap: () => context.go('/bookmarks'),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 24),
 

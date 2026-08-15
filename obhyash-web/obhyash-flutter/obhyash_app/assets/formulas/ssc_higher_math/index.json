@@ -1,0 +1,76 @@
+{
+  "subjectId": "ssc_higher_math",
+  "subjectName": "উচ্চতর গণিত",
+  "chapters": [
+    {
+      "chapterId": "chapter_1",
+      "chapterName": "সেট ও ফাংশন",
+      "chapterNumber": 1
+    },
+    {
+      "chapterId": "chapter_2",
+      "chapterName": "বীজগাণিতিক রাশি",
+      "chapterNumber": 2
+    },
+    {
+      "chapterId": "chapter_3",
+      "chapterName": "জ্যামিতি",
+      "chapterNumber": 3
+    },
+    {
+      "chapterId": "chapter_4",
+      "chapterName": "অঙ্কন",
+      "chapterNumber": 4
+    },
+    {
+      "chapterId": "chapter_5",
+      "chapterName": "সমীকরণ",
+      "chapterNumber": 5
+    },
+    {
+      "chapterId": "chapter_6",
+      "chapterName": "অসমতা",
+      "chapterNumber": 6
+    },
+    {
+      "chapterId": "chapter_7",
+      "chapterName": "অসীম ধারা",
+      "chapterNumber": 7
+    },
+    {
+      "chapterId": "chapter_8",
+      "chapterName": "ত্রিকোণমিতি",
+      "chapterNumber": 8
+    },
+    {
+      "chapterId": "chapter_9",
+      "chapterName": "সূচকীয় ও লগারিদমীয় ফাংশন",
+      "chapterNumber": 9
+    },
+    {
+      "chapterId": "chapter_10",
+      "chapterName": "দ্বিপদী বিস্তৃতি",
+      "chapterNumber": 10
+    },
+    {
+      "chapterId": "chapter_11",
+      "chapterName": "স্থানাঙ্ক জ্যামিতি",
+      "chapterNumber": 11
+    },
+    {
+      "chapterId": "chapter_12",
+      "chapterName": "সমতলীয় ভেক্টর",
+      "chapterNumber": 12
+    },
+    {
+      "chapterId": "chapter_13",
+      "chapterName": "ঘন জ্যামিতি",
+      "chapterNumber": 13
+    },
+    {
+      "chapterId": "chapter_14",
+      "chapterName": "সম্ভাবনা",
+      "chapterNumber": 14
+    }
+  ]
+}

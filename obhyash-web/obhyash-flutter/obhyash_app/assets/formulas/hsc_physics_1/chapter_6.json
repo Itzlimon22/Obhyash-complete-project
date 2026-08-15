@@ -1,0 +1,22 @@
+[
+  {
+    "title": "মহাকর্ষ সূত্র",
+    "latex": "F = G\\frac{m_1 m_2}{r^2}",
+    "description": "G = 6.674 × 10⁻¹¹ Nm²/kg²"
+  },
+  {
+    "title": "মুক্তিবেগ",
+    "latex": "v_e = \\sqrt{\\frac{2GM}{R}}",
+    "description": "M = পৃথিবীর ভর, R = পৃথিবীর ব্যাসার্ধ"
+  },
+  {
+    "title": "কক্ষীয় বেগ",
+    "latex": "v_o = \\sqrt{\\frac{GM}{r}}",
+    "description": "r = কক্ষপথের ব্যাসার্ধ"
+  },
+  {
+    "title": "কেপলারের তৃতীয় সূত্র",
+    "latex": "T^2 \\propto r^3",
+    "description": "পর্যায়কাল T ও কক্ষপথের ব্যাসার্ধ r এর সম্পর্ক"
+  }
+]

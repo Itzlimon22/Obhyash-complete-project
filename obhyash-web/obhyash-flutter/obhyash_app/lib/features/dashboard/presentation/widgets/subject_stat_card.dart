@@ -73,8 +73,8 @@ class SubjectStatCard extends StatelessWidget {
                 'সাবজেক্ট ভিত্তিক রিপোর্ট',
                 style: TextStyle(
                   fontFamily: 'Anek Bangla',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 20,
                   color: isDark ? Colors.white : const Color(0xFF1A1A1A),
                 ),
               ),
@@ -133,7 +133,7 @@ class SubjectStatCard extends StatelessWidget {
         children: [
           const Text(
             'সাবজেক্ট ভিত্তিক রিপোর্ট',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22),
           ),
           const SizedBox(height: 24),
           ...List.generate(
@@ -418,7 +418,7 @@ class _SubjectItemState extends State<_SubjectItem> {
                       Text(
                         'বিস্তারিত রিপোর্ট',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Anek Bangla',
                           color: isDark
@@ -470,7 +470,7 @@ class _StatBox extends StatelessWidget {
               label,
               style: TextStyle(
                 fontFamily: 'Anek Bangla',
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: isDark
                     ? const Color(0xFFA3A3A3)

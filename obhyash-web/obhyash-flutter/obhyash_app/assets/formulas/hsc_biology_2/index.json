@@ -1,0 +1,66 @@
+{
+  "subjectId": "hsc_biology_2",
+  "subjectName": "জীববিজ্ঞান ২য় পত্র",
+  "chapters": [
+    {
+      "chapterId": "chapter_1",
+      "chapterName": "প্রাণীর বিভিন্নতা ও শ্রেণিবিন্যাস",
+      "chapterNumber": 1
+    },
+    {
+      "chapterId": "chapter_2",
+      "chapterName": "প্রাণীর পরিচিতি",
+      "chapterNumber": 2
+    },
+    {
+      "chapterId": "chapter_3",
+      "chapterName": "মানব শারীরতত্ত্ব: পরিপাক ও শোষণ",
+      "chapterNumber": 3
+    },
+    {
+      "chapterId": "chapter_4",
+      "chapterName": "মানব শারীরতত্ত্ব: রক্ত ও সঞ্চালন",
+      "chapterNumber": 4
+    },
+    {
+      "chapterId": "chapter_5",
+      "chapterName": "মানব শারীরতত্ত্ব: শ্বসন ও শ্বাসক্রিয়া",
+      "chapterNumber": 5
+    },
+    {
+      "chapterId": "chapter_6",
+      "chapterName": "মানব শারীরতত্ত্ব: বর্জ্য ও নিষ্কাশন",
+      "chapterNumber": 6
+    },
+    {
+      "chapterId": "chapter_7",
+      "chapterName": "মানব শারীরতত্ত্ব: চলন ও অঙ্গচালনা",
+      "chapterNumber": 7
+    },
+    {
+      "chapterId": "chapter_8",
+      "chapterName": "মানব শারীরতত্ত্ব: সমন্বয় ও নিয়ন্ত্রণ",
+      "chapterNumber": 8
+    },
+    {
+      "chapterId": "chapter_9",
+      "chapterName": "মানব জীবনের ধারাবাহিকতা",
+      "chapterNumber": 9
+    },
+    {
+      "chapterId": "chapter_10",
+      "chapterName": "মানবদেহের প্রতিরক্ষা",
+      "chapterNumber": 10
+    },
+    {
+      "chapterId": "chapter_11",
+      "chapterName": "জিনতত্ত্ব ও বিবর্তন",
+      "chapterNumber": 11
+    },
+    {
+      "chapterId": "chapter_12",
+      "chapterName": "প্রাণীর আচরণ",
+      "chapterNumber": 12
+    }
+  ]
+}

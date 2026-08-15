@@ -1,0 +1,31 @@
+{
+  "subjectId": "hsc_chemistry_1",
+  "subjectName": "রসায়ন ১ম পত্র",
+  "chapters": [
+    {
+      "chapterId": "chapter_1",
+      "chapterName": "ল্যাবরেটরির নিরাপদ ব্যবহার",
+      "chapterNumber": 1
+    },
+    {
+      "chapterId": "chapter_2",
+      "chapterName": "গুণগত রসায়ন",
+      "chapterNumber": 2
+    },
+    {
+      "chapterId": "chapter_3",
+      "chapterName": "মৌলের পর্যায়বৃত্ত ধর্ম ও রাসায়নিক বন্ধন",
+      "chapterNumber": 3
+    },
+    {
+      "chapterId": "chapter_4",
+      "chapterName": "রাসায়নিক পরিবর্তন",
+      "chapterNumber": 4
+    },
+    {
+      "chapterId": "chapter_5",
+      "chapterName": "কর্মমুখী রসায়ন",
+      "chapterNumber": 5
+    }
+  ]
+}

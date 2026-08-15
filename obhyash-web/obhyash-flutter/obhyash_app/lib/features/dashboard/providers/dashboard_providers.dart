@@ -10,6 +10,55 @@ import '../../live_exam/domain/models.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/shared_prefs_provider.dart';
 
+/// Mirrors the web app's `getAvatarUrl()` in storage-service.ts.
+/// If [raw] is already a full https URL, returns it unchanged.
+/// If it's a storage path (e.g. "1234-abc.jpg"), constructs the
+/// Supabase Storage public URL for the 'avatars' bucket.
+String? _resolveAvatarUrl(String? raw) {
+  if (raw == null || raw.isEmpty || raw == 'null') return null;
+  if (raw.startsWith('http')) return raw;
+  // It's a bare file path — build the full public URL
+  final publicUrl = Supabase.instance.client.storage
+      .from('avatars')
+      .getPublicUrl(raw);
+  return publicUrl;
+}
+
+/// Builds a UserProfile from JSON and resolves its avatarUrl.
+UserProfile _profileFromJson(Map<String, dynamic> json) {
+  final profile = UserProfile.fromJson(json);
+  final resolved = _resolveAvatarUrl(profile.avatarUrl);
+  if (resolved == profile.avatarUrl) return profile;
+  // Return a copy with the resolved URL
+  return UserProfile(
+    id: profile.id,
+    name: profile.name,
+    email: profile.email,
+    xp: profile.xp,
+    level: profile.level,
+    division: profile.division,
+    stream: profile.stream,
+    optionalSubject: profile.optionalSubject,
+    institute: profile.institute,
+    streakCount: profile.streakCount,
+    phone: profile.phone,
+    dob: profile.dob,
+    gender: profile.gender,
+    address: profile.address,
+    batch: profile.batch,
+    target: profile.target,
+    sscRoll: profile.sscRoll,
+    sscReg: profile.sscReg,
+    sscBoard: profile.sscBoard,
+    sscYear: profile.sscYear,
+    avatarUrl: resolved,
+    examTarget: profile.examTarget,
+    dailyExamsGoal: profile.dailyExamsGoal,
+    admissionTrackInterest: profile.admissionTrackInterest,
+    lastStreakDate: profile.lastStreakDate,
+  );
+}
+
 // Riverpod Provider for the Supabase Client
 final supabaseClientProvider = Provider<SupabaseClient>((ref) {
   return Supabase.instance.client;
@@ -41,7 +90,7 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
             decoded.containsKey('phone') ||
             decoded.containsKey('stream') ||
             decoded.containsKey('optional_subject')) {
-          return UserProfile.fromJson(decoded);
+          return _profileFromJson(decoded);
         }
         // Else fall through to re-fetch from users table
       } catch (_) {}
@@ -58,7 +107,7 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
 
       if (response != null) {
         prefs.setString(cacheKey, jsonEncode(response));
-        return UserProfile.fromJson(response);
+        return _profileFromJson(response);
       }
     } catch (e) {
       debugPrint('[UserProfileNotifier] users table query failed: $e');
@@ -74,7 +123,7 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
 
       if (fallback != null) {
         // public_profiles may lack email/phone/stream — store with flag so we re-fetch later
-        return UserProfile.fromJson(fallback);
+        return _profileFromJson(fallback);
       }
     } catch (e) {
       debugPrint('[UserProfileNotifier] public_profiles fallback failed: $e');
@@ -228,9 +277,37 @@ class DashboardLiveExamsNotifier extends AsyncNotifier<List<LiveExam>> {
     final profile = await ref.watch(userProfileProvider.future);
     if (profile == null) return [];
 
-    final supabase = ref.watch(supabaseClientProvider);
+    final prefs = ref.watch(sharedPreferencesProvider);
     final category = profile.level ?? 'HSC';
+    final cacheKey = 'cached_live_exams_$category';
 
+    // 1. Cache-first: return immediately if cached
+    final cached = prefs.getString(cacheKey);
+    if (cached != null) {
+      try {
+        final List list = jsonDecode(cached);
+        final cachedExams = list
+            .map((e) => LiveExam.fromJson(e as Map<String, dynamic>))
+            .where((e) => e.isOngoing || e.isUpcoming)
+            .toList();
+        if (cachedExams.isNotEmpty) {
+          // Trigger background refresh
+          unawaited(_fetchAndCache(category, cacheKey, prefs));
+          return cachedExams;
+        }
+      } catch (_) {}
+    }
+
+    // 2. Network fetch
+    return _fetchAndCache(category, cacheKey, prefs);
+  }
+
+  Future<List<LiveExam>> _fetchAndCache(
+    String category,
+    String cacheKey,
+    var prefs,
+  ) async {
+    final supabase = ref.read(supabaseClientProvider);
     try {
       final examsResponse = await supabase
           .from('live_exams')
@@ -243,8 +320,14 @@ class DashboardLiveExamsNotifier extends AsyncNotifier<List<LiveExam>> {
           .map((e) => LiveExam.fromJson(e as Map<String, dynamic>))
           .toList();
 
-      // Only return exams that are ongoing or upcoming (not past)
-      return exams.where((e) => e.isOngoing || e.isUpcoming).toList();
+      final validExams = exams.where((e) => e.isOngoing || e.isUpcoming).toList();
+
+      prefs.setString(
+        cacheKey,
+        jsonEncode(exams.map((e) => e.toJson()).toList()),
+      );
+
+      return validExams;
     } catch (e) {
       debugPrint('[DashboardLiveExamsNotifier] failed: $e');
       return [];

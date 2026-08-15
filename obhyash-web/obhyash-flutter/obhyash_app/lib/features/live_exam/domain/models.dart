@@ -48,6 +48,23 @@ class LiveExam {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'start_time': startTime.toIso8601String(),
+      'end_time': endTime.toIso8601String(),
+      'duration_minutes': durationMinutes,
+      'total_questions': totalQuestions,
+      'total_marks': totalMarks,
+      'negative_marking': negativeMarking,
+      'status': status,
+      'category': category,
+      'userAttemptStatus': userAttemptStatus,
+    };
+  }
+
   bool get isOngoing {
     final now = DateTime.now();
     return now.isAfter(startTime) && now.isBefore(endTime);

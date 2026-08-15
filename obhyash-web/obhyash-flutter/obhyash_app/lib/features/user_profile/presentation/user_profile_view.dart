@@ -7,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
+import '../../../core/presentation/widgets/user_avatar.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────────
 class _OtherUser {
@@ -787,51 +788,27 @@ class _UPAvatar extends StatelessWidget {
   final String? avatarUrl;
   final String name;
   final double size;
+  final String? id;
 
   const _UPAvatar({
     required this.avatarUrl,
     required this.name,
     required this.size,
+    this.id,
   });
 
   @override
   Widget build(BuildContext context) {
-    final initial = name.isNotEmpty ? name[0].toUpperCase() : 'U';
-    if (avatarUrl != null && avatarUrl!.isNotEmpty) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(size / 2),
-        child: CachedNetworkImage(
-          imageUrl: avatarUrl!,
-          width: size,
-          height: size,
-          fit: BoxFit.cover,
-          placeholder: (_, _) => _circle(initial, size),
-          errorWidget: (_, _, _) => _circle(initial, size),
-        ),
-      );
-    }
-    return _circle(initial, size);
+    return UserAvatar(
+      id: id,
+      name: name,
+      avatarUrl: avatarUrl,
+      size: size,
+      showBorder: true,
+      borderColor: const Color(0xFFFEF2F2),
+      borderWidth: 3,
+    );
   }
-
-  static Widget _circle(String letter, double size) => Container(
-    width: size,
-    height: size,
-    decoration: BoxDecoration(
-      color: const Color(0xFFB91C1C),
-      shape: BoxShape.circle,
-      border: Border.all(color: const Color(0xFFFEF2F2), width: 3),
-    ),
-    child: Center(
-      child: Text(
-        letter,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: size * 0.38,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    ),
-  );
 }
 
 // ─── Stat Box ────────────────────────────────────────────────────────────────────

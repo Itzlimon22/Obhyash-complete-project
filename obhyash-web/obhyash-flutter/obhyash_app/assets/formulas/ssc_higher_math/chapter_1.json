@@ -1,0 +1,7 @@
+[
+  {
+    "title": "সেট সংযোগ",
+    "latex": "n(A \\cup B) = n(A) + n(B) - n(A \\cap B)",
+    "description": "দুটি সেটের উপাদান সংখ্যা"
+  }
+]

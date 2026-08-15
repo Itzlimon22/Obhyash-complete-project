@@ -1,0 +1,66 @@
+{
+  "subjectId": "ssc_chemistry",
+  "subjectName": "রসায়ন",
+  "chapters": [
+    {
+      "chapterId": "chapter_1",
+      "chapterName": "রসায়নের ধারণা",
+      "chapterNumber": 1
+    },
+    {
+      "chapterId": "chapter_2",
+      "chapterName": "পদার্থের অবস্থা",
+      "chapterNumber": 2
+    },
+    {
+      "chapterId": "chapter_3",
+      "chapterName": "পদার্থের গঠন",
+      "chapterNumber": 3
+    },
+    {
+      "chapterId": "chapter_4",
+      "chapterName": "পর্যায় সারণি",
+      "chapterNumber": 4
+    },
+    {
+      "chapterId": "chapter_5",
+      "chapterName": "রাসায়নিক বন্ধন",
+      "chapterNumber": 5
+    },
+    {
+      "chapterId": "chapter_6",
+      "chapterName": "মোলের ধারণা ও রাসায়নিক গণনা",
+      "chapterNumber": 6
+    },
+    {
+      "chapterId": "chapter_7",
+      "chapterName": "রাসায়নিক বিক্রিয়া",
+      "chapterNumber": 7
+    },
+    {
+      "chapterId": "chapter_8",
+      "chapterName": "রসায়ন ও শক্তি",
+      "chapterNumber": 8
+    },
+    {
+      "chapterId": "chapter_9",
+      "chapterName": "এসিড-ক্ষার সমতা",
+      "chapterNumber": 9
+    },
+    {
+      "chapterId": "chapter_10",
+      "chapterName": "খনিজ সম্পদ: ধাতু-অধাতু",
+      "chapterNumber": 10
+    },
+    {
+      "chapterId": "chapter_11",
+      "chapterName": "খনিজ সম্পদ: জীবাশ্ম",
+      "chapterNumber": 11
+    },
+    {
+      "chapterId": "chapter_12",
+      "chapterName": "আমাদের জীবনে রসায়ন",
+      "chapterNumber": 12
+    }
+  ]
+}

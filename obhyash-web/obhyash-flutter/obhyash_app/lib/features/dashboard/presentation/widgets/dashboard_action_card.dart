@@ -24,7 +24,6 @@ class _DashboardActionCardState extends State<DashboardActionCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
-  bool _isHovered = false;
 
   @override
   void initState() {
@@ -56,56 +55,67 @@ class _DashboardActionCardState extends State<DashboardActionCard>
         widget.onTap();
       },
       onTapCancel: () => _controller.reverse(),
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
-        child: AnimatedBuilder(
-          animation: _scaleAnimation,
-          builder: (context, child) =>
-              Transform.scale(scale: _scaleAnimation.value, child: child),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE5E7EB),
-                width: 1,
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) =>
+            Transform.scale(scale: _scaleAnimation.value, child: child),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE5E7EB),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.35)
+                    : const Color(0xFFE4E4E7),
+                blurRadius: 0,
+                offset: const Offset(0, 2.5),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: isDark 
-                      ? Colors.black.withValues(alpha: 0.4) 
-                      : const Color(0xFFE4E4E7), // Premium Zinc 200 for bottom shadow
-                  blurRadius: 0,
-                  offset: const Offset(0, 3), // Subtle 3D effect
+              BoxShadow(
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.15)
+                    : const Color(0x0A000000),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(9),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? widget.primaryColor.withValues(alpha: 0.18)
+                      : widget.lightColor,
+                  shape: BoxShape.circle,
                 ),
-                BoxShadow(
-                  color: isDark 
-                      ? Colors.black.withValues(alpha: 0.15) 
-                      : const Color(0xFF27272A).withValues(alpha: 0.04), // Zinc tint soft shadow
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+                child: Icon(
+                  widget.icon,
+                  color: widget.primaryColor,
+                  size: 22,
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(widget.icon, color: widget.primaryColor, size: 28),
-                const SizedBox(height: 8),
-                Text(
-                  widget.title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: isDark ? Colors.white : const Color(0xFF374151),
-                    fontFamily: 'Anek Bangla',
-                  ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                widget.title,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? Colors.white : const Color(0xFF18181B),
+                  fontFamily: 'Anek Bangla',
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

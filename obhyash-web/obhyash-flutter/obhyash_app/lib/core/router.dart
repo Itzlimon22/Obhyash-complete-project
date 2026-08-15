@@ -9,6 +9,7 @@ import '../features/auth/presentation/login_view.dart';
 import '../features/auth/presentation/update_password_view.dart';
 
 import '../features/auth/presentation/signup_view.dart';
+import '../features/auth/presentation/welcome_view.dart';
 import '../features/profile/presentation/profile_route_view.dart';
 import '../features/profile/presentation/profile_stats_page.dart';
 import '../features/subscription/presentation/subscription_view.dart';
@@ -30,6 +31,9 @@ import '../features/blog/presentation/blog_view.dart';
 import '../features/referral/presentation/referral_view.dart';
 import '../features/live_exam/presentation/live_exam_category_view.dart';
 import '../features/profile/presentation/bookmarks_view.dart';
+import '../features/formulas/presentation/subjects/formula_subjects_view.dart';
+import '../features/formulas/presentation/chapters/formula_chapters_view.dart';
+import '../features/formulas/presentation/detail/formula_detail_view.dart';
 import 'presentation/main_layout.dart';
 import 'services/deep_link_service.dart';
 
@@ -81,11 +85,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuth = session != null;
       final isLoggingIn =
           state.matchedLocation == '/login' ||
-          state.matchedLocation == '/signup';
+          state.matchedLocation == '/signup' ||
+          state.matchedLocation == '/welcome';
       final isUpdatingPassword = state.matchedLocation == '/update-password';
 
       if (!isAuth && !isLoggingIn && !isUpdatingPassword) {
-        return '/login';
+        return '/welcome';
       }
       if (isAuth && isLoggingIn) {
         return '/';
@@ -93,6 +98,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/welcome',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => _fadeRoute(const WelcomeView(), state),
+      ),
       GoRoute(
         path: '/update-password',
         parentNavigatorKey: _rootNavigatorKey,
@@ -161,6 +171,32 @@ final routerProvider = Provider<GoRouter>((ref) {
                       final category = state.pathParameters['category']!;
                       return LiveExamCategoryView(category: category);
                     },
+                  ),
+                  GoRoute(
+                    path: 'formulas',
+                    builder: (context, state) => const FormulaSubjectsView(),
+                    routes: [
+                      GoRoute(
+                        path: ':subjectId',
+                        builder: (context, state) {
+                          final subjectId = state.pathParameters['subjectId']!;
+                          return FormulaChaptersView(subjectId: subjectId);
+                        },
+                        routes: [
+                          GoRoute(
+                            path: ':chapterId',
+                            builder: (context, state) {
+                              final subjectId = state.pathParameters['subjectId']!;
+                              final chapterId = state.pathParameters['chapterId']!;
+                              return FormulaDetailView(
+                                subjectId: subjectId,
+                                chapterId: chapterId,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),

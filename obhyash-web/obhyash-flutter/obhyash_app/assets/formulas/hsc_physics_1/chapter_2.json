@@ -1,0 +1,27 @@
+[
+  {
+    "title": "ভেক্টরের লব্ধির মান",
+    "latex": "R = \\sqrt{P^2 + Q^2 + 2PQ\\cos\\alpha}",
+    "description": "P ও Q দুটি ভেক্টর এবং α তাদের মধ্যবর্তী কোণ"
+  },
+  {
+    "title": "লব্ধির দিক",
+    "latex": "\\tan\\theta = \\frac{Q\\sin\\alpha}{P + Q\\cos\\alpha}",
+    "description": "θ = P এর সাথে লব্ধি R এর মধ্যবর্তী কোণ"
+  },
+  {
+    "title": "ভেক্টরের উপাংশ",
+    "latex": "A_x = A\\cos\\theta, \\quad A_y = A\\sin\\theta",
+    "description": "θ = x-অক্ষ ও ভেক্টর A এর মধ্যবর্তী কোণ"
+  },
+  {
+    "title": "ডট গুণফল",
+    "latex": "\\vec{A} \\cdot \\vec{B} = AB\\cos\\theta",
+    "description": "দুটি ভেক্টরের স্কেলার গুণফল"
+  },
+  {
+    "title": "ক্রস গুণফলের মান",
+    "latex": "|\\vec{A} \\times \\vec{B}| = AB\\sin\\theta",
+    "description": "দুটি ভেক্টরের ভেক্টর গুণফলের মান"
+  }
+]

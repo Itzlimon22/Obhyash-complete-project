@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'user_avatar.dart';
 
 class MainSidebar extends StatelessWidget {
   final String activeTab;
@@ -26,16 +28,13 @@ class MainSidebar extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final menuItems = [
-      {
-        'id': 'dashboard',
-        'label': 'ড্যাশবোর্ড',
-        'icon': LucideIcons.layoutDashboard,
-      },
-      {'id': 'setup', 'label': 'মক পরীক্ষা', 'icon': LucideIcons.fileEdit},
+      {'id': 'dashboard', 'label': 'ড্যাশবোর্ড', 'icon': LucideIcons.layoutDashboard},
+      {'id': 'setup', 'label': 'পরীক্ষা', 'icon': LucideIcons.fileEdit},
       {'id': 'history', 'label': 'ইতিহাস', 'icon': LucideIcons.history},
       {'id': 'practice', 'label': 'অনুশীলন', 'icon': LucideIcons.penTool},
       {'id': 'leaderboard', 'label': 'লিডারবোর্ড', 'icon': LucideIcons.trophy},
       {'id': 'analysis', 'label': 'এনালাইসিস', 'icon': LucideIcons.barChart2},
+      {'id': 'formulas', 'label': 'ফর্মুলা', 'icon': LucideIcons.sigma},
       {'id': 'profile/blog', 'label': 'ব্লগ', 'icon': LucideIcons.newspaper},
     ];
 
@@ -257,33 +256,13 @@ class MainSidebar extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: const Color(0xFFB91C1C),
-                              image: avatarUrl != null
-                                  ? DecorationImage(
-                                      image: NetworkImage(avatarUrl!),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null,
-                            ),
-                            child: avatarUrl == null
-                                ? Center(
-                                    child: Text(
-                                      userName.isNotEmpty
-                                          ? userName[0].toUpperCase()
-                                          : 'U',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  )
-                                : null,
+                          UserAvatar(
+                            name: userName,
+                            avatarUrl: avatarUrl,
+                            size: 36,
+                            showBorder: true,
+                            borderColor: Colors.white,
+                            borderWidth: 1.5,
                           ),
                           const SizedBox(width: 12),
                           Expanded(

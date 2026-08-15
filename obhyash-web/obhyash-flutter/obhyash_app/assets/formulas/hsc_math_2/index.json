@@ -1,0 +1,56 @@
+{
+  "subjectId": "hsc_math_2",
+  "subjectName": "উচ্চতর গণিত ২য় পত্র",
+  "chapters": [
+    {
+      "chapterId": "chapter_1",
+      "chapterName": "বাস্তব সংখ্যা ও অসমতা",
+      "chapterNumber": 1
+    },
+    {
+      "chapterId": "chapter_2",
+      "chapterName": "যোগাশ্রয়ী প্রোগ্রাম",
+      "chapterNumber": 2
+    },
+    {
+      "chapterId": "chapter_3",
+      "chapterName": "জটিল সংখ্যা",
+      "chapterNumber": 3
+    },
+    {
+      "chapterId": "chapter_4",
+      "chapterName": "বহুপদী ও বহুপদী সমীকরণ",
+      "chapterNumber": 4
+    },
+    {
+      "chapterId": "chapter_5",
+      "chapterName": "দ্বিপদী বিস্তৃতি",
+      "chapterNumber": 5
+    },
+    {
+      "chapterId": "chapter_6",
+      "chapterName": "কণিক",
+      "chapterNumber": 6
+    },
+    {
+      "chapterId": "chapter_7",
+      "chapterName": "বিপরীত ত্রিকোণমিতিক ফাংশন ও ত্রিকোণমিতিক সমীকরণ",
+      "chapterNumber": 7
+    },
+    {
+      "chapterId": "chapter_8",
+      "chapterName": "স্থিতিবিদ্যা",
+      "chapterNumber": 8
+    },
+    {
+      "chapterId": "chapter_9",
+      "chapterName": "সমতলীয় বস্তুকণার গতিবিদ্যা",
+      "chapterNumber": 9
+    },
+    {
+      "chapterId": "chapter_10",
+      "chapterName": "বিস্তার পরিমাপ ও সম্ভাবনা",
+      "chapterNumber": 10
+    }
+  ]
+}

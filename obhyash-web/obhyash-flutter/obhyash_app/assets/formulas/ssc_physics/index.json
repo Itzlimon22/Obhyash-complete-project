@@ -1,0 +1,76 @@
+{
+  "subjectId": "ssc_physics",
+  "subjectName": "পদার্থবিজ্ঞান",
+  "chapters": [
+    {
+      "chapterId": "chapter_1",
+      "chapterName": "ভৌত রাশি ও পরিমাপ",
+      "chapterNumber": 1
+    },
+    {
+      "chapterId": "chapter_2",
+      "chapterName": "গতি",
+      "chapterNumber": 2
+    },
+    {
+      "chapterId": "chapter_3",
+      "chapterName": "বল",
+      "chapterNumber": 3
+    },
+    {
+      "chapterId": "chapter_4",
+      "chapterName": "কাজ, ক্ষমতা ও শক্তি",
+      "chapterNumber": 4
+    },
+    {
+      "chapterId": "chapter_5",
+      "chapterName": "পদার্থের অবস্থা ও চাপ",
+      "chapterNumber": 5
+    },
+    {
+      "chapterId": "chapter_6",
+      "chapterName": "বস্তুর উপর তাপের প্রভাব",
+      "chapterNumber": 6
+    },
+    {
+      "chapterId": "chapter_7",
+      "chapterName": "তরঙ্গ ও শব্দ",
+      "chapterNumber": 7
+    },
+    {
+      "chapterId": "chapter_8",
+      "chapterName": "আলোর প্রতিফলন",
+      "chapterNumber": 8
+    },
+    {
+      "chapterId": "chapter_9",
+      "chapterName": "আলোর প্রতিসরণ",
+      "chapterNumber": 9
+    },
+    {
+      "chapterId": "chapter_10",
+      "chapterName": "স্থির তড়িৎ",
+      "chapterNumber": 10
+    },
+    {
+      "chapterId": "chapter_11",
+      "chapterName": "চল তড়িৎ",
+      "chapterNumber": 11
+    },
+    {
+      "chapterId": "chapter_12",
+      "chapterName": "বিদ্যুতের চৌম্বক ক্রিয়া",
+      "chapterNumber": 12
+    },
+    {
+      "chapterId": "chapter_13",
+      "chapterName": "আধুনিক পদার্থবিজ্ঞান ও ইলেকট্রনিক্স",
+      "chapterNumber": 13
+    },
+    {
+      "chapterId": "chapter_14",
+      "chapterName": "জীবন বাঁচাতে পদার্থবিজ্ঞান",
+      "chapterNumber": 14
+    }
+  ]
+}

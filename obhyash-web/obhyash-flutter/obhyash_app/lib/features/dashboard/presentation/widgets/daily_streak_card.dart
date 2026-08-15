@@ -12,12 +12,13 @@ class DailyStreakCard extends ConsumerStatefulWidget {
 }
 
 class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
-  bool _isLoading = true;
-  List<int> _last30DaysActivity = List.filled(30, 0); // 0 = no activity, 1+ = activity count
+  static List<int>? _cachedActivity;
+  late List<int> _last30DaysActivity;
 
   @override
   void initState() {
     super.initState();
+    _last30DaysActivity = _cachedActivity ?? List.filled(30, 0);
     _fetchActivityData();
   }
 
@@ -25,10 +26,7 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
     try {
       final supabase = Supabase.instance.client;
       final userId = supabase.auth.currentUser?.id;
-      if (userId == null) {
-        if (mounted) setState(() => _isLoading = false);
-        return;
-      }
+      if (userId == null) return;
 
       final today = DateTime.now();
       final thirtyDaysAgo = today.subtract(const Duration(days: 29));
@@ -66,15 +64,13 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
         activeDates.add(d.toIso8601String());
       }
 
+      _cachedActivity = activity;
       if (mounted) {
         setState(() {
           _last30DaysActivity = activity;
-          _isLoading = false;
         });
       }
-    } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    } catch (_) {}
   }
 
   @override
@@ -85,34 +81,19 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
     final Color borderColor = isDark ? const Color(0xFF2C2C2E) : const Color(0xFFE2E8F0);
     const Color primaryAccent = Color(0xFFEF4444); // Red
 
-    if (_isLoading) {
-      return Container(
-        height: 160,
-        decoration: BoxDecoration(
-          color: surfaceColor,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: borderColor),
-        ),
-        child: const Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(primaryAccent),
-          ),
-        ),
-      );
-    }
-
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: borderColor),
         boxShadow: [
-          if (!isDark) BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02), 
-            blurRadius: 10, 
-            offset: const Offset(0, 4)
-          )
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
         ],
       ),
       child: Column(
@@ -124,14 +105,21 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
             children: [
               Row(
                 children: [
-                  Icon(LucideIcons.flame, size: 28, color: widget.userStreak > 0 ? const Color(0xFF059669) : (isDark ? Colors.white54 : Colors.black54)),
-                  const SizedBox(width: 12),
+                  Icon(
+                    LucideIcons.flame,
+                    size: 26,
+                    color: widget.userStreak > 0
+                        ? const Color(0xFF059669)
+                        : (isDark ? Colors.white54 : Colors.black54),
+                  ),
+                  const SizedBox(width: 10),
                   Text(
                     '${widget.userStreak} দিনের স্ট্রাইক',
                     style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.w900,
-                      color: isDark ? Colors.white : Colors.black87,
+                      fontFamily: 'Anek Bangla',
+                      color: isDark ? Colors.white : const Color(0xFF18181B),
                     ),
                   ),
                 ],
@@ -148,25 +136,15 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'Anek Bangla',
                       color: Color(0xFF059669),
                     ),
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            widget.userStreak == 0 
-                ? 'আজকের পরীক্ষা দিয়ে স্ট্রাইক শুরু করো!' 
-                : 'স্ট্রাইক ধরে রাখতে প্রতিদিন অন্তত একটি পরীক্ষা দাও।',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: isDark ? Colors.white54 : Colors.black54,
-            ),
-          ),
-          const SizedBox(height: 24),
-          
+          const SizedBox(height: 18),
+
           // Heatmap
           _buildHeatmap(isDark, primaryAccent),
         ],
@@ -175,17 +153,19 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
   }
 
   Widget _buildHeatmap(bool isDark, Color primaryAccent) {
-    final emptyBoxColor = isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF1F5F9);
-    
+    final emptyBoxColor =
+        isDark ? const Color(0xFF2C2C2E) : const Color(0xFFF1F5F9);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'গত ৩০ দিনের অ্যাক্টিভিটি',
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w800,
-            color: isDark ? Colors.white70 : Colors.black87,
+            fontFamily: 'Anek Bangla',
+            color: isDark ? Colors.white70 : const Color(0xFF3F3F46),
           ),
         ),
         const SizedBox(height: 12),

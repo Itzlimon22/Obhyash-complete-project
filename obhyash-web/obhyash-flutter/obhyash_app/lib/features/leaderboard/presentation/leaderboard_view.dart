@@ -9,6 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../../core/data/college_list.dart';
+import '../../../core/presentation/widgets/user_avatar.dart';
 
 // ─── Level Data ────────────────────────────────────────────────────────────────
 class _LevelInfo {
@@ -206,7 +207,7 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
           final fetchedUsers = (data as List)
               .map((u) => _LBUser.fromJson(u as Map<String, dynamic>, me: me))
               .toList();
-              
+
           if (fetchedUsers.length < _limit) {
             _hasMore = false;
           }
@@ -268,7 +269,9 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
           .read(userProfileProvider)
           .whenOrNull(data: (u) => u);
       final rawMyInstitute = myProfile?.institute;
-      final myInstitute = rawMyInstitute != null ? normalizeCollegeName(rawMyInstitute) : null;
+      final myInstitute = rawMyInstitute != null
+          ? normalizeCollegeName(rawMyInstitute)
+          : null;
 
       final data = await supabase
           .from('public_profiles')
@@ -420,35 +423,55 @@ class _LeaderboardViewState extends ConsumerState<LeaderboardView> {
                                   _PodiumSection(
                                     users: _users.take(3).toList(),
                                     isDark: isDark,
-                                    onTap: (id) =>
-                                        context.push('/leaderboard/user-profile/$id'),
+                                    onTap: (id) => context.push(
+                                      '/leaderboard/user-profile/$id',
+                                    ),
                                   ),
                                 _LeaderboardTable(
                                   users: _users,
                                   levelLabel: lvl.label.split(' ').first,
                                   isLoading: _isLoading,
                                   isDark: isDark,
-                                  onUserTap: (id) =>
-                                      context.push('/leaderboard/user-profile/$id'),
+                                  onUserTap: (id) => context.push(
+                                    '/leaderboard/user-profile/$id',
+                                  ),
                                 ),
                                 if (_hasMore && !_isLoading)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 16),
                                     child: ElevatedButton(
-                                      onPressed: _isLoadingMore ? null : () => _fetch(isLoadMore: true),
+                                      onPressed: _isLoadingMore
+                                          ? null
+                                          : () => _fetch(isLoadMore: true),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: isDark ? const Color(0xFF141414) : const Color(0xFFFAFAFA),
-                                        foregroundColor: isDark ? Colors.white : Colors.black,
-                                        side: BorderSide(color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5)),
-                                        padding: const EdgeInsets.symmetric(vertical: 14),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                        backgroundColor: isDark
+                                            ? const Color(0xFF141414)
+                                            : const Color(0xFFFAFAFA),
+                                        foregroundColor: isDark
+                                            ? Colors.white
+                                            : Colors.black,
+                                        side: BorderSide(
+                                          color: isDark
+                                              ? const Color(0xFF1C1C1E)
+                                              : const Color(0xFFE5E5E5),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 14,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                        ),
                                         elevation: 0,
                                       ),
                                       child: _isLoadingMore
                                           ? const SizedBox(
                                               height: 20,
                                               width: 20,
-                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
                                             )
                                           : const Text(
                                               'আরও লোড করুন',
@@ -529,8 +552,8 @@ class _ViewModeTab extends StatelessWidget {
                 color: isActive
                     ? Colors.white
                     : (isDark
-                        ? const Color(0xFF6B7280)
-                        : const Color(0xFF9CA3AF)),
+                          ? const Color(0xFF6B7280)
+                          : const Color(0xFF9CA3AF)),
               ),
             ),
           ),
@@ -618,7 +641,9 @@ class _CollegeLeaderboardBody extends StatelessWidget {
                         ? const Color(0xFF059669)
                         : const Color(0xFF059669),
                   ),
-                 maxLines: 1, overflow: TextOverflow.ellipsis),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
@@ -960,21 +985,29 @@ class _LevelSelector extends StatelessWidget {
                       colors: isActive
                           ? [l.start, l.end]
                           : [
-                              isDark ? const Color(0xFF141414) : const Color(0xFFFAFAFA),
-                              isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF5F5F5),
+                              isDark
+                                  ? const Color(0xFF141414)
+                                  : const Color(0xFFFAFAFA),
+                              isDark
+                                  ? const Color(0xFF0F0F0F)
+                                  : const Color(0xFFF5F5F5),
                             ],
                     ),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
                       color: isActive
                           ? l.start.withValues(alpha: 0.8)
-                          : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5)),
+                          : (isDark
+                                ? const Color(0xFF1C1C1E)
+                                : const Color(0xFFE5E5E5)),
                       width: isActive ? 2.0 : 1.0,
                     ),
                     boxShadow: isActive
                         ? [
                             BoxShadow(
-                              color: l.start.withValues(alpha: isDark ? 0.4 : 0.3),
+                              color: l.start.withValues(
+                                alpha: isDark ? 0.4 : 0.3,
+                              ),
                               blurRadius: 16,
                               offset: const Offset(0, 6),
                               spreadRadius: -2,
@@ -1003,17 +1036,22 @@ class _LevelSelector extends StatelessWidget {
                                 shape: BoxShape.circle,
                                 color: isActive
                                     ? Colors.white.withValues(alpha: 0.2)
-                                    : l.start.withValues(alpha: isDark ? 0.15 : 0.1),
+                                    : l.start.withValues(
+                                        alpha: isDark ? 0.15 : 0.1,
+                                      ),
                                 border: isActive
-                                    ? Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1)
+                                    ? Border.all(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                        width: 1,
+                                      )
                                     : null,
                               ),
                               child: Icon(
                                 l.icon,
                                 size: 18,
-                                color: isActive
-                                    ? Colors.white
-                                    : l.start,
+                                color: isActive ? Colors.white : l.start,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -1026,7 +1064,9 @@ class _LevelSelector extends StatelessWidget {
                                 height: 1.1, // Constrain vertical height
                                 color: isActive
                                     ? Colors.white
-                                    : (isDark ? const Color(0xFFE5E5E5) : const Color(0xFF1F2937)),
+                                    : (isDark
+                                          ? const Color(0xFFE5E5E5)
+                                          : const Color(0xFF1F2937)),
                               ),
                               textAlign: TextAlign.center,
                               maxLines: 1,
@@ -1042,7 +1082,9 @@ class _LevelSelector extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: isActive
                                       ? Colors.white.withValues(alpha: 0.25)
-                                      : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5)),
+                                      : (isDark
+                                            ? const Color(0xFF1C1C1E)
+                                            : const Color(0xFFE5E5E5)),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
@@ -1053,7 +1095,9 @@ class _LevelSelector extends StatelessWidget {
                                     fontWeight: FontWeight.w900,
                                     color: isActive
                                         ? Colors.white
-                                        : (isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563)),
+                                        : (isDark
+                                              ? const Color(0xFFA3A3A3)
+                                              : const Color(0xFF4B5563)),
                                   ),
                                 ),
                               ),
@@ -1077,7 +1121,12 @@ class _LevelSelector extends StatelessWidget {
                                   colors: [l.start, l.end],
                                 ),
                                 borderRadius: BorderRadius.circular(100),
-                                border: Border.all(color: isDark ? const Color(0xFF000000) : Colors.white, width: 1.5),
+                                border: Border.all(
+                                  color: isDark
+                                      ? const Color(0xFF000000)
+                                      : Colors.white,
+                                  width: 1.5,
+                                ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: l.start.withValues(alpha: 0.4),
@@ -1145,7 +1194,7 @@ class _UserProgressCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isDark 
+          colors: isDark
               ? [const Color(0xFF1F2937), const Color(0xFF111827)]
               : [const Color(0xFFFFFFFF), const Color(0xFFF3F4F6)],
         ),
@@ -1160,14 +1209,14 @@ class _UserProgressCard extends StatelessWidget {
                   color: Colors.black.withValues(alpha: 0.4),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
-                )
+                ),
               ]
             : [
                 BoxShadow(
                   color: const Color(0xFF000000).withValues(alpha: 0.05),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
-                )
+                ),
               ],
       ),
       child: Column(
@@ -1188,7 +1237,7 @@ class _UserProgressCard extends StatelessWidget {
                       color: lvl.start.withValues(alpha: 0.4),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
-                    )
+                    ),
                   ],
                 ),
                 child: Icon(lvl.icon, color: Colors.white, size: 28),
@@ -1221,12 +1270,17 @@ class _UserProgressCard extends StatelessWidget {
               ),
               if (rank > 0)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF374151) : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: isDark ? const Color(0xFF4B5563) : const Color(0xFFE5E5E5),
+                      color: isDark
+                          ? const Color(0xFF4B5563)
+                          : const Color(0xFFE5E5E5),
                     ),
                     boxShadow: [
                       if (!isDark)
@@ -1234,7 +1288,7 @@ class _UserProgressCard extends StatelessWidget {
                           color: Color(0x0A000000),
                           blurRadius: 4,
                           offset: Offset(0, 2),
-                        )
+                        ),
                     ],
                   ),
                   child: Column(
@@ -1244,7 +1298,9 @@ class _UserProgressCard extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 22,
-                          color: isDark ? Colors.white : const Color(0xFF111827),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF111827),
                         ),
                       ),
                       Text(
@@ -1252,7 +1308,9 @@ class _UserProgressCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                          color: isDark
+                              ? const Color(0xFF9CA3AF)
+                              : const Color(0xFF6B7280),
                         ),
                       ),
                     ],
@@ -1270,7 +1328,9 @@ class _UserProgressCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563),
+                    color: isDark
+                        ? const Color(0xFF9CA3AF)
+                        : const Color(0xFF4B5563),
                   ),
                 ),
                 Text(
@@ -1278,7 +1338,9 @@ class _UserProgressCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563),
+                    color: isDark
+                        ? const Color(0xFF9CA3AF)
+                        : const Color(0xFF4B5563),
                   ),
                 ),
               ],
@@ -1289,7 +1351,9 @@ class _UserProgressCard extends StatelessWidget {
                 Container(
                   height: 12,
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E5E5),
+                    color: isDark
+                        ? const Color(0xFF374151)
+                        : const Color(0xFFE5E5E5),
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -1299,15 +1363,13 @@ class _UserProgressCard extends StatelessWidget {
                   height: 12,
                   width: MediaQuery.of(context).size.width * progress,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [lvl.start, lvl.end],
-                    ),
+                    gradient: LinearGradient(colors: [lvl.start, lvl.end]),
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
                         color: lvl.start.withValues(alpha: 0.5),
                         blurRadius: 8,
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -1347,7 +1409,13 @@ class _LeaderboardTable extends StatelessWidget {
         ),
         boxShadow: isDark
             ? []
-            : [const BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 4))],
+            : [
+                const BoxShadow(
+                  color: Color(0x0A000000),
+                  blurRadius: 12,
+                  offset: Offset(0, 4),
+                ),
+              ],
       ),
       child: Column(
         children: [
@@ -1355,9 +1423,7 @@ class _LeaderboardTable extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF141414)
-                  : const Color(0xFFFAFAFA),
+              color: isDark ? const Color(0xFF141414) : const Color(0xFFFAFAFA),
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(24),
               ),
@@ -1398,151 +1464,185 @@ class _LeaderboardTable extends StatelessWidget {
               final u = entry.value;
               final isMe = u.isCurrentUser;
               return InkWell(
-                onTap: onUserTap != null ? () => onUserTap!(u.id) : null,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: isMe 
-                        ? (isDark ? const Color(0xFF450a0a).withValues(alpha: 0.4) : const Color(0xFFFEF2F2))
-                        : (isDark ? const Color(0xFF000000) : Colors.white),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: isMe 
-                          ? const Color(0xFFEF4444).withValues(alpha: 0.5) 
-                          : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5)),
-                      width: isMe ? 1.5 : 1,
-                    ),
-                    boxShadow: isMe 
-                        ? [
-                            BoxShadow(
-                              color: const Color(0xFFEF4444).withValues(alpha: 0.1),
-                              blurRadius: 8,
-                              spreadRadius: 1,
-                            )
-                          ]
-                        : [],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 12,
-                    ),
-                    child: Row(
-                      children: [
-                        SizedBox(width: 40, child: _rankBadge(i + 1, isDark)),
-                        const SizedBox(width: 12),
-                        _ColorAvatar(
-                          name: u.name,
-                          avatarUrl: u.avatarUrl,
-                          size: 46,
-                          highlighted: isMe,
+                    onTap: onUserTap != null ? () => onUserTap!(u.id) : null,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isMe
+                            ? (isDark
+                                  ? const Color(
+                                      0xFF450a0a,
+                                    ).withValues(alpha: 0.4)
+                                  : const Color(0xFFFEF2F2))
+                            : (isDark ? const Color(0xFF000000) : Colors.white),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isMe
+                              ? const Color(0xFFEF4444).withValues(alpha: 0.5)
+                              : (isDark
+                                    ? const Color(0xFF1C1C1E)
+                                    : const Color(0xFFF5F5F5)),
+                          width: isMe ? 1.5 : 1,
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      u.name,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 17,
-                                        fontFamily: 'Anek Bangla',
-                                        color: isMe
-                                            ? (isDark
-                                                  ? const Color(0xFFFCA5A5)
-                                                  : const Color(0xFFB91C1C))
-                                            : (isDark
-                                                  ? Colors.white
-                                                  : const Color(0xFF000000)),
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  if (isMe) ...[
-                                    const SizedBox(width: 8),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
-                                          colors: [Color(0xFFEF4444), Color(0xFFB91C1C)],
-                                        ),
-                                        borderRadius: BorderRadius.circular(100),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: const Color(0xFFEF4444).withValues(alpha: 0.4),
-                                            blurRadius: 4,
-                                            offset: const Offset(0, 2),
-                                          )
-                                        ],
-                                      ),
-                                      child: const Text(
-                                        'তুমি',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w900,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  if (u.institute.isNotEmpty)
-                                    Flexible(
-                                      child: Text(
-                                        u.institute,
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          color: Color(0xFFA3A3A3),
-                                          fontFamily: 'Anek Bangla',
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ],
-                          ),
+                        boxShadow: isMe
+                            ? [
+                                BoxShadow(
+                                  color: const Color(
+                                    0xFFEF4444,
+                                  ).withValues(alpha: 0.1),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                            : [],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
+                        child: Row(
                           children: [
-                            Text(
-                              '${_numFmt.format(u.xp)}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                                fontSize: 18,
-                                color: isMe 
-                                    ? const Color(0xFFEF4444)
-                                    : (isDark ? const Color(0xFFE5E5E5) : const Color(0xFF1F2937)),
+                            SizedBox(
+                              width: 40,
+                              child: _rankBadge(i + 1, isDark),
+                            ),
+                            const SizedBox(width: 12),
+                            UserAvatar(
+                              id: u.id,
+                              name: u.name,
+                              avatarUrl: u.avatarUrl,
+                              size: 46,
+                              showBorder: isMe,
+                              borderColor: const Color(0xFFFECDD3),
+                              borderWidth: 2.5,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          u.name,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 17,
+                                            fontFamily: 'Anek Bangla',
+                                            color: isMe
+                                                ? (isDark
+                                                      ? const Color(0xFFFCA5A5)
+                                                      : const Color(0xFFB91C1C))
+                                                : (isDark
+                                                      ? Colors.white
+                                                      : const Color(
+                                                          0xFF000000,
+                                                        )),
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      if (isMe) ...[
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(0xFFEF4444),
+                                                Color(0xFFB91C1C),
+                                              ],
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              100,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: const Color(
+                                                  0xFFEF4444,
+                                                ).withValues(alpha: 0.4),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: const Text(
+                                            'তুমি',
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w900,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      if (u.institute.isNotEmpty)
+                                        Flexible(
+                                          child: Text(
+                                            u.institute,
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              color: Color(0xFFA3A3A3),
+                                              fontFamily: 'Anek Bangla',
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
-                            const Text('XP', style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w900,
-                              color: Color(0xFFA3A3A3),
-                              letterSpacing: 1.0,
-                            )),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '${_numFmt.format(u.xp)}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 18,
+                                    color: isMe
+                                        ? const Color(0xFFEF4444)
+                                        : (isDark
+                                              ? const Color(0xFFE5E5E5)
+                                              : const Color(0xFF1F2937)),
+                                  ),
+                                ),
+                                const Text(
+                                  'XP',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w900,
+                                    color: Color(0xFFA3A3A3),
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ).animate().fade(delay: (i * 50).ms, duration: 400.ms).slideY(begin: 0.1, end: 0.0);
+                  )
+                  .animate()
+                  .fade(delay: (i * 50).ms, duration: 400.ms)
+                  .slideY(begin: 0.1, end: 0.0);
             }),
         ],
       ),
@@ -1569,7 +1669,11 @@ class _LeaderboardTable extends StatelessWidget {
         const SizedBox(height: 16),
         const Text(
           'এই লেভেলে এখনও কোনো শিক্ষার্থী নেই।',
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: Color(0xFFA3A3A3)),
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFFA3A3A3),
+          ),
         ),
       ],
     ),
@@ -1649,9 +1753,12 @@ class _LeaderboardTable extends StatelessWidget {
   );
 
   Widget _rankBadge(int rank, bool isDark) {
-    if (rank == 1) return const Center(child: Text('🥇', style: TextStyle(fontSize: 28)));
-    if (rank == 2) return const Center(child: Text('🥈', style: TextStyle(fontSize: 28)));
-    if (rank == 3) return const Center(child: Text('🥉', style: TextStyle(fontSize: 28)));
+    if (rank == 1)
+      return const Center(child: Text('🥇', style: TextStyle(fontSize: 28)));
+    if (rank == 2)
+      return const Center(child: Text('🥈', style: TextStyle(fontSize: 28)));
+    if (rank == 3)
+      return const Center(child: Text('🥉', style: TextStyle(fontSize: 28)));
     return Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
@@ -1671,6 +1778,7 @@ class _LeaderboardTable extends StatelessWidget {
     );
   }
 }
+
 // ─── Avatar Color ─────────────────────────────────────────────────────────────────────────// ─── Avatar Color ─────────────────────────────────────────────────────────────────────────
 Color _avatarColor(String name) {
   const colors = <Color>[
@@ -1694,6 +1802,7 @@ Color _avatarColor(String name) {
 // ─── Color Avatar ──────────────────────────────────────────────────────────────────────────
 class _ColorAvatar extends StatelessWidget {
   final String name;
+  final String? id;
   final String? avatarUrl;
   final double size;
   final bool highlighted;
@@ -1701,83 +1810,21 @@ class _ColorAvatar extends StatelessWidget {
   const _ColorAvatar({
     required this.name,
     required this.size,
+    this.id,
     this.avatarUrl,
     this.highlighted = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final color = _avatarColor(name);
-    final darker = Color.lerp(color, Colors.black, 0.28) ?? color;
-    final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
-
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [color, darker],
-        ),
-        border: highlighted
-            ? Border.all(color: const Color(0xFFFECDD3), width: 2.5)
-            : null,
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.35),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: ClipOval(
-        child: (avatarUrl != null && avatarUrl!.isNotEmpty && avatarUrl != 'null')
-            ? (avatarUrl!.toLowerCase().contains('.svg')
-                ? SvgPicture.network(
-                    avatarUrl!,
-                    fit: BoxFit.cover,
-                    width: size,
-                    height: size,
-                    placeholderBuilder: (context) => Center(
-                      child: Text(
-                        initial,
-                        style: TextStyle(
-                          fontSize: size * 0.4,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  )
-                : Image.network(
-                    avatarUrl!,
-                    fit: BoxFit.cover,
-                    width: size,
-                    height: size,
-                    errorBuilder: (context, error, stackTrace) => Center(
-                      child: Text(
-                        initial,
-                        style: TextStyle(
-                          fontSize: size * 0.4,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ))
-            : Center(
-                child: Text(
-                  initial,
-                  style: TextStyle(
-                    fontSize: size * 0.4,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-      ),
+    return UserAvatar(
+      id: id,
+      name: name,
+      avatarUrl: avatarUrl,
+      size: size,
+      showBorder: highlighted,
+      borderColor: const Color(0xFFFECDD3),
+      borderWidth: 2.5,
     );
   }
 }
@@ -1893,11 +1940,14 @@ class _PodiumSection extends StatelessWidget {
                               padding: EdgeInsets.only(
                                 top: slot.rank == 1 ? 8 : 0,
                               ),
-                              child: _ColorAvatar(
+                              child: UserAvatar(
+                                id: slot.user.id,
                                 name: slot.user.name,
                                 avatarUrl: slot.user.avatarUrl,
                                 size: slot.avatarSize,
-                                highlighted: slot.rank == 1,
+                                showBorder: slot.rank == 1,
+                                borderColor: const Color(0xFFFDE047),
+                                borderWidth: 2.5,
                               ),
                             ),
                           ],

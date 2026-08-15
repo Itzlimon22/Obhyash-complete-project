@@ -84,8 +84,21 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/audio/
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+    - assets/formulas/
+    - assets/formulas/hsc_physics_1/
+    - assets/formulas/hsc_physics_2/
+    - assets/formulas/hsc_chemistry_1/
+    - assets/formulas/hsc_chemistry_2/
+    - assets/formulas/hsc_math_1/
+    - assets/formulas/hsc_math_2/
+    - assets/formulas/hsc_biology_1/
+    - assets/formulas/hsc_biology_2/
+    - assets/formulas/hsc_ict/
+    - assets/formulas/ssc_physics/
+    - assets/formulas/ssc_chemistry/
+    - assets/formulas/ssc_math/
+    - assets/formulas/ssc_higher_math/
+    - assets/formulas/ssc_biology/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

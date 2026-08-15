@@ -1,0 +1,36 @@
+{
+  "subjectId": "hsc_ict",
+  "subjectName": "তথ্য ও যোগাযোগ প্রযুক্তি",
+  "chapters": [
+    {
+      "chapterId": "chapter_1",
+      "chapterName": "তথ্য ও যোগাযোগ প্রযুক্তি: বিশ্ব ও বাংলাদেশ প্রেক্ষিত",
+      "chapterNumber": 1
+    },
+    {
+      "chapterId": "chapter_2",
+      "chapterName": "কমিউনিকেশন সিস্টেমস ও নেটওয়ার্কিং",
+      "chapterNumber": 2
+    },
+    {
+      "chapterId": "chapter_3",
+      "chapterName": "সংখ্যা পদ্ধতি ও ডিজিটাল ডিভাইস",
+      "chapterNumber": 3
+    },
+    {
+      "chapterId": "chapter_4",
+      "chapterName": "ওয়েব ডিজাইন পরিচিতি এবং HTML",
+      "chapterNumber": 4
+    },
+    {
+      "chapterId": "chapter_5",
+      "chapterName": "প্রোগ্রামিং ভাষা",
+      "chapterNumber": 5
+    },
+    {
+      "chapterId": "chapter_6",
+      "chapterName": "ডেটাবেস ম্যানেজমেন্ট সিস্টেম",
+      "chapterNumber": 6
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "subjectId": "ssc_biology",
+  "subjectName": "জীববিজ্ঞান",
+  "chapters": [
+    {
+      "chapterId": "chapter_1",
+      "chapterName": "জীবন পাঠ",
+      "chapterNumber": 1
+    },
+    {
+      "chapterId": "chapter_2",
+      "chapterName": "জীবকোষ ও টিস্যু",
+      "chapterNumber": 2
+    },
+    {
+      "chapterId": "chapter_3",
+      "chapterName": "কোষ বিভাজন",
+      "chapterNumber": 3
+    },
+    {
+      "chapterId": "chapter_4",
+      "chapterName": "জীবনীশক্তি",
+      "chapterNumber": 4
+    },
+    {
+      "chapterId": "chapter_5",
+      "chapterName": "খাদ্য, পুষ্টি ও পরিপাক",
+      "chapterNumber": 5
+    },
+    {
+      "chapterId": "chapter_6",
+      "chapterName": "জীবে পরিবহন",
+      "chapterNumber": 6
+    },
+    {
+      "chapterId": "chapter_7",
+      "chapterName": "গ্যাসীয় বিনিময়",
+      "chapterNumber": 7
+    },
+    {
+      "chapterId": "chapter_8",
+      "chapterName": "রেচন প্রক্রিয়া",
+      "chapterNumber": 8
+    },
+    {
+      "chapterId": "chapter_9",
+      "chapterName": "দৃঢ়তা প্রদান ও চলন",
+      "chapterNumber": 9
+    },
+    {
+      "chapterId": "chapter_10",
+      "chapterName": "সমন্বয়",
+      "chapterNumber": 10
+    },
+    {
+      "chapterId": "chapter_11",
+      "chapterName": "জীবের প্রজনন",
+      "chapterNumber": 11
+    },
+    {
+      "chapterId": "chapter_12",
+      "chapterName": "জীবের বংশগতি ও বিবর্তন",
+      "chapterNumber": 12
+    },
+    {
+      "chapterId": "chapter_13",
+      "chapterName": "জীবের পরিবেশ",
+      "chapterNumber": 13
+    },
+    {
+      "chapterId": "chapter_14",
+      "chapterName": "জীববিজ্ঞান ও প্রযুক্তি",
+      "chapterNumber": 14
+    }
+  ]
+}

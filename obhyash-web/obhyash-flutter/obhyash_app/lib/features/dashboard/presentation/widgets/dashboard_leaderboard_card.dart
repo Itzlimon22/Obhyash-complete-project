@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../domain/models.dart';
+import '../../../../core/presentation/widgets/user_avatar.dart';
 
 class DashboardLeaderboardCard extends StatelessWidget {
   final LeaderboardUser currentUser;
@@ -103,8 +104,8 @@ class DashboardLeaderboardCard extends StatelessWidget {
                           'লিডারবোর্ড',
                           style: TextStyle(
                             fontFamily: 'Anek Bangla',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 20,
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF1C1C1E),
@@ -130,7 +131,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: 'Anek Bangla',
                               fontWeight: FontWeight.bold,
-                              fontSize: 15,
+                              fontSize: 16,
                               color: isDark
                                   ? const Color(0xFF059669)
                                   : const Color(0xFF059669),
@@ -180,7 +181,15 @@ class DashboardLeaderboardCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       if (topUser != null) ...[
-                        _buildMiniAvatar(topUser!.name, isDark),
+                        UserAvatar(
+                          id: topUser!.id,
+                          name: topUser!.name,
+                          avatarUrl: topUser!.avatarUrl,
+                          size: 28,
+                          showBorder: true,
+                          borderColor: const Color(0xFF6EE7B7),
+                          borderWidth: 1.5,
+                        ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
@@ -190,7 +199,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                             style: const TextStyle(
                               fontFamily: 'Anek Bangla',
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: 17,
                               color: Colors.white,
                             ),
                           ),
@@ -250,7 +259,15 @@ class DashboardLeaderboardCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      _buildMiniAvatar(currentUser.name, isDark),
+                      UserAvatar(
+                        id: currentUser.id,
+                        name: currentUser.name,
+                        avatarUrl: currentUser.avatarUrl,
+                        size: 28,
+                        showBorder: true,
+                        borderColor: Colors.white,
+                        borderWidth: 1.5,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Row(
@@ -263,7 +280,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                                 style: const TextStyle(
                                   fontFamily: 'Anek Bangla',
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  fontSize: 17,
                                   color: Colors.white,
                                 ),
                               ),
@@ -313,7 +330,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                         'শীর্ষে পৌঁছাতে আরও ',
                         style: TextStyle(
                           fontFamily: 'Anek Bangla',
-                          fontSize: 14,
+                          fontSize: 16,
                           color: isDark
                               ? const Color(0xFFA3A3A3)
                               : const Color(0xFF737373),
@@ -323,7 +340,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                         '$xpDiff XP',
                         style: TextStyle(
                           fontFamily: 'Anek Bangla',
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: isDark
                               ? const Color(0xFFD4D4D4)
@@ -334,7 +351,7 @@ class DashboardLeaderboardCard extends StatelessWidget {
                         ' লাগবে',
                         style: TextStyle(
                           fontFamily: 'Anek Bangla',
-                          fontSize: 14,
+                          fontSize: 16,
                           color: isDark
                               ? const Color(0xFFA3A3A3)
                               : const Color(0xFF737373),

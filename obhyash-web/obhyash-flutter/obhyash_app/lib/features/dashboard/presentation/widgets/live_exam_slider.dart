@@ -15,134 +15,175 @@ class LiveExamSlider extends ConsumerWidget {
     final liveExamsAsync = ref.watch(dashboardLiveExamsProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return liveExamsAsync.when(
-      data: (exams) {
-        if (exams.isEmpty) {
-          return const SizedBox(height: 20);
-        }
-
-        return Padding(
-          padding: const EdgeInsets.only(top: 10, bottom: 0),
-          child: CarouselSlider(
-            options: CarouselOptions(
-              height: 180.0,
-              autoPlay: exams.length > 1,
-              autoPlayInterval: const Duration(seconds: 4),
-              enlargeCenterPage: true,
-              viewportFraction: 0.92,
-              aspectRatio: 2.0,
-            ),
-            items: exams.map((exam) {
-              return Builder(
-                builder: (BuildContext context) {
-                  return _buildExamCard(context, exam, isDark);
-                },
-              );
-            }).toList(),
-          ),
-        );
-      },
-      loading: () => const SizedBox(
-        height: 200,
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      error: (_, __) => const SizedBox(height: 20),
+    final displayExams = liveExamsAsync.when(
+      data: (exams) => exams.isNotEmpty ? exams : _getDemoExams(),
+      loading: () => _getDemoExams(),
+      error: (_, _) => _getDemoExams(),
     );
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 0),
+      child: CarouselSlider(
+        options: CarouselOptions(
+          height: 155.0,
+          autoPlay: displayExams.length > 1,
+          autoPlayInterval: const Duration(seconds: 5),
+          enlargeCenterPage: true,
+          viewportFraction: 0.92,
+          aspectRatio: 2.3,
+        ),
+        items: displayExams.map((exam) {
+          return Builder(
+            builder: (BuildContext context) {
+              return _buildExamCard(context, exam, isDark);
+            },
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  static List<LiveExam> _getDemoExams() {
+    final now = DateTime.now();
+    return [
+      LiveExam(
+        id: 'demo-1',
+        title: 'HSC পদার্থবিজ্ঞান ১ম পত্র পূর্ণাঙ্গ লাইভ মক',
+        description: 'অধ্যায় ১-১০ সমন্বিত স্পেশাল মডেল টেস্ট',
+        startTime: now.subtract(const Duration(minutes: 30)),
+        endTime: now.add(const Duration(hours: 3)),
+        durationMinutes: 45,
+        totalQuestions: 50,
+        totalMarks: 50,
+        negativeMarking: 0.25,
+        status: 'published',
+        category: 'HSC',
+      ),
+      LiveExam(
+        id: 'demo-2',
+        title: 'মেডিকেল স্পেশাল বায়োলজি মেগা লাইভ এক্সাম',
+        description: 'প্রাণীবিজ্ঞান ও উদ্ভিদবিজ্ঞান সমন্বিত টেস্ট',
+        startTime: now.add(const Duration(hours: 4)),
+        endTime: now.add(const Duration(hours: 9)),
+        durationMinutes: 60,
+        totalQuestions: 100,
+        totalMarks: 100,
+        negativeMarking: 0.25,
+        status: 'published',
+        category: 'Medical',
+      ),
+      LiveExam(
+        id: 'demo-3',
+        title: 'রসায়ন ২য় পত্র: জৈব রসায়ন স্পেশাল এক্সাম',
+        description: 'জৈব যৌগ ও পরিবেশ রসায়ন অধ্যায়ভিত্তিক পরীক্ষা',
+        startTime: now.add(const Duration(days: 1, hours: 2)),
+        endTime: now.add(const Duration(days: 1, hours: 6)),
+        durationMinutes: 30,
+        totalQuestions: 30,
+        totalMarks: 30,
+        negativeMarking: 0.25,
+        status: 'published',
+        category: 'HSC',
+      ),
+    ];
   }
 
   Widget _buildExamCard(BuildContext context, LiveExam exam, bool isDark) {
     final isOngoing = exam.isOngoing;
     final formatter = DateFormat('dd MMM, hh:mm a');
-    
+
     final bgGradient = isOngoing
         ? LinearGradient(
             colors: isDark
-                ? [const Color(0xFF059669).withValues(alpha: 0.8), const Color(0xFF065F46).withValues(alpha: 0.8)]
+                ? [const Color(0xFF047857), const Color(0xFF064E3B)]
                 : [const Color(0xFF10B981), const Color(0xFF059669)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           )
         : LinearGradient(
             colors: isDark
-                ? [const Color(0xFFD97706).withValues(alpha: 0.8), const Color(0xFFB45309).withValues(alpha: 0.8)]
-                : [const Color(0xFF1E3A8A), const Color(0xFFD97706)],
+                ? [const Color(0xFFD97706), const Color(0xFF92400E)]
+                : [const Color(0xFFF59E0B), const Color(0xFFD97706)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           );
 
     return Container(
       width: MediaQuery.of(context).size.width,
-      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+      margin: const EdgeInsets.symmetric(horizontal: 4.0),
       decoration: BoxDecoration(
         gradient: bgGradient,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
             color: (isOngoing ? const Color(0xFF059669) : const Color(0xFFD97706))
-                .withValues(alpha: 0.3),
+                .withValues(alpha: 0.25),
             blurRadius: 10,
-            offset: const Offset(0, 5),
+            offset: const Offset(0, 4),
           )
         ],
       ),
       child: Stack(
         children: [
           Positioned(
-            right: -20,
-            bottom: -20,
+            right: -10,
+            bottom: -15,
             child: Icon(
               isOngoing ? LucideIcons.radio : LucideIcons.calendarClock,
-              size: 140,
-              color: Colors.white.withValues(alpha: 0.1),
+              size: 110,
+              color: Colors.white.withValues(alpha: 0.12),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 13.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
+                // Top Tag
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.22),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isOngoing ? LucideIcons.radio : LucideIcons.clock,
+                        color: Colors.white,
+                        size: 11,
                       ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            isOngoing ? LucideIcons.radio : LucideIcons.clock,
-                            color: Colors.white,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            isOngoing ? 'LIVE NOW' : 'UPCOMING',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      const SizedBox(width: 4),
+                      Text(
+                        isOngoing ? 'LIVE NOW' : 'UPCOMING',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.3,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+
+                // Exam Title
                 Text(
                   exam.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
                     fontFamily: 'Anek Bangla',
+                    height: 1.25,
                   ),
                 ),
+
+                // Bottom Timing & Button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -154,7 +195,7 @@ class LiveExamSlider extends ConsumerWidget {
                           isOngoing ? 'শেষ হবে:' : 'শুরু হবে:',
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 15,
+                            fontSize: 12,
                             fontFamily: 'Anek Bangla',
                           ),
                         ),
@@ -162,8 +203,8 @@ class LiveExamSlider extends ConsumerWidget {
                           formatter.format(isOngoing ? exam.endTime : exam.startTime),
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ],
@@ -174,19 +215,22 @@ class LiveExamSlider extends ConsumerWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
-                        foregroundColor: isOngoing ? const Color(0xFF059669) : const Color(0xFFD97706),
+                        foregroundColor: isOngoing
+                            ? const Color(0xFF059669)
+                            : const Color(0xFFD97706),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        minimumSize: const Size(0, 36),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        minimumSize: const Size(0, 30),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                       child: const Text(
                         'অংশগ্রহণ করুন',
                         style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
                           fontFamily: 'Anek Bangla',
                         ),
                       ),

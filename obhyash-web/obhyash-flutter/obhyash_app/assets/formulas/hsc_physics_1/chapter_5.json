@@ -1,0 +1,22 @@
+[
+  {
+    "title": "কাজ",
+    "latex": "W = Fs\\cos\\theta",
+    "description": "F = বল, s = সরণ, θ = বল ও সরণের মধ্যবর্তী কোণ"
+  },
+  {
+    "title": "গতিশক্তি",
+    "latex": "E_k = \\frac{1}{2}mv^2",
+    "description": "m = ভর, v = বেগ"
+  },
+  {
+    "title": "বিভব শক্তি",
+    "latex": "E_p = mgh",
+    "description": "m = ভর, g = অভিকর্ষজ ত্বরণ, h = উচ্চতা"
+  },
+  {
+    "title": "ক্ষমতা",
+    "latex": "P = \\frac{W}{t} = Fv",
+    "description": "P = ক্ষমতা (Watt), W = কাজ, t = সময়"
+  }
+]

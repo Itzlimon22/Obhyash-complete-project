@@ -1,69 +1,82 @@
-import type { Metadata, Viewport } from 'next';
-import { Suspense } from 'react';
-import { Inter, Anek_Bangla } from 'next/font/google';
-import './globals.css';
-import 'katex/dist/katex.min.css';
-import { Toaster } from 'sonner';
-import AuthProvider from '@/components/auth/AuthProvider';
-import SWRProvider from '@/components/providers/SWRProvider';
-import { Analytics } from '@vercel/analytics/next';
-import { SpeedInsights } from '@vercel/speed-insights/next';
-import ReferralCatcher from '@/components/ReferralCatcher';
+import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
+import { Inter, Anek_Bangla } from "next/font/google";
+import "./globals.css";
+import "katex/dist/katex.min.css";
+import { Toaster } from "sonner";
+import AuthProvider from "@/components/auth/AuthProvider";
+import SWRProvider from "@/components/providers/SWRProvider";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import ReferralCatcher from "@/components/ReferralCatcher";
 
 // ✅ Configure Inter (English text)
 const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
-  display: 'swap',
+  variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 // ✅ Configure Anek Bangla (Bengali text)
 const anekBangla = Anek_Bangla({
-  variable: '--font-anek',
-  subsets: ['bengali', 'latin'],
-  display: 'swap',
+  variable: "--font-anek",
+  subsets: ["bengali", "latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Obhyash',
-    default: 'Obhyash - The Smart Exam Platform for Students',
+    template: "%s | Obhyash",
+    default: "Obhyash - The Smart Exam Platform for Students",
   },
-  description: 'Prepare for your exams with Obhyash. Practice thousands of questions, track your progress, identify your mistakes, and improve your scores with our smart exam platform.',
-  keywords: ['exam preparation', 'practice tests', 'mock tests', 'student platform', 'education', 'obhyash', 'bcs', 'admission test', 'smart exam'],
-  authors: [{ name: 'Obhyash Team' }],
-  creator: 'Obhyash',
-  publisher: 'Obhyash',
+  description:
+    "Prepare for your exams with Obhyash. Practice thousands of questions, track your progress, identify your mistakes, and improve your scores with our smart exam platform.",
+  keywords: [
+    "exam preparation",
+    "practice tests",
+    "mock tests",
+    "student platform",
+    "education",
+    "obhyash",
+    "bcs",
+    "admission test",
+    "smart exam",
+  ],
+  authors: [{ name: "Obhyash Team" }],
+  creator: "Obhyash",
+  publisher: "Obhyash",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
   openGraph: {
-    title: 'Obhyash - Smart Exam Platform',
-    description: 'Prepare for your exams with Obhyash. Practice thousands of questions, track your progress, and improve your scores.',
-    url: 'https://obhyash.com', // Replace with your actual domain
-    siteName: 'Obhyash',
-    locale: 'bn_BD',
-    type: 'website',
+    title: "Obhyash - Smart Exam Platform",
+    description:
+      "Prepare for your exams with Obhyash. Practice thousands of questions, track your progress, and improve your scores.",
+    url: "https://obhyash.com", // Replace with your actual domain
+    siteName: "Obhyash",
+    locale: "bn_BD",
+    type: "website",
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Obhyash - Smart Exam Platform',
-    description: 'Practice thousands of questions and track your progress with our smart exam platform.',
-    creator: '@obhyash',
+    card: "summary_large_image",
+    title: "Obhyash - Smart Exam Platform",
+    description:
+      "Practice thousands of questions and track your progress with our smart exam platform.",
+    creator: "@obhyash",
   },
-  manifest: '/manifest.json',
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
-    title: 'Obhyash',
+    statusBarStyle: "default",
+    title: "Obhyash",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#9f1239',
-  width: 'device-width',
+  themeColor: "#9f1239",
+  width: "device-width",
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
@@ -76,7 +89,11 @@ export default function RootLayout({
 }>) {
   return (
     // ✅ Added 'dark' class for theme and font variables
-    <html lang="en" className={`${inter.variable} ${anekBangla.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${inter.variable} ${anekBangla.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <link rel="apple-touch-icon" href="/icon-512.png" />
       </head>
@@ -95,9 +112,9 @@ export default function RootLayout({
                 closeButton
                 theme="dark"
                 toastOptions={{
-                  className: 'font-anek !rounded-2xl shadow-2xl !border-0',
+                  className: "font-anek !rounded-2xl shadow-2xl !border-0",
                   style: {
-                    padding: '16px',
+                    padding: "16px",
                   },
                 }}
               />

@@ -290,295 +290,251 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
               ? _errorState(isDark)
               : RefreshIndicator(
                   onRefresh: () => _fetchReports(),
-                  child: SingleChildScrollView(
+                  child: CustomScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // ── Premium Header ─────────────────────────────
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: isDark
-                                  ? [const Color(0xFF1A0508), const Color(0xFF3F0F17)]
-                                  : [const Color(0xFFFFF1F2), const Color(0xFFFFE4E6)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: isDark ? const Color(0xFF7F1D2A).withValues(alpha: 0.3) : const Color(0xFFFECDD3),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: isDark ? const Color(0xFFB91C1C).withValues(alpha: 0.2) : Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFFB91C1C).withValues(alpha: 0.1),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
+                    slivers: [
+                      // ── Top 3 Compact Centered Stat Boxes ───────────────────
+                      if (_reports.isNotEmpty)
+                        SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                          sliver: SliverToBoxAdapter(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: _StatBox(
+                                    label: 'অপেক্ষমান',
+                                    value: pendingCount.toString(),
+                                    icon: LucideIcons.clock,
+                                    color: const Color(0xFF3B82F6),
+                                    isDark: isDark,
+                                  ),
                                 ),
-                                child: const Icon(
-                                  LucideIcons.alertTriangle,
-                                  size: 24,
-                                  color: Color(0xFFE11D48),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: _StatBox(
+                                    label: 'গৃহীত',
+                                    value: resolvedCount.toString(),
+                                    icon: LucideIcons.checkCircle2,
+                                    color: const Color(0xFF10B981),
+                                    isDark: isDark,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'আমার রিপোর্টসমূহ',
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w900,
-                                        color: isDark ? Colors.white : const Color(0xFF000000),
-                                      ),
-                                    ),
-                                    Text(
-                                      'রিপোর্ট ও অ্যাডমিন ফিডব্যাক',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: isDark ? const Color(0xFFFCA5A5) : const Color(0xFFF43F5E),
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // ── Dashboard-style Stats ────────────────────────────
-                        if (_reports.isNotEmpty) ...[
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _StatBox(
-                                  label: 'অপেক্ষমান',
-                                  value: pendingCount.toString(),
-                                  icon: LucideIcons.clock,
-                                  color: const Color(0xFF1E3A8A),
-                                  isDark: isDark,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: _StatBox(
-                                  label: 'গৃহীত',
-                                  value: resolvedCount.toString(),
-                                  icon: LucideIcons.checkCircle2,
-                                  color: const Color(0xFF064E3B),
-                                  isDark: isDark,
-                                ),
-                              ),
-                              if (ignoredCount > 0) ...[
-                                const SizedBox(width: 10),
+                                const SizedBox(width: 8),
                                 Expanded(
                                   child: _StatBox(
                                     label: 'বাতিল',
                                     value: ignoredCount.toString(),
                                     icon: LucideIcons.xCircle,
-                                    color: const Color(0xFF1C1C1E),
+                                    color: const Color(0xFFEF4444),
                                     isDark: isDark,
                                   ),
                                 ),
                               ],
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-
-                          // ── Status Filter Pills ──────────────────────
-                          Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF000000) : const Color(0xFFF4F4F5),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                _FilterPill(
-                                  label: 'সব',
-                                  isSelected: _statusFilter.isEmpty,
-                                  isDark: isDark,
-                                  onTap: () => setState(() => _statusFilter = ''),
-                                ),
-                                _FilterPill(
-                                  label: 'অপেক্ষমান',
-                                  isSelected: _statusFilter == 'pending',
-                                  isDark: isDark,
-                                  onTap: () => setState(() => _statusFilter = 'pending'),
-                                ),
-                                _FilterPill(
-                                  label: 'গৃহীত',
-                                  isSelected: _statusFilter == 'Resolved',
-                                  isDark: isDark,
-                                  onTap: () => setState(() => _statusFilter = 'Resolved'),
-                                ),
-                                _FilterPill(
-                                  label: 'বাতিল',
-                                  isSelected: _statusFilter == 'Ignored',
-                                  isDark: isDark,
-                                  onTap: () => setState(() => _statusFilter = 'Ignored'),
-                                ),
-                              ],
                             ),
                           ),
-                          const SizedBox(height: 20),
-                        ],
+                        ),
 
-                        // ── Empty state ──────────────────────────────
-                        if (_filteredReports.isEmpty)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 60,
-                              horizontal: 24,
-                            ),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: isDark
-                                    ? [const Color(0xFF000000), const Color(0xFF171717)]
-                                    : [Colors.white, const Color(0xFFF9FAFB)],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
+                      // ── Sticky Status Filter Pills ──────────────────────
+                      if (_reports.isNotEmpty)
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: _StickyFilterDelegate(
+                            isDark: isDark,
+                            height: 56.0,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF000000) : const Color(0xFFF4F4F5),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: isDark ? Colors.black54 : const Color(0x0A000000),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                              borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+                              child: Row(
+                                children: [
+                                  _FilterPill(
+                                    label: 'সব',
+                                    isSelected: _statusFilter.isEmpty,
+                                    isDark: isDark,
+                                    onTap: () => setState(() => _statusFilter = ''),
+                                  ),
+                                  _FilterPill(
+                                    label: 'অপেক্ষমান',
+                                    isSelected: _statusFilter == 'pending',
+                                    isDark: isDark,
+                                    onTap: () => setState(() => _statusFilter = 'pending'),
+                                  ),
+                                  _FilterPill(
+                                    label: 'গৃহীত',
+                                    isSelected: _statusFilter == 'Resolved',
+                                    isDark: isDark,
+                                    onTap: () => setState(() => _statusFilter = 'Resolved'),
+                                  ),
+                                  _FilterPill(
+                                    label: 'বাতিল',
+                                    isSelected: _statusFilter == 'Ignored',
+                                    isDark: isDark,
+                                    onTap: () => setState(() => _statusFilter = 'Ignored'),
+                                  ),
+                                ],
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: isDark ? Colors.black26 : const Color(0x0A000000),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                )
-                              ],
                             ),
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: 80,
-                                  height: 80,
+                          ),
+                        ),
+
+                      // ── Report List Content ──────────────────────────────
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
+                        sliver: _filteredReports.isEmpty
+                            ? SliverToBoxAdapter(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 60,
+                                    horizontal: 24,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF3F4F6),
-                                    shape: BoxShape.circle,
+                                    gradient: LinearGradient(
+                                      colors: isDark
+                                          ? [const Color(0xFF000000), const Color(0xFF171717)]
+                                          : [Colors.white, const Color(0xFFF9FAFB)],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
+                                    borderRadius: BorderRadius.circular(24),
+                                    border: Border.all(
+                                      color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+                                    ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: isDark ? Colors.black45 : const Color(0x1A000000),
+                                        color: isDark ? Colors.black26 : const Color(0x0A000000),
                                         blurRadius: 10,
-                                        spreadRadius: 2,
+                                        offset: const Offset(0, 4),
+                                      )
+                                    ],
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: 80,
+                                        height: 80,
+                                        decoration: BoxDecoration(
+                                          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF3F4F6),
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: isDark ? Colors.black45 : const Color(0x1A000000),
+                                              blurRadius: 10,
+                                              spreadRadius: 2,
+                                            ),
+                                          ],
+                                        ),
+                                        child: const Icon(
+                                          LucideIcons.inbox,
+                                          size: 36,
+                                          color: Color(0xFF9CA3AF),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 24),
+                                      Text(
+                                        'কোনো রিপোর্ট পাওয়া যায়নি',
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.w900,
+                                          color: isDark ? Colors.white : const Color(0xFF000000),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        _reports.isEmpty
+                                            ? 'তুমি এখন পর্যন্ত কোনো প্রশ্ন রিপোর্ট করোনি।\nপ্রশ্নে কোনো ভুল পেলে রিপোর্ট করতে পারো।'
+                                            : 'এই ফিল্টারে কোনো রিপোর্ট পাওয়া যায়নি।',
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          color: Color(0xFFA3A3A3),
+                                          height: 1.5,
+                                        ),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ],
                                   ),
-                                  child: const Icon(
-                                    LucideIcons.inbox,
-                                    size: 36,
-                                    color: Color(0xFF9CA3AF),
-                                  ),
                                 ),
-                                const SizedBox(height: 24),
-                                Text(
-                                  'কোনো রিপোর্ট পাওয়া যায়নি',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w900,
-                                    color: isDark ? Colors.white : const Color(0xFF000000),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  _reports.isEmpty
-                                      ? 'তুমি এখন পর্যন্ত কোনো প্রশ্ন রিপোর্ট করোনি।\\nপ্রশ্নে কোনো ভুল পেলে রিপোর্ট করতে পারো।'
-                                      : 'এই ফিল্টারে কোনো রিপোর্ট পাওয়া যায়নি।',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    color: Color(0xFFA3A3A3),
-                                    height: 1.5,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          )
-                        else ...[
-                          // ── Report list ──────────────────────────────
-                          ...List.generate(_filteredReports.length, (i) {
-                            final report = _filteredReports[i];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16),
-                              child: _ReportCard(
-                                report: report,
-                                isDark: isDark,
-                                isExpanded: _expandedId == report.id,
-                                onToggle: () => setState(() {
-                                  _expandedId = _expandedId == report.id ? null : report.id;
-                                }),
-                                onShowQuestion: () => _showQuestion(context, report, isDark),
-                              ),
-                            );
-                          }),
+                              )
+                            : SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, i) {
+                                    if (i < _filteredReports.length) {
+                                      final report = _filteredReports[i];
+                                      return Padding(
+                                        padding: const EdgeInsets.only(bottom: 16),
+                                        child: _ReportCard(
+                                          report: report,
+                                          isDark: isDark,
+                                          isExpanded: _expandedId == report.id,
+                                          onToggle: () => setState(() {
+                                            _expandedId = _expandedId == report.id ? null : report.id;
+                                          }),
+                                          onShowQuestion: () => _showQuestion(context, report, isDark),
+                                        ),
+                                      );
+                                    }
 
-                          // ── Load more ────────────────────────────────
-                          if (_hasMore && _statusFilter.isEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: OutlinedButton(
-                                onPressed: _isLoadingMore ? null : () => _fetchReports(loadMore: true),
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 24,
-                                    vertical: 16,
-                                  ),
-                                  backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
-                                  foregroundColor: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF525252),
-                                  side: BorderSide(
-                                    color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
+                                    // Load more button at the end
+                                    if (_hasMore && _statusFilter.isEmpty) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(top: 8),
+                                        child: OutlinedButton(
+                                          onPressed: _isLoadingMore ? null : () => _fetchReports(loadMore: true),
+                                          style: OutlinedButton.styleFrom(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 24,
+                                              vertical: 16,
+                                            ),
+                                            backgroundColor: isDark ? const Color(0xFF000000) : Colors.white,
+                                            foregroundColor: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF525252),
+                                            side: BorderSide(
+                                              color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(16),
+                                            ),
+                                          ),
+                                          child: _isLoadingMore
+                                              ? const Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    SizedBox(
+                                                      width: 16,
+                                                      height: 16,
+                                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                                    ),
+                                                    SizedBox(width: 12),
+                                                    Text(
+                                                      'লোড হচ্ছে...',
+                                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                    ),
+                                                  ],
+                                                )
+                                              : const Text(
+                                                  'আরো দেখো',
+                                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                ),
+                                        ),
+                                      );
+                                    }
+                                    return null;
+                                  },
+                                  childCount: _filteredReports.length + ((_hasMore && _statusFilter.isEmpty) ? 1 : 0),
                                 ),
-                                child: _isLoadingMore
-                                    ? const Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          SizedBox(
-                                            width: 16,
-                                            height: 16,
-                                            child: CircularProgressIndicator(strokeWidth: 2),
-                                          ),
-                                          SizedBox(width: 12),
-                                          Text(
-                                            'লোড হচ্ছে...',
-                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                          ),
-                                        ],
-                                      )
-                                    : const Text(
-                                        'আরো দেখো',
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                      ),
                               ),
-                            ),
-                        ],
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
         ),
@@ -598,203 +554,203 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         return Container(
-          height: MediaQuery.of(ctx).size.height * 0.85,
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF000000) : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(ctx).size.height * 0.72,
           ),
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 12, bottom: 8),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
-                  borderRadius: BorderRadius.circular(2),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF18181B) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 8, bottom: 2),
+                  width: 32,
+                  height: 3.5,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE4E4E7),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'সম্পূর্ণ প্রশ্ন',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF000000),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(LucideIcons.x),
-                      onPressed: () => Navigator.pop(ctx),
-                    ),
-                  ],
-                ),
-              ),
-              Divider(
-                height: 1,
-                color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF0F0F0),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 10, 6),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF0D3326) : const Color(0xFFE8F4F0),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          _subjectName(q.subject).toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1A7A5A),
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
                       Text(
-                        q.question,
+                        'সম্পূর্ণ প্রশ্ন',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 16.5,
+                          fontWeight: FontWeight.w800,
                           fontFamily: 'Anek Bangla',
-                          color: isDark ? Colors.white : const Color(0xFF111827),
-                          height: 1.4,
+                          color: isDark ? Colors.white : const Color(0xFF18181B),
                         ),
                       ),
-                      const SizedBox(height: 24),
-                      ...List.generate(q.options.length, (idx) {
-                        final isCorrect = q.correctAnswerIndices?.contains(idx) ?? false;
-                        
-                        Color boxBg = isDark ? const Color(0xFF1F1F1F) : const Color(0xFFF8F9FA);
-                        Color boxBorder = isDark ? const Color(0xFF333333) : const Color(0xFFE5E7EB);
-                        Color bulletBg = Colors.transparent;
-                        Color bulletBorder = isDark ? const Color(0xFF525252) : const Color(0xFFD1D5DB);
-                        Color bulletText = isDark ? const Color(0xFFD4D4D4) : const Color(0xFF6B7280);
-                        Color optionTextColor = isDark ? const Color(0xFFE5E5E5) : const Color(0xFF1F2937);
-                        bool boldText = false;
-
-                        if (isCorrect) {
-                          boxBg = isDark ? const Color(0xFF059669).withValues(alpha: 0.15) : const Color(0xFFECFDF5).withValues(alpha: 0.4);
-                          boxBorder = isDark ? const Color(0xFF059669) : const Color(0xFFBBF7D0);
-                          bulletBg = const Color(0xFF059669);
-                          bulletBorder = const Color(0xFF059669);
-                          bulletText = Colors.white;
-                          optionTextColor = isDark ? const Color(0xFF059669) : const Color(0xFF059669);
-                          boldText = true;
-                        }
-
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: boxBg,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: boxBorder),
-                            boxShadow: isDark || isCorrect
-                                ? []
-                                : [
-                                    const BoxShadow(
-                                      color: Color(0x0A000000),
-                                      blurRadius: 6,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 28,
-                                height: 28,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: bulletBg,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: bulletBorder),
-                                ),
-                                child: Text(
-                                  String.fromCharCode(65 + idx),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: bulletText,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  q.options[idx],
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: optionTextColor,
-                                    fontWeight: boldText ? FontWeight.bold : FontWeight.w500,
-                                    fontFamily: 'Anek Bangla',
-                                    height: 1.4,
-                                  ),
-                                 maxLines: 1, overflow: TextOverflow.ellipsis),
-                              ),
-                              if (isCorrect)
-                                const Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 22),
-                            ],
-                          ),
-                        );
-                      }),
-                      if (q.explanation != null && q.explanation!.isNotEmpty) ...[
-                        const SizedBox(height: 24),
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF1C1C1E).withValues(alpha: 0.5) : const Color(0xFFF0F9FF),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFBAE6FD)),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(Icons.lightbulb_outline_rounded, size: 20, color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7)),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'ব্যাখ্যা',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                q.explanation!,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
-                                  fontFamily: 'Anek Bangla',
-                                  height: 1.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 40),
+                      IconButton(
+                        icon: const Icon(LucideIcons.x, size: 18),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () => Navigator.pop(ctx),
+                      ),
                     ],
                   ),
                 ),
-              ),
-            ],
+                Divider(
+                  height: 1,
+                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
+                ),
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            _subjectName(q.subject),
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Anek Bangla',
+                              color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF047857),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          q.question,
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Anek Bangla',
+                            color: isDark ? Colors.white : const Color(0xFF18181B),
+                            height: 1.35,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        ...List.generate(q.options.length, (idx) {
+                          final isCorrect = q.correctAnswerIndices?.contains(idx) ?? false;
+                          
+                          Color boxBg = isDark ? const Color(0xFF27272A) : const Color(0xFFF8FAFC);
+                          Color boxBorder = isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0);
+                          Color bulletBg = Colors.transparent;
+                          Color bulletBorder = isDark ? const Color(0xFF52525B) : const Color(0xFFCBD5E1);
+                          Color bulletText = isDark ? const Color(0xFFD4D4D8) : const Color(0xFF64748B);
+                          Color optionTextColor = isDark ? const Color(0xFFE4E4E7) : const Color(0xFF1E293B);
+                          bool boldText = false;
+
+                          if (isCorrect) {
+                            boxBg = isDark ? const Color(0xFF059669).withValues(alpha: 0.15) : const Color(0xFFECFDF5);
+                            boxBorder = isDark ? const Color(0xFF059669) : const Color(0xFFA7F3D0);
+                            bulletBg = const Color(0xFF059669);
+                            bulletBorder = const Color(0xFF059669);
+                            bulletText = Colors.white;
+                            optionTextColor = isDark ? const Color(0xFF34D399) : const Color(0xFF047857);
+                            boldText = true;
+                          }
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: boxBg,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: boxBorder),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 24,
+                                  height: 24,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: bulletBg,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: bulletBorder),
+                                  ),
+                                  child: Text(
+                                    String.fromCharCode(65 + idx),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                      color: bulletText,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    q.options[idx],
+                                    style: TextStyle(
+                                      fontSize: 14.5,
+                                      color: optionTextColor,
+                                      fontWeight: boldText ? FontWeight.w800 : FontWeight.w600,
+                                      fontFamily: 'Anek Bangla',
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                ),
+                                if (isCorrect)
+                                  const Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 18),
+                              ],
+                            ),
+                          );
+                        }),
+                        if (q.explanation != null && q.explanation!.isNotEmpty) ...[
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF1E293B).withValues(alpha: 0.5) : const Color(0xFFF0F9FF),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFBAE6FD)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.lightbulb_outline_rounded, size: 16, color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7)),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'ব্যাখ্যা',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13.5,
+                                        fontFamily: 'Anek Bangla',
+                                        color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  q.explanation!,
+                                  style: TextStyle(
+                                    fontSize: 13.5,
+                                    color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
+                                    fontFamily: 'Anek Bangla',
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -820,50 +776,51 @@ class _StatBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
         ),
-        boxShadow: isDark
-            ? []
-            : [
-                const BoxShadow(
-                  color: Color(0x05000000),
-                  blurRadius: 10,
-                  offset: Offset(0, 4),
-                ),
-              ],
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? Colors.black26 : const Color(0x06000000),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(10),
+              color: color.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
             ),
             child: Icon(icon, size: 16, color: color),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Text(
             value,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.w900,
-              color: isDark ? Colors.white : const Color(0xFF000000),
+              fontFamily: 'Anek Bangla',
+              color: isDark ? Colors.white : const Color(0xFF18181B),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFFA3A3A3),
+              fontWeight: FontWeight.w700,
+              fontFamily: 'Anek Bangla',
+              color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
             ),
           ),
         ],
@@ -890,38 +847,81 @@ class _FilterPill extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
+        behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           decoration: BoxDecoration(
             color: isSelected
-                ? (isDark ? const Color(0xFF1C1C1E) : Colors.white)
+                ? (isDark ? const Color(0xFF27272A) : Colors.white)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             boxShadow: isSelected && !isDark
                 ? [
                     const BoxShadow(
-                      color: Color(0x0A000000),
-                      blurRadius: 4,
+                      color: Color(0x0F000000),
+                      blurRadius: 6,
                       offset: Offset(0, 2),
                     ),
                   ]
                 : [],
           ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-              color: isSelected
-                  ? (isDark ? Colors.white : const Color(0xFF000000))
-                  : const Color(0xFFA3A3A3),
+          child: Center(
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 14,
+                fontFamily: 'Anek Bangla',
+                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                color: isSelected
+                    ? (isDark ? Colors.white : const Color(0xFF18181B))
+                    : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A)),
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+}
+
+// ─── Sticky Filter Delegate ───────────────────────────────────────────────────────
+class _StickyFilterDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  final double height;
+  final bool isDark;
+
+  _StickyFilterDelegate({
+    required this.child,
+    this.height = 60.0,
+    required this.isDark,
+  });
+
+  @override
+  double get minExtent => height;
+  @override
+  double get maxExtent => height;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      color: isDark ? const Color(0xFF0C0A09) : const Color(0xFFFAFAF9),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      alignment: Alignment.center,
+      child: child,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_StickyFilterDelegate oldDelegate) {
+    return true;
   }
 }
 

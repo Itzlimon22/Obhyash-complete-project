@@ -1,0 +1,91 @@
+{
+  "subjectId": "ssc_math",
+  "subjectName": "সাধারণ গণিত",
+  "chapters": [
+    {
+      "chapterId": "chapter_1",
+      "chapterName": "বাস্তব সংখ্যা",
+      "chapterNumber": 1
+    },
+    {
+      "chapterId": "chapter_2",
+      "chapterName": "সেট ও ফাংশন",
+      "chapterNumber": 2
+    },
+    {
+      "chapterId": "chapter_3",
+      "chapterName": "বীজগাণিতিক রাশি",
+      "chapterNumber": 3
+    },
+    {
+      "chapterId": "chapter_4",
+      "chapterName": "সূচক ও লগারিদম",
+      "chapterNumber": 4
+    },
+    {
+      "chapterId": "chapter_5",
+      "chapterName": "এক চলকবিশিষ্ট সমীকরণ",
+      "chapterNumber": 5
+    },
+    {
+      "chapterId": "chapter_6",
+      "chapterName": "রেখা, কোণ ও ত্রিভুজ",
+      "chapterNumber": 6
+    },
+    {
+      "chapterId": "chapter_7",
+      "chapterName": "ব্যবহারিক জ্যামিতি",
+      "chapterNumber": 7
+    },
+    {
+      "chapterId": "chapter_8",
+      "chapterName": "বৃত্ত",
+      "chapterNumber": 8
+    },
+    {
+      "chapterId": "chapter_9",
+      "chapterName": "ত্রিকোণমিতিক অনুপাত",
+      "chapterNumber": 9
+    },
+    {
+      "chapterId": "chapter_10",
+      "chapterName": "দূরত্ব ও উচ্চতা",
+      "chapterNumber": 10
+    },
+    {
+      "chapterId": "chapter_11",
+      "chapterName": "বীজগাণিতিক অনুপাত ও সমানুপাত",
+      "chapterNumber": 11
+    },
+    {
+      "chapterId": "chapter_12",
+      "chapterName": "দুই চলকবিশিষ্ট সরল সহসমীকরণ",
+      "chapterNumber": 12
+    },
+    {
+      "chapterId": "chapter_13",
+      "chapterName": "সসীম ধারা",
+      "chapterNumber": 13
+    },
+    {
+      "chapterId": "chapter_14",
+      "chapterName": "অনুপাত, সদৃশতা ও প্রতিসমতা",
+      "chapterNumber": 14
+    },
+    {
+      "chapterId": "chapter_15",
+      "chapterName": "ক্ষেত্রফল সম্পর্কিত উপপাদ্য ও সম্পাদ্য",
+      "chapterNumber": 15
+    },
+    {
+      "chapterId": "chapter_16",
+      "chapterName": "পরিমিতি",
+      "chapterNumber": 16
+    },
+    {
+      "chapterId": "chapter_17",
+      "chapterName": "পরিসংখ্যান",
+      "chapterNumber": 17
+    }
+  ]
+}

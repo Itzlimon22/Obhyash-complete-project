@@ -81,22 +81,22 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
         : const Color(0xFFE5E5E5);
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.75,
-      maxChildSize: 0.92,
-      minChildSize: 0.5,
+      initialChildSize: 0.58,
+      maxChildSize: 0.72,
+      minChildSize: 0.38,
       builder: (_, scrollCtrl) => Container(
         decoration: BoxDecoration(
           color: sheetBg,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           border: Border(top: BorderSide(color: borderColor)),
         ),
         child: Column(
           children: [
             // Handle bar
             Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 4),
-              width: 40,
-              height: 4,
+              margin: const EdgeInsets.only(top: 8, bottom: 2),
+              width: 32,
+              height: 3.5,
               decoration: BoxDecoration(
                 color: isDark
                     ? const Color(0xFF27272A)
@@ -106,23 +106,23 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
             ),
             // Header
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 2),
               child: Column(
                 children: [
                   Text(
                     'তোমার লক্ষ্য কী?',
                     style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 18,
                       fontWeight: FontWeight.w800,
                       color: isDark ? Colors.white : const Color(0xFF000000),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     'সঠিক কাউন্টডাউন ও পরিকল্পনা পেতে তোমার পরীক্ষা বেছে নাও',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 13,
                       color: isDark
                           ? const Color(0xFF737373)
                           : const Color(0xFF525252),
@@ -131,7 +131,7 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             // Options grid
             Expanded(
               child: GridView.builder(

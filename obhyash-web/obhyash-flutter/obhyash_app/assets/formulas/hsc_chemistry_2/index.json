@@ -1,0 +1,31 @@
+{
+  "subjectId": "hsc_chemistry_2",
+  "subjectName": "রসায়ন ২য় পত্র",
+  "chapters": [
+    {
+      "chapterId": "chapter_1",
+      "chapterName": "পরিবেশ রসায়ন",
+      "chapterNumber": 1
+    },
+    {
+      "chapterId": "chapter_2",
+      "chapterName": "জৈব রসায়ন",
+      "chapterNumber": 2
+    },
+    {
+      "chapterId": "chapter_3",
+      "chapterName": "পরিমাণগত রসায়ন",
+      "chapterNumber": 3
+    },
+    {
+      "chapterId": "chapter_4",
+      "chapterName": "তড়িৎ রসায়ন",
+      "chapterNumber": 4
+    },
+    {
+      "chapterId": "chapter_5",
+      "chapterName": "অর্থনৈতিক রসায়ন",
+      "chapterNumber": 5
+    }
+  ]
+}

@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../dashboard/domain/models.dart';
-import '../../notifications/presentation/notifications_view.dart';
-import '../../subscription/presentation/subscription_view.dart';
 import '../../../core/providers/theme_provider.dart';
 import 'personal_details_view.dart';
+import '../../../core/presentation/widgets/user_avatar.dart';
 
 // ─── Data model ──────────────────────────────────────────────────────────────
 
@@ -57,21 +55,21 @@ class SettingsView extends ConsumerWidget {
         title: 'কার্যকলাপ',
         items: [
           _SettingsItem(
-            label: 'আমার বুকমার্কস',
-            description: 'সংরক্ষণ করা প্রশ্নগুলো',
-            icon: LucideIcons.bookmark,
-            type: _ItemType.navigate,
-            route: '/bookmarks',
-          ),
-          _SettingsItem(
-            label: 'আমার প্রোফাইল',
+            label: 'প্রোফাইল',
             description: 'এক্সাম ইতিহাস, বিষয়ভিত্তিক স্কোর',
             icon: LucideIcons.user,
             type: _ItemType.navigate,
             route: '/profile/stats',
           ),
           _SettingsItem(
-            label: 'আমার রিপোর্ট',
+            label: 'বুকমার্ক',
+            description: 'সংরক্ষণ করা প্রশ্নগুলো',
+            icon: LucideIcons.bookmark,
+            type: _ItemType.navigate,
+            route: '/bookmarks',
+          ),
+          _SettingsItem(
+            label: 'রিপোর্ট',
             description: 'রিপোর্ট করা প্রশ্ন ও অ্যাডমিন ফিডব্যাক',
             icon: LucideIcons.alertTriangle,
             type: _ItemType.navigate,
@@ -90,14 +88,14 @@ class SettingsView extends ConsumerWidget {
         title: 'সাবস্ক্রিপশন',
         items: [
           _SettingsItem(
-            label: 'আমার সাবস্ক্রিপশন',
+            label: 'সাবস্ক্রিপশন',
             description: 'বর্তমান প্ল্যান, ইতিহাস ও লেনদেন',
             icon: LucideIcons.crown,
             type: _ItemType.navigate,
             route: '/profile/my-subscription',
           ),
           _SettingsItem(
-            label: 'আপগ্রেড করো',
+            label: 'আপগ্রেড',
             description: 'নতুন প্ল্যান কিনুন',
             icon: LucideIcons.trendingUp,
             type: _ItemType.navigate,
@@ -110,28 +108,28 @@ class SettingsView extends ConsumerWidget {
         title: 'অ্যাপ ও আইনি',
         items: [
           _SettingsItem(
-            label: 'আমাদের সম্পর্কে',
+            label: 'পরিচিতি',
             description: 'Obhyash সম্পর্কে জানো',
             icon: LucideIcons.info,
             type: _ItemType.navigate,
             route: '/profile/about',
           ),
           _SettingsItem(
-            label: 'প্রাইভেসি পলিসি',
+            label: 'প্রাইভেসি',
             description: 'তোমার ডেটা কীভাবে ব্যবহার হয়',
             icon: LucideIcons.shield,
             type: _ItemType.navigate,
             route: '/profile/privacy',
           ),
           _SettingsItem(
-            label: 'ব্যবহারের নিয়মাবলী',
+            label: 'শর্তাবলী',
             description: 'শর্ত ও বিধিমালা',
             icon: LucideIcons.fileText,
             type: _ItemType.navigate,
             route: '/profile/terms',
           ),
           _SettingsItem(
-            label: 'সাহায্য ও FAQ',
+            label: 'সাহায্য',
             description: 'সাধারণ প্রশ্নের উত্তর',
             icon: LucideIcons.helpCircle,
             type: _ItemType.navigate,
@@ -268,44 +266,15 @@ class SettingsView extends ConsumerWidget {
                     child: Column(
                       children: [
                         // Avatar
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0xFFB91C1C),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
-                              width: 3,
-                            ),
-                            image: (user.avatarUrl != null && user.avatarUrl!.isNotEmpty && !user.avatarUrl!.toLowerCase().contains('.svg'))
-                                ? DecorationImage(
-                                    image: NetworkImage(user.avatarUrl!),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
-                          ),
-                          child: (user.avatarUrl == null || user.avatarUrl!.isEmpty || user.avatarUrl == 'null')
-                              ? Center(
-                                  child: Text(
-                                    initials,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                )
-                              : (user.avatarUrl!.toLowerCase().contains('.svg')
-                                  ? ClipOval(
-                                      child: SvgPicture.network(
-                                        user.avatarUrl!,
-                                        fit: BoxFit.cover,
-                                        width: 80,
-                                        height: 80,
-                                      ),
-                                    )
-                                  : null),
+                        UserAvatar(
+                          id: user.id,
+                          name: user.name,
+                          avatarUrl: user.avatarUrl,
+                          gender: user.gender,
+                          size: 80,
+                          showBorder: true,
+                          borderColor: Colors.white.withOpacity(0.3),
+                          borderWidth: 3,
                         ),
                         const SizedBox(height: 12),
                         // Name
@@ -339,31 +308,46 @@ class SettingsView extends ConsumerWidget {
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                     child: Column(
                       children: [
-                        // Info chips
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          alignment: WrapAlignment.center,
+                        // Info chips (2-column first row + centered batch)
+                        Column(
                           children: [
-                            if (user.phone != null && user.phone!.isNotEmpty)
-                              _InfoChip(
-                                emoji: '📞',
-                                label: user.phone!,
-                                isDark: isDark,
+                            if ((user.phone != null && user.phone!.isNotEmpty) ||
+                                (user.institute != null && user.institute!.isNotEmpty))
+                              Row(
+                                children: [
+                                  if (user.phone != null && user.phone!.isNotEmpty)
+                                    Expanded(
+                                      child: _InfoChip(
+                                        emoji: '📞',
+                                        label: user.phone!,
+                                        isDark: isDark,
+                                      ),
+                                    ),
+                                  if (user.phone != null &&
+                                      user.phone!.isNotEmpty &&
+                                      user.institute != null &&
+                                      user.institute!.isNotEmpty)
+                                    const SizedBox(width: 8),
+                                  if (user.institute != null && user.institute!.isNotEmpty)
+                                    Expanded(
+                                      child: _InfoChip(
+                                        emoji: '🏫',
+                                        label: user.institute!,
+                                        isDark: isDark,
+                                      ),
+                                    ),
+                                ],
                               ),
-                            if (user.institute != null &&
-                                user.institute!.isNotEmpty)
-                              _InfoChip(
-                                emoji: '🏫',
-                                label: user.institute!,
-                                isDark: isDark,
-                              ),
-                            if (user.batch != null && user.batch!.isNotEmpty)
+                            if (user.batch != null && user.batch!.isNotEmpty) ...[
+                              const SizedBox(height: 8),
                               _InfoChip(
                                 emoji: '📅',
-                                label: 'ব্যাচ ${user.batch!}',
+                                label: user.batch!.toLowerCase().contains('ব্যাচ')
+                                    ? user.batch!
+                                    : 'ব্যাচ ${user.batch!}',
                                 isDark: isDark,
                               ),
+                            ],
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -570,7 +554,7 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6.5),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(20),
@@ -579,17 +563,22 @@ class _InfoChip extends StatelessWidget {
         ),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 15)),
+          Text(emoji, style: const TextStyle(fontSize: 14)),
           const SizedBox(width: 5),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Anek Bangla',
-              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Anek Bangla',
+                color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
+              ),
             ),
           ),
         ],

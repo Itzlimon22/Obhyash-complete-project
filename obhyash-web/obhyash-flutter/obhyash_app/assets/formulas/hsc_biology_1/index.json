@@ -1,0 +1,66 @@
+{
+  "subjectId": "hsc_biology_1",
+  "subjectName": "জীববিজ্ঞান ১ম পত্র",
+  "chapters": [
+    {
+      "chapterId": "chapter_1",
+      "chapterName": "কোষ ও এর গঠন",
+      "chapterNumber": 1
+    },
+    {
+      "chapterId": "chapter_2",
+      "chapterName": "কোষ বিভাজন",
+      "chapterNumber": 2
+    },
+    {
+      "chapterId": "chapter_3",
+      "chapterName": "কোষ রসায়ন",
+      "chapterNumber": 3
+    },
+    {
+      "chapterId": "chapter_4",
+      "chapterName": "অণুজীব",
+      "chapterNumber": 4
+    },
+    {
+      "chapterId": "chapter_5",
+      "chapterName": "শৈবাল ও ছত্রাক",
+      "chapterNumber": 5
+    },
+    {
+      "chapterId": "chapter_6",
+      "chapterName": "ব্রায়োফাইটা ও টেরিডোফাইটা",
+      "chapterNumber": 6
+    },
+    {
+      "chapterId": "chapter_7",
+      "chapterName": "নগ্নবীজী ও আবৃতবীজী উদ্ভিদ",
+      "chapterNumber": 7
+    },
+    {
+      "chapterId": "chapter_8",
+      "chapterName": "টিস্যু ও টিস্যুতন্ত্র",
+      "chapterNumber": 8
+    },
+    {
+      "chapterId": "chapter_9",
+      "chapterName": "উদ্ভিদ শারীরতত্ত্ব",
+      "chapterNumber": 9
+    },
+    {
+      "chapterId": "chapter_10",
+      "chapterName": "উদ্ভিদ প্রজনন",
+      "chapterNumber": 10
+    },
+    {
+      "chapterId": "chapter_11",
+      "chapterName": "জীবপ্রযুক্তি",
+      "chapterNumber": 11
+    },
+    {
+      "chapterId": "chapter_12",
+      "chapterName": "জীবের পরিবেশ, বিস্তার ও সংরক্ষণ",
+      "chapterNumber": 12
+    }
+  ]
+}
