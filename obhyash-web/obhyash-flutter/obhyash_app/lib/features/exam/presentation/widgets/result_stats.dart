@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/presentation/widgets/obhyash_tooltip.dart';
 
 class ResultStats extends StatelessWidget {
   final double percentage;
@@ -44,33 +45,45 @@ class ResultStats extends StatelessWidget {
           children: [
             // Accuracy
             Expanded(
-              child: _CircularAccuracyCard(
-                title: 'সঠিকতা',
-                percentage: percentage,
-                isDark: isDark,
+              child: ObhyashTooltip(
+                message: 'আপনার উত্তরের নির্ভুলতার হার (সঠিক উত্তর / দেওয়া মোট উত্তর)',
+                preferredPosition: TooltipPosition.top,
+                child: _CircularAccuracyCard(
+                  title: 'সঠিকতা',
+                  percentage: percentage,
+                  isDark: isDark,
+                ),
               ),
             ),
             const SizedBox(width: 12),
             // Score
             Expanded(
-              child: _StatCard(
-                title: 'প্রাপ্ত নম্বর',
-                value: finalScore.toStringAsFixed(2),
-                subtitle: '/ $totalPoints',
-                icon: Icons.emoji_events_outlined,
-                color: const Color(0xFFEF4444),
-                isDark: isDark,
+              child: ObhyashTooltip(
+                message: 'নেগেটিভ মার্কিং হিসাবের পর মোট প্রাপ্ত চূড়ান্ত নম্বর',
+                preferredPosition: TooltipPosition.top,
+                child: _StatCard(
+                  title: 'প্রাপ্ত নম্বর',
+                  value: finalScore.toStringAsFixed(2),
+                  subtitle: '/ $totalPoints',
+                  icon: Icons.emoji_events_outlined,
+                  color: const Color(0xFFEF4444),
+                  isDark: isDark,
+                ),
               ),
             ),
             const SizedBox(width: 12),
             // Time
             Expanded(
-              child: _StatCard(
-                title: 'সময় লেগেছে',
-                value: _formatDuration(timeTaken),
-                icon: Icons.timer_outlined,
-                color: const Color(0xFF14B8A6),
-                isDark: isDark,
+              child: ObhyashTooltip(
+                message: 'পরীক্ষা শেষ করতে নেওয়া মোট সময়',
+                preferredPosition: TooltipPosition.top,
+                child: _StatCard(
+                  title: 'সময় লেগেছে',
+                  value: _formatDuration(timeTaken),
+                  icon: Icons.timer_outlined,
+                  color: const Color(0xFF14B8A6),
+                  isDark: isDark,
+                ),
               ),
             ),
           ],

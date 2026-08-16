@@ -60,44 +60,40 @@ const SUBJECT_BANGLA_MAP: Record<string, string> = {
 const fetchAdminDashboardData = async () => {
   const supabase = createClient();
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (!session) throw new Error('Auth session not ready for admin dashboard');
-
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
   const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString();
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
 
-  // Parallel database execution for maximum speed
-  const [
-    totalUsersRes,
-    last30DaysUsersRes,
-    prev30DaysUsersRes,
-    totalQuestionsRes,
-    totalExamsRes,
-    todayExamsRes,
-    pendingReportsRes,
-    recentExamsRes,
-    recentReportsRes,
-    recentUsersRes,
-    liveExamsRes,
-    subjectCountsRes,
-  ] = await Promise.all([
-    supabase.from('users').select('*', { count: 'exact', head: true }),
-    supabase.from('users').select('*', { count: 'exact', head: true }).gte('created_at', thirtyDaysAgo),
-    supabase.from('users').select('*', { count: 'exact', head: true }).gte('created_at', sixtyDaysAgo).lt('created_at', thirtyDaysAgo),
-    supabase.from('questions').select('*', { count: 'exact', head: true }),
-    supabase.from('exam_results').select('*', { count: 'exact', head: true }),
-    supabase.from('exam_results').select('*', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString()),
-    supabase.from('reports').select('*', { count: 'exact', head: true }).in('status', ['Pending', 'pending']),
-    supabase.from('exam_results').select('id, created_at, score, total_marks, subject, users(name)').order('created_at', { ascending: false }).limit(6),
-    supabase.from('reports').select('id, created_at, reason, reporter_name, status').order('created_at', { ascending: false }).limit(4),
-    supabase.from('users').select('id, name, email, created_at, level').order('created_at', { ascending: false }).limit(4),
-    supabase.from('live_exams').select('id, title, subject, total_questions, duration_minutes, start_time, end_time, status').order('start_time', { ascending: false }).limit(4),
-    supabase.from('questions').select('subject').limit(1500),
-  ]);
+  try {
+    // Parallel database execution for maximum speed
+    const [
+      totalUsersRes,
+      last30DaysUsersRes,
+      prev30DaysUsersRes,
+      totalQuestionsRes,
+      totalExamsRes,
+      todayExamsRes,
+      pendingReportsRes,
+      recentExamsRes,
+      recentReportsRes,
+      recentUsersRes,
+      liveExamsRes,
+      subjectCountsRes,
+    ] = await Promise.all([
+      supabase.from('users').select('*', { count: 'exact', head: true }),
+      supabase.from('users').select('*', { count: 'exact', head: true }).gte('created_at', thirtyDaysAgo),
+      supabase.from('users').select('*', { count: 'exact', head: true }).gte('created_at', sixtyDaysAgo).lt('created_at', thirtyDaysAgo),
+      supabase.from('questions').select('*', { count: 'exact', head: true }),
+      supabase.from('exam_results').select('*', { count: 'exact', head: true }),
+      supabase.from('exam_results').select('*', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString()),
+      supabase.from('reports').select('*', { count: 'exact', head: true }).in('status', ['Pending', 'pending']),
+      supabase.from('exam_results').select('id, created_at, score, total_marks, subject, users(name)').order('created_at', { ascending: false }).limit(6),
+      supabase.from('reports').select('id, created_at, reason, reporter_name, status').order('created_at', { ascending: false }).limit(4),
+      supabase.from('users').select('id, name, email, created_at, level').order('created_at', { ascending: false }).limit(4),
+      supabase.from('live_exams').select('id, title, subject, total_questions, duration_minutes, start_time, end_time, status').order('start_time', { ascending: false }).limit(4),
+      supabase.from('questions').select('subject').limit(1500),
+    ]);
 
   // 1. Calculate Real User Growth
   const currentMonthUsers = last30DaysUsersRes.count || 0;
@@ -259,14 +255,32 @@ const fetchAdminDashboardData = async () => {
     },
   ];
 
-  return {
-    kpis,
-    subjectHealth,
-    liveExams: liveExamsList,
-    recentActivity: activities.slice(0, 10),
-    totalQuestions: totalQuestionsRes.count || 0,
-    timestamp: new Date().toLocaleTimeString(),
-  };
+    return {
+      kpis,
+      subjectHealth,
+      liveExams: liveExamsList,
+      recentActivity: activities.slice(0, 10),
+      totalQuestions: totalQuestionsRes.count || 0,
+      timestamp: new Date().toLocaleTimeString(),
+    };
+  } catch (err) {
+    console.warn('[AdminDashboard] Soft fetch error (session initializing):', err);
+    const fallbackKpis: AdminKPIData[] = [
+      { id: 'users', title: 'Total Students', value: '...', subtitle: 'Connecting...', icon: Users, accentColor: 'blue', href: '/admin/user-management' },
+      { id: 'questions', title: 'Question Bank', value: '...', subtitle: 'Connecting...', icon: FileQuestion, accentColor: 'emerald', href: '/admin/question-management' },
+      { id: 'exams', title: 'Total Exams Taken', value: '...', subtitle: 'Connecting...', icon: CheckCircle, accentColor: 'purple', href: '/admin/analytics' },
+      { id: 'live_exams', title: 'Active / Scheduled', value: '...', subtitle: 'Connecting...', icon: Radio, accentColor: 'rose', href: '/admin/live-exams' },
+      { id: 'reports', title: 'Pending Reports', value: '...', subtitle: 'Connecting...', icon: AlertTriangle, accentColor: 'amber', href: '/admin/reports' },
+    ];
+    return {
+      kpis: fallbackKpis,
+      subjectHealth: [],
+      liveExams: [],
+      recentActivity: [],
+      totalQuestions: 0,
+      timestamp: new Date().toLocaleTimeString(),
+    };
+  }
 };
 
 export default function AdminDashboardPage() {

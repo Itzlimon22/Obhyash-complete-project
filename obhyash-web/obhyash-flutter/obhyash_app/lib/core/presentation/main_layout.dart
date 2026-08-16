@@ -18,6 +18,7 @@ import '../../features/auth/providers/auth_controller.dart';
 import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/title_provider.dart';
+import 'widgets/obhyash_tooltip.dart';
 import '../../features/dashboard/presentation/widgets/countdown_banner.dart';
 
 final _unreadNotifCountProvider = FutureProvider.autoDispose<int>((ref) async {
@@ -440,151 +441,163 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              // Streak Badge (No background, slightly bigger, with animation)
-                              GestureDetector(
-                                onTap: user != null ? () => _triggerStreakAnimation(streak, user.id) : null,
-                              behavior: HitTestBehavior.opaque,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Animate(
-                                    key: ValueKey(_streakAnimKey),
-                                    effects: _streakAnimKey > 0
-                                        ? [
-                                            ScaleEffect(
-                                                begin: const Offset(1, 1),
-                                                end: const Offset(1.4, 1.4),
-                                                duration: 250.ms,
-                                                curve: Curves.easeOutBack),
-                                            ShakeEffect(
-                                              hz: 4,
-                                              duration: 400.ms,
-                                              delay: 200.ms,
-                                            ),
-                                            ScaleEffect(
-                                                begin: const Offset(1.4, 1.4),
-                                                end: const Offset(1, 1),
-                                                duration: 250.ms,
-                                                delay: 600.ms,
-                                                curve: Curves.easeIn),
-                                          ]
-                                        : [],
-                                    child: const Icon(
-                                      Icons.local_fire_department_rounded,
-                                      color: Color(0xFFF97316),
-                                      size: 24,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  isLoading
-                                      ? Container(
-                                          width: 16,
-                                          height: 12,
-                                          decoration: BoxDecoration(
-                                            color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E7EB),
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                        )
-                                      : Animate(
-                                          key: ValueKey('text_$_streakAnimKey'),
-                                          effects: _streakAnimKey > 0
-                                              ? [
-                                                  ShimmerEffect(
-                                                    color: const Color(0xFFFDE047),
-                                                    duration: 600.ms,
-                                                  ),
-                                                ]
-                                              : [],
-                                          child: Text(
-                                            streak.toString(),
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              color: Color(0xFFEA580C),
-                                            ),
-                                          ),
-                                        ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-
-                            // Notification Bell (No background, slightly bigger)
-                            Builder(
-                              builder: (context) {
-                                final unreadAsync = ref.watch(_unreadNotifCountProvider);
-                                final unread = unreadAsync.whenOrNull(data: (c) => c) ?? 0;
-                                return GestureDetector(
-                                  onTap: () => context.push('/notifications'),
+                              // Streak Badge with Tooltip
+                              ObhyashTooltip(
+                                message: 'দৈনিক স্ট্রাইক: টানা পরীক্ষার দিনগুলো',
+                                preferredPosition: TooltipPosition.bottom,
+                                child: GestureDetector(
+                                  onTap: user != null ? () => _triggerStreakAnimation(streak, user.id) : null,
                                   behavior: HitTestBehavior.opaque,
-                                  child: Stack(
-                                    clipBehavior: Clip.none,
-                                    alignment: Alignment.center,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                                        child: Icon(
-                                          LucideIcons.bell,
+                                      Animate(
+                                        key: ValueKey(_streakAnimKey),
+                                        effects: _streakAnimKey > 0
+                                            ? [
+                                                ScaleEffect(
+                                                    begin: const Offset(1, 1),
+                                                    end: const Offset(1.4, 1.4),
+                                                    duration: 250.ms,
+                                                    curve: Curves.easeOutBack),
+                                                ShakeEffect(
+                                                  hz: 4,
+                                                  duration: 400.ms,
+                                                  delay: 200.ms,
+                                                ),
+                                                ScaleEffect(
+                                                    begin: const Offset(1.4, 1.4),
+                                                    end: const Offset(1, 1),
+                                                    duration: 250.ms,
+                                                    delay: 600.ms,
+                                                    curve: Curves.easeIn),
+                                              ]
+                                            : [],
+                                        child: const Icon(
+                                          Icons.local_fire_department_rounded,
+                                          color: Color(0xFFF97316),
                                           size: 24,
-                                          color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF4B5563),
                                         ),
                                       ),
-                                      if (unread > 0)
-                                        Positioned(
-                                          top: -4,
-                                          right: -2,
-                                          child: Container(
-                                            padding: const EdgeInsets.all(4),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFEF4444),
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: isDark ? const Color(0xFF0C0A09) : Colors.white,
-                                                width: 1.5,
+                                      const SizedBox(width: 4),
+                                      isLoading
+                                          ? Container(
+                                              width: 16,
+                                              height: 12,
+                                              decoration: BoxDecoration(
+                                                color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E7EB),
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                            )
+                                          : Animate(
+                                              key: ValueKey('text_$_streakAnimKey'),
+                                              effects: _streakAnimKey > 0
+                                                  ? [
+                                                      ShimmerEffect(
+                                                        color: const Color(0xFFFDE047),
+                                                        duration: 600.ms,
+                                                      ),
+                                                    ]
+                                                  : [],
+                                              child: Text(
+                                                streak.toString(),
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xFFEA580C),
+                                                ),
                                               ),
                                             ),
-                                            child: Text(
-                                              unread > 99 ? '99+' : unread.toString(),
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w900,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
                                     ],
                                   ),
-                                );
-                              },
-                            ),
-
-                            // Divider
-                            Container(
-                              width: 1,
-                              height: 24,
-                              margin: const EdgeInsets.symmetric(horizontal: 10),
-                              color: isDark
-                                  ? const Color(0xFF27272A)
-                                  : const Color(0xFFE5E5E5),
-                            ),
-
-                            // Profile Avatar
-                            GestureDetector(
-                              onTap: () => context.go('/profile'),
-                              child: UserAvatar(
-                                name: userName,
-                                avatarUrl: user?.avatarUrl,
-                                gender: user?.gender,
-                                id: user?.id,
-                                size: 40,
-                                showBorder: true,
-                                borderColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-                                borderWidth: 1.5,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
+                              const SizedBox(width: 12),
+
+                              // Notification Bell with Tooltip
+                              Builder(
+                                builder: (context) {
+                                  final unreadAsync = ref.watch(_unreadNotifCountProvider);
+                                  final unread = unreadAsync.whenOrNull(data: (c) => c) ?? 0;
+                                  return ObhyashTooltip(
+                                    message: 'নতুন নোটিফিকেশন ও আপডেট',
+                                    preferredPosition: TooltipPosition.bottom,
+                                    child: GestureDetector(
+                                      onTap: () => context.push('/notifications'),
+                                      behavior: HitTestBehavior.opaque,
+                                      child: Stack(
+                                        clipBehavior: Clip.none,
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                            child: Icon(
+                                              LucideIcons.bell,
+                                              size: 24,
+                                              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF4B5563),
+                                            ),
+                                          ),
+                                          if (unread > 0)
+                                            Positioned(
+                                              top: -4,
+                                              right: -2,
+                                              child: Container(
+                                                padding: const EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFFEF4444),
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: isDark ? const Color(0xFF0C0A09) : Colors.white,
+                                                    width: 1.5,
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  unread > 99 ? '99+' : unread.toString(),
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w900,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+
+                              // Divider
+                              Container(
+                                width: 1,
+                                height: 24,
+                                margin: const EdgeInsets.symmetric(horizontal: 10),
+                                color: isDark
+                                    ? const Color(0xFF27272A)
+                                    : const Color(0xFFE5E5E5),
+                              ),
+
+                              // Profile Avatar with Tooltip
+                              ObhyashTooltip(
+                                message: 'প্রোফাইল ও সেটিংস',
+                                preferredPosition: TooltipPosition.bottom,
+                                child: GestureDetector(
+                                  onTap: () => context.go('/profile'),
+                                  child: UserAvatar(
+                                    name: userName,
+                                    avatarUrl: user?.avatarUrl,
+                                    gender: user?.gender,
+                                    id: user?.id,
+                                    size: 40,
+                                    showBorder: true,
+                                    borderColor: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                                    borderWidth: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                       ],
                     ),
                   ),

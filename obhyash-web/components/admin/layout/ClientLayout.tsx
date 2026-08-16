@@ -37,13 +37,12 @@ export default function ClientLayout({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Safety timeout: if we're stuck loading for more than 8 seconds, show an error
+  // Safety timeout: if we're stuck loading for more than 10 seconds, show an error
   useEffect(() => {
     if (loading || (!profile && user)) {
-      const timer = setTimeout(() => setShowTimeoutError(true), 8000);
+      const timer = setTimeout(() => setShowTimeoutError(true), 10000);
       return () => clearTimeout(timer);
     } else {
-      // Defer state reset to avoid synchronous cascading render warning
       const resetTimer = setTimeout(() => setShowTimeoutError(false), 0);
       return () => clearTimeout(resetTimer);
     }
@@ -69,8 +68,7 @@ export default function ClientLayout({
 
   // Loading state for initial session hydration
   if (loading || !user || !profile || profile.role?.toLowerCase() !== 'admin') {
-    const isProfileMissing = !loading && user && !profile;
-    const shouldShowError = showTimeoutError || isProfileMissing;
+    const shouldShowError = showTimeoutError;
 
     return (
       <div className="min-h-screen bg-neutral-50 dark:bg-black flex items-center justify-center">
@@ -78,9 +76,7 @@ export default function ClientLayout({
           {shouldShowError ? (
             <div className="text-center space-y-4">
               <p className="text-sm font-bold text-red-500">
-                {isProfileMissing 
-                  ? "Admin profile not found or access denied." 
-                  : "Session restore timed out."}
+                Session restore timed out or access denied.
               </p>
               <div className="flex gap-3 justify-center">
                 <button 

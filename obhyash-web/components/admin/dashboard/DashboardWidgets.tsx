@@ -103,6 +103,16 @@ export const IntelligentStatCard: React.FC<{ data: AdminKPIData }> = ({ data }) 
     },
   }[data.accentColor];
 
+  const renderIcon = () => {
+    if (!Icon) return null;
+    if (React.isValidElement(Icon)) return Icon;
+    if (typeof Icon === 'function' || typeof Icon === 'object') {
+      const Comp = Icon as any;
+      return <Comp className="w-5 h-5" strokeWidth={2.2} />;
+    }
+    return null;
+  };
+
   const content = (
     <div
       className={`relative overflow-hidden bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-zinc-800/80 rounded-2xl p-4 md:p-5 transition-all duration-300 group shadow-sm hover:shadow-lg dark:hover:shadow-black/50 ${colorStyles.border}`}
@@ -127,7 +137,7 @@ export const IntelligentStatCard: React.FC<{ data: AdminKPIData }> = ({ data }) 
         <div
           className={`p-2.5 rounded-xl border ${colorStyles.iconBg} flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-300`}
         >
-          <Icon className="w-5 h-5" strokeWidth={2.2} />
+          {renderIcon()}
         </div>
       </div>
 
