@@ -11,6 +11,8 @@ import '../../../core/data/college_list.dart';
 import '../../dashboard/domain/models.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../../core/providers/shared_prefs_provider.dart';
+import '../../../core/presentation/widgets/user_avatar.dart';
+import 'widgets/avatar_picker_modal.dart';
 
 class PersonalDetailsView extends ConsumerStatefulWidget {
   final UserProfile user;
@@ -394,6 +396,81 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
             key: _formKey,
             child: Column(
               children: [
+                // 0. Avatar Card
+                Container(
+                  decoration: cardDecoration,
+                  margin: const EdgeInsets.only(bottom: 24),
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => AvatarPickerModal.show(context, widget.user),
+                        child: Stack(
+                          children: [
+                            UserAvatar(
+                              id: widget.user.id,
+                              name: widget.user.name,
+                              avatarUrl: widget.user.avatarUrl,
+                              gender: widget.user.gender,
+                              size: 72,
+                              showBorder: true,
+                              borderColor: const Color(0xFF059669),
+                              borderWidth: 2.5,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'প্রোফাইল অ্যাভাটার',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'HindSiliguri',
+                                color: isDark ? Colors.white : const Color(0xFF1F2937),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'ছবি আপলোড করো বা কার্টুন অ্যাভাটার বেছে নাও',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontFamily: 'HindSiliguri',
+                                color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF6B7280),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            OutlinedButton.icon(
+                              onPressed: () => AvatarPickerModal.show(context, widget.user),
+                              icon: const Icon(LucideIcons.edit3, size: 14, color: Color(0xFF059669)),
+                              label: const Text(
+                                'অ্যাভাটার পরিবর্তন করো',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'HindSiliguri',
+                                  color: Color(0xFF059669),
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Color(0xFF059669)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
                 // 1. Personal Info Card
                 Container(
                   decoration: cardDecoration,

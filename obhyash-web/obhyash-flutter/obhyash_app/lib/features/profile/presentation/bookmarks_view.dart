@@ -226,14 +226,21 @@ class _BookmarksViewState extends State<BookmarksView> {
                       child: Text('সব বিষয়', style: TextStyle(fontSize: 15, fontFamily: 'HindSiliguri')),
                     ),
                     ...subjects.map(
-                      (s) => DropdownMenuItem<String>(
-                        value: s,
-                        child: Text(
-                          BanglaNameHelper.formatSubject(s),
-                          style: const TextStyle(fontSize: 15, fontFamily: 'HindSiliguri'),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
+                      (s) {
+                        final name = BanglaNameHelper.formatSubject(s);
+                        final emoji = BanglaNameHelper.getSubjectEmoji(s, name);
+                        return DropdownMenuItem<String>(
+                          value: s,
+                          child: Text(
+                            '$emoji $name',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontFamily: 'HindSiliguri',
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        );
+                      },
                     ),
                   ],
                   onChanged: (v) {

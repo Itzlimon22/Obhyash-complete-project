@@ -584,11 +584,34 @@ export const useExamEngine = () => {
       }, 1000);
     }
 
+    // Instantly synchronize timer upon tab resume/focus (bypasses browser setInterval background throttling)
+    const handleVisibilitySync = () => {
+      if (
+        document.visibilityState === 'visible' &&
+        appState === AppState.ACTIVE &&
+        targetEndTimeRef.current
+      ) {
+        const remaining = Math.max(
+          0,
+          Math.round((targetEndTimeRef.current - Date.now()) / 1000),
+        );
+        setTimeLeft(remaining);
+        if (remaining <= 0) {
+          submitExam(false);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilitySync);
+    window.addEventListener('focus', handleVisibilitySync);
+
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
+      document.removeEventListener('visibilitychange', handleVisibilitySync);
+      window.removeEventListener('focus', handleVisibilitySync);
     };
   }, [appState, timeLeft > 0, graceTimeLeft > 0, submitExam]);
 

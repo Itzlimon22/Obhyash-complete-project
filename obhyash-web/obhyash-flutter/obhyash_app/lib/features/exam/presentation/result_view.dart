@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import '../domain/exam_models.dart';
@@ -7,6 +9,8 @@ import 'widgets/result_stats.dart';
 import 'widgets/question_card.dart';
 import 'widgets/question_report_dialog.dart';
 import '../services/pdf_download_service.dart';
+import '../../../core/utils/app_popups.dart';
+import '../../../core/presentation/widgets/obhyash_tooltip.dart';
 
 class ResultView extends StatefulWidget {
   final ExamResult result;
@@ -28,6 +32,7 @@ class _ResultViewState extends State<ResultView> {
   final Set<String> _bookmarkedIds = {};
   late final ConfettiController _confettiController;
   String _reviewFilter = 'all'; // 'all', 'correct', 'wrong', 'skipped'
+  bool _showAllChapters = false;
 
   @override
   void initState() {
@@ -153,15 +158,22 @@ class _ResultViewState extends State<ResultView> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        leading: widget.isHistoryMode
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: widget.onRestart,
-              )
-            : IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: widget.onRestart,
-              ),
+        leading: IconButton(
+          icon: Icon(widget.isHistoryMode ? Icons.arrow_back : Icons.close),
+          onPressed: () {
+            if (widget.isHistoryMode) {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              } else {
+                context.go('/history');
+              }
+            } else {
+              Navigator.of(context, rootNavigator: true)
+                  .popUntil((route) => route.isFirst);
+              context.go('/dashboard');
+            }
+          },
+        ),
       ),
       body: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -172,103 +184,85 @@ class _ResultViewState extends State<ResultView> {
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
               child: Column(
                 children: [
-                  // Banner for OMR review
-                  if (widget.result.submissionType == 'script' &&
-                      !widget.isHistoryMode)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 20),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFEF3C7),
-                        border: Border.all(color: const Color(0xFFFCD34D)),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.warning_amber_rounded,
-                            color: Color(0xFFD97706),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'OMR মূল্যায়ন নিয়ে খুশি নন?',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF92400E),
-                                  ),
-                                ),
-                                Text(
-                                  'যান্ত্রিক ত্রুটির কারণে ফলাফল ভুল হতে পারে।',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: const Color(0xFFB45309).withValues(alpha: 0.8),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: const Color(0xFFB45309),
-                            ),
-                            child: const Text('আবার যাচাই করো'),
-                          ),
-                        ],
-                      ),
-                    ),
+
 
                   // Top Action buttons (PDF)
                   Row(
                     children: [
                       Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () async {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...'),
-                                behavior: SnackBarBehavior.floating,
-                                duration: Duration(seconds: 2),
+                        child: ObhyashTooltip(
+                          message: 'শুধুমাত্র প্রশ্নপত্রের PDF ডাউনলোড করো',
+                          preferredPosition: TooltipPosition.top,
+                          child: OutlinedButton.icon(
+                            onPressed: () async {
+                              AppPopups.show(
+                                context,
+                                message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...',
+                                isError: false,
+                              );
+                              await PdfDownloadService.downloadQuestionPaper(
+                                  widget.result, context);
+                            },
+                            icon: const Icon(Icons.download_rounded, size: 16),
+                            label: const Text(
+                              'প্রশ্নপত্র',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'HindSiliguri',
                               ),
-                            );
-                            await PdfDownloadService.downloadQuestionPaper(
-                                widget.result, context);
-                          },
-                          icon: const Icon(Icons.download_rounded, size: 16),
-                          label: const Text('প্রশ্নপত্র'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: const Color(0xFF004633),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            side: const BorderSide(color: Color(0xFF004633)),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
+                              foregroundColor: isDark ? const Color(0xFF34D399) : const Color(0xFF004633),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              side: BorderSide(
+                                color: isDark ? const Color(0xFF27272A) : const Color(0xFF004633),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () async {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...'),
-                                behavior: SnackBarBehavior.floating,
-                                duration: Duration(seconds: 2),
+                        child: ObhyashTooltip(
+                          message: 'প্রতিটি প্রশ্নের সঠিক উত্তর ও বিস্তারিত ব্যাখ্যা সহ PDF ডাউনলোড করো',
+                          preferredPosition: TooltipPosition.top,
+                          child: OutlinedButton.icon(
+                            onPressed: () async {
+                              AppPopups.show(
+                                context,
+                                message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...',
+                                isError: false,
+                              );
+                              await PdfDownloadService.downloadResultWithExplanations(
+                                  widget.result, context);
+                            },
+                            icon: const Icon(Icons.download_done_rounded, size: 16),
+                            label: const Text(
+                              'ফলাফল ও ব্যাখ্যা',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'HindSiliguri',
                               ),
-                            );
-                            await PdfDownloadService.downloadResultWithExplanations(
-                                widget.result, context);
-                          },
-                          icon: const Icon(Icons.download_done_rounded, size: 16),
-                          label: const Text('ফলাফল ও ব্যাখ্যা'),
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: const Color(0xFF004633).withValues(alpha: 0.1),
-                            foregroundColor: const Color(0xFF004633),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            side: const BorderSide(color: Color(0xFF004633)),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: isDark
+                                  ? const Color(0xFF059669).withValues(alpha: 0.18)
+                                  : const Color(0xFF004633).withValues(alpha: 0.1),
+                              foregroundColor: isDark ? const Color(0xFF34D399) : const Color(0xFF004633),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              side: BorderSide(
+                                color: isDark
+                                    ? const Color(0xFF059669).withValues(alpha: 0.4)
+                                    : const Color(0xFF004633),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -276,87 +270,13 @@ class _ResultViewState extends State<ResultView> {
                   ),
 
                   // Exam Details Ribbon
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 20),
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF1C1C1E).withValues(alpha: 0.4)
-                          : const Color(0xFFF9FAFB),
-                      border: Border.all(
-                        color: isDark
-                            ? const Color(0xFF27272A)
-                            : const Color(0xFFF3F4F6),
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.menu_book_rounded,
-                              size: 16,
-                              color: Color(0xFF004633),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              BanglaNameHelper.formatSubject(
-                                widget.result.subject,
-                                widget.result.subjectLabel,
-                              ),
-                              style: const TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.history_rounded,
-                              size: 16,
-                              color: Color(0xFF004633),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              widget.isHistoryMode ? 'ইতিহাস' : 'আজকের পরীক্ষা',
-                              style: const TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.help_outline_rounded,
-                              size: 16,
-                              color: Color(0xFF004633),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'মোট প্রশ্ন: ${widget.result.totalQuestions}',
-                              style: const TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                  _ExamDetailsRibbon(
+                    result: widget.result,
+                    isHistoryMode: widget.isHistoryMode,
+                    isDark: isDark,
+                    showAllChapters: _showAllChapters,
+                    onToggleChapters: () =>
+                        setState(() => _showAllChapters = !_showAllChapters),
                   ),
 
                   ResultStats(
@@ -479,31 +399,48 @@ class _ResultViewState extends State<ResultView> {
             ),
           ),
 
-          // ── Bottom Action (Restart Exam Button) ──
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: widget.onRestart,
-                  icon: const Icon(Icons.refresh_rounded),
-                  label: const Text(
-                    'আবার পরীক্ষা দিন',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF004633),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+          // ── Bottom Action (Redirect to Exam Setup) ──
+          if (!widget.isHistoryMode)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      if (context.mounted) {
+                        Navigator.of(context, rootNavigator: true)
+                            .popUntil((route) => route.isFirst);
+                        context.go('/setup');
+                      }
+                    },
+                    icon: const Icon(
+                      LucideIcons.rotateCcw,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      'আবার পরীক্ষা দাও',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        fontFamily: 'HindSiliguri',
+                        color: Colors.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF004633),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
 
           const SliverToBoxAdapter(
             child: SizedBox(height: 20),
@@ -670,4 +607,268 @@ class _StickyFilterDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// Exam Details Ribbon  –  smart collapsible chapter chip row
+// ─────────────────────────────────────────────────────────────
+class _ExamDetailsRibbon extends StatelessWidget {
+  final ExamResult result;
+  final bool isHistoryMode;
+  final bool isDark;
+  final bool showAllChapters;
+  final VoidCallback onToggleChapters;
 
+  const _ExamDetailsRibbon({
+    required this.result,
+    required this.isHistoryMode,
+    required this.isDark,
+    required this.showAllChapters,
+    required this.onToggleChapters,
+  });
+
+  static const int _kMaxVisible = 3;
+
+  @override
+  Widget build(BuildContext context) {
+    // Derive unique non-empty chapters from questions
+    final chapters = result.questions
+        .map((q) => q.chapter.trim())
+        .where((c) => c.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+
+    final accentColor =
+        isDark ? const Color(0xFF34D399) : const Color(0xFF004633);
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subTextColor =
+        isDark ? const Color(0xFF71717A) : const Color(0xFF64748B);
+    final bgColor =
+        isDark ? const Color(0xFF18181B) : const Color(0xFFF8FAFC);
+    final borderColor =
+        isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0);
+    final chipBg =
+        isDark ? const Color(0xFF27272A) : const Color(0xFFEFF6FF);
+    final chipBorder =
+        isDark ? const Color(0xFF3F3F46) : const Color(0xFFBFDBFE);
+
+    final visibleChapters =
+        (!showAllChapters && chapters.length > _kMaxVisible)
+            ? chapters.sublist(0, _kMaxVisible)
+            : chapters;
+    final hiddenCount = chapters.length - _kMaxVisible;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 14),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Top meta row: subject | mode | question count ──
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            children: [
+              _MetaChip(
+                icon: Icons.menu_book_rounded,
+                label: BanglaNameHelper.formatSubject(
+                    result.subject, result.subjectLabel),
+                accentColor: accentColor,
+                textColor: textColor,
+              ),
+              _MetaChip(
+                icon: Icons.history_rounded,
+                label: isHistoryMode ? 'ইতিহাস' : 'আজকের পরীক্ষা',
+                accentColor: accentColor,
+                textColor: textColor,
+              ),
+              _MetaChip(
+                icon: Icons.help_outline_rounded,
+                label: 'মোট প্রশ্ন: ${result.totalQuestions}',
+                accentColor: accentColor,
+                textColor: textColor,
+              ),
+            ],
+          ),
+
+          // ── Chapter chips section ──
+          if (chapters.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.only(top: 10, bottom: 6),
+              child: Row(
+                children: [
+                  Icon(Icons.layers_rounded, size: 13, color: subTextColor),
+                  const SizedBox(width: 4),
+                  Text(
+                    'অধ্যায়সমূহ',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'HindSiliguri',
+                      color: subTextColor,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 260),
+              curve: Curves.easeInOut,
+              alignment: Alignment.topLeft,
+              child: Wrap(
+                spacing: 7,
+                runSpacing: 7,
+                children: [
+                  ...visibleChapters.map(
+                    (ch) => _ChapterChip(
+                      label: ch,
+                      chipBg: chipBg,
+                      chipBorder: chipBorder,
+                      textColor: textColor,
+                    ),
+                  ),
+
+                  // "Show more" toggle chip
+                  if (!showAllChapters && hiddenCount > 0)
+                    _ToggleChip(
+                      label: '+$hiddenCount আরো',
+                      onTap: onToggleChapters,
+                      accentColor: accentColor,
+                      isDark: isDark,
+                    ),
+                  if (showAllChapters && chapters.length > _kMaxVisible)
+                    _ToggleChip(
+                      label: 'কম দেখো ↑',
+                      onTap: onToggleChapters,
+                      accentColor: accentColor,
+                      isDark: isDark,
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _MetaChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color accentColor;
+  final Color textColor;
+
+  const _MetaChip({
+    required this.icon,
+    required this.label,
+    required this.accentColor,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 15, color: accentColor),
+        const SizedBox(width: 5),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'HindSiliguri',
+            color: textColor,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ChapterChip extends StatelessWidget {
+  final String label;
+  final Color chipBg;
+  final Color chipBorder;
+  final Color textColor;
+
+  const _ChapterChip({
+    required this.label,
+    required this.chipBg,
+    required this.chipBorder,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: chipBg,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: chipBorder, width: 1),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          fontFamily: 'HindSiliguri',
+          color: textColor,
+        ),
+      ),
+    );
+  }
+}
+
+class _ToggleChip extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  final Color accentColor;
+  final bool isDark;
+
+  const _ToggleChip({
+    required this.label,
+    required this.onTap,
+    required this.accentColor,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: accentColor.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: accentColor.withValues(alpha: 0.35)),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'HindSiliguri',
+            color: accentColor,
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -36,14 +36,33 @@ class Subject {
   final String id;
   final String name;
   final String? icon;
+  final String? category;
+  final String? level;
+  final String? division;
+  final int? paperNumber;
+  final int? sortOrder;
 
-  Subject({required this.id, required this.name, this.icon});
+  Subject({
+    required this.id,
+    required this.name,
+    this.icon,
+    this.category,
+    this.level,
+    this.division,
+    this.paperNumber,
+    this.sortOrder,
+  });
 
   factory Subject.fromJson(Map<String, dynamic> json) {
     return Subject(
       id: json['id'] as String,
-      name: json['name'] as String,
+      name: json['name'] as String? ?? '',
       icon: json['icon'] as String?,
+      category: json['category'] as String?,
+      level: json['level'] as String?,
+      division: json['division'] as String?,
+      paperNumber: json['paper_number'] as int?,
+      sortOrder: json['sort_order'] as int?,
     );
   }
 }

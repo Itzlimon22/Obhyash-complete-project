@@ -144,4 +144,4 @@ export const DIFFICULTY_OPTIONS = [
   { id: Difficulty.Hard, label: 'কঠিন', color: 'red' },
 ];
 
-export const NEGATIVE_MARKING_OPTIONS = [0, 0.25, 0.5, 1.0];
+export const NEGATIVE_MARKING_OPTIONS = [0, 0.25, 0.5];

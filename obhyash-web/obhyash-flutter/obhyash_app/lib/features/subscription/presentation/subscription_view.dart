@@ -432,32 +432,50 @@ class _PricingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isEmerald = plan.colorTheme == 'emerald';
     final bool isPopular = plan.durationDays >= 90;
-    
-    // Premium deep colors replacing light blocky colors
+
     final Color primaryColor = isEmerald ? const Color(0xFF10B981) : const Color(0xFFF43F5E);
-    final Color cardBg = isDark ? const Color(0xFF000000) : Colors.white;
-    final Color glowColor = primaryColor.withValues(alpha: 0.15);
+    final Color accentGreen = const Color(0xFF059669);
+
+    final cardGradient = isDark
+        ? LinearGradient(
+            colors: isPopular
+                ? [const Color(0xFF1A2621), const Color(0xFF131A17)]
+                : [const Color(0xFF18181B), const Color(0xFF121215)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          )
+        : LinearGradient(
+            colors: isPopular
+                ? [const Color(0xFFF0FDF4), Colors.white]
+                : [Colors.white, const Color(0xFFFAFAFA)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          );
+
+    final borderColor = isPopular
+        ? accentGreen.withValues(alpha: isDark ? 0.7 : 0.5)
+        : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0));
 
     return Container(
       decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(24),
+        gradient: cardGradient,
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: isPopular ? primaryColor.withValues(alpha: 0.5) : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5)),
-          width: isPopular ? 1.5 : 1.0,
+          color: borderColor,
+          width: isPopular ? 1.6 : 1.2,
         ),
         boxShadow: [
           if (isPopular)
             BoxShadow(
-              color: glowColor,
+              color: accentGreen.withValues(alpha: isDark ? 0.22 : 0.1),
               blurRadius: 24,
               offset: const Offset(0, 8),
-            ),
-          if (!isDark && !isPopular)
-            const BoxShadow(
-              color: Color(0x0A000000),
-              blurRadius: 10,
-              offset: Offset(0, 4),
+            )
+          else
+            BoxShadow(
+              color: isDark ? const Color(0x2A000000) : const Color(0x08000000),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
             ),
         ],
       ),
@@ -465,88 +483,112 @@ class _PricingCard extends StatelessWidget {
         children: [
           if (isPopular)
             Positioned(
-              top: 0,
-              right: 24,
+              top: 16,
+              right: 16,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: primaryColor,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(8),
-                    bottomRight: Radius.circular(8),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF004633), Color(0xFF059669)],
                   ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: accentGreen.withValues(alpha: 0.35),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                child: const Text(
-                  'জনপ্রিয়',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(LucideIcons.sparkles, size: 12, color: Colors.white),
+                    SizedBox(width: 4),
+                    Text(
+                      'জনপ্রিয়',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'HindSiliguri',
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(22),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 8),
+                const SizedBox(height: 2),
                 Text(
                   plan.name,
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white : const Color(0xFF000000),
+                    fontFamily: 'HindSiliguri',
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
                     Text(
-                      '${plan.currency} ${plan.price}',
+                      '৳${plan.price}',
                       style: TextStyle(
-                        fontSize: 36,
+                        fontSize: 34,
                         fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : const Color(0xFF000000),
+                        fontFamily: 'HindSiliguri',
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                         height: 1,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       '/ ${plan.durationDays} দিন',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: Color(0xFF737373),
+                      style: TextStyle(
+                        fontSize: 14.5,
+                        color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                         fontWeight: FontWeight.w600,
+                        fontFamily: 'HindSiliguri',
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 18),
                 Divider(
-                  color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+                  height: 1,
+                  thickness: 0.8,
+                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 18),
                 ...plan.features.map(
                   (feature) => Padding(
-                    padding: const EdgeInsets.only(bottom: 14),
+                    padding: const EdgeInsets.only(bottom: 12),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          margin: const EdgeInsets.only(top: 2),
+                          width: 22,
+                          height: 22,
+                          margin: const EdgeInsets.only(top: 1),
                           decoration: BoxDecoration(
-                            color: primaryColor.withValues(alpha: 0.1),
+                            color: isEmerald
+                                ? const Color(0xFF059669).withValues(alpha: isDark ? 0.22 : 0.12)
+                                : const Color(0xFFF43F5E).withValues(alpha: isDark ? 0.22 : 0.12),
                             shape: BoxShape.circle,
                           ),
-                          padding: const EdgeInsets.all(2),
-                          child: Icon(
-                            LucideIcons.check,
-                            size: 14,
-                            color: primaryColor,
+                          child: Center(
+                            child: Icon(
+                              LucideIcons.check,
+                              size: 13,
+                              color: primaryColor,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -554,45 +596,71 @@ class _PricingCard extends StatelessWidget {
                           child: Text(
                             feature,
                             style: TextStyle(
-                              fontSize: 15,
-                              height: 1.4,
+                              fontSize: 14.5,
+                              height: 1.35,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'HindSiliguri',
                               color: isDark
-                                  ? const Color(0xFFD4D4D4)
-                                  : const Color(0xFF27272A),
+                                  ? const Color(0xFFE4E4E7)
+                                  : const Color(0xFF334155),
                             ),
-                           maxLines: 1, overflow: TextOverflow.ellipsis),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: isCurrent ? null : onSelect,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isCurrent
-                        ? (isDark
-                              ? const Color(0xFF1C1C1E)
-                              : const Color(0xFFE5E5E5))
-                        : (isPopular ? primaryColor : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFF000000))),
-                    foregroundColor: isCurrent
-                        ? (isDark
-                              ? const Color(0xFFA3A3A3)
-                              : const Color(0xFF737373))
-                        : Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                const SizedBox(height: 18),
+                SizedBox(
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: isCurrent ? null : onSelect,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isCurrent
+                          ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB))
+                          : (isPopular
+                              ? const Color(0xFF004633)
+                              : (isDark ? const Color(0xFF27272A) : const Color(0xFF0F172A))),
+                      foregroundColor: isCurrent
+                          ? (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A))
+                          : Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: !isPopular && !isCurrent
+                            ? BorderSide(
+                                color: isDark ? const Color(0xFF3F3F46) : const Color(0xFF0F172A),
+                                width: 1,
+                              )
+                            : BorderSide.none,
+                      ),
+                      elevation: isPopular ? 3 : 0,
+                      shadowColor: isPopular ? accentGreen.withValues(alpha: 0.35) : Colors.transparent,
                     ),
-                    elevation: isPopular ? 4 : 0,
-                    shadowColor: isPopular ? primaryColor.withValues(alpha: 0.4) : Colors.transparent,
-                  ),
-                  child: Text(
-                    isCurrent ? 'বর্তমান প্ল্যান' : 'আপগ্রেড করো',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          isCurrent ? 'বর্তমান প্ল্যান' : 'আপগ্রেড করো',
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'HindSiliguri',
+                            color: isCurrent
+                                ? (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A))
+                                : Colors.white,
+                          ),
+                        ),
+                        if (!isCurrent) ...[
+                          const SizedBox(width: 8),
+                          Icon(
+                            isPopular ? LucideIcons.sparkles : LucideIcons.arrowRight,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ),

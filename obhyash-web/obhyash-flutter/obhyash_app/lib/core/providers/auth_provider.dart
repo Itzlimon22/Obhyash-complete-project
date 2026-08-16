@@ -59,7 +59,12 @@ class AuthNotifier extends Notifier<User?> {
 
   /// Convenience sign-out that delegates to the controller.
   Future<void> signOut() async {
-    await Supabase.instance.client.auth.signOut();
-    // SecureStorageService.clearSession() is handled by AuthController.logout()
+    try {
+      await Supabase.instance.client.auth.signOut();
+    } catch (e) {
+      try {
+        await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
+      } catch (_) {}
+    }
   }
 }

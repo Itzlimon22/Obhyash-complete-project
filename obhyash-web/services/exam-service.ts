@@ -70,6 +70,68 @@ function fisherYatesShuffle<T>(arr: T[]): T[] {
   return a;
 }
 
+// ─── Balanced Stratified Question Sampler (prevents chapter imbalance) ───────
+export function balanceQuestionsByChapter(
+  questions: Question[],
+  targetCount: number,
+  targetChapters?: string[] | null,
+): Question[] {
+  if (!questions || questions.length === 0) return [];
+  if (!targetChapters || targetChapters.length <= 1 || questions.length <= targetCount) {
+    return fisherYatesShuffle(questions).slice(0, targetCount);
+  }
+
+  // 1. Group questions by chapter (case & trim insensitive matching)
+  const buckets = new Map<string, Question[]>();
+  targetChapters.forEach((ch) => buckets.set(ch.trim(), []));
+  const generalPool: Question[] = [];
+
+  questions.forEach((q) => {
+    const qCh = (q.chapter || '').trim().toLowerCase();
+    const match = targetChapters.find(
+      (c) => c.trim().toLowerCase() === qCh || qCh.includes(c.trim().toLowerCase()),
+    );
+    if (match) {
+      buckets.get(match.trim())!.push(q);
+    } else {
+      generalPool.push(q);
+    }
+  });
+
+  // 2. Compute proportional quotas
+  const numCh = targetChapters.length;
+  const baseQuota = Math.floor(targetCount / numCh);
+  let remainder = targetCount % numCh;
+
+  const selected: Question[] = [];
+  const overflowPool: Question[] = [...generalPool];
+
+  // 3. Pick allocated quota from each chapter bucket
+  buckets.forEach((chapterQs, chName) => {
+    const quota = baseQuota + (remainder > 0 ? 1 : 0);
+    if (remainder > 0) remainder--;
+
+    const shuffled = fisherYatesShuffle(chapterQs);
+    const takeCount = Math.min(quota, shuffled.length);
+
+    selected.push(...shuffled.slice(0, takeCount));
+    // Remaining questions from this chapter go into overflow
+    if (shuffled.length > takeCount) {
+      overflowPool.push(...shuffled.slice(takeCount));
+    }
+  });
+
+  // 4. Fill shortfalls from overflow pool if any chapter had fewer questions than quota
+  if (selected.length < targetCount && overflowPool.length > 0) {
+    const needed = targetCount - selected.length;
+    const extra = fisherYatesShuffle(overflowPool).slice(0, needed);
+    selected.push(...extra);
+  }
+
+  // 5. Final unbiased shuffle so chapters appear mixed naturally
+  return fisherYatesShuffle(selected).slice(0, targetCount);
+}
+
 // ─── Map a DB row to the Question type ───────────────────────────────────────
 function mapDbRow(q: QuestionDbRow): Question {
   const indices = q.correct_answer_indices || [];
@@ -228,14 +290,17 @@ export const fetchQuestionsWithDiagnostics = async (
       return { questions: [], debug };
     }
 
-    const finalQuestions = fisherYatesShuffle(
-      ((fallbackData ?? []) as unknown as QuestionDbRow[]).map(mapDbRow),
-    ).slice(0, config.questionCount);
+    const mappedQuestions = ((fallbackData ?? []) as unknown as QuestionDbRow[]).map(mapDbRow);
+    const finalQuestions = balanceQuestionsByChapter(
+      mappedQuestions,
+      config.questionCount,
+      chapters,
+    );
 
-    debug.fetchMethod = 'LEGACY_FALLBACK';
+    debug.fetchMethod = 'BALANCED_FALLBACK';
     debug.resultCount = finalQuestions.length;
     debug.diagnosis.push(
-      `🏁 Fallback returned ${finalQuestions.length}/${config.questionCount}`,
+      `🏁 Fallback returned ${finalQuestions.length}/${config.questionCount} (balanced across ${chapters?.length || 1} chapter(s))`,
     );
     return { questions: finalQuestions, debug };
   } catch (err) {

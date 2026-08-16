@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/live_exam_providers.dart';
 import '../domain/models.dart';
+import 'widgets/live_exam_routine_sheet.dart';
 
 class LiveExamCategoryView extends ConsumerStatefulWidget {
   final String category;
@@ -154,38 +155,43 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
                 // Routine & Schedule Actions
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF1E3A8A).withOpacity(0.3)
-                            : const Color(0xFFE8F0FE),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            LucideIcons.calendar,
-                            size: 14,
-                            color: isDark
-                                ? const Color(0xFF27272A)
-                                : const Color(0xFF1A73E8),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Routine',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
+                    GestureDetector(
+                      onTap: () {
+                        LiveExamRoutineSheet.show(context, widget.category);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF1E3A8A).withOpacity(0.3)
+                              : const Color(0xFFE8F0FE),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              LucideIcons.calendar,
+                              size: 14,
                               color: isDark
-                                  ? const Color(0xFF27272A)
+                                  ? const Color(0xFF60A5FA)
                                   : const Color(0xFF1A73E8),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 6),
+                            Text(
+                              'রুটিন',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: isDark
+                                    ? const Color(0xFF60A5FA)
+                                    : const Color(0xFF1A73E8),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

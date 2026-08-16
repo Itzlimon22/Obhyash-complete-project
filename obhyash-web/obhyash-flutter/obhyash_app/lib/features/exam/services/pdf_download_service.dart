@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
+import '../../../core/utils/app_popups.dart';
 import '../domain/exam_models.dart';
 
 class PdfDownloadService {
-  /// Opens the system print/save-as-PDF dialog with a full preview
+  /// Directly exports/downloads the question paper as a PDF file
   static Future<void> downloadQuestionPaper(
     ExamResult result,
     BuildContext context,
@@ -14,42 +15,41 @@ class PdfDownloadService {
     final htmlContent = _generateQuestionPaperHtml(result);
 
     try {
-      await Printing.layoutPdf(
-        name: filename,
+      final pdfBytes = await Printing.convertHtml(
         format: PdfPageFormat.a4,
-        onLayout: (PdfPageFormat format) async {
-          return await Printing.convertHtml(
-            format: format,
-            html: htmlContent,
-          );
-        },
+        html: htmlContent,
+      );
+      await Printing.sharePdf(
+        bytes: pdfBytes,
+        filename: filename,
       );
     } catch (e) {
-      debugPrint('[PdfDownloadService] layoutPdf failed: $e. Falling back to sharePdf...');
+      debugPrint('[PdfDownloadService] sharePdf failed: $e. Falling back to layoutPdf...');
       try {
-        final pdfBytes = await Printing.convertHtml(
+        await Printing.layoutPdf(
+          name: filename,
           format: PdfPageFormat.a4,
-          html: htmlContent,
-        );
-        await Printing.sharePdf(
-          bytes: pdfBytes,
-          filename: filename,
+          onLayout: (PdfPageFormat format) async {
+            return await Printing.convertHtml(
+              format: format,
+              html: htmlContent,
+            );
+          },
         );
       } catch (innerError) {
-        debugPrint('[PdfDownloadService] sharePdf error: $innerError');
+        debugPrint('[PdfDownloadService] layoutPdf error: $innerError');
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('PDF তৈরি করতে সমস্যা হয়েছে: $innerError'),
-              backgroundColor: Colors.red,
-            ),
+          AppPopups.show(
+            context,
+            message: 'PDF তৈরি করতে সমস্যা হয়েছে: $innerError',
+            isError: true,
           );
         }
       }
     }
   }
 
-  /// Opens the system print/save-as-PDF dialog for result and explanation
+  /// Directly exports/downloads the result & explanation as a PDF file
   static Future<void> downloadResultWithExplanations(
     ExamResult result,
     BuildContext context,
@@ -59,35 +59,34 @@ class PdfDownloadService {
     final htmlContent = _generateResultHtml(result);
 
     try {
-      await Printing.layoutPdf(
-        name: filename,
+      final pdfBytes = await Printing.convertHtml(
         format: PdfPageFormat.a4,
-        onLayout: (PdfPageFormat format) async {
-          return await Printing.convertHtml(
-            format: format,
-            html: htmlContent,
-          );
-        },
+        html: htmlContent,
+      );
+      await Printing.sharePdf(
+        bytes: pdfBytes,
+        filename: filename,
       );
     } catch (e) {
-      debugPrint('[PdfDownloadService] layoutPdf failed: $e. Falling back to sharePdf...');
+      debugPrint('[PdfDownloadService] sharePdf failed: $e. Falling back to layoutPdf...');
       try {
-        final pdfBytes = await Printing.convertHtml(
+        await Printing.layoutPdf(
+          name: filename,
           format: PdfPageFormat.a4,
-          html: htmlContent,
-        );
-        await Printing.sharePdf(
-          bytes: pdfBytes,
-          filename: filename,
+          onLayout: (PdfPageFormat format) async {
+            return await Printing.convertHtml(
+              format: format,
+              html: htmlContent,
+            );
+          },
         );
       } catch (innerError) {
-        debugPrint('[PdfDownloadService] sharePdf error: $innerError');
+        debugPrint('[PdfDownloadService] layoutPdf error: $innerError');
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('PDF তৈরি করতে সমস্যা হয়েছে: $innerError'),
-              backgroundColor: Colors.red,
-            ),
+          AppPopups.show(
+            context,
+            message: 'PDF তৈরি করতে সমস্যা হয়েছে: $innerError',
+            isError: true,
           );
         }
       }

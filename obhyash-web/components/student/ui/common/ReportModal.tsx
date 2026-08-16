@@ -15,11 +15,11 @@ interface ReportModalProps {
 
 const REPORT_TYPES = [
   { id: 'ভুল উত্তর', label: 'ভুল উত্তর' },
-  { id: 'প্রশ্নে ডাউট', label: 'প্রশ্নে ডাউট' },
-  { id: 'অসম্পূর্ণ প্রশ্ন', label: 'অসম্পূর্ণ প্রশ্ন' },
-  { id: 'অসম্পূর্ণ সলিউশন', label: 'অসম্পূর্ণ সলিউশন' },
-  { id: 'ভুল ক্যাটাগরি', label: 'ভুল ক্যাটাগরি' },
-  { id: 'Other', label: 'অন্যান্য' },
+  { id: 'প্রশ্ন অসম্পূর্ণ', label: 'প্রশ্ন অসম্পূর্ণ' },
+  { id: 'অপশনে ত্রুটি', label: 'অপশনে ত্রুটি' },
+  { id: 'ব্যাখ্যা ভুল', label: 'ব্যাখ্যা ভুল' },
+  { id: 'বানান ভুল', label: 'বানান ভুল' },
+  { id: 'অন্যান্য সমস্যা', label: 'অন্যান্য সমস্যা' },
 ];
 
 const CHAR_LIMIT = 500;
@@ -158,7 +158,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
                   <label className="block text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-2">
                     সমস্যা
                   </label>
-                  <div className="grid grid-cols-2 gap-1.5">
+                  <div className="grid grid-cols-3 gap-1.5">
                     {REPORT_TYPES.map((type) => (
                       <button
                         key={type.id}

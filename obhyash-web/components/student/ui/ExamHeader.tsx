@@ -15,7 +15,6 @@ interface ExamHeaderProps {
   graceTimeLeft?: number;
   appState: AppState;
   onDownloadQuestionPaper: () => void;
-  onDownloadOMR: () => void;
   onExit?: () => void;
   onSubmit?: () => void;
   totalQuestions?: number;
@@ -28,7 +27,6 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
   graceTimeLeft = 0,
   appState,
   onDownloadQuestionPaper,
-  onDownloadOMR,
   onExit,
   answeredCount = 0,
   totalQuestions = 0,
@@ -141,17 +139,7 @@ const ExamHeader: React.FC<ExamHeaderProps> = ({
                       </span>
                       প্রশ্নপত্র
                     </button>
-                    {/* OMR শিট download — HIDDEN (uncomment to restore)
-                    <button
-                      onClick={() => { onDownloadOMR(); setShowDownloads(false); }}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-                    >
-                      <span className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-600 shrink-0">
-                        <ClipboardList size={15} />
-                      </span>
-                      OMR শিট
-                    </button>
-                    */}
+
                   </div>
                 </div>
               </>

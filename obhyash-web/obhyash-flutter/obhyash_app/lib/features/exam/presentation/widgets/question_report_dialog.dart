@@ -10,9 +10,11 @@ class QuestionReportDialog extends StatefulWidget {
   const QuestionReportDialog({super.key, required this.questionId});
 
   static Future<void> show(BuildContext context, String questionId) async {
-    await showDialog(
+    await showModalBottomSheet(
       context: context,
-      barrierDismissible: true,
+      isScrollControlled: true,
+      useRootNavigator: true,
+      backgroundColor: Colors.transparent,
       builder: (_) => QuestionReportDialog(questionId: questionId),
     );
   }
@@ -26,13 +28,10 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
   String _selectedReason = 'ভুল উত্তর';
   bool _isSubmitting = false;
 
-  final List<String> _reasons = [
-    'ভুল উত্তর',
-    'প্রশ্ন অসম্পূর্ণ',
-    'অপশনে ত্রুটি',
-    'ব্যাখ্যা ভুল',
-    'বানান ভুল',
-    'অন্যান্য সমস্যা',
+  // 6 options structured as 2 rows × 3 columns
+  final List<List<String>> _reasonRows = [
+    ['ভুল উত্তর', 'প্রশ্ন অসম্পূর্ণ', 'অপশনে ত্রুটি'],
+    ['ব্যাখ্যা ভুল', 'বানান ভুল', 'অন্যান্য সমস্যা'],
   ];
 
   @override
@@ -47,179 +46,188 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
 
     try {
       final sb = Supabase.instance.client;
-      final uid = sb.auth.currentUser?.id;
+      final user = sb.auth.currentUser;
+      final uid = user?.id;
 
-      await sb.from('question_reports').insert({
-        'question_id': widget.questionId,
-        'user_id': uid,
+      String reporterName = 'Student';
+      if (user?.userMetadata != null && user!.userMetadata!['name'] != null) {
+        reporterName = user.userMetadata!['name'].toString();
+      }
+
+      dynamic qId = int.tryParse(widget.questionId) ?? widget.questionId;
+
+      await sb.from('reports').insert({
+        'question_id': qId,
+        'reporter_id': uid,
+        'reporter_name': reporterName,
         'reason': _selectedReason,
-        'comment': _commentController.text.trim(),
+        'description': _commentController.text.trim(),
+        'status': 'Pending',
         'created_at': DateTime.now().toUtc().toIso8601String(),
       });
-    } catch (e) {
-      debugPrint('[QuestionReportDialog] Submit error (non-fatal): $e');
-    }
 
-    if (mounted) {
-      Navigator.of(context).pop();
-      AppPopups.show(
-        context,
-        message: 'রিপোর্ট সফলভাবে জমা নেওয়া হয়েছে। ধন্যবাদ!',
-        isError: false,
-      );
+      if (mounted) {
+        AppPopups.show(
+          context,
+          message: 'রিপোর্ট সফলভাবে জমা নেওয়া হয়েছে। ধন্যবাদ!',
+          isError: false,
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      debugPrint('[QuestionReportDialog] Submit error: $e');
+      if (mounted) {
+        AppPopups.show(
+          context,
+          message: 'রিপোর্ট জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।',
+          isError: true,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return Dialog(
-      backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
-      surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
-          width: 1,
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF121214) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.5 : 0.15),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
+        ],
       ),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-        child: SingleChildScrollView(
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(20, 12, 20, 20 + bottomInset),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Drag Handle
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+
               // Header
               Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEF4444).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      LucideIcons.alertTriangle,
-                      size: 18,
-                      color: Color(0xFFEF4444),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'প্রশ্ন রিপোর্ট করুন',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
-                            color: isDark
-                                ? Colors.white
-                                : const Color(0xFF111827),
-                          ),
-                        ),
-                        Text(
-                          'কী ধরনের সমস্যা রয়েছে?',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontFamily: 'HindSiliguri',
-                            color: isDark
-                                ? const Color(0xFFA1A1AA)
-                                : const Color(0xFF6B7280),
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      'প্রশ্ন রিপোর্ট করো',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        fontFamily: 'HindSiliguri',
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
                     ),
                   ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(
                       LucideIcons.x,
-                      size: 18,
-                      color: isDark
-                          ? const Color(0xFF71717A)
-                          : const Color(0xFF9CA3AF),
+                      size: 20,
+                      color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                     ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
 
-              // Reason Radio Options
+              // 6 options as 2 rows × 3 columns
               Column(
-                children: _reasons.map((reason) {
-                  final isSelected = _selectedReason == reason;
-                  return InkWell(
-                    onTap: () {
-                      HapticFeedback.selectionClick();
-                      setState(() => _selectedReason = reason);
-                    },
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 6),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? (isDark
-                                  ? const Color(0xFF27272A)
-                                  : const Color(0xFFF4F4F5))
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: isSelected
-                              ? (isDark
-                                    ? const Color(0xFF52525B)
-                                    : const Color(0xFFD4D4D8))
-                              : Colors.transparent,
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 16,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: isSelected
-                                    ? const Color(0xFF004633)
-                                    : (isDark
-                                          ? const Color(0xFF71717A)
-                                          : const Color(0xFFA1A1AA)),
-                                width: isSelected ? 4.5 : 1.5,
+                children: _reasonRows.map((row) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
+                      children: row.map((reason) {
+                        final isSelected = _selectedReason == reason;
+                        return Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: InkWell(
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                setState(() => _selectedReason = reason);
+                              },
+                              borderRadius: BorderRadius.circular(12),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 150),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? (isDark
+                                          ? const Color(0xFF059669).withValues(alpha: 0.22)
+                                          : const Color(0xFF004633).withValues(alpha: 0.1))
+                                      : (isDark
+                                          ? const Color(0xFF1E1E22)
+                                          : const Color(0xFFF8FAFC)),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? const Color(0xFF059669)
+                                        : (isDark
+                                            ? const Color(0xFF2E2E34)
+                                            : const Color(0xFFE2E8F0)),
+                                    width: isSelected ? 1.5 : 1,
+                                  ),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      reason,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontFamily: 'HindSiliguri',
+                                        fontWeight: isSelected
+                                            ? FontWeight.w700
+                                            : FontWeight.w600,
+                                        color: isSelected
+                                            ? (isDark
+                                                ? const Color(0xFF34D399)
+                                                : const Color(0xFF004633))
+                                            : (isDark
+                                                ? const Color(0xFFD4D4D8)
+                                                : const Color(0xFF334155)),
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              reason,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontFamily: 'HindSiliguri',
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.w500,
-                                color: isDark
-                                    ? Colors.white
-                                    : const Color(0xFF18181B),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        );
+                      }).toList(),
                     ),
                   );
                 }).toList(),
@@ -233,12 +241,12 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                 maxLines: 2,
                 maxLength: 200,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 13.5,
                   fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF18181B),
                 ),
                 decoration: InputDecoration(
-                  hintText: 'মন্তব্য বা বিস্তারিত (ঐচ্ছিক)...',
+                  hintText: 'মন্তব্য বা বিস্তারিত লেখো (ঐচ্ছিক)...',
                   hintStyle: TextStyle(
                     fontSize: 12.5,
                     fontFamily: 'HindSiliguri',
@@ -248,16 +256,27 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                   ),
                   filled: true,
                   fillColor: isDark
-                      ? const Color(0xFF27272A)
-                      : const Color(0xFFF4F4F5),
+                      ? const Color(0xFF1E1E22)
+                      : const Color(0xFFF8FAFC),
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
+                    horizontal: 14,
+                    vertical: 12,
                   ),
                   counterText: '',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? const Color(0xFF2E2E34)
+                          : const Color(0xFFE2E8F0),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(
+                      color: Color(0xFF059669),
+                      width: 1.5,
+                    ),
                   ),
                 ),
               ),
@@ -268,61 +287,68 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    child: SizedBox(
+                      height: 46,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          side: BorderSide(
+                            color: isDark
+                                ? const Color(0xFF3F3F46)
+                                : const Color(0xFFCBD5E1),
+                          ),
                         ),
-                        side: BorderSide(
-                          color: isDark
-                              ? const Color(0xFF3F3F46)
-                              : const Color(0xFFE4E4E7),
-                        ),
-                      ),
-                      child: Text(
-                        'বাতিল',
-                        style: TextStyle(
-                          fontSize: 13.5,
-                          fontFamily: 'HindSiliguri',
-                          color: isDark
-                              ? const Color(0xFFA1A1AA)
-                              : const Color(0xFF71717A),
+                        child: Text(
+                          'বাতিল',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'HindSiliguri',
+                            color: isDark
+                                ? const Color(0xFFA1A1AA)
+                                : const Color(0xFF64748B),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton(
-                      onPressed: _isSubmitting ? null : _submitReport,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF004633),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    flex: 2,
+                    child: SizedBox(
+                      height: 46,
+                      child: ElevatedButton(
+                        onPressed: _isSubmitting ? null : _submitReport,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF004633),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                         ),
+                        child: _isSubmitting
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                'রিপোর্ট পাঠাও',
+                                style: TextStyle(
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'HindSiliguri',
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
-                      child: _isSubmitting
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text(
-                              'রিপোর্ট পাঠান',
-                              style: TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'HindSiliguri',
-                              ),
-                            ),
                     ),
                   ),
                 ],

@@ -240,7 +240,14 @@ class AuthController extends AsyncNotifier<void> {
       await SecureStorageService.clearUserMeta();
 
       // Sign out from Supabase (invalidates access + refresh tokens)
-      await _supabase.auth.signOut();
+      try {
+        await _supabase.auth.signOut();
+      } catch (e) {
+        debugPrint('[AuthController] Remote signOut failed, falling back to local: $e');
+        try {
+          await _supabase.auth.signOut(scope: SignOutScope.local);
+        } catch (_) {}
+      }
     });
   }
 }

@@ -3,9 +3,10 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { getStudentLiveExamDetails, getPublicLeaderboard } from "@/services/live-exam-student-service";
 import { LiveExam, LiveExamAttempt } from "@/lib/types";
 import { toast } from "sonner";
-import { Trophy, Clock, Target } from "lucide-react";
+import { Trophy, Clock, CheckCircle, BookOpen, AlertCircle, RotateCcw, ChevronRight } from "lucide-react";
 import { LiveExamSession } from "./LiveExamSession";
-
+import LiveExamSolutionView from "./LiveExamSolutionView";
+import LiveExamLeaderboardView from "./LiveExamLeaderboardView";
 import AppLayout from "@/components/student/ui/layout/AppLayout";
 
 export interface LiveExamDetailsViewProps {
@@ -29,6 +30,8 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isTakingExam, setIsTakingExam] = useState(false);
+  const [isViewingSolutions, setIsViewingSolutions] = useState(false);
+  const [isViewingLeaderboard, setIsViewingLeaderboard] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -43,7 +46,12 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
       setExam(exam);
       setAttempt(attempt);
 
-      if (attempt?.status === "submitted") {
+      const now = new Date();
+      const end = new Date(exam.end_time);
+      const isPast = now > end;
+
+      // Only show public leaderboard if exam has ended or publish_result_instantly is true
+      if (attempt?.status === "submitted" && (isPast || exam.id.startsWith("mock-"))) {
         const lb = await getPublicLeaderboard(examId, 5);
         setLeaderboard(lb);
       }
@@ -55,7 +63,7 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   };
 
   if (isLoading) {
-    return <div className="w-full flex justify-center py-20 text-neutral-500 font-medium">Loading details...</div>;
+    return <div className="w-full flex justify-center py-20 text-neutral-500 font-medium animate-pulse">পরীক্ষার বিবরণ লোড হচ্ছে...</div>;
   }
 
   if (!exam) return null;
@@ -64,19 +72,53 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
   const start = new Date(exam.start_time);
   const end = new Date(exam.end_time);
 
-  let statusText = "Upcoming";
-  let canStart = false;
+  const isOngoing = now >= start && now <= end;
+  const isUpcoming = now < start;
+  const isPast = now > end;
+  const isTaken = attempt?.status === "submitted";
 
-  if (now >= start && now <= end) {
-    statusText = "Ongoing";
-    canStart = true;
-  } else if (now > end) {
-    statusText = "Past";
+  let statusBadgeText = "Upcoming";
+  let statusBadgeColor = "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400";
+
+  if (isOngoing) {
+    statusBadgeText = "Ongoing Live";
+    statusBadgeColor = "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400";
+  } else if (isPast) {
+    statusBadgeText = "Archive / Past";
+    statusBadgeColor = "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400";
   }
 
-  const isTaken = attempt?.status === "submitted";
-  const displayStatus = isTaken ? "taken" : "untaken";
+  // Leaderboard View Screen
+  if (isViewingLeaderboard) {
+    return (
+      <AppLayout activeTab="live_exam" {...commonLayoutProps} title="মেধা তালিকা">
+        <LiveExamLeaderboardView
+          exam={exam}
+          onBack={() => setIsViewingLeaderboard(false)}
+          onViewSolutions={() => {
+            setIsViewingLeaderboard(false);
+            setIsViewingSolutions(true);
+          }}
+        />
+      </AppLayout>
+    );
+  }
 
+  // Solution View Screen
+  if (isViewingSolutions) {
+    return (
+      <LiveExamSolutionView
+        examId={exam.id}
+        examTitle={exam.title}
+        categoryTitle={exam.category}
+        negativeMarking={exam.negative_marking || 0.25}
+        commonLayoutProps={commonLayoutProps}
+        onBack={() => setIsViewingSolutions(false)}
+      />
+    );
+  }
+
+  // Exam Taking Screen
   if (isTakingExam) {
     return (
       <LiveExamSession
@@ -110,127 +152,182 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
           </button>
-          <h2 className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white">
-            {exam.title}
-          </h2>
+          <div>
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+              {exam.category}
+            </span>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white">
+              {exam.title}
+            </h2>
+          </div>
         </div>
 
         {isTaken && attempt && (
-          <div className="bg-[#ebd9d9] dark:bg-red-900/30 text-red-700 dark:text-red-400 px-3 py-1.5 rounded-full flex items-center gap-2 font-bold text-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-              <path fillRule="evenodd" d="M12.963 2.286a.75.75 0 00-1.071-.136 9.742 9.742 0 00-3.539 6.177A7.547 7.547 0 016.648 6.61a.75.75 0 00-1.152-.082A9 9 0 1015.68 4.534a7.46 7.46 0 01-2.717-2.248z" clipRule="evenodd" />
-            </svg>
-            Score: {attempt.score}
+          <div className="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 px-3.5 py-1.5 rounded-full flex items-center gap-2 font-bold text-sm">
+            <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span>প্রাপ্ত নম্বর: {attempt.score}</span>
           </div>
         )}
       </div>
 
-      <div className={`grid gap-12 lg:gap-16 ${isTaken ? "lg:grid-cols-[1fr_1fr]" : "max-w-2xl mx-auto"}`}>
+      <div className={`grid gap-8 lg:gap-12 ${(isTaken && isPast) ? "lg:grid-cols-[1.1fr_0.9fr]" : "max-w-2xl mx-auto"}`}>
         
-        {/* Left Column: Shared details */}
+        {/* Left Column: Details & Actions */}
         <div className="space-y-6">
           
           {/* Schedule Card */}
-          <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-sm border border-neutral-100 dark:border-neutral-700">
-            <div className="flex items-center justify-center gap-2 font-extrabold text-lg text-neutral-900 dark:text-white mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-teal-700 dark:text-teal-500">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
-              </svg>
-              সময়সূচী
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-sm border border-neutral-200 dark:border-neutral-800">
+            <div className="flex items-center justify-between font-extrabold text-lg text-neutral-900 dark:text-white mb-6">
+              <div className="flex items-center gap-2">
+                <Clock className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <span>পরীক্ষার সময়সূচী</span>
+              </div>
+              <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusBadgeColor}`}>
+                {statusBadgeText}
+              </span>
             </div>
             
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center bg-neutral-50 dark:bg-neutral-800/40 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800">
               <div>
-                <div className="font-extrabold text-neutral-900 dark:text-white text-lg">
-                  {start.toLocaleDateString()}
+                <span className="text-xs text-neutral-500 font-semibold">শুরু</span>
+                <div className="font-extrabold text-neutral-900 dark:text-white text-base sm:text-lg">
+                  {start.toLocaleDateString('bn-BD', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </div>
-                <div className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
+                <div className="text-xs text-neutral-500 font-medium">
                   {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
+              <div className="text-neutral-300 dark:text-neutral-700 font-black text-xl">→</div>
               <div className="text-right">
-                <div className="font-extrabold text-neutral-900 dark:text-white text-lg">
-                  {end.toLocaleDateString()}
+                <span className="text-xs text-neutral-500 font-semibold">সমাপ্তি</span>
+                <div className="font-extrabold text-neutral-900 dark:text-white text-base sm:text-lg">
+                  {end.toLocaleDateString('bn-BD', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </div>
-                <div className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
+                <div className="text-xs text-neutral-500 font-medium">
                   {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Meta Card */}
-          <div className="bg-white dark:bg-neutral-800 rounded-2xl p-4 sm:p-6 shadow-sm border border-neutral-100 dark:border-neutral-700 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4 text-neutral-900 dark:text-white font-extrabold text-lg">
-              <div className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-red-600">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {exam.duration_minutes} মিনিট
-              </div>
-              <div className="w-px h-6 bg-neutral-200 dark:bg-neutral-700"></div>
-              <div className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-green-700">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                </svg>
-                {exam.total_questions} প্রশ্ন
-              </div>
+          {/* Meta Information */}
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-800 grid grid-cols-3 divide-x divide-neutral-200 dark:divide-neutral-800 text-center">
+            <div>
+              <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">সময়</p>
+              <p className="text-lg font-extrabold text-neutral-900 dark:text-white">{exam.duration_minutes} মিনিট</p>
             </div>
-            
-            <div className={`px-4 py-2 rounded-xl flex items-center gap-1.5 font-bold ${canStart ? "bg-[#ebfaef] dark:bg-green-900/30 text-[#2ca05a] dark:text-green-400" : "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400"}`}>
-              {canStart ? (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                    <path fillRule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clipRule="evenodd" />
-                  </svg>
-                  {statusText}
-                </>
-              ) : (
-                statusText
-              )}
+            <div>
+              <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">মোট প্রশ্ন</p>
+              <p className="text-lg font-extrabold text-neutral-900 dark:text-white">{exam.total_questions} টি</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">নেগেটিভ মার্ক</p>
+              <p className="text-lg font-extrabold text-red-600 dark:text-red-400">-{exam.negative_marking || 0.25}</p>
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col gap-3">
+          {/* Syllabus Card */}
+          <div className="bg-white dark:bg-neutral-900 rounded-2xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-800 space-y-2">
+            <div className="flex items-center gap-2 text-sm font-extrabold text-neutral-900 dark:text-white">
+              <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>সিলেবাস ও অধ্যায়সমূহ</span>
+            </div>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed font-medium bg-neutral-50 dark:bg-neutral-800/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800">
+              {exam.description || "এই পরীক্ষার সিলেবাসে বোর্ড পাঠ্যবইয়ের সংশ্লিষ্ট অধ্যায়সমূহ অন্তর্ভুক্ত রয়েছে।"}
+            </p>
+          </div>
+
+          {/* Anti-Leakage / Pending Results Banner */}
+          {isTaken && isOngoing && !exam.id.startsWith("mock-") && (
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 rounded-2xl p-5 text-amber-900 dark:text-amber-200 flex items-start gap-3.5">
+              <AlertCircle className="w-6 h-6 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-bold text-base mb-1">উত্তরপত্র সফলভাবে জমা নেওয়া হয়েছে!</h4>
+                <p className="text-sm text-amber-800/90 dark:text-amber-300 leading-relaxed">
+                  পরীক্ষার গোপনীয়তা ও সমতা বজায় রাখতে, লাইভ পরীক্ষার সময়সীমা ({end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}) শেষ হওয়ার পর সম্পূর্ণ সমাধান ও মেধা তালিকা উন্মুক্ত করা হবে।
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons based on lifecycle */}
+          <div className="flex flex-col gap-3 pt-2">
             {!isTaken ? (
-              <button 
-                disabled={!canStart}
-                className="w-full bg-[#0B6B42] hover:bg-[#095937] disabled:opacity-50 disabled:hover:bg-[#0B6B42] text-white py-3.5 rounded-xl font-bold text-lg transition-colors"
-                onClick={() => setIsTakingExam(true)}
-              >
-                {canStart ? "পরীক্ষা শুরু করো" : "পরীক্ষা শুরু হয়নি"}
-              </button>
+              // Untaken
+              isOngoing ? (
+                <button 
+                  className="w-full bg-[#0B6B42] hover:bg-[#095937] text-white py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-emerald-800/20 active:scale-[0.99] flex items-center justify-center gap-2"
+                  onClick={() => setIsTakingExam(true)}
+                >
+                  <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
+                  পরীক্ষা শুরু করুন
+                </button>
+              ) : isUpcoming ? (
+                <button 
+                  disabled
+                  className="w-full bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 py-4 rounded-2xl font-bold text-base cursor-not-allowed"
+                >
+                  পরীক্ষা এখনো শুরু হয়নি
+                </button>
+              ) : (
+                // Past & Untaken -> Practice mode
+                <button 
+                  className="w-full bg-[#0B6B42] hover:bg-[#095937] text-white py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-emerald-800/20 active:scale-[0.99] flex items-center justify-center gap-2"
+                  onClick={() => setIsTakingExam(true)}
+                >
+                  <RotateCcw className="w-5 h-5" />
+                  অনুশীলন পরীক্ষা শুরু করুন
+                </button>
+              )
             ) : (
-              <button className="w-full bg-[#0B6B42] hover:bg-[#095937] text-white py-3.5 rounded-xl font-bold text-lg transition-colors">
-                সমাধান দেখুন
-              </button>
+              // Taken
+              isPast || exam.id.startsWith("mock-") ? (
+                <div className="space-y-3">
+                  <button 
+                    onClick={() => setIsViewingSolutions(true)}
+                    className="w-full bg-[#0B6B42] hover:bg-[#095937] text-white py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-emerald-800/20 active:scale-[0.99] flex items-center justify-center gap-2"
+                  >
+                    <BookOpen className="w-5 h-5" />
+                    সমাধান ও ব্যাখ্যা দেখুন
+                  </button>
+                  <button 
+                    onClick={() => setIsTakingExam(true)}
+                    className="w-full bg-transparent border-2 border-[#0B6B42] text-[#0B6B42] dark:border-emerald-600 dark:text-emerald-400 py-3.5 rounded-2xl font-bold text-base hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    পুনরায় অনুশীলন করুন
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  disabled
+                  className="w-full bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 py-4 rounded-2xl font-bold text-base cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Clock className="w-5 h-5" />
+                  ফলাফল প্রকাশের অপেক্ষায়...
+                </button>
+              )
             )}
-            
-            <button className="w-full bg-transparent border-2 border-[#0B6B42] text-[#0B6B42] dark:border-green-600 dark:text-green-500 py-3.5 rounded-xl font-bold text-lg hover:bg-[#0B6B42]/5 dark:hover:bg-green-900/20 transition-colors">
-              অন্যান্য পরীক্ষা
-            </button>
           </div>
 
-          {/* Previous Attempts (Taken Only) */}
-          {isTaken && attempt && (
-            <div className="mt-8">
-              <h3 className="text-xl font-extrabold text-neutral-900 dark:text-white mb-4">
-                আপনার ফলাফল
+          {/* User's Result summary if completed and ended */}
+          {isTaken && (isPast || exam.id.startsWith("mock-")) && attempt && (
+            <div className="mt-6 bg-white dark:bg-neutral-900 rounded-2xl p-5 shadow-sm border border-neutral-200 dark:border-neutral-800">
+              <h3 className="text-base font-extrabold text-neutral-900 dark:text-white mb-3">
+                আপনার ফলাফল সারাংশ
               </h3>
-              <div className="space-y-4">
-                <div className="bg-white dark:bg-neutral-800 rounded-2xl p-5 shadow-sm border border-neutral-100 dark:border-neutral-700 flex items-center justify-between">
-                  <div>
-                    <div className="font-extrabold text-lg text-neutral-900 dark:text-white">
-                      সর্বশেষ প্রচেষ্টা
-                    </div>
-                    <div className="text-sm text-neutral-500 dark:text-neutral-400 font-medium mt-1">
-                      {new Date(attempt.submit_time || "").toLocaleString()}
-                    </div>
-                  </div>
-                  <div className="w-10 h-10 bg-neutral-100 dark:bg-neutral-700 rounded-full flex items-center justify-center font-extrabold text-lg text-neutral-700 dark:text-neutral-300">
-                    {attempt.score}
-                  </div>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="bg-emerald-50 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
+                  <span className="text-xs text-neutral-500 font-medium">সঠিক</span>
+                  <p className="text-lg font-black text-emerald-600 dark:text-emerald-400">{attempt.correct_count || 0}</p>
+                </div>
+                <div className="bg-red-50 dark:bg-red-950/30 p-3 rounded-xl border border-red-100 dark:border-red-900/30">
+                  <span className="text-xs text-neutral-500 font-medium">ভুল</span>
+                  <p className="text-lg font-black text-red-600 dark:text-red-400">{attempt.wrong_count || 0}</p>
+                </div>
+                <div className="bg-neutral-50 dark:bg-neutral-800 p-3 rounded-xl border border-neutral-100 dark:border-neutral-700">
+                  <span className="text-xs text-neutral-500 font-medium">মোট স্কোর</span>
+                  <p className="text-lg font-black text-neutral-900 dark:text-white">{attempt.score}</p>
                 </div>
               </div>
             </div>
@@ -238,52 +335,88 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
 
         </div>
 
-        {/* Right Column: Leaderboard (Taken Only) */}
-        {isTaken && (
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-extrabold text-neutral-900 dark:text-white">
-                লিডারবোর্ড
-              </h3>
-              <button className="w-10 h-10 bg-[#0B6B42] hover:bg-[#095937] text-white rounded-full flex items-center justify-center transition-colors shadow-md">
-                <Trophy size={20} />
-              </button>
+        {/* Right Column: Leaderboard (Published / Ended) */}
+        {isTaken && (isPast || exam.id.startsWith("mock-")) && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-amber-500" />
+                <h3 className="text-lg font-extrabold text-neutral-900 dark:text-white">
+                  শীর্ষ মেধা তালিকা (Top Rankers)
+                </h3>
+              </div>
+              <span className="text-xs font-bold text-neutral-500">
+                শীর্ষ ৫ জন
+              </span>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {leaderboard.length === 0 ? (
-                <div className="p-4 text-center text-neutral-500">No leaderboard data yet.</div>
+                <div className="p-8 text-center text-neutral-500 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800">
+                  লিডারবোর্ড তথ্য এখনও উপলব্ধ নয়।
+                </div>
               ) : (
                 leaderboard.map((lbEntry, index) => (
-                  <div key={lbEntry.id} className="bg-white dark:bg-neutral-800 rounded-2xl p-3 sm:p-4 shadow-sm border border-neutral-100 dark:border-neutral-700 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      {/* Avatar */}
+                  <div 
+                    key={lbEntry.id || index} 
+                    className={`bg-white dark:bg-neutral-900 rounded-2xl p-4 shadow-sm border transition-all flex items-center justify-between ${
+                      index === 0 
+                        ? "border-amber-300 dark:border-amber-700 bg-amber-50/20 dark:bg-amber-950/10" 
+                        : "border-neutral-200 dark:border-neutral-800"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      {/* Rank number badge */}
+                      <span className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-sm shrink-0 ${
+                        index === 0 ? "bg-amber-500 text-white shadow-md shadow-amber-500/20" :
+                        index === 1 ? "bg-slate-300 text-slate-800 dark:bg-slate-700 dark:text-white" :
+                        index === 2 ? "bg-amber-700 text-white" :
+                        "bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400"
+                      }`}>
+                        #{index + 1}
+                      </span>
+
+                      {/* User Avatar */}
                       <div 
-                        className="w-14 h-14 rounded-xl flex items-center justify-center text-white font-bold text-xl shrink-0"
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm"
                         style={{ backgroundColor: lbEntry.users?.avatarColor || '#10b981' }}
                       >
                         {lbEntry.users?.name?.charAt(0)?.toUpperCase() || 'U'}
                       </div>
                       
-                      {/* Details */}
-                      <div>
-                        <div className="font-extrabold text-neutral-900 dark:text-white text-base sm:text-lg">
-                          {lbEntry.users?.name || "Unknown"}
+                      {/* Name & Institute */}
+                      <div className="min-w-0">
+                        <div className="font-extrabold text-neutral-900 dark:text-white text-sm sm:text-base truncate">
+                          {lbEntry.users?.name || "নাম অপ্রকাশিত"}
                         </div>
-                        <div className="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
-                          Score: {lbEntry.score}
+                        <div className="text-xs text-neutral-500 dark:text-neutral-400 truncate">
+                          {lbEntry.users?.institute || "প্রতিষ্ঠান নেই"}
                         </div>
                       </div>
                     </div>
                     
-                    {/* Rank */}
-                    <div className={`font-black text-xl pl-4 ${index === 0 ? "text-yellow-500" : index === 1 ? "text-gray-400" : index === 2 ? "text-orange-500" : "text-neutral-400"}`}>
-                      #{index + 1}
+                    {/* Score */}
+                    <div className="text-right shrink-0 pl-3">
+                      <span className="font-black text-base sm:text-lg text-emerald-600 dark:text-emerald-400">
+                        {lbEntry.score}
+                      </span>
+                      <p className="text-[10px] text-neutral-400 font-semibold">নম্বর</p>
                     </div>
                   </div>
                 ))
               )}
             </div>
+
+            {leaderboard.length > 0 && (
+              <button
+                onClick={() => setIsViewingLeaderboard(true)}
+                className="w-full mt-4 py-3 bg-neutral-100 dark:bg-neutral-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-neutral-800 dark:text-neutral-200 hover:text-emerald-700 dark:hover:text-emerald-300 font-extrabold text-sm rounded-xl transition-all flex items-center justify-center gap-2 border border-neutral-200 dark:border-neutral-700"
+              >
+                <Trophy className="w-4 h-4 text-emerald-600" />
+                <span>সম্পূর্ণ মেধা তালিকা দেখুন</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            )}
           </div>
         )}
 
@@ -294,3 +427,4 @@ const LiveExamDetailsView: React.FC<LiveExamDetailsViewProps> = ({
 };
 
 export default LiveExamDetailsView;
+

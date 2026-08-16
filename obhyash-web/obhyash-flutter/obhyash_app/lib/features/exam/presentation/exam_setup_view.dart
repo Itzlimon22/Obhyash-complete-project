@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -7,7 +8,8 @@ import '../domain/exam_models.dart';
 import '../providers/exam_provider.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
-
+import '../../../core/presentation/widgets/latex_text.dart';
+import '../../../core/presentation/widgets/obhyash_tooltip.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 
 // --- Domain Models ---
@@ -15,11 +17,15 @@ class SubjectItem {
   final String id;
   final String name;
   final String label;
+  final String? category;
+  final int? sortOrder;
 
   const SubjectItem({
     required this.id,
     required this.name,
     required this.label,
+    this.category,
+    this.sortOrder,
   });
 }
 
@@ -125,38 +131,39 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
       final profile = ref.read(userProfileProvider).value;
       final level = profile?.level?.trim();
       final division = profile?.division?.trim();
-      final stream = profile?.stream?.trim();
       final optionalSubject = profile?.optionalSubject?.trim();
 
       final supabase = Supabase.instance.client;
-      var query = supabase.from('subjects').select('*');
-
-      // Filter by Level (HSC vs SSC)
-      if (level != null && level.isNotEmpty) {
-        query = query.or('level.eq.$level,level.is.null,level.eq.all');
+      
+      // Fetch subjects from Supabase with fallback to all rows if filtered query fails or returns empty
+      dynamic data;
+      try {
+        var query = supabase.from('subjects').select('*');
+        if (division != null && division.isNotEmpty && division != 'General') {
+          query = query.or('division.eq.$division,division.eq.General,division.is.null');
+        }
+        data = await query.limit(150);
+      } catch (queryErr) {
+        debugPrint('[ExamSetupView] Filtered subjects query failed, falling back to all: $queryErr');
+        data = await supabase.from('subjects').select('*').limit(150);
       }
 
-      // Filter by Division
-      if (division != null && division != 'General' && division.isNotEmpty) {
-        query = query.or('division.eq.$division,division.eq.General,division.is.null');
+      // If filtered query returned 0 rows, fallback to select('*')
+      if (data == null || data.isEmpty) {
+        data = await supabase.from('subjects').select('*').limit(150);
       }
 
-      // Filter by Stream
-      if (stream != null && stream.isNotEmpty) {
-        query = query.or('stream.ilike.%$stream%,stream.is.null');
-      }
-
-      final data = await query.limit(150);
-
-      final filteredData = (data as List).where((e) {
+      final List rawList = data is List ? data : [];
+      var filteredData = rawList.where((e) {
         final subName = (e['name'] ?? e['name_en'] ?? '').toString().toLowerCase();
         final subId = e['id'].toString().toLowerCase();
+        final subLevel = (e['level'] ?? '').toString().toUpperCase();
 
         // Level safety check
         if (level != null && level.toUpperCase() == 'SSC') {
-          if (subId.startsWith('hsc_') || subName.contains('hsc')) return false;
+          if (subId.startsWith('hsc_') || subName.contains('hsc') || subLevel == 'HSC') return false;
         } else if (level != null && level.toUpperCase() == 'HSC') {
-          if (subId.startsWith('ssc_') || subName.contains('ssc')) return false;
+          if (subId.startsWith('ssc_') || subName.contains('ssc') || subLevel == 'SSC') return false;
         }
 
         // Optional Subject filtering
@@ -171,7 +178,12 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
           }
         }
         return true;
-      });
+      }).toList();
+
+      // If over-filtered to empty, fall back to raw list so subjects are always visible
+      if (filteredData.isEmpty) {
+        filteredData = rawList;
+      }
 
       final seen = <String>{};
       final list = <SubjectItem>[];
@@ -187,11 +199,16 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
           id: e['id'].toString(),
           name: formattedName,
           label: formattedName,
+          category: e['category']?.toString(),
+          sortOrder: e['sort_order'] is int ? e['sort_order'] as int : null,
         ));
       }
 
-      // Sort with custom serial: bangla, eng, ict, phy, che, math, bio, other
+      // Sort with custom serial: sort_order if present, otherwise custom canonical priority
       list.sort((a, b) {
+        if (a.sortOrder != null && b.sortOrder != null && a.sortOrder != b.sortOrder) {
+          return a.sortOrder!.compareTo(b.sortOrder!);
+        }
         final priorityA = _getSubjectSortPriority(a.name, a.id);
         final priorityB = _getSubjectSortPriority(b.name, b.id);
         if (priorityA != priorityB) {
@@ -210,11 +227,6 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
       debugPrint('Failed to fetch subjects: $e\n$st');
       if (mounted) {
         setState(() => _isLoadingData = false);
-        AppPopups.show(
-          context,
-          message: 'Failed to load subjects: $e',
-          isError: true,
-        );
       }
     }
   }
@@ -315,32 +327,24 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
   }
 
   void _showTopicDropdown() {
+    final activeChapters = _selectedChapters.isEmpty
+        ? _chapters
+        : _chapters.where((c) => _selectedChapters.contains(c.id)).toList();
+
     showModalBottomSheet(
       context: context,
       useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _MultiSelectDropdownModal(
-        title: 'টপিক নির্বাচন করো',
-        searchHint: 'টপিক খুঁজুন...',
-        items: _topics,
-        selectedIds: _selectedTopics,
+      builder: (context) => _TopicCollapsibleSelectionModal(
+        chapters: activeChapters,
+        topics: _topics,
+        selectedTopicIds: _selectedTopics,
         onSave: (newSelection) {
           setState(() {
             _selectedTopics.clear();
             _selectedTopics.addAll(newSelection);
           });
-        },
-        getId: (item) => (item as TopicItem).id,
-        getName: (item) {
-          final t = item as TopicItem;
-          final chapter = _chapters.firstWhere(
-            (c) => c.id == t.chapterId,
-            orElse: () => const ChapterItem(id: '', name: ''),
-          );
-          return chapter.name.isNotEmpty
-              ? '${chapter.name} - ${t.name}'
-              : t.name;
         },
       ),
     );
@@ -440,13 +444,13 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF1C1C1E)
-                    : const Color(0xFFF5F5F5),
+                    ? const Color(0xFF18181B)
+                    : const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isDark
                       ? const Color(0xFF27272A)
-                      : const Color(0xFFE5E5E5),
+                      : const Color(0xFFE2E8F0),
                 ),
               ),
               child: Row(
@@ -461,17 +465,19 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                             ? FontWeight.normal
                             : FontWeight.bold,
                         color: value.isEmpty
-                            ? const Color(0xFFA3A3A3)
-                            : (isDark ? Colors.white : const Color(0xFF000000)),
+                            ? (isDark
+                                ? const Color(0xFF71717A)
+                                : const Color(0xFF94A3B8))
+                            : (isDark ? Colors.white : const Color(0xFF0F172A)),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const Icon(
+                  Icon(
                     LucideIcons.chevronDown,
                     size: 18,
-                    color: Color(0xFFA3A3A3),
+                    color: isDark
+                        ? const Color(0xFFA1A1AA)
+                        : const Color(0xFF64748B),
                   ),
                 ],
               ),
@@ -482,381 +488,644 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     );
   }
 
+  Widget _buildSegmentedGroup({
+    required List<String> items,
+    required Iterable<String> selectedItems,
+    required bool isDark,
+    required void Function(String) onToggle,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+        ),
+      ),
+      child: Row(
+        children: items.map((item) {
+          final isSelected = selectedItems.contains(item);
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onToggle(item),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeInOut,
+                padding: const EdgeInsets.symmetric(vertical: 9),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? (isDark ? const Color(0xFF27272A) : Colors.white)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: isDark
+                                ? Colors.black.withValues(alpha: 0.3)
+                                : const Color(0x0A000000),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : [],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      item,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                        fontFamily: 'HindSiliguri',
+                        color: isSelected
+                            ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                            : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                      ),
+                    ),
+                    if (isSelected) ...[
+                      const SizedBox(width: 5),
+                      Container(
+                        width: 5,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildStepperControl({
+    required int value,
+    required String unit,
+    required int min,
+    required int max,
+    required int step,
+    required bool isDark,
+    required void Function(int) onChanged,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            onPressed: value > min ? () => onChanged(value - step) : null,
+            icon: const Icon(LucideIcons.minus, size: 16),
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
+            disabledColor: isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            padding: EdgeInsets.zero,
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Text(
+              '$value $unit',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+                fontFamily: 'HindSiliguri',
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: value < max ? () => onChanged(value + step) : null,
+            icon: const Icon(LucideIcons.plus, size: 16),
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
+            disabledColor: isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            padding: EdgeInsets.zero,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPresetPill({
+    required String label,
+    required bool isSelected,
+    required bool isDark,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isDark ? const Color(0xFF27272A) : const Color(0xFF0F172A))
+              : (isDark ? const Color(0xFF18181B) : const Color(0xFFF8FAFC)),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected
+                ? (isDark ? const Color(0xFF71717A) : const Color(0xFF0F172A))
+                : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+            width: isSelected ? 1.2 : 1.0,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13.5,
+            fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+            fontFamily: 'HindSiliguri',
+            color: isSelected
+                ? Colors.white
+                : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLiveConfigBlueprint(bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF141416) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildBlueprintItem(
+            icon: LucideIcons.helpCircle,
+            label: '$_questionCountটি প্রশ্ন',
+            isDark: isDark,
+          ),
+          _buildBlueprintDivider(isDark),
+          _buildBlueprintItem(
+            icon: LucideIcons.clock,
+            label: '$_durationMinutes মিনিট',
+            isDark: isDark,
+          ),
+          _buildBlueprintDivider(isDark),
+          _buildBlueprintItem(
+            icon: LucideIcons.minusCircle,
+            label: _negativeMarking == 0 ? '০ মার্ক' : '-$_negativeMarking',
+            isDark: isDark,
+          ),
+          _buildBlueprintDivider(isDark),
+          _buildBlueprintItem(
+            icon: LucideIcons.zap,
+            label: '+${_questionCount * 2} XP',
+            isDark: isDark,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBlueprintItem({
+    required IconData icon,
+    required String label,
+    required bool isDark,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          icon,
+          size: 13,
+          color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w700,
+            fontFamily: 'HindSiliguri',
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBlueprintDivider(bool isDark) {
+    return Container(
+      width: 1,
+      height: 14,
+      color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-      physics: const BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
-            child: Center(
-              child: Text(
-                'পরীক্ষা সেটআপ করো',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'HindSiliguri',
-                  color: isDark ? Colors.white : const Color(0xFF000000),
+    ref.listen(userProfileProvider, (previous, next) {
+      if (next.value != null && previous?.value != next.value) {
+        _fetchSubjects();
+      }
+    });
+
+    return Container(
+      color: isDark ? const Color(0xFF000000) : const Color(0xFFF8FAFC),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
+              child: Center(
+                child: Text(
+                  'পরীক্ষা সেটআপ করো',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'HindSiliguri',
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
                 ),
               ),
             ),
-          ),
 
-          // 1. Subject Selector
-          _CardContainer(
-            isDark: isDark,
-            title: 'বিষয় নির্বাচন',
-            icon: LucideIcons.bookOpen,
-            child: _isLoadingData
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                : GestureDetector(
-                    onTap: _showSubjectDropdown,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
+            // 1. Subject Selector
+            _CardContainer(
+              isDark: isDark,
+              title: 'বিষয় নির্বাচন',
+              icon: LucideIcons.bookOpen,
+              child: _isLoadingData
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: CircularProgressIndicator(),
                       ),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF000000) : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: _selectedSubject != null
-                              ? const Color(0xFF059669)
-                              : (isDark
-                                    ? const Color(0xFF27272A)
-                                    : const Color(0xFFE5E5E5)),
-                          width: _selectedSubject != null ? 1.5 : 1,
+                    )
+                  : GestureDetector(
+                      onTap: _showSubjectDropdown,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: _selectedSubject != null
-                                  ? const Color(
-                                      0xFF059669,
-                                    ).withValues(alpha: 0.1)
-                                  : (isDark
-                                        ? const Color(0xFF1C1C1E)
-                                        : const Color(0xFFF5F5F5)),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              LucideIcons.bookOpen,
-                              size: 16,
-                              color: _selectedSubject != null
-                                  ? const Color(0xFF059669)
-                                  : const Color(0xFFA3A3A3),
-                            ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF18181B)
+                              : const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: _selectedSubject != null
+                                ? (isDark
+                                    ? const Color(0xFF52525B)
+                                    : const Color(0xFF0F172A))
+                                : (isDark
+                                    ? const Color(0xFF27272A)
+                                    : const Color(0xFFE2E8F0)),
+                            width: _selectedSubject != null ? 1.4 : 1,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              _selectedSubject != null
-                                  ? _subjects
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _selectedSubject != null
+                                    ? _subjects
                                         .firstWhere(
                                           (s) => s.id == _selectedSubject,
                                         )
                                         .label
-                                  : 'বিষয় নির্বাচন করো...',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: 'HindSiliguri',
-                                fontWeight: FontWeight.bold,
-                                color: _selectedSubject != null
-                                    ? (isDark
+                                    : 'বিষয় নির্বাচন করো...',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'HindSiliguri',
+                                  fontWeight: FontWeight.bold,
+                                  color: _selectedSubject != null
+                                      ? (isDark
                                           ? Colors.white
-                                          : const Color(0xFF000000))
-                                    : const Color(0xFFA3A3A3),
+                                          : const Color(0xFF0F172A))
+                                      : (isDark
+                                          ? const Color(0xFF71717A)
+                                          : const Color(0xFF94A3B8)),
+                                ),
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          const Icon(
-                            LucideIcons.chevronDown,
-                            size: 18,
-                            color: Color(0xFFA3A3A3),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-          ),
-          const SizedBox(height: 12),
-
-          // 2. Chapters & Topics
-          Opacity(
-            opacity: _selectedSubject == null ? 0.5 : 1.0,
-            child: IgnorePointer(
-              ignoring: _selectedSubject == null,
-              child: _CardContainer(
-                isDark: isDark,
-                title: 'অধ্যায় ও টপিক',
-                icon: LucideIcons.list,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildDropdownSelector(
-                      label: 'অধ্যায়',
-                      hint: 'সব অধ্যায়',
-                      value: _selectedChapters.isEmpty
-                          ? ''
-                          : _selectedChapters.length == _chapters.length
-                          ? 'সব অধ্যায়'
-                          : '${_selectedChapters.length}টি অধ্যায় নির্বাচিত',
-                      isDark: isDark,
-                      onTap: _showChapterDropdown,
-                      disabled: _chapters.isEmpty && _selectedSubject != null,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildDropdownSelector(
-                      label: 'টপিক',
-                      hint: 'সব টপিক',
-                      value: _selectedTopics.isEmpty
-                          ? ''
-                          : _selectedTopics.length == _topics.length
-                          ? 'সব টপিক'
-                          : '${_selectedTopics.length}টি টপিক নির্বাচিত',
-                      isDark: isDark,
-                      onTap: _showTopicDropdown,
-                      disabled: _selectedChapters.isEmpty || _topics.isEmpty,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // 3. Exam Tools (Type, Difficulty, Mark, etc)
-          _CardContainer(
-            isDark: isDark,
-            title: 'পরীক্ষার ধরন',
-            icon: LucideIcons.settings,
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: ['Academic', 'Admission', 'Board']
-                  .map(
-                    (t) => _ToggleBox(
-                      label: t,
-                      selected: _examTypes.contains(t),
-                      isDark: isDark,
-                      onTap: () => setState(() {
-                        if (_examTypes.contains(t) && _examTypes.length > 1) {
-                          _examTypes.remove(t);
-                        } else if (!_examTypes.contains(t)) {
-                          _examTypes.add(t);
-                        }
-                      }),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          _CardContainer(
-            isDark: isDark,
-            title: 'কঠিনতা',
-            icon: LucideIcons.activity,
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: ['Easy', 'Medium', 'Hard']
-                  .map(
-                    (d) => _ToggleBox(
-                      label: d,
-                      selected: _difficulties.contains(d),
-                      isDark: isDark,
-                      onTap: () => setState(() {
-                        if (_difficulties.contains(d) &&
-                            _difficulties.length > 1) {
-                          _difficulties.remove(d);
-                        } else if (!_difficulties.contains(d)) {
-                          _difficulties.add(d);
-                        }
-                      }),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // 4. Sliders (Questions & Time)
-          _CardContainer(
-            isDark: isDark,
-            title: 'প্রশ্নের সংখ্যা (সর্বোচ্চ ১০০)',
-            icon: LucideIcons.helpCircle,
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'মোট প্রশ্ন:',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: 'HindSiliguri',
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF000000),
-                      ),
-                    ),
-                    Text(
-                      '$_questionCount',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        color: Color(0xFF059669),
-                      ),
-                    ),
-                  ],
-                ),
-                Slider(
-                  value: _questionCount.toDouble(),
-                  min: 5,
-                  max: 100,
-                  divisions: 95,
-                  activeColor: const Color(0xFF059669),
-                  onChanged: (v) => setState(() {
-                    _questionCount = v.round();
-                    _durationMinutes =
-                        _questionCount; // Sync duration with questions like web app
-                  }),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          _CardContainer(
-            isDark: isDark,
-            title: 'সময় (সর্বোচ্চ ১৮০ মি)',
-            icon: LucideIcons.clock,
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'মোট সময়:',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: 'HindSiliguri',
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : const Color(0xFF000000),
-                      ),
-                    ),
-                    Text(
-                      '$_durationMinutes মি',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        fontFamily: 'HindSiliguri',
-                        color: Color(0xFF059669),
-                      ),
-                    ),
-                  ],
-                ),
-                Slider(
-                  value: _durationMinutes.toDouble(),
-                  min: 5,
-                  max: 180,
-                  divisions: 175,
-                  activeColor: const Color(0xFF059669),
-                  onChanged: (v) =>
-                      setState(() => _durationMinutes = v.round()),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          _CardContainer(
-            isDark: isDark,
-            title: 'নেগেটিভ মার্কিং',
-            icon: LucideIcons.minusCircle,
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [0.0, 0.25, 0.5, 1.0]
-                  .map(
-                    (v) => _ToggleBox(
-                      label: v == 0.0 ? '0' : '-$v',
-                      selected: _negativeMarking == v,
-                      isDark: isDark,
-                      onTap: () => setState(() => _negativeMarking = v),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Start Button
-          ElevatedButton(
-            onPressed: (_isStarting || _selectedSubject == null)
-                ? null
-                : _startExam,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF059669),
-              disabledBackgroundColor: isDark
-                  ? const Color(0xFF1C1C1E)
-                  : const Color(0xFFE5E5E5),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: 0,
-            ),
-            child: _isStarting
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'পরীক্ষা শুরু করো',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w900,
-                          fontFamily: 'HindSiliguri',
+                            Icon(
+                              LucideIcons.chevronDown,
+                              size: 18,
+                              color: isDark
+                                  ? const Color(0xFFA1A1AA)
+                                  : const Color(0xFF64748B),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      const Icon(
-                        LucideIcons.sparkles,
-                        size: 18,
-                        color: Colors.white,
+                    ),
+            ),
+            const SizedBox(height: 12),
+
+            // 2. Chapters & Topics
+            Opacity(
+              opacity: _selectedSubject == null ? 0.5 : 1.0,
+              child: IgnorePointer(
+                ignoring: _selectedSubject == null,
+                child: _CardContainer(
+                  isDark: isDark,
+                  title: 'অধ্যায় ও টপিক',
+                  icon: LucideIcons.list,
+                  tooltip: 'যে বিষয় ও অধ্যায়গুলোর ওপর পরীক্ষা দিতে চাও সেগুলো বেছে নাও',
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDropdownSelector(
+                        label: 'অধ্যায়',
+                        hint: 'সব অধ্যায়',
+                        value: _selectedChapters.isEmpty
+                            ? ''
+                            : _selectedChapters.length == _chapters.length
+                            ? 'সব অধ্যায়'
+                            : '${_selectedChapters.length}টি অধ্যায় নির্বাচিত',
+                        isDark: isDark,
+                        onTap: _showChapterDropdown,
+                        disabled: _chapters.isEmpty && _selectedSubject != null,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildDropdownSelector(
+                        label: 'টপিক',
+                        hint: 'সব টপিক',
+                        value: _selectedTopics.isEmpty
+                            ? ''
+                            : _selectedTopics.length == _topics.length
+                            ? 'সব টপিক'
+                            : '${_selectedTopics.length}টি টপিক নির্বাচিত',
+                        isDark: isDark,
+                        onTap: _showTopicDropdown,
+                        disabled: _selectedChapters.isEmpty || _topics.isEmpty,
                       ),
                     ],
                   ),
-          ),
-          const SizedBox(height: 40),
-        ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // 3. Exam Tools (Type, Difficulty, Mark, etc) - iOS Segmented Control
+            _CardContainer(
+              isDark: isDark,
+              title: 'পরীক্ষার ধরন',
+              icon: LucideIcons.settings,
+              tooltip: 'Academic: ক্লাসের সিলেবাস অনুযায়ী\nAdmission: বিশ্ববিদ্যালয় ও ইঞ্জিনিয়ারিং প্রশ্ন\nBoard: বিগত বোর্ড পরীক্ষার প্রশ্ন',
+              child: _buildSegmentedGroup(
+                items: const ['Academic', 'Admission', 'Board'],
+                selectedItems: _examTypes,
+                isDark: isDark,
+                onToggle: (t) {
+                  HapticFeedback.selectionClick();
+                  setState(() {
+                    if (_examTypes.contains(t) && _examTypes.length > 1) {
+                      _examTypes.remove(t);
+                    } else if (!_examTypes.contains(t)) {
+                      _examTypes.add(t);
+                    }
+                  });
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            _CardContainer(
+              isDark: isDark,
+              title: 'কঠিনতা',
+              icon: LucideIcons.activity,
+              tooltip: 'Easy: বেসিক ধারণা\nMedium: স্ট্যান্ডার্ড মান\nHard: চ্যালেঞ্জিং ও উচ্চতর দক্ষতা',
+              child: _buildSegmentedGroup(
+                items: const ['Easy', 'Medium', 'Hard'],
+                selectedItems: _difficulties,
+                isDark: isDark,
+                onToggle: (d) {
+                  HapticFeedback.selectionClick();
+                  setState(() {
+                    if (_difficulties.contains(d) && _difficulties.length > 1) {
+                      _difficulties.remove(d);
+                    } else if (!_difficulties.contains(d)) {
+                      _difficulties.add(d);
+                    }
+                  });
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // 4. Questions: Quick Presets + Stepper Counter
+            _CardContainer(
+              isDark: isDark,
+              title: 'প্রশ্নের সংখ্যা',
+              icon: LucideIcons.helpCircle,
+              tooltip: 'পরীক্ষায় মোট কতটি প্রশ্ন থাকবে তা নির্ধারণ করো',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Stepper row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'মোট প্রশ্ন:',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontFamily: 'HindSiliguri',
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                        ),
+                      ),
+                      _buildStepperControl(
+                        value: _questionCount,
+                        unit: 'টি',
+                        min: 5,
+                        max: 100,
+                        step: 5,
+                        isDark: isDark,
+                        onChanged: (val) {
+                          HapticFeedback.lightImpact();
+                          setState(() {
+                            _questionCount = val;
+                            _durationMinutes = val;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  // Quick Preset Pills
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [10, 15, 20, 25, 50, 100].map((count) {
+                      final isSelected = _questionCount == count;
+                      return _buildPresetPill(
+                        label: '$countটি',
+                        isSelected: isSelected,
+                        isDark: isDark,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          setState(() {
+                            _questionCount = count;
+                            _durationMinutes = count;
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // 5. Time: Quick Presets + Stepper Counter
+            _CardContainer(
+              isDark: isDark,
+              title: 'পরীক্ষার সময়',
+              icon: LucideIcons.clock,
+              tooltip: 'পরীক্ষার মোট সময় (মিনিট)',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Stepper row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'মোট সময়:',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontFamily: 'HindSiliguri',
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                        ),
+                      ),
+                      _buildStepperControl(
+                        value: _durationMinutes,
+                        unit: 'মি.',
+                        min: 5,
+                        max: 180,
+                        step: 5,
+                        isDark: isDark,
+                        onChanged: (val) {
+                          HapticFeedback.lightImpact();
+                          setState(() => _durationMinutes = val);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  // Quick Preset Pills
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [10, 15, 20, 25, 45, 60].map((mins) {
+                      final isSelected = _durationMinutes == mins;
+                      return _buildPresetPill(
+                        label: '$mins মি.',
+                        isSelected: isSelected,
+                        isDark: isDark,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          setState(() => _durationMinutes = mins);
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            _CardContainer(
+              isDark: isDark,
+              title: 'নেগেটিভ মার্কিং',
+              icon: LucideIcons.minusCircle,
+              tooltip: '-০.২৫: প্রতি ৪টি ভুল উত্তরের জন্য ১ নম্বর কাটা\n-০.৫০: প্রতি ২টি ভুল উত্তরের জন্য ১ নম্বর কাটা',
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [0.0, 0.25, 0.5]
+                    .map(
+                      (v) => _ToggleBox(
+                        label: v == 0.0 ? '০ (নেই)' : '-$v মার্ক',
+                        selected: _negativeMarking == v,
+                        isDark: isDark,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          setState(() => _negativeMarking = v);
+                        },
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Live Blueprint Capsule Summary
+            _buildLiveConfigBlueprint(isDark),
+            const SizedBox(height: 16),
+
+            // Start Button - Deep Green Theme Color
+            ElevatedButton(
+              onPressed: _isStarting
+                  ? null
+                  : () {
+                      HapticFeedback.mediumImpact();
+                      _startExam();
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF004633),
+                disabledBackgroundColor: const Color(0xFF004633).withValues(alpha: 0.6),
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 0,
+              ),
+              child: _isStarting
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text(
+                      'শুরু করো',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17.5,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'HindSiliguri',
+                      ),
+                    ),
+            ),
+            const SizedBox(height: 40),
+          ],
+        ),
       ),
     );
   }
@@ -867,12 +1136,14 @@ class _CardContainer extends StatelessWidget {
   final String title;
   final IconData icon;
   final Widget child;
+  final String? tooltip;
 
   const _CardContainer({
     required this.isDark,
     required this.title,
     required this.icon,
     required this.child,
+    this.tooltip,
   });
 
   @override
@@ -880,10 +1151,10 @@ class _CardContainer extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
+        color: isDark ? const Color(0xFF141416) : Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
         ),
         boxShadow: isDark
             ? []
@@ -900,7 +1171,13 @@ class _CardContainer extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 18, color: const Color(0xFF059669)),
+              Icon(
+                icon,
+                size: 18,
+                color: isDark
+                    ? const Color(0xFFA1A1AA)
+                    : const Color(0xFF475569),
+              ),
               const SizedBox(width: 8),
               Text(
                 title,
@@ -908,9 +1185,19 @@ class _CardContainer extends StatelessWidget {
                   fontSize: 16.5,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'HindSiliguri',
-                  color: isDark ? Colors.white : const Color(0xFF000000),
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
+              if (tooltip != null) ...[
+                const SizedBox(width: 6),
+                ObhyashTooltipIcon(
+                  message: tooltip!,
+                  size: 16,
+                  color: isDark
+                      ? const Color(0xFF71717A)
+                      : const Color(0xFF94A3B8),
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 14),
@@ -942,12 +1229,13 @@ class _ToggleBox extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
         decoration: BoxDecoration(
           color: selected
-              ? const Color(0xFF059669).withValues(alpha: isDark ? 0.2 : 0.1)
-              : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5)),
+              ? (isDark ? const Color(0xFF27272A) : const Color(0xFF0F172A))
+              : (isDark ? const Color(0xFF141416) : const Color(0xFFF8FAFC)),
           border: Border.all(
             color: selected
-                ? const Color(0xFF059669)
-                : (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5)),
+                ? (isDark ? const Color(0xFF71717A) : const Color(0xFF0F172A))
+                : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+            width: selected ? 1.2 : 1.0,
           ),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -961,10 +1249,10 @@ class _ToggleBox extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 fontFamily: 'HindSiliguri',
                 color: selected
-                    ? const Color(0xFF059669)
+                    ? Colors.white
                     : (isDark
-                          ? const Color(0xFFA3A3A3)
-                          : const Color(0xFF525252)),
+                        ? const Color(0xFFA1A1AA)
+                        : const Color(0xFF64748B)),
               ),
             ),
             if (selected) ...[
@@ -973,7 +1261,7 @@ class _ToggleBox extends StatelessWidget {
                 width: 6,
                 height: 6,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF059669),
+                  color: Colors.white,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -1010,7 +1298,7 @@ class _SubjectDropdownModal extends StatelessWidget {
         color: Colors.transparent,
         child: Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF0D0D0E) : Colors.white,
+            color: isDark ? const Color(0xFF000000) : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -1024,7 +1312,7 @@ class _SubjectDropdownModal extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isDark
                         ? const Color(0xFF27272A)
-                        : const Color(0xFFE5E5E5),
+                        : const Color(0xFFE2E8F0),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1042,15 +1330,15 @@ class _SubjectDropdownModal extends StatelessWidget {
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'HindSiliguri',
-                        color: isDark ? Colors.white : const Color(0xFF000000),
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(LucideIcons.x, size: 20),
                       color: isDark
-                          ? const Color(0xFFA3A3A3)
-                          : const Color(0xFF737373),
+                          ? const Color(0xFFA1A1AA)
+                          : const Color(0xFF64748B),
                     ),
                   ],
                 ),
@@ -1058,7 +1346,7 @@ class _SubjectDropdownModal extends StatelessWidget {
 
               const Divider(height: 1, thickness: 0.8),
 
-              // List of Subjects
+              // List of Subjects with 3-Tier Chorcha Categorization
               Expanded(
                 child: subjects.isEmpty
                     ? Center(
@@ -1066,101 +1354,176 @@ class _SubjectDropdownModal extends StatelessWidget {
                           'কোনো বিষয় পাওয়া যায়নি',
                           style: TextStyle(
                             color: isDark
-                                ? const Color(0xFFA3A3A3)
-                                : const Color(0xFF737373),
+                                ? const Color(0xFFA1A1AA)
+                                : const Color(0xFF64748B),
                             fontSize: 16,
                             fontFamily: 'HindSiliguri',
                           ),
                         ),
                       )
-                    : ListView.builder(
-                        controller: scrollController,
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 14,
-                        ),
-                        itemCount: subjects.length,
-                        itemBuilder: (context, index) {
-                          final subject = subjects[index];
-                          final isSelected = subject.id == selectedId;
+                    : Builder(
+                        builder: (context) {
+                          // Group subjects into Compulsory, Core, and Elective
+                          final compulsory = <SubjectItem>[];
+                          final core = <SubjectItem>[];
+                          final elective = <SubjectItem>[];
 
-                          final bg = isSelected
-                              ? (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9))
-                              : (isDark ? const Color(0xFF18181B) : const Color(0xFFFAFAFA));
+                          for (final s in subjects) {
+                            final catStr = s.category?.toLowerCase();
+                            final cat = (catStr == 'compulsory')
+                                ? SubjectCategoryType.compulsory
+                                : (catStr == 'elective')
+                                    ? SubjectCategoryType.elective
+                                    : (catStr == 'core'
+                                        ? SubjectCategoryType.core
+                                        : BanglaNameHelper.getSubjectCategory(s.id, s.name));
+                            switch (cat) {
+                              case SubjectCategoryType.compulsory:
+                                compulsory.add(s);
+                                break;
+                              case SubjectCategoryType.core:
+                                core.add(s);
+                                break;
+                              case SubjectCategoryType.elective:
+                                elective.add(s);
+                                break;
+                            }
+                          }
 
-                          final border = isSelected
-                              ? (isDark ? const Color(0xFF475569) : const Color(0xFF0F172A))
-                              : (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB));
+                          final sections = <({SubjectCategoryType type, List<SubjectItem> items})>[
+                            if (compulsory.isNotEmpty)
+                              (type: SubjectCategoryType.compulsory, items: compulsory),
+                            if (core.isNotEmpty)
+                              (type: SubjectCategoryType.core, items: core),
+                            if (elective.isNotEmpty)
+                              (type: SubjectCategoryType.elective, items: elective),
+                          ];
 
-                          final textColor = isSelected
-                              ? (isDark ? Colors.white : const Color(0xFF0F172A))
-                              : (isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155));
-
-                          final iconBg = isSelected
-                              ? (isDark ? Colors.white : const Color(0xFF0F172A))
-                              : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0));
-
-                          final iconColor = isSelected
-                              ? (isDark ? const Color(0xFF0F172A) : Colors.white)
-                              : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B));
-
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: InkWell(
-                              onTap: () => onSelect(subject.id),
-                              borderRadius: BorderRadius.circular(14),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: bg,
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                    color: border,
-                                    width: isSelected ? 1.4 : 1.0,
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 38,
-                                      height: 38,
-                                      decoration: BoxDecoration(
-                                        color: iconBg,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Icon(
-                                        LucideIcons.bookOpen,
-                                        size: 18,
-                                        color: iconColor,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 14),
-                                    Expanded(
-                                      child: Text(
-                                        subject.label,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: isSelected
-                                              ? FontWeight.w900
-                                              : FontWeight.w600,
-                                          fontFamily: 'HindSiliguri',
-                                          color: textColor,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    if (isSelected)
-                                      Icon(
-                                        Icons.check_circle_rounded,
-                                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                        size: 20,
-                                      ),
-                                  ],
-                                ),
-                              ),
+                          return ListView.builder(
+                            controller: scrollController,
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
                             ),
+                            itemCount: sections.length,
+                            itemBuilder: (context, sectionIndex) {
+                              final section = sections[sectionIndex];
+                              final title = BanglaNameHelper.getCategoryTitle(section.type);
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      top: sectionIndex == 0 ? 4 : 16,
+                                      bottom: 8,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 4,
+                                          height: 14,
+                                          decoration: BoxDecoration(
+                                            color: section.type == SubjectCategoryType.compulsory
+                                                ? const Color(0xFF3B82F6)
+                                                : (section.type == SubjectCategoryType.core
+                                                    ? const Color(0xFF10B981)
+                                                    : const Color(0xFF8B5CF6)),
+                                            borderRadius: BorderRadius.circular(2),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          title,
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700,
+                                            fontFamily: 'HindSiliguri',
+                                            color: isDark
+                                                ? const Color(0xFFA1A1AA)
+                                                : const Color(0xFF64748B),
+                                            letterSpacing: 0.2,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  ...section.items.map((subject) {
+                                    final isSelected = subject.id == selectedId;
+
+                                    final bg = isSelected
+                                        ? (isDark
+                                            ? const Color(0xFF27272A)
+                                            : const Color(0xFFF1F5F9))
+                                        : (isDark
+                                            ? const Color(0xFF141416)
+                                            : const Color(0xFFFAFAFA));
+
+                                    final border = isSelected
+                                        ? (isDark
+                                            ? const Color(0xFF71717A)
+                                            : const Color(0xFF0F172A))
+                                        : (isDark
+                                            ? const Color(0xFF27272A)
+                                            : const Color(0xFFE2E8F0));
+
+                                    final textColor = isSelected
+                                        ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                                        : (isDark
+                                            ? const Color(0xFFD4D4D8)
+                                            : const Color(0xFF334155));
+
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: InkWell(
+                                        onTap: () => onSelect(subject.id),
+                                        borderRadius: BorderRadius.circular(14),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 13,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: bg,
+                                            borderRadius: BorderRadius.circular(14),
+                                            border: Border.all(
+                                              color: border,
+                                              width: isSelected ? 1.4 : 1.0,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  subject.label,
+                                                  style: TextStyle(
+                                                    fontSize: 15.5,
+                                                    fontWeight: isSelected
+                                                        ? FontWeight.w900
+                                                        : FontWeight.w600,
+                                                    fontFamily: 'HindSiliguri',
+                                                    color: textColor,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (isSelected)
+                                                Icon(
+                                                  Icons.check_circle_rounded,
+                                                  color: isDark
+                                                      ? Colors.white
+                                                      : const Color(0xFF0F172A),
+                                                  size: 20,
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              );
+                            },
                           );
                         },
                       ),
@@ -1269,7 +1632,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                   decoration: BoxDecoration(
                     color: isDark
                         ? const Color(0xFF27272A)
-                        : const Color(0xFFE5E5E5),
+                        : const Color(0xFFE2E8F0),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1277,10 +1640,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
 
               // Header
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.fromLTRB(20, 8, 12, 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -1289,69 +1649,68 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : const Color(0xFF000000),
+                        fontFamily: 'HindSiliguri',
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(LucideIcons.x, size: 20),
                       color: isDark
-                          ? const Color(0xFFA3A3A3)
-                          : const Color(0xFF737373),
+                          ? const Color(0xFFA1A1AA)
+                          : const Color(0xFF64748B),
                     ),
                   ],
                 ),
               ),
 
-              // Search Bar & Select All
+              const Divider(height: 1, thickness: 0.8),
+
+              // Search & Select All
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
                 child: Row(
                   children: [
                     Expanded(
                       child: Container(
+                        height: 44,
                         decoration: BoxDecoration(
                           color: isDark
-                              ? const Color(0xFF1C1C1E)
-                              : const Color(0xFFF5F5F5),
-                          borderRadius: BorderRadius.circular(12),
+                              ? const Color(0xFF18181B)
+                              : const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: isDark
                                 ? const Color(0xFF27272A)
-                                : const Color(0xFFE5E5E5),
+                                : const Color(0xFFE2E8F0),
                           ),
                         ),
                         child: TextField(
                           controller: _searchController,
-                          onChanged: (val) =>
-                              setState(() => _searchQuery = val),
+                          onChanged: (v) => setState(() => _searchQuery = v),
                           style: TextStyle(
-                            color: isDark
-                                ? Colors.white
-                                : const Color(0xFF000000),
-                            fontSize: 16,
+                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            fontSize: 15,
                           ),
                           decoration: InputDecoration(
-                            hintText: widget.searchHint,
+                            hintText: 'খুঁজুন...',
                             hintStyle: TextStyle(
                               color: isDark
-                                  ? const Color(0xFFA3A3A3)
-                                  : const Color(0xFFA3A3A3),
+                                  ? const Color(0xFF71717A)
+                                  : const Color(0xFF94A3B8),
+                              fontSize: 14,
                             ),
                             prefixIcon: Icon(
                               LucideIcons.search,
-                              size: 18,
+                              size: 16,
                               color: isDark
-                                  ? const Color(0xFFA3A3A3)
-                                  : const Color(0xFFA3A3A3),
+                                  ? const Color(0xFFA1A1AA)
+                                  : const Color(0xFF64748B),
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16,
-                              vertical: 14,
+                              vertical: 12,
                             ),
                           ),
                         ),
@@ -1368,23 +1727,24 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                         ),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? const Color(0xFF1C1C1E)
-                              : const Color(0xFFF5F5F5),
+                              ? const Color(0xFF18181B)
+                              : const Color(0xFFF8FAFC),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: isDark
                                 ? const Color(0xFF27272A)
-                                : const Color(0xFFE5E5E5),
+                                : const Color(0xFFE2E8F0),
                           ),
                         ),
                         child: Text(
                           'সবগুলো',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
+                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF000000),
+                                : const Color(0xFF0F172A),
                           ),
                         ),
                       ),
@@ -1403,9 +1763,10 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                           'কোনো তথ্য পাওয়া যায়নি',
                           style: TextStyle(
                             color: isDark
-                                ? const Color(0xFFA3A3A3)
-                                : const Color(0xFF737373),
-                            fontSize: 17,
+                                ? const Color(0xFFA1A1AA)
+                                : const Color(0xFF64748B),
+                            fontSize: 16,
+                            fontFamily: 'HindSiliguri',
                           ),
                         ),
                       )
@@ -1431,17 +1792,22 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: isSelected
-                                      ? const Color(
-                                          0xFF059669,
-                                        ).withValues(alpha: 0.1)
-                                      : Colors.transparent,
+                                      ? (isDark
+                                          ? const Color(0xFF27272A)
+                                          : const Color(0xFFF1F5F9))
+                                      : (isDark
+                                          ? const Color(0xFF141416)
+                                          : Colors.transparent),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
                                     color: isSelected
-                                        ? const Color(
-                                            0xFF059669,
-                                          ).withValues(alpha: 0.3)
-                                        : Colors.transparent,
+                                        ? (isDark
+                                            ? const Color(0xFF71717A)
+                                            : const Color(0xFF0F172A))
+                                        : (isDark
+                                            ? const Color(0xFF27272A)
+                                            : const Color(0xFFE2E8F0)),
+                                    width: isSelected ? 1.4 : 1.0,
                                   ),
                                 ),
                                 child: Row(
@@ -1451,48 +1817,574 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                       height: 24,
                                       decoration: BoxDecoration(
                                         color: isSelected
-                                            ? const Color(0xFF059669)
+                                            ? (isDark
+                                                ? Colors.white
+                                                : const Color(0xFF0F172A))
                                             : Colors.transparent,
                                         border: Border.all(
                                           color: isSelected
-                                              ? const Color(0xFF059669)
+                                              ? (isDark
+                                                  ? Colors.white
+                                                  : const Color(0xFF0F172A))
                                               : (isDark
-                                                    ? const Color(0xFF525252)
-                                                    : const Color(0xFFA3A3A3)),
-                                          width: 2,
+                                                  ? const Color(0xFF52525B)
+                                                  : const Color(0xFFCBD5E1)),
+                                          width: 1.8,
                                         ),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: isSelected
-                                          ? const Icon(
+                                          ? Icon(
                                               LucideIcons.check,
-                                              size: 16,
-                                              color: Colors.white,
+                                              size: 14,
+                                              color: isDark
+                                                  ? const Color(0xFF000000)
+                                                  : Colors.white,
                                             )
                                           : null,
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
-                                      child: Text(
-                                        name,
+                                      child: LatexText(
+                                        text: name,
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 15.5,
+                                          fontFamily: 'HindSiliguri',
                                           fontWeight: isSelected
                                               ? FontWeight.bold
                                               : FontWeight.w600,
                                           color: isSelected
-                                              ? const Color(0xFF059669)
+                                              ? (isDark
+                                                  ? Colors.white
+                                                  : const Color(0xFF0F172A))
                                               : (isDark
-                                                    ? Colors.white
-                                                    : const Color(0xFF000000)),
+                                                  ? const Color(0xFFD4D4D8)
+                                                  : const Color(0xFF334155)),
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+
+              // Footer Save Button - Deep Green Theme Button
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        widget.onSave(_currentSelected);
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF004633),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'সংরক্ষণ করো (${_currentSelected.length})',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TopicCollapsibleSelectionModal extends StatefulWidget {
+  final List<ChapterItem> chapters;
+  final List<TopicItem> topics;
+  final Set<String> selectedTopicIds;
+  final void Function(Set<String>) onSave;
+
+  const _TopicCollapsibleSelectionModal({
+    required this.chapters,
+    required this.topics,
+    required this.selectedTopicIds,
+    required this.onSave,
+  });
+
+  @override
+  State<_TopicCollapsibleSelectionModal> createState() =>
+      _TopicCollapsibleSelectionModalState();
+}
+
+class _TopicCollapsibleSelectionModalState
+    extends State<_TopicCollapsibleSelectionModal> {
+  String _searchQuery = '';
+  final _searchController = TextEditingController();
+  late Set<String> _currentSelected;
+  final Set<String> _expandedChapterIds = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _currentSelected = Set.from(widget.selectedTopicIds);
+    for (final c in widget.chapters) {
+      _expandedChapterIds.add(c.id);
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _toggleTopic(String topicId) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      if (_currentSelected.contains(topicId)) {
+        _currentSelected.remove(topicId);
+      } else {
+        _currentSelected.add(topicId);
+      }
+    });
+  }
+
+  void _toggleChapterAll(String chapterId, List<TopicItem> chapterTopics) {
+    HapticFeedback.selectionClick();
+    final topicIds = chapterTopics.map((t) => t.id).toSet();
+    final isAllSelected = topicIds.every((id) => _currentSelected.contains(id));
+
+    setState(() {
+      if (isAllSelected) {
+        _currentSelected.removeAll(topicIds);
+      } else {
+        _currentSelected.addAll(topicIds);
+      }
+    });
+  }
+
+  void _toggleSelectAll(List<TopicItem> filteredTopics) {
+    HapticFeedback.selectionClick();
+    final allIds = filteredTopics.map((t) => t.id).toSet();
+    final allSelected = allIds.every((id) => _currentSelected.contains(id));
+
+    setState(() {
+      if (allSelected) {
+        _currentSelected.removeAll(allIds);
+      } else {
+        _currentSelected.addAll(allIds);
+      }
+    });
+  }
+
+  void _toggleExpand(String chapterId) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      if (_expandedChapterIds.contains(chapterId)) {
+        _expandedChapterIds.remove(chapterId);
+      } else {
+        _expandedChapterIds.add(chapterId);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final query = _searchQuery.trim().toLowerCase();
+    final filteredTopics = widget.topics.where((t) {
+      if (query.isEmpty) return true;
+      return t.name.toLowerCase().contains(query);
+    }).toList();
+
+    final Map<String, List<TopicItem>> topicsByChapter = {};
+    for (final t in filteredTopics) {
+      topicsByChapter.putIfAbsent(t.chapterId, () => []).add(t);
+    }
+
+    final visibleChapters = widget.chapters.where((c) {
+      return topicsByChapter.containsKey(c.id) && topicsByChapter[c.id]!.isNotEmpty;
+    }).toList();
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.75,
+      minChildSize: 0.45,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (_, scrollController) => Material(
+        color: Colors.transparent,
+        child: Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF000000) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              // Drag Handle
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF27272A)
+                        : const Color(0xFFE2E8F0),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+
+              // Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 12, 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'টপিক নির্বাচন করো',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'HindSiliguri',
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(LucideIcons.x, size: 20),
+                      color: isDark
+                          ? const Color(0xFFA1A1AA)
+                          : const Color(0xFF64748B),
+                    ),
+                  ],
+                ),
+              ),
+
+              const Divider(height: 1, thickness: 0.8),
+
+              // Search & Select All
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF18181B)
+                              : const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0xFF27272A)
+                                : const Color(0xFFE2E8F0),
+                          ),
+                        ),
+                        child: TextField(
+                          controller: _searchController,
+                          onChanged: (v) => setState(() => _searchQuery = v),
+                          style: TextStyle(
+                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            fontSize: 15,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'টপিক খুঁজুন...',
+                            hintStyle: TextStyle(
+                              color: isDark
+                                  ? const Color(0xFF71717A)
+                                  : const Color(0xFF94A3B8),
+                              fontSize: 14,
+                            ),
+                            prefixIcon: Icon(
+                              LucideIcons.search,
+                              size: 16,
+                              color: isDark
+                                  ? const Color(0xFFA1A1AA)
+                                  : const Color(0xFF64748B),
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    InkWell(
+                      onTap: () => _toggleSelectAll(filteredTopics),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF18181B)
+                              : const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0xFF27272A)
+                                : const Color(0xFFE2E8F0),
+                          ),
+                        ),
+                        child: Text(
+                          'সবগুলো',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'HindSiliguri',
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF0F172A),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              // Collapsible Chapter & Topics List
+              Expanded(
+                child: visibleChapters.isEmpty
+                    ? Center(
+                        child: Text(
+                          'কোনো টপিক পাওয়া যায়নি',
+                          style: TextStyle(
+                            color: isDark
+                                ? const Color(0xFFA1A1AA)
+                                : const Color(0xFF64748B),
+                            fontSize: 16,
+                            fontFamily: 'HindSiliguri',
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        controller: scrollController,
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 6,
+                        ),
+                        itemCount: visibleChapters.length,
+                        itemBuilder: (context, chapterIdx) {
+                          final chapter = visibleChapters[chapterIdx];
+                          final chapterTopics = topicsByChapter[chapter.id] ?? [];
+                          final isExpanded = query.isNotEmpty || _expandedChapterIds.contains(chapter.id);
+                          final selectedInChapterCount = chapterTopics
+                              .where((t) => _currentSelected.contains(t.id))
+                              .length;
+                          final isAllInChapterSelected = chapterTopics.isNotEmpty &&
+                              selectedInChapterCount == chapterTopics.length;
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF141416) : Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: selectedInChapterCount > 0
+                                    ? (isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1))
+                                    : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                // Chapter Header
+                                InkWell(
+                                  onTap: () => _toggleExpand(chapter.id),
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 12,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        // Chapter Checkbox for quick batch selection
+                                        GestureDetector(
+                                          onTap: () => _toggleChapterAll(chapter.id, chapterTopics),
+                                          child: Container(
+                                            width: 22,
+                                            height: 22,
+                                            decoration: BoxDecoration(
+                                              color: isAllInChapterSelected
+                                                  ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                                                  : (selectedInChapterCount > 0
+                                                      ? (isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0))
+                                                      : Colors.transparent),
+                                              border: Border.all(
+                                                color: selectedInChapterCount > 0
+                                                    ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                                                    : (isDark ? const Color(0xFF52525B) : const Color(0xFFCBD5E1)),
+                                                width: 1.6,
+                                              ),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: isAllInChapterSelected
+                                                ? Icon(
+                                                    LucideIcons.check,
+                                                    size: 13,
+                                                    color: isDark ? const Color(0xFF000000) : Colors.white,
+                                                  )
+                                                : (selectedInChapterCount > 0
+                                                    ? Center(
+                                                        child: Container(
+                                                          width: 8,
+                                                          height: 2,
+                                                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                                        ),
+                                                      )
+                                                    : null),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              LatexText(
+                                                text: chapter.name,
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w800,
+                                                  fontFamily: 'HindSiliguri',
+                                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                '$selectedInChapterCount/${chapterTopics.length}টি টপিক নির্বাচিত',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontFamily: 'HindSiliguri',
+                                                  fontWeight: FontWeight.w600,
+                                                  color: selectedInChapterCount > 0
+                                                      ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
+                                                      : (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8)),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Icon(
+                                          isExpanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
+                                          size: 18,
+                                          color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+                                // Expanded Topic Items
+                                if (isExpanded) ...[
+                                  Divider(
+                                    height: 1,
+                                    thickness: 0.8,
+                                    color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                                  ),
+                                  ListView.separated(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+                                    itemCount: chapterTopics.length,
+                                    separatorBuilder: (context, index) => const SizedBox(height: 6),
+                                    itemBuilder: (context, topicIdx) {
+                                      final topic = chapterTopics[topicIdx];
+                                      final isSelected = _currentSelected.contains(topic.id);
+
+                                      return InkWell(
+                                        onTap: () => _toggleTopic(topic.id),
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 10,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? (isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9))
+                                                : (isDark ? const Color(0xFF18181B) : const Color(0xFFFAFAFA)),
+                                            borderRadius: BorderRadius.circular(10),
+                                            border: Border.all(
+                                              color: isSelected
+                                                  ? (isDark ? const Color(0xFF71717A) : const Color(0xFF0F172A))
+                                                  : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                                              width: isSelected ? 1.2 : 1.0,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                width: 20,
+                                                height: 20,
+                                                decoration: BoxDecoration(
+                                                  color: isSelected
+                                                      ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                                                      : Colors.transparent,
+                                                  border: Border.all(
+                                                    color: isSelected
+                                                        ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                                                        : (isDark ? const Color(0xFF52525B) : const Color(0xFFCBD5E1)),
+                                                    width: 1.6,
+                                                  ),
+                                                  borderRadius: BorderRadius.circular(5),
+                                                ),
+                                                child: isSelected
+                                                    ? Icon(
+                                                        LucideIcons.check,
+                                                        size: 12,
+                                                        color: isDark ? const Color(0xFF000000) : Colors.white,
+                                                      )
+                                                    : null,
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                child: LatexText(
+                                                  text: topic.name,
+                                                  style: TextStyle(
+                                                    fontSize: 14.5,
+                                                    fontFamily: 'HindSiliguri',
+                                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                                    color: isSelected
+                                                        ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                                                        : (isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155)),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ],
                             ),
                           );
                         },
@@ -1507,23 +2399,25 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
+                        HapticFeedback.selectionClick();
                         widget.onSave(_currentSelected);
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF059669),
+                        backgroundColor: const Color(0xFF004633),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                         elevation: 0,
                       ),
                       child: Text(
-                        'সংরক্ষণ করো (${_currentSelected.length})',
+                        'সংরক্ষণ করো (${_currentSelected.length}টি টপিক)',
                         style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                          fontFamily: 'HindSiliguri',
                         ),
                       ),
                     ),

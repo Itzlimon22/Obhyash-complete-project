@@ -10,6 +10,7 @@ import 'widgets/question_card.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 import 'package:obhyash_app/core/utils/bangla_name_helper.dart';
 import 'package:obhyash_app/core/providers/theme_provider.dart';
+import '../../../core/presentation/widgets/obhyash_tooltip.dart';
 
 class ExamRunnerView extends ConsumerStatefulWidget {
   const ExamRunnerView({super.key});
@@ -42,6 +43,10 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
       if (appLifecycleState == AppLifecycleState.paused) {
         _backgroundWarnings++;
       } else if (appLifecycleState == AppLifecycleState.resumed) {
+        // 1. Immediately synchronize timer to absolute timestamp (prevent background freeze)
+        ref.read(examEngineProvider.notifier).syncTimerOnResume();
+
+        // 2. Anti-cheat integrity check
         if (_backgroundWarnings == 1) {
           _showCheatingWarning();
         } else if (_backgroundWarnings >= 2) {
@@ -622,70 +627,78 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // LEFT: Answered / Total
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        '$answeredCount / $totalCount',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w900,
-                          color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
+                    ObhyashTooltip(
+                      message: 'উত্তর দেওয়া প্রশ্ন / মোট প্রশ্নের সংখ্যা',
+                      preferredPosition: TooltipPosition.bottom,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '$answeredCount / $totalCount',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900,
+                            color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
+                          ),
                         ),
                       ),
                     ),
                     
                     // MIDDLE: Timer box
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: state.timeLeft < 60
-                            ? const Color(0xFFDC2626) // Critical
-                            : state.timeLeft < 300
-                                ? (isDark ? const Color(0xFF451A03) : const Color(0xFFFFFBEB)) // Warning
-                                : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9)), // Normal
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
+                    ObhyashTooltip(
+                      message: 'অবশিষ্ট সময়। সময় শেষ হলে পরীক্ষা স্বয়ংক্রিয়ভাবে জমা হয়ে যাবে।',
+                      preferredPosition: TooltipPosition.bottom,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
                           color: state.timeLeft < 60
-                              ? const Color(0xFFDC2626)
+                              ? const Color(0xFFDC2626) // Critical
                               : state.timeLeft < 300
-                                  ? (isDark ? const Color(0xFFB45309) : const Color(0xFFFDE68A))
-                                  : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
-                        ),
-                        boxShadow: state.timeLeft < 60 
-                            ? [BoxShadow(color: const Color(0xFFDC2626).withValues(alpha: 0.3), blurRadius: 8, spreadRadius: 2)]
-                            : [],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.timer_outlined,
-                            size: 14,
+                                  ? (isDark ? const Color(0xFF451A03) : const Color(0xFFFFFBEB)) // Warning
+                                  : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9)), // Normal
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
                             color: state.timeLeft < 60
-                                ? Colors.white
+                                ? const Color(0xFFDC2626)
                                 : state.timeLeft < 300
-                                    ? (isDark ? const Color(0xFFFCD34D) : const Color(0xFFB45309))
-                                    : (isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569)),
+                                    ? (isDark ? const Color(0xFFB45309) : const Color(0xFFFDE68A))
+                                    : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            _formatTime(state.timeLeft),
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              fontFamily: 'monospace',
+                          boxShadow: state.timeLeft < 60 
+                              ? [BoxShadow(color: const Color(0xFFDC2626).withValues(alpha: 0.3), blurRadius: 8, spreadRadius: 2)]
+                              : [],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.timer_outlined,
+                              size: 14,
                               color: state.timeLeft < 60
                                   ? Colors.white
                                   : state.timeLeft < 300
                                       ? (isDark ? const Color(0xFFFCD34D) : const Color(0xFFB45309))
-                                      : (isDark ? const Color(0xFFF5F5F5) : const Color(0xFF27272A)),
+                                      : (isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569)),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Text(
+                              _formatTime(state.timeLeft),
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900,
+                                fontFamily: 'monospace',
+                                color: state.timeLeft < 60
+                                    ? Colors.white
+                                    : state.timeLeft < 300
+                                        ? (isDark ? const Color(0xFFFCD34D) : const Color(0xFFB45309))
+                                        : (isDark ? const Color(0xFFF5F5F5) : const Color(0xFF27272A)),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     
@@ -693,69 +706,75 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        InkWell(
-                          onTap: () async {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...'),
-                                behavior: SnackBarBehavior.floating,
-                                duration: Duration(seconds: 2),
+                        ObhyashTooltip(
+                          message: 'অফলাইন প্রশ্নপত্র PDF ডাউনলোড করো',
+                          preferredPosition: TooltipPosition.bottom,
+                          child: InkWell(
+                            onTap: () async {
+                              AppPopups.show(
+                                context,
+                                message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...',
+                                isError: false,
+                              );
+                              
+                              final dummyResult = ExamResult(
+                                id: 'dummy',
+                                subject: state.examDetails?.subject ?? 'general',
+                                subjectLabel: state.examDetails?.subjectLabel,
+                                examType: state.examDetails?.examType ?? '',
+                                date: DateTime.now().toIso8601String(),
+                                score: 0,
+                                totalMarks: state.questions.fold(0.0, (sum, q) => sum + q.points),
+                                totalQuestions: state.questions.length,
+                                correctCount: 0,
+                                wrongCount: 0,
+                                timeTaken: 0,
+                                negativeMarking: state.examDetails?.negativeMarking ?? 0.0,
+                                questions: state.questions,
+                                flaggedQuestions: [],
+                                submissionType: 'online',
+                                status: 'active',
+                                userAnswers: {},
+                              );
+                              
+                              await PdfDownloadService.downloadQuestionPaper(dummyResult, context);
+                            },
+                            borderRadius: BorderRadius.circular(6),
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(6),
                               ),
-                            );
-                            
-                            final dummyResult = ExamResult(
-                              id: 'dummy',
-                              subject: state.examDetails?.subject ?? 'general',
-                              subjectLabel: state.examDetails?.subjectLabel,
-                              examType: state.examDetails?.examType ?? '',
-                              date: DateTime.now().toIso8601String(),
-                              score: 0,
-                              totalMarks: state.questions.fold(0.0, (sum, q) => sum + q.points),
-                              totalQuestions: state.questions.length,
-                              correctCount: 0,
-                              wrongCount: 0,
-                              timeTaken: 0,
-                              negativeMarking: state.examDetails?.negativeMarking ?? 0.0,
-                              questions: state.questions,
-                              flaggedQuestions: [],
-                              submissionType: 'online',
-                              status: 'active',
-                              userAnswers: {},
-                            );
-                            
-                            await PdfDownloadService.downloadQuestionPaper(dummyResult, context);
-                          },
-                          borderRadius: BorderRadius.circular(6),
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Icon(
-                              Icons.download_rounded,
-                              size: 16,
-                              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
+                              child: Icon(
+                                Icons.download_rounded,
+                                size: 16,
+                                color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 6),
                         // Theme Toggle Button
-                        InkWell(
-                          onTap: () {
-                            ref.read(themeModeProvider.notifier).toggle();
-                          },
-                          borderRadius: BorderRadius.circular(6),
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Icon(
-                              isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                              size: 16,
-                              color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
+                        ObhyashTooltip(
+                          message: isDark ? 'লাইট মোড' : 'ডার্ক মোড',
+                          preferredPosition: TooltipPosition.bottom,
+                          child: InkWell(
+                            onTap: () {
+                              ref.read(themeModeProvider.notifier).toggle();
+                            },
+                            borderRadius: BorderRadius.circular(6),
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Icon(
+                                isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                                size: 16,
+                                color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
+                              ),
                             ),
                           ),
                         ),
@@ -874,7 +893,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
 
 // ─── Ultra-Premium Exam Instruction Screen ───────────────────────────────────
 
-class _ExamInstructionScreen extends StatelessWidget {
+class _ExamInstructionScreen extends StatefulWidget {
   final ExamEngineState state;
   final bool isDark;
   final VoidCallback onStart;
@@ -886,46 +905,76 @@ class _ExamInstructionScreen extends StatelessWidget {
   });
 
   @override
+  State<_ExamInstructionScreen> createState() => _ExamInstructionScreenState();
+}
+
+class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulseCtrl;
+  late final Animation<double> _pulseAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+    _pulseAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final details = state.examDetails;
+    final isDark = widget.isDark;
+    final details = widget.state.examDetails;
     final subjectTitle = BanglaNameHelper.formatSubject(
       details?.subject,
       details?.subjectLabel,
     );
     final duration = details?.durationMinutes ?? 0;
-    final totalQ = details?.totalQuestions ?? state.questions.length;
+    final totalQ = details?.totalQuestions ?? widget.state.questions.length;
     final negMark = details?.negativeMarking ?? 0.0;
     final chapters = details?.chapters ?? '';
 
+    final bg = isDark ? const Color(0xFF09090B) : const Color(0xFFF4F6FA);
+    final cardBg = isDark ? const Color(0xFF111113) : Colors.white;
+    final border = isDark ? const Color(0xFF222226) : const Color(0xFFE4E9F0);
+    final accent = const Color(0xFF059669);
+    final accentGlow = const Color(0xFF34D399);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textSub = isDark ? const Color(0xFF71717A) : const Color(0xFF64748B);
+
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF09090B) : const Color(0xFFF8FAFC),
+      backgroundColor: bg,
       appBar: AppBar(
         backgroundColor: isDark ? const Color(0xFF09090B) : Colors.white,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(
-            LucideIcons.arrowLeft,
-            color: isDark ? Colors.white : const Color(0xFF0F172A),
-            size: 20,
-          ),
+          icon: Icon(LucideIcons.arrowLeft, color: textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'পরীক্ষার নির্দেশাবলী',
           style: TextStyle(
-            fontSize: 17,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             fontFamily: 'HindSiliguri',
-            color: isDark ? Colors.white : const Color(0xFF0F172A),
+            color: textPrimary,
           ),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(
-            color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-            height: 1,
-          ),
+          child: Container(color: border, height: 1),
         ),
       ),
       body: SafeArea(
@@ -934,251 +983,305 @@ class _ExamInstructionScreen extends StatelessWidget {
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                padding: const EdgeInsets.fromLTRB(18, 20, 18, 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // 1. Hero Badge & Subject Banner
+
+                    // ── 1. Hero Subject Card ──────────────────────────────
                     Container(
-                      padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: isDark
-                              ? [const Color(0xFF141F1B), const Color(0xFF18221E)]
-                              : [const Color(0xFFECFDF5), const Color(0xFFF0FDF4)],
+                              ? [const Color(0xFF0B1A14), const Color(0xFF0E1F18)]
+                              : [const Color(0xFFE8F9F3), const Color(0xFFF0FDF7)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(22),
                         border: Border.all(
-                          color: const Color(0xFF059669).withValues(alpha: isDark ? 0.35 : 0.2),
+                          color: accent.withValues(alpha: isDark ? 0.28 : 0.18),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF059669).withValues(alpha: isDark ? 0.15 : 0.04),
-                            blurRadius: 14,
-                            offset: const Offset(0, 4),
+                            color: accent.withValues(alpha: isDark ? 0.12 : 0.06),
+                            blurRadius: 24,
+                            offset: const Offset(0, 6),
                           ),
                         ],
                       ),
-                      child: Column(
+                      child: Stack(
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 44,
-                                height: 44,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF059669),
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFF059669).withValues(alpha: 0.35),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: const Center(
-                                  child: Icon(
-                                    LucideIcons.fileSpreadsheet,
-                                    color: Colors.white,
-                                    size: 22,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF059669).withValues(alpha: 0.15),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: const Text(
-                                        'অনলাইন পরীক্ষা',
-                                        style: TextStyle(
-                                          fontSize: 11.5,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'HindSiliguri',
-                                          color: Color(0xFF059669),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      subjectTitle,
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w900,
-                                        fontFamily: 'HindSiliguri',
-                                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (chapters.isNotEmpty && chapters != 'All') ...[
-                            const SizedBox(height: 12),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          // Decorative circle accent top-right
+                          Positioned(
+                            right: -20,
+                            top: -20,
+                            child: Container(
+                              width: 90,
+                              height: 90,
                               decoration: BoxDecoration(
-                                color: isDark ? const Color(0xFF0D1512) : Colors.white.withValues(alpha: 0.8),
-                                borderRadius: BorderRadius.circular(10),
+                                shape: BoxShape.circle,
+                                color: accent.withValues(alpha: 0.06),
                               ),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    LucideIcons.bookmark,
-                                    size: 14,
-                                    color: Color(0xFF059669),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      BanglaNameHelper.formatChapter(chapters),
-                                      style: TextStyle(
-                                        fontSize: 12.5,
-                                        fontFamily: 'HindSiliguri',
-                                        color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    // Icon box with glow
+                                    Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: accent,
+                                        borderRadius: BorderRadius.circular(14),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: accent.withValues(alpha: 0.4),
+                                            blurRadius: 14,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                                      child: const Icon(
+                                        LucideIcons.fileSpreadsheet,
+                                        color: Colors.white,
+                                        size: 22,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 14),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          // Badge pill
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 9, vertical: 3),
+                                            decoration: BoxDecoration(
+                                              color: accent.withValues(alpha: 0.15),
+                                              borderRadius: BorderRadius.circular(20),
+                                              border: Border.all(
+                                                color: accent.withValues(alpha: 0.3),
+                                                width: 0.8,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              'অনলাইন পরীক্ষা',
+                                              style: TextStyle(
+                                                fontSize: 10.5,
+                                                fontWeight: FontWeight.w700,
+                                                fontFamily: 'HindSiliguri',
+                                                color: isDark ? accentGlow : accent,
+                                                letterSpacing: 0.2,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Text(
+                                            subjectTitle,
+                                            style: TextStyle(
+                                              fontSize: 19,
+                                              fontWeight: FontWeight.w900,
+                                              fontFamily: 'HindSiliguri',
+                                              color: textPrimary,
+                                              height: 1.2,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (chapters.isNotEmpty && chapters != 'All') ...[
+                                  const SizedBox(height: 14),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: isDark
+                                          ? Colors.black.withValues(alpha: 0.3)
+                                          : Colors.white.withValues(alpha: 0.7),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color: accent.withValues(alpha: 0.18),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(LucideIcons.bookmark,
+                                            size: 13, color: accent),
+                                        const SizedBox(width: 7),
+                                        Expanded(
+                                          child: Text(
+                                            BanglaNameHelper.formatChapter(chapters),
+                                            style: TextStyle(
+                                              fontSize: 12.5,
+                                              fontFamily: 'HindSiliguri',
+                                              color: textSub,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
-                              ),
+                              ],
                             ),
-                          ],
+                          ),
                         ],
                       ),
                     ),
+
                     const SizedBox(height: 16),
 
-                    // 2. Parameter Grid (4 Quick Cards)
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _InstructionParamCard(
+                    // ── 2. Stat Ribbon ────────────────────────────────────
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: cardBg,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: border),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(
+                                alpha: isDark ? 0.25 : 0.04),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          _StatCell(
                             icon: LucideIcons.clock,
-                            iconColor: const Color(0xFF2563EB),
-                            title: 'সময়সীমা',
-                            value: '${BanglaNameHelper.toBanglaNumeral(duration)} মিনিট',
+                            iconColor: const Color(0xFF3B82F6),
+                            label: 'সময়সীমা',
+                            value:
+                                '${BanglaNameHelper.toBanglaNumeral(duration)} মিনিট',
                             isDark: isDark,
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _InstructionParamCard(
+                          _StatDivider(isDark: isDark),
+                          _StatCell(
                             icon: LucideIcons.helpCircle,
-                            iconColor: const Color(0xFF059669),
-                            title: 'মোট প্রশ্ন',
-                            value: '${BanglaNameHelper.toBanglaNumeral(totalQ)}টি MCQ',
+                            iconColor: accent,
+                            label: 'মোট প্রশ্ন',
+                            value:
+                                '${BanglaNameHelper.toBanglaNumeral(totalQ)}টি MCQ',
                             isDark: isDark,
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _InstructionParamCard(
+                          _StatDivider(isDark: isDark),
+                          _StatCell(
                             icon: LucideIcons.alertCircle,
-                            iconColor: negMark > 0 ? const Color(0xFFEA580C) : const Color(0xFF64748B),
-                            title: 'নেগেটিভ মার্ক',
-                            value: negMark > 0 ? '-${BanglaNameHelper.toBanglaNumeral(negMark)}' : 'নেই (০.০০)',
+                            iconColor: negMark > 0
+                                ? const Color(0xFFEA580C)
+                                : const Color(0xFF64748B),
+                            label: 'নেগেটিভ',
+                            value: negMark > 0
+                                ? '-${BanglaNameHelper.toBanglaNumeral(negMark)}'
+                                : 'নেই',
                             isDark: isDark,
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _InstructionParamCard(
+                          _StatDivider(isDark: isDark),
+                          _StatCell(
                             icon: LucideIcons.award,
                             iconColor: const Color(0xFF8B5CF6),
-                            title: 'পূর্ণমান',
-                            value: '${BanglaNameHelper.toBanglaNumeral(totalQ)} নম্বর',
+                            label: 'পূর্ণমান',
+                            value:
+                                '${BanglaNameHelper.toBanglaNumeral(totalQ)} নম্বর',
                             isDark: isDark,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 20),
 
-                    // 3. Rules & Guidelines
+                    const SizedBox(height: 16),
+
+                    // ── 3. Rules Card — Timeline Style ────────────────────
                     Container(
-                      padding: const EdgeInsets.all(18),
+                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF141416) : Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-                        ),
+                        color: cardBg,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: border),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(
+                                alpha: isDark ? 0.25 : 0.04),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Section header
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(6),
+                                padding: const EdgeInsets.all(7),
                                 decoration: BoxDecoration(
-                                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
-                                  borderRadius: BorderRadius.circular(8),
+                                  color: accent.withValues(
+                                      alpha: isDark ? 0.18 : 0.1),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: Icon(
-                                  LucideIcons.shieldAlert,
-                                  size: 16,
-                                  color: isDark ? Colors.white70 : const Color(0xFF0F172A),
-                                ),
+                                child: Icon(LucideIcons.shieldAlert,
+                                    size: 15, color: accent),
                               ),
                               const SizedBox(width: 10),
                               Text(
                                 'গুরুত্বপূর্ণ নির্দেশনাবলী',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.w900,
                                   fontFamily: 'HindSiliguri',
-                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  color: textPrimary,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
-                          _RuleBullet(
-                            number: '১',
-                            title: 'সঠিক উত্তর নির্বাচন:',
-                            desc: 'প্রতিটি প্রশ্নের ৪টি অপশন থাকবে। পছন্দের অপশনে ট্যাপ করে উত্তর নির্বাচন করো। সাবমিট করার পূর্ব পর্যন্ত পরিবর্তন সম্ভব।',
+                          const SizedBox(height: 18),
+                          _RuleItem(
+                            icon: LucideIcons.checkCircle2,
+                            iconColor: const Color(0xFF10B981),
+                            title: 'সঠিক উত্তর নির্বাচন',
+                            desc: 'প্রতিটি প্রশ্নে ৪টি অপশন থাকবে। পছন্দের অপশনে ট্যাপ করে উত্তর দাও। সাবমিটের আগে যেকোনো সময় পরিবর্তন করা যাবে।',
                             isDark: isDark,
+                            isLast: false,
                           ),
-                          const SizedBox(height: 12),
-                          _RuleBullet(
-                            number: '২',
-                            title: 'টাইমার ও স্বয়ংক্রিয় সাবমিট:',
-                            desc: 'স্ক্রিনের শীর্ষে কাউন্টডাউন টাইমার চালু থাকবে। নির্ধারিত সময় শেষ হলে পরীক্ষা স্বয়ংক্রিয়ভাবে সমাপ্ত হয়ে রেজাল্ট দেখাবে।',
+                          _RuleItem(
+                            icon: LucideIcons.timer,
+                            iconColor: const Color(0xFF3B82F6),
+                            title: 'টাইমার ও স্বয়ংক্রিয় সাবমিট',
+                            desc: 'স্ক্রিনের শীর্ষে কাউন্টডাউন থাকবে। সময় শেষ হলে পরীক্ষা নিজেই সাবমিট হয়ে রেজাল্ট দেখাবে।',
                             isDark: isDark,
+                            isLast: false,
                           ),
-                          const SizedBox(height: 12),
-                          _RuleBullet(
-                            number: '৩',
-                            title: 'প্রশ্ন প্যালেট জাম্প:',
-                            desc: 'উপরের প্রশ্ন নম্বরে ট্যাপ করে যেকোনো প্রশ্নে সরাসরি চলে যেতে পারবে।',
+                          _RuleItem(
+                            icon: LucideIcons.layoutGrid,
+                            iconColor: const Color(0xFF8B5CF6),
+                            title: 'প্রশ্ন প্যালেট জাম্প',
+                            desc: 'উপরের প্রশ্ন নম্বরে ট্যাপ করে সরাসরি যেকোনো প্রশ্নে চলে যাও।',
                             isDark: isDark,
+                            isLast: false,
                           ),
-                          const SizedBox(height: 12),
-                          _RuleBullet(
-                            number: '৪',
-                            title: 'অ্যাপ ত্যাগ সতর্কতা:',
-                            desc: 'পরীক্ষা চলাকালে অ্যাপ থেকে বের হওয়া বা ব্যাকগ্রাউন্ডে রাখা যাবে না। অন্যথায় পরীক্ষা অকার্যকর হতে পারে।',
+                          _RuleItem(
+                            icon: LucideIcons.alertTriangle,
+                            iconColor: const Color(0xFFEF4444),
+                            title: 'অ্যাপ ত্যাগ সতর্কতা',
+                            desc: 'পরীক্ষা চলাকালে অ্যাপ থেকে বের বা ব্যাকগ্রাউন্ডে গেলে পরীক্ষা অকার্যকর হতে পারে।',
                             isDark: isDark,
+                            isLast: true,
                             isWarning: true,
                           ),
                         ],
@@ -1189,50 +1292,75 @@ class _ExamInstructionScreen extends StatelessWidget {
               ),
             ),
 
-            // 4. Fixed Bottom Floating Start Button
+            // ── 4. Bottom Glow CTA ────────────────────────────────────────
             Container(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF09090B) : Colors.white,
                 border: Border(
-                  top: BorderSide(
-                    color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-                    width: 1,
-                  ),
+                  top: BorderSide(color: border, width: 1),
                 ),
               ),
-              child: SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: onStart,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF004633),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    elevation: 2,
-                    shadowColor: const Color(0xFF004633).withValues(alpha: 0.35),
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'পরীক্ষা শুরু করো',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w900,
-                          fontFamily: 'HindSiliguri',
-                          color: Colors.white,
+              child: AnimatedBuilder(
+                animation: _pulseAnim,
+                builder: (context, child) {
+                  final glowOpacity = 0.22 + (_pulseAnim.value * 0.22);
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF059669).withValues(alpha: glowOpacity),
+                          blurRadius: 20 + (_pulseAnim.value * 12),
+                          spreadRadius: 0,
+                          offset: const Offset(0, 4),
                         ),
+                      ],
+                    ),
+                    child: child,
+                  );
+                },
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton(
+                    onPressed: widget.onStart,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF004633),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      SizedBox(width: 8),
-                      Icon(
-                        LucideIcons.arrowRight,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ],
+                      elevation: 0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'পরীক্ষা শুরু করো',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'HindSiliguri',
+                            color: Colors.white,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            LucideIcons.arrowRight,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -1244,70 +1372,64 @@ class _ExamInstructionScreen extends StatelessWidget {
   }
 }
 
-class _InstructionParamCard extends StatelessWidget {
+// ── Stat Cell (for horizontal ribbon) ────────────────────────────────────────
+
+class _StatCell extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
-  final String title;
+  final String label;
   final String value;
   final bool isDark;
 
-  const _InstructionParamCard({
+  const _StatCell({
     required this.icon,
     required this.iconColor,
-    required this.title,
+    required this.label,
     required this.value,
     required this.isDark,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF141416) : Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-        ),
-      ),
-      child: Row(
+    final subColor =
+        isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8);
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 34,
-            height: 34,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: isDark ? 0.2 : 0.1),
-              borderRadius: BorderRadius.circular(8),
+              color: iconColor.withValues(alpha: isDark ? 0.18 : 0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, size: 16, color: iconColor),
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    fontFamily: 'HindSiliguri',
-                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
-                  ),
-                ),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'HindSiliguri',
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'HindSiliguri',
+              color: textColor,
+              height: 1.1,
             ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10.5,
+              fontFamily: 'HindSiliguri',
+              color: subColor,
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -1315,73 +1437,119 @@ class _InstructionParamCard extends StatelessWidget {
   }
 }
 
-class _RuleBullet extends StatelessWidget {
-  final String number;
+class _StatDivider extends StatelessWidget {
+  final bool isDark;
+  const _StatDivider({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 44,
+      color: isDark ? const Color(0xFF27272A) : const Color(0xFFE9EFF6),
+    );
+  }
+}
+
+// ── Rule Item — timeline style ────────────────────────────────────────────────
+
+class _RuleItem extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
   final String title;
   final String desc;
   final bool isDark;
+  final bool isLast;
   final bool isWarning;
 
-  const _RuleBullet({
-    required this.number,
+  const _RuleItem({
+    required this.icon,
+    required this.iconColor,
     required this.title,
     required this.desc,
     required this.isDark,
+    this.isLast = false,
     this.isWarning = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 22,
-          height: 22,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: isWarning
-                ? const Color(0xFFDC2626).withValues(alpha: isDark ? 0.25 : 0.1)
-                : const Color(0xFF004633).withValues(alpha: isDark ? 0.25 : 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Text(
-            number,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'HindSiliguri',
-              color: isWarning ? const Color(0xFFDC2626) : const Color(0xFF004633),
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: RichText(
-            text: TextSpan(
-              style: TextStyle(
-                fontSize: 13,
-                fontFamily: 'HindSiliguri',
-                height: 1.4,
-                color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),
-              ),
-              children: [
-                TextSpan(
-                  text: '$title ',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: isWarning
-                        ? const Color(0xFFDC2626)
-                        : (isDark ? Colors.white : const Color(0xFF0F172A)),
+    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textSub =
+        isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569);
+    final lineColor =
+        isDark ? const Color(0xFF27272A) : const Color(0xFFE4E9F0);
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Timeline column
+          Column(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: isDark ? 0.18 : 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: iconColor.withValues(alpha: isDark ? 0.25 : 0.15),
                   ),
                 ),
-                TextSpan(text: desc),
-              ],
+                child: Icon(icon, size: 16, color: iconColor),
+              ),
+              if (!isLast)
+                Expanded(
+                  child: Container(
+                    width: 1.5,
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    decoration: BoxDecoration(
+                      color: lineColor,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+
+          const SizedBox(width: 12),
+
+          // Content
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 2),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'HindSiliguri',
+                      color: isWarning
+                          ? const Color(0xFFEF4444)
+                          : textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    desc,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      fontFamily: 'HindSiliguri',
+                      color: textSub,
+                      height: 1.45,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
-

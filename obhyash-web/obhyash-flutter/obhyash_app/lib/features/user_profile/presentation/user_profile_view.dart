@@ -313,11 +313,11 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                    color: isDark ? const Color(0xFF18181B) : Colors.white,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
                       color: isDark
-                          ? const Color(0xFF1C1C1E)
+                          ? const Color(0xFF27272A)
                           : const Color(0xFFE5E5E5),
                     ),
                     boxShadow: isDark
@@ -466,10 +466,10 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                    color: isDark ? const Color(0xFF18181B) : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+                      color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
                     ),
                   ),
                   child: Column(
@@ -497,7 +497,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                                 CircularProgressIndicator(
                                   value: 1.0,
                                   strokeWidth: 8,
-                                  color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9),
+                                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9),
                                 ),
                                 CircularProgressIndicator(
                                   value: analytics.totalExams > 0 ? (analytics.avgScore / 100.0) : 0,
@@ -567,7 +567,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                           runSpacing: 4,
                           children: List.generate(30, (index) {
                             final count = analytics.last30DaysActivity.isNotEmpty ? analytics.last30DaysActivity[index] : 0;
-                            Color boxColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF1F5F9);
+                            Color boxColor = isDark ? const Color(0xFF27272A) : const Color(0xFFF1F5F9);
                             if (count > 0) {
                               double opacity = 0.3;
                               if (count > 1) opacity = 0.6;
@@ -595,11 +595,11 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                      color: isDark ? const Color(0xFF18181B) : Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isDark
-                            ? const Color(0xFF1C1C1E)
+                            ? const Color(0xFF27272A)
                             : const Color(0xFFE5E5E5),
                       ),
                     ),
@@ -717,11 +717,11 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                 if (analytics.subjects.isNotEmpty)
                   Container(
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                      color: isDark ? const Color(0xFF18181B) : Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isDark
-                            ? const Color(0xFF1C1C1E)
+                            ? const Color(0xFF27272A)
                             : const Color(0xFFE5E5E5),
                       ),
                     ),
@@ -1145,9 +1145,9 @@ class _UPActivityComparisonChart extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5)),
+        border: Border.all(color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1168,7 +1168,7 @@ class _UPActivityComparisonChart extends StatelessWidget {
                 gridData: FlGridData(
                   show: true, 
                   drawVerticalLine: false, 
-                  getDrawingHorizontalLine: (val) => FlLine(color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5), strokeWidth: 1),
+                  getDrawingHorizontalLine: (val) => FlLine(color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5), strokeWidth: 1),
                 ),
                 titlesData: FlTitlesData(
                   show: true,
@@ -1284,15 +1284,15 @@ class _UPCompareCell extends StatelessWidget {
     final Color myColor = iWon ? const Color(0xFF059669) : const Color(0xFFB91C1C);
     final Color opColor = !iWon ? const Color(0xFF059669) : const Color(0xFFB91C1C);
     
-    final Color trackColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5);
+    final Color trackColor = isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5);
     final Color textColor = isDark ? Colors.white : const Color(0xFF000000);
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5)),
+        border: Border.all(color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -19,6 +19,8 @@ import '../features/reports/presentation/student_report_view.dart';
 import '../features/user_profile/presentation/user_profile_view.dart';
 import '../features/subject_report/presentation/subject_report_view.dart';
 import '../features/profile/presentation/about_us_view.dart';
+import '../features/profile/presentation/privacy_policy_view.dart';
+import '../features/profile/presentation/terms_conditions_view.dart';
 import '../features/profile/presentation/faq_view.dart';
 import '../features/leaderboard/presentation/leaderboard_view.dart';
 import '../features/analysis/presentation/analysis_view.dart';
@@ -30,6 +32,11 @@ import '../features/notifications/presentation/notifications_view.dart';
 import '../features/blog/presentation/blog_view.dart';
 import '../features/referral/presentation/referral_view.dart';
 import '../features/live_exam/presentation/live_exam_category_view.dart';
+import '../features/live_exam/presentation/live_exam_details_view.dart';
+import '../features/live_exam/presentation/live_exam_session_view.dart';
+import '../features/live_exam/presentation/live_exam_solution_view.dart';
+import '../features/live_exam/presentation/live_exam_leaderboard_view.dart';
+import '../features/live_exam/domain/models.dart';
 import '../features/profile/presentation/bookmarks_view.dart';
 import '../features/formulas/presentation/subjects/formula_subjects_view.dart';
 import '../features/formulas/presentation/chapters/formula_chapters_view.dart';
@@ -124,6 +131,54 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) =>
             _fadeRoute(const ExamRunnerView(), state),
       ),
+      GoRoute(
+        path: '/live_exam_details/:id',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final examId = state.pathParameters['id']!;
+          final exam = state.extra as LiveExam?;
+          return _fadeRoute(
+            LiveExamDetailsView(examId: examId, preloadedExam: exam),
+            state,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/live_exam_session/:id',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final examId = state.pathParameters['id']!;
+          final exam = state.extra as LiveExam?;
+          return _fadeRoute(
+            LiveExamSessionView(examId: examId, exam: exam),
+            state,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/live_exam_solution/:id',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final examId = state.pathParameters['id']!;
+          final exam = state.extra as LiveExam?;
+          return _fadeRoute(
+            LiveExamSolutionView(examId: examId, exam: exam),
+            state,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/live_exam_leaderboard/:id',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final examId = state.pathParameters['id']!;
+          final exam = state.extra as LiveExam?;
+          return _fadeRoute(
+            LiveExamLeaderboardView(examId: examId, exam: exam),
+            state,
+          );
+        },
+      ),
       // Stateful shell route for bottom tabs and drawer items
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -166,11 +221,19 @@ final routerProvider = Provider<GoRouter>((ref) {
                     },
                   ),
                   GoRoute(
-                    path: 'live_exam/:category',
-                    builder: (context, state) {
-                      final category = state.pathParameters['category']!;
-                      return LiveExamCategoryView(category: category);
-                    },
+                    path: 'live_exam',
+                    builder: (context, state) =>
+                        const LiveExamCategoryView(category: 'hsc'),
+                    routes: [
+                      GoRoute(
+                        path: ':category',
+                        builder: (context, state) {
+                          final category =
+                              state.pathParameters['category'] ?? 'hsc';
+                          return LiveExamCategoryView(category: category);
+                        },
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: 'formulas',
@@ -275,11 +338,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ),
                   GoRoute(
                     path: 'privacy',
-                    builder: (context, state) => const AboutUsView(initialPolicyId: 'privacy'),
+                    builder: (context, state) => const PrivacyPolicyView(),
                   ),
                   GoRoute(
                     path: 'terms',
-                    builder: (context, state) => const AboutUsView(initialPolicyId: 'terms'),
+                    builder: (context, state) => const TermsConditionsView(),
                   ),
                   GoRoute(
                     path: 'faq',

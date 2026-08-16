@@ -157,7 +157,7 @@ export const FlashcardMode: React.FC<FlashcardModeProps> = ({
         iconBorder = 'border-red-600 bg-red-600 text-white';
         iconText = '✕';
       } else {
-        bgClass = 'bg-neutral-50 dark:bg-neutral-800/40 opacity-60';
+        bgClass = 'bg-neutral-50 dark:bg-neutral-800/40 opacity-95';
       }
     } else if (selectedIdx === idx) {
       bgClass = 'bg-emerald-50 dark:bg-emerald-900/20';

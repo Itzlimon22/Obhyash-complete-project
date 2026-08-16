@@ -95,7 +95,6 @@ class StreakService {
       // 4. Update DB
       final Map<String, dynamic> updatePayload = {
         'streak': computedStreak,
-        'streak_count': computedStreak,
       };
       
       if (giveLoginBonus) {

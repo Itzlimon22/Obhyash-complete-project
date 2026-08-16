@@ -25,7 +25,6 @@ import {
 } from "@/lib/types";
 import {
   downloadQuestionPaper,
-  downloadOMRSheet,
 } from "@/services/download-service";
 
 /**
@@ -51,8 +50,7 @@ interface ExamRunnerProps {
   >;
   /** Remaining time in seconds */
   timeLeft: number;
-  /** Grace period time remaining in seconds (for OMR upload) */
-  graceTimeLeft: number;
+
 
   /** Whether the exam is currently being submitted/evaluated */
   isEvaluating?: boolean;
@@ -107,7 +105,6 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
   flaggedQuestions,
   setFlaggedQuestions,
   timeLeft,
-  graceTimeLeft,
 
   isEvaluating,
   onSubmit,
@@ -174,10 +171,8 @@ const ExamRunner: React.FC<ExamRunnerProps> = ({
         <ExamHeader
           details={examDetails}
           timeLeft={timeLeft}
-          graceTimeLeft={graceTimeLeft}
           appState={appState}
           onDownloadQuestionPaper={() => downloadQuestionPaper(examDetails, questions)}
-          onDownloadOMR={() => downloadOMRSheet(examDetails, questions.length)}
           onExit={onExit}
           totalQuestions={questions.length}
           answeredCount={Object.keys(userAnswers).length}

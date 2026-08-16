@@ -91,7 +91,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
   toggleTheme,
 }) => {
   const [activeDemoTab, setActiveDemoTab] = useState<
-    'generate' | /*'omr' |*/ 'analytics'
+    'generate' | 'analytics'
   >('generate');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
@@ -255,7 +255,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     {
       name: 'সাদিয়া আফরিন',
       role: 'মেডিকেল ভর্তি পরীক্ষার্থী',
-      text: 'OMR শিট পূরণ করে সাথে সাথে রেজাল্ট পাওয়ার ফিচারটি অসাধারণ। কোচিং-এর ভিড় এড়িয়ে বাসায় বসেই এখন নিজেকে যাচাই করতে পারছি।',
+      text: 'সাথে সাথে রেজাল্ট পাওয়ার ফিচারটি অসাধারণ। কোচিং-এর ভিড় এড়িয়ে বাসায় বসেই এখন নিজেকে যাচাই করতে পারছি।',
       initial: 'S',
       color: 'bg-emerald-500',
     },
@@ -283,7 +283,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     },
     /*
     {
-      q: 'OMR স্ক্যান ফিচারটি কিভাবে কাজ করে?',
+      
       a: 'আপনি যেকোনো সাধারণ কাগজে পরীক্ষা দিয়ে আমাদের অ্যাপের মাধ্যমে ছবি তুললেই আমাদের AI সিস্টেম তা যাচাই করে ফলাফল জানিয়ে দিবে।',
     },
     */
@@ -439,7 +439,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 Adaptive AI
               </span>{' '}
               এর সাহায্যে নিজের দুর্বলতা কাটিয়ে ওঠো। আনলিমিটেড প্রশ্ন,
-              {/* OMR Upload এবং */} স্মার্ট এনালাইসিস—সবই এক অ্যাপে।
+              স্মার্ট এনালাইসিস—সবই এক অ্যাপে।
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
@@ -482,10 +482,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </button>
                   {/*
                   <button
-                    onClick={() => setActiveDemoTab('omr')}
-                    className={`flex items-center gap-1 px-3 py-1 rounded transition-all ${activeDemoTab === 'omr' ? 'bg-white dark:bg-neutral-700 shadow text-emerald-600 dark:text-emerald-400' : 'text-neutral-500 dark:text-neutral-400'}`}
+                    
+                    className={`flex items-center gap-1 px-3 py-1 rounded transition-all ${false ? 'bg-white dark:bg-neutral-700 shadow text-emerald-600 dark:text-emerald-400' : 'text-neutral-500 dark:text-neutral-400'}`}
                   >
-                    <ScanLine className="w-3 h-3" /> OMR
+                    
                   </button>
                   */}
                   <button
@@ -534,8 +534,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </div>
                 )}
 
-                {/* 2. OMR Demo
-                {activeDemoTab === 'omr' && (
+                {/*
+                {false && (
                   <div className="animate-in fade-in zoom-in duration-300 flex flex-col items-center justify-center h-full pt-4">
                     <div className="relative w-48 h-64 bg-white border border-neutral-300 rounded shadow-md p-4 flex flex-col gap-3">
                       {[1, 2, 3, 4, 5, 6].map((row) => (
@@ -857,13 +857,13 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 </p>
               </div>
 
-              {/* OMR Scanning
+              {/* Scanning
               <div className="min-w-[85%] md:min-w-0 snap-center group p-8 rounded-[2rem] bg-white dark:bg-neutral-900/70 border border-neutral-100 dark:border-neutral-800/80 shadow-sm hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 transition-all duration-300 flex flex-col items-center text-center md:items-start md:text-left backdrop-blur-sm">
                 <div className="w-16 h-16 md:w-14 md:h-14 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 ring-1 ring-red-100 dark:ring-red-900/30">
                   <ScanLine className="w-8 h-8 md:w-7 md:h-7 text-red-600" />
                 </div>
                 <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-                  OMR স্ক্যানিং
+                  
                 </h3>
                 <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
                   বাসায় বসে খাতায় পরীক্ষা দিয়ে অ্যাপ দিয়ে ছবি তোলো। নিমিষেই পেয়ে

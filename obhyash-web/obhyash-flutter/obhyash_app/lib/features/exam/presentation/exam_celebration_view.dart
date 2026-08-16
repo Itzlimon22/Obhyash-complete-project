@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import '../domain/exam_models.dart';
@@ -535,18 +536,26 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
                         width: double.infinity,
                         height: 42,
                         child: TextButton.icon(
-                          onPressed: widget.onRestart,
+                          onPressed: () {
+                            Navigator.of(context, rootNavigator: true)
+                                .popUntil((route) => route.isFirst);
+                            context.go('/dashboard');
+                          },
                           icon: Icon(
                             LucideIcons.home,
                             size: 16,
-                            color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563),
+                            color: isDark
+                                ? const Color(0xFFA3A3A3)
+                                : const Color(0xFF4B5563),
                           ),
                           label: Text(
-                            'ড্যাশবোর্ডে ফিরে যান',
+                            'ড্যাশবোর্ডে ফিরে যাও',
                             style: TextStyle(
                               fontSize: 13.5,
                               fontFamily: 'HindSiliguri',
-                              color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563),
+                              color: isDark
+                                  ? const Color(0xFFA3A3A3)
+                                  : const Color(0xFF4B5563),
                             ),
                           ),
                         ),

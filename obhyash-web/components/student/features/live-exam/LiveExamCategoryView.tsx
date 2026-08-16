@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import LiveExamDetailsView from "./LiveExamDetailsView";
+import LiveExamRoutineModal from "./LiveExamRoutineModal";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { getPublishedLiveExams } from "@/services/live-exam-student-service";
 import { LiveExam } from "@/lib/types";
@@ -26,6 +27,7 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
   const [exams, setExams] = useState<(LiveExam & { userAttemptStatus?: string })[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isRoutineOpen, setIsRoutineOpen] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -38,13 +40,19 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
       setIsLoading(true);
       const data = await getPublishedLiveExams(categoryTitle, user?.id);
       
-      // Inject mock data for every category
+      const isHSC = categoryTitle.toLowerCase().includes("hsc") || categoryTitle.includes("এইচএসসি");
+
+      // Inject realistic SSC / HSC mock data
       const mockExams: (LiveExam & { userAttemptStatus?: string })[] = [
         {
           id: `mock-untaken-${categoryTitle}`,
           category: categoryTitle,
-          title: `[Mock] ${categoryTitle} - Untaken`,
-          description: "This is a mock untaken exam for testing.",
+          title: isHSC
+            ? `পদার্থবিজ্ঞান ১ম পত্র: অধ্যায় ২ (ভেক্টর) ও অধ্যায় ৩ (গতিবিদ্যা)`
+            : `পদার্থবিজ্ঞান: অধ্যায় ২ (গতি) ও অধ্যায় ৩ (বল)`,
+          description: isHSC 
+            ? "HSC বোর্ড পরীক্ষার স্ট্যান্ডার্ড অধ্যায়ভিত্তিক পূর্ণাঙ্গ লাইভ মডেল টেস্ট।"
+            : "SSC বোর্ড পরীক্ষার পূর্ণাঙ্গ প্রস্তুতিমূলক বিশেষ লাইভ টেস্ট।",
           start_time: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // started yesterday
           end_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(), // ends in 7 days
           duration_minutes: 45,
@@ -60,8 +68,12 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
         {
           id: `mock-taken-${categoryTitle}`,
           category: categoryTitle,
-          title: `[Mock] ${categoryTitle} - Taken`,
-          description: "This is a mock taken exam for testing.",
+          title: isHSC
+            ? `রসায়ন ১ম পত্র: গুণগত রসায়ন ও পর্যায়বৃত্ত ধর্ম`
+            : `সাধারণ গণিত: অধ্যায় ২ (সেট ও ফাংশন) ও অধ্যায় ৩`,
+          description: isHSC 
+            ? "HSC বোর্ড ভিত্তিক গুণগত রসায়ন ও পর্যায়বৃত্ত ধর্ম স্পেশাল মডেল টেস্ট।"
+            : "SSC বোর্ড স্ট্যান্ডার্ড বীজগাণিতিক রাশি ও ফাংশন লাইভ টেস্ট।",
           start_time: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // started 2 days ago
           end_time: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(), // ends in 7 days
           duration_minutes: 60,
@@ -176,16 +188,14 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
 
           {/* Right Actions */}
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 bg-[#e8f0fe] dark:bg-blue-900/30 text-[#1a73e8] dark:text-blue-400 px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
+            <button 
+              onClick={() => setIsRoutineOpen(true)}
+              className="flex items-center gap-2 bg-[#e8f0fe] dark:bg-blue-900/30 text-[#1a73e8] dark:text-blue-400 px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors shadow-xs"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
               </svg>
-              Routine
-            </button>
-            <button className="flex items-center justify-center bg-[#e8f0fe] dark:bg-blue-900/30 text-[#1a73e8] dark:text-blue-400 w-9 h-9 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-              </svg>
+              <span>রুটিন ও সিলেবাস</span>
             </button>
           </div>
         </div>
@@ -264,9 +274,16 @@ const LiveExamCategoryView: React.FC<LiveExamCategoryViewProps> = ({
             })
           )}
       </div>
+
+      <LiveExamRoutineModal
+        categoryTitle={categoryTitle}
+        isOpen={isRoutineOpen}
+        onClose={() => setIsRoutineOpen(false)}
+      />
     </div>
     </AppLayout>
   );
 };
 
 export default LiveExamCategoryView;
+

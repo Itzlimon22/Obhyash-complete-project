@@ -10,6 +10,7 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MathRenderer } from '@/components/common/MathRenderer';
 
 /**
  * Props for the TopicSelector component.
@@ -321,9 +322,9 @@ export const TopicSelector: React.FC<TopicSelectorProps> = ({
                             )}
                           </span>
 
-                          <div className="flex flex-col">
+                          <div className="flex flex-col min-w-0 flex-1">
                             <span className="text-sm font-bold text-neutral-800 dark:text-neutral-200">
-                              {group}
+                              <MathRenderer text={group} />
                             </span>
                             <span className="text-[10px] font-medium text-neutral-500">
                               {
@@ -420,13 +421,13 @@ const SelectorItem = React.memo(
     >
       <span
         className={cn(
-          'text-sm font-medium',
+          'text-sm font-medium flex-1 pr-2',
           isSelected
             ? 'text-emerald-900 dark:text-emerald-100'
             : 'text-neutral-700 dark:text-neutral-300',
         )}
       >
-        {item}
+        <MathRenderer text={item} />
       </span>
       <div
         className={cn(

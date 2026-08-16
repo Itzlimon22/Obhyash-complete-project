@@ -108,7 +108,6 @@ export const LiveExamSession: React.FC<LiveExamSessionProps> = ({
       flaggedQuestions={engine.flaggedQuestions}
       setFlaggedQuestions={engine.setFlaggedQuestions}
       timeLeft={engine.timeLeft}
-      graceTimeLeft={engine.graceTimeLeft}
       isEvaluating={engine.isEvaluating}
       onSubmit={(manual) => {
         if (user?.id) engine.submitExam(user.id, manual);

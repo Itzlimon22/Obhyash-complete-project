@@ -34,9 +34,7 @@ class ExamEngineState {
   final Set<String> bookmarkedQuestions;
   final int timeLeft;
   final int graceTimeLeft;
-  final bool isOmrMode;
   final String? dbSessionId;
-  final String? selectedScriptPath;
   final ExamResult? completedResult;
 
   const ExamEngineState({
@@ -50,9 +48,7 @@ class ExamEngineState {
     this.bookmarkedQuestions = const {},
     this.timeLeft = 0,
     this.graceTimeLeft = 0,
-    this.isOmrMode = false,
     this.dbSessionId,
-    this.selectedScriptPath,
     this.completedResult,
   });
 
@@ -67,9 +63,7 @@ class ExamEngineState {
     Set<String>? bookmarkedQuestions,
     int? timeLeft,
     int? graceTimeLeft,
-    bool? isOmrMode,
     String? dbSessionId,
-    String? selectedScriptPath,
     ExamResult? completedResult,
   }) {
     return ExamEngineState(
@@ -83,9 +77,7 @@ class ExamEngineState {
       bookmarkedQuestions: bookmarkedQuestions ?? this.bookmarkedQuestions,
       timeLeft: timeLeft ?? this.timeLeft,
       graceTimeLeft: graceTimeLeft ?? this.graceTimeLeft,
-      isOmrMode: isOmrMode ?? this.isOmrMode,
       dbSessionId: dbSessionId ?? this.dbSessionId,
-      selectedScriptPath: selectedScriptPath ?? this.selectedScriptPath,
       completedResult: completedResult ?? this.completedResult,
     );
   }
@@ -99,8 +91,9 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
 
   @override
   ExamEngineState build() {
-    // Cancel timer when provider is disposed
     ref.onDispose(() => _timer?.cancel());
+    // Auto-restore active draft if app crashed or was killed mid-exam
+    Future.microtask(() => _restoreActiveDraftIfExists());
     return const ExamEngineState();
   }
 
@@ -108,7 +101,6 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
     state = state.copyWith(
       appState: AppState.loading,
       errorDetails: '',
-      isOmrMode: false,
     );
     try {
       final supabase = Supabase.instance.client;
@@ -138,7 +130,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           ? null
           : config.examType.split('+').map((e) => e.trim()).toList();
 
-      List<dynamic> qList = [];
+      List<Question> generatedQuestions = [];
 
       // 1. Try distributed RPC
       try {
@@ -155,9 +147,16 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
             'p_exam_types': examTypesList,
           },
         );
-        qList = (data as List<dynamic>?) ?? [];
+        final qList = (data as List<dynamic>?) ?? [];
         if (qList.isNotEmpty) {
-          qList.shuffle();
+          final parsed = qList
+              .map((e) => Question.fromJson(e as Map<String, dynamic>))
+              .toList();
+          generatedQuestions = OfflineQuestionBankService.balanceQuestionsByChapter(
+            parsed,
+            config.questionCount,
+            chaptersList,
+          );
         }
       } catch (rpcErr) {
         debugPrint(
@@ -166,10 +165,10 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       }
 
       // 2. Fallback: Direct query from questions table
-      if (qList.isEmpty) {
+      if (generatedQuestions.isEmpty) {
         try {
           debugPrint(
-            '[ExamProvider] RPC failed, falling back to direct questions query',
+            '[ExamProvider] RPC failed, falling back to direct questions query with balanced sampling',
           );
           var query = supabase
               .from('questions')
@@ -190,30 +189,30 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           }
 
           final fallbackData = await query.limit(config.questionCount * 3);
-          final allRows = List<dynamic>.from(fallbackData as List);
-          allRows.shuffle();
-          qList = allRows.take(config.questionCount).toList();
+          final allQuestions = List<dynamic>.from(fallbackData as List)
+              .map((e) => Question.fromJson(e as Map<String, dynamic>))
+              .toList();
+          generatedQuestions = OfflineQuestionBankService.balanceQuestionsByChapter(
+            allQuestions,
+            config.questionCount,
+            chaptersList,
+          );
         } catch (directErr) {
           debugPrint('[ExamProvider] Direct questions query error (likely offline): $directErr');
         }
       }
 
-      List<Question> generatedQuestions = [];
-
-      if (qList.isNotEmpty) {
-        generatedQuestions = qList
-            .map((e) => Question.fromJson(e as Map<String, dynamic>))
-            .toList();
-        // Automatically cache these questions for offline availability
-        OfflineQuestionBankService.cacheQuestions(generatedQuestions);
-      } else {
-        // 3. Fallback: Load from local offline question bank
+      // 3. Fallback: Load from local offline question bank
+      if (generatedQuestions.isEmpty) {
         debugPrint('[ExamProvider] Trying offline question bank fallback...');
         generatedQuestions = await OfflineQuestionBankService.getQuestions(
           subject: config.subject,
           chapters: chaptersList,
           count: config.questionCount,
         );
+      } else {
+        // Automatically cache successfully fetched questions for future offline availability
+        OfflineQuestionBankService.cacheQuestions(generatedQuestions);
       }
 
       if (generatedQuestions.isEmpty) {
@@ -301,6 +300,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       _examStartTime = DateTime.now();
       _totalDurationSeconds = duration;
       state = state.copyWith(timeLeft: duration, appState: AppState.active);
+      _persistActiveDraft();
       _timer?.cancel();
       _timer = Timer.periodic(const Duration(seconds: 1), (t) {
         if (_examStartTime == null) return;
@@ -317,10 +317,136 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
     }
   }
 
+  void syncTimerOnResume() {
+    if (_examStartTime != null && state.appState == AppState.active) {
+      final elapsed = DateTime.now().difference(_examStartTime!).inSeconds;
+      final newTimeLeft = _totalDurationSeconds - elapsed;
+      if (newTimeLeft <= 0) {
+        _timer?.cancel();
+        submitExam();
+      } else {
+        state = state.copyWith(timeLeft: newTimeLeft);
+        _persistActiveDraft();
+      }
+    }
+  }
+
+  void _persistActiveDraft() {
+    if (state.appState == AppState.active && state.questions.isNotEmpty && _examStartTime != null) {
+      final targetEndTimeMs = _examStartTime!.millisecondsSinceEpoch + (_totalDurationSeconds * 1000);
+      LocalExamCacheService.saveActiveExamDraft({
+        'questions': state.questions.map((q) => q.toJson()).toList(),
+        'examDetails': state.examDetails != null
+            ? {
+                'subject': state.examDetails!.subject,
+                'subjectLabel': state.examDetails!.subjectLabel,
+                'examType': state.examDetails!.examType,
+                'chapters': state.examDetails!.chapters,
+                'topics': state.examDetails!.topics,
+                'totalQuestions': state.examDetails!.totalQuestions,
+                'durationMinutes': state.examDetails!.durationMinutes,
+                'totalMarks': state.examDetails!.totalMarks,
+                'negativeMarking': state.examDetails!.negativeMarking,
+              }
+            : null,
+        'userAnswers': state.userAnswers,
+        'flaggedQuestions': state.flaggedQuestions.toList(),
+        'bookmarkedQuestions': state.bookmarkedQuestions.toList(),
+        'dbSessionId': state.dbSessionId,
+        'targetEndTimeMs': targetEndTimeMs,
+        'totalDurationSeconds': _totalDurationSeconds,
+        'savedAt': DateTime.now().millisecondsSinceEpoch,
+      });
+    }
+  }
+
+  Future<void> _restoreActiveDraftIfExists() async {
+    try {
+      final draft = await LocalExamCacheService.getActiveExamDraft();
+      if (draft == null) return;
+
+      final targetEndTimeMs = draft['targetEndTimeMs'] as int?;
+      if (targetEndTimeMs == null) return;
+
+      final nowMs = DateTime.now().millisecondsSinceEpoch;
+      final rawQuestions = draft['questions'] as List<dynamic>? ?? [];
+      final questions = rawQuestions
+          .map((e) => Question.fromJson(e as Map<String, dynamic>))
+          .toList();
+      if (questions.isEmpty) return;
+
+      final rawDetails = draft['examDetails'] as Map<String, dynamic>?;
+      final details = rawDetails != null
+          ? ExamDetails(
+              subject: rawDetails['subject'] ?? '',
+              subjectLabel: rawDetails['subjectLabel'],
+              examType: rawDetails['examType'],
+              chapters: rawDetails['chapters'],
+              topics: rawDetails['topics'],
+              totalQuestions: rawDetails['totalQuestions'] ?? questions.length,
+              durationMinutes: rawDetails['durationMinutes'] ?? 0,
+              totalMarks: rawDetails['totalMarks'] ??
+                  questions.fold(0, (s, q) => s + q.points),
+              negativeMarking:
+                  (rawDetails['negativeMarking'] as num?)?.toDouble() ?? 0.25,
+            )
+          : null;
+
+      final rawAnswers = draft['userAnswers'] as Map<String, dynamic>? ?? {};
+      final userAnswers = rawAnswers
+          .map((k, v) => MapEntry(k, (v as num).toInt()));
+      final flagged = (draft['flaggedQuestions'] as List<dynamic>? ?? [])
+          .map((e) => e.toString())
+          .toSet();
+      final bookmarked = (draft['bookmarkedQuestions'] as List<dynamic>? ?? [])
+          .map((e) => e.toString())
+          .toSet();
+      final dbSessionId = draft['dbSessionId']?.toString();
+      final totalDuration = draft['totalDurationSeconds'] as int? ??
+          ((details?.durationMinutes ?? 0) * 60);
+
+      final remainingSeconds = ((targetEndTimeMs - nowMs) / 1000).round();
+
+      if (remainingSeconds <= 0) {
+        // Expired while app was closed / battery dead — auto-evaluate & submit saved answers
+        state = state.copyWith(
+          appState: AppState.active,
+          questions: questions,
+          examDetails: details,
+          userAnswers: userAnswers,
+          flaggedQuestions: flagged,
+          bookmarkedQuestions: bookmarked,
+          dbSessionId: dbSessionId,
+          timeLeft: 0,
+        );
+        await submitExam();
+      } else {
+        // Active — seamlessly restore answers and resume countdown
+        _totalDurationSeconds = totalDuration;
+        _examStartTime = DateTime.fromMillisecondsSinceEpoch(
+            targetEndTimeMs - (totalDuration * 1000));
+        state = state.copyWith(
+          appState: AppState.active,
+          questions: questions,
+          examDetails: details,
+          userAnswers: userAnswers,
+          flaggedQuestions: flagged,
+          bookmarkedQuestions: bookmarked,
+          dbSessionId: dbSessionId,
+          timeLeft: remainingSeconds,
+        );
+        beginTimer(remainingSeconds);
+      }
+    } catch (e) {
+      debugPrint('[ExamProvider] Failed to restore active draft: $e');
+    }
+  }
+
   void setAnswer(String questionId, int optionIndex) {
     final updated = Map<String, int>.from(state.userAnswers);
     updated[questionId] = optionIndex;
     state = state.copyWith(userAnswers: updated);
+    _persistActiveDraft();
   }
 
   void toggleFlag(String questionId) {
@@ -331,6 +457,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       updated.add(questionId);
     }
     state = state.copyWith(flaggedQuestions: updated);
+    _persistActiveDraft();
   }
 
   void toggleBookmark(String questionId) {
@@ -342,6 +469,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       updated.add(questionId);
     }
     state = state.copyWith(bookmarkedQuestions: updated);
+    _persistActiveDraft();
 
     // Persist to Supabase bookmarks table
     final supabase = Supabase.instance.client;
@@ -365,9 +493,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
     }
   }
 
-  void toggleOmrMode(bool isOmr) {
-    state = state.copyWith(isOmrMode: isOmr);
-  }
+
 
   Future<void> submitExam() async {
     if (state.appState == AppState.completed ||
@@ -414,7 +540,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       negativeMarking: state.examDetails?.negativeMarking ?? 0.25,
       questions: state.questions,
       flaggedQuestions: state.flaggedQuestions.toList(),
-      submissionType: state.isOmrMode ? 'script' : 'digital',
+      submissionType: 'digital',
       userAnswers: state.userAnswers,
       status: 'evaluated',
     );
@@ -475,32 +601,30 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
         final xpEarned = (result.correctCount * 10 - result.wrongCount * 2)
             .clamp(0, 9999);
         if (xpEarned > 0) {
-          try {
-            await supabase.rpc(
-              'increment_user_xp',
-              params: {'uid': authId, 'amount': xpEarned},
-            );
-          } catch (xpRpcErr) {
-            debugPrint(
-              '[ExamProvider] increment_user_xp RPC failed, trying direct update: $xpRpcErr',
-            );
+          bool rpcSuccess = false;
+          // Atomic RPC call with retry (prevents race conditions)
+          for (int attempt = 0; attempt < 2; attempt++) {
             try {
-              // Fallback: read current XP then update
-              final profile = await supabase
-                  .from('users')
-                  .select('xp')
-                  .eq('id', authId)
-                  .maybeSingle();
-              final currentXp = (profile?['xp'] as num?)?.toInt() ?? 0;
-              await supabase
-                  .from('users')
-                  .update({'xp': currentXp + xpEarned})
-                  .eq('id', authId);
-            } catch (xpUpdateErr) {
-              debugPrint(
-                '[ExamProvider] XP direct update also failed: $xpUpdateErr',
+              await supabase.rpc(
+                'increment_user_xp',
+                params: {'uid': authId, 'amount': xpEarned},
               );
+              rpcSuccess = true;
+              break;
+            } catch (xpRpcErr) {
+              debugPrint(
+                '[ExamProvider] increment_user_xp RPC attempt ${attempt + 1} failed: $xpRpcErr',
+              );
+              if (attempt < 1) {
+                await Future.delayed(const Duration(milliseconds: 300));
+              }
             }
+          }
+
+          if (!rpcSuccess) {
+            debugPrint(
+              '[ExamProvider] Atomic XP update failed after retries. Will sync on next connection.',
+            );
           }
         }
       } catch (e) {
@@ -522,10 +646,19 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
       } catch (_) {}
     }
 
+    // Clear active ongoing draft once evaluated
+    await LocalExamCacheService.clearActiveExamDraft();
+
     state = state.copyWith(
       appState: AppState.completed,
       completedResult: result,
     );
+  }
+
+  void resetExam() {
+    _timer?.cancel();
+    LocalExamCacheService.clearActiveExamDraft();
+    state = const ExamEngineState();
   }
 }
 

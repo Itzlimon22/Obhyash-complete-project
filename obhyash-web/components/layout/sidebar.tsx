@@ -103,12 +103,7 @@ const SIDEBAR_NAVIGATION: { title?: string; items: NavItem[] }[] = [
         href: '/admin/notifications',
       },
       /*
-      {
-        id: 'omr-check',
-        title: 'OMR Check',
-        href: '/admin/omr-check',
-        icon: <ScanLine className="w-5 h-5" />,
-      },
+
       */
       {
         id: 'complaints',

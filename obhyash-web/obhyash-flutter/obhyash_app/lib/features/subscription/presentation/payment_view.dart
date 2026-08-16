@@ -165,13 +165,13 @@ class _PaymentViewState extends State<PaymentView>
           if (mounted) Navigator.pop(context, true);
         });
       }
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
         setState(() => _isSubmitting = false);
         AppPopups.show(
           context,
           message: 'ত্রুটি হয়েছে। আবার চেষ্টা করো।',
-          isError: false,
+          isError: true,
         );
       }
     }
@@ -911,7 +911,7 @@ class _PaymentViewState extends State<PaymentView>
       ),
       (
         q: 'প্রিমিয়াম প্যাকেজে কী কী থাকছে?',
-        a: 'আনলিমিটেড এক্সাম, OMR চেকিং, এবং বিস্তারিত এনালাইসিস রিপোর্ট।',
+        a: 'আনলিমিটেড এক্সাম, AI বিস্তারিত ব্যাখ্যা, এবং পারফরম্যান্স এনালাইসিস রিপোর্ট।',
       ),
     ];
 

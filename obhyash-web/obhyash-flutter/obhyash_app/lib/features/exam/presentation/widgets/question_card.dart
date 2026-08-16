@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/presentation/widgets/latex_text.dart';
+import '../../../../core/presentation/widgets/obhyash_tooltip.dart';
 import '../../domain/exam_models.dart';
 
 class QuestionCard extends StatefulWidget {
@@ -12,7 +13,6 @@ class QuestionCard extends StatefulWidget {
   final ValueChanged<int> onSelectOption;
   final VoidCallback onToggleFlag;
   final VoidCallback onReport;
-  final bool isOmrMode;
   final bool showFeedback;
   final bool readOnly;
   final bool showAnswer;
@@ -29,7 +29,6 @@ class QuestionCard extends StatefulWidget {
     required this.onSelectOption,
     required this.onToggleFlag,
     required this.onReport,
-    this.isOmrMode = false,
     this.showFeedback = false,
     this.readOnly = false,
     this.showAnswer = false,
@@ -154,7 +153,7 @@ class _QuestionCardState extends State<QuestionCard>
                 LatexText(
                   text: '**${_toBengaliNumeral(widget.serialNumber)}.** ${widget.question.question}',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight.w500,
                     fontFamily: 'HindSiliguri',
                     color: isDark
@@ -315,11 +314,11 @@ class _QuestionCardState extends State<QuestionCard>
                     ? const Color(0xFF525252)
                     : const Color(0xFFD1D5DB);
                 Color bulletText = isDark
-                    ? const Color(0xFFD4D4D4)
-                    : const Color(0xFF6B7280);
+                    ? const Color(0xFFE4E4E7)
+                    : const Color(0xFF475569);
                 Color optionTextColor = isDark
-                    ? const Color(0xFFE5E5E5)
-                    : const Color(0xFF1F2937);
+                    ? const Color(0xFFF4F4F5)
+                    : const Color(0xFF0F172A);
                 bool boldText = false;
                 double opacity = 1.0;
                 Widget? trailingBadge;
@@ -370,7 +369,7 @@ class _QuestionCardState extends State<QuestionCard>
                       color: isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626),
                     );
                   } else {
-                    opacity = 0.5;
+                    opacity = 0.95; // High brightness and crystal clear visibility
                   }
                 } else if (widget.showAnswer && isCorrect) {
                   boxBg = isDark
@@ -435,7 +434,7 @@ class _QuestionCardState extends State<QuestionCard>
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
                           onTap: () {
-                            if (!isAnswered && !widget.isOmrMode && !widget.readOnly) {
+                            if (!isAnswered && !widget.readOnly) {
                               HapticFeedback.lightImpact();
                               widget.onSelectOption(idx);
                             }
@@ -490,7 +489,7 @@ class _QuestionCardState extends State<QuestionCard>
                                   child: LatexText(
                                     text: option,
                                     style: TextStyle(
-                                      fontSize: 16.5,
+                                      fontSize: 16,
                                       fontFamily: 'HindSiliguri',
                                       fontWeight: boldText
                                           ? FontWeight.bold
@@ -555,31 +554,31 @@ class _ExplanationPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ── Book Page Theme Color Tokens ──
-    // Header (deeper tone)
+    // ── Modern Sleek Blackish Theme Tokens for Explanation Panel ──
+    // Header (clean dark tone)
     final headerBg = isDark
-        ? const Color(0xFF28221D)
-        : const Color(0xFFF3ECE4);
+        ? const Color(0xFF141416)
+        : const Color(0xFFF4F4F5);
     final headerTextColor = isDark
-        ? const Color(0xFFEADFCF)
-        : const Color(0xFF42352B);
+        ? const Color(0xFFF4F4F5)
+        : const Color(0xFF18181B);
     final headerBorderColor = isDark
-        ? const Color(0xFF3D332B)
-        : const Color(0xFFE2D7C9);
+        ? const Color(0xFF27272A)
+        : const Color(0xFFE4E4E7);
     final chevronBg = isDark
-        ? const Color(0xFF362C25)
-        : const Color(0xFFE7DDD0);
+        ? const Color(0xFF1E1E22)
+        : const Color(0xFFE4E4E7);
 
-    // Below body (lighter tone)
+    // Below body (deeper sleek blackish background with crisp contrast)
     final bodyBg = isDark
-        ? const Color(0xFF1B1614)
-        : const Color(0xFFFAF7F2);
+        ? const Color(0xFF09090B)
+        : const Color(0xFFFAFAFA);
     final bodyTextColor = isDark
-        ? const Color(0xFFD6CDC3)
-        : const Color(0xFF2E2621);
+        ? const Color(0xFFF4F4F5)
+        : const Color(0xFF18181B);
     final dividerColor = isDark
-        ? const Color(0xFF332922)
-        : const Color(0xFFE8DFD3);
+        ? const Color(0xFF27272A)
+        : const Color(0xFFE4E4E7);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -698,18 +697,21 @@ class _IconBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
+    return ObhyashTooltip(
       message: tooltip,
+      preferredPosition: TooltipPosition.bottom,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: onTap != null ? () {
-            HapticFeedback.lightImpact();
-            onTap!();
-          } : null,
+          onTap: onTap != null
+              ? () {
+                  HapticFeedback.lightImpact();
+                  onTap!();
+                }
+              : null,
           borderRadius: BorderRadius.circular(8),
           child: Padding(
-            padding: const EdgeInsets.all(8), 
+            padding: const EdgeInsets.all(8),
             child: child,
           ),
         ),

@@ -138,6 +138,9 @@ final userProfileProvider =
       return UserProfileNotifier();
     });
 
+const int _kLeaderboardTtlMs = 10 * 60 * 1000; // 10 minutes
+const int _kSubjectStatsTtlMs = 15 * 60 * 1000; // 15 minutes
+
 class LeaderboardNotifier extends AsyncNotifier<List<LeaderboardUser>> {
   @override
   FutureOr<List<LeaderboardUser>> build() async {
@@ -146,10 +149,14 @@ class LeaderboardNotifier extends AsyncNotifier<List<LeaderboardUser>> {
 
     final prefs = ref.watch(sharedPreferencesProvider);
     final cacheKey = 'leaderboard_${profile.level ?? "HSC"}';
+    final cacheTimeKey = '${cacheKey}_time';
 
-    // 1. Cache-first
+    // 1. Cache-first with TTL check (10 min)
     final cached = prefs.getString(cacheKey);
-    if (cached != null) {
+    final cachedTime = prefs.getInt(cacheTimeKey) ?? 0;
+    final isCacheFresh = (DateTime.now().millisecondsSinceEpoch - cachedTime) < _kLeaderboardTtlMs;
+
+    if (cached != null && isCacheFresh) {
       try {
         final List list = jsonDecode(cached);
         final cachedUsers = list
@@ -165,11 +172,32 @@ class LeaderboardNotifier extends AsyncNotifier<List<LeaderboardUser>> {
     final repository = ref.watch(dashboardRepositoryProvider);
     final fresh = await repository.getLeaderboardUsers(profile.level ?? 'HSC');
 
-    prefs.setString(
-      cacheKey,
-      jsonEncode(fresh.map((e) => e.toJson()).toList()),
-    );
+    if (fresh.isNotEmpty) {
+      prefs.setString(
+        cacheKey,
+        jsonEncode(fresh.map((e) => e.toJson()).toList()),
+      );
+      prefs.setInt(cacheTimeKey, DateTime.now().millisecondsSinceEpoch);
+    }
     return fresh;
+  }
+
+  Future<void> forceRefresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final profile = await ref.read(userProfileProvider.future);
+      if (profile == null) return [];
+
+      final repository = ref.read(dashboardRepositoryProvider);
+      final fresh = await repository.getLeaderboardUsers(profile.level ?? 'HSC');
+
+      final prefs = ref.read(sharedPreferencesProvider);
+      final cacheKey = 'leaderboard_${profile.level ?? "HSC"}';
+      prefs.setString(cacheKey, jsonEncode(fresh.map((e) => e.toJson()).toList()));
+      prefs.setInt('${cacheKey}_time', DateTime.now().millisecondsSinceEpoch);
+
+      return fresh;
+    });
   }
 }
 
@@ -186,10 +214,14 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
 
     final prefs = ref.watch(sharedPreferencesProvider);
     final cacheKey = 'subject_stats_v2_${profile.id}';
+    final cacheTimeKey = '${cacheKey}_time';
 
-    // 1. Cache-first
+    // 1. Cache-first with TTL check (15 min)
     final cached = prefs.getString(cacheKey);
-    if (cached != null) {
+    final cachedTime = prefs.getInt(cacheTimeKey) ?? 0;
+    final isCacheFresh = (DateTime.now().millisecondsSinceEpoch - cachedTime) < _kSubjectStatsTtlMs;
+
+    if (cached != null && isCacheFresh) {
       try {
         final List list = jsonDecode(cached);
         final cachedStats = list.map((e) => SubjectStats.fromJson(e)).toList();
@@ -260,6 +292,7 @@ class DashboardSubjectStatsNotifier extends AsyncNotifier<List<SubjectStats>> {
       cacheKey,
       jsonEncode(fresh.map((e) => e.toJson()).toList()),
     );
+    prefs.setInt(cacheTimeKey, DateTime.now().millisecondsSinceEpoch);
     return fresh;
   }
 }

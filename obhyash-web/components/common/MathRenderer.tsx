@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import "katex/dist/katex.min.css";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
@@ -14,8 +15,6 @@ interface MathRendererProps {
   block?: boolean;
 }
 
-// Allow all attributes KaTeX injects (className, style on span/div) while
-// blocking everything actually dangerous (script, event handlers, etc.).
 const sanitizeSchema = {
   ...defaultSchema,
   attributes: {
@@ -25,42 +24,135 @@ const sanitizeSchema = {
   },
 };
 
-export function MathRenderer({ text, block = false }: MathRendererProps) {
+function unwrapBengaliMathContent(inner: string): string {
+  let clean = inner.replace(/\\(?:text|mathrm|textbf|textit)\{([^}]*)\}/g, "$1");
+
+  clean = clean
+    .replace(/\\,/g, " ")
+    .replace(/\\;/g, " ")
+    .replace(/\\quad/g, " ")
+    .replace(/\\qquad/g, " ")
+    .replace(/\\ /g, " ")
+    .replace(/~/g, " ");
+
+  const tokenRegex = /(\\[a-zA-Z]+(?:\{[^{}]*\}|\[[^\[\]]*\])*|[a-zA-Z0-9]+(?:\^|\_)\{?[a-zA-Z0-9\-\+]+\}?)/g;
+  clean = clean.replace(tokenRegex, "$$$1$$");
+
+  return clean;
+}
+
+function cleanIntraSentenceNewlines(text: string): string {
+  const placeholder = "___DBL_NL___";
+  text = text.replace(/\r\n|\r/g, "\n");
+  text = text.replace(/\n\s*\n+/g, placeholder);
+
+  const lines = text.split("\n");
+  if (lines.length <= 1) {
+    return text.replaceAll(placeholder, "\n\n");
+  }
+
+  const buffer: string[] = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    if (buffer.length === 0) {
+      buffer.push(trimmed);
+      continue;
+    }
+
+    const isListItem = /^(?:\([iIvVxX0-9a-zA-Z\u0980-\u09fa]+\)|[iIvVxX0-9a-zA-Z\u0980-\u09fa]+\.|\-|\*|\#|নিচের)/.test(
+      trimmed
+    );
+
+    if (isListItem) {
+      buffer.push("\n" + trimmed);
+    } else {
+      buffer.push(" " + trimmed);
+    }
+  }
+
+  return buffer.join("").replaceAll(placeholder, "\n\n");
+}
+
+const preprocessCache = new Map<string, string>();
+const MAX_PREPROCESS_CACHE = 600;
+
+function preprocess(text: string): string {
+  if (preprocessCache.has(text)) {
+    return preprocessCache.get(text)!;
+  }
+
+  // 1. Normalize literal \n
+  let processedText = text.replace(/\\n/g, "\n");
+
+  // 2. Split into math blocks and non-math segments
+  const mathPattern = /(\$\$[\s\S]*?\$\$|\$(?!\$)[^\n]*?\$)/g;
+  const parts: string[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = mathPattern.exec(processedText)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(processedText.slice(lastIndex, match.index));
+    }
+    parts.push(match[0]);
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < processedText.length) {
+    parts.push(processedText.slice(lastIndex));
+  }
+
+  // 3. Process each segment safely (never modifying content inside pure math blocks)
+  const processedParts = parts.map((part) => {
+    if (part.startsWith("$")) {
+      const isDisplay = part.startsWith("$$");
+      const inner = isDisplay ? part.slice(2, -2) : part.slice(1, -1);
+
+      const cleanInner = inner.replace(/\\\\([a-zA-Z{])/g, "\\$1");
+
+      if (!/[\u0980-\u09FF]/.test(cleanInner)) {
+        return isDisplay ? `$$${cleanInner}$$` : `$${cleanInner}$`;
+      }
+
+      return unwrapBengaliMathContent(cleanInner);
+    }
+
+    let t = part;
+    const trimmed = t.trim();
+    const hasNoBengali = !/[\u0980-\u09FF]/.test(trimmed);
+    const hasLatexCmd = trimmed.includes("\\") && /\\[a-zA-Z]+/.test(trimmed);
+    const hasMathExpr = /[a-zA-Z0-9]+(?:\^|\_)\{?[a-zA-Z0-9\-\+]+\}?/.test(trimmed);
+
+    if (hasNoBengali && trimmed.length > 0 && (hasLatexCmd || (hasMathExpr && /[=+\-*/<>()]/.test(trimmed)))) {
+      return `$${trimmed}$`;
+    }
+
+    t = t.replace(/\b([a-zA-Z0-9]+)\^(-?[0-9]+)\b/g, "$$$1^{$2}$$");
+    t = t.replace(/\b([a-zA-Z0-9]+)\^\{(-?[0-9a-zA-Z]+)\}\b/g, "$$$1^{$2}$$");
+
+    t = cleanIntraSentenceNewlines(t);
+
+    t = t.replace(/(?:\s+|^|-)(i|ii|iii|iv|v)\.\s+/gi, "\n$1. ");
+    t = t.replace(/(?:\s+|^)\((i|ii|iii|iv|v)\)\s+/gi, "\n($1) ");
+    t = t.replace(/(?:\s+|^)নিচের কোনটি সঠিক\?/g, "\n\nনিচের কোনটি সঠিক?");
+
+    return t;
+  });
+
+  const result = processedParts.join("");
+  if (preprocessCache.size >= MAX_PREPROCESS_CACHE) {
+    const firstKey = preprocessCache.keys().next().value;
+    if (firstKey) preprocessCache.delete(firstKey);
+  }
+  preprocessCache.set(text, result);
+  return result;
+}
+
+function BaseMathRenderer({ text, block = false }: MathRendererProps) {
   if (!text) return null;
 
-  // Enhance formatting for list items that are often pasted inline
-  let formattedText = text;
-
-  // Normalize literal \n (two-char escape sequence) to actual newlines.
-  // Handles content pasted from JSON or bulk-uploaded with \n as newline placeholder.
-  formattedText = formattedText.replace(/\\n/g, "\n");
-
-  // In math blocks, un-escape \\command → \command.
-  // tiptap-markdown escapes backslashes in math content (e.g. \text → \\text),
-  // which breaks KaTeX: \\rightarrow → \\ (line-break) + unknown 'rightarrow'.
-  formattedText = formattedText.replace(
-    /(\$\$[\s\S]*?\$\$|\$(?!\$)[^\n]*?\$)/g,
-    (match) => match.replace(/\\\\([a-zA-Z{])/g, "\\$1"),
-  );
-
-  // Format i., ii., iii. etc
-  // Use (?:\s+|^|-) to match space, start of string, or a dash before the numeral
-  formattedText = formattedText.replace(
-    /(?:\s+|^|-)(i|ii|iii|iv|v)\.\s+/gi,
-    "\n$1. ",
-  );
-
-  // Format parenthesis numerals (i), (ii), etc
-  formattedText = formattedText.replace(
-    /(?:\s+|^|-)\((i|ii|iii|iv|v)\)\s+/gi,
-    "\n($1) ",
-  );
-
-  // Catch the typical ending question and push it to a new line
-  formattedText = formattedText.replace(
-    /(?:\s+|^)নিচের কোনটি সঠিক\?/g,
-    "\n\nনিচের কোনটি সঠিক?",
-  );
+  const formattedText = preprocess(text);
 
   return (
     <div
@@ -87,3 +179,5 @@ export function MathRenderer({ text, block = false }: MathRendererProps) {
     </div>
   );
 }
+
+export const MathRenderer = React.memo(BaseMathRenderer);

@@ -58,7 +58,7 @@ class ResultStats extends StatelessWidget {
                 value: finalScore.toStringAsFixed(2),
                 subtitle: '/ $totalPoints',
                 icon: Icons.emoji_events_outlined,
-                color: Colors.redAccent,
+                color: const Color(0xFFEF4444),
                 isDark: isDark,
               ),
             ),
@@ -69,40 +69,48 @@ class ResultStats extends StatelessWidget {
                 title: 'সময় লেগেছে',
                 value: _formatDuration(timeTaken),
                 icon: Icons.timer_outlined,
-                color: Colors.teal,
+                color: const Color(0xFF14B8A6),
                 isDark: isDark,
               ),
             ),
           ],
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
 
-        // Summary Table
+        // Summary Table Card
         Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF000000) : Colors.white,
+            color: isDark ? const Color(0xFF18181B) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Column(
             children: [
+              // Header
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF1C1C1E).withValues(alpha: 0.5)
-                      : const Color(0xFFF9FAFB),
+                      ? const Color(0xFF202024)
+                      : const Color(0xFFF8FAFC),
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(16),
                   ),
                   border: Border(
                     bottom: BorderSide(
                       color: isDark
-                          ? const Color(0xFF1C1C1E)
-                          : const Color(0xFFE5E5E5),
+                          ? const Color(0xFF27272A)
+                          : const Color(0xFFE2E8F0),
                     ),
                   ),
                 ),
@@ -111,14 +119,17 @@ class ResultStats extends StatelessWidget {
                     Text(
                       'ফলাফল বিস্তারিত',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 16.5,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
+                        fontFamily: 'HindSiliguri',
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                   ],
                 ),
               ),
+
+              // Rows Content
               IntrinsicHeight(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -149,8 +160,8 @@ class ResultStats extends StatelessWidget {
                       width: 1,
                       thickness: 1,
                       color: isDark
-                          ? const Color(0xFF1C1C1E)
-                          : const Color(0xFFE5E5E5),
+                          ? const Color(0xFF27272A)
+                          : const Color(0xFFE2E8F0),
                     ),
                     // Right Column
                     Expanded(
@@ -160,21 +171,23 @@ class ResultStats extends StatelessWidget {
                             label: 'সঠিক উত্তর',
                             value: correctCount.toString(),
                             isDark: isDark,
-                            valueColor: Colors.green,
+                            valueColor: const Color(0xFF10B981),
                           ),
                           _TableRow(
                             label: 'ভুল উত্তর',
                             value: wrongCount.toString(),
                             isDark: isDark,
-                            valueColor: Colors.red,
+                            valueColor: const Color(0xFFEF4444),
                           ),
                           _TableRow(
-                            label: 'নেগেটিভ মার্কিং (${negativeMarking}x)',
+                            label: 'নেগেটিভ (${negativeMarking}x)',
                             value:
                                 '-${negativeMarksDeduction.toStringAsFixed(2)}',
                             isDark: isDark,
-                            valueColor: Colors.red,
-                            bgColor: Colors.red.withValues(alpha: 0.05),
+                            valueColor: const Color(0xFFEF4444),
+                            bgColor: isDark
+                                ? const Color(0x227F1D1D)
+                                : const Color(0xFFFEF2F2),
                           ),
                         ],
                       ),
@@ -182,20 +195,22 @@ class ResultStats extends StatelessWidget {
                   ],
                 ),
               ),
+
+              // Footer
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF1C1C1E).withValues(alpha: 0.5)
-                      : const Color(0xFFF9FAFB),
+                      ? const Color(0xFF202024)
+                      : const Color(0xFFF8FAFC),
                   borderRadius: const BorderRadius.vertical(
                     bottom: Radius.circular(16),
                   ),
                   border: Border(
                     top: BorderSide(
                       color: isDark
-                          ? const Color(0xFF1C1C1E)
-                          : const Color(0xFFE5E5E5),
+                          ? const Color(0xFF27272A)
+                          : const Color(0xFFE2E8F0),
                     ),
                   ),
                 ),
@@ -205,17 +220,19 @@ class ResultStats extends StatelessWidget {
                     Text(
                       'মোট প্রাপ্ত নম্বর',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15.5,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
+                        fontFamily: 'HindSiliguri',
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                     Text(
                       '${finalScore.toStringAsFixed(2)} / $totalPoints',
                       style: const TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'HindSiliguri',
+                        color: Color(0xFF10B981),
                       ),
                     ),
                   ],
@@ -249,45 +266,58 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: color.withValues(alpha: isDark ? 0.16 : 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 22),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Text(
             value,
             style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF000000),
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              fontFamily: 'HindSiliguri',
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
           ),
           if (subtitle != null)
             Text(
               subtitle!,
-              style: const TextStyle(fontSize: 15, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 12,
+                fontFamily: 'HindSiliguri',
+                color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
+              ),
             ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             title,
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 12.5,
               fontWeight: FontWeight.bold,
-              color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+              fontFamily: 'HindSiliguri',
+              color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
             ),
           ),
         ],
@@ -315,7 +345,7 @@ class _TableRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: bgColor ?? Colors.transparent,
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -323,18 +353,22 @@ class _TableRow extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 16,
-                color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
+                fontSize: 13,
+                fontFamily: 'HindSiliguri',
+                color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),
               ),
-             maxLines: 1, overflow: TextOverflow.ellipsis),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
           Text(
             value,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 13.5,
               fontWeight: FontWeight.bold,
-              color: valueColor ?? (isDark ? Colors.white : Colors.black),
+              fontFamily: 'HindSiliguri',
+              color: valueColor ?? (isDark ? Colors.white : const Color(0xFF0F172A)),
             ),
           ),
         ],
@@ -357,57 +391,66 @@ class _CircularAccuracyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = percentage >= 70
-        ? Colors.green
+        ? const Color(0xFF10B981)
         : percentage >= 40
-        ? Colors.orange
-        : Colors.red;
+            ? const Color(0xFFF59E0B)
+            : const Color(0xFFEF4444);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         children: [
           SizedBox(
-            width: 56,
-            height: 56,
+            width: 52,
+            height: 52,
             child: Stack(
               fit: StackFit.expand,
               children: [
                 CircularProgressIndicator(
                   value: percentage / 100,
-                  strokeWidth: 6,
+                  strokeWidth: 5.5,
                   color: color,
                   backgroundColor: isDark
-                      ? const Color(0xFF1C1C1E)
-                      : const Color(0xFFF3F4F6),
+                      ? const Color(0xFF27272A)
+                      : const Color(0xFFF1F5F9),
                   strokeCap: StrokeCap.round,
                 ),
                 Center(
                   child: Text(
                     '${percentage.round()}%',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF000000),
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'HindSiliguri',
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Text(
             title,
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 12.5,
               fontWeight: FontWeight.bold,
-              color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+              fontFamily: 'HindSiliguri',
+              color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
             ),
           ),
         ],

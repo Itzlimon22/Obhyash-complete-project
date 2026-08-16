@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../dashboard/domain/models.dart';
 import '../../../core/providers/theme_provider.dart';
+import '../../auth/providers/auth_controller.dart';
 import 'personal_details_view.dart';
 import '../../../core/presentation/widgets/user_avatar.dart';
 
@@ -205,7 +206,14 @@ class SettingsView extends ConsumerWidget {
             ),
           );
           if (confirmed == true) {
-            await Supabase.instance.client.auth.signOut();
+            try {
+              await ref.read(authControllerProvider.notifier).logout();
+            } catch (e) {
+              debugPrint('[SettingsView] Logout error: $e');
+              try {
+                await Supabase.instance.client.auth.signOut(scope: SignOutScope.local);
+              } catch (_) {}
+            }
             if (context.mounted) context.go('/login');
           }
         }

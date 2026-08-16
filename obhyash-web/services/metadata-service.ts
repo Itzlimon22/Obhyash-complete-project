@@ -63,13 +63,17 @@ export function getSubjectSortPriority(id: string, name: string): number {
   return 100;
 }
 
-type Subject = {
+export type Subject = {
   id: string;
   name?: string;
   name_en?: string;
   icon?: string;
   division?: string;
   stream?: string;
+  level?: string;
+  category?: 'compulsory' | 'core' | 'elective' | string;
+  paper_number?: number | null;
+  sort_order?: number;
 };
 
 const SUBJECT_ICONS: Record<string, string> = {
@@ -83,13 +87,22 @@ const SUBJECT_ICONS: Record<string, string> = {
   ICT: '💻',
 };
 
-// Helper to get subjects based on group (Science, Humanities, Business Studies) and stream (HSC, Admission)
+// Helper to get subjects based on group (Science, Humanities, Business Studies) and stream/level (HSC, SSC, Admission)
 export const getSubjects = async (
   group?: string,
   stream?: string,
   optionalSubject?: string,
 ): Promise<
-  { id: string; name: string; label?: string; icon?: string; group?: string }[]
+  {
+    id: string;
+    name: string;
+    label?: string;
+    icon?: string;
+    group?: string;
+    category?: 'compulsory' | 'core' | 'elective' | string;
+    paper_number?: number | null;
+    sort_order?: number;
+  }[]
 > => {
   if (isSupabaseConfigured() && supabase) {
     let query = supabase.from('subjects').select('*');
@@ -99,20 +112,17 @@ export const getSubjects = async (
       console.log(
         `[getSubjects] Filtering by Division (Group): ${group} OR General`,
       );
-      query = query.or(`division.eq.${group},division.eq.General`);
+      query = query.or(`division.eq.${group},division.eq.General,division.is.null`);
     }
 
-    // Filter by Stream (HSC, Admission) - if provided
-    // Show subjects that match the stream OR contain NULL (applicable to all streams)
+    // Filter by Stream/Level (HSC, SSC, Admission) - if provided
     if (stream) {
-      console.log(`[getSubjects] Filtering by Stream: ${stream} OR NULL`);
-      // Use ilike to allow partial matches (e.g., "HSC" will match "HSC, Admission")
-      query = query.or(`stream.ilike.%${stream}%,stream.is.null`);
+      console.log(`[getSubjects] Filtering by Stream/Level: ${stream}`);
+      query = query.or(`stream.ilike.%${stream}%,level.ilike.%${stream}%,stream.is.null`);
     }
 
-    // FUTURE: If subjects table supports 'section' column, we can filter here.
-    // currently schema doesn't have 'section' in subjects, so we skip DB filtering for section.
-    // if (section) { query = query.eq('section', section); }
+    // Sort order from database if present
+    query = query.order('sort_order', { ascending: true, nullsFirst: false });
 
     const { data, error } = await query;
     console.log(
@@ -126,9 +136,9 @@ export const getSubjects = async (
         const subId = (subject.id || '').toLowerCase();
 
         const isBiology =
-          subName.includes('biology') || subId.includes('biology');
+          subName.includes('biology') || subId.includes('biology') || subName.includes('জীববিজ্ঞান');
         const isStatistics =
-          subName.includes('statistics') || subId.includes('statistics');
+          subName.includes('statistics') || subId.includes('statistics') || subName.includes('পরিসংখ্যান');
 
         if (optionalSubject === 'Statistics') {
           // User wants Statistics: Hide Biology
@@ -140,30 +150,64 @@ export const getSubjects = async (
         return true;
       });
 
-      // Deduplicate subjects by name to prevent "Chemistry Ch 1" appearing twice
-      // if multiple entries exist with the same name in the database.
+      // Deduplicate subjects by name/id
       const uniqueSubjects = new Map<string, Subject>();
       filteredData.forEach((s: Subject) => {
-        const name = s.name || s.name_en || '';
-        if (name && !uniqueSubjects.has(name)) {
-          uniqueSubjects.set(name, s);
+        const key = s.id || s.name || '';
+        if (key && !uniqueSubjects.has(key)) {
+          uniqueSubjects.set(key, s);
         }
       });
 
-      // Enrich with icons and sort by canonical subject order
-      const enriched = Array.from(uniqueSubjects.values()).map((s) => ({
-        ...s,
-        name: s.name || s.name_en || '', // Ensure 'name' is always a string
-        icon:
-          s.icon ||
-          (s.name ? SUBJECT_ICONS[s.name] : undefined) ||
-          (s.id ? SUBJECT_ICONS[s.id] : undefined) ||
-          '📘',
-      }));
-      return enriched.sort((a, b) =>
-        getSubjectSortPriority(a.id, a.name) -
-        getSubjectSortPriority(b.id, b.name),
-      );
+      // Enrich with category, icons and sort by canonical subject order
+      const enriched = Array.from(uniqueSubjects.values()).map((s) => {
+        const idLower = (s.id || '').toLowerCase();
+        const nameLower = (s.name || s.name_en || '').toLowerCase();
+        
+        let category = s.category;
+        if (!category) {
+          if (
+            idLower.includes('bangla') ||
+            idLower.includes('english') ||
+            idLower.includes('ict') ||
+            nameLower.includes('বাংলা') ||
+            nameLower.includes('ইংরেজি') ||
+            nameLower.includes('তথ্য')
+          ) {
+            category = 'compulsory';
+          } else if (
+            idLower.includes('biology') ||
+            idLower.includes('statistics') ||
+            nameLower.includes('জীববিজ্ঞান') ||
+            nameLower.includes('পরিসংখ্যান')
+          ) {
+            category = 'elective';
+          } else {
+            category = 'core';
+          }
+        }
+
+        return {
+          ...s,
+          name: s.name || s.name_en || '',
+          category,
+          icon:
+            s.icon ||
+            (s.name ? SUBJECT_ICONS[s.name] : undefined) ||
+            (s.id ? SUBJECT_ICONS[s.id] : undefined) ||
+            '📘',
+        };
+      });
+
+      return enriched.sort((a, b) => {
+        if (a.sort_order !== undefined && b.sort_order !== undefined && a.sort_order !== b.sort_order) {
+          return a.sort_order - b.sort_order;
+        }
+        return (
+          getSubjectSortPriority(a.id, a.name) -
+          getSubjectSortPriority(b.id, b.name)
+        );
+      });
     }
   }
 

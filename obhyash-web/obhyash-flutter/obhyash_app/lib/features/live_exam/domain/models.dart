@@ -80,3 +80,91 @@ class LiveExam {
     return now.isAfter(endTime);
   }
 }
+
+class LiveExamAttempt {
+  final String id;
+  final String liveExamId;
+  final String userId;
+  final String status;
+  final num score;
+  final int correctCount;
+  final int wrongCount;
+  final Map<String, int> userAnswers;
+  final DateTime? startTime;
+  final DateTime? submitTime;
+
+  LiveExamAttempt({
+    required this.id,
+    required this.liveExamId,
+    required this.userId,
+    required this.status,
+    required this.score,
+    required this.correctCount,
+    required this.wrongCount,
+    required this.userAnswers,
+    this.startTime,
+    this.submitTime,
+  });
+
+  factory LiveExamAttempt.fromJson(Map<String, dynamic> json) {
+    Map<String, int> answers = {};
+    if (json['user_answers'] is Map) {
+      (json['user_answers'] as Map).forEach((k, v) {
+        if (v is num) {
+          answers[k.toString()] = v.toInt();
+        }
+      });
+    }
+
+    return LiveExamAttempt(
+      id: json['id'] as String? ?? '',
+      liveExamId: json['live_exam_id'] as String? ?? '',
+      userId: json['user_id'] as String? ?? '',
+      status: json['status'] as String? ?? 'ongoing',
+      score: json['score'] as num? ?? 0,
+      correctCount: json['correct_count'] as int? ?? 0,
+      wrongCount: json['wrong_count'] as int? ?? 0,
+      userAnswers: answers,
+      startTime: json['start_time'] != null ? DateTime.parse(json['start_time'].toString()) : null,
+      submitTime: json['submit_time'] != null ? DateTime.parse(json['submit_time'].toString()) : null,
+    );
+  }
+}
+
+class LiveExamLeaderboardEntry {
+  final String id;
+  final num score;
+  final int correctCount;
+  final int wrongCount;
+  final String userName;
+  final String userInstitute;
+  final String avatarColor;
+  final DateTime? submitTime;
+
+  LiveExamLeaderboardEntry({
+    required this.id,
+    required this.score,
+    required this.correctCount,
+    required this.wrongCount,
+    required this.userName,
+    required this.userInstitute,
+    required this.avatarColor,
+    this.submitTime,
+  });
+
+  factory LiveExamLeaderboardEntry.fromJson(Map<String, dynamic> json) {
+    final userData = json['users'] as Map<String, dynamic>?;
+
+    return LiveExamLeaderboardEntry(
+      id: json['id'] as String? ?? '',
+      score: json['score'] as num? ?? 0,
+      correctCount: json['correct_count'] as int? ?? 0,
+      wrongCount: json['wrong_count'] as int? ?? 0,
+      userName: userData?['name'] as String? ?? 'শিক্ষার্থী',
+      userInstitute: userData?['institute'] as String? ?? 'প্রতিষ্ঠান নেই',
+      avatarColor: userData?['avatar_color'] as String? ?? userData?['avatarColor'] as String? ?? '#10b981',
+      submitTime: json['submit_time'] != null ? DateTime.parse(json['submit_time'].toString()) : null,
+    );
+  }
+}
+

@@ -8,84 +8,95 @@ import {
   Search,
   ChevronDown,
   ChevronUp,
-  User,
-  CreditCard,
-  FileQuestion,
-  Wrench,
-  MessageCircle,
+  HelpCircle,
+  MessageSquare,
+  Mail,
 } from 'lucide-react';
 
 export default function FAQPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [openIndex, setOpenIndex] = useState<number | null>(0); // First one open by default
+  const [selectedCategory, setSelectedCategory] = useState('সব');
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  const categories = ['সব', 'পরীক্ষা', 'পেমেন্ট', 'অ্যাকাউন্ট'];
 
   const faqs = [
     {
-      category: 'General',
-      question: 'Obhyash অ্যাপটি কি সম্পূর্ণ ফ্রি?',
+      category: 'পরীক্ষা',
+      question: 'স্মার্ট ওএমআর (OMR) স্ক্যানার কীভাবে কাজ করে?',
       answer:
-        "আমাদের একটি 'বেসিক' প্ল্যাও আছে যা সম্পূর্ণ ফ্রি। এর মাধ্যমে তুমি প্রতিদিন ১টি পরীক্ষা দিতে পারবেন এবং বেসিক ফিচারগুলো ব্যবহার করতে পারবেন। তবে আনলিমিটেড এক্সাম এবং অ্যাডভান্সড এনালাইসিসের জন্য প্রিমিয়াম সাবস্ক্রিপশন প্রয়োজন।",
-    },
-    /*
-    {
-      category: 'Exam',
-      question: 'OMR স্ক্যাও ফিচারটি কিভাবে কাজ করে?',
-      answer:
-        'খুবই সহজ! প্রথমে তুমি অ্যাপ থেকে প্রশ্ন দেখে বা প্রশ্নপত্র ডাউনলোড করে খাতায় পরীক্ষা দিন। এরপর অ্যাপের "OMR Scan" অপশনে গিয়ে তোমার উত্তরপত্রের ছবি তোলো। আমাদের AI মাত্র কয়েক সেকেন্ডে তোমার খাতা যাচাই করে নির্ভুল ফলাফল এবং বিস্তারিত সমাধান দেখিয়ে দিবে।',
-    },
-    */
-    {
-      category: 'Account',
-      question: 'আমি কি একাধিক ডিভাইস থেকে ব্যবহার করতে পারবো?',
-      answer:
-        'হ্যাঁ, তুমি একই একাউন্ট দিয়ে মোবাইল, ট্যাবলেট বা ল্যাপটপ - যেকোনো ডিভাইস থেকে লগইন করতে পারবেন। তোমার সব ডাটা সব ডিভাইসে সিঙ্ক করা থাকবে।',
+        'Obhyash ওএমআর শিট প্রিন্ট করে সাধারণ বলপেন দিয়ে বৃত্ত ভরাট করো। এরপর অ্যাপের ওএমআর স্ক্যানার দিয়ে শিটের ছবি তুললেই ১-২ সেকেন্ডে প্রতিটি বৃত্ত নির্ভুলভাবে মূল্যায়ন করে বিস্তারিত মার্কস ও র‍্যাংক জানিয়ে দেওয়া হবে।',
     },
     {
-      category: 'Payment',
-      question: 'পেমেন্ট পদ্ধতি কি কি?',
+      category: 'পরীক্ষা',
+      question: 'নেগেটিভ মার্কিং কীভাবে হিসাব করা হয়?',
       answer:
-        'বর্তমানে আমরা বিকাশ (bKash), নগদ (Nagad) এবং রকেটের (Rocket) মাধ্যমে পেমেন্ট গ্রহণ করছি। অ্যাপের সাবস্ক্রিপশন পেজ থেকে সরাসরি পেমেন্ট করা যাবে।',
+        'বোর্ড এবং মেডিকেল/ইঞ্জিনিয়ারিং ভর্তি পরীক্ষার আসল নিয়ম অনুসারে প্রতিটি ভুল উত্তরের জন্য ০.২৫ নম্বর কাটা হয়। সঠিক উত্তরের জন্য নির্ধারিত পূর্ণমান যোগ হয়।',
     },
     {
-      category: 'Exam',
-      question: 'প্রশ্নগুলো কি সিলেবাস অনুযায়ী তৈরি?',
+      category: 'পরীক্ষা',
+      question: 'ইন্টারনেট ছাড়া কি অফলাইনে পরীক্ষা দেওয়া যায়?',
       answer:
-        'অবশ্যই! আমাদের সব প্রশ্ন সর্বশেষ NCTB সিলেবাস এবং বোর্ড পরীক্ষার মানবন্টন অনুযায়ী তৈরি করা হয়েছে। আমাদের এক্সপার্ট টিচার প্যাওেল এবং AI প্রতিনিয়ত প্রশ্ন ব্যাংক আপডেট করে।',
+        'হ্যাঁ! একবার পরীক্ষার প্রশ্নপত্র লোড হয়ে গেলে ইন্টারনেট সংযোগ বিচ্ছিন্ন হলেও তুমি নিরবচ্ছিন্নভাবে পরীক্ষা শেষ করতে পারবে। ইন্টারনেট পাওয়ার সাথে সাথে ফলাফল স্বয়ংক্রিয়ভাবে ক্লাউডে সিঙ্ক হয়ে যাবে।',
     },
     {
-      category: 'Payment',
-      question: 'সাবস্ক্রিপশন কি ক্যাও্সেল করা যায়?',
+      category: 'পেমেন্ট',
+      question: 'ফ্রি এবং প্রিমিয়ামের মধ্যে পার্থক্য কী?',
       answer:
-        'Obhyash এ অটো-রিনিউয়াল সিস্টেম নেই, তাই সাবস্ক্রিপশন ক্যাও্সেল করার ঝামেলা নেই। মেয়াদ শেষ হলে তোমার প্যাকেজ স্বয়ংক্রিয়ভাবে ফ্রি প্ল্যাওে চলে আসবে, যতক্ষণ না তুমি পুনরায় রিনিউ করছেন।',
+        'ফ্রি প্ল্যানে প্রতিদিন নির্দিষ্ট সংখ্যক পরীক্ষা ও বেসিক ফিচার ব্যবহার করা যায়। অন্যদিকে প্রিমিয়ামে রয়েছে আনলিমিটেড মক টেস্ট, সীমাহীন ওএমআর স্ক্যানিং, AI বিস্তারিত ব্যাখ্যা ও ন্যাশনাল লিডারবোর্ড র‍্যাংকিং।',
     },
     {
-      category: 'Tech',
-      question: 'অ্যাপ কাজ না করলে বা সমস্যা হলে কি করবো?',
+      category: 'পেমেন্ট',
+      question: 'পেমেন্ট করার কতক্ষণ পর প্রিমিয়াম সক্রিয় হয়?',
       answer:
-        'যেকোনো টেকনিক্যাল সমস্যায় আমাদের অ্যাপের "হেল্প" অপশন থেকে রিপোর্ট করতে পারেন। অথবা সরাসরি আমাদের সাপোর্ট ইমেইলে (support@obhyash.com) স্ক্রিনশটসহ মেইল করো।',
+        'বিকাশ বা নগদ নম্বর থেকে টাকা পাঠানোর পর সঠিক Transaction ID (TrxID) অ্যাপে সাবমিট করলে আমাদের অ্যাডমিন প্যানেল দ্রুততম সময়ে ভেরিফাই করে সাবস্ক্রিপশন সক্রিয় করে দেয়।',
+    },
+    {
+      category: 'পেমেন্ট',
+      question: 'কোনো অটো-রিনিউয়াল বা গোপন চার্জ আছে কি?',
+      answer:
+        'না! Obhyash-এ কোনো হিডেন চার্জ বা অটো-রিনিউয়াল সিস্টেম নেই। নির্দিষ্ট মেয়াদের (৩০ দিন / ৯০ দিন) পর সাবস্ক্রিপশন শেষ হলে স্বয়ংক্রিয়ভাবে ফ্রি প্ল্যানে চলে আসবে।',
+    },
+    {
+      category: 'অ্যাকাউন্ট',
+      question: 'আমি কি একাধিক ফোন বা ল্যাপটপ থেকে ব্যবহার করতে পারব?',
+      answer:
+        'হ্যাঁ, তুমি তোমার রেজিস্টার্ড ফোন নম্বর/ইমেইল দিয়ে যেকোনো ডিভাইস থেকে লগইন করতে পারবে। তবে প্ল্যাটফর্মের ফেয়ার ইউজ পলিসি অনুযায়ী আইডি অন্যের সাথে শেয়ার করা সম্পূর্ণ নিষিদ্ধ।',
+    },
+    {
+      category: 'অ্যাকাউন্ট',
+      question: 'প্রোফাইল তথ্য বা লক্ষ্য (Target) পরিবর্তন করা যায়?',
+      answer:
+        'অবশ্যই! সেটিংস ➔ ব্যক্তিগত তথ্য পেজে গিয়ে যেকোনো সময় তোমার নাম, শিক্ষা প্রতিষ্ঠান, ব্যাচ ও টার্গেট (মেডিকেল/ইঞ্জিনিয়ারিং/ভার্সিটি) পরিবর্তন করতে পারবে।',
     },
   ];
 
-  const filteredFaqs = faqs.filter((faq) =>
-    faq.question.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredFaqs = faqs.filter((faq) => {
+    const matchesCategory =
+      selectedCategory === 'সব' || faq.category === selectedCategory;
+    const matchesSearch =
+      searchQuery === '' ||
+      faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans selection:bg-red-500/20 text-slate-900 dark:text-slate-100">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#09090B] font-sans selection:bg-emerald-500/20 text-slate-900 dark:text-slate-100">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full backdrop-blur-lg bg-white/70 dark:bg-black/70 border-b border-red-100 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-red-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-red-500/20 group-hover:scale-105 transition-transform">
+      <header className="sticky top-0 z-50 w-full backdrop-blur-lg bg-white/80 dark:bg-[#09090B]/80 border-b border-slate-200 dark:border-[#27272A]">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-lg flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
               <Flame className="w-5 h-5" />
             </div>
             <span className="text-xl font-bold text-slate-900 dark:text-white font-serif-exam">
-              অভ্যাস
+              Obhyash (অভ্যাস)
             </span>
           </Link>
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+            className="flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             হোম-এ ফিরে যাও
@@ -94,126 +105,155 @@ export default function FAQPage() {
       </header>
 
       {/* Hero with Search */}
-      <section className="relative py-20 bg-white dark:bg-slate-900 border-b border-red-100 dark:border-slate-800">
-        <div className="absolute inset-0 bg-[radial-gradient(#e11d48_1px,transparent_1px)] [background-size:16px_16px] opacity-[0.03] dark:opacity-[0.1]" />
+      <section className="relative py-16 bg-white dark:bg-[#121215] border-b border-slate-200 dark:border-[#27272A]">
         <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
-          <div className="inline-flex items-center justify-center p-3 mb-6 bg-red-100 dark:bg-red-900/30 text-red-600 rounded-2xl">
-            <MessageCircle className="w-8 h-8" />
+          <div className="inline-flex items-center justify-center p-3 mb-5 bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 rounded-2xl border border-emerald-500/20">
+            <HelpCircle className="w-8 h-8" />
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-6">
-            আমরা কীভাবে সাহায্য করতে পারি?
+          <h1 className="text-2xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-3 font-serif-exam">
+            কীভাবে সাহায্য করতে পারি?
           </h1>
+          <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 mb-8 max-w-lg mx-auto">
+            প্রয়োজনীয় প্রশ্নের উত্তর বা সরাসরি সাহায্য নিতে নিচের অপশনগুলো দেখুন।
+          </p>
 
           {/* Search Bar */}
           <div className="relative max-w-xl mx-auto">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
               type="text"
-              placeholder="আপনার প্রশ্ন লেখো... (যেমন: পেমেন্ট, লগইন)"
+              placeholder="প্রশ্ন খুঁজুন... (যেমন: ওএমআর, পেমেন্ট, রেজাল্ট)"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 rounded-xl border border-red-100 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl shadow-red-500/5 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all text-slate-900 dark:text-white"
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setOpenIndex(null);
+              }}
+              className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-[#27272A] bg-slate-50 dark:bg-[#18181B] shadow-lg shadow-emerald-500/5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-slate-900 dark:text-white text-sm md:text-base"
             />
           </div>
         </div>
       </section>
 
       {/* FAQ Content */}
-      <section className="py-16 px-6">
+      <section className="py-12 px-4 md:px-6">
         <div className="max-w-3xl mx-auto">
-          {/* Categories Row (Visual Only) */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
-            {[
-              { label: 'একাউন্ট', icon: User },
-              { label: 'এক্সাম', icon: FileQuestion },
-              { label: 'পেমেন্ট', icon: CreditCard },
-              { label: 'টেকনিক্যাল', icon: Wrench },
-            ].map((cat, idx) => (
-              <div
-                key={idx}
-                className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full text-sm font-bold text-slate-600 dark:text-slate-400 select-none cursor-default"
-              >
-                <cat.icon className="w-4 h-4" />
-                {cat.label}
+          {/* Quick Support Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+            <Link
+              href="/complaint"
+              className="p-5 rounded-2xl border border-slate-200 dark:border-[#27272A] bg-white dark:bg-[#18181B] hover:border-emerald-500/40 hover:shadow-md transition-all flex items-start gap-4"
+            >
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 rounded-xl">
+                <MessageSquare className="w-5 h-5" />
               </div>
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-white text-base">
+                  অভিযোগ ও মতামত
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  অ্যাপ সংক্রান্ত সমস্যা বা মতামত পাঠাও
+                </p>
+              </div>
+            </Link>
+
+            <a
+              href="mailto:support@obhyash.com"
+              className="p-5 rounded-2xl border border-slate-200 dark:border-[#27272A] bg-white dark:bg-[#18181B] hover:border-emerald-500/40 hover:shadow-md transition-all flex items-start gap-4"
+            >
+              <div className="p-3 bg-blue-50 dark:bg-blue-950/30 text-blue-600 rounded-xl">
+                <Mail className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-white text-base">
+                  ইমেইল সাপোর্ট
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  support@obhyash.com
+                </p>
+              </div>
+            </a>
+          </div>
+
+          {/* Category Chips */}
+          <div className="flex flex-wrap items-center gap-2 mb-8">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mr-2">
+              ক্যাটাগরি:
+            </span>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => {
+                  setSelectedCategory(cat);
+                  setOpenIndex(null);
+                }}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                  selectedCategory === cat
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                    : 'bg-white dark:bg-[#18181B] border border-slate-200 dark:border-[#27272A] text-slate-600 dark:text-slate-400 hover:border-emerald-500/40'
+                }`}
+              >
+                {cat}
+              </button>
             ))}
           </div>
 
-          <div className="space-y-4">
+          {/* Accordion List */}
+          <div className="space-y-3">
             {filteredFaqs.length > 0 ? (
               filteredFaqs.map((faq, idx) => (
                 <div
                   key={idx}
-                  className={`group rounded-2xl border transition-all duration-300 overflow-hidden ${
+                  className={`rounded-2xl border transition-all overflow-hidden ${
                     openIndex === idx
-                      ? 'bg-white dark:bg-slate-900 border-red-200 dark:border-red-900/50 shadow-lg shadow-red-500/5'
-                      : 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-900'
+                      ? 'bg-white dark:bg-[#18181B] border-emerald-500/40 shadow-sm'
+                      : 'bg-white dark:bg-[#18181B] border-slate-200 dark:border-[#27272A] hover:border-emerald-500/30'
                   }`}
                 >
                   <button
                     onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
-                    className="w-full flex items-center justify-between p-6 text-left"
+                    className="w-full flex items-center justify-between p-5 text-left"
                   >
                     <span
-                      className={`font-bold text-lg ${
+                      className={`font-bold text-base md:text-lg ${
                         openIndex === idx
-                          ? 'text-red-600 dark:text-red-400'
+                          ? 'text-emerald-600 dark:text-emerald-400'
                           : 'text-slate-900 dark:text-slate-200'
                       }`}
                     >
                       {faq.question}
                     </span>
                     {openIndex === idx ? (
-                      <ChevronUp className="w-5 h-5 text-red-600" />
+                      <ChevronUp className="w-5 h-5 text-emerald-600 flex-shrink-0 ml-2" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-slate-400 group-hover:text-slate-600" />
+                      <ChevronDown className="w-5 h-5 text-slate-400 flex-shrink-0 ml-2" />
                     )}
                   </button>
                   <div
-                    className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${
+                    className={`px-5 overflow-hidden transition-all duration-200 ease-in-out ${
                       openIndex === idx
-                        ? 'max-h-96 pb-6 opacity-100'
+                        ? 'max-h-96 pb-5 opacity-100'
                         : 'max-h-0 opacity-0'
                     }`}
                   >
-                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-4">
+                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-[#27272A] pt-4 text-sm md:text-base">
                       {faq.answer}
                     </p>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center py-12">
-                <p className="text-slate-500">
-                  কোনো প্রশ্ন খুঁজে পাওয়া যায়নি। অন্য কিছু লিখে খুঁজুন।
+              <div className="text-center py-12 bg-white dark:bg-[#18181B] rounded-2xl border border-slate-200 dark:border-[#27272A]">
+                <p className="text-slate-500 text-sm">
+                  কোনো প্রশ্ন খুঁজে পাওয়া যায়নি।
                 </p>
               </div>
             )}
-          </div>
-
-          <div className="mt-16 bg-gradient-to-r from-red-600 to-red-600 rounded-3xl p-8 md:p-12 text-center text-white shadow-2xl shadow-red-500/30 relative overflow-hidden">
-            <div className="relative z-10">
-              <h3 className="text-2xl font-bold mb-4">আরও প্রশ্ন আছে?</h3>
-              <p className="mb-6 text-red-100 max-w-lg mx-auto">
-                তোমার প্রশ্নের উত্তর এখানে না পেলে আমাদের সাপোর্ট টিমের সাথে
-                সরাসরি কথা বলুন।
-              </p>
-              <a
-                href="mailto:support@obhyash.com"
-                className="inline-flex px-6 py-3 bg-white text-red-600 rounded-xl font-bold hover:bg-red-50 transition-colors"
-              >
-                আমাদের মেইল করো
-              </a>
-            </div>
-            {/* Decor */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-slate-900 py-8 border-t border-red-100 dark:border-slate-800 text-center text-sm text-slate-500">
+      <footer className="bg-white dark:bg-[#121215] py-8 border-t border-slate-200 dark:border-[#27272A] text-center text-xs text-slate-500">
         © {new Date().getFullYear()} Obhyash Platform. All rights reserved.
       </footer>
     </div>

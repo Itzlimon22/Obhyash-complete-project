@@ -458,7 +458,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                   onTap: () => _handleSelect(idx),
                   child: AnimatedOpacity(
                     duration: const Duration(milliseconds: 200),
-                    opacity: dimmed ? 0.45 : 1.0,
+                    opacity: dimmed ? 0.92 : 1.0,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       margin: const EdgeInsets.only(bottom: 8),

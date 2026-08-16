@@ -203,7 +203,7 @@ export default function QuestionCard({
               textClass = 'text-red-700 dark:text-red-300 font-bold';
             } else {
               boxClass =
-                'bg-[#f8f9fa] dark:bg-[#1f1f1f] border border-[#e5e7eb] dark:border-[#333] opacity-60';
+                'bg-[#f8f9fa] dark:bg-[#1f1f1f] border border-[#e5e7eb] dark:border-[#333] opacity-95';
             }
           } else if (showAnswer && isCorrect) {
             boxClass =

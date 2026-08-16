@@ -177,29 +177,6 @@ const ResultView: React.FC<ResultViewProps> = ({
           {feedback.text}
         </p>
 
-        {/* Challenge Banner for OMR
-        {submissionType === 'script' &&
-          onChallengeEvaluation &&
-          !isHistoryMode && (
-            <div className="mt-6 max-w-xl mx-auto bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-left">
-                <h4 className="font-bold text-red-800 dark:text-red-200 text-sm">
-                  OMR মূল্যায়ন নিয়ে সন্তুষ্ট নন?
-                </h4>
-                <p className="text-xs text-red-700 dark:text-red-300">
-                  যাও্ত্রিক ত্রুটির কারণে ফলাফল ভুল হতে পারে।
-                </p>
-              </div>
-              <button
-                onClick={onChallengeEvaluation}
-                className="px-4 py-2 bg-white dark:bg-neutral-800 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 text-sm font-bold rounded hover:bg-red-100 dark:hover:bg-neutral-700 transition-colors whitespace-nowrap"
-              >
-                পুনরায় যাচাই করো
-              </button>
-            </div>
-          )}
-        */}
-
         <div className="grid grid-cols-2 gap-2 mt-5 max-w-sm mx-auto">
           {onDownloadResultWithExplanations && (
             <button

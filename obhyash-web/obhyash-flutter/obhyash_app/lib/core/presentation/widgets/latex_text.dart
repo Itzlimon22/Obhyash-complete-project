@@ -7,41 +7,202 @@ import 'package:markdown/markdown.dart' as md;
 // PREPROCESSING  (mirrors the web app's MathRenderer preprocessing pipeline)
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+// PREPROCESSING  (mirrors the web app's MathRenderer preprocessing pipeline)
+// ─────────────────────────────────────────────────────────────────────────────
+
+String _unwrapBengaliMathContent(String inner) {
+  String clean = inner;
+
+  // 1. Un-escape \text{...}, \mathrm{...}, \textbf{...}, \textit{...}
+  clean = clean.replaceAllMapped(
+    RegExp(r'\\(?:text|mathrm|textbf|textit)\{([^}]*)\}'),
+    (m) => m.group(1)!,
+  );
+
+  // 2. Un-escape LaTeX spacing commands
+  clean = clean
+      .replaceAll(r'\,', ' ')
+      .replaceAll(r'\;', ' ')
+      .replaceAll(r'\quad', ' ')
+      .replaceAll(r'\qquad', ' ')
+      .replaceAll(r'\ ', ' ')
+      .replaceAll('~', ' ');
+
+  // 3. Re-wrap math constructs within this mixed text
+  final tokenRegex = RegExp(
+    r'(\\[a-zA-Z]+(?:\{[^{}]*\}|\[[^\[\]]*\])*|[a-zA-Z0-9]+(?:\^|\_)\{?[a-zA-Z0-9\-\+]+\}?)',
+  );
+
+  clean = clean.replaceAllMapped(tokenRegex, (m) {
+    final token = m.group(0)!;
+    return '\$$token\$';
+  });
+
+  return clean;
+}
+
+String _cleanIntraSentenceNewlines(String text) {
+  const placeholder = '___DBL_NL___';
+  text = text.replaceAll(RegExp(r'\r\n|\r'), '\n');
+  // Preserve intentional double newlines (paragraphs)
+  text = text.replaceAll(RegExp(r'\n\s*\n+'), placeholder);
+
+  final lines = text.split('\n');
+  if (lines.length <= 1) {
+    return text.replaceAll(placeholder, '\n\n');
+  }
+
+  final buffer = StringBuffer();
+  for (int i = 0; i < lines.length; i++) {
+    final line = lines[i].trim();
+    if (line.isEmpty) continue;
+
+    if (buffer.isEmpty) {
+      buffer.write(line);
+      continue;
+    }
+
+    // Check if the line is an intentional list item or section header
+    final isListItem = RegExp(
+      r'^(?:\([iIvVxX0-9a-zA-Z\u0980-\u09fa]+\)|[iIvVxX0-9a-zA-Z\u0980-\u09fa]+[\.\)]|\-|\*|\#|নিচের|উদ্দীপক)',
+    ).hasMatch(line);
+
+    // Check if line starts with punctuation that should attach to previous word
+    final isPunctuation = RegExp(r'^[।,\.\?\!:\;]').hasMatch(line);
+
+    if (isListItem) {
+      buffer.write('\n');
+      buffer.write(line);
+    } else if (isPunctuation) {
+      buffer.write(line);
+    } else {
+      buffer.write(' ');
+      buffer.write(line);
+    }
+  }
+
+  return buffer.toString().replaceAll(placeholder, '\n\n');
+}
+
+final Map<String, String> _preprocessCache = {};
+const int _kMaxPreprocessCache = 600;
+
 String _preprocess(String text) {
-  // 1. Normalise literal \n (two-char escape) → real newlines
-  text = text.replaceAll(r'\n', '\n');
+  final cached = _preprocessCache[text];
+  if (cached != null) return cached;
 
-  // 2. Inside math blocks: un-escape \\command → \command
-  //    (tiptap-markdown double-escapes backslashes inside math)
-  text = text.replaceAllMapped(
-    RegExp(r'(\$\$[\s\S]*?\$\$|\$(?!\$)[^\n]*?\$)'),
-    (m) => m
-        .group(0)!
-        .replaceAllMapped(
-          RegExp(r'\\\\([a-zA-Z{])'),
-          (inner) => '\\${inner.group(1)}',
-        ),
+  // 1. Normalise literal \n and carriage returns
+  var processedText = text.replaceAll(r'\n', '\n').replaceAll(RegExp(r'\r\n|\r'), '\n');
+
+  // 2. Convert inline $$...$$ (short, single-line) into inline $...$
+  // In many question datasets, $23\text{ m}$ is authored as $$23\text{ m}$$ which forces a block break.
+  processedText = processedText.replaceAllMapped(
+    RegExp(r'\$\$([^\n]{1,80}?)\$\$'),
+    (m) {
+      final inner = m.group(1)!.trim();
+      // If it contains newline or is a long complex equation, keep it as display math
+      if (inner.contains('\n') || inner.length > 80) {
+        return '\$\$$inner\$\$';
+      }
+      return '\$$inner\$';
+    },
   );
 
-  // 3. Roman-numeral list items  "i. " → "\ni. "
-  text = text.replaceAllMapped(
-    RegExp(r'(?:\s+|^|-)(i|ii|iii|iv|v)\.\s+', caseSensitive: false),
-    (m) => '\n${m.group(1)}. ',
-  );
+  // 3. Clean intra-sentence accidental newlines across the entire text
+  processedText = _cleanIntraSentenceNewlines(processedText);
 
-  // 4. Parenthetical roman numerals "(i) " → "\n(i) "
-  text = text.replaceAllMapped(
-    RegExp(r'(?:\s+|^|-)\((i|ii|iii|iv|v)\)\s+', caseSensitive: false),
-    (m) => '\n(${m.group(1)}) ',
-  );
+  // 4. Split into math blocks ($$...$$ or $...$) and non-math segments
+  final mathPattern = RegExp(r'(\$\$[\s\S]*?\$\$|\$(?!\$)[^\n]*?\$)');
+  final parts = <String>[];
+  int lastIndex = 0;
 
-  // 5. Common Bangla question tail
-  text = text.replaceAll(
-    RegExp(r'(?:\s+|^)নিচের কোনটি সঠিক\?'),
-    '\n\nনিচের কোনটি সঠিক?',
-  );
+  for (final match in mathPattern.allMatches(processedText)) {
+    if (match.start > lastIndex) {
+      parts.add(processedText.substring(lastIndex, match.start));
+    }
+    parts.add(match.group(0)!);
+    lastIndex = match.end;
+  }
+  if (lastIndex < processedText.length) {
+    parts.add(processedText.substring(lastIndex));
+  }
 
-  return text;
+  // 5. Process each segment safely
+  final processedParts = parts.map((part) {
+    if (part.startsWith(r'$')) {
+      final isDisplay = part.startsWith(r'$$');
+      final inner = isDisplay
+          ? part.substring(2, part.length - 2)
+          : part.substring(1, part.length - 1);
+
+      // Unescape double backslashes inside math
+      String cleanInner = inner.replaceAllMapped(
+        RegExp(r'\\\\([a-zA-Z{])'),
+        (m) => '\\${m.group(1)}',
+      );
+
+      // If the math block does NOT contain Bengali characters, keep it as pure intact LaTeX
+      if (!RegExp(r'[\u0980-\u09FF]').hasMatch(cleanInner)) {
+        return isDisplay ? '\$\$$cleanInner\$\$' : '\$$cleanInner\$';
+      }
+
+      // If it contains Bengali text, unwrap the Bengali words
+      return _unwrapBengaliMathContent(cleanInner);
+    }
+
+    // It's a Non-Math Text Segment
+    String t = part;
+
+    // Check if the segment is an un-delimited LaTeX formula or algebraic expression
+    final trimmed = t.trim();
+    final hasNoBengali = !RegExp(r'[\u0980-\u09FF]').hasMatch(trimmed);
+    final hasLatexCmd = trimmed.contains(r'\') && RegExp(r'\\[a-zA-Z]+').hasMatch(trimmed);
+    final hasMathExpr = RegExp(r'[a-zA-Z0-9]+(?:\^|\_)\{?[a-zA-Z0-9\-\+]+\}?').hasMatch(trimmed);
+
+    if (hasNoBengali && trimmed.isNotEmpty && (hasLatexCmd || (hasMathExpr && trimmed.contains(RegExp(r'[=+\-*/<>()]'))))) {
+      return '\$$trimmed\$';
+    }
+
+    // Normalize isolated superscripts like ms^-1 or ms^{-1}
+    t = t.replaceAllMapped(
+      RegExp(r'\b([a-zA-Z0-9]+)\^(-?[0-9]+)\b'),
+      (m) => '\$${m.group(1)}^{${m.group(2)}}\$',
+    );
+    t = t.replaceAllMapped(
+      RegExp(r'\b([a-zA-Z0-9]+)\^\{(-?[0-9a-zA-Z]+)\}\b'),
+      (m) => '\$${m.group(1)}^{${m.group(2)}}\$',
+    );
+
+    // Roman-numeral list items "i. " → "\ni. "
+    t = t.replaceAllMapped(
+      RegExp(r'(?:\s+|^|-)(i|ii|iii|iv|v)\.\s+', caseSensitive: false),
+      (m) => '\n${m.group(1)}. ',
+    );
+
+    // Parenthetical roman numerals "(i) " → "\n(i) "
+    t = t.replaceAllMapped(
+      RegExp(r'(?:\s+|^|-)\((i|ii|iii|iv|v)\)\s+', caseSensitive: false),
+      (m) => '\n(${m.group(1)}) ',
+    );
+
+    // Common Bangla question tail
+    t = t.replaceAll(
+      RegExp(r'(?:\s+|^)নিচের কোনটি সঠিক\?'),
+      '\n\nনিচের কোনটি সঠিক?',
+    );
+
+    return t;
+  }).toList();
+
+  final result = processedParts.join('');
+
+  if (_preprocessCache.length >= _kMaxPreprocessCache) {
+    _preprocessCache.clear();
+  }
+  _preprocessCache[text] = result;
+
+  return result;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -49,18 +210,14 @@ String _preprocess(String text) {
 // Teaches the markdown parser to recognise $...$ and $$...$$ as math spans.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Tag names used by our custom elements
 const _kInlineMath = 'inline-math';
 const _kDisplayMath = 'display-math';
 
-/// Markdown syntax node that wraps a LaTeX expression.
 class _MathElement extends md.Element {
   _MathElement.inline(String latex) : super(_kInlineMath, [md.Text(latex)]);
-
   _MathElement.display(String latex) : super(_kDisplayMath, [md.Text(latex)]);
 }
 
-/// Inline syntax: $...$  (but not $$)
 class _InlineMathSyntax extends md.InlineSyntax {
   _InlineMathSyntax() : super(r'\$(?!\$)(.*?)\$', caseSensitive: true);
 
@@ -72,7 +229,6 @@ class _InlineMathSyntax extends md.InlineSyntax {
   }
 }
 
-/// Inline syntax: $$...$$  (display mode, treated inline but rendered display)
 class _DisplayMathSyntax extends md.InlineSyntax {
   _DisplayMathSyntax() : super(r'\$\$([\s\S]*?)\$\$', caseSensitive: true);
 
@@ -90,9 +246,8 @@ class _DisplayMathSyntax extends md.InlineSyntax {
 
 class _InlineMathBuilder extends MarkdownElementBuilder {
   final TextStyle? textStyle;
-  final double maxWidth;
 
-  _InlineMathBuilder({this.textStyle, required this.maxWidth});
+  _InlineMathBuilder({this.textStyle});
 
   @override
   Widget? visitElementAfterWithContext(
@@ -102,20 +257,19 @@ class _InlineMathBuilder extends MarkdownElementBuilder {
     TextStyle? parentStyle,
   ) {
     final latex = element.textContent;
-    final style = textStyle ?? preferredStyle ?? const TextStyle();
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: maxWidth),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Math.tex(
-          latex,
-          mathStyle: MathStyle.text,
-          textStyle: style,
-          onErrorFallback: (_) => Text(
-            '\$$latex\$',
-            style: style.copyWith(color: Colors.red),
-          ),
-        ),
+    final style = (textStyle ?? preferredStyle ?? parentStyle ?? const TextStyle()).copyWith(
+      fontFamily: 'HindSiliguri',
+    );
+
+    // Render directly as an inline Math widget without SingleChildScrollView/ConstrainedBox.
+    // SingleChildScrollView inside a WidgetSpan forces RenderParagraph to break lines.
+    return Math.tex(
+      latex,
+      mathStyle: MathStyle.text,
+      textStyle: style,
+      onErrorFallback: (_) => Text(
+        latex,
+        style: style,
       ),
     );
   }
@@ -134,20 +288,22 @@ class _DisplayMathBuilder extends MarkdownElementBuilder {
     TextStyle? parentStyle,
   ) {
     final latex = element.textContent;
-    final style = textStyle ?? preferredStyle ?? const TextStyle();
+    final style = (textStyle ?? preferredStyle ?? const TextStyle()).copyWith(
+      fontFamily: 'HindSiliguri',
+    );
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: Alignment.center,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
+          padding: const EdgeInsets.symmetric(vertical: 6),
           child: Math.tex(
             latex,
             mathStyle: MathStyle.display,
             textStyle: style,
             onErrorFallback: (_) => Text(
               '\$\$$latex\$\$',
-              style: style.copyWith(color: Colors.red),
+              style: style.copyWith(color: Colors.redAccent),
             ),
           ),
         ),
@@ -160,12 +316,6 @@ class _DisplayMathBuilder extends MarkdownElementBuilder {
 // PUBLIC WIDGET
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Drop-in replacement for [Text] that supports:
-///   • Markdown (bold, italic, lists, line-breaks, GFM tables)
-///   • Inline LaTeX:  $E = mc^2$
-///   • Display LaTeX: $$\int_0^1 x\,dx$$
-///
-/// Matches the web app's MathRenderer + preprocessing pipeline exactly.
 class LatexText extends StatelessWidget {
   final String text;
   final TextStyle? style;
@@ -176,7 +326,6 @@ class LatexText extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Effective text color (for markdown body text)
     final effectiveStyle = (style ?? DefaultTextStyle.of(context).style)
         .copyWith(
           fontFamily: style?.fontFamily ?? 'HindSiliguri',
@@ -184,17 +333,17 @@ class LatexText extends StatelessWidget {
           color:
               style?.color ??
               (isDark ? const Color(0xFFF5F5F5) : const Color(0xFF111827)),
-          height: style?.height ?? 1.5,
+          height: style?.height ?? 1.45,
         );
 
-    // Fast-path bypass for plain text without math or markdown tokens (10x faster)
     final bool hasSpecialSyntax = text.contains(r'$') ||
         text.contains('*') ||
         text.contains('_') ||
         text.contains('#') ||
         text.contains('`') ||
         text.contains('\n') ||
-        text.contains(r'\');
+        text.contains(r'\') ||
+        text.contains('^');
 
     if (!hasSpecialSyntax) {
       return Text(
@@ -205,17 +354,14 @@ class LatexText extends StatelessWidget {
 
     final processed = _preprocess(text);
 
-    return LayoutBuilder(builder: (context, constraints) {
-      final maxWidth = constraints.maxWidth;
-      return MarkdownBody(
-        data: processed,
-        // plug in $$...$$ BEFORE $...$ so the longer pattern matches first
-        inlineSyntaxes: [_DisplayMathSyntax(), _InlineMathSyntax()],
-        builders: {
-          _kInlineMath: _InlineMathBuilder(textStyle: effectiveStyle, maxWidth: maxWidth),
-          _kDisplayMath: _DisplayMathBuilder(textStyle: effectiveStyle),
-        },
-        styleSheet: MarkdownStyleSheet(
+    return MarkdownBody(
+      data: processed,
+      inlineSyntaxes: [_DisplayMathSyntax(), _InlineMathSyntax()],
+      builders: {
+        _kInlineMath: _InlineMathBuilder(textStyle: effectiveStyle),
+        _kDisplayMath: _DisplayMathBuilder(textStyle: effectiveStyle),
+      },
+      styleSheet: MarkdownStyleSheet(
           textAlign: WrapAlignment.start,
           p: effectiveStyle,
           pPadding: EdgeInsets.zero,
@@ -262,6 +408,6 @@ class LatexText extends StatelessWidget {
         selectable: false,
         shrinkWrap: true,
       );
-    });
   }
 }
+

@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/utils/app_popups.dart';
 import '../../../core/utils/bangla_name_helper.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/presentation/result_view.dart';
 import '../../exam/presentation/widgets/question_card.dart';
@@ -53,7 +54,8 @@ class _ExamRecord {
     final score = total > 0 ? (correct / total * 100) : 0.0;
 
     final dateStr = j['date']?.toString() ?? j['created_at']?.toString() ?? '';
-    final createdAt = DateTime.tryParse(dateStr) ?? DateTime.now();
+    final parsed = DateTime.tryParse(dateStr);
+    final createdAt = parsed != null ? parsed.toLocal() : DateTime.now();
 
     return _ExamRecord(
       id: j['id']?.toString() ?? '',
@@ -74,6 +76,65 @@ class _ExamRecord {
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
+int _getSubjectSortPriority(String name, String id) {
+  final l = '$name $id'.toLowerCase();
+  int base = 100;
+
+  if (l.contains('bangla') || l.contains('বাংলা')) {
+    base = 10;
+  } else if (l.contains('english') || l.contains('ইংরেজি')) {
+    base = 20;
+  } else if (l.contains('ict') ||
+      l.contains('তথ্য') ||
+      l.contains('information')) {
+    base = 30;
+  } else if (l.contains('physics') || l.contains('পদার্থ')) {
+    base = 40;
+  } else if (l.contains('chemistry') ||
+      l.contains('রসায়ন') ||
+      l.contains('রসায়ন')) {
+    base = 50;
+  } else if (l.contains('math') || l.contains('গণিত')) {
+    base = 60;
+  } else if (l.contains('biology') ||
+      l.contains('botany') ||
+      l.contains('zoology') ||
+      l.contains('জীববিজ্ঞান')) {
+    base = 70;
+  } else if (l.contains('accounting') || l.contains('হিসাব')) {
+    base = 80;
+  } else if (l.contains('finance') ||
+      l.contains('ফিন্যান্স') ||
+      l.contains('ব্যাংকিং')) {
+    base = 82;
+  } else if (l.contains('management') ||
+      l.contains('ব্যবসায়') ||
+      l.contains('ব্যবস্থাপনা')) {
+    base = 84;
+  } else if (l.contains('marketing') || l.contains('বিপণন')) {
+    base = 86;
+  } else if (l.contains('economics') || l.contains('অর্থনীতি')) {
+    base = 88;
+  } else if (l.contains('statistics') || l.contains('পরিসংখ্যান')) {
+    base = 90;
+  } else if (l.contains('civics') || l.contains('পৌরনীতি')) {
+    base = 92;
+  } else if (l.contains('history') || l.contains('ইতিহাস')) {
+    base = 94;
+  }
+
+  // 1st paper comes before 2nd paper
+  if (l.contains('2nd') ||
+      l.contains('_2') ||
+      l.contains('২য়') ||
+      l.contains('২য়') ||
+      l.contains('zoology') ||
+      l.contains('প্রাণি')) {
+    return base + 1;
+  }
+  return base;
+}
+
 String _subjectDisplay(String key, [String? label]) {
   return BanglaNameHelper.formatSubject(key, label);
 }
@@ -113,12 +174,15 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   List<MapEntry<String, String>> _subjectList = [];
   List<String> _chapterList = [];
 
-  // Exams Tab state
+  // Exams Tab state (Server-side paginated)
   List<_ExamRecord> _history = [];
   bool _isLoadingExams = true;
-  bool _isClearing = false;
+  bool _isLoadingMoreExams = false;
+  bool _hasMoreExams = true;
   bool _hasErrorExams = false;
   _SortMode _sortBy = _SortMode.date;
+  static const int _examPageSize = 20;
+  int _examOffset = 0;
 
   // Questions Tab state (Server-side paginated)
   List<Question> _questions = [];
@@ -127,7 +191,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   bool _isLoadingMoreQuestions = false;
   bool _hasMoreQuestions = true;
   bool _hasErrorQuestions = false;
-  static const int _qPageSize = 15;
+  static const int _qPageSize = 20;
   int _qOffset = 0;
 
   @override
@@ -142,7 +206,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
     _fetchMetadata();
     _fetchBookmarks();
-    _fetchExams();
+    _fetchExams(refresh: true);
     _fetchQuestions(refresh: true);
   }
 
@@ -154,21 +218,107 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
   Future<void> _fetchMetadata() async {
     try {
+      final profile = ref.read(userProfileProvider).value;
+      final level = profile?.level?.trim() ?? profile?.stream?.trim();
+      final division = profile?.division?.trim();
+      final optionalSubject = profile?.optionalSubject?.trim();
+
       final sb = Supabase.instance.client;
-      final subData = await sb.from('subjects').select('id, name, name_en').limit(100);
+      dynamic data;
+      try {
+        var query = sb.from('subjects').select('*');
+        if (division != null && division.isNotEmpty && division != 'General') {
+          query = query.or(
+            'division.eq.$division,division.eq.General,division.is.null',
+          );
+        }
+        data = await query.limit(150);
+      } catch (e) {
+        data = await sb.from('subjects').select('*').limit(150);
+      }
+
+      if (data == null || (data is List && data.isEmpty)) {
+        data = await sb.from('subjects').select('*').limit(150);
+      }
+
+      final List rawList = data is List ? data : [];
+      var filteredData = rawList.where((e) {
+        final subName =
+            (e['name'] ?? e['name_en'] ?? '').toString().toLowerCase();
+        final subId = e['id'].toString().toLowerCase();
+        final subLevel = (e['level'] ?? '').toString().toUpperCase();
+
+        // Level safety check (HSC vs SSC)
+        if (level != null && level.toUpperCase().contains('SSC')) {
+          if (subId.startsWith('hsc_') ||
+              subName.contains('hsc') ||
+              subLevel == 'HSC') {
+            return false;
+          }
+        } else if (level != null && level.toUpperCase().contains('HSC')) {
+          if (subId.startsWith('ssc_') ||
+              subName.contains('ssc') ||
+              subLevel == 'SSC') {
+            return false;
+          }
+        }
+
+        // Optional Subject filtering
+        final isBiology = subName.contains('biology') ||
+            subId.contains('biology') ||
+            subName.contains('জীববিজ্ঞান');
+        final isStatistics = subName.contains('statistics') ||
+            subId.contains('statistics') ||
+            subName.contains('পরিসংখ্যান');
+
+        if (optionalSubject != null && optionalSubject.isNotEmpty) {
+          if (optionalSubject.toLowerCase().contains('stat')) {
+            if (isBiology) return false;
+          } else if (optionalSubject.toLowerCase().contains('bio')) {
+            if (isStatistics) return false;
+          }
+        }
+        return true;
+      }).toList();
+
+      if (filteredData.isEmpty) {
+        filteredData = rawList;
+      }
+
+      final sortOrderMap = <String, int>{};
       final seen = <String, String>{};
-      for (final s in (subData as List)) {
+      for (final s in filteredData) {
         final id = s['id']?.toString() ?? '';
-        final name = (s['name'] ?? s['name_en'] ?? '').toString();
-        if (id.isNotEmpty && name.isNotEmpty) {
-          seen[id] = name;
+        final rawName = (s['name'] ?? s['name_en'] ?? '').toString();
+        final rawNameEn = (s['name_en'] ?? '').toString();
+        final formattedName = BanglaNameHelper.formatSubject(
+          rawNameEn.isNotEmpty ? rawNameEn : rawName,
+          rawName,
+        );
+        if (id.isNotEmpty && formattedName.isNotEmpty) {
+          seen[id] = formattedName;
+          if (s['sort_order'] is int) {
+            sortOrderMap[id] = s['sort_order'] as int;
+          }
         }
       }
 
+      final entries = seen.entries.toList();
+      entries.sort((a, b) {
+        final soA = sortOrderMap[a.key];
+        final soB = sortOrderMap[b.key];
+        if (soA != null && soB != null && soA != soB) {
+          return soA.compareTo(soB);
+        }
+        final prioA = _getSubjectSortPriority(a.value, a.key);
+        final prioB = _getSubjectSortPriority(b.value, b.key);
+        if (prioA != prioB) return prioA.compareTo(prioB);
+        return a.value.compareTo(b.value);
+      });
+
       if (mounted) {
         setState(() {
-          _subjectList = seen.entries.toList()
-            ..sort((a, b) => a.value.compareTo(b.value));
+          _subjectList = entries;
         });
       }
     } catch (e) {
@@ -263,38 +413,84 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     }
   }
 
-  Future<void> _fetchExams() async {
-    setState(() {
-      _isLoadingExams = true;
-      _hasErrorExams = false;
-    });
+  Future<void> _fetchExams({bool refresh = false}) async {
+    if (refresh) {
+      setState(() {
+        _isLoadingExams = true;
+        _hasErrorExams = false;
+        _examOffset = 0;
+        _hasMoreExams = true;
+      });
+    } else {
+      if (_isLoadingMoreExams || !_hasMoreExams) return;
+      setState(() {
+        _isLoadingMoreExams = true;
+      });
+    }
+
     try {
       final sb = Supabase.instance.client;
       final authResponse = await sb.auth.getSession();
       final uid = sb.auth.currentUser?.id ?? authResponse?.user.id;
       if (uid == null) {
-        setState(() => _isLoadingExams = false);
+        setState(() {
+          _isLoadingExams = false;
+          _isLoadingMoreExams = false;
+        });
         return;
       }
 
-      final data = await sb
+      final currentOffset = refresh ? 0 : _examOffset;
+
+      var query = sb
           .from('exam_results')
           .select(
             'id, subject, subject_label, correct_count, wrong_count, total_questions, time_taken, created_at, date, exam_type',
           )
-          .eq('user_id', uid)
+          .eq('user_id', uid);
+
+      if (_filterSubject.isNotEmpty) {
+        query = query.or('subject.eq.$_filterSubject,subject.ilike.%$_filterSubject%');
+      }
+
+      if (_filterDate != null) {
+        final startUtc = DateTime(
+          _filterDate!.year,
+          _filterDate!.month,
+          _filterDate!.day,
+          0,
+          0,
+          0,
+        ).toUtc().toIso8601String();
+        final endUtc = DateTime(
+          _filterDate!.year,
+          _filterDate!.month,
+          _filterDate!.day,
+          23,
+          59,
+          59,
+          999,
+        ).toUtc().toIso8601String();
+        query = query.or(
+          'and(created_at.gte.$startUtc,created_at.lte.$endUtc),and(date.gte.$startUtc,date.lte.$endUtc)',
+        );
+      }
+
+      final data = await query
           .order('date', ascending: false)
-          .limit(200);
+          .range(currentOffset, currentOffset + _examPageSize - 1);
 
       if (mounted) {
         final records = (data as List)
             .map((r) => _ExamRecord.fromJson(r as Map<String, dynamic>))
             .toList();
 
-        // Cache history list for offline usage
-        await LocalExamCacheService.cacheHistoryList(
-          (data as List).map((e) => e as Map<String, dynamic>).toList(),
-        );
+        // Cache history list for offline usage (on first page)
+        if (refresh) {
+          await LocalExamCacheService.cacheHistoryList(
+            (data as List).map((e) => e as Map<String, dynamic>).toList(),
+          );
+        }
 
         // If subject list was empty, extract from history
         if (_subjectList.isEmpty) {
@@ -311,28 +507,42 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
         }
 
         setState(() {
-          _history = records;
-          _isLoadingExams = false;
+          if (refresh) {
+            _history = records;
+            _isLoadingExams = false;
+          } else {
+            _history.addAll(records);
+            _isLoadingMoreExams = false;
+          }
+          _examOffset = currentOffset + records.length;
+          _hasMoreExams = records.length >= _examPageSize;
         });
       }
     } catch (e) {
       debugPrint('[ExamHistoryView] _fetchExams error: $e');
-      final cached = await LocalExamCacheService.getCachedHistoryList();
-      if (cached != null && cached.isNotEmpty && mounted) {
-        final records = cached
-            .map((r) => _ExamRecord.fromJson(r))
-            .toList();
-        setState(() {
-          _history = records;
-          _isLoadingExams = false;
-          _hasErrorExams = false;
-        });
-        return;
+      if (refresh) {
+        final cached = await LocalExamCacheService.getCachedHistoryList();
+        if (cached != null && cached.isNotEmpty && mounted) {
+          final records = cached
+              .map((r) => _ExamRecord.fromJson(r))
+              .toList();
+          setState(() {
+            _history = records;
+            _isLoadingExams = false;
+            _hasErrorExams = false;
+            _hasMoreExams = false;
+          });
+          return;
+        }
       }
       if (mounted) {
         setState(() {
-          _isLoadingExams = false;
-          _hasErrorExams = true;
+          if (refresh) {
+            _isLoadingExams = false;
+            _hasErrorExams = true;
+          } else {
+            _isLoadingMoreExams = false;
+          }
         });
       }
     }
@@ -368,12 +578,15 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
       }
 
       if (_filterDate != null) {
-        final start = DateTime(
+        final startUtc = DateTime(
           _filterDate!.year,
           _filterDate!.month,
           _filterDate!.day,
+          0,
+          0,
+          0,
         ).toUtc().toIso8601String();
-        final end = DateTime(
+        final endUtc = DateTime(
           _filterDate!.year,
           _filterDate!.month,
           _filterDate!.day,
@@ -382,7 +595,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
           59,
           999,
         ).toUtc().toIso8601String();
-        query = query.gte('created_at', start).lte('created_at', end);
+        query = query.gte('created_at', startUtc).lte('created_at', endUtc);
       }
 
       final data = await query
@@ -422,6 +635,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
   }
 
   void _onFilterChanged() {
+    _fetchExams(refresh: true);
     _fetchQuestions(refresh: true);
     setState(() {});
   }
@@ -457,55 +671,24 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     return list;
   }
 
-  Future<void> _clearHistory() async {
-    final ok = await showDialog<bool>(
+
+
+  void _openPremiumDatePicker(BuildContext context) {
+    showModalBottomSheet(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('ইতিহাস মুছবেন?'),
-        content: const Text('এই অ্যাকশনটি ফিরিয়ে আনা যাবে না।'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('বাতিল'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('মুছুন', style: TextStyle(color: Colors.white)),
-          ),
-        ],
+      useRootNavigator: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _PremiumDatePickerModal(
+        selectedDate: _filterDate,
+        onDateSelected: (date) {
+          setState(() {
+            _filterDate = date;
+          });
+          _onFilterChanged();
+        },
       ),
     );
-    if (ok != true) return;
-    setState(() => _isClearing = true);
-    try {
-      final sb = Supabase.instance.client;
-      final uid = sb.auth.currentUser?.id;
-      if (uid != null) {
-        await sb.from('exam_results').delete().eq('user_id', uid);
-        setState(() {
-          _history = [];
-        });
-        if (mounted) {
-          AppPopups.show(
-            context,
-            message: 'ইতিহাস মুছে ফেলা হয়েছে',
-            isError: false,
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        AppPopups.show(
-          context,
-          message: 'ইতিহাস মুছতে সমস্যা হয়েছে',
-          isError: true,
-        );
-      }
-      debugPrint('[ExamHistoryView] _clearHistory error: $e');
-    } finally {
-      if (mounted) setState(() => _isClearing = false);
-    }
   }
 
   @override
@@ -576,25 +759,11 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                   tabs: const [
                     Tab(
                       height: 30,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(LucideIcons.barChart2, size: 14),
-                          SizedBox(width: 5),
-                          Text('পরীক্ষা'),
-                        ],
-                      ),
+                      child: Text('পরীক্ষা'),
                     ),
                     Tab(
                       height: 30,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(LucideIcons.helpCircle, size: 14),
-                          SizedBox(width: 5),
-                          Text('প্রশ্ন'),
-                        ],
-                      ),
+                      child: Text('প্রশ্ন'),
                     ),
                   ],
                 ),
@@ -665,18 +834,21 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                           ),
                         ),
                         ..._subjectList.map(
-                          (s) => DropdownMenuItem<String>(
-                            value: s.key,
-                            child: Text(
-                              s.value,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontFamily: 'HindSiliguri',
+                          (s) {
+                            final emoji = BanglaNameHelper.getSubjectEmoji(s.key, s.value);
+                            return DropdownMenuItem<String>(
+                              value: s.key,
+                              child: Text(
+                                '$emoji ${s.value}',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontFamily: 'HindSiliguri',
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
+                            );
+                          },
                         ),
                       ],
                       onChanged: (v) {
@@ -776,18 +948,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
               // 3. Date Filter Chip
               GestureDetector(
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: _filterDate ?? DateTime.now(),
-                    firstDate: DateTime(2023),
-                    lastDate: DateTime.now(),
-                  );
-                  if (picked != null) {
-                    setState(() => _filterDate = picked);
-                    _onFilterChanged();
-                  }
-                },
+                onTap: () => _openPremiumDatePicker(context),
                 child: Container(
                   height: 38,
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -882,11 +1043,12 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                   : _ExamsTab(
                       records: _sortedFilteredExams,
                       isDark: isDark,
-                      onClear: _history.isEmpty ? null : _clearHistory,
-                      isClearing: _isClearing,
                       sortBy: _sortBy,
                       onSortChange: (s) => setState(() => _sortBy = s),
-                      onRefresh: _fetchExams,
+                      onRefresh: () => _fetchExams(refresh: true),
+                      hasMore: _hasMoreExams,
+                      isLoadingMore: _isLoadingMoreExams,
+                      onLoadMore: () => _fetchExams(refresh: false),
                     ),
 
               // Tab 2: Questions (Paginated with Load More using standard QuestionCard)
@@ -922,20 +1084,22 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 class _ExamsTab extends StatelessWidget {
   final List<_ExamRecord> records;
   final bool isDark;
-  final VoidCallback? onClear;
-  final bool isClearing;
   final _SortMode sortBy;
   final void Function(_SortMode) onSortChange;
   final Future<void> Function() onRefresh;
+  final bool hasMore;
+  final bool isLoadingMore;
+  final VoidCallback onLoadMore;
 
   const _ExamsTab({
     required this.records,
     required this.isDark,
-    this.onClear,
-    required this.isClearing,
     required this.sortBy,
     required this.onSortChange,
     required this.onRefresh,
+    required this.hasMore,
+    required this.isLoadingMore,
+    required this.onLoadMore,
   });
 
   @override
@@ -962,12 +1126,10 @@ class _ExamsTab extends StatelessWidget {
 
     int totalQuestions = 0;
     int totalCorrect = 0;
-    int totalWrong = 0;
 
     for (final r in records) {
       totalQuestions += r.totalQuestions;
       totalCorrect += r.correctCount;
-      totalWrong += r.wrongCount;
     }
 
     final avgScore = records.isEmpty
@@ -981,176 +1143,107 @@ class _ExamsTab extends StatelessWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         children: [
-          // Sort & Clear Header Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Compact Sort Dropdown
-              Container(
-                height: 34,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                  borderRadius: BorderRadius.circular(9),
-                  border: Border.all(
-                    color: isDark
-                        ? const Color(0xFF2E2E2E)
-                        : const Color(0xFFE5E7EB),
-                  ),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<_SortMode>(
-                    value: sortBy,
-                    isDense: true,
-                    icon: Icon(
-                      LucideIcons.chevronDown,
-                      size: 13,
-                      color: isDark
-                          ? const Color(0xFFA3A3A3)
-                          : const Color(0xFF6B7280),
-                    ),
-                    dropdownColor: isDark
-                        ? const Color(0xFF1E1E1E)
-                        : Colors.white,
-                    items: const [
-                      DropdownMenuItem(
-                        value: _SortMode.date,
-                        child: Text(
-                          'তারিখ অনুযায়ী',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontFamily: 'HindSiliguri',
-                          ),
-                        ),
-                      ),
-                      DropdownMenuItem(
-                        value: _SortMode.scoreDesc,
-                        child: Text(
-                          'স্কোর: বেশি আগে',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontFamily: 'HindSiliguri',
-                          ),
-                        ),
-                      ),
-                      DropdownMenuItem(
-                        value: _SortMode.scoreAsc,
-                        child: Text(
-                          'স্কোর: কম আগে',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontFamily: 'HindSiliguri',
-                          ),
-                        ),
-                      ),
-                    ],
-                    onChanged: (v) {
-                      if (v != null) onSortChange(v);
-                    },
-                  ),
+          // Sort Header Row
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              height: 34,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                borderRadius: BorderRadius.circular(9),
+                border: Border.all(
+                  color: isDark
+                      ? const Color(0xFF2E2E2E)
+                      : const Color(0xFFE5E7EB),
                 ),
               ),
-
-              // Compact Clear Button
-              if (onClear != null)
-                GestureDetector(
-                  onTap: isClearing ? null : onClear,
-                  child: Container(
-                    height: 34,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEF4444).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(9),
-                      border: Border.all(
-                        color: const Color(0xFFEF4444).withValues(alpha: 0.2),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<_SortMode>(
+                  value: sortBy,
+                  isDense: true,
+                  icon: Icon(
+                    LucideIcons.chevronDown,
+                    size: 13,
+                    color: isDark
+                        ? const Color(0xFFA3A3A3)
+                        : const Color(0xFF6B7280),
+                  ),
+                  dropdownColor: isDark
+                      ? const Color(0xFF1E1E1E)
+                      : Colors.white,
+                  items: const [
+                    DropdownMenuItem(
+                      value: _SortMode.date,
+                      child: Text(
+                        'তারিখ অনুযায়ী',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontFamily: 'HindSiliguri',
+                        ),
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (isClearing)
-                          const SizedBox(
-                            width: 12,
-                            height: 12,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 1.5,
-                              color: Color(0xFFEF4444),
-                            ),
-                          )
-                        else
-                          const Icon(
-                            LucideIcons.trash2,
-                            size: 13,
-                            color: Color(0xFFEF4444),
-                          ),
-                        const SizedBox(width: 5),
-                        const Text(
-                          'মুছুন',
-                          style: TextStyle(
-                            color: Color(0xFFEF4444),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            fontFamily: 'HindSiliguri',
-                          ),
+                    DropdownMenuItem(
+                      value: _SortMode.scoreDesc,
+                      child: Text(
+                        'স্কোর: বেশি আগে',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontFamily: 'HindSiliguri',
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                    DropdownMenuItem(
+                      value: _SortMode.scoreAsc,
+                      child: Text(
+                        'স্কোর: কম আগে',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontFamily: 'HindSiliguri',
+                        ),
+                      ),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) onSortChange(v);
+                  },
                 ),
-            ],
+              ),
+            ),
           ),
           const SizedBox(height: 10),
 
-          // ── Compact Center-Aligned Stats Grid ─────────────────────────────
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 2.15,
+          // ── Compact Center-Aligned 3-Card Stat Row ─────────────────────────────
+          Row(
             children: [
-              _buildStatCard(
-                title: 'মোট প্রশ্ন',
-                value: '$totalQuestions',
-                icon: LucideIcons.layers,
-                gradient: const [Color(0xFF004633), Color(0xFF00664B)],
-                textColor: Colors.white,
-                isDark: isDark,
+              Expanded(
+                child: _buildStatCard(
+                  title: 'মোট প্রশ্ন',
+                  value: '$totalQuestions',
+                  icon: LucideIcons.layers,
+                  accentColor: const Color(0xFF059669),
+                  isDark: isDark,
+                ),
               ),
-              _buildStatCard(
-                title: 'সঠিক',
-                value: '$totalCorrect',
-                icon: LucideIcons.checkCircle2,
-                gradient: isDark
-                    ? const [Color(0xFF064E3B), Color(0xFF065F46)]
-                    : const [Color(0xFFECFDF5), Color(0xFFD1FAE5)],
-                textColor: isDark
-                    ? const Color(0xFF34D399)
-                    : const Color(0xFF004633),
-                isDark: isDark,
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildStatCard(
+                  title: 'সঠিক উত্তর',
+                  value: '$totalCorrect',
+                  icon: LucideIcons.checkCircle2,
+                  accentColor: const Color(0xFF10B981),
+                  isDark: isDark,
+                ),
               ),
-              _buildStatCard(
-                title: 'ভুল',
-                value: '$totalWrong',
-                icon: LucideIcons.xCircle,
-                gradient: isDark
-                    ? const [Color(0xFF450A0A), Color(0xFF7F1D1D)]
-                    : const [Color(0xFFFEF2F2), Color(0xFFFEE2E2)],
-                textColor: isDark
-                    ? const Color(0xFFF87171)
-                    : const Color(0xFFDC2626),
-                isDark: isDark,
-              ),
-              _buildStatCard(
-                title: 'গড় নম্বর',
-                value: '${avgScore.round()}%',
-                icon: LucideIcons.target,
-                gradient: isDark
-                    ? const [Color(0xFF1C1C1E), Color(0xFF2E2E2E)]
-                    : const [Color(0xFFF3F4F6), Color(0xFFE5E7EB)],
-                textColor: isDark ? Colors.white : const Color(0xFF111827),
-                isDark: isDark,
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildStatCard(
+                  title: 'গড় নম্বর',
+                  value: '${avgScore.round()}%',
+                  icon: LucideIcons.target,
+                  accentColor: const Color(0xFF3B82F6),
+                  isDark: isDark,
+                ),
               ),
             ],
           ),
@@ -1160,17 +1253,66 @@ class _ExamsTab extends StatelessWidget {
           Text(
             'সাম্প্রতিক পরীক্ষাসমূহ',
             style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
               fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF111827),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
 
           // Compact Exam Cards
           ...records.map((r) => _ExamCard(record: r, isDark: isDark)),
-          const SizedBox(height: 20),
+          if (hasMore) ...[
+            const SizedBox(height: 12),
+            Center(
+              child: SizedBox(
+                width: 220,
+                height: 46,
+                child: ElevatedButton.icon(
+                  onPressed: isLoadingMore ? null : onLoadMore,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        isDark ? const Color(0xFF18181B) : Colors.white,
+                    foregroundColor:
+                        isDark ? Colors.white : const Color(0xFF0F172A),
+                    elevation: 0,
+                    side: BorderSide(
+                      color: isDark
+                          ? const Color(0xFF27272A)
+                          : const Color(0xFFE2E8F0),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  icon: isLoadingMore
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Color(0xFF059669),
+                          ),
+                        )
+                      : const Icon(
+                          LucideIcons.arrowDown,
+                          size: 16,
+                          color: Color(0xFF059669),
+                        ),
+                  label: Text(
+                    isLoadingMore ? 'লোড হচ্ছে...' : 'আরও ২০টি পরীক্ষা লোড করো',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      fontFamily: 'HindSiliguri',
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -1180,54 +1322,65 @@ class _ExamsTab extends StatelessWidget {
     required String title,
     required String value,
     required IconData icon,
-    required List<Color> gradient,
-    required Color textColor,
+    required Color accentColor,
     required bool isDark,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: gradient,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(12),
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.05)
-              : Colors.transparent,
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 13, color: textColor.withValues(alpha: 0.85)),
-              const SizedBox(width: 4),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: textColor.withValues(alpha: 0.9),
-                  fontFamily: 'HindSiliguri',
-                ),
-              ),
-            ],
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: accentColor.withValues(alpha: isDark ? 0.15 : 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, size: 15, color: accentColor),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 6),
           Text(
             value,
             style: TextStyle(
-              fontSize: 19,
+              fontSize: 18,
               fontWeight: FontWeight.w900,
-              color: textColor,
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
               height: 1.1,
             ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 3),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w600,
+              color: isDark
+                  ? const Color(0xFFA1A1AA)
+                  : const Color(0xFF71717A),
+              fontFamily: 'HindSiliguri',
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -1327,17 +1480,17 @@ class _ExamCardState extends State<_ExamCard> {
         : '--';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? const Color(0xFF2E2E2E) : const Color(0xFFF3F4F6),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.03),
-            blurRadius: 6,
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
@@ -1346,16 +1499,16 @@ class _ExamCardState extends State<_ExamCard> {
         color: Colors.transparent,
         child: InkWell(
           onTap: _handleTap,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Compact Score Ring
+                // Score Ring
                 SizedBox(
-                  width: 42,
-                  height: 42,
+                  width: 46,
+                  height: 46,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -1363,7 +1516,7 @@ class _ExamCardState extends State<_ExamCard> {
                         value: 1.0,
                         strokeWidth: 3.5,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          isDark ? const Color(0xFF2E2E2E) : const Color(0xFFF3F4F6),
+                          isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6),
                         ),
                       ),
                       CircularProgressIndicator(
@@ -1377,7 +1530,7 @@ class _ExamCardState extends State<_ExamCard> {
                         child: Text(
                           '${record.score.round()}%',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 13,
                             fontWeight: FontWeight.w900,
                             fontFamily: 'HindSiliguri',
                             color: isDark ? Colors.white : const Color(0xFF111827),
@@ -1387,7 +1540,7 @@ class _ExamCardState extends State<_ExamCard> {
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
 
                 // Details Center Aligned vertically
                 Expanded(
@@ -1398,8 +1551,8 @@ class _ExamCardState extends State<_ExamCard> {
                       Text(
                         label,
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
                           fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : const Color(0xFF111827),
                         ),
@@ -1411,61 +1564,61 @@ class _ExamCardState extends State<_ExamCard> {
                         children: [
                           Icon(
                             LucideIcons.calendar,
-                            size: 11,
+                            size: 12,
                             color: isDark
-                                ? const Color(0xFFA3A3A3)
-                                : const Color(0xFF6B7280),
+                                ? const Color(0xFFA1A1AA)
+                                : const Color(0xFF71717A),
                           ),
                           const SizedBox(width: 4),
                           Text(
                             dateStr,
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 12.5,
                               fontWeight: FontWeight.w500,
                               fontFamily: 'HindSiliguri',
                               color: isDark
-                                  ? const Color(0xFFA3A3A3)
-                                  : const Color(0xFF6B7280),
+                                  ? const Color(0xFFA1A1AA)
+                                  : const Color(0xFF71717A),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       Row(
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
+                              horizontal: 8,
+                              vertical: 3,
                             ),
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? const Color(0xFF2A2A2A)
-                                  : const Color(0xFFF3F4F6),
+                                  ? const Color(0xFF27272A)
+                                  : const Color(0xFFF4F4F5),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               '${record.correctCount} সঠিক, ${record.wrongCount} ভুল',
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 fontFamily: 'HindSiliguri',
                                 color: isDark
-                                    ? const Color(0xFFD4D4D4)
-                                    : const Color(0xFF4B5563),
+                                    ? const Color(0xFFE4E4E7)
+                                    : const Color(0xFF3F3F46),
                               ),
                             ),
                           ),
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
+                              horizontal: 8,
+                              vertical: 3,
                             ),
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? const Color(0xFF2A2A2A)
-                                  : const Color(0xFFF3F4F6),
+                                  ? const Color(0xFF27272A)
+                                  : const Color(0xFFF4F4F5),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Row(
@@ -1473,21 +1626,21 @@ class _ExamCardState extends State<_ExamCard> {
                               children: [
                                 Icon(
                                   LucideIcons.timer,
-                                  size: 10,
+                                  size: 11,
                                   color: isDark
-                                      ? const Color(0xFFD4D4D4)
-                                      : const Color(0xFF4B5563),
+                                      ? const Color(0xFFE4E4E7)
+                                      : const Color(0xFF3F3F46),
                                 ),
                                 const SizedBox(width: 3),
                                 Text(
                                   timeStr,
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     fontFamily: 'HindSiliguri',
                                     color: isDark
-                                        ? const Color(0xFFD4D4D4)
-                                        : const Color(0xFF4B5563),
+                                        ? const Color(0xFFE4E4E7)
+                                        : const Color(0xFF3F3F46),
                                   ),
                                 ),
                               ],
@@ -1498,27 +1651,11 @@ class _ExamCardState extends State<_ExamCard> {
                     ],
                   ),
                 ),
-
-                const SizedBox(width: 8),
-
-                // Right Action / Loading indicator
-                if (_isLoading)
-                  const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF004633)),
-                    ),
-                  )
-                else
-                  Icon(
-                    LucideIcons.chevronRight,
-                    size: 16,
-                    color: isDark
-                        ? const Color(0xFF525252)
-                        : const Color(0xFFD1D5DB),
-                  ),
+                Icon(
+                  LucideIcons.chevronRight,
+                  size: 18,
+                  color: isDark ? const Color(0xFF52525B) : const Color(0xFFA1A1AA),
+                ),
               ],
             ),
           ),
@@ -1587,55 +1724,49 @@ class _QuestionsTab extends StatelessWidget {
           if (index == questions.length) {
             // Load More Button
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: Center(
-                child: GestureDetector(
-                  onTap: isLoadingMore ? null : onLoadMore,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF1E1E1E)
-                          : const Color(0xFFF3F4F6),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
+                child: SizedBox(
+                  width: 220,
+                  height: 46,
+                  child: ElevatedButton.icon(
+                    onPressed: isLoadingMore ? null : onLoadMore,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          isDark ? const Color(0xFF18181B) : Colors.white,
+                      foregroundColor:
+                          isDark ? Colors.white : const Color(0xFF0F172A),
+                      elevation: 0,
+                      side: BorderSide(
                         color: isDark
-                            ? const Color(0xFF2E2E2E)
-                            : const Color(0xFFE5E7EB),
+                            ? const Color(0xFF27272A)
+                            : const Color(0xFFE2E8F0),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (isLoadingMore)
-                          const SizedBox(
-                            width: 14,
-                            height: 14,
+                    icon: isLoadingMore
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Color(0xFF10B981),
+                              color: Color(0xFF059669),
                             ),
                           )
-                        else
-                          const Icon(
-                            LucideIcons.chevronDown,
-                            size: 15,
-                            color: Color(0xFF10B981),
+                        : const Icon(
+                            LucideIcons.arrowDown,
+                            size: 16,
+                            color: Color(0xFF059669),
                           ),
-                        const SizedBox(width: 6),
-                        Text(
-                          isLoadingMore ? 'লোড হচ্ছে...' : 'আরও লোড করুন (১৫টি)',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'HindSiliguri',
-                            color: isDark ? Colors.white : const Color(0xFF111827),
-                          ),
-                        ),
-                      ],
+                    label: Text(
+                      isLoadingMore ? 'লোড হচ্ছে...' : 'আরও ২০টি প্রশ্ন লোড করো',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        fontFamily: 'HindSiliguri',
+                      ),
                     ),
                   ),
                 ),
@@ -1810,4 +1941,617 @@ Widget _errorState(bool isDark, VoidCallback onRetry) {
       ),
     ),
   );
+}
+
+// ─── Premium Calendar Modal ──────────────────────────────────────────────────
+class _PremiumDatePickerModal extends StatefulWidget {
+  final DateTime? selectedDate;
+  final ValueChanged<DateTime?> onDateSelected;
+
+  const _PremiumDatePickerModal({
+    required this.selectedDate,
+    required this.onDateSelected,
+  });
+
+  @override
+  State<_PremiumDatePickerModal> createState() =>
+      _PremiumDatePickerModalState();
+}
+
+class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
+  late DateTime _displayedMonth;
+  DateTime? _tempSelected;
+
+  static const List<String> _banglaMonths = [
+    'জানুয়ারি',
+    'ফেব্রুয়ারি',
+    'মার্চ',
+    'এপ্রিল',
+    'মে',
+    'জুন',
+    'জুলাই',
+    'আগস্ট',
+    'সেপ্টেম্বর',
+    'অক্টোবর',
+    'নভেম্বর',
+    'ডিসেম্বর'
+  ];
+
+  static const List<String> _banglaWeekdays = [
+    'রবি',
+    'সোম',
+    'মঙ্গল',
+    'বুধ',
+    'বৃহঃ',
+    'শুক্র',
+    'শনি'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    _displayedMonth = widget.selectedDate != null
+        ? DateTime(widget.selectedDate!.year, widget.selectedDate!.month)
+        : DateTime(now.year, now.month);
+    _tempSelected = widget.selectedDate;
+  }
+
+  String _toBanglaNumber(int n) {
+    const bn = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    return n
+        .toString()
+        .split('')
+        .map((char) {
+          final digit = int.tryParse(char);
+          return digit != null ? bn[digit] : char;
+        })
+        .join('');
+  }
+
+  void _previousMonth() {
+    setState(() {
+      _displayedMonth = DateTime(
+        _displayedMonth.year,
+        _displayedMonth.month - 1,
+      );
+    });
+  }
+
+  void _nextMonth() {
+    final now = DateTime.now();
+    if (_displayedMonth.year > now.year ||
+        (_displayedMonth.year == now.year &&
+            _displayedMonth.month >= now.month)) {
+      return;
+    }
+    setState(() {
+      _displayedMonth = DateTime(
+        _displayedMonth.year,
+        _displayedMonth.month + 1,
+      );
+    });
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    final isNextDisabled = _displayedMonth.year > now.year ||
+        (_displayedMonth.year == now.year &&
+            _displayedMonth.month >= now.month);
+
+    final firstDayOfMonth = DateTime(
+      _displayedMonth.year,
+      _displayedMonth.month,
+      1,
+    );
+    final daysInMonth = DateTime(
+      _displayedMonth.year,
+      _displayedMonth.month + 1,
+      0,
+    ).day;
+
+    // Sunday = 0, Monday = 1, ..., Saturday = 6
+    final startOffset = firstDayOfMonth.weekday % 7;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF18181B) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        border: Border.all(
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF3F3F46)
+                        : const Color(0xFFD1D5DB),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // Title & Close
+              Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF059669).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      LucideIcons.calendar,
+                      size: 18,
+                      color: Color(0xFF10B981),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'তারিখ নির্বাচন করুন',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'HindSiliguri',
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF111827),
+                          ),
+                        ),
+                        Text(
+                          'নির্দিষ্ট দিনের পরীক্ষার ফলাফল ও প্রশ্নসমূহ দেখুন',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'HindSiliguri',
+                            color: isDark
+                                ? const Color(0xFFA1A1AA)
+                                : const Color(0xFF6B7280),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(LucideIcons.x, size: 20),
+                    color: isDark
+                        ? const Color(0xFFA1A1AA)
+                        : const Color(0xFF6B7280),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Quick Preset Chips
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildPresetChip(
+                      label: 'আজ',
+                      isSelected: _tempSelected != null &&
+                          _isSameDay(_tempSelected!, today),
+                      isDark: isDark,
+                      onTap: () {
+                        setState(() {
+                          _tempSelected = today;
+                          _displayedMonth =
+                              DateTime(today.year, today.month);
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _buildPresetChip(
+                      label: 'গতকাল',
+                      isSelected: _tempSelected != null &&
+                          _isSameDay(
+                            _tempSelected!,
+                            today.subtract(const Duration(days: 1)),
+                          ),
+                      isDark: isDark,
+                      onTap: () {
+                        final yest = today.subtract(const Duration(days: 1));
+                        setState(() {
+                          _tempSelected = yest;
+                          _displayedMonth =
+                              DateTime(yest.year, yest.month);
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _buildPresetChip(
+                      label: 'গত ৭ দিন',
+                      isSelected: false,
+                      isDark: isDark,
+                      onTap: () {
+                        final past7 = today.subtract(const Duration(days: 7));
+                        setState(() {
+                          _tempSelected = past7;
+                          _displayedMonth =
+                              DateTime(past7.year, past7.month);
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _buildPresetChip(
+                      label: 'সকল তারিখ (Clear)',
+                      isSelected: _tempSelected == null,
+                      isDark: isDark,
+                      isClear: true,
+                      onTap: () {
+                        setState(() {
+                          _tempSelected = null;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Calendar Card Container
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF09090B)
+                      : const Color(0xFFF9FAFB),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark
+                        ? const Color(0xFF27272A)
+                        : const Color(0xFFE5E7EB),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Month & Navigation Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: _previousMonth,
+                          icon: const Icon(
+                            LucideIcons.chevronLeft,
+                            size: 18,
+                          ),
+                          color: isDark
+                              ? Colors.white70
+                              : const Color(0xFF374151),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
+                        ),
+                        Text(
+                          '${_banglaMonths[_displayedMonth.month - 1]} ${_toBanglaNumber(_displayedMonth.year)}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'HindSiliguri',
+                            color: isDark
+                                ? Colors.white
+                                : const Color(0xFF111827),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: isNextDisabled ? null : _nextMonth,
+                          icon: const Icon(
+                            LucideIcons.chevronRight,
+                            size: 18,
+                          ),
+                          color: isNextDisabled
+                              ? (isDark
+                                    ? const Color(0xFF3F3F46)
+                                    : const Color(0xFFD1D5DB))
+                              : (isDark
+                                    ? Colors.white70
+                                    : const Color(0xFF374151)),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Weekdays Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: _banglaWeekdays
+                          .map(
+                            (day) => SizedBox(
+                              width: 38,
+                              child: Text(
+                                day,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'HindSiliguri',
+                                  color: isDark
+                                      ? const Color(0xFFA1A1AA)
+                                      : const Color(0xFF9CA3AF),
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Days Grid
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: startOffset + daysInMonth,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 7,
+                        mainAxisSpacing: 6,
+                        crossAxisSpacing: 4,
+                        childAspectRatio: 1.05,
+                      ),
+                      itemBuilder: (context, index) {
+                        if (index < startOffset) {
+                          return const SizedBox.shrink();
+                        }
+                        final dayNum = index - startOffset + 1;
+                        final currentDay = DateTime(
+                          _displayedMonth.year,
+                          _displayedMonth.month,
+                          dayNum,
+                        );
+                        final isFuture = currentDay.isAfter(today);
+                        final isSelected = _tempSelected != null &&
+                            _isSameDay(_tempSelected!, currentDay);
+                        final isCurrentToday = _isSameDay(currentDay, today);
+
+                        Color? cellBg;
+                        Color textCol = isDark
+                            ? Colors.white
+                            : const Color(0xFF1F2937);
+                        BoxBorder? cellBorder;
+                        List<BoxShadow> cellShadow = [];
+
+                        if (isSelected) {
+                          cellBg = const Color(0xFF004633);
+                          textCol = Colors.white;
+                          cellShadow = [
+                            BoxShadow(
+                              color: const Color(
+                                0xFF10B981,
+                              ).withValues(alpha: 0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ];
+                        } else if (isCurrentToday) {
+                          cellBorder = Border.all(
+                            color: const Color(0xFF10B981),
+                            width: 1.5,
+                          );
+                          textCol = const Color(0xFF10B981);
+                        }
+
+                        if (isFuture) {
+                          textCol = isDark
+                              ? const Color(0xFF3F3F46)
+                              : const Color(0xFFD1D5DB);
+                        }
+
+                        return GestureDetector(
+                          onTap: isFuture
+                              ? null
+                              : () {
+                                  setState(() {
+                                    _tempSelected = currentDay;
+                                  });
+                                },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            decoration: BoxDecoration(
+                              color: cellBg,
+                              borderRadius: BorderRadius.circular(10),
+                              border: cellBorder,
+                              boxShadow: cellShadow,
+                            ),
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  _toBanglaNumber(dayNum),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: (isSelected || isCurrentToday)
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    fontFamily: 'HindSiliguri',
+                                    color: textCol,
+                                  ),
+                                ),
+                                if (isCurrentToday && !isSelected)
+                                  Container(
+                                    width: 4,
+                                    height: 4,
+                                    margin: const EdgeInsets.only(top: 2),
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF10B981),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+
+              // Bottom Actions
+              Row(
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        widget.onDateSelected(null);
+                        Navigator.pop(context);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: BorderSide(
+                          color: isDark
+                              ? const Color(0xFF3F3F46)
+                              : const Color(0xFFD1D5DB),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'মুছুন',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'HindSiliguri',
+                          color: isDark
+                              ? const Color(0xFFA1A1AA)
+                              : const Color(0xFF6B7280),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    flex: 6,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        widget.onDateSelected(_tempSelected);
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF004633),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        shadowColor: const Color(
+                          0xFF10B981,
+                        ).withValues(alpha: 0.3),
+                      ),
+                      child: const Text(
+                        'ফিল্টার প্রয়োগ করুন',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'HindSiliguri',
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPresetChip({
+    required String label,
+    required bool isSelected,
+    required bool isDark,
+    required VoidCallback onTap,
+    bool isClear = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isClear
+                    ? (isDark
+                          ? const Color(0xFF27272A)
+                          : const Color(0xFFF3F4F6))
+                    : const Color(0xFF004633))
+              : (isDark
+                    ? const Color(0xFF1E1E1E)
+                    : const Color(0xFFF9FAFB)),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? (isClear
+                      ? (isDark
+                            ? const Color(0xFF3F3F46)
+                            : const Color(0xFFD1D5DB))
+                      : const Color(0xFF10B981))
+                : (isDark
+                      ? const Color(0xFF27272A)
+                      : const Color(0xFFE5E7EB)),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12.5,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            fontFamily: 'HindSiliguri',
+            color: isSelected
+                ? (isClear
+                      ? (isDark ? Colors.white : Colors.black87)
+                      : Colors.white)
+                : (isDark
+                      ? const Color(0xFFA1A1AA)
+                      : const Color(0xFF6B7280)),
+          ),
+        ),
+      ),
+    );
+  }
 }

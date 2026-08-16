@@ -103,6 +103,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/bookmarks')) return 'bookmarks';
     if (location.contains('/formulas/') && location.split('/').length >= 5) return 'formula_detail';
     if (location.contains('/formulas/') && location.split('/').length >= 4) return 'formula_chapters';
+    if (location.startsWith('/live_exam')) return 'live_exam';
     if (location.startsWith('/formulas')) return 'formulas';
     return 'dashboard';
   }
@@ -147,6 +148,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         return 'ড্যাশবোর্ড';
       case 'setup':
         return 'পরীক্ষা';
+      case 'live_exam':
+        return 'লাইভ পরীক্ষা';
       case 'history':
         return 'ইতিহাস';
       case 'practice':
@@ -204,6 +207,12 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (tab == 'formulas') {
       widget.navigationShell.goBranch(0);
       context.push('/formulas');
+      return;
+    }
+
+    if (tab == 'live_exam') {
+      widget.navigationShell.goBranch(0);
+      context.push('/live_exam');
       return;
     }
 
@@ -403,69 +412,31 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Left: Logo + back button + title
+                        // Left: Clean Title
                         Expanded(
-                          child: Row(
-                            children: [
-                              if (activeTab != 'dashboard' &&
-                                  activeTab != 'history' &&
-                                  activeTab != 'setup' &&
-                                  activeTab != 'leaderboard') ...[
-                                GestureDetector(
-                                  onTap: () {
-                                    if (context.canPop()) {
-                                      context.pop();
-                                    } else {
-                                      context.go('/');
-                                    }
-                                  },
-                                  child: Container(
-                                    width: 40,
-                                    height: 40,
-                                    margin: const EdgeInsets.only(right: 12),
-                                    decoration: BoxDecoration(
-                                      color: isDark
-                                          ? const Color(0xFF1C1C1E)
-                                          : const Color(0xFFF3F4F6),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      LucideIcons.arrowLeft,
-                                      size: 20,
-                                      color: isDark
-                                          ? const Color(0xFFE5E5E5)
-                                          : const Color(0xFF1F2937),
-                                    ),
-                                  ),
+                          child: Consumer(
+                            builder: (context, ref, child) {
+                              final currentLoc = GoRouterState.of(context).uri.toString();
+                              final dynamicTitle = ref.watch(locationTitleProvider)[currentLoc];
+                              
+                              return Text(
+                                dynamicTitle ?? _getTitle(activeTab),
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w900,
+                                  fontFamily: 'Anek Bangla',
+                                  color: isDark
+                                      ? Colors.white
+                                      : const Color(0xFF111827),
                                 ),
-                              ],
-                              Expanded(
-                                child: Consumer(
-                                  builder: (context, ref, child) {
-                                    final currentLoc = GoRouterState.of(context).uri.toString();
-                                    final dynamicTitle = ref.watch(locationTitleProvider)[currentLoc];
-                                    
-                                    return Text(
-                                      dynamicTitle ?? _getTitle(activeTab),
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w900,
-                                        fontFamily: 'Anek Bangla',
-                                        color: isDark
-                                            ? Colors.white
-                                            : const Color(0xFF111827),
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
+                                overflow: TextOverflow.ellipsis,
+                              );
+                            },
                           ),
                         ),
 
-                        // Right: Streak + Notification + Divider + Avatar
-                        if (activeTab != 'setup' && !activeTab.startsWith('formula'))
+                        // Right: Streak + Notification + Divider + Avatar (Dashboard Only for Clean Look)
+                        if (activeTab == 'dashboard')
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [

@@ -36,52 +36,70 @@ class DashboardRepository {
     try {
       var query = _supabase.from('subjects').select('*');
 
-      if (division != null && division != 'General') {
-        query = query.or('division.eq.$division,division.eq.General');
-      }
-
-      if (stream != null) {
-        // stream.ilike.%stream%,stream.is.null
-        query = query.or('stream.ilike.%$stream%,stream.is.null');
+      if (division != null && division.isNotEmpty && division != 'General') {
+        query = query.or('division.eq.$division,division.eq.General,division.is.null');
       }
 
       final response = await query;
 
-      final subjects = (response as List)
+      final rawSubjects = (response as List)
           .map((json) => Subject.fromJson(json))
           .toList();
 
-      // Client side filtering for optional logic
-      return subjects.where((sub) {
+      final streamUpper = stream?.toUpperCase() ?? '';
+
+      // Client side filtering for stream, level & optional logic
+      final filtered = rawSubjects.where((sub) {
         final subName = sub.name.toLowerCase();
         final subId = sub.id.toLowerCase();
 
-        final isBiology =
-            subName.contains('biology') || subId.contains('biology');
-        final isStatistics =
-            subName.contains('statistics') || subId.contains('statistics');
+        // Level / Stream safety check (HSC vs SSC)
+        if (streamUpper.contains('SSC')) {
+          if (subId.startsWith('hsc_') || subName.contains('hsc')) return false;
+        } else if (streamUpper.contains('HSC')) {
+          if (subId.startsWith('ssc_') || subName.contains('ssc')) return false;
+        }
 
-        if (optionalSubject == 'Statistics') {
-          if (isBiology) return false;
-        } else {
-          if (isStatistics) return false;
+        final isBiology =
+            subName.contains('biology') || subId.contains('biology') || subName.contains('জীববিজ্ঞান');
+        final isStatistics =
+            subName.contains('statistics') || subId.contains('statistics') || subName.contains('পরিসংখ্যান');
+
+        if (optionalSubject != null && optionalSubject.isNotEmpty) {
+          if (optionalSubject.toLowerCase().contains('stat')) {
+            if (isBiology) return false;
+          } else if (optionalSubject.toLowerCase().contains('bio')) {
+            if (isStatistics) return false;
+          }
         }
         return true;
       }).toList();
+
+      // Sort by sortOrder from DB if available
+      filtered.sort((a, b) {
+        if (a.sortOrder != null && b.sortOrder != null && a.sortOrder != b.sortOrder) {
+          return a.sortOrder!.compareTo(b.sortOrder!);
+        }
+        return a.name.compareTo(b.name);
+      });
+
+      return filtered;
     } catch (e) {
       debugPrint('DashboardRepository: getSubjects Error: $e');
       return [];
     }
   }
 
-  // Fetching history required for SubjectStats calculation
-  Future<List<ExamResult>> getUserHistory(String userId) async {
+  // Fetching history required for SubjectStats calculation (capped with limit for 10k+ scalability)
+  Future<List<ExamResult>> getUserHistory(String userId, {int limit = 150}) async {
     try {
       final response = await _supabase
           .from('exam_results')
-          .select('id, subject, total_questions, correct_count, wrong_count')
+          .select('id, subject, total_questions, correct_count, wrong_count, date')
           .eq('user_id', userId)
-          .eq('status', 'evaluated');
+          .eq('status', 'evaluated')
+          .order('created_at', ascending: false)
+          .limit(limit);
 
       return (response as List)
           .map((json) => ExamResult.fromJson(json))

@@ -1029,7 +1029,6 @@ export default function StudentRoot({
             flaggedQuestions={flaggedQuestions}
             setFlaggedQuestions={setFlaggedQuestions}
             timeLeft={timeLeft}
-            graceTimeLeft={graceTimeLeft}
             isEvaluating={isEvaluating}
             onSubmit={handleExamSubmit}
             onExit={() =>

@@ -210,7 +210,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              {/* New: OMR Scan Feature Available */}
+              <span>নতুন ফিচার</span>
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight font-serif-exam">
@@ -430,7 +430,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   {/*
                   <li>
                     <a href="#" className="hover:text-red-500 transition-colors">
-                      OMR Grading
+                      Instant Grading
                     </a>
                   </li>
                   */}

@@ -1,4 +1,4 @@
-﻿-- Add columns if they don't exist (Schema Migration)
+-- Add columns if they don't exist (Schema Migration)
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'subscription_plans' AND column_name = 'is_popular') THEN
@@ -46,7 +46,7 @@ INSERT INTO subscription_plans (display_name, name, price, duration_days, featur
   'exam_ready',
   149,
   30,
-  '["আনলিমিটেড মক এক্সাম","আনলিমিটেড OMR স্ক্যান","AI ব্যাখ্যাসহ সমাধান","অ্যাডভান্সড এনালাইসিস","বিজ্ঞাপনমুক্ত অভিজ্ঞতা"]'::jsonb,
+  '["আনলিমিটেড মক এক্সাম","AI ব্যাখ্যাসহ সমাধান","অ্যাডভান্সড এনালাইসিস","বিজ্ঞাপনমুক্ত অভিজ্ঞতা"]'::jsonb,
   false,
   'border-indigo-500'
 ),

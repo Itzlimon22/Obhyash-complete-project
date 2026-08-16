@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/presentation/widgets/obhyash_tooltip.dart';
 
 class DailyStreakCard extends ConsumerStatefulWidget {
   final int userStreak;
@@ -189,8 +190,9 @@ class _DailyStreakCardState extends ConsumerState<DailyStreakCard> {
                   boxColor = primaryAccent.withValues(alpha: opacity);
                 }
                 
-                return Tooltip(
-                  message: activityCount > 0 ? '$activityCount পরীক্ষা দেওয়া হয়েছে' : 'কোনো পরীক্ষা দেওয়া হয়নি',
+                return ObhyashTooltip(
+                  message: activityCount > 0 ? '$activityCountটি পরীক্ষা দেওয়া হয়েছে' : 'কোনো পরীক্ষা দেওয়া হয়নি',
+                  preferredPosition: TooltipPosition.top,
                   child: Container(
                     width: boxSize,
                     height: boxSize,

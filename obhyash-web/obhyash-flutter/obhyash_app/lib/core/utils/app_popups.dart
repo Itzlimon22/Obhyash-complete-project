@@ -11,22 +11,43 @@ class AppPopups {
     // Strip "Exception: " if it exists
     final cleanMessage = message.replaceFirst(RegExp(r'^Exception:\s*'), '');
 
-    final overlayState = Overlay.of(context);
+    final overlayState =
+        Overlay.maybeOf(context, rootOverlay: true) ?? Overlay.maybeOf(context);
+    if (overlayState == null) return;
+
     late OverlayEntry overlayEntry;
+    bool isRemoved = false;
+
+    void safeRemove() {
+      if (!isRemoved && overlayEntry.mounted) {
+        isRemoved = true;
+        try {
+          overlayEntry.remove();
+        } catch (_) {}
+      }
+    }
 
     overlayEntry = OverlayEntry(
       builder: (context) {
         return _TopAnimatedPopup(
           message: cleanMessage,
           isError: isError,
-          onDismiss: () {
-            overlayEntry.remove();
-          },
+          onDismiss: safeRemove,
         );
       },
     );
 
-    overlayState.insert(overlayEntry);
+    try {
+      overlayState.insert(overlayEntry);
+    } catch (_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!isRemoved) {
+          try {
+            overlayState.insert(overlayEntry);
+          } catch (_) {}
+        }
+      });
+    }
   }
 }
 
@@ -50,13 +71,14 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
   Timer? _timer;
+  bool _isDismissed = false;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 400),
     );
 
     _offsetAnimation = Tween<Offset>(
@@ -65,7 +87,7 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.elasticOut, // Spring animation
+        curve: Curves.easeOutCubic,
       ),
     );
 
@@ -76,10 +98,18 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
   }
 
   void _dismiss() {
+    if (_isDismissed) return;
+    _isDismissed = true;
+    _timer?.cancel();
+
     if (mounted) {
       _controller.reverse().then((_) {
         widget.onDismiss();
+      }).catchError((_) {
+        widget.onDismiss();
       });
+    } else {
+      widget.onDismiss();
     }
   }
 
@@ -92,16 +122,15 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
 
   @override
   Widget build(BuildContext context) {
-    // Get screen properties to position it safely below the status bar
     final topPadding = MediaQuery.of(context).padding.top;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Solid Background Colors (Deep Green & Deep Red)
     final bgColor = widget.isError
         ? const Color(0xFFB91C1C) // Deep Red
         : const Color(0xFF059669); // Deep Green
 
-    final icon = widget.isError ? LucideIcons.alertCircle : LucideIcons.checkCircle2;
+    final icon =
+        widget.isError ? LucideIcons.alertCircle : LucideIcons.checkCircle2;
 
     return Positioned(
       top: topPadding + 16,
@@ -114,13 +143,14 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
           child: GestureDetector(
             onTap: _dismiss, // Dismiss on tap
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 color: bgColor,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
+                    color: Colors.black.withValues(alpha: 0.25),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -128,18 +158,20 @@ class _TopAnimatedPopupState extends State<_TopAnimatedPopup>
               ),
               child: Row(
                 children: [
-                  Icon(icon, color: Colors.white, size: 24),
+                  Icon(icon, color: Colors.white, size: 22),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       widget.message,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 14.5,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'Anek Bangla',
+                        fontFamily: 'HindSiliguri',
                       ),
-                     maxLines: 1, overflow: TextOverflow.ellipsis),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

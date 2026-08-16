@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'user_avatar.dart';
+import 'obhyash_tooltip.dart';
 
 class MainSidebar extends StatelessWidget {
   final String activeTab;
@@ -30,6 +30,7 @@ class MainSidebar extends StatelessWidget {
     final menuItems = [
       {'id': 'dashboard', 'label': 'ড্যাশবোর্ড', 'icon': LucideIcons.layoutDashboard},
       {'id': 'setup', 'label': 'পরীক্ষা', 'icon': LucideIcons.fileEdit},
+      {'id': 'live_exam', 'label': 'লাইভ পরীক্ষা', 'icon': LucideIcons.radio},
       {'id': 'history', 'label': 'ইতিহাস', 'icon': LucideIcons.history},
       {'id': 'practice', 'label': 'অনুশীলন', 'icon': LucideIcons.penTool},
       {'id': 'leaderboard', 'label': 'লিডারবোর্ড', 'icon': LucideIcons.trophy},
@@ -39,8 +40,9 @@ class MainSidebar extends StatelessWidget {
     ];
 
     return Drawer(
+      width: 250,
       backgroundColor: isDark
-          ? const Color(0xFF000000)
+          ? const Color(0xFF0C0A09)
           : Colors.white, // neutral-900 : white
       elevation: 16,
       child: SafeArea(
@@ -310,54 +312,60 @@ class MainSidebar extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        onPressed: toggleTheme,
-                        icon: Icon(
-                          isDark ? LucideIcons.sun : LucideIcons.moon,
-                          size: 20,
-                        ),
-                        color: const Color(0xFF737373),
-                        tooltip: isDark ? 'Light Mode' : 'Dark Mode',
-                        style: IconButton.styleFrom(
-                          backgroundColor: isDark
-                              ? const Color(0xFF1C1C1E)
-                              : Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      ObhyashTooltip(
+                        message: isDark ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো',
+                        preferredPosition: TooltipPosition.top,
+                        child: IconButton(
+                          onPressed: toggleTheme,
+                          icon: Icon(
+                            isDark ? LucideIcons.sun : LucideIcons.moon,
+                            size: 20,
+                          ),
+                          color: const Color(0xFF737373),
+                          style: IconButton.styleFrom(
+                            backgroundColor: isDark
+                                ? const Color(0xFF1C1C1E)
+                                : Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                         ),
                       ),
-                      IconButton(
-                        onPressed: () {
-                          onLogout();
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(LucideIcons.logOut, size: 20),
-                        color: const Color(0xFF737373),
-                        tooltip: 'Logout',
-                        style:
-                            IconButton.styleFrom(
-                              hoverColor: const Color(
-                                0x33E11D48,
-                              ), // rose-600/20
-                              backgroundColor: isDark
-                                  ? const Color(0xFF1C1C1E)
-                                  : Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                      ObhyashTooltip(
+                        message: 'লগআউট করো',
+                        preferredPosition: TooltipPosition.top,
+                        child: IconButton(
+                          onPressed: () {
+                            onLogout();
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(LucideIcons.logOut, size: 20),
+                          color: const Color(0xFF737373),
+                          style:
+                              IconButton.styleFrom(
+                                hoverColor: const Color(
+                                  0x33E11D48,
+                                ), // rose-600/20
+                                backgroundColor: isDark
+                                    ? const Color(0xFF1C1C1E)
+                                    : Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ).copyWith(
+                                foregroundColor: WidgetStateProperty.resolveWith((
+                                  states,
+                                ) {
+                                  if (states.contains(WidgetState.hovered)) {
+                                    return const Color(
+                                      0xFFB91C1C,
+                                    ); // hover:text-rose-600
+                                  }
+                                  return null;
+                                }),
                               ),
-                            ).copyWith(
-                              foregroundColor: WidgetStateProperty.resolveWith((
-                                states,
-                              ) {
-                                if (states.contains(WidgetState.hovered)) {
-                                  return const Color(
-                                    0xFFB91C1C,
-                                  ); // hover:text-rose-600
-                                }
-                                return null;
-                              }),
-                            ),
+                        ),
                       ),
                     ],
                   ),

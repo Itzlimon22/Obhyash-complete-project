@@ -157,7 +157,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
   toggleTheme,
 }) => {
   const [activeDemoTab, setActiveDemoTab] = useState<
-    'generate' | /*'omr' |*/ 'analytics'
+    'generate' | 'analytics'
   >('generate');
   const [latestPosts, setLatestPosts] = useState<BlogPost[]>([]);
   const marqueeRef = useRef<HTMLDivElement>(null);
@@ -192,7 +192,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
     {
       name: 'সাদিয়া আফরিন',
       role: 'মেডিকেল ভর্তি পরীক্ষার্থী',
-      text: 'OMR শিট পূরণ করে সাথে সাথে রেজাল্ট পাওয়ার ফিচারটি অসাধারণ। কোচিং-এর ভিড় এড়িয়ে বাসায় বসেই এখন নিজেকে যাচাই করতে পারছি।',
+      text: 'সাথে সাথে রেজাল্ট পাওয়ার ফিচারটি অসাধারণ। কোচিং-এর ভিড় এড়িয়ে বাসায় বসেই এখন নিজেকে যাচাই করতে পারছি।',
       initial: 'S',
       color: 'bg-emerald-500',
     },
@@ -235,7 +235,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       period: '/১ মাস',
       features: [
         'আনলিমিটেড এক্সাম',
-        /* 'আনলিমিটেড OMR স্ক্যান', */
+        
         'বুকমার্ক করার সুবিধা',
         'অ্যাডভান্সড এনালাইসিস',
         'বিজ্ঞাপনমুক্ত অভিজ্ঞতা',
@@ -269,7 +269,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
       a: "আমাদের একটি 'বেসিক' প্ল্যান আছে যা আজীবন ফ্রি। এতে প্রতিদিন ১টি ফ্রি এক্সাম এবং লিমিটেড ফিচার ব্যবহারের সুযোগ রয়েছে। তবে আনলিমিটেড এক্সাম এবং অ্যাডভান্সড এনালাইসিস ব্যবহারের জন্য তোমাকে মাসিক বা ত্রৈমাসিক সাবস্ক্রিপশন নিতে হবে।",
     },
     {
-      q: 'OMR স্ক্যান ফিচারটি কিভাবে কাজ করে?',
+      
       a: 'বাসায় বসে সাধারণ কাগজে পরীক্ষা দাও এবং আমাদের অ্যাপের ক্যামেরা দিয়ে ওএমআর শিটটির ছবি তোলো। আমাদের উন্নত প্রযুক্তি ২০ সেকেন্ডের মধ্যে তোমার খাতা মূল্যায়ন করে নির্ভুল স্কোর দেখাবে। এটি কোচিং সেন্টারের ওএমআর রিডারের মতোই কার্যকর।',
     },
     {
@@ -404,7 +404,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
               {/*
               ,{' '}
               <span className="text-emerald-600 dark:text-emerald-400">
-                OMR Upload
               </span>{' '}
               */}
               এবং নিজের অগ্রগতি যাচাই করো এক নিমিষেই। একাডেমিক এবং অ্যাডমিশন
@@ -493,10 +492,10 @@ const LandingPage: React.FC<LandingPageProps> = ({
                   </button>
                   {/*
                   <button
-                    onClick={() => setActiveDemoTab('omr')}
-                    className={`px-3 py-1 rounded-md transition-all ${activeDemoTab === 'omr' ? 'bg-white dark:bg-neutral-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-neutral-500'}`}
+                    
+                    className={`px-3 py-1 rounded-md transition-all ${false ? 'bg-white dark:bg-neutral-700 shadow-sm text-emerald-600 dark:text-emerald-400' : 'text-neutral-500'}`}
                   >
-                    OMR যাচাই
+                    
                   </button>
                   */}
                   <button
@@ -560,8 +559,8 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     </div>
                   </div>
                 )}
-                {/* 2. OMR Demo - HIDDEN
-                {activeDemoTab === 'omr' && (
+                {/* - HIDDEN
+                {false && (
                   <div className="animate-fade-in flex flex-col items-center justify-center h-full pt-4">
                     <div className="relative w-48 h-64 bg-white border border-neutral-300 rounded shadow-md p-4 flex flex-col gap-3">
                       {[1, 2, 3, 4, 5, 6].map((row) => (
@@ -712,7 +711,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
             </ul>
           </div>
 
-          {/* Card 2: OMR Scanner
+          {/* Card 2: Scanner
           <div className="lg:col-span-3 p-8 rounded-3xl bg-white dark:bg-black border border-neutral-100 dark:border-neutral-800 shadow-sm relative overflow-hidden group hover:border-red-200 dark:hover:border-red-900 transition-all">
             <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
               Available Now
@@ -734,7 +733,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
               </svg>
             </div>
             <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-3">
-              OMR স্ক্যানার
             </h3>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
               খাতায় পরীক্ষা দিয়ে ছবি তোলো। আমাদের কম্পিউটার ভিশন টেকনোলজি
@@ -828,7 +826,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
               PDF ও অফলাইন টুলস
             </h3>
             <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
-              প্রশ্নপত্র {/* এবং OMR শিট */} PDF আকারে ডাউনলোড করে প্রিন্ট করো। অফলাইনে
+              প্রশ্নপত্র PDF আকারে ডাউনলোড করে প্রিন্ট করো। অফলাইনে
               পরীক্ষা দেওয়ার পূর্ণ স্বাধীনতা।
             </p>
           </div>
@@ -1313,7 +1311,7 @@ const LandingPage: React.FC<LandingPageProps> = ({
                     href="#"
                     className="hover:text-red-600 transition-colors flex items-center gap-2"
                   >
-                    OMR গ্রেডিং (OMR Grading)
+                    
                   </a>
                 </li>
                 */}

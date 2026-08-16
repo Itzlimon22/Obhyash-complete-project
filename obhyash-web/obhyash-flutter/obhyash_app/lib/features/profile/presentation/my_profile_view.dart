@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../dashboard/domain/models.dart';
 import 'widgets/stats_grid.dart';
 import 'widgets/subjects_progress_section.dart';
 import 'widgets/recent_activity_section.dart';
 import 'widgets/streak_calendar.dart';
-import '../../dashboard/presentation/widgets/exam_target_modal.dart';
 import '../../../core/presentation/widgets/user_avatar.dart';
+import 'widgets/avatar_picker_modal.dart';
 
 class MyProfileView extends ConsumerWidget {
   final UserProfile user;
@@ -332,15 +331,22 @@ class _UserProfileCard extends StatelessWidget {
       child: Row(
         children: [
           // Avatar
-          UserAvatar(
-            id: user.id,
-            name: user.name,
-            avatarUrl: user.avatarUrl,
-            gender: user.gender,
-            size: 64,
-            showBorder: true,
-            borderColor: Colors.white,
-            borderWidth: 2,
+          GestureDetector(
+            onTap: () => AvatarPickerModal.show(context, user),
+            child: Stack(
+              children: [
+                UserAvatar(
+                  id: user.id,
+                  name: user.name,
+                  avatarUrl: user.avatarUrl,
+                  gender: user.gender,
+                  size: 64,
+                  showBorder: true,
+                  borderColor: Colors.white,
+                  borderWidth: 2,
+                ),
+              ],
+            ),
           ),
           const SizedBox(width: 16),
           // Info

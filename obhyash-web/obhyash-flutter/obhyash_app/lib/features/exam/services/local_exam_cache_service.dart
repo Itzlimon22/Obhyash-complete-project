@@ -104,6 +104,41 @@ class LocalExamCacheService {
     }
   }
 
+  static const String _kActiveDraftKey = 'obhyash_active_exam_draft_v1';
+
+  /// Save live active exam draft on the fly for crash / power-off recovery
+  static Future<void> saveActiveExamDraft(Map<String, dynamic> draft) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_kActiveDraftKey, jsonEncode(draft));
+    } catch (e) {
+      debugPrint('[LocalExamCacheService] saveActiveExamDraft error: $e');
+    }
+  }
+
+  /// Retrieve the active exam draft if app crashed or was killed
+  static Future<Map<String, dynamic>?> getActiveExamDraft() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = prefs.getString(_kActiveDraftKey);
+      if (jsonStr == null || jsonStr.isEmpty) return null;
+      return jsonDecode(jsonStr) as Map<String, dynamic>;
+    } catch (e) {
+      debugPrint('[LocalExamCacheService] getActiveExamDraft error: $e');
+      return null;
+    }
+  }
+
+  /// Clear the active draft once exam is evaluated or discarded
+  static Future<void> clearActiveExamDraft() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_kActiveDraftKey);
+    } catch (e) {
+      debugPrint('[LocalExamCacheService] clearActiveExamDraft error: $e');
+    }
+  }
+
   /// Clear all cached exams
   static Future<void> clearAll() async {
     try {
@@ -114,6 +149,7 @@ class LocalExamCacheService {
       }
       await prefs.remove(_kSavedExamIdsKey);
       await prefs.remove(_kHistoryCacheKey);
+      await prefs.remove(_kActiveDraftKey);
     } catch (e) {
       debugPrint('[LocalExamCacheService] clearAll error: $e');
     }

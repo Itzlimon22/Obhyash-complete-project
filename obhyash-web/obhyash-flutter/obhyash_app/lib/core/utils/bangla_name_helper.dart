@@ -145,4 +145,78 @@ class BanglaNameHelper {
   static bool _hasBengali(String text) {
     return RegExp(r'[\u0980-\u09FF]').hasMatch(text);
   }
+
+  /// Determines the 3-tier academic category: Compulsory, Core, or Elective.
+  static SubjectCategoryType getSubjectCategory(String id, [String? name]) {
+    final lower = '$id ${name ?? ''}'.toLowerCase();
+
+    // 1. Compulsory (আবশ্যিক)
+    if (lower.contains('bangla') ||
+        lower.contains('বাংলা') ||
+        lower.contains('english') ||
+        lower.contains('ইংরেজি') ||
+        lower.contains('ict') ||
+        lower.contains('তথ্য')) {
+      return SubjectCategoryType.compulsory;
+    }
+
+    // 2. Elective / 4th Subject (ঐচ্ছিক)
+    if (lower.contains('biology') ||
+        lower.contains('জীববিজ্ঞান') ||
+        lower.contains('botany') ||
+        lower.contains('zoology') ||
+        lower.contains('statistics') ||
+        lower.contains('পরিসংখ্যান') ||
+        lower.contains('psychology') ||
+        lower.contains('মনোবিজ্ঞান') ||
+        lower.contains('agriculture') ||
+        lower.contains('কৃষি')) {
+      return SubjectCategoryType.elective;
+    }
+
+    // 3. Core Departmental Subject (বিভাগীয় মূল বিষয়)
+    return SubjectCategoryType.core;
+  }
+
+  /// Human-friendly Bangla & English title for the category headers
+  static String getCategoryTitle(SubjectCategoryType type) {
+    switch (type) {
+      case SubjectCategoryType.compulsory:
+        return 'আবশ্যিক বিষয়সমূহ (Compulsory)';
+      case SubjectCategoryType.core:
+        return 'বিভাগীয় মূল বিষয়সমূহ (Core Subjects)';
+      case SubjectCategoryType.elective:
+        return 'ঐচ্ছিক / ৪র্থ বিষয় (Elective)';
+    }
+  }
+
+  /// Returns a themed emoji icon for each subject
+  static String getSubjectEmoji(String id, [String? name]) {
+    final lower = '$id ${name ?? ''}'.toLowerCase();
+
+    if (lower.contains('physics') || lower.contains('পদার্থ')) return '⚛️';
+    if (lower.contains('chemistry') || lower.contains('রসায়ন') || lower.contains('রসায়ন')) return '🧪';
+    if (lower.contains('higher_math') || lower.contains('উচ্চতর গণিত') || lower.contains('math') || lower.contains('গণিত')) return '📐';
+    if (lower.contains('biology') || lower.contains('জীববিজ্ঞান') || lower.contains('botany') || lower.contains('zoology')) return '🧬';
+    if (lower.contains('bangla') || lower.contains('বাংলা')) return '📚';
+    if (lower.contains('english') || lower.contains('ইংরেজি')) return '📝';
+    if (lower.contains('ict') || lower.contains('তথ্য') || lower.contains('information')) return '💻';
+    if (lower.contains('accounting') || lower.contains('হিসাব')) return '📊';
+    if (lower.contains('finance') || lower.contains('ফিন্যান্স') || lower.contains('ব্যাংকিং')) return '💼';
+    if (lower.contains('management') || lower.contains('ব্যবস্থাপনা') || lower.contains('ব্যবসায়')) return '🏢';
+    if (lower.contains('marketing') || lower.contains('বিপণন') || lower.contains('উৎপাদন')) return '📈';
+    if (lower.contains('economics') || lower.contains('অর্থনীতি')) return '📉';
+    if (lower.contains('civics') || lower.contains('পৌরনীতি')) return '🏛️';
+    if (lower.contains('history') || lower.contains('ইতিহাস')) return '📜';
+    if (lower.contains('geography') || lower.contains('ভূগোল')) return '🌍';
+    if (lower.contains('statistics') || lower.contains('পরিসংখ্যান')) return '📊';
+
+    return '📘';
+  }
+}
+
+enum SubjectCategoryType {
+  compulsory,
+  core,
+  elective,
 }
