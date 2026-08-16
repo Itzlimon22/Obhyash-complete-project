@@ -55,9 +55,13 @@ export default function EmojiReactions({ slug }: EmojiReactionsProps) {
 
     mutate({ counts: nextCounts, userReactions: Array.from(nextUser) }, false);
 
+    const token = typeof window !== 'undefined' ? (window as any)._obhyashToken : null;
     const res = await fetch('/api/blog/reactions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
       body: JSON.stringify({ slug, emoji }),
     });
 

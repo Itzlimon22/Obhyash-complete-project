@@ -14,8 +14,16 @@ interface LikeButtonProps {
 }
 
 export default function LikeButton({ postSlug }: LikeButtonProps) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [isLiking, setIsLiking] = useState(false);
+
+  const isAuthed = !!(
+    user ||
+    profile ||
+    (typeof window !== 'undefined' &&
+      (localStorage.getItem('obhyash_user_profile') ||
+        (window as any)._obhyashToken))
+  );
 
   // Local state for optimistic UI updates
   const [localLikes, setLocalLikes] = useState(0);
@@ -35,7 +43,7 @@ export default function LikeButton({ postSlug }: LikeButtonProps) {
   }, [data, isLoading, isLiking]);
 
   const toggleLike = async () => {
-    if (!user) {
+    if (!isAuthed) {
       toast('লগইন প্রয়োজন', {
         description: 'পোস্ট লাইক করতে অনুগ্রহ করে তোমার একাউন্টে প্রবেশ করো।',
       });
@@ -53,10 +61,12 @@ export default function LikeButton({ postSlug }: LikeButtonProps) {
     setLocalLikes(previousHasLiked ? previousLikes - 1 : previousLikes + 1);
 
     try {
+      const token = typeof window !== 'undefined' ? (window as any)._obhyashToken : null;
       const res = await fetch('/api/blog/likes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: JSON.stringify({ slug: postSlug }),
       });

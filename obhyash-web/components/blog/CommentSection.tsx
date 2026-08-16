@@ -79,9 +79,13 @@ function ReplyForm({
     if (!content.trim()) return;
     setIsSubmitting(true);
     try {
+      const token = typeof window !== 'undefined' ? (window as any)._obhyashToken : null;
       const res = await fetch('/api/blog/comments', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           slug: postSlug,
           content: content.trim(),
@@ -234,10 +238,18 @@ function ThreadedComment({
 }
 
 export default function CommentSection({ postSlug }: CommentSectionProps) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+
+  const isAuthed = !!(
+    user ||
+    profile ||
+    (typeof window !== 'undefined' &&
+      (localStorage.getItem('obhyash_user_profile') ||
+        (window as any)._obhyashToken))
+  );
 
   const { data, error, mutate, isLoading } = useSWR<{
     comments: BlogComment[];
@@ -250,12 +262,16 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!content.trim() || !user) return;
+    if (!content.trim() || !isAuthed) return;
     setIsSubmitting(true);
     try {
+      const token = typeof window !== 'undefined' ? (window as any)._obhyashToken : null;
       const res = await fetch('/api/blog/comments', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ slug: postSlug, content: content.trim() }),
       });
       if (!res.ok) throw new Error();
@@ -283,7 +299,7 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
 
       {/* ─── Comment Input ─── */}
       <div className="mb-8">
-        {user ? (
+        {isAuthed ? (
           <form onSubmit={handleSubmit} className="relative">
             <textarea
               value={content}

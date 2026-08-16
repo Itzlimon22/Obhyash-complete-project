@@ -43,7 +43,7 @@ class AppDropdown<T> extends StatelessWidget {
       builder: (BuildContext ctx) {
         return Container(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(ctx).size.height * 0.7,
+            maxHeight: MediaQuery.of(ctx).size.height * 0.5,
           ),
           decoration: BoxDecoration(
             color: bgColor,

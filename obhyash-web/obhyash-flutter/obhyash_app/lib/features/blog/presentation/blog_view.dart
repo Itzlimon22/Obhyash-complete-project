@@ -109,14 +109,10 @@ class _BlogViewState extends State<BlogView> {
 
     final session = Supabase.instance.client.auth.currentSession;
     final headers = <String, String>{};
-    Uri startUri = Uri.parse(_baseBlogUrl);
+    final startUri = Uri.parse(_baseBlogUrl);
 
     if (session != null && session.accessToken.isNotEmpty) {
       headers['Authorization'] = 'Bearer ${session.accessToken}';
-      
-      // Use Next.js auth sync endpoint to set HttpOnly cookies robustly before redirecting to /blog
-      final syncUrl = 'https://obhyash.vercel.app/api/auth/sync?access_token=${session.accessToken}&refresh_token=${session.refreshToken ?? ''}&next=/blog';
-      startUri = Uri.parse(syncUrl);
     }
 
     await _controller.loadRequest(
@@ -249,6 +245,9 @@ class _BlogViewState extends State<BlogView> {
             window._obhyashToken = accessToken;
           }
 
+          window._obhyashToken = accessToken;
+          window._obhyashUser = sessionObj.user;
+
           // 5. Inform Supabase JS & trigger storage events
           if (window.supabase && window.supabase.auth) {
             window.supabase.auth.setSession({
@@ -257,6 +256,7 @@ class _BlogViewState extends State<BlogView> {
             }).catch(() => {});
           }
           window.dispatchEvent(new Event('storage'));
+          window.dispatchEvent(new CustomEvent('obhyash:auth_ready', { detail: { token: accessToken, user: sessionObj.user } }));
         } catch (err) {
           console.error('[ObhyashApp] Auth Sync Error:', err);
         }
