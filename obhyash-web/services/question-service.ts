@@ -102,8 +102,15 @@ export const getQuestionsPage = async (
       const to = from + pageSize - 1;
       query = query.range(from, to);
 
-      // 1. Fetch paginated data
-      const { data, error, count } = await query;
+      // 1. Fetch paginated data with safe timeout
+      const queryPromise = query;
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Questions query timed out")), 10000),
+      );
+      const { data, error, count } = (await Promise.race([
+        queryPromise,
+        timeoutPromise,
+      ])) as { data: any[] | null; error: any; count: number | null };
 
       if (error) {
         console.error("Error fetching questions page:", error);
@@ -115,9 +122,9 @@ export const getQuestionsPage = async (
       let pendingCount = 0;
       let rejectedCount = 0;
 
-      // 2. Fetch status counts with graceful fallback if RPC does not exist
+      // 2. Fetch status counts with graceful fallback and 3s timeout
       try {
-        const countsResult = await supabase.rpc("get_question_status_counts", {
+        const rpcPromise = supabase.rpc("get_question_status_counts", {
           p_subject: filters.subject || null,
           p_chapter: filters.chapter || null,
           p_topic: filters.topic || null,
@@ -125,6 +132,13 @@ export const getQuestionsPage = async (
           p_author: filters.author || null,
           p_search: filters.search?.trim() || null,
         });
+        const rpcTimeout = new Promise<null>((resolve) =>
+          setTimeout(() => resolve(null), 3000),
+        );
+        const countsResult = (await Promise.race([
+          rpcPromise,
+          rpcTimeout,
+        ])) as any;
 
         if (countsResult && countsResult.data) {
           const statusCounts = countsResult.data as {

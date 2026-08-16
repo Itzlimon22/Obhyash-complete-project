@@ -1,1 +1,152 @@
-[]
+[
+  {
+    "title": "ভেক্টরের যোগ: ত্রিভুজ সূত্র (Triangle Law)",
+    "latex": "\\vec{AB} + \\vec{BC} = \\vec{AC}",
+    "description": "কোনো ত্রিভুজের দুটি সন্নিহিত বাহু একই ক্রমে দুটি ভেক্টরকে নির্দেশ করলে, বিপরীত ক্রমে গৃহীত তৃতীয় বাহুটি তাদের লব্ধি নির্দেশ করে।"
+  },
+  {
+    "title": "ভেক্টরের যোগ: সামান্তরিক সূত্র (Parallelogram Law)",
+    "latex": "R = \\sqrt{P^2 + Q^2 + 2PQ\\cos\\alpha}, \\quad \\tan\\theta = \\frac{Q\\sin\\alpha}{P+Q\\cos\\alpha}",
+    "description": "P ও Q দুটি ভেক্টর α কোণে ক্রিয়াশীল হলে, তাদের লব্ধি R এবং লব্ধিটি P এর সাথে θ কোণ উৎপন্ন করে। (MCQ ও সিকিউ উভয়ের জন্য অপরিহার্য)"
+  },
+  {
+    "title": "অবস্থান ভেক্টর ও সরণ (Position Vector & Displacement)",
+    "latex": "\\vec{AB} = \\vec{OB} - \\vec{OA}, \\quad |\\vec{AB}| = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2 + (z_2-z_1)^2}",
+    "description": "মূলবিন্দুর সাপেক্ষে A ও B এর অবস্থান ভেক্টর যথাক্রমে OA ও OB হলে, সরণ ভেক্টর AB হলো তাদের বিয়োগফল (শেষেরটা - প্রথমটা)।"
+  },
+  {
+    "title": "ভেক্টরের মান বা দৈর্ঘ্য (Magnitude)",
+    "latex": "|\\vec{A}| = \\sqrt{A_x^2 + A_y^2 + A_z^2}",
+    "description": "ত্রিমাত্রিক স্থানাঙ্ক ব্যবস্থায় \\vec{A} = A_x\\hat{i} + A_y\\hat{j} + A_z\\hat{k} ভেক্টরের সাংখ্যিক মান বা দৈর্ঘ্য নির্ণয়ের সূত্র।"
+  },
+  {
+    "title": "একক ভেক্টর (Unit Vector)",
+    "latex": "\\hat{a} = \\frac{\\vec{A}}{|\\vec{A}|}",
+    "description": "কোনো অশূন্য ভেক্টরকে তার মান দিয়ে ভাগ করলে ওই ভেক্টরের সমান্তরাল একটি একক ভেক্টর (যার মান ১) পাওয়া যায়।"
+  },
+  {
+    "title": "দিক কোসাইন (Direction Cosines)",
+    "latex": "l = \\frac{A_x}{|\\vec{A}|}, \\; m = \\frac{A_y}{|\\vec{A}|}, \\; n = \\frac{A_z}{|\\vec{A}|} \\implies \\cos^2\\alpha + \\cos^2\\beta + \\cos^2\\gamma = 1",
+    "description": "কোনো ভেক্টর অক্ষগুলোর সাথে α, β, γ কোণ তৈরি করলে। শর্টকাট (MCQ): cos²α + cos²β + cos²γ = 1 এবং sin²α + sin²β + sin²γ = 2।"
+  },
+  {
+    "title": "অন্তঃবিভক্তকারী বিন্দুর অবস্থান ভেক্টর (Internal Division)",
+    "latex": "\\vec{r} = \\frac{m\\vec{b} + n\\vec{a}}{m+n}",
+    "description": "\\vec{a} ও \\vec{b} অবস্থান ভেক্টরবিশিষ্ট দুটি বিন্দুকে সংযোগকারী রেখাংশকে কোনো বিন্দু m:n অনুপাতে অন্তঃবিভক্ত করলে তার অবস্থান ভেক্টর।"
+  },
+  {
+    "title": "বহির্বিভক্তকারী বিন্দুর অবস্থান ভেক্টর (External Division)",
+    "latex": "\\vec{r} = \\frac{m\\vec{b} - n\\vec{a}}{m - n}",
+    "description": "\\vec{a} ও \\vec{b} অবস্থান ভেক্টরবিশিষ্ট বিন্দুদ্বয়কে m:n অনুপাতে বহির্বিভক্ত করলে। (মাঝে মাইনাস হবে)।"
+  },
+  {
+    "title": "ত্রিভুজের ভরকেন্দ্রের অবস্থান ভেক্টর (Centroid)",
+    "latex": "\\vec{G} = \\frac{\\vec{a} + \\vec{b} + \\vec{c}}{3}",
+    "description": "কোনো ত্রিভুজের তিনটি শীর্ষবিন্দুর অবস্থান ভেক্টর যথাক্রমে a, b, c হলে তার ভরকেন্দ্রের অবস্থান ভেক্টর।"
+  },
+  {
+    "title": "ডট বা স্কেলার গুণন (Dot Product)",
+    "latex": "\\vec{A} \\cdot \\vec{B} = |\\vec{A}||\\vec{B}| \\cos \\theta = A_x B_x + A_y B_y + A_z B_z",
+    "description": "দুটি ভেক্টরের ডট গুণফল একটি স্কেলার রাশি। এটি বিনিময় সূত্র (A.B = B.A) মেনে চলে।"
+  },
+  {
+    "title": "আয়ত একক ভেক্টরের ডট গুণন",
+    "latex": "\\hat{i}\\cdot\\hat{i} = \\hat{j}\\cdot\\hat{j} = \\hat{k}\\cdot\\hat{k} = 1, \\quad \\hat{i}\\cdot\\hat{j} = \\hat{j}\\cdot\\hat{k} = \\hat{k}\\cdot\\hat{i} = 0",
+    "description": "সমজাতীয় ভেক্টরের মধ্যবর্তী কোণ 0° হওয়ায় মান 1 হয়, ভিন্নজাতীয় ভেক্টরের কোণ 90° হওয়ায় মান 0 হয়।"
+  },
+  {
+    "title": "দুটি ভেক্টরের মধ্যবর্তী কোণ (Angle between Vectors)",
+    "latex": "\\theta = \\cos^{-1} \\left( \\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{A}| |\\vec{B}|} \\right)",
+    "description": "ডট গুণনের সূত্র ব্যবহার করে যেকোনো দুটি ভেক্টরের মধ্যবর্তী কোণ নির্ণয় করা যায়।"
+  },
+  {
+    "title": "লম্ব হওয়ার শর্ত (Condition for Perpendicularity)",
+    "latex": "\\vec{A} \\perp \\vec{B} \\iff \\vec{A} \\cdot \\vec{B} = 0",
+    "description": "দুটি অশূন্য ভেক্টর পরস্পর লম্ব হলে তাদের ডট গুণফলের মান সর্বদা শূন্য (0) হবে। (m বা a এর মান নির্ণয়ের MCQ-তে সবচেয়ে বেশি আসে)"
+  },
+  {
+    "title": "লম্ব অভিক্ষেপ (Scalar Projection)",
+    "latex": "\\text{Projection of } \\vec{A} \\text{ on } \\vec{B} = |\\vec{A}| \\cos\\theta = \\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{B}|}",
+    "description": "B ভেক্টরের ওপর (বা বরাবর) A ভেক্টরের লম্ব অভিক্ষেপ। এটি একটি স্কেলার রাশি। শর্টকাট: যার ওপর অভিক্ষেপ, তার মান নিচে বসবে।"
+  },
+  {
+    "title": "ভেক্টর উপাংশ (Vector Component)",
+    "latex": "\\text{Component of } \\vec{A} \\text{ along } \\vec{B} = \\left( \\frac{\\vec{A} \\cdot \\vec{B}}{|\\vec{B}|} \\right) \\frac{\\vec{B}}{|\\vec{B}|}",
+    "description": "B ভেক্টরের দিকে A ভেক্টরের উপাংশ। অভিক্ষেপের মানের সাথে B এর একক ভেক্টর গুণ করে এটি পাওয়া যায়। এটি একটি ভেক্টর রাশি।"
+  },
+  {
+    "title": "ক্রস বা ভেক্টর গুণন (Cross Product)",
+    "latex": "\\vec{A} \\times \\vec{B} = \\begin{vmatrix} \\hat{i} & \\hat{j} & \\hat{k} \\\\ A_x & A_y & A_z \\\\ B_x & B_y & B_z \\end{vmatrix}",
+    "description": "ক্রস গুণফল একটি ভেক্টর রাশি। এটি বিনিময় সূত্র মানে না, বরং \\vec{A} \\times \\vec{B} = - (\\vec{B} \\times \\vec{A}) হয়।"
+  },
+  {
+    "title": "আয়ত একক ভেক্টরের ক্রস গুণন (Cyclic Order)",
+    "latex": "\\hat{i}\\times\\hat{i} = 0, \\quad \\hat{i}\\times\\hat{j} = \\hat{k}, \\quad \\hat{j}\\times\\hat{k} = \\hat{i}, \\quad \\hat{k}\\times\\hat{i} = \\hat{j}",
+    "description": "বিপরীত ক্রমে গুণ করলে চিহ্ন ঋণাত্মক (মাইনাস) হবে। যেমন: j × i = -k। (MCQ এর জন্য চক্রক্রমিক নিয়মটি মনে রাখা জরুরি)।"
+  },
+  {
+    "title": "ক্রস গুণনের মান (Magnitude of Cross Product)",
+    "latex": "|\\vec{A} \\times \\vec{B}| = |\\vec{A}||\\vec{B}| \\sin \\theta",
+    "description": "দুটি ভেক্টরের ক্রস গুণফলের মান তাদের নিজ নিজ মান এবং মধ্যবর্তী কোণের সাইন (sin) এর গুণফলের সমান।"
+  },
+  {
+    "title": "সমান্তরাল হওয়ার শর্ত (Condition for Parallelism)",
+    "latex": "\\vec{A} \\parallel \\vec{B} \\iff \\vec{A} \\times \\vec{B} = 0 \\implies \\frac{A_x}{B_x} = \\frac{A_y}{B_y} = \\frac{A_z}{B_z}",
+    "description": "সমান্তরাল হলে তাদের ক্রস গুণফল শূন্য ভেক্টর হয়। শর্টকাট: সমান্তরাল হলে তাদের i, j, k এর সহগগুলোর অনুপাত পরস্পর সমান হবে।"
+  },
+  {
+    "title": "উভয় ভেক্টরের ওপর লম্ব একক ভেক্টর",
+    "latex": "\\hat{\\eta} = \\pm \\frac{\\vec{A} \\times \\vec{B}}{|\\vec{A} \\times \\vec{B}|}",
+    "description": "A ও B উভয় ভেক্টরের ওপর (বা তাদের সমতলের ওপর) লম্ব একক ভেক্টর। ক্রস গুণফলকে তার মান দিয়ে ভাগ করলে এটি পাওয়া যায়।"
+  },
+  {
+    "title": "ত্রিভুজের ক্ষেত্রফল (Area of Triangle)",
+    "latex": "\\text{Area} = \\frac{1}{2} |\\vec{A} \\times \\vec{B}|",
+    "description": "যদি \\vec{A} এবং \\vec{B} একটি ত্রিভুজের দুটি সন্নিহিত বাহু নির্দেশ করে, তবে তার ক্ষেত্রফল।"
+  },
+  {
+    "title": "সামান্তরিকের ক্ষেত্রফল: সন্নিহিত বাহু দেওয়া থাকলে",
+    "latex": "\\text{Area} = |\\vec{A} \\times \\vec{B}|",
+    "description": "যদি \\vec{A} এবং \\vec{B} সামান্তরিকের দুটি সন্নিহিত বাহু (Adjacent sides) নির্দেশ করে, তবে তার ক্ষেত্রফল।"
+  },
+  {
+    "title": "সামান্তরিকের ক্ষেত্রফল: কর্ণ দেওয়া থাকলে",
+    "latex": "\\text{Area} = \\frac{1}{2} |\\vec{d_1} \\times \\vec{d_2}|",
+    "description": "যদি \\vec{d_1} এবং \\vec{d_2} সামান্তরিকের দুটি কর্ণ (Diagonals) নির্দেশ করে, তবে ক্ষেত্রফল নির্ণয়ে সামনে হাফ (1/2) গুণ করতে হবে।"
+  },
+  {
+    "title": "ভেক্টরের প্রয়োগ: কাজ (Work Done)",
+    "latex": "W = \\vec{F} \\cdot \\vec{s} \\quad \\text{অথবা} \\quad W = \\vec{F} \\cdot (\\vec{r_2} - \\vec{r_1})",
+    "description": "ধ্রুব বল F দ্বারা কৃতকাজ বল এবং সরণের ডট গুণফলের সমান। এটি একটি স্কেলার রাশি।"
+  },
+  {
+    "title": "ভেক্টরের প্রয়োগ: টর্ক বা বলের ভ্রামক (Torque)",
+    "latex": "\\vec{\\tau} = \\vec{r} \\times \\vec{F}",
+    "description": "কোনো বিন্দুর সাপেক্ষে বলের ভ্রামক হলো ঐ বিন্দুর অবস্থান ভেক্টর (r) এবং প্রযুক্ত বলের (F) ক্রস গুণফল। (অর্ডার খেয়াল রাখতে হবে, F × r দিলে ভুল হবে)।"
+  },
+  {
+    "title": "রৈখিক বেগ ও কৌণিক বেগের সম্পর্ক",
+    "latex": "\\vec{v} = \\vec{\\omega} \\times \\vec{r}",
+    "description": "রৈখিক বেগ (v) হলো কৌণিক বেগ (ω) এবং ব্যাসার্ধ ভেক্টরের (r) ক্রস গুণফল।"
+  },
+  {
+    "title": "ভেক্টরের স্কেলার ত্রিগুণন (Scalar Triple Product / Volume)",
+    "latex": "[\\vec{A} \\; \\vec{B} \\; \\vec{C}] = \\vec{A} \\cdot (\\vec{B} \\times \\vec{C}) = \\begin{vmatrix} A_x & A_y & A_z \\\\ B_x & B_y & B_z \\\\ C_x & C_y & C_z \\end{vmatrix}",
+    "description": "এটি একটি সামান্তরিক আকারের ঘনবস্তুর (Parallelepiped) আয়তন নির্দেশ করে, যার তিনটি সন্নিহিত ধার হলো A, B এবং C।"
+  },
+  {
+    "title": "সমতলীয় বা একতলীয় হওয়ার শর্ত (Coplanar Vectors)",
+    "latex": "\\vec{A} \\cdot (\\vec{B} \\times \\vec{C}) = 0",
+    "description": "তিনটি ভেক্টর একই সমতলে অবস্থান করলে তাদের দ্বারা গঠিত ঘনবস্তুর আয়তন শূন্য হয়, অর্থাৎ তাদের স্কেলার ত্রিগুণনের মান শূন্য (0) হবে।"
+  },
+  {
+    "title": "ভেক্টরের ভেক্টর ত্রিগুণন (Vector Triple Product)",
+    "latex": "\\vec{A} \\times (\\vec{B} \\times \\vec{C}) = (\\vec{A} \\cdot \\vec{C})\\vec{B} - (\\vec{A} \\cdot \\vec{B})\\vec{C}",
+    "description": "এটি 'BAC - CAB' রুল নামে পরিচিত। এডমিশন টেস্টের জন্য এটি অত্যন্ত সহায়ক একটি সূত্র।"
+  },
+  {
+    "title": "ভেক্টরের রৈখিক নির্ভরশীলতা (Linear Dependence)",
+    "latex": "c_1\\vec{a} + c_2\\vec{b} + c_3\\vec{c} = 0",
+    "description": "যদি c1, c2, c3 এর অন্তত একটি মান অশূন্য হয়, তবে ভেক্টরগুলো রৈখিকভাবে নির্ভরশীল। আর কেবল c1=c2=c3=0 হলেই তারা স্বাধীন (Independent)।"
+  }
+]

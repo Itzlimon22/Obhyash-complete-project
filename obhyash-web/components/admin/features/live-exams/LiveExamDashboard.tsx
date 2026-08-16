@@ -9,7 +9,10 @@ import { getLiveExams, deleteLiveExam, createLiveExam, updateLiveExam } from "@/
 import Link from "next/link";
 import LiveExamFormModal from "./LiveExamFormModal";
 
+import { useAuth } from '@/components/auth/AuthProvider';
+
 export default function LiveExamDashboard() {
+  const { user } = useAuth();
   const pathname = usePathname();
   const basePath = pathname.startsWith('/teacher') ? '/teacher/live-exams' : '/admin/live-exams';
   const [exams, setExams] = useState<LiveExam[]>([]);
@@ -19,7 +22,7 @@ export default function LiveExamDashboard() {
 
   useEffect(() => {
     fetchExams();
-  }, []);
+  }, [user?.id]);
 
   const fetchExams = async () => {
     try {

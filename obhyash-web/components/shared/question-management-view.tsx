@@ -99,10 +99,10 @@ export default function QuestionManagementView({
     [totalCount, approvedCount, pendingCount, rejectedCount],
   );
 
-  // Initial load
+  // Initial load and reload when user session authenticates
   useEffect(() => {
     fetchQuestions();
-  }, [fetchQuestions]);
+  }, [fetchQuestions, user?.id]);
 
   const handleEdit = (q: Question) => {
     setEditingData(q);

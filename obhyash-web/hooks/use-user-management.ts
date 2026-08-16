@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { FilterState } from '@/components/admin/user-management/AdvancedFilterBar';
 import { User, UserRole } from '@/lib/types';
 import { getErrorMessage } from '@/lib/error-utils';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 /**
  * Custom hook for managing user data in the Admin Panel.
@@ -12,6 +13,7 @@ import { getErrorMessage } from '@/lib/error-utils';
  * @returns An object containing user data, loading states, filter controls, and action handlers.
  */
 export function useUserManagement() {
+  const { user } = useAuth();
   // --- State Management ---
 
   /** Full list of users fetched from the database */
@@ -57,11 +59,11 @@ export function useUserManagement() {
     // Reset to page 1 when filters change (except when explicitly changing page)
     setPage(1);
     fetchUsers();
-  }, [searchQuery, roleFilter, statusFilter, advancedFilters, pageSize]);
+  }, [searchQuery, roleFilter, statusFilter, advancedFilters, pageSize, user?.id]);
 
   useEffect(() => {
     fetchUsers();
-  }, [page]);
+  }, [page, user?.id]);
 
   /**
    * Fetches the latest list of users from Supabase with server-side pagination and filtering.
