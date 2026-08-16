@@ -141,7 +141,7 @@ export async function updateSession(request: NextRequest) {
       }
     }
 
-    const role = (profile?.role ?? 'student').toLowerCase();
+    const role = (profile?.role || (user as any)?.app_metadata?.role || (user as any)?.user_metadata?.role || '').toLowerCase();
     const status = profile?.status ?? 'Active';
     const isInactive = status === 'Inactive' || status === 'Suspended';
 
@@ -175,8 +175,8 @@ export async function updateSession(request: NextRequest) {
       return response;
     }
 
-    // Role-based route protection
-    if (isAdminRoute && role !== 'admin') {
+    // Role-based route protection: only redirect if profile was definitively retrieved and is NOT an admin
+    if (isAdminRoute && profile && role !== 'admin') {
       const response = NextResponse.redirect(
         new URL('/dashboard', request.url),
       );
@@ -186,7 +186,7 @@ export async function updateSession(request: NextRequest) {
       return response;
     }
 
-    if (isTeacherRoute && role !== 'teacher') {
+    if (isTeacherRoute && profile && role !== 'teacher') {
       const response = NextResponse.redirect(
         new URL('/dashboard', request.url),
       );
@@ -196,8 +196,8 @@ export async function updateSession(request: NextRequest) {
       return response;
     }
 
-    // Forward admins and teachers away from the student dashboard
-    if (isStudentRoute && role === 'admin') {
+    // Forward confirmed admins away from the student dashboard
+    if (isStudentRoute && profile && role === 'admin') {
       const response = NextResponse.redirect(
         new URL('/admin/dashboard', request.url),
       );
@@ -207,7 +207,7 @@ export async function updateSession(request: NextRequest) {
       return response;
     }
 
-    if (isStudentRoute && role === 'teacher') {
+    if (isStudentRoute && profile && role === 'teacher') {
       const response = NextResponse.redirect(
         new URL('/teacher/dashboard', request.url),
       );
