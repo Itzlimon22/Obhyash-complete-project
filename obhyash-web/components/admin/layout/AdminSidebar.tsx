@@ -21,6 +21,7 @@ import {
   ChevronsLeft,
   X,
   Sparkles,
+  UploadCloud,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -65,10 +66,16 @@ const ADMIN_NAVIGATION: NavSection[] = [
     title: 'ম্যানেজমেন্ট',
     items: [
       {
-        id: 'questions',
-        label: 'প্রশ্ন ব্যাংক ও বাল্ক',
+        id: 'question-bank',
+        label: 'প্রশ্ন ব্যাংক মাস্টার',
         icon: FileQuestion,
-        href: '/admin/question-management',
+        href: '/admin/question-bank',
+      },
+      {
+        id: 'questions-upload',
+        label: 'প্রশ্ন ও বাল্ক আপলোড',
+        icon: UploadCloud,
+        href: '/admin/questions/bulk-upload',
       },
       {
         id: 'live-exams',
