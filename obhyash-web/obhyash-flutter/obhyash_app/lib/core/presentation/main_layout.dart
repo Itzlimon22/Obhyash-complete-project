@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -148,7 +149,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       case 'dashboard':
         return 'ড্যাশবোর্ড';
       case 'setup':
-        return 'পরীক্ষা';
+        return 'পরীক্ষা সেটআপ';
       case 'live_exam':
         return 'লাইভ পরীক্ষা';
       case 'history':
@@ -412,7 +413,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Left: Clean Title
+                        // Left: Clean Title & Back Button
                         Expanded(
                           child: Consumer(
                             builder: (context, ref, child) {
@@ -420,23 +421,67 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                               final dynamicTitle = ref.watch(locationTitleProvider)[currentLoc];
                               final titleText = dynamicTitle ?? _getTitle(activeTab);
                               final isSubRoute = dynamicTitle != null;
+                              final showBackButton = activeTab == 'setup' || isSubRoute || context.canPop();
 
-                              return FittedBox(
-                                fit: BoxFit.scaleDown,
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  titleText,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    fontSize: isSubRoute ? 18 : 21,
-                                    fontWeight: FontWeight.w700,
-                                    fontFamily: 'Anek Bangla',
-                                    letterSpacing: -0.2,
-                                    color: isDark
-                                        ? Colors.white
-                                        : const Color(0xFF111827),
+                              return Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (showBackButton) ...[
+                                    GestureDetector(
+                                      onTap: () {
+                                        HapticFeedback.lightImpact();
+                                        if (context.canPop()) {
+                                          context.pop();
+                                        } else {
+                                          widget.navigationShell.goBranch(0);
+                                          context.go('/');
+                                        }
+                                      },
+                                      behavior: HitTestBehavior.opaque,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(7),
+                                        margin: const EdgeInsets.only(right: 10),
+                                        decoration: BoxDecoration(
+                                          color: isDark
+                                              ? const Color(0xFF1C1C1E)
+                                              : const Color(0xFFF1F5F9),
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: isDark
+                                                ? const Color(0xFF27272A)
+                                                : const Color(0xFFE2E8F0),
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          LucideIcons.arrowLeft,
+                                          size: 18,
+                                          color: isDark
+                                              ? Colors.white
+                                              : const Color(0xFF0F172A),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                  Flexible(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        titleText,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: isSubRoute ? 18 : 21,
+                                          fontWeight: FontWeight.w700,
+                                          fontFamily: 'Anek Bangla',
+                                          letterSpacing: -0.2,
+                                          color: isDark
+                                              ? Colors.white
+                                              : const Color(0xFF111827),
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                ],
                               );
                             },
                           ),
@@ -633,13 +678,15 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         child: widget.navigationShell,
       ),
 
-      bottomNavigationBar: MainBottomNav(
-        activeTab: activeTab,
-        onTabChange: _onTabChange,
-        onMenuClick: () {
-          _scaffoldKey.currentState?.openDrawer();
-        },
-      ),
+      bottomNavigationBar: activeTab == 'setup'
+          ? null
+          : MainBottomNav(
+              activeTab: activeTab,
+              onTabChange: _onTabChange,
+              onMenuClick: () {
+                _scaffoldKey.currentState?.openDrawer();
+              },
+            ),
     ),
   );
   }

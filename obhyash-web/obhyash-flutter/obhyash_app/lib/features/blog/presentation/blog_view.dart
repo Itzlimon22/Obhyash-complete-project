@@ -297,8 +297,13 @@ class _BlogViewState extends State<BlogView> {
             section:has(a[href="/"]):has(h2) {
               display: none !important;
             }
+            .sticky.top-16,
+            [class*="sticky"][class*="top-16"],
+            #blog-category-sticky-bar {
+              top: 0px !important;
+            }
             main {
-              padding-top: 12px !important;
+              padding-top: 0px !important;
               padding-bottom: 32px !important;
             }
           `;
@@ -307,7 +312,7 @@ class _BlogViewState extends State<BlogView> {
           }
         }
 
-        // 2. Hide elements directly on DOM nodes
+        // 2. Hide elements directly on DOM nodes and adjust sticky elements
         const hideElements = () => {
           const selectors = [
             'header',
@@ -326,6 +331,15 @@ class _BlogViewState extends State<BlogView> {
               });
             } catch (_) {}
           });
+
+          // Ensure category bar sticks flush to top: 0px (no floating gap)
+          try {
+            document.querySelectorAll('.sticky, [class*="sticky"], #blog-category-sticky-bar').forEach(el => {
+              if (el.id === 'blog-category-sticky-bar' || el.className.includes('top-16')) {
+                el.style.setProperty('top', '0px', 'important');
+              }
+            });
+          } catch (_) {}
 
           // Adjust main padding to sit cleanly under native app bar
           const main = document.querySelector('main');

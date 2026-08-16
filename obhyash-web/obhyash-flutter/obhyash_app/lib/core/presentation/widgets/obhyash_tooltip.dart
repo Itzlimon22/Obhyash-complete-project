@@ -85,10 +85,17 @@ class _ObhyashTooltipState extends State<ObhyashTooltip>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenSize = MediaQuery.of(context).size;
 
-    // Calculate whether to position on top or bottom
+    // Smart placement calculation: keep tight (4px) to target
+    final double spaceAbove = targetOffset.dy;
+    final double spaceBelow = screenSize.height - (targetOffset.dy + targetSize.height);
+
     final bool showOnTop = widget.preferredPosition == TooltipPosition.top
-        ? targetOffset.dy > 140
-        : targetOffset.dy + targetSize.height + 140 > screenSize.height;
+        ? (spaceAbove >= 80 || spaceAbove > spaceBelow)
+        : (spaceBelow < 80 && spaceAbove > spaceBelow);
+
+    final double targetCenter = targetOffset.dx + (targetSize.width / 2);
+    final double leftPos = (targetCenter - (widget.maxWidth / 2))
+        .clamp(12.0, (screenSize.width - widget.maxWidth - 12.0).clamp(12.0, double.infinity));
 
     _overlayEntry = OverlayEntry(
       builder: (overlayContext) {
@@ -103,14 +110,13 @@ class _ObhyashTooltipState extends State<ObhyashTooltip>
               ),
             ),
 
-            // Animated Tooltip Box
+            // Animated Tooltip Box (tightly positioned 4px from icon)
             Positioned(
-              top: showOnTop ? null : targetOffset.dy + targetSize.height + 8,
+              top: showOnTop ? null : targetOffset.dy + targetSize.height + 4,
               bottom: showOnTop
-                  ? screenSize.height - targetOffset.dy + 8
+                  ? screenSize.height - targetOffset.dy + 4
                   : null,
-              left: (targetOffset.dx + (targetSize.width / 2) - (widget.maxWidth / 2))
-                  .clamp(16.0, screenSize.width - widget.maxWidth - 16.0),
+              left: leftPos,
               child: Material(
                 color: Colors.transparent,
                 child: ScaleTransition(
@@ -124,7 +130,7 @@ class _ObhyashTooltipState extends State<ObhyashTooltip>
                       isDark: isDark,
                       maxWidth: widget.maxWidth,
                       showOnTop: showOnTop,
-                      targetCenterDx: targetOffset.dx + (targetSize.width / 2),
+                      targetCenterDx: targetCenter,
                     ),
                   ),
                 ),

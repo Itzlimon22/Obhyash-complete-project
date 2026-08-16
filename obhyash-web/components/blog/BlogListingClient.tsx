@@ -253,7 +253,7 @@ export default function BlogListingClient({
       </section>
 
       {/* ─── Category Filter ─── */}
-      <div className="sticky top-16 z-40 bg-[#FAF6F3]/90 dark:bg-[#0a0a0a]/90 backdrop-blur-md border-b border-black/[0.04] dark:border-white/[0.04] pt-2 pb-3">
+      <div id="blog-category-sticky-bar" className="sticky top-16 z-40 bg-[#FAF6F3]/90 dark:bg-[#0a0a0a]/90 backdrop-blur-md border-b border-black/[0.04] dark:border-white/[0.04] pt-2 pb-3">
         <div className="max-w-7xl mx-auto py-1.5">
           <div className="relative">
             <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-[#FAF6F3]/90 dark:from-[#0a0a0a]/90 to-transparent z-10" />

@@ -507,56 +507,55 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
         children: items.map((item) {
           final isSelected = selectedItems.contains(item);
           return Expanded(
-            child: GestureDetector(
-              onTap: () => onToggle(item),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.easeInOut,
-                padding: const EdgeInsets.symmetric(vertical: 9),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? (isDark ? const Color(0xFF27272A) : Colors.white)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: isDark
-                                ? Colors.black.withValues(alpha: 0.3)
-                                : const Color(0x0A000000),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ]
-                      : [],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      item,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                        fontFamily: 'HindSiliguri',
-                        color: isSelected
-                            ? (isDark ? Colors.white : const Color(0xFF0F172A))
-                            : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
-                      ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: GestureDetector(
+                onTap: () => onToggle(item),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeInOut,
+                  padding: const EdgeInsets.symmetric(vertical: 9),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? (isDark ? const Color(0xFF27272A) : Colors.white)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isSelected
+                          ? (isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1))
+                          : Colors.transparent,
+                      width: 1.0,
                     ),
-                    if (isSelected) ...[
-                      const SizedBox(width: 5),
-                      Container(
-                        width: 5,
-                        height: 5,
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
-                          shape: BoxShape.circle,
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: isDark
+                                  ? Colors.black.withValues(alpha: 0.3)
+                                  : const Color(0x0A000000),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : [],
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: Text(
+                        item,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                          fontFamily: 'HindSiliguri',
+                          color: isSelected
+                              ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                              : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
                         ),
                       ),
-                    ],
-                  ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -629,7 +628,8 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isSelected
               ? (isDark ? const Color(0xFF27272A) : const Color(0xFF0F172A))
@@ -642,15 +642,21 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
             width: isSelected ? 1.2 : 1.0,
           ),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 13.5,
-            fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-            fontFamily: 'HindSiliguri',
-            color: isSelected
-                ? Colors.white
-                : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13.5,
+                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                fontFamily: 'HindSiliguri',
+                color: isSelected
+                    ? Colors.white
+                    : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+              ),
+            ),
           ),
         ),
       ),
@@ -751,22 +757,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
-              child: Center(
-                child: Text(
-                  'পরীক্ষা সেটআপ করো',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'HindSiliguri',
-                    color: isDark ? Colors.white : const Color(0xFF0F172A),
-                  ),
-                ),
-              ),
-            ),
+            const SizedBox(height: 8),
 
             // 1. Subject Selector
             _CardContainer(
@@ -974,23 +965,26 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     ],
                   ),
                   const SizedBox(height: 14),
-                  // Quick Preset Pills
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [10, 15, 20, 25, 50, 100].map((count) {
+                  // Quick Preset Pills (Single Row)
+                  Row(
+                    children: [10, 20, 25, 50, 100].map((count) {
                       final isSelected = _questionCount == count;
-                      return _buildPresetPill(
-                        label: '$countটি',
-                        isSelected: isSelected,
-                        isDark: isDark,
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          setState(() {
-                            _questionCount = count;
-                            _durationMinutes = count;
-                          });
-                        },
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 3),
+                          child: _buildPresetPill(
+                            label: '$countটি',
+                            isSelected: isSelected,
+                            isDark: isDark,
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              setState(() {
+                                _questionCount = count;
+                                _durationMinutes = count;
+                              });
+                            },
+                          ),
+                        ),
                       );
                     }).toList(),
                   ),
@@ -1036,20 +1030,23 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     ],
                   ),
                   const SizedBox(height: 14),
-                  // Quick Preset Pills
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [10, 15, 20, 25, 45, 60].map((mins) {
+                  // Quick Preset Pills (10, 20, 30, 60, 90 in single row)
+                  Row(
+                    children: [10, 20, 30, 60, 90].map((mins) {
                       final isSelected = _durationMinutes == mins;
-                      return _buildPresetPill(
-                        label: '$mins মি.',
-                        isSelected: isSelected,
-                        isDark: isDark,
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          setState(() => _durationMinutes = mins);
-                        },
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 3),
+                          child: _buildPresetPill(
+                            label: '$mins মি.',
+                            isSelected: isSelected,
+                            isDark: isDark,
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              setState(() => _durationMinutes = mins);
+                            },
+                          ),
+                        ),
                       );
                     }).toList(),
                   ),
@@ -1058,27 +1055,89 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
             ),
             const SizedBox(height: 12),
 
+            // 6. Negative Marking - Segmented Bar matching Exam Type & Difficulty
             _CardContainer(
               isDark: isDark,
               title: 'নেগেটিভ মার্কিং',
               icon: LucideIcons.minusCircle,
               tooltip: '-০.২৫: প্রতি ৪টি ভুল উত্তরের জন্য ১ নম্বর কাটা\n-০.৫০: প্রতি ২টি ভুল উত্তরের জন্য ১ নম্বর কাটা',
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [0.0, 0.25, 0.5]
-                    .map(
-                      (v) => _ToggleBox(
-                        label: v == 0.0 ? '০ (নেই)' : '-$v মার্ক',
-                        selected: _negativeMarking == v,
-                        isDark: isDark,
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          setState(() => _negativeMarking = v);
-                        },
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    (0.0, '০ (নেই)'),
+                    (0.25, '-০.২৫ মার্ক'),
+                    (0.5, '-০.৫ মার্ক'),
+                  ].map((entry) {
+                    final v = entry.$1;
+                    final label = entry.$2;
+                    final isSelected = _negativeMarking == v;
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: GestureDetector(
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            setState(() => _negativeMarking = v);
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            curve: Curves.easeInOut,
+                            padding: const EdgeInsets.symmetric(vertical: 9),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? (isDark ? const Color(0xFF27272A) : Colors.white)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isSelected
+                                    ? (isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1))
+                                    : Colors.transparent,
+                                width: 1.0,
+                              ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: isDark
+                                            ? Colors.black.withValues(alpha: 0.3)
+                                            : const Color(0x0A000000),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                : [],
+                            ),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 6),
+                                child: Text(
+                                  label,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                                    fontFamily: 'HindSiliguri',
+                                    color: isSelected
+                                        ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                                        : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    )
-                    .toList(),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -1193,6 +1252,7 @@ class _CardContainer extends StatelessWidget {
                 ObhyashTooltipIcon(
                   message: tooltip!,
                   size: 16,
+                  preferredPosition: TooltipPosition.bottom,
                   color: isDark
                       ? const Color(0xFF71717A)
                       : const Color(0xFF94A3B8),
@@ -1208,70 +1268,6 @@ class _CardContainer extends StatelessWidget {
   }
 }
 
-class _ToggleBox extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final bool isDark;
-  final VoidCallback onTap;
-
-  const _ToggleBox({
-    required this.label,
-    required this.selected,
-    required this.isDark,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-        decoration: BoxDecoration(
-          color: selected
-              ? (isDark ? const Color(0xFF27272A) : const Color(0xFF0F172A))
-              : (isDark ? const Color(0xFF141416) : const Color(0xFFF8FAFC)),
-          border: Border.all(
-            color: selected
-                ? (isDark ? const Color(0xFF71717A) : const Color(0xFF0F172A))
-                : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
-            width: selected ? 1.2 : 1.0,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14.5,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'HindSiliguri',
-                color: selected
-                    ? Colors.white
-                    : (isDark
-                        ? const Color(0xFFA1A1AA)
-                        : const Color(0xFF64748B)),
-              ),
-            ),
-            if (selected) ...[
-              const SizedBox(width: 6),
-              Container(
-                width: 6,
-                height: 6,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 
 class _SubjectDropdownModal extends StatelessWidget {
