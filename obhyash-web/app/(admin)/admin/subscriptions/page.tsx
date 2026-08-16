@@ -400,19 +400,6 @@ export default function SubscriptionsPage() {
     return matchesSearch;
   });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-neutral-950 flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="w-12 h-12 animate-spin text-red-600 dark:text-red-400 mx-auto mb-4" />
-          <p className="text-neutral-600 dark:text-neutral-400 font-medium">
-            Loading subscription data...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-white dark:bg-black p-4 sm:p-6 lg:p-8">
       <div className="max-w-[1600px] mx-auto space-y-6 sm:space-y-8">
@@ -425,6 +412,16 @@ export default function SubscriptionsPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              onClick={() => fetchData(true)}
+              className="p-2 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              title="Refresh"
+            >
+              <RefreshCw
+                size={16}
+                className={`text-neutral-500 ${isLoading ? 'animate-spin' : ''}`}
+              />
+            </button>
 
             {/* View Toggles for Requests and Subscriptions */}
             {(activeTab === 'requests' || activeTab === 'subscriptions') && (
