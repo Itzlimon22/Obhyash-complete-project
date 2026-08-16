@@ -14,7 +14,6 @@ import {
   Activity,
   Clock,
   ArrowRight,
-  RefreshCw,
   PlusCircle,
   UploadCloud,
   ShieldCheck,
@@ -284,25 +283,10 @@ const fetchAdminDashboardData = async () => {
 };
 
 export default function AdminDashboardPage() {
-  const { data, error, isLoading, isValidating, mutate } = useSWR('adminCommandCenterDashboard', fetchAdminDashboardData, {
+  const { data, error, isLoading } = useSWR('adminCommandCenterDashboard', fetchAdminDashboardData, {
     revalidateOnFocus: false,
     revalidateIfStale: true,
-    refreshInterval: 60000, // Background refresh every 60s
   });
-
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const handleManualRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await mutate();
-      toast.success('Dashboard metrics refreshed');
-    } catch {
-      toast.error('Failed to refresh data');
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
 
   useEffect(() => {
     if (error) {
@@ -349,19 +333,6 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="flex items-center gap-2.5 flex-wrap">
-            <button
-              onClick={handleManualRefresh}
-              disabled={isRefreshing || isValidating}
-              className="px-3 py-2 bg-white dark:bg-zinc-900 hover:bg-neutral-50 dark:hover:bg-zinc-800 border border-neutral-200 dark:border-zinc-800 rounded-xl text-xs font-semibold text-neutral-700 dark:text-zinc-300 transition-all flex items-center gap-1.5 shadow-sm active:scale-95 disabled:opacity-50"
-              title="Refresh dashboard metrics"
-            >
-              <RefreshCw
-                size={13}
-                className={`${isRefreshing || isValidating ? 'animate-spin text-emerald-500' : ''}`}
-              />
-              <span>Refresh</span>
-            </button>
-
             <Link
               href="/admin/question-management"
               className="px-3.5 py-2 bg-[#004633] hover:bg-[#005a41] text-white text-xs font-bold rounded-xl shadow-md shadow-[#004633]/20 transition-all flex items-center gap-1.5 active:scale-95"
