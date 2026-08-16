@@ -51,69 +51,68 @@ export default function AdminDashboardPage() {
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
 
-        // Safe async query helpers
-        const getUsersCount = async () => {
+        // Safe async query helpers with timeout protection
+        async function safeQuery<T>(promise: PromiseLike<T>, fallback: T, ms = 6000): Promise<T> {
+          let timer: any;
+          const timeout = new Promise<T>((resolve) => {
+            timer = setTimeout(() => resolve(fallback), ms);
+          });
           try {
-            const { count } = await supabase.from('users').select('*', { count: 'exact', head: true });
-            return count || 0;
+            return await Promise.race([Promise.resolve(promise), timeout]);
           } catch {
-            return 0;
+            return fallback;
+          } finally {
+            clearTimeout(timer);
           }
-        };
+        }
 
-        const getQuestionsCount = async () => {
-          try {
-            const { count } = await supabase.from('questions').select('*', { count: 'exact', head: true });
-            return count || 0;
-          } catch {
-            return 0;
-          }
-        };
+        const getUsersCount = () =>
+          safeQuery(
+            supabase.from('users').select('*', { count: 'exact', head: true }).then((r) => r.count || 0),
+            0
+          );
 
-        const getExamsCount = async () => {
-          try {
-            const { count } = await supabase.from('exam_results').select('*', { count: 'exact', head: true });
-            return count || 0;
-          } catch {
-            return 0;
-          }
-        };
+        const getQuestionsCount = () =>
+          safeQuery(
+            supabase.from('questions').select('*', { count: 'exact', head: true }).then((r) => r.count || 0),
+            0
+          );
 
-        const getTodayExamsCount = async () => {
-          try {
-            const { count } = await supabase
+        const getExamsCount = () =>
+          safeQuery(
+            supabase.from('exam_results').select('*', { count: 'exact', head: true }).then((r) => r.count || 0),
+            0
+          );
+
+        const getTodayExamsCount = () =>
+          safeQuery(
+            supabase
               .from('exam_results')
               .select('*', { count: 'exact', head: true })
-              .gte('created_at', todayStart.toISOString());
-            return count || 0;
-          } catch {
-            return 0;
-          }
-        };
+              .gte('created_at', todayStart.toISOString())
+              .then((r) => r.count || 0),
+            0
+          );
 
-        const getLiveExamsCount = async () => {
-          try {
-            const { count } = await supabase
+        const getLiveExamsCount = () =>
+          safeQuery(
+            supabase
               .from('live_exams')
               .select('*', { count: 'exact', head: true })
-              .eq('status', 'live');
-            return count || 0;
-          } catch {
-            return 0;
-          }
-        };
+              .eq('status', 'live')
+              .then((r) => r.count || 0),
+            0
+          );
 
-        const getReportsCount = async () => {
-          try {
-            const { count } = await supabase
+        const getReportsCount = () =>
+          safeQuery(
+            supabase
               .from('reports')
               .select('*', { count: 'exact', head: true })
-              .in('status', ['Pending', 'pending']);
-            return count || 0;
-          } catch {
-            return 0;
-          }
-        };
+              .in('status', ['Pending', 'pending'])
+              .then((r) => r.count || 0),
+            0
+          );
 
         const [
           totalUsers,
