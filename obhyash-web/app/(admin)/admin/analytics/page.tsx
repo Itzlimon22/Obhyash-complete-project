@@ -47,35 +47,10 @@ interface TopPerformer {
   examsCompleted: number;
 }
 
-interface ExamResult {
-  users: {
-    id: string;
-  } | null;
-}
-
-interface ExamResultWithUserId {
-  user_id: string;
-}
-
-interface UserRecord {
-  created_at: string;
-}
-
-interface ExamData {
-  score: number;
-  created_at: string;
-  subject: string;
-}
-
-interface UserFromDatabase {
-  id: string;
-  name: string;
-  exams_taken: number;
-}
-
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [examStats, setExamStats] = useState<ExamStats>({
     totalExams: 0,
@@ -97,122 +72,90 @@ export default function AnalyticsPage() {
   }, [timeRange]);
 
   const fetchAnalyticsData = async (showToast = false) => {
-    const supabase = createClient();
+    if (showToast) setIsRefreshing(true);
+    else setIsLoading(true);
 
     try {
+      // 1. Fetch from secure server-side admin analytics endpoint (bypasses RLS limits)
+      const res = await fetch(`/api/admin/analytics?timeRange=${timeRange}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          const {
+            examStats: stats,
+            totalUsers: totalU,
+            activeUsers: activeU,
+            userGrowth: growth,
+            subjectPerformance: subPerf,
+            topPerformers: topP,
+          } = json.data;
+
+          setExamStats(stats || { totalExams: 0, averageScore: 0, completionRate: 0, totalQuestions: 0 });
+          setTotalUsers(totalU || 0);
+          setActiveUsers(activeU || 0);
+          setUserGrowth(growth || []);
+          setSubjectPerformance(subPerf || []);
+          setTopPerformers(topP || []);
+
+          if (showToast) {
+            toast.success('Analytics refreshed successfully');
+          }
+          return;
+        }
+      }
+
+      // 2. Client-side fallback if API is unreachable
+      const supabase = createClient();
       const daysAgo = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - daysAgo);
 
-      const { data: exams, error: examsError } = await supabase
-        .from('exam_results')
-        .select('score, created_at, subject')
-        .gte('created_at', startDate.toISOString());
+      const [examsRes, questionsRes, usersRes, topUsersRes] = await Promise.all([
+        supabase
+          .from('exam_results')
+          .select('score, created_at, subject, user_id')
+          .gte('created_at', startDate.toISOString()),
+        supabase
+          .from('questions')
+          .select('*', { count: 'exact', head: true }),
+        supabase
+          .from('users')
+          .select('*', { count: 'exact', head: true }),
+        supabase
+          .from('users')
+          .select('id, name, exams_taken')
+          .order('exams_taken', { ascending: false })
+          .limit(5),
+      ]);
 
-      if (examsError) throw examsError;
-
-      const { count: questionsCount } = await supabase
-        .from('questions')
-        .select('*', { count: 'exact', head: true });
-
-      const { count: usersCount } = await supabase
-        .from('users')
-        .select('*', { count: 'exact', head: true });
-
-      const { data: activeUsersData } = await supabase
-        .from('exam_results')
-        .select('user_id')
-        .gte('created_at', startDate.toISOString());
+      const exams = examsRes.data || [];
+      const totalExams = exams.length;
+      const averageScore =
+        exams.length > 0
+          ? exams.reduce((sum, e) => sum + (e.score || 0), 0) / exams.length
+          : 0;
 
       const uniqueActiveUsers = new Set(
-        activeUsersData
-          ?.map((e: ExamResultWithUserId) => e.user_id)
-          .filter(Boolean),
+        exams.map((e) => e.user_id).filter(Boolean),
       );
-
-      const totalExams = exams?.length || 0;
-      const averageScore =
-        exams && exams.length > 0
-          ? exams.reduce((sum: number, exam: ExamData) => sum + (exam.score || 0), 0) /
-            exams.length
-          : 0;
 
       setExamStats({
         totalExams,
         averageScore,
         completionRate: totalExams > 0 ? 85 : 0,
-        totalQuestions: questionsCount || 0,
+        totalQuestions: questionsRes.count || 0,
       });
 
-      setTotalUsers(usersCount || 0);
+      setTotalUsers(usersRes.count || 0);
       setActiveUsers(uniqueActiveUsers.size);
 
-      const subjectMap = new Map<
-        string,
-        { scores: number[]; students: Set<string> }
-      >();
-
-      exams?.forEach((exam: ExamData) => {
-        const subject = exam.subject || 'Unknown';
-        if (!subjectMap.has(subject)) {
-          subjectMap.set(subject, { scores: [], students: new Set() });
-        }
-        const subjectData = subjectMap.get(subject)!;
-        subjectData.scores.push(exam.score || 0);
-      });
-
-      const subjectPerf: SubjectPerformance[] = Array.from(
-        subjectMap.entries(),
-      ).map(([subject, data]) => ({
-        subject,
-        examsCount: data.scores.length,
-        averageScore:
-          data.scores.reduce((a, b) => a + b, 0) / data.scores.length,
-        totalStudents: data.students.size || data.scores.length,
-      }));
-
-      setSubjectPerformance(
-        subjectPerf.sort((a, b) => b.examsCount - a.examsCount),
-      );
-
-      const { data: allUsers } = await supabase
-        .from('users')
-        .select('created_at')
-        .gte('created_at', startDate.toISOString())
-        .order('created_at', { ascending: true });
-
-      const growthMap = new Map<string, number>();
-      allUsers?.forEach((user: UserRecord) => {
-        const date = new Date(user.created_at).toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-        });
-        growthMap.set(date, (growthMap.get(date) || 0) + 1);
-      });
-
-      let cumulative = 0;
-      const growth: UserGrowthData[] = Array.from(growthMap.entries()).map(
-        ([date, count]) => {
-          cumulative += count;
-          return { date, users: cumulative };
-        },
-      );
-
-      setUserGrowth(growth);
-
-      const { data: topUsers } = await supabase
-        .from('users')
-        .select('id, name, exams_taken')
-        .order('exams_taken', { ascending: false })
-        .limit(5);
-
       setTopPerformers(
-        topUsers?.map((user: UserFromDatabase) => ({
-          id: user.id,
-          name: user.name || 'Anonymous',
+        (topUsersRes.data || []).map((u) => ({
+          id: u.id,
+          name: u.name || 'Anonymous',
           score: 0,
-          examsCompleted: user.exams_taken || 0,
-        })) || [],
+          examsCompleted: u.exams_taken || 0,
+        })),
       );
 
       if (showToast) {
@@ -223,17 +166,66 @@ export default function AnalyticsPage() {
       toast.error('Failed to load analytics data');
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
 
   const handleExport = () => {
-    toast.success('Preparing analytics export...');
-    setTimeout(() => {
-      toast.success('Analytics data exported successfully!');
-    }, 1500);
+    try {
+      toast.info('Generating analytics export...');
+
+      const rows: string[][] = [];
+      rows.push(['Metric', 'Value']);
+      rows.push(['Total Users', totalUsers.toString()]);
+      rows.push(['Active Users (' + timeRange + ')', activeUsers.toString()]);
+      rows.push(['Total Questions in Bank', examStats.totalQuestions.toString()]);
+      rows.push(['Total Exams Completed', examStats.totalExams.toString()]);
+      rows.push(['Average Score', `${examStats.averageScore.toFixed(2)}%`]);
+      rows.push([]);
+
+      rows.push(['Subject', 'Exams Count', 'Average Score (%)', 'Students']);
+      subjectPerformance.forEach((s) => {
+        rows.push([
+          `"${s.subject.replace(/"/g, '""')}"`,
+          s.examsCount.toString(),
+          s.averageScore.toFixed(2),
+          s.totalStudents.toString(),
+        ]);
+      });
+      rows.push([]);
+
+      rows.push(['Leaderboard Rank', 'Student Name', 'Exams Completed']);
+      topPerformers.forEach((p, idx) => {
+        rows.push([
+          (idx + 1).toString(),
+          `"${p.name.replace(/"/g, '""')}"`,
+          p.examsCompleted.toString(),
+        ]);
+      });
+
+      const csvContent =
+        'data:text/csv;charset=utf-8,\uFEFF' +
+        rows.map((e) => e.join(',')).join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute(
+        'download',
+        `obhyash_analytics_${timeRange}_${new Date().toISOString().slice(0, 10)}.csv`,
+      );
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success('Analytics exported to CSV successfully!');
+    } catch (e) {
+      console.error('Export error:', e);
+      toast.error('Failed to export analytics');
+    }
   };
 
   const maxUserGrowth = Math.max(...userGrowth.map((g) => g.users), 1);
+  const minUserGrowth = Math.min(...userGrowth.map((g) => g.users), 0);
 
   return (
     <div className="min-h-screen bg-white dark:bg-black p-4 lg:p-8 text-neutral-900 dark:text-neutral-100">
@@ -268,6 +260,15 @@ export default function AnalyticsPage() {
             </div>
 
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => fetchAnalyticsData(true)}
+                disabled={isRefreshing}
+                className="p-2.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all"
+                title="Refresh Data"
+              >
+                <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+              </button>
+
               <button
                 onClick={handleExport}
                 className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-neutral-900 dark:bg-white text-white dark:text-black text-[11px] font-black rounded-xl shadow-lg active:scale-95 transition-all uppercase tracking-tight"
@@ -307,16 +308,16 @@ export default function AnalyticsPage() {
               color: 'text-emerald-600',
               bgColor: 'bg-emerald-50/50 dark:bg-emerald-500/5',
               borderColor: 'border-emerald-100 dark:border-emerald-500/10',
-              change: totalUsers,
+              change: `${totalUsers} Users`,
             },
             {
               label: 'Bank',
-              value: examStats.totalQuestions,
+              value: examStats.totalQuestions.toLocaleString(),
               icon: FileQuestion,
               color: 'text-blue-600 dark:text-blue-400',
               bgColor: 'bg-blue-50/50 dark:bg-blue-500/5',
               borderColor: 'border-blue-100 dark:border-blue-500/10',
-              change: 'Qns',
+              change: 'MCQs',
             },
           ].map((stat, i) => (
             <div
@@ -352,14 +353,13 @@ export default function AnalyticsPage() {
             <div className="flex justify-between items-center mb-5">
               <div>
                 <h3 className="text-xs md:text-sm font-black text-neutral-900 dark:text-white uppercase tracking-widest flex items-center gap-2 opacity-80">
-                  <TrendingUp className="text-red-500" size={16} /> User
-                  Acquisition
+                  <TrendingUp className="text-red-500" size={16} /> User Acquisition
                 </h3>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
                 <span className="text-[10px] font-black text-neutral-400 uppercase tracking-tight">
-                  Total Users
+                  {totalUsers} Total Users
                 </span>
               </div>
             </div>
@@ -376,84 +376,91 @@ export default function AnalyticsPage() {
                 </p>
               </div>
             ) : (
-              <div className="h-[240px] md:h-[300px] bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800 p-4 overflow-hidden">
-                <svg
-                  viewBox="0 0 1000 250"
-                  className="w-full h-full"
-                  preserveAspectRatio="none"
-                >
-                  <defs>
-                    <linearGradient
-                      id="growthGrad"
-                      x1="0%"
-                      y1="0%"
-                      x2="0%"
-                      y2="100%"
-                    >
-                      <stop offset="0%" stopColor="#f43f5e" stopOpacity="0.2" />
-                      <stop offset="100%" stopColor="#f43f5e" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
+              <div className="h-[240px] md:h-[300px] bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800 p-4 flex flex-col justify-between overflow-hidden">
+                <div className="flex-1 relative w-full h-[85%]">
+                  <svg
+                    viewBox="0 0 1000 250"
+                    className="w-full h-full"
+                    preserveAspectRatio="none"
+                  >
+                    <defs>
+                      <linearGradient
+                        id="growthGrad"
+                        x1="0%"
+                        y1="0%"
+                        x2="0%"
+                        y2="100%"
+                      >
+                        <stop offset="0%" stopColor="#f43f5e" stopOpacity="0.25" />
+                        <stop offset="100%" stopColor="#f43f5e" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
 
-                  {/* Grid Lines */}
-                  {[0, 1, 2, 3, 4].map((i) => (
-                    <line
-                      key={i}
-                      x1="0"
-                      y1={i * 62.5}
-                      x2="1000"
-                      y2={i * 62.5}
-                      className="stroke-neutral-100 dark:stroke-neutral-900"
-                      strokeWidth="1"
-                      strokeDasharray="4,4"
-                    />
-                  ))}
-
-                  {/* Area */}
-                  <path
-                    d={`M 0 250 ${userGrowth
-                      .map((d, i) => {
-                        const x = (i / (userGrowth.length - 1)) * 1000;
-                        const y = 250 - (d.users / maxUserGrowth) * 220;
-                        return `L ${x} ${y}`;
-                      })
-                      .join(' ')} L 1000 250 Z`}
-                    fill="url(#growthGrad)"
-                  />
-
-                  {/* Line */}
-                  <path
-                    d={`M ${userGrowth
-                      .map((d, i) => {
-                        const x = (i / (userGrowth.length - 1)) * 1000;
-                        const y = 250 - (d.users / maxUserGrowth) * 220;
-                        return `${x},${y}`;
-                      })
-                      .join(' L ')}`}
-                    fill="none"
-                    stroke="#f43f5e"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-
-                  {/* Nodes */}
-                  {userGrowth.map((d, i) => {
-                    const x = (i / (userGrowth.length - 1)) * 1000;
-                    const y = 250 - (d.users / maxUserGrowth) * 220;
-                    return (
-                      <circle
+                    {/* Horizontal Grid Lines */}
+                    {[0, 1, 2, 3, 4].map((i) => (
+                      <line
                         key={i}
-                        cx={x}
-                        cy={y}
-                        r="4"
-                        fill="white"
-                        stroke="#f43f5e"
-                        strokeWidth="2.5"
+                        x1="0"
+                        y1={i * 62.5}
+                        x2="1000"
+                        y2={i * 62.5}
+                        className="stroke-neutral-100 dark:stroke-neutral-900"
+                        strokeWidth="1"
+                        strokeDasharray="4,4"
                       />
-                    );
-                  })}
-                </svg>
+                    ))}
+
+                    {/* Area Fill */}
+                    {userGrowth.length > 0 && (() => {
+                      const count = userGrowth.length;
+                      const getX = (i: number) =>
+                        count <= 1 ? 500 : (i / (count - 1)) * 1000;
+                      const getY = (val: number) =>
+                        250 - (val / (maxUserGrowth || 1)) * 200 - 20;
+
+                      const points = userGrowth.map((d, i) => `${getX(i)} ${getY(d.users)}`);
+                      const pathData = `M 0 250 L 0 ${getY(userGrowth[0].users)} ${points
+                        .map((p) => `L ${p}`)
+                        .join(' ')} L 1000 250 Z`;
+
+                      const lineData = points.join(' L ');
+
+                      return (
+                        <>
+                          <path d={pathData} fill="url(#growthGrad)" />
+                          <path
+                            d={`M ${lineData}`}
+                            fill="none"
+                            stroke="#f43f5e"
+                            strokeWidth="3.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          {userGrowth.map((d, i) => (
+                            <circle
+                              key={i}
+                              cx={getX(i)}
+                              cy={getY(d.users)}
+                              r="4.5"
+                              fill="white"
+                              stroke="#f43f5e"
+                              strokeWidth="3"
+                            />
+                          ))}
+                        </>
+                      );
+                    })()}
+                  </svg>
+                </div>
+
+                {/* Date Labels below chart */}
+                <div className="flex justify-between text-[10px] font-black text-neutral-400 uppercase tracking-widest pt-2 border-t border-neutral-100 dark:border-neutral-900 px-2">
+                  <span>{userGrowth[0]?.date || 'Start'}</span>
+                  {userGrowth.length > 2 && (
+                    <span>{userGrowth[Math.floor(userGrowth.length / 2)]?.date}</span>
+                  )}
+                  <span>{userGrowth[userGrowth.length - 1]?.date || 'Today'}</span>
+                </div>
               </div>
             )}
           </div>
@@ -476,7 +483,7 @@ export default function AnalyticsPage() {
                 <div className="col-span-full py-10 flex flex-col items-center justify-center bg-white dark:bg-black rounded-xl border border-neutral-100 dark:border-neutral-800">
                   <Zap className="text-neutral-200 dark:text-neutral-700 mb-2" />
                   <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                    No Activites
+                    No Activities
                   </p>
                 </div>
               ) : (
@@ -488,12 +495,12 @@ export default function AnalyticsPage() {
                     <div
                       className={`w-9 h-9 rounded-lg flex items-center justify-center font-black text-xs shadow-sm ${
                         index === 0
-                          ? 'bg-red-100 text-red-600'
+                          ? 'bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400'
                           : index === 1
-                            ? 'bg-neutral-100 text-neutral-500'
+                            ? 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300'
                             : index === 2
-                              ? 'bg-red-100 text-red-600'
-                              : 'bg-neutral-50 text-neutral-400'
+                              ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+                              : 'bg-neutral-50 text-neutral-400 dark:bg-neutral-900'
                       }`}
                     >
                       {index + 1}
@@ -569,7 +576,7 @@ export default function AnalyticsPage() {
                       <div
                         className="h-full bg-red-500 rounded-full transition-all duration-700"
                         style={{
-                          width: `${Math.min(subject.averageScore, 100)}%`,
+                          width: `${Math.min(Math.max(subject.averageScore, 5), 100)}%`,
                         }}
                       ></div>
                     </div>

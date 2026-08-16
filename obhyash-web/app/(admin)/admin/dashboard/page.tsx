@@ -47,6 +47,17 @@ export default function AdminDashboardPage() {
 
     async function loadDashboardData() {
       try {
+        // Try server-side admin stats API first
+        const apiRes = await fetch('/api/admin/stats');
+        if (apiRes.ok) {
+          const json = await apiRes.json();
+          if (json.success && json.data && isMounted) {
+            setMetrics(json.data);
+            setIsLoading(false);
+            return;
+          }
+        }
+
         const supabase = createClient();
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);

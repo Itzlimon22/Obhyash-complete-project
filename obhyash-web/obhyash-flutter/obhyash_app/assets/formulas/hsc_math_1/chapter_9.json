@@ -1,1 +1,122 @@
-[]
+[
+  {
+    "title": "অবিচ্ছিন্নতা (Continuity)",
+    "latex": "\\lim_{x \\to a^-} f(x) = \\lim_{x \\to a^+} f(x) = f(a)",
+    "description": "কোনো বিন্দুতে ফাংশনটি অবিচ্ছিন্ন (Continuous) হবে যদি তার Left Hand Limit (LHL), Right Hand Limit (RHL) এবং ফাংশনাল ভ্যালু পরস্পর সমান হয়।"
+  },
+  {
+    "title": "অন্তরীকরণযোগ্যতা (Differentiability)",
+    "latex": "LHD = RHD \\implies \\lim_{h \\to 0^-} \\frac{f(a+h)-f(a)}{h} = \\lim_{h \\to 0^+} \\frac{f(a+h)-f(a)}{h}",
+    "description": "বিন্দুটিতে Left Hand Derivative এবং Right Hand Derivative সমান হলে তা অন্তরীকরণযোগ্য। মনে রাখতে হবে: সব অন্তরীকরণযোগ্য ফাংশন অবিচ্ছিন্ন, কিন্তু সব অবিচ্ছিন্ন ফাংশন অন্তরীকরণযোগ্য নয় (যেমন: y=|x| মূলবিন্দুতে অবিচ্ছিন্ন কিন্তু অন্তরীকরণযোগ্য নয়)।"
+  },
+  {
+    "title": "ধারার সাহায্যে লিমিট (Series Expansions)",
+    "latex": "e^x = 1 + x + \\frac{x^2}{2!} + \\dots, \\quad \\ln(1+x) = x - \\frac{x^2}{2} + \\frac{x^3}{3} - \\dots",
+    "description": "লা-হোপিটাল দিয়ে বড় হয়ে গেলে ধারার সাহায্যে লিমিট সলভ করতে হয়। sin x = x - x³/3! + ... এবং cos x = 1 - x²/2! + ... জানা থাকা খুব জরুরি।"
+  },
+  {
+    "title": "লিমিট সমাধানের ব্রহ্মাস্ত্র (L'Hôpital's Rule)",
+    "latex": "\\lim_{x \\to a} \\frac{f(x)}{g(x)} = \\lim_{x \\to a} \\frac{f'(x)}{g'(x)} \\quad \\left[\\text{শর্ত: } \\frac{0}{0} \\text{ বা } \\frac{\\infty}{\\infty}\\right]",
+    "description": "লিমিটের ম্যাথে x এর মান বসালে 0/0 বা ∞/∞ আকার আসলে লব ও হরকে আলাদাভাবে অন্তরীকরণ করতে হয়। যতক্ষণ না ওই আকার দূর হয়, ততক্ষণ অন্তরীকরণ চলবে।"
+  },
+  {
+    "title": "ত্রিকোণমিতিক ও সূচকীয় লিমিট শর্টকাট",
+    "latex": "\\lim_{x \\to 0} \\frac{\\sin ax}{\\sin bx} = \\frac{a}{b}, \\quad \\lim_{x \\to 0} (1+ax)^{\\frac{b}{x}} = e^{ab}",
+    "description": "MCQ এর জন্য ডিরেক্ট শর্টকাট। tan এর ক্ষেত্রেও sin এর নিয়ম খাটে। কিন্তু cos 0 = 1 হওয়ায় তার ক্ষেত্রে এটি প্রযোজ্য নয়।"
+  },
+  {
+    "title": "মূল নিয়মে অন্তরীকরণ (First Principle)",
+    "latex": "\\frac{d}{dx} f(x) = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}",
+    "description": "অন্তরীকরণের মূল সংজ্ঞা। সৃজনশীলের (খ) নাম্বারে sinx, cosx, e^x বা x^n এর অন্তরক সহগ এই সূত্র দিয়ে নির্ণয় করতে বলা হয়।"
+  },
+  {
+    "title": "বিপরীত ত্রিকোণমিতির প্রতিস্থাপন রুল (Substitution Rule)",
+    "latex": "\\sqrt{a^2-x^2} \\to x=a\\sin\\theta, \\; \\sqrt{a^2+x^2} \\to x=a\\tan\\theta, \\; \\sqrt{x^2-a^2} \\to x=a\\sec\\theta",
+    "description": "বিপরীত ত্রিকোণমিতিক ফাংশনের (যেমন: sin⁻¹, tan⁻¹) ম্যাথগুলো ডিরেক্ট ডেরিভেটিভ না করে x এর জায়গায় এই মানগুলো ধরে ছোট করে নিতে হয়। এটি সিকিউ এর জন্য মাস্ট।"
+  },
+  {
+    "title": "গুণন ও ভাগের বিধি (Product & Quotient Rule)",
+    "latex": "\\frac{d}{dx}(uv) = u\\frac{dv}{dx} + v\\frac{du}{dx}, \\quad \\frac{d}{dx}\\left(\\frac{u}{v}\\right) = \\frac{v\\frac{du}{dx} - u\\frac{dv}{dx}}{v^2}",
+    "description": "গুণের ক্ষেত্রে একটি রেখে অন্যটির ডেরিভেটিভ। ভাগের ক্ষেত্রে: নিচে হরের স্কয়ার এবং উপরে হরকে আগে ফিক্সড রাখতে হয়, মাঝে মাইনাস বসে।"
+  },
+  {
+    "title": "চেইন রুল (Chain Rule)",
+    "latex": "\\frac{dy}{dx} = \\frac{dy}{du} \\times \\frac{du}{dx}",
+    "description": "অন্তরীকরণের প্রাণ! ফাংশনের ভেতরে ফাংশন থাকলে (যেমন: sin(x²)), ভেতরের অংশকে মনে মনে x ধরে অন্তরীকরণ করতে হয় এবং যাকে x ধরা হয়েছে তাকে আবার অন্তরীকরণ করে গুণ করতে হয়।"
+  },
+  {
+    "title": "অব্যক্ত ফাংশনের অন্তরীকরণ শর্টকাট (Implicit Function)",
+    "latex": "\\frac{dy}{dx} = - \\frac{f_x}{f_y}",
+    "description": "সমীকরণের সব পদ একপাশে এনে 0 ধরতে হবে। এরপর উপরে x এর সাপেক্ষে অন্তরীকরণ (y কে ধ্রুবক ধরে) এবং নিচে y এর সাপেক্ষে অন্তরীকরণ (x কে ধ্রুবক ধরে) করতে হবে। সামনে একটি মাইনাস বসবে।"
+  },
+  {
+    "title": "পাওয়ারের ওপর পাওয়ার (Logarithmic Differentiation Shortcut)",
+    "latex": "y = u^v \\implies \\frac{dy}{dx} = u^v \\left[ \\frac{v}{u} \\frac{du}{dx} + \\ln(u) \\frac{dv}{dx} \right]",
+    "description": "যেমন: x^x বা (sinx)^x আকারের ম্যাথ। u হলো ভিত্তি এবং v হলো পাওয়ার। এই হ্যাকটি দিয়ে ২ পেজের ম্যাথ ২ লাইনে সলভ করা যায়।"
+  },
+  {
+    "title": "প্যারামেট্রিক সমীকরণের অন্তরীকরণ",
+    "latex": "x = f(t), \\; y = g(t) \\implies \\frac{dy}{dx} = \\frac{\\frac{dy}{dt}}{\\frac{dx}{dt}}",
+    "description": "x এবং y সরাসরি যুক্ত না থেকে তৃতীয় কোনো চলকের (t বা θ) মাধ্যমে যুক্ত থাকলে, উভয়কে আলাদাভাবে t এর সাপেক্ষে ডেরিভেটিভ করে ভাগ করতে হয়।"
+  },
+  {
+    "title": "পর্যায়ক্রমিক অন্তরীকরণ (n-th Derivative Formulae)",
+    "latex": "y = \\frac{1}{ax+b} \\implies y_n = \\frac{(-1)^n n! a^n}{(ax+b)^{n+1}}, \\quad y = \\ln(ax+b) \\implies y_n = \\frac{(-1)^{n-1} (n-1)! a^n}{(ax+b)^n}",
+    "description": "এডমিশন টেস্টে সরাসরি n-তম অন্তরজ চাওয়া হয়। এই সূত্রগুলো মুখস্থ থাকলে কয়েক সেকেন্ডে উত্তর করা যায়।"
+  },
+  {
+    "title": "n-তম অন্তরজ: ত্রিকোণমিতি ও এক্সপোনেনশিয়াল",
+    "latex": "y = \\sin(ax+b) \\implies y_n = a^n \\sin\\left(ax+b + \\frac{n\\pi}{2}\\right), \\quad y = e^{ax}\\sin(bx+c) \\implies y_n = r^n e^{ax} \\sin(bx+c+n\\phi)",
+    "description": "যেখানে r = √(a² + b²) এবং φ = tan⁻¹(b/a)। Cos এর ক্ষেত্রেও একই সূত্র, শুধু sin এর জায়গায় cos বসবে।"
+  },
+  {
+    "title": "লিভনিজ উপপাদ্য (Leibniz Theorem)",
+    "latex": "(uv)_n = u_n v + ^nC_1 u_{n-1} v_1 + ^nC_2 u_{n-2} v_2 + \\dots + u v_n",
+    "description": "দুটি ফাংশনের গুণফলের n-তম অন্তরজ নির্ণয়ের সূত্র। সাধারণত v এমন একটি ফাংশন ধরা হয় যা কয়েকবার অন্তরীকরণ করলে শূন্য হয়ে যায় (যেমন: x²)।"
+  },
+  {
+    "title": "স্পর্শক ও অভিলম্বের সমীকরণ (Tangent & Normal)",
+    "latex": "\\text{Tangent: } y - y_1 = m(x - x_1), \\quad \\text{Normal: } y - y_1 = -\\frac{1}{m}(x - x_1)",
+    "description": "এখানে m = (dy/dx) at (x₁, y₁)। অভিলম্ব স্পর্শকের ওপর লম্ব হওয়ায় এর ঢাল -1/m হয়।"
+  },
+  {
+    "title": "উপস্পর্শক ও উপঅভিলম্ব (Sub-tangent & Sub-normal)",
+    "latex": "\\text{Sub-tangent} = \\left| \\frac{y_1}{m} \\right|, \\quad \\text{Sub-normal} = \\left| y_1 m \\right|",
+    "description": "BUET এবং ইঞ্জিনিয়ারিং এর জন্য খুব গুরুত্বপূর্ণ। স্পর্শক ও অভিলম্ব x-অক্ষের যে অংশ কাটে তার ওপর ভিত্তি করে এই দৈর্ঘ্যগুলো মাপা হয়।"
+  },
+  {
+    "title": "বক্ররেখাদ্বয়ের ছেদকোণ (Angle of Intersection)",
+    "latex": "\\tan\\theta = \\left| \\frac{m_1 - m_2}{1 + m_1 m_2} \\right|",
+    "description": "দুটি বক্ররেখা যে বিন্দুতে ছেদ করে, ওই বিন্দুতে রেখাদ্বয়ের স্পর্শকদ্বয়ের মধ্যবর্তী কোণই হলো বক্ররেখার ছেদকোণ। m₁ ও m₂ হলো ওই বিন্দুতে ঢাল।"
+  },
+  {
+    "title": "রোলের উপপাদ্য (Rolle's Theorem)",
+    "latex": "f(a) = f(b) \\implies \\exists c \\in (a,b) \\text{ such that } f'(c) = 0",
+    "description": "ফাংশনটি [a,b] তে অবিচ্ছিন্ন ও (a,b) তে অন্তরীকরণযোগ্য হলে এবং প্রান্তবিন্দুতে মান সমান হলে, এর মাঝে এমন অন্তত একটি বিন্দু c থাকবে যেখানে স্পর্শক x-অক্ষের সমান্তরাল (ঢাল শূন্য) হবে।"
+  },
+  {
+    "title": "গড়মান উপপাদ্য (Mean Value Theorem / Lagrange)",
+    "latex": "f'(c) = \\frac{f(b) - f(a)}{b - a}",
+    "description": "রোলের উপপাদ্যের আপগ্রেড ভার্সন। এখানে প্রান্তবিন্দুতে মান সমান না হলেও চলে। মাঝে এমন একটি বিন্দু c থাকবে যেখানে স্পর্শকের ঢাল রেখার জ্যা-এর ঢালের সমান হবে।"
+  },
+  {
+    "title": "অন্তরকের সাহায্যে আসন্ন মান (Approximation / Error)",
+    "latex": "f(x + \\Delta x) \\approx f(x) + f'(x) \\Delta x \\implies \\delta y \\approx \\frac{dy}{dx} \\delta x",
+    "description": "খুব ছোট পরিবর্তন (Error) নির্ণয়ে ব্যবহৃত হয়। যেমন: √25.2 এর মান বের করতে এটি ব্যবহার করা যায়।"
+  },
+  {
+    "title": "হার বা পরিবর্তনের হার (Rate of Change)",
+    "latex": "\\text{Velocity } v = \\frac{ds}{dt}, \\quad \\text{Acceleration } a = \\frac{dv}{dt} = \\frac{d^2s}{dt^2}",
+    "description": "সময় t এর সাপেক্ষে সরণের (s) অন্তরীকরণ বেগ এবং বেগের অন্তরীকরণ ত্বরণ নির্দেশ করে। ক্ষেত্রফল বা আয়তন বৃদ্ধির হারও একই নিয়মে (dA/dt, dV/dt) বের করা হয়।"
+  },
+  {
+    "title": "গুরুমান ও লঘুমানের টেস্ট (Maxima & Minima Test)",
+    "latex": "f''(x) < 0 \\implies \\text{গুরুমান (Maxima)}, \\quad f''(x) > 0 \\implies \\text{লঘুমান (Minima)}",
+    "description": "প্রথমে f'(x) = 0 ধরে x এর মানগুলো (Critical points) বের করতে হয়। সেগুলো ২য় অন্তরজে (f''(x)) বসালে মান নেগেটিভ আসলে গুরুমান, আর পজিটিভ আসলে লঘুমান থাকে।"
+  },
+  {
+    "title": "দ্বিঘাত ফাংশনের চরম মান শর্টকাট (MCQ Hack)",
+    "latex": "y = ax^2 + bx + c \\implies \\text{চরম বিন্দু পাওয়া যাবে } x = -\\frac{b}{2a} \\text{ বিন্দুতে}",
+    "description": "যেকোনো প্যারাবোলার ডেরিভেটিভ না করেই সরাসরি x এর মান বের করার শর্টকাট। এই x এর মান মূল সমীকরণে বসালেই সর্বোচ্চ বা সর্বনিম্ন মান পাওয়া যায়।"
+  }
+]
