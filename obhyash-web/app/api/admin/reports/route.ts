@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
     const pageSize = Math.max(1, parseInt(searchParams.get('pageSize') || '20'));
     const status = searchParams.get('status');
+    const reason = searchParams.get('reason');
     const search = searchParams.get('search');
 
     const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
@@ -21,6 +22,10 @@ export async function GET(request: NextRequest) {
 
     if (status && status !== 'All') {
       query = query.eq('status', status);
+    }
+
+    if (reason && reason !== 'All') {
+      query = query.ilike('reason', `%${reason}%`);
     }
 
     if (search && search.trim()) {
@@ -74,14 +79,14 @@ export async function GET(request: NextRequest) {
         ? supabaseAdmin
             .from('questions')
             .select(
-              'id, question, options, correct_answer_indices, explanation, subject, chapter, topic',
+              'id, question, options, correct_answer_indices, explanation, subject, chapter, topic, difficulty',
             )
             .in('id', questionIds)
         : Promise.resolve({ data: [] }),
       reporterIds.length > 0
         ? supabaseAdmin
             .from('users')
-            .select('id, name, email, phone')
+            .select('id, name, email, phone, institute, avatar_url, avatar_color')
             .in('id', reporterIds)
         : Promise.resolve({ data: [] }),
     ]);
@@ -100,11 +105,7 @@ export async function GET(request: NextRequest) {
       return {
         ...report,
         question: q || null,
-        reporter: u || {
-          name: report.reporter_name || 'Student',
-          email: '',
-          phone: '',
-        },
+        reporter: u || null,
       };
     });
 
@@ -124,7 +125,7 @@ export async function GET(request: NextRequest) {
   } catch (err: any) {
     console.error('Error in /api/admin/reports GET:', err);
     return NextResponse.json(
-      { success: false, error: err.message || 'Failed to fetch reports' },
+      { success: false, error: err.message || 'Internal Server Error' },
       { status: 500 },
     );
   }
@@ -134,9 +135,63 @@ export async function POST(request: NextRequest) {
   try {
     await connection();
     const body = await request.json();
-    const { action, reportId, resolution, adminComment } = body;
+    const { action, reportId, resolution, adminComment, questionFix, reportIds } = body;
     const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
+    const now = new Date();
 
+    // 1. In-line Fix & Resolve Action
+    if (action === 'fix_and_resolve' && reportId) {
+      // If questionFix is provided, update the question
+      if (questionFix && questionFix.questionId) {
+        const updatePayload: any = {};
+        if (questionFix.correctAnswerIndex !== undefined) {
+          updatePayload.correct_answer_indices = [questionFix.correctAnswerIndex];
+        }
+        if (questionFix.questionText) {
+          updatePayload.question = questionFix.questionText;
+        }
+        if (questionFix.explanation !== undefined) {
+          updatePayload.explanation = questionFix.explanation;
+        }
+        if (questionFix.options) {
+          updatePayload.options = questionFix.options;
+        }
+
+        if (Object.keys(updatePayload).length > 0) {
+          await supabaseAdmin
+            .from('questions')
+            .update(updatePayload)
+            .eq('id', questionFix.questionId);
+        }
+      }
+
+      // Fetch report for reward
+      const { data: reportData } = await supabaseAdmin
+        .from('reports')
+        .select('*')
+        .eq('id', reportId)
+        .single();
+
+      // Resolve the report
+      await supabaseAdmin
+        .from('reports')
+        .update({
+          status: 'Resolved',
+          admin_comment: adminComment || 'ত্রুটি সংশোধন করা হয়েছে। ধন্যবাদ!',
+          resolved_at: now.toISOString(),
+          updated_at: now.toISOString(),
+        })
+        .eq('id', reportId);
+
+      // Reward student with 1 day bonus
+      if (reportData?.reporter_id) {
+        await rewardReporter(supabaseAdmin, reportData.reporter_id, now);
+      }
+
+      return NextResponse.json({ success: true, status: 'Resolved' });
+    }
+
+    // 2. Simple Resolve Action (Accept or Reject)
     if (action === 'resolve') {
       if (!reportId || !resolution) {
         return NextResponse.json(
@@ -146,9 +201,7 @@ export async function POST(request: NextRequest) {
       }
 
       const status = resolution === 'Accept' ? 'Resolved' : 'Ignored';
-      const now = new Date();
 
-      // Fetch report details
       const { data: reportData, error: fetchErr } = await supabaseAdmin
         .from('reports')
         .select('*')
@@ -162,8 +215,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Update Report Status
-      const { error: updateErr } = await supabaseAdmin
+      await supabaseAdmin
         .from('reports')
         .update({
           status,
@@ -173,62 +225,28 @@ export async function POST(request: NextRequest) {
         })
         .eq('id', reportId);
 
-      if (updateErr) throw updateErr;
-
-      // If accepted, reward student with +1 day subscription bonus
       if (resolution === 'Accept' && reportData.reporter_id) {
-        try {
-          const { data: userData } = await supabaseAdmin
-            .from('users')
-            .select('subscription')
-            .eq('id', reportData.reporter_id)
-            .single();
-
-          if (userData) {
-            const currentSub = userData.subscription || {};
-            const currentExpiry = currentSub.expiry || currentSub.expires_at;
-            const baseDate =
-              currentExpiry && new Date(currentExpiry) > now
-                ? new Date(currentExpiry)
-                : now;
-
-            const newExpiry = new Date(baseDate);
-            newExpiry.setDate(newExpiry.getDate() + 1);
-
-            await supabaseAdmin
-              .from('users')
-              .update({
-                subscription: {
-                  ...currentSub,
-                  plan:
-                    currentSub.plan && currentSub.plan !== 'Free'
-                      ? currentSub.plan
-                      : 'Premium (Reward)',
-                  expiry: newExpiry.toISOString(),
-                  expires_at: newExpiry.toISOString(),
-                  status: 'Active',
-                },
-                updated_at: now.toISOString(),
-              })
-              .eq('id', reportData.reporter_id);
-
-            // Send notification
-            await supabaseAdmin.from('notifications').insert({
-              user_id: reportData.reporter_id,
-              title: 'রিপোর্ট গৃহীত ও রিওয়ার্ড প্রদান! 🎁',
-              message:
-                'আপনার পাঠানো প্রশ্নের রিপোর্টটি সঠিক হিসেবে গৃহীত হয়েছে। আপনাকে ১ দিনের প্রিমিয়াম সাবস্ক্রিপশন রিওয়ার্ড দেওয়া হয়েছে!',
-              type: 'success',
-              read: false,
-              created_at: now.toISOString(),
-            });
-          }
-        } catch (subErr) {
-          console.warn('Failed to extend subscription for report:', subErr);
-        }
+        await rewardReporter(supabaseAdmin, reportData.reporter_id, now);
       }
 
       return NextResponse.json({ success: true, status });
+    }
+
+    // 3. Mass Bulk Action (Bulk Resolve or Bulk Ignore)
+    if (action === 'bulk_update' && Array.isArray(reportIds) && reportIds.length > 0) {
+      const status = resolution === 'Accept' ? 'Resolved' : 'Ignored';
+
+      await supabaseAdmin
+        .from('reports')
+        .update({
+          status,
+          admin_comment: adminComment || 'বাল্ক প্রসেস করা হয়েছে।',
+          resolved_at: now.toISOString(),
+          updated_at: now.toISOString(),
+        })
+        .in('id', reportIds);
+
+      return NextResponse.json({ success: true, count: reportIds.length, status });
     }
 
     return NextResponse.json(
@@ -238,8 +256,105 @@ export async function POST(request: NextRequest) {
   } catch (err: any) {
     console.error('Error in /api/admin/reports POST:', err);
     return NextResponse.json(
-      { success: false, error: err.message || 'Failed to process report' },
+      { success: false, error: err.message || 'Internal Server Error' },
       { status: 500 },
     );
+  }
+}
+
+async function rewardReporter(supabaseAdmin: any, reporterId: string, now: Date) {
+  try {
+    // 1. Get latest active subscription from subscription_history
+    const { data: sub } = await supabaseAdmin
+      .from('subscription_history')
+      .select('*')
+      .eq('user_id', reporterId)
+      .eq('is_active', true)
+      .gt('expires_at', now.toISOString())
+      .order('expires_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    // 2. Fetch User Profile
+    const { data: userData } = await supabaseAdmin
+      .from('users')
+      .select('subscription, subscription_expires_at')
+      .eq('id', reporterId)
+      .maybeSingle();
+
+    const currentSub = userData?.subscription || {};
+    let baseDate = now;
+
+    if (sub && sub.expires_at) {
+      const exp = new Date(sub.expires_at);
+      if (exp > now) baseDate = exp;
+    } else if (currentSub.expiry || userData?.subscription_expires_at) {
+      const exp = new Date(currentSub.expiry || userData?.subscription_expires_at);
+      if (exp > now) baseDate = exp;
+    }
+
+    const newExpiry = new Date(baseDate.getTime() + 1 * 24 * 60 * 60 * 1000);
+
+    // 3. Update 'users' table (Web & Profile queries)
+    await supabaseAdmin
+      .from('users')
+      .update({
+        subscription: {
+          ...currentSub,
+          plan:
+            currentSub.plan && currentSub.plan !== 'Free'
+              ? currentSub.plan
+              : 'Premium (Reward)',
+          expiry: newExpiry.toISOString(),
+          expires_at: newExpiry.toISOString(),
+          status: 'Active',
+        },
+        subscription_status: 'Active',
+        subscription_expires_at: newExpiry.toISOString(),
+        is_subscribed: true,
+        updated_at: now.toISOString(),
+      })
+      .eq('id', reporterId);
+
+    // 4. Update 'subscription_history' table (Flutter & Invoices queries)
+    if (sub) {
+      await supabaseAdmin
+        .from('subscription_history')
+        .update({ expires_at: newExpiry.toISOString() })
+        .eq('id', sub.id);
+    } else {
+      const { data: planData } = await supabaseAdmin
+        .from('subscription_plans')
+        .select('id')
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle();
+
+      await supabaseAdmin
+        .from('subscription_history')
+        .update({ is_active: false })
+        .eq('user_id', reporterId);
+
+      await supabaseAdmin.from('subscription_history').insert({
+        user_id: reporterId,
+        plan_id: planData?.id || null,
+        started_at: now.toISOString(),
+        expires_at: newExpiry.toISOString(),
+        is_active: true,
+      });
+    }
+
+    // 5. Send Notification (is_read matches schema)
+    await supabaseAdmin.from('notifications').insert({
+      user_id: reporterId,
+      title: 'রিপোর্ট গৃহীত ও ১ দিনের প্রো রিওয়ার্ড! 🎁',
+      message:
+        'আপনার পাঠানো প্রশ্নের ত্রুটি রিপোর্টটি ভেরিফাই করে সমাধান করা হয়েছে। সহযোগিতার জন্য আপনাকে ১ দিনের প্রো সাবস্ক্রিপশন রিওয়ার্ড দেওয়া হয়েছে!',
+      type: 'reward',
+      is_read: false,
+      created_at: now.toISOString(),
+    });
+  } catch (subErr) {
+    console.warn('Failed to reward subscription:', subErr);
   }
 }

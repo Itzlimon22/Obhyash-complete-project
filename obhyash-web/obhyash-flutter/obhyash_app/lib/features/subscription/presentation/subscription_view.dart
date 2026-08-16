@@ -53,6 +53,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
       DateTime? expiresAt;
 
       if (userId != null) {
+        // Try subscription_history first
         final histData = await supabase
             .from('subscription_history')
             .select('*, subscription_plans(*)')
@@ -66,15 +67,85 @@ class _SubscriptionViewState extends State<SubscriptionView> {
           final h = hist.first as Map<String, dynamic>;
           final planJson = h['subscription_plans'] as Map<String, dynamic>?;
           final rawExpires = h['expires_at'] as String?;
+          if (rawExpires != null) {
+            expiresAt = DateTime.tryParse(rawExpires);
+          }
+
           if (planJson != null) {
             activeSub = SubscriptionPlan.fromJson(
               planJson,
               expiresAt: rawExpires?.substring(0, 10),
             );
             currentPlanId = activeSub.id;
-            if (rawExpires != null) {
-              expiresAt = DateTime.tryParse(rawExpires);
+          } else if (expiresAt != null && expiresAt.isAfter(DateTime.now())) {
+            // Reward / Custom Plan
+            activeSub = SubscriptionPlan(
+              id: 'active_reward_plan',
+              name: 'প্রো সাবস্ক্রিপশন (রিওয়ার্ড)',
+              price: 0,
+              billingCycle: 'Active Plan',
+              durationDays: expiresAt.difference(DateTime.now()).inDays.clamp(1, 999),
+              currency: '৳',
+              features: [
+                'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+                'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+                'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ'
+              ],
+              colorTheme: 'emerald',
+              expiresAt: rawExpires?.substring(0, 10),
+            );
+            currentPlanId = 'pro';
+          }
+        }
+
+        // Fallback: Check 'users' table (e.g. Question Report Reward / Referral Bonus)
+        if (activeSub == null) {
+          try {
+            final userRes = await supabase
+                .from('users')
+                .select('subscription, subscription_status, subscription_expires_at, is_subscribed')
+                .eq('id', userId)
+                .maybeSingle();
+
+            if (userRes != null) {
+              final subJson = userRes['subscription'] as Map<String, dynamic>?;
+              final status = subJson?['status'] ?? userRes['subscription_status'];
+              final rawExp = subJson?['expiry'] ?? userRes['subscription_expires_at'];
+              final isSub = userRes['is_subscribed'] == true ||
+                  status?.toString().toLowerCase() == 'active';
+
+              if (isSub) {
+                DateTime? parsedExp;
+                if (rawExp != null) parsedExp = DateTime.tryParse(rawExp.toString());
+                if (parsedExp == null || parsedExp.isAfter(DateTime.now())) {
+                  expiresAt = parsedExp;
+                  final days = parsedExp != null
+                      ? parsedExp.difference(DateTime.now()).inDays.clamp(1, 999)
+                      : 30;
+                  final planTitle = subJson?['plan']?.toString() ?? 'প্রো সাবস্ক্রিপশন';
+                  activeSub = SubscriptionPlan(
+                    id: 'user_active_sub',
+                    name: planTitle,
+                    price: 0,
+                    billingCycle: 'Active Plan',
+                    durationDays: days,
+                    currency: '৳',
+                    features: [
+                      'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+                      'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+                      'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ'
+                    ],
+                    colorTheme: 'emerald',
+                    expiresAt: parsedExp != null && parsedExp.toIso8601String().length >= 10
+                        ? parsedExp.toIso8601String().substring(0, 10)
+                        : null,
+                  );
+                  currentPlanId = 'pro';
+                }
+              }
             }
+          } catch (userSubErr) {
+            debugPrint('User profile sub check error: $userSubErr');
           }
         }
       }

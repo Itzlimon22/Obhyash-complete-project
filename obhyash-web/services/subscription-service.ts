@@ -251,33 +251,72 @@ export const getUserActiveSubscription =
     if (!user) return null;
 
     try {
+      const now = new Date();
+
+      // 1. Try subscription_history first
+      const { data: hist } = await supabase
+        .from('subscription_history')
+        .select('*, subscription_plans(*)')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .gt('expires_at', now.toISOString())
+        .order('started_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (hist) {
+        const plan = hist.subscription_plans as any;
+        const expiry = hist.expires_at;
+        return {
+          id: plan?.id || 'history_active_sub',
+          name: plan?.display_name || 'প্রো সাবস্ক্রিপশন (রিওয়ার্ড)',
+          price: plan?.price || 0,
+          currency: plan?.currency || '৳',
+          billingCycle: 'Active Plan',
+          features: plan?.features || [
+            'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+            'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+            'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
+          ],
+          colorTheme: 'emerald',
+          isPopular: true,
+          expiresAt: expiry || undefined,
+        };
+      }
+
+      // 2. Check 'users' table fallback
       const { data: userProfile } = await supabase
         .from('users')
-        .select('subscription, subscription_status, subscription_expires_at, is_subscribed')
+        .select(
+          'subscription, subscription_status, subscription_expires_at, is_subscribed',
+        )
         .eq('id', user.id)
         .maybeSingle();
 
       if (userProfile) {
         const sub = userProfile.subscription as any;
         const status = sub?.status || userProfile.subscription_status;
-        const expiry = sub?.expiry || sub?.expires_at || userProfile.subscription_expires_at;
+        const expiry =
+          sub?.expiry ||
+          sub?.expires_at ||
+          userProfile.subscription_expires_at;
         const isSub =
           userProfile.is_subscribed ||
           (status && String(status).toLowerCase() === 'active');
 
         if (isSub && sub?.plan && sub.plan !== 'Free') {
           const expDate = expiry ? new Date(expiry) : null;
-          if (!expDate || expDate > new Date()) {
+          if (!expDate || expDate > now) {
             return {
               id: 'user_active_plan',
-              name: sub?.plan || 'প্রিমিয়াম প্ল্যান',
+              name: sub?.plan || 'প্রো সাবস্ক্রিপশন',
               price: 0,
               currency: '৳',
               billingCycle: 'Active Plan',
               features: [
-                'সকল প্রিমিয়াম ফিচার আনলকড',
-                'লাইভ এক্সাম ও আনলিমিটেড প্র্যাকটিস',
-                'পূর্ণাঙ্গ এনালাইসিস ও র‍্যাঙ্ক প্রেডিকশন',
+                'সকল প্রিমিয়াম প্রশ্নের সমাধান',
+                'আনলিমিটেড মডেল টেস্ট ও লাইভ এক্সাম',
+                'পূর্ণাঙ্গ এনালাইসিস ও পারফরম্যান্স গ্রাফ',
               ],
               colorTheme: 'emerald',
               isPopular: true,
@@ -364,7 +403,6 @@ export const updatePaymentStatus = async (
   return true;
 };
 
-// Actual implementation for extending subscription
 export const extendSubscription = async (
   userId: string,
   days: number,
@@ -374,53 +412,99 @@ export const extendSubscription = async (
   }
 
   try {
-    // 1. Get latest active subscription
-    const { data: sub, error } = await supabase
+    const now = new Date();
+
+    // 1. Get latest active subscription from subscription_history
+    const { data: sub } = await supabase
       .from('subscription_history')
       .select('*')
       .eq('user_id', userId)
       .eq('is_active', true)
-      .gt('expires_at', new Date().toISOString())
+      .gt('expires_at', now.toISOString())
       .order('expires_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
-    if (error) {
-      console.error('Error finding subscription to extend:', error);
-      return false;
+    // 2. Fetch User Profile subscription info
+    const { data: userProfile } = await supabase
+      .from('users')
+      .select('subscription, subscription_expires_at')
+      .eq('id', userId)
+      .maybeSingle();
+
+    const currentSub = userProfile?.subscription || {};
+    let baseDate = now;
+
+    if (sub && sub.expires_at) {
+      const exp = new Date(sub.expires_at);
+      if (exp > now) baseDate = exp;
+    } else if (currentSub.expiry || userProfile?.subscription_expires_at) {
+      const exp = new Date(currentSub.expiry || userProfile?.subscription_expires_at);
+      if (exp > now) baseDate = exp;
     }
 
-    if (!sub) {
-      console.log('No active subscription found to extend for user:', userId);
-      // Optional: Could grant a new 1-day subscription here if desired logic
-      return false;
+    const newExpiry = new Date(baseDate.getTime() + days * 24 * 60 * 60 * 1000);
+
+    // 3. Update 'users' table
+    await supabase
+      .from('users')
+      .update({
+        subscription: {
+          ...currentSub,
+          plan:
+            currentSub.plan && currentSub.plan !== 'Free'
+              ? currentSub.plan
+              : 'Premium (Reward)',
+          expiry: newExpiry.toISOString(),
+          expires_at: newExpiry.toISOString(),
+          status: 'Active',
+        },
+        subscription_status: 'Active',
+        subscription_expires_at: newExpiry.toISOString(),
+        is_subscribed: true,
+        updated_at: now.toISOString(),
+      })
+      .eq('id', userId);
+
+    // 4. Update 'subscription_history' table
+    if (sub) {
+      await supabase
+        .from('subscription_history')
+        .update({ expires_at: newExpiry.toISOString() })
+        .eq('id', sub.id);
+    } else {
+      // Find popular or default plan
+      const { data: planData } = await supabase
+        .from('subscription_plans')
+        .select('id')
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle();
+
+      // Deactivate older inactive records
+      await supabase
+        .from('subscription_history')
+        .update({ is_active: false })
+        .eq('user_id', userId);
+
+      await supabase.from('subscription_history').insert({
+        user_id: userId,
+        plan_id: planData?.id || null,
+        started_at: now.toISOString(),
+        expires_at: newExpiry.toISOString(),
+        is_active: true,
+      });
     }
 
-    // 2. Calculate new date
-    const currentExpiry = new Date(sub.expires_at);
-    const newExpiry = new Date(
-      currentExpiry.getTime() + days * 24 * 60 * 60 * 1000,
-    );
-
-    // 3. Update DB
-    const { error: updateError } = await supabase
-      .from('subscription_history')
-      .update({ expires_at: newExpiry.toISOString() })
-      .eq('id', sub.id);
-
-    if (updateError) throw updateError;
-
-    // 4. Notify User
-    await createNotification(
-      userId,
-      'বোনাস সাবস্ক্রিপশন!',
-      `আপনার রিপোর্টের জন্য ধন্যবাদ। পুরস্কার হিসেবে তোমার সাবস্ক্রিপশনের মেয়াদ ${days} দিন বাড়ানো হয়েছে!`,
-      'success',
-      {
-        actionUrl: '/subscription',
-        priority: 'high',
-      },
-    );
+    // 5. Notify User
+    await supabase.from('notifications').insert({
+      user_id: userId,
+      title: 'রিপোর্ট গৃহীত ও প্রো রিওয়ার্ড! 🎁',
+      message: `আপনার রিপোর্টের জন্য ধন্যবাদ। পুরস্কার হিসেবে তোমার অ্যাকাউন্টে ${days} দিনের প্রো সাবস্ক্রিপশন চালু করা হয়েছে!`,
+      type: 'reward',
+      is_read: false,
+      created_at: now.toISOString(),
+    });
 
     return true;
   } catch (err) {
