@@ -70,7 +70,7 @@ const AdminMobileBottomNav: React.FC<AdminMobileBottomNavProps> = ({
                 {isActive && (
                   <motion.div
                     layoutId="activeTabCircle"
-                    className="absolute inset-0 bg-red-600 rounded-2xl -m-2.5 shadow-lg shadow-red-500/30"
+                    className="absolute inset-0 bg-[#004633] rounded-2xl -m-2.5 shadow-lg shadow-emerald-900/40 border border-emerald-500/30"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}

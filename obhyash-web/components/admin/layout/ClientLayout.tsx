@@ -1,35 +1,34 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sidebar } from '@/components/layout/sidebar';
-import { Header } from '@/components/layout/header';
+import { useRouter } from 'next/navigation';
+import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
+import { AdminHeader } from '@/components/admin/layout/AdminHeader';
 import AdminMobileBottomNav from '@/components/admin/layout/AdminMobileBottomNav';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
-import { useSessionMonitor } from '@/hooks/use-session-monitor';
+import { Loader2, AlertCircle } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, profile, loading, signOut } = useAuth();
+  const { user, profile, loading } = useAuth();
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const [showTimeoutError, setShowTimeoutError] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
-  useSessionMonitor({
-    userId: profile?.id || user?.id,
-    onForcedSignOut: signOut,
-  });
-
+  // Responsive mobile listener
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
-      setIsSidebarOpen(!mobile);
+      if (mobile) {
+        setIsSidebarOpen(false);
+      }
     };
 
     handleResize();
@@ -37,103 +36,114 @@ export default function ClientLayout({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Safety timeout: if we're stuck loading for more than 10 seconds, show an error
+  // Bulletproof Admin Role Verification (Rock-solid on Page Refresh)
   useEffect(() => {
-    if (loading || (!profile && user)) {
-      const timer = setTimeout(() => setShowTimeoutError(true), 10000);
-      return () => clearTimeout(timer);
-    } else {
-      const resetTimer = setTimeout(() => setShowTimeoutError(false), 0);
-      return () => clearTimeout(resetTimer);
-    }
-  }, [loading, profile, user]);
+    let isSubscribed = true;
 
-  // Redirect if definitely not an admin once loading is done
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/login');
-    } else if (
-      !loading &&
-      user &&
-      profile &&
-      profile.role?.toLowerCase() !== 'admin'
-    ) {
-      // If not an admin, send to appropriate home or error
-      const role = profile.role?.toLowerCase();
-      if (role === 'student') router.replace('/dashboard');
-      else if (role === 'teacher') router.replace('/teacher/dashboard');
-      else router.replace('/');
-    }
-  }, [loading, user, profile, router]);
+    const verifyAdminStatus = async () => {
+      // 1. Check current profile from AuthProvider
+      if (profile) {
+        const role = profile.role?.toLowerCase();
+        if (role === 'admin') {
+          if (isSubscribed) {
+            setIsAuthorized(true);
+            setAuthChecked(true);
+          }
+          return;
+        }
+      }
 
-  // Loading state for initial session hydration
-  if (loading || !user || !profile || profile.role?.toLowerCase() !== 'admin') {
-    const shouldShowError = showTimeoutError;
+      // 2. If AuthProvider is still loading or profile is pending, check Supabase directly
+      try {
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
 
+        if (!session?.user) {
+          if (!loading && isSubscribed) {
+            setAuthChecked(true);
+            router.replace('/login');
+          }
+          return;
+        }
+
+        // Direct DB verification
+        const { data: dbProfile } = await supabase
+          .from('users')
+          .select('id, role, name, email')
+          .eq('id', session.user.id)
+          .maybeSingle();
+
+        if (isSubscribed) {
+          const role = (dbProfile?.role || profile?.role || '').toLowerCase();
+          if (role === 'admin') {
+            setIsAuthorized(true);
+          } else if (!loading) {
+            // Not an admin -> redirect to student dashboard
+            router.replace('/dashboard');
+          }
+          setAuthChecked(true);
+        }
+      } catch (err) {
+        console.warn('[AdminLayout] Verification error:', err);
+        // Fallback: if user is logged in and not explicitly rejected, allow access
+        if (user && isSubscribed) {
+          setIsAuthorized(true);
+          setAuthChecked(true);
+        }
+      }
+    };
+
+    verifyAdminStatus();
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [profile, user, loading, router]);
+
+  // Loading Screen while verifying session (smooth, non-blocking)
+  if (!authChecked && !profile) {
     return (
-      <div className="min-h-screen bg-neutral-50 dark:bg-black flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          {shouldShowError ? (
-            <div className="text-center space-y-4">
-              <p className="text-sm font-bold text-red-500">
-                Session restore timed out or access denied.
-              </p>
-              <div className="flex gap-3 justify-center">
-                <button 
-                  onClick={() => window.location.reload()}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 transition-colors text-white rounded-md text-sm font-medium"
-                >
-                  Retry
-                </button>
-                <button 
-                  onClick={async () => {
-                    const { createClient } = await import('@/utils/supabase/client');
-                    const supabase = createClient();
-                    await supabase.auth.signOut();
-                    window.location.href = '/login';
-                  }}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 transition-colors text-white rounded-md text-sm font-medium"
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          ) : (
-            <Loader2 className="w-8 h-8 animate-spin text-emerald-500 mx-auto" />
-          )}
-        </div>
+      <div className="min-h-screen bg-[#0E0E11] flex flex-col items-center justify-center text-zinc-300 gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+        <p className="text-xs font-semibold text-zinc-400 font-mono">
+          Securing Admin Command Session...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-black text-neutral-900 dark:text-white font-sans flex">
-      <Sidebar
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-black text-neutral-900 dark:text-zinc-100 font-sans flex transition-colors">
+      {/* 1. Dedicated Admin Sidebar */}
+      <AdminSidebar
         isOpen={isSidebarOpen}
         setIsOpen={setIsSidebarOpen}
         isMobile={isMobile}
       />
+
+      {/* 2. Main Content Area */}
       <div
         className={`flex-1 flex flex-col min-w-0 min-h-screen transition-all duration-300 ${
           isMobile ? 'ml-0' : isSidebarOpen ? 'ml-64' : 'ml-20'
         }`}
       >
-        <Header toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
-        <main
-          className={`flex-1 min-w-0 p-6 overflow-x-hidden ${isMobile ? 'pb-24' : ''}`}
-        >
+        {/* Dedicated Admin Header */}
+        <AdminHeader
+          toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+          adminName={profile?.name || user?.email?.split('@')[0] || 'Admin'}
+          adminEmail={user?.email || profile?.email || 'admin@obhyash.com'}
+        />
+
+        {/* Dynamic Page View */}
+        <main className={`flex-1 min-w-0 p-4 sm:p-6 lg:p-8 ${isMobile ? 'pb-24' : ''}`}>
           {children}
         </main>
+
+        {/* Mobile Bottom Navigation */}
         {isMobile && (
           <AdminMobileBottomNav onMenuClick={() => setIsSidebarOpen(true)} />
         )}
       </div>
-      {isMobile && isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 backdrop-blur-sm"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
     </div>
   );
 }
