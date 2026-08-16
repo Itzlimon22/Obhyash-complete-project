@@ -111,7 +111,7 @@
   },
   {
     "title": "বর্গের ধারার সমষ্টি শর্টকাট (Series Summation Shortcut)",
-    "latex": "\\sin^2 10^\\circ + \\sin^2 20^\\circ + \\dots + \\sin^2 80^\\circ = \\frac{\\text{পদসংখ্যা}}{2}",
+    "latex": "\\sin^2 10^\\circ + \\sin^2 20^\\circ + \\dots + \\sin^2 80^\\circ = \\frac{n}{2} \\quad (n = \\text{পদসংখ্যা})",
     "description": "ত্রিকোণমিতিক ধারার প্রথম ও শেষ কোণের যোগফল ৯০° হলে (যেমন 10°+80°=90°), মোট পদসংখ্যাকে ২ দিয়ে ভাগ করলেই উত্তর চলে আসে।"
   }
 ]

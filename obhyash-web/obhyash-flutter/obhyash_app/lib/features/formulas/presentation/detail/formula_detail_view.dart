@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import '../../models/formula_models.dart';
 import '../../../../core/providers/title_provider.dart';
+import '../../../../core/presentation/widgets/formula_math_view.dart';
 
 class FormulaDetailView extends ConsumerStatefulWidget {
   final String subjectId;
@@ -211,27 +212,11 @@ class _FormulaCard extends StatelessWidget {
           ),
           // LaTeX Formula
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-            child: Center(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Math.tex(
-                  formula.latex,
-                  mathStyle: MathStyle.display,
-                  textStyle: TextStyle(
-                    fontSize: 22,
-                    color: isDark ? Colors.white : const Color(0xFF111827),
-                  ),
-                  onErrorFallback: (err) => SelectableText(
-                    formula.latex,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'monospace',
-                      color: isDark ? Colors.white70 : Colors.black87,
-                    ),
-                  ),
-                ),
-              ),
+            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+            child: FormulaMathView(
+              latex: formula.latex,
+              isDark: isDark,
+              fontSize: 18.5,
             ),
           ),
           // Description

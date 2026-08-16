@@ -419,18 +419,25 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                             builder: (context, ref, child) {
                               final currentLoc = GoRouterState.of(context).uri.toString();
                               final dynamicTitle = ref.watch(locationTitleProvider)[currentLoc];
-                              
-                              return Text(
-                                dynamicTitle ?? _getTitle(activeTab),
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w900,
-                                  fontFamily: 'Anek Bangla',
-                                  color: isDark
-                                      ? Colors.white
-                                      : const Color(0xFF111827),
+                              final titleText = dynamicTitle ?? _getTitle(activeTab);
+                              final isSubRoute = dynamicTitle != null;
+
+                              return FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  titleText,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    fontSize: isSubRoute ? 18 : 21,
+                                    fontWeight: FontWeight.w700,
+                                    fontFamily: 'Anek Bangla',
+                                    letterSpacing: -0.2,
+                                    color: isDark
+                                        ? Colors.white
+                                        : const Color(0xFF111827),
+                                  ),
                                 ),
-                                overflow: TextOverflow.ellipsis,
                               );
                             },
                           ),

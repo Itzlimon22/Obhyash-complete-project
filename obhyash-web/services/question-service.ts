@@ -57,6 +57,36 @@ export const getQuestionsPage = async (
   sortBy: string = "created_at",
   sortOrder: "asc" | "desc" = "desc",
 ): Promise<PaginatedQuestionsResponse> => {
+  // 1. Try server-side admin API endpoint first (uses service role key to bypass client RLS limits)
+  if (typeof window !== "undefined") {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        pageSize: pageSize.toString(),
+        sortBy,
+        sortOrder,
+      });
+      if (filters.subject) params.set("subject", filters.subject);
+      if (filters.chapter) params.set("chapter", filters.chapter);
+      if (filters.topic) params.set("topic", filters.topic);
+      if (filters.difficulty) params.set("difficulty", filters.difficulty);
+      if (filters.status) params.set("status", filters.status);
+      if (filters.author) params.set("author", filters.author);
+      if (filters.search) params.set("search", filters.search);
+
+      const res = await fetch(`/api/admin/questions?${params.toString()}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          return json.data;
+        }
+      }
+    } catch (apiErr) {
+      console.warn("Questions API error, falling back to direct client query:", apiErr);
+    }
+  }
+
+  // 2. Fallback to direct client-side Supabase query
   if (isSupabaseConfigured() && supabase) {
     try {
       // Build the query
@@ -306,6 +336,24 @@ export const getQuestion = async (id: string): Promise<Question | null> => {
 export const createQuestion = async (
   question: Partial<Question>,
 ): Promise<{ success: boolean; error?: string; id?: string }> => {
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/admin/questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(question),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          return { success: true, id: json.data?.id };
+        }
+      }
+    } catch (e) {
+      console.warn("API createQuestion error, falling back to client query:", e);
+    }
+  }
+
   if (isSupabaseConfigured() && supabase) {
     try {
       // Build correct_answer_indices array
@@ -408,6 +456,24 @@ export const updateQuestion = async (
   id: string,
   updates: Partial<Question>,
 ): Promise<{ success: boolean; error?: string }> => {
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/admin/questions", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, ...updates }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          return { success: true };
+        }
+      }
+    } catch (e) {
+      console.warn("API updateQuestion error, falling back to client query:", e);
+    }
+  }
+
   if (isSupabaseConfigured() && supabase) {
     try {
       const payload: Record<string, unknown> = {
@@ -481,6 +547,22 @@ export const updateQuestion = async (
 export const deleteQuestions = async (
   ids: string[],
 ): Promise<{ success: boolean; error?: string; deletedCount?: number }> => {
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch(`/api/admin/questions?ids=${ids.join(",")}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          return { success: true, deletedCount: json.count || ids.length };
+        }
+      }
+    } catch (e) {
+      console.warn("API deleteQuestions error, falling back to client query:", e);
+    }
+  }
+
   if (isSupabaseConfigured() && supabase) {
     try {
       const { error, count } = await supabase
@@ -513,6 +595,24 @@ export const bulkUpdateQuestionStatus = async (
   ids: string[],
   status: string,
 ): Promise<{ success: boolean; error?: string; updatedCount?: number }> => {
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/admin/questions", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids, status }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          return { success: true, updatedCount: json.count || ids.length };
+        }
+      }
+    } catch (e) {
+      console.warn("API bulkUpdateQuestionStatus error, falling back to client query:", e);
+    }
+  }
+
   if (isSupabaseConfigured() && supabase) {
     try {
       const { error, count } = await supabase
@@ -545,6 +645,24 @@ export const bulkUpdateMetadata = async (
   ids: string[],
   fields: { subject?: string; chapter?: string; topic?: string },
 ): Promise<{ success: boolean; error?: string; updatedCount?: number }> => {
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/admin/questions", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids, metadata: fields }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          return { success: true, updatedCount: json.count || ids.length };
+        }
+      }
+    } catch (e) {
+      console.warn("API bulkUpdateMetadata error, falling back to client query:", e);
+    }
+  }
+
   if (isSupabaseConfigured() && supabase) {
     try {
       const updateData: Record<string, string> = {
