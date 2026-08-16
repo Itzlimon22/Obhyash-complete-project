@@ -342,10 +342,11 @@ class DashboardLiveExamsNotifier extends AsyncNotifier<List<LiveExam>> {
   ) async {
     final supabase = ref.read(supabaseClientProvider);
     try {
+      final catLower = category.toLowerCase().trim();
       final examsResponse = await supabase
           .from('live_exams')
           .select()
-          .eq('category', category)
+          .or('category.eq.$catLower,category.eq.all')
           .eq('status', 'published')
           .order('start_time', ascending: false);
 
@@ -353,7 +354,8 @@ class DashboardLiveExamsNotifier extends AsyncNotifier<List<LiveExam>> {
           .map((e) => LiveExam.fromJson(e as Map<String, dynamic>))
           .toList();
 
-      final validExams = exams.where((e) => e.isOngoing || e.isUpcoming).toList();
+      final validExams =
+          exams.where((e) => e.isOngoing || e.isUpcoming).toList();
 
       prefs.setString(
         cacheKey,

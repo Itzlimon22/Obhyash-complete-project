@@ -203,6 +203,76 @@ export async function reorderLiveExamQuestions(
   }
 }
 
+export async function autoAssignQuestionsToLiveExam(
+  examId: string,
+  subject?: string,
+  chapter?: string,
+  count: number = 25,
+  difficulty?: string
+): Promise<number> {
+  // 1. Get existing question IDs to avoid duplicates
+  const existing = await getLiveExamQuestions(examId);
+  const existingIds = new Set(existing.map((e) => e.question?.id).filter(Boolean));
+
+  // 2. Query approved questions
+  let query = supabase
+    .from("questions")
+    .select("id")
+    .or("status.eq.Approved,status.eq.published");
+
+  if (subject) query = query.eq("subject", subject);
+  if (chapter) query = query.eq("chapter", chapter);
+  if (difficulty) query = query.eq("difficulty", difficulty);
+
+  const { data: candidates, error } = await query.limit(100);
+
+  if (error) {
+    console.error("Error fetching candidate questions for auto-assign:", error);
+    throw error;
+  }
+
+  const newQuestions = (candidates || []).filter((q: any) => !existingIds.has(q.id));
+  const selected = newQuestions.slice(0, count);
+
+  if (selected.length === 0) return 0;
+
+  let currentSerial = existing.length + 1;
+  const inserts = selected.map((q: any) => ({
+    live_exam_id: examId,
+    question_id: q.id,
+    serial: currentSerial++,
+    points: 1,
+  }));
+
+  const { error: insertErr } = await supabase
+    .from("live_exam_questions")
+    .insert(inserts);
+
+  if (insertErr) {
+    console.error("Error inserting auto-assigned questions:", insertErr);
+    throw insertErr;
+  }
+
+  return selected.length;
+}
+
+export async function extendLiveExamDuration(
+  examId: string,
+  additionalMinutes: number = 5
+): Promise<LiveExam> {
+  const current = await getLiveExam(examId);
+  if (!current) throw new Error("Live exam not found");
+
+  const currentEndTime = new Date(current.end_time).getTime();
+  const newEndTime = new Date(currentEndTime + additionalMinutes * 60000).toISOString();
+  const newDuration = (current.duration_minutes || 0) + additionalMinutes;
+
+  return updateLiveExam(examId, {
+    end_time: newEndTime,
+    duration_minutes: newDuration,
+  });
+}
+
 // ==========================================
 // ATTEMPTS & LEADERBOARD
 // ==========================================
@@ -224,7 +294,7 @@ export async function getLiveExamLeaderboard(examId: string): Promise<any[]> {
     .eq("live_exam_id", examId)
     .eq("status", "submitted")
     .order("score", { ascending: false })
-    .order("submit_time", { ascending: true }); // Tie-breaker: who submitted faster
+    .order("submit_time", { ascending: true });
 
   if (error) {
     console.error("Error fetching live exam leaderboard:", error);

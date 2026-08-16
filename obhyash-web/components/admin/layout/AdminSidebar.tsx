@@ -66,16 +66,10 @@ const ADMIN_NAVIGATION: NavSection[] = [
     title: 'ম্যানেজমেন্ট',
     items: [
       {
-        id: 'question-bank',
-        label: 'প্রশ্ন ব্যাংক মাস্টার',
+        id: 'questions',
+        label: 'প্রশ্ন ব্যাংক ও বাল্ক',
         icon: FileQuestion,
-        href: '/admin/question-bank',
-      },
-      {
-        id: 'questions-upload',
-        label: 'প্রশ্ন ও বাল্ক আপলোড',
-        icon: UploadCloud,
-        href: '/admin/questions/bulk-upload',
+        href: '/admin/question-management',
       },
       {
         id: 'live-exams',

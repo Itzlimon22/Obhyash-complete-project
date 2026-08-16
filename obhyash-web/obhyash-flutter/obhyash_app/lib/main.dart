@@ -9,6 +9,9 @@ import 'core/theme/app_theme.dart';
 import 'core/router.dart';
 import 'core/providers/shared_prefs_provider.dart';
 import 'core/providers/theme_provider.dart';
+import 'core/providers/app_config_provider.dart';
+import 'core/presentation/screens/force_update_screen.dart';
+import 'core/presentation/screens/maintenance_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,8 +46,9 @@ class ObhyashApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
-
     final themeMode = ref.watch(themeModeProvider);
+    final configAsync = ref.watch(appConfigStreamProvider);
+    final isForceUpdate = ref.watch(isForceUpdateRequiredProvider);
 
     return MaterialApp.router(
       title: 'Obhyash',
@@ -53,6 +57,31 @@ class ObhyashApp extends ConsumerWidget {
       themeMode: themeMode,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        // 1. Force Update Screen
+        if (isForceUpdate) {
+          final minVersion = configAsync.value?.minAppVersion ?? '1.0.0';
+          final updateUrl = configAsync.value?.updateUrl ??
+              'https://play.google.com/store/apps/details?id=com.obhyash.app';
+          return ForceUpdateScreen(
+            minVersion: minVersion,
+            updateUrl: updateUrl,
+          );
+        }
+
+        // 2. Server Maintenance Screen
+        final isMaintenance = configAsync.value?.maintenanceMode ?? false;
+        if (isMaintenance) {
+          final message = configAsync.value?.maintenanceMessage ??
+              'অভ্যাস প্ল্যাটফর্মের নিয়মিত রক্ষণাবেক্ষণ চলছে। শীঘ্রই আমরা ফিরে আসছি।';
+          return MaintenanceScreen(
+            message: message,
+            onRetry: () => ref.refresh(appConfigStreamProvider),
+          );
+        }
+
+        return child ?? const SizedBox.shrink();
+      },
     );
   }
 }

@@ -14,6 +14,8 @@ import '../services/streak_service.dart';
 import '../../exam/services/offline_exam_sync_queue.dart';
 import '../../exam/services/offline_question_bank_service.dart';
 
+import '../../../core/presentation/widgets/global_announcement_banner.dart';
+
 class DashboardView extends ConsumerStatefulWidget {
   const DashboardView({super.key});
 
@@ -82,6 +84,11 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
 
     return CustomScrollView(
       slivers: [
+        // 0. Live In-App Global Broadcast Announcement Banner
+        const SliverToBoxAdapter(
+          child: GlobalAnnouncementBanner(),
+        ),
+
         // 1. Clean Minimalist Header (Live Exam Slider)
         const SliverToBoxAdapter(
           child: LiveExamSlider(),
