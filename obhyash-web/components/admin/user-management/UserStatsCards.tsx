@@ -23,8 +23,8 @@ const UserStatsCards: React.FC<UserStatsCardsProps> = ({
       label: 'Total Users',
       value: stats.total,
       icon: User,
-      gradient: 'from-red-500 to-red-500',
-      bg: 'bg-red-50 dark:bg-red-500/10',
+      gradient: 'from-blue-600 to-blue-500',
+      bg: 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400',
       onClick: () => onStatClick?.('total'),
     },
     {
@@ -32,8 +32,8 @@ const UserStatsCards: React.FC<UserStatsCardsProps> = ({
       label: 'Active Users',
       value: stats.active,
       icon: UserCheck,
-      gradient: 'from-emerald-500 to-emerald-500',
-      bg: 'bg-emerald-50 dark:bg-emerald-500/10',
+      gradient: 'from-emerald-600 to-emerald-500',
+      bg: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
       onClick: () => onStatClick?.('active'),
     },
     {
@@ -41,8 +41,8 @@ const UserStatsCards: React.FC<UserStatsCardsProps> = ({
       label: 'Students',
       value: stats.students,
       icon: BookOpen,
-      gradient: 'from-red-500 to-red-400',
-      bg: 'bg-red-50 dark:bg-red-500/10',
+      gradient: 'from-purple-600 to-purple-500',
+      bg: 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400',
       onClick: () => onStatClick?.('students'),
     },
     {
@@ -50,8 +50,8 @@ const UserStatsCards: React.FC<UserStatsCardsProps> = ({
       label: 'Premium Users',
       value: stats.premium,
       icon: Crown,
-      gradient: 'from-red-500 to-red-500',
-      bg: 'bg-red-50 dark:bg-red-500/10',
+      gradient: 'from-amber-600 to-amber-500',
+      bg: 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400',
       onClick: () => onStatClick?.('premium'),
     },
   ];

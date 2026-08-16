@@ -99,88 +99,112 @@ export default function LiveExamDashboard() {
             <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-neutral-500">
-                    Loading exams...
+                  <td colSpan={6} className="p-8 text-center text-neutral-500 font-mono text-sm">
+                    Loading live exams database...
                   </td>
                 </tr>
               ) : exams.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-neutral-500">
-                    No live exams found. Create one to get started.
+                    No live exams found. Click "Create New Exam" to schedule your first exam.
                   </td>
                 </tr>
               ) : (
-                exams.map((exam) => (
-                  <tr key={exam.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors">
-                    <td className="p-4">
-                      <p className="font-bold text-neutral-900 dark:text-white">
-                        {exam.title}
-                      </p>
-                      <p className="text-xs text-neutral-500">{exam.description || "No description"}</p>
-                    </td>
-                    <td className="p-4">
-                      <span className="px-2.5 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-lg text-xs font-semibold capitalize">
-                        {exam.category}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <div className="text-xs">
-                        <p><span className="text-neutral-500">Starts:</span> {new Date(exam.start_time).toLocaleString()}</p>
-                        <p><span className="text-neutral-500">Ends:</span> {new Date(exam.end_time).toLocaleString()}</p>
-                      </div>
-                    </td>
-                    <td className="p-4 text-xs text-neutral-600 dark:text-neutral-400">
-                      <p>{exam.duration_minutes} mins • {exam.total_marks} marks</p>
-                      <p>{exam.total_questions || 0} questions added</p>
-                    </td>
-                    <td className="p-4">
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold capitalize ${
-                        exam.status === "published" 
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                          : exam.status === "archived"
-                          ? "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-400"
-                          : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                      }`}>
-                        {exam.status}
-                      </span>
-                    </td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link 
-                          href={`${basePath}/${exam.id}/builder`}
-                          className="p-1.5 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md transition-colors"
-                          title="Question Builder"
-                        >
-                          <List size={18} />
-                        </Link>
-                        <Link 
-                          href={`${basePath}/${exam.id}/results`}
-                          className="p-1.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
-                          title="Leaderboard & Results"
-                        >
-                          <Trophy size={18} />
-                        </Link>
-                        <button
-                          onClick={() => {
-                            setEditingExam(exam);
-                            setIsModalOpen(true);
-                          }}
-                          className="p-1.5 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-md transition-colors"
-                          title="Edit Exam Info"
-                        >
-                          <Edit2 size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(exam.id)}
-                          className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
-                          title="Delete Exam"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                exams.map((exam) => {
+                  const now = new Date().getTime();
+                  const start = new Date(exam.start_time).getTime();
+                  const end = new Date(exam.end_time).getTime();
+                  const isLiveNow = now >= start && now <= end;
+                  const isUpcoming = now < start;
+                  const isEnded = now > end;
+
+                  return (
+                    <tr key={exam.id} className="hover:bg-neutral-50 dark:hover:bg-zinc-800/30 transition-colors">
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          {isLiveNow && (
+                            <span className="flex h-2 w-2 relative">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                            </span>
+                          )}
+                          <p className="font-bold text-neutral-900 dark:text-zinc-100 text-sm">
+                            {exam.title}
+                          </p>
+                        </div>
+                        <p className="text-xs text-neutral-500 dark:text-zinc-400 mt-0.5 line-clamp-1">
+                          {exam.description || "No description provided"}
+                        </p>
+                      </td>
+                      <td className="p-4">
+                        <span className="px-2.5 py-1 bg-neutral-100 dark:bg-zinc-800 text-neutral-700 dark:text-zinc-300 rounded-lg text-xs font-semibold capitalize border border-neutral-200/60 dark:border-zinc-700/60">
+                          {exam.category}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <div className="text-xs space-y-0.5 font-mono">
+                          <p className="text-neutral-700 dark:text-zinc-300"><span className="text-neutral-400">Starts:</span> {new Date(exam.start_time).toLocaleString()}</p>
+                          <p className="text-neutral-500 dark:text-zinc-400"><span className="text-neutral-400">Ends:</span> {new Date(exam.end_time).toLocaleString()}</p>
+                        </div>
+                      </td>
+                      <td className="p-4 text-xs text-neutral-600 dark:text-zinc-400">
+                        <p className="font-semibold">{exam.duration_minutes} mins • {exam.total_marks} marks</p>
+                        <p className="text-emerald-600 dark:text-emerald-400 font-bold">{exam.total_questions || 0} questions assigned</p>
+                      </td>
+                      <td className="p-4">
+                        {isLiveNow ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                            LIVE NOW
+                          </span>
+                        ) : isUpcoming ? (
+                          <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                            Upcoming
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-zinc-400 border border-neutral-200 dark:border-zinc-700">
+                            Ended
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Link 
+                            href={`${basePath}/${exam.id}/builder`}
+                            className="p-2 text-zinc-600 dark:text-zinc-300 hover:text-emerald-500 hover:bg-emerald-500/10 rounded-xl transition-colors border border-transparent hover:border-emerald-500/20"
+                            title="Question Builder"
+                          >
+                            <List size={17} />
+                          </Link>
+                          <Link 
+                            href={`${basePath}/${exam.id}/results`}
+                            className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-xl transition-colors border border-transparent hover:border-blue-500/20"
+                            title="Leaderboard & Results"
+                          >
+                            <Trophy size={17} />
+                          </Link>
+                          <button
+                            onClick={() => {
+                              setEditingExam(exam);
+                              setIsModalOpen(true);
+                            }}
+                            className="p-2 text-amber-500 hover:bg-amber-500/10 rounded-xl transition-colors border border-transparent hover:border-amber-500/20"
+                            title="Edit Exam Info"
+                          >
+                            <Edit2 size={17} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(exam.id)}
+                            className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-colors border border-transparent hover:border-rose-500/20"
+                            title="Delete Exam"
+                          >
+                            <Trash2 size={17} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

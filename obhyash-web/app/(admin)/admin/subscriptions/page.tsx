@@ -650,33 +650,33 @@ export default function SubscriptionsPage() {
               label: 'মোট আয়',
               value: `৳${stats.totalRevenue.toLocaleString()}`,
               icon: DollarSign,
-              gradient: 'from-red-500 to-red-500',
-              bg: 'bg-red-50 dark:bg-red-500/10',
-              textColor: 'text-red-600 dark:text-red-400',
+              gradient: 'from-emerald-600 to-emerald-500',
+              bg: 'bg-emerald-50 dark:bg-emerald-500/10',
+              textColor: 'text-emerald-600 dark:text-emerald-400',
             },
             {
               label: 'পেন্ডিং রিকোয়েস্ট',
               value: stats.pendingRequests,
               icon: Clock,
-              gradient: 'from-red-500 to-red-500',
-              bg: 'bg-red-50 dark:bg-red-500/10',
-              textColor: 'text-red-600 dark:text-red-400',
+              gradient: 'from-amber-600 to-amber-500',
+              bg: 'bg-amber-50 dark:bg-amber-500/10',
+              textColor: 'text-amber-600 dark:text-amber-400',
             },
             {
               label: 'এক্টিভ ইউজার',
               value: stats.activeSubscriptions,
               icon: Users,
-              gradient: 'from-red-500 to-red-500',
-              bg: 'bg-red-50 dark:bg-red-500/10',
-              textColor: 'text-red-600 dark:text-red-400',
+              gradient: 'from-purple-600 to-purple-500',
+              bg: 'bg-purple-50 dark:bg-purple-500/10',
+              textColor: 'text-purple-600 dark:text-purple-400',
             },
             {
               label: 'অ্যাপ্রুভাল রেট',
               value: `${stats.approvalRate}%`,
               icon: TrendingUp,
-              gradient: 'from-emerald-500 to-emerald-500',
-              bg: 'bg-emerald-50 dark:bg-emerald-500/10',
-              textColor: 'text-emerald-600 dark:text-emerald-400',
+              gradient: 'from-blue-600 to-blue-500',
+              bg: 'bg-blue-50 dark:bg-blue-500/10',
+              textColor: 'text-blue-600 dark:text-blue-400',
             },
           ].map((stat, i) => (
             <div
@@ -707,14 +707,14 @@ export default function SubscriptionsPage() {
           {[
             { id: 'requests', label: 'পেমেন্ট রিকোয়েস্ট', icon: FileText },
             { id: 'subscriptions', label: 'এক্টিভ ইউজার', icon: Crown },
-            { id: 'plans', label: 'প্লান ম্যাওেজমেন্ট', icon: CreditCard },
+            { id: 'plans', label: 'প্লান ম্যানেজমেন্ট', icon: CreditCard },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
               className={`flex items-center gap-2 px-4 sm:px-6 py-3 text-[13px] sm:text-sm font-bold border-b-2 transition-colors shrink-0 whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'border-red-600 text-red-600 dark:text-red-400'
+                  ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
                   : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'
               }`}
             >

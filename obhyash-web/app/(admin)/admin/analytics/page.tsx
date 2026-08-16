@@ -313,9 +313,9 @@ export default function AnalyticsPage() {
               label: 'Bank',
               value: examStats.totalQuestions,
               icon: FileQuestion,
-              color: 'text-red-600',
-              bgColor: 'bg-red-50/50 dark:bg-red-500/5',
-              borderColor: 'border-red-100 dark:border-red-500/10',
+              color: 'text-blue-600 dark:text-blue-400',
+              bgColor: 'bg-blue-50/50 dark:bg-blue-500/5',
+              borderColor: 'border-blue-100 dark:border-blue-500/10',
               change: 'Qns',
             },
           ].map((stat, i) => (

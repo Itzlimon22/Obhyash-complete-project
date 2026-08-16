@@ -69,13 +69,13 @@ export default function AdminReportsPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Pending':
-        return 'bg-red-100 text-red-700 border-red-200';
+        return 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-900/50';
       case 'Resolved':
-        return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+        return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50';
       case 'Ignored':
-        return 'bg-red-100 text-red-700 border-red-200';
+        return 'bg-neutral-100 text-neutral-700 dark:bg-zinc-800 dark:text-zinc-400 border-neutral-200 dark:border-zinc-700';
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        return 'bg-neutral-100 text-neutral-700 dark:bg-zinc-800 dark:text-zinc-300 border-neutral-200 dark:border-zinc-700';
     }
   };
 
