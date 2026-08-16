@@ -8,10 +8,10 @@ import '../domain/exam_models.dart';
 import 'widgets/result_stats.dart';
 import 'widgets/question_card.dart';
 import 'widgets/question_report_dialog.dart';
+import 'widgets/exam_scope_header.dart';
 import '../services/pdf_download_service.dart';
 import '../../../core/utils/app_popups.dart';
 import '../../../core/presentation/widgets/obhyash_tooltip.dart';
-import '../../../core/presentation/widgets/latex_text.dart';
 
 class ResultView extends StatefulWidget {
   final ExamResult result;
@@ -33,7 +33,6 @@ class _ResultViewState extends State<ResultView> {
   final Set<String> _bookmarkedIds = {};
   late final ConfettiController _confettiController;
   String _reviewFilter = 'all'; // 'all', 'correct', 'wrong', 'skipped'
-  bool _showAllChapters = false;
 
   @override
   void initState() {
@@ -169,9 +168,11 @@ class _ResultViewState extends State<ResultView> {
                 context.go('/history');
               }
             } else {
-              Navigator.of(context, rootNavigator: true)
-                  .popUntil((route) => route.isFirst);
-              context.go('/dashboard');
+              if (Navigator.of(context, rootNavigator: true).canPop()) {
+                Navigator.of(context, rootNavigator: true)
+                    .popUntil((route) => route.isFirst);
+              }
+              context.go('/');
             }
           },
         ),
@@ -270,14 +271,26 @@ class _ResultViewState extends State<ResultView> {
                     ],
                   ),
 
-                  // Exam Details Ribbon
-                  _ExamDetailsRibbon(
-                    result: widget.result,
-                    isHistoryMode: widget.isHistoryMode,
+                  // Exam Details Scope Header
+                  ExamScopeHeader(
+                    subjectName: BanglaNameHelper.formatSubject(
+                      widget.result.subject,
+                      widget.result.subjectLabel,
+                    ),
+                    chapters: widget.result.questions
+                        .map((q) => q.chapter.trim())
+                        .where((c) => c.isNotEmpty)
+                        .toSet()
+                        .toList()
+                      ..sort(),
+                    topics: widget.result.questions
+                        .map((q) => (q.institutes.isNotEmpty ? '' : ''))
+                        .where((t) => t.isNotEmpty)
+                        .toSet()
+                        .toList()
+                      ..sort(),
                     isDark: isDark,
-                    showAllChapters: _showAllChapters,
-                    onToggleChapters: () =>
-                        setState(() => _showAllChapters = !_showAllChapters),
+                    margin: const EdgeInsets.symmetric(vertical: 12),
                   ),
 
                   ResultStats(
@@ -605,444 +618,5 @@ class _StickyFilterDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(covariant _StickyFilterDelegate oldDelegate) {
     return true;
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// Exam Details Ribbon – Clean Subject Header with Chapters & Topics Modal Buttons
-// ─────────────────────────────────────────────────────────────
-class _ExamDetailsRibbon extends StatelessWidget {
-  final ExamResult result;
-  final bool isHistoryMode;
-  final bool isDark;
-
-  const _ExamDetailsRibbon({
-    required this.result,
-    required this.isHistoryMode,
-    required this.isDark,
-    bool showAllChapters = false,
-    VoidCallback? onToggleChapters,
-  });
-
-  void _showChaptersBottomSheet(
-      BuildContext context, List<String> chapters, String subjectName) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (ctx) => _MetadataListModal(
-        title: 'পরীক্ষার অধ্যায়সমূহ',
-        subtitle: subjectName,
-        icon: Icons.layers_rounded,
-        items: chapters,
-        isDark: isDark,
-        emptyMessage: 'এই পরীক্ষার জন্য নির্দিষ্ট কোনো অধ্যায় তালিকাভুক্ত নেই।',
-      ),
-    );
-  }
-
-  void _showTopicsBottomSheet(
-      BuildContext context, List<String> topics, String subjectName) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (ctx) => _MetadataListModal(
-        title: 'পরীক্ষার টপিকসমূহ',
-        subtitle: subjectName,
-        icon: Icons.tag_rounded,
-        items: topics,
-        isDark: isDark,
-        emptyMessage: 'সিলেবাসের অন্তর্ভুক্ত সকল টপিক থেকে প্রশ্ন করা হয়েছে।',
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final chapters = result.questions
-        .map((q) => q.chapter.trim())
-        .where((c) => c.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
-
-    final topics = result.questions
-        .map((q) => (q.institutes.isNotEmpty ? '' : ''))
-        .where((t) => t.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
-
-    final subjectName = BanglaNameHelper.formatSubject(
-        result.subject, result.subjectLabel);
-
-    final accentColor =
-        isDark ? const Color(0xFF34D399) : const Color(0xFF004633);
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final bgColor =
-        isDark ? const Color(0xFF141416) : Colors.white;
-    final borderColor =
-        isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0);
-    final buttonBg =
-        isDark ? const Color(0xFF202024) : const Color(0xFFF1F5F9);
-    final buttonBorder =
-        isDark ? const Color(0xFF2E2E33) : const Color(0xFFE2E8F0);
-
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: borderColor),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // ── Left: Subject Icon & Subject Name ──
-          Expanded(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(7),
-                  decoration: BoxDecoration(
-                    color: accentColor.withValues(alpha: isDark ? 0.15 : 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: accentColor.withValues(alpha: 0.25),
-                      width: 0.8,
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.menu_book_rounded,
-                    size: 16,
-                    color: accentColor,
-                  ),
-                ),
-                const SizedBox(width: 9),
-                Flexible(
-                  child: Text(
-                    subjectName,
-                    style: TextStyle(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'HindSiliguri',
-                      color: textColor,
-                      height: 1.2,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: 8),
-
-          // ── Right: Action Buttons (Chapters & Topics) ──
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Chapters Button
-              _ActionPillButton(
-                icon: Icons.layers_rounded,
-                label: chapters.isNotEmpty
-                    ? 'অধ্যায় (${chapters.length})'
-                    : 'অধ্যায়সমূহ',
-                bgColor: buttonBg,
-                borderColor: buttonBorder,
-                textColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF334155),
-                iconColor: accentColor,
-                onTap: () =>
-                    _showChaptersBottomSheet(context, chapters, subjectName),
-              ),
-
-              const SizedBox(width: 6),
-
-              // Topics Button
-              _ActionPillButton(
-                icon: Icons.tag_rounded,
-                label: 'টপিকসমূহ',
-                bgColor: buttonBg,
-                borderColor: buttonBorder,
-                textColor: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF334155),
-                iconColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
-                onTap: () =>
-                    _showTopicsBottomSheet(context, topics, subjectName),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// Pill Button for Ribbon Actions
-// ─────────────────────────────────────────────────────────────
-class _ActionPillButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color bgColor;
-  final Color borderColor;
-  final Color textColor;
-  final Color iconColor;
-  final VoidCallback onTap;
-
-  const _ActionPillButton({
-    required this.icon,
-    required this.label,
-    required this.bgColor,
-    required this.borderColor,
-    required this.textColor,
-    required this.iconColor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6.5),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: borderColor, width: 1),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 13.5, color: iconColor),
-              const SizedBox(width: 4.5),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'HindSiliguri',
-                  color: textColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// Sleek Modal BottomSheet for Chapters & Topics Display
-// ─────────────────────────────────────────────────────────────
-class _MetadataListModal extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final List<String> items;
-  final bool isDark;
-  final String emptyMessage;
-
-  const _MetadataListModal({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.items,
-    required this.isDark,
-    required this.emptyMessage,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bgColor = isDark ? const Color(0xFF141416) : Colors.white;
-    final cardBg = isDark ? const Color(0xFF1E1E22) : const Color(0xFFF8FAFC);
-    final cardBorder = isDark ? const Color(0xFF2E2E33) : const Color(0xFFE2E8F0);
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final subColor = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B);
-    final accentColor = isDark ? const Color(0xFF34D399) : const Color(0xFF004633);
-
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.75,
-      ),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border.all(
-          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
-        ),
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Drag Handle
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFCBD5E1),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Header Row
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: accentColor.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Icon(icon, size: 20, color: accentColor),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        fontFamily: 'HindSiliguri',
-                        color: textColor,
-                      ),
-                    ),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: 'HindSiliguri',
-                        color: subColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(
-                  Icons.close_rounded,
-                  color: subColor,
-                  size: 22,
-                ),
-                splashRadius: 20,
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-          const Divider(height: 1),
-          const SizedBox(height: 14),
-
-          // Items List
-          if (items.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.check_circle_outline_rounded,
-                    size: 36,
-                    color: accentColor.withValues(alpha: 0.7),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    emptyMessage,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'HindSiliguri',
-                      color: subColor,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else
-            Flexible(
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: items.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 8),
-                itemBuilder: (context, idx) {
-                  final item = items[idx];
-                  return Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 11,
-                    ),
-                    decoration: BoxDecoration(
-                      color: cardBg,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: cardBorder),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 24,
-                          height: 24,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: accentColor.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                          child: Text(
-                            '${idx + 1}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'HindSiliguri',
-                              color: accentColor,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: LatexText(
-                            text: item,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'HindSiliguri',
-                              color: textColor,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-        ],
-      ),
-    );
   }
 }

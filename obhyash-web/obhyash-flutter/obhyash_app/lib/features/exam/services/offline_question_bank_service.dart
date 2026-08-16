@@ -8,6 +8,17 @@ class OfflineQuestionBankService {
   static const String _kOfflineBankKey = 'obhyash_offline_question_bank_v1';
   static const int _kMaxQuestionsPerSubject = 200; // ~200 KB per subject
 
+  static String _normalizeKey(String s) {
+    return s
+        .toLowerCase()
+        .replaceAll('\u09df', '\u09af\u09bc') // য় -> য + ়
+        .replaceAll('২য়', '২য়')
+        .replaceAll('১ম', '১ম')
+        .replaceAll('-', '_')
+        .replaceAll(' ', '_')
+        .trim();
+  }
+
   /// Store a list of questions into the local offline question bank
   static Future<void> cacheQuestions(List<Question> questions) async {
     if (questions.isEmpty) return;
@@ -21,33 +32,39 @@ class OfflineQuestionBankService {
       }
 
       for (final q in questions) {
-        final subjectKey = q.subject.toLowerCase().trim();
-        List<dynamic> subjectQuestions = bank[subjectKey] is List ? bank[subjectKey] : [];
+        final subjectKey = _normalizeKey(q.subject);
+        List<dynamic> subjectQuestions =
+            bank[subjectKey] is List ? bank[subjectKey] : [];
 
         // Check if question already exists by id
-        final existingIdx = subjectQuestions.indexWhere((item) => item['id'] == q.id);
+        final existingIdx =
+            subjectQuestions.indexWhere((item) => item['id'] == q.id);
         if (existingIdx != -1) {
           subjectQuestions[existingIdx] = q.toJson();
         } else {
           subjectQuestions.add(q.toJson());
         }
 
-        // Limit per subject to maintain ultra-lightweight storage (~200 questions max)
+        // Limit per subject to maintain lightweight storage (~200 questions max)
         if (subjectQuestions.length > _kMaxQuestionsPerSubject) {
-          subjectQuestions = subjectQuestions.sublist(subjectQuestions.length - _kMaxQuestionsPerSubject);
+          subjectQuestions = subjectQuestions
+              .sublist(subjectQuestions.length - _kMaxQuestionsPerSubject);
         }
 
         bank[subjectKey] = subjectQuestions;
       }
 
       await prefs.setString(_kOfflineBankKey, jsonEncode(bank));
-      debugPrint('[OfflineQuestionBankService] Cached ${questions.length} questions offline.');
+      debugPrint(
+        '[OfflineQuestionBankService] Cached ${questions.length} questions offline.',
+      );
     } catch (e) {
       debugPrint('[OfflineQuestionBankService] Error caching questions: $e');
     }
   }
 
-  /// Get random questions from offline cache for an exam/practice
+  /// Get random questions from offline cache for an exam/practice.
+  /// Strictly scopes to the requested subject. NEVER cross-pollutes with other subjects.
   static Future<List<Question>> getQuestions({
     required String subject,
     List<String>? chapters,
@@ -59,22 +76,28 @@ class OfflineQuestionBankService {
       if (existingJson == null || existingJson.isEmpty) return [];
 
       final bank = jsonDecode(existingJson) as Map<String, dynamic>;
-      final subjectKey = subject.toLowerCase().trim();
-      final subjectQuestions = bank[subjectKey] is List ? (bank[subjectKey] as List) : [];
+      final targetKey = _normalizeKey(subject);
 
-      if (subjectQuestions.isEmpty) {
-        // Fallback: check other subjects or all questions if specific subject is empty
-        final all = <dynamic>[];
-        bank.forEach((k, v) {
-          if (v is List) all.addAll(v);
-        });
-        if (all.isEmpty) return [];
-        all.shuffle();
-        return all
-            .take(count)
-            .map((e) => Question.fromJson(e as Map<String, dynamic>))
-            .toList();
+      // Find matching questions under normalized key or related subject keys
+      List<dynamic> subjectQuestions = [];
+      if (bank.containsKey(targetKey) && bank[targetKey] is List) {
+        subjectQuestions = bank[targetKey] as List;
+      } else {
+        // Match by prefix or contains (e.g. 'chemistry', 'physics', 'math')
+        for (final entry in bank.entries) {
+          final k = entry.key;
+          if (k == targetKey ||
+              k.contains(targetKey) ||
+              targetKey.contains(k)) {
+            if (entry.value is List) {
+              subjectQuestions.addAll(entry.value as List);
+            }
+          }
+        }
       }
+
+      // Strictly return empty if no questions match this subject! (Do not fallback to other subjects)
+      if (subjectQuestions.isEmpty) return [];
 
       List<Question> parsed = subjectQuestions
           .map((e) => Question.fromJson(e as Map<String, dynamic>))
@@ -83,12 +106,13 @@ class OfflineQuestionBankService {
       // Filter and balance by chapter if provided
       if (chapters != null && chapters.isNotEmpty) {
         final chapterMatches = parsed.where((q) {
-          final qCh = q.chapter.toLowerCase().trim();
-          return chapters.any(
-            (c) => qCh == c.toLowerCase().trim() ||
-                   qCh.contains(c.toLowerCase().trim()) ||
-                   c.toLowerCase().trim().contains(qCh),
-          );
+          final qCh = _normalizeKey(q.chapter);
+          return chapters.any((c) {
+            final targetCh = _normalizeKey(c);
+            return qCh == targetCh ||
+                qCh.contains(targetCh) ||
+                targetCh.contains(qCh);
+          });
         }).toList();
 
         if (chapterMatches.isNotEmpty) {
@@ -99,7 +123,9 @@ class OfflineQuestionBankService {
       parsed.shuffle();
       return parsed.take(count).toList();
     } catch (e) {
-      debugPrint('[OfflineQuestionBankService] Error getting offline questions: $e');
+      debugPrint(
+        '[OfflineQuestionBankService] Error getting offline questions: $e',
+      );
       return [];
     }
   }
@@ -111,22 +137,23 @@ class OfflineQuestionBankService {
     List<String>? targetChapters,
   ) {
     if (questions.isEmpty) return [];
-    if (targetChapters == null || targetChapters.length <= 1 || questions.length <= targetCount) {
-      final list = List<Question>.from(questions)..shuffle();
-      return list.take(targetCount).toList();
+    if (targetChapters == null || targetChapters.isEmpty) {
+      final shuffled = List<Question>.from(questions)..shuffle();
+      return shuffled.take(targetCount).toList();
     }
 
     final Map<String, List<Question>> buckets = {};
-    for (final ch in targetChapters) {
-      buckets[ch.trim()] = [];
+    for (final c in targetChapters) {
+      buckets[c.trim()] = [];
     }
-    final List<Question> generalPool = [];
 
+    final List<Question> generalPool = [];
     for (final q in questions) {
-      final qCh = q.chapter.trim().toLowerCase();
       String? matchedChapter;
       for (final c in targetChapters) {
-        if (c.trim().toLowerCase() == qCh || qCh.contains(c.trim().toLowerCase())) {
+        final qCh = _normalizeKey(q.chapter);
+        final tCh = _normalizeKey(c);
+        if (qCh == tCh || qCh.contains(tCh) || tCh.contains(qCh)) {
           matchedChapter = c.trim();
           break;
         }
@@ -183,7 +210,6 @@ class OfflineQuestionBankService {
         await cacheQuestions(questions);
       }
     } catch (e) {
-      // Non-fatal background task
       debugPrint('[OfflineQuestionBankService] Background prefetch: $e');
     }
   }

@@ -135,9 +135,16 @@ export async function GET(request: NextRequest) {
     const to = from + pageSize - 1;
     query = query.range(from, to);
 
-    // Run paginated query and status counts in parallel
-    const [pageRes, approvedCountRes, pendingCountRes, rejectedCountRes] =
-      await Promise.all([
+    // Optimize DB Reads: Only fetch separate status breakdown on page 1
+    const shouldFetchBreakdown = page === 1;
+
+    let approvedCount = 0;
+    let pendingCount = 0;
+    let rejectedCount = 0;
+
+    let pageRes;
+    if (shouldFetchBreakdown) {
+      const [pRes, appRes, pendRes, rejRes] = await Promise.all([
         query,
         supabaseAdmin
           .from('questions')
@@ -152,6 +159,13 @@ export async function GET(request: NextRequest) {
           .select('*', { count: 'exact', head: true })
           .eq('status', 'Rejected'),
       ]);
+      pageRes = pRes;
+      approvedCount = appRes.count || 0;
+      pendingCount = pendRes.count || 0;
+      rejectedCount = rejRes.count || 0;
+    } else {
+      pageRes = await query;
+    }
 
     if (pageRes.error) {
       console.error('Error fetching questions:', pageRes.error);
@@ -166,9 +180,9 @@ export async function GET(request: NextRequest) {
       data: {
         questions: mappedQuestions,
         totalCount,
-        approvedCount: approvedCountRes.count || 0,
-        pendingCount: pendingCountRes.count || 0,
-        rejectedCount: rejectedCountRes.count || 0,
+        approvedCount,
+        pendingCount,
+        rejectedCount,
         totalPages: Math.ceil(totalCount / pageSize),
         currentPage: page,
         pageSize,

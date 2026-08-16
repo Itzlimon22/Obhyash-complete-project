@@ -13,57 +13,54 @@ export const uploadFile = async (
   bucket: string, // 'avatars' | 'scripts' | 'questions' | 'resources' etc.
 ): Promise<UploadResult> => {
   try {
-    // A: Supabase Storage for Avatars (Easy RLS integration in future if needed, currently public bucket)
-    if (bucket === 'avatars') {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${fileName}`;
+    // A: Upload to Cloudflare R2 for zero egress bandwidth cost
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      form.append('folder', bucket);
 
-      const { data, error } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
+      const response = await fetch('/api/r2-upload', {
+        method: 'POST',
+        body: form,
+      });
 
-      if (error) throw error;
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from('avatars').getPublicUrl(filePath);
-
-      console.log('✅ Uploaded to Supabase Storage:', publicUrl);
-
-      return {
-        url: publicUrl,
-        path: filePath,
-      };
+      if (response.ok) {
+        const { publicUrl } = await response.json();
+        console.log(`✅ Uploaded ${bucket} to Cloudflare R2:`, publicUrl);
+        return {
+          url: publicUrl,
+          path: publicUrl,
+        };
+      }
+    } catch (r2Error) {
+      console.warn(`R2 upload failed for ${bucket}, falling back to Supabase Storage:`, r2Error);
     }
 
-    // B: Cloudflare R2 for heavy/large assets (Zero egress cost)
-    // Proxy upload through Next.js API to avoid CORS issues with direct browser → R2 PUT
-    const form = new FormData();
-    form.append('file', file);
-    form.append('folder', bucket);
+    // B: Fallback to Supabase Storage if R2 is unavailable
+    const fileExt = file.name.split('.').pop() || 'jpg';
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `${fileName}`;
 
-    const response = await fetch('/api/r2-upload', {
-      method: 'POST',
-      body: form,
-    });
+    const { error: supabaseError } = await supabase.storage
+      .from(bucket === 'avatars' ? 'avatars' : 'uploads')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+      });
 
-    if (!response.ok) {
-      const body = await response.json().catch(() => ({}));
-      throw new Error(
-        `R2 upload failed (${response.status}): ${body?.error ?? response.statusText}`,
-      );
-    }
+    if (supabaseError) throw supabaseError;
 
-    const { publicUrl } = await response.json();
-    console.log('✅ Uploaded to R2:', publicUrl);
+    const {
+      data: { publicUrl },
+    } = supabase.storage
+      .from(bucket === 'avatars' ? 'avatars' : 'uploads')
+      .getPublicUrl(filePath);
+
+    console.log(`✅ Uploaded ${bucket} to Supabase Storage:`, publicUrl);
 
     return {
       url: publicUrl,
-      path: publicUrl,
+      path: filePath,
     };
   } catch (error) {
     console.error(`${bucket} Upload failed:`, error);
@@ -72,7 +69,7 @@ export const uploadFile = async (
 };
 
 /**
- * Helper to upload user avatar images to Supabase Storage.
+ * Helper to upload user avatar images (Cloudflare R2 with Supabase fallback).
  */
 export const uploadAvatar = async (file: File) => {
   return uploadFile(file, 'avatars');

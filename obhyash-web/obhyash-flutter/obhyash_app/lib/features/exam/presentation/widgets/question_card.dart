@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/presentation/widgets/latex_text.dart';
 import '../../../../core/presentation/widgets/obhyash_tooltip.dart';
+import '../../../../core/utils/bangla_name_helper.dart';
 import '../../domain/exam_models.dart';
 
 class QuestionCard extends StatefulWidget {
@@ -145,7 +146,7 @@ class _QuestionCardState extends State<QuestionCard>
         children: [
           // ── Top section: serial + question + tags/actions ─────────────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 12, 10, 8),
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -153,13 +154,13 @@ class _QuestionCardState extends State<QuestionCard>
                 LatexText(
                   text: '**${_toBengaliNumeral(widget.serialNumber)}.** ${widget.question.question}',
                   style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w600,
                     fontFamily: 'HindSiliguri',
                     color: isDark
                         ? const Color(0xFFF5F5F5)
                         : const Color(0xFF111827),
-                    height: 1.45,
+                    height: 1.5,
                   ),
                 ),
 
@@ -168,55 +169,43 @@ class _QuestionCardState extends State<QuestionCard>
                 // Tags + action buttons row
                 Row(
                   children: [
-                    // Institute tag (if present)
-                    if (widget.readOnly && widget.question.institutes.isNotEmpty) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF1E3A8A).withValues(alpha: 0.3)
-                              : const Color(0xFFDBEAFE),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          widget.question.institutes.join(', '),
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF1D4ED8),
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                    ],
+                    // Unified Source Tag (Board / University & Year - Chorcha Style)
+                    if (widget.readOnly &&
+                        (widget.question.institutes.isNotEmpty ||
+                            widget.question.years.isNotEmpty)) ...[
+                      () {
+                        final sourceText = BanglaNameHelper.formatQuestionSource(
+                          institutes: widget.question.institutes,
+                          years: widget.question.years,
+                        );
+                        if (sourceText.isEmpty) return const SizedBox.shrink();
 
-                    // Year tag (if present)
-                    if (widget.readOnly && widget.question.years.isNotEmpty) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF4C1D95).withValues(alpha: 0.3)
-                              : const Color(0xFFF3E8FF),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          widget.question.years.join(', '),
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: isDark ? const Color(0xFFA78BFA) : const Color(0xFF6D28D9),
-                            letterSpacing: 0.3,
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 3,
                           ),
-                        ),
-                      ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF0E3A4A)
+                                : const Color(0xFFBAF7FF),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            sourceText,
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              fontFamily: 'HindSiliguri',
+                              color: isDark
+                                  ? const Color(0xFFA5F3FC)
+                                  : const Color(0xFF083344),
+                              letterSpacing: 0.2,
+                              height: 1.1,
+                            ),
+                          ),
+                        );
+                      }(),
                       const SizedBox(width: 6),
                     ],
 
@@ -441,8 +430,8 @@ class _QuestionCardState extends State<QuestionCard>
                           },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
+                              horizontal: 14,
+                              vertical: 10,
                             ),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -450,15 +439,15 @@ class _QuestionCardState extends State<QuestionCard>
                                 // Circular badge (letter)
                                 AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
-                                  width: 24,
-                                  height: 24,
-                                  margin: const EdgeInsets.only(right: 10),
+                                  width: 26,
+                                  height: 26,
+                                  margin: const EdgeInsets.only(right: 12),
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: bulletBg,
                                     border: Border.all(
                                       color: bulletBorder,
-                                      width: 1.5,
+                                      width: 1.4,
                                     ),
                                     boxShadow:
                                         bulletBg == Colors.transparent && !isDark

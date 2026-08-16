@@ -7,6 +7,7 @@ import '../services/pdf_download_service.dart';
 import '../domain/exam_models.dart';
 import 'exam_celebration_view.dart';
 import 'widgets/question_card.dart';
+import 'widgets/exam_scope_header.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 import 'package:obhyash_app/core/utils/bangla_name_helper.dart';
 import 'package:obhyash_app/core/providers/theme_provider.dart';
@@ -344,28 +345,6 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Icon Header with glowing badge
-                Center(
-                  child: Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF004633).withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFF004633).withValues(alpha: 0.3),
-                        width: 1.5,
-                      ),
-                    ),
-                    child: const Icon(
-                      LucideIcons.helpCircle,
-                      color: Color(0xFF10B981),
-                      size: 28,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
                 // Title
                 Text(
                   'খাতা জমা দিবে?',
@@ -377,20 +356,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                     color: isDark ? Colors.white : const Color(0xFF111827),
                   ),
                 ),
-                const SizedBox(height: 10),
-
-                // Summary Text
-                Text(
-                  'তুমি ${_toBn(totalQuestions)} টি প্রশ্নের মধ্যে ${_toBn(answeredQuestions)} টির উত্তর দিয়েছো। ${remaining > 0 ? "এখনো ${_toBn(remaining)} টি প্রশ্ন বাকি আছে।" : "সবগুলোর উত্তর দেওয়া সম্পন্ন হয়েছে!"}',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    height: 1.5,
-                    fontFamily: 'HindSiliguri',
-                    color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
-                  ),
-                ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 18),
 
                 // Stats Snapshot Row
                 Container(
@@ -826,7 +792,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
         // Bottom Action Bar
         bottomNavigationBar: SafeArea(
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
             decoration: BoxDecoration(
               color: isDark
                   ? const Color(0xFF000000).withValues(alpha: 0.95)
@@ -840,9 +806,9 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, -4),
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 6,
+                  offset: const Offset(0, -2),
                 ),
               ],
             ),
@@ -858,28 +824,23 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF059669), // Deep green
+                    backgroundColor: const Color(0xFF004633), // Deep signature emerald green
                     foregroundColor: Colors.white,
-                    elevation: 4,
-                    shadowColor: const Color(0xFF059669).withValues(alpha: 0.4),
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
+                    elevation: 0,
+                    minimumSize: const Size(0, 35),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    padding: const EdgeInsets.symmetric(vertical: 6.5, horizontal: 22),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.check_circle_outline, size: 18),
-                      SizedBox(width: 6),
-                      Text(
-                        'পরীক্ষা শেষ করো',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
+                  child: const Text(
+                    'জমা দাও',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14.5,
+                      fontFamily: 'HindSiliguri',
+                    ),
                   ),
                 ),
               ],
@@ -942,15 +903,36 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
     final duration = details?.durationMinutes ?? 0;
     final totalQ = details?.totalQuestions ?? widget.state.questions.length;
     final negMark = details?.negativeMarking ?? 0.0;
-    final chapters = details?.chapters ?? '';
+
+    final chaptersList = (details?.chapters != null &&
+            details!.chapters!.trim().isNotEmpty &&
+            details.chapters != 'All')
+        ? details.chapters!
+            .split(',')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList()
+        : widget.state.questions
+            .map((q) => q.chapter.trim())
+            .where((c) => c.isNotEmpty && c != 'All')
+            .toSet()
+            .toList();
+
+    final topicsList = (details?.topics != null &&
+            details!.topics!.trim().isNotEmpty &&
+            details.topics != 'All')
+        ? details.topics!
+            .split(',')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList()
+        : <String>[];
 
     final bg = isDark ? const Color(0xFF09090B) : const Color(0xFFF4F6FA);
     final cardBg = isDark ? const Color(0xFF111113) : Colors.white;
     final border = isDark ? const Color(0xFF222226) : const Color(0xFFE4E9F0);
-    final accent = const Color(0xFF059669);
-    final accentGlow = const Color(0xFF34D399);
     final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
-    final textSub = isDark ? const Color(0xFF71717A) : const Color(0xFF64748B);
+    final accent = const Color(0xFF059669);
 
     return Scaffold(
       backgroundColor: bg,
@@ -983,165 +965,19 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(18, 20, 18, 24),
+                padding: const EdgeInsets.fromLTRB(18, 16, 18, 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
 
-                    // ── 1. Hero Subject Card ──────────────────────────────
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: isDark
-                              ? [const Color(0xFF0B1A14), const Color(0xFF0E1F18)]
-                              : [const Color(0xFFE8F9F3), const Color(0xFFF0FDF7)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(22),
-                        border: Border.all(
-                          color: accent.withValues(alpha: isDark ? 0.28 : 0.18),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: accent.withValues(alpha: isDark ? 0.12 : 0.06),
-                            blurRadius: 24,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          // Decorative circle accent top-right
-                          Positioned(
-                            right: -20,
-                            top: -20,
-                            child: Container(
-                              width: 90,
-                              height: 90,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: accent.withValues(alpha: 0.06),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    // Icon box with glow
-                                    Container(
-                                      width: 48,
-                                      height: 48,
-                                      decoration: BoxDecoration(
-                                        color: accent,
-                                        borderRadius: BorderRadius.circular(14),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: accent.withValues(alpha: 0.4),
-                                            blurRadius: 14,
-                                            offset: const Offset(0, 4),
-                                          ),
-                                        ],
-                                      ),
-                                      child: const Icon(
-                                        LucideIcons.fileSpreadsheet,
-                                        color: Colors.white,
-                                        size: 22,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 14),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          // Badge pill
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 9, vertical: 3),
-                                            decoration: BoxDecoration(
-                                              color: accent.withValues(alpha: 0.15),
-                                              borderRadius: BorderRadius.circular(20),
-                                              border: Border.all(
-                                                color: accent.withValues(alpha: 0.3),
-                                                width: 0.8,
-                                              ),
-                                            ),
-                                            child: Text(
-                                              'অনলাইন পরীক্ষা',
-                                              style: TextStyle(
-                                                fontSize: 10.5,
-                                                fontWeight: FontWeight.w700,
-                                                fontFamily: 'HindSiliguri',
-                                                color: isDark ? accentGlow : accent,
-                                                letterSpacing: 0.2,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 5),
-                                          Text(
-                                            subjectTitle,
-                                            style: TextStyle(
-                                              fontSize: 19,
-                                              fontWeight: FontWeight.w900,
-                                              fontFamily: 'HindSiliguri',
-                                              color: textPrimary,
-                                              height: 1.2,
-                                            ),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                if (chapters.isNotEmpty && chapters != 'All') ...[
-                                  const SizedBox(height: 14),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      color: isDark
-                                          ? Colors.black.withValues(alpha: 0.3)
-                                          : Colors.white.withValues(alpha: 0.7),
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                        color: accent.withValues(alpha: 0.18),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(LucideIcons.bookmark,
-                                            size: 13, color: accent),
-                                        const SizedBox(width: 7),
-                                        Expanded(
-                                          child: Text(
-                                            BanglaNameHelper.formatChapter(chapters),
-                                            style: TextStyle(
-                                              fontSize: 12.5,
-                                              fontFamily: 'HindSiliguri',
-                                              color: textSub,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                    // ── 1. Clean Scope Header Row ──────────────────────────────
+                    ExamScopeHeader(
+                      subjectName: subjectTitle,
+                      chapters: chaptersList,
+                      topics: topicsList,
+                      isDark: isDark,
+                      margin: const EdgeInsets.only(bottom: 14),
                     ),
-
-                    const SizedBox(height: 16),
 
                     // ── 2. Stat Ribbon ────────────────────────────────────
                     Container(
@@ -1163,8 +999,6 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                       child: Row(
                         children: [
                           _StatCell(
-                            icon: LucideIcons.clock,
-                            iconColor: const Color(0xFF3B82F6),
                             label: 'সময়সীমা',
                             value:
                                 '${BanglaNameHelper.toBanglaNumeral(duration)} মিনিট',
@@ -1172,8 +1006,6 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                           ),
                           _StatDivider(isDark: isDark),
                           _StatCell(
-                            icon: LucideIcons.helpCircle,
-                            iconColor: accent,
                             label: 'মোট প্রশ্ন',
                             value:
                                 '${BanglaNameHelper.toBanglaNumeral(totalQ)}টি MCQ',
@@ -1181,10 +1013,6 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                           ),
                           _StatDivider(isDark: isDark),
                           _StatCell(
-                            icon: LucideIcons.alertCircle,
-                            iconColor: negMark > 0
-                                ? const Color(0xFFEA580C)
-                                : const Color(0xFF64748B),
                             label: 'নেগেটিভ',
                             value: negMark > 0
                                 ? '-${BanglaNameHelper.toBanglaNumeral(negMark)}'
@@ -1193,8 +1021,6 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                           ),
                           _StatDivider(isDark: isDark),
                           _StatCell(
-                            icon: LucideIcons.award,
-                            iconColor: const Color(0xFF8B5CF6),
                             label: 'পূর্ণমান',
                             value:
                                 '${BanglaNameHelper.toBanglaNumeral(totalQ)} নম্বর',
@@ -1375,15 +1201,11 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
 // ── Stat Cell (for horizontal ribbon) ────────────────────────────────────────
 
 class _StatCell extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
   final String label;
   final String value;
   final bool isDark;
 
   const _StatCell({
-    required this.icon,
-    required this.iconColor,
     required this.label,
     required this.value,
     required this.isDark,
@@ -1392,26 +1214,30 @@ class _StatCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final subColor =
-        isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8);
+        isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B);
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
     return Expanded(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: isDark ? 0.18 : 0.1),
-              borderRadius: BorderRadius.circular(10),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'HindSiliguri',
+              color: subColor,
+              height: 1.2,
             ),
-            child: Icon(icon, size: 16, color: iconColor),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 5),
           Text(
             value,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: FontWeight.w900,
               fontFamily: 'HindSiliguri',
               color: textColor,
@@ -1420,16 +1246,6 @@ class _StatCell extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10.5,
-              fontFamily: 'HindSiliguri',
-              color: subColor,
-            ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),

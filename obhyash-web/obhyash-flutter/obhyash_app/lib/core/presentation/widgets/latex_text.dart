@@ -4,23 +4,91 @@ import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:markdown/markdown.dart' as md;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PREPROCESSING  (mirrors the web app's MathRenderer preprocessing pipeline)
+// PREPROCESSING (Chemical arrows, Equilibrium, Bengali un-wrapping, TeX sanitization)
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PREPROCESSING  (mirrors the web app's MathRenderer preprocessing pipeline)
-// ─────────────────────────────────────────────────────────────────────────────
+const String _kChemArrowPrefix = '@@CHEM_ARROW:';
+const String _kChemArrowSuffix = '@@';
+const String _kChemArrow = 'chem-arrow';
+const String _kInlineMath = 'inline-math';
+const String _kDisplayMath = 'display-math';
+
+String _cleanConditionText(String raw) {
+  return raw
+      .replaceAll(r'\text{', '')
+      .replaceAll(r'\mathrm{', '')
+      .replaceAll(r'\textbf{', '')
+      .replaceAll(r'\textit{', '')
+      .replaceAll('}', '')
+      .replaceAll(r'\,', ' ')
+      .replaceAll(r'\;', ' ')
+      .replaceAll(r'\quad', ' ')
+      .replaceAll(r'\qquad', ' ')
+      .replaceAll(r'\ ', ' ')
+      .replaceAll(r'^\circ\text{C}', '°C')
+      .replaceAll(r'^\circ C', '°C')
+      .replaceAll(r'^\circ\mathrm{C}', '°C')
+      .replaceAll(r'^\circ', '°')
+      .replaceAll('^\\circ', '°')
+      .replaceAll(r'^{\circ}', '°')
+      .replaceAll(r'\Delta', 'Δ')
+      .trim();
+}
 
 String _unwrapBengaliMathContent(String inner) {
   String clean = inner;
 
-  // 1. Un-escape \text{...}, \mathrm{...}, \textbf{...}, \textit{...}
+  // 1. Process chemical arrows and equilibrium arrows first
+  clean = clean.replaceAllMapped(
+    RegExp(r'\\xrightleftharpoons(?:\[([^\]]*)\])?\{([^}]*)\}'),
+    (m) {
+      final below = m.group(1) ?? '';
+      final above = m.group(2) ?? '';
+      return ' $_kChemArrowPrefix$above|$below|bi$_kChemArrowSuffix ';
+    },
+  );
+
+  clean = clean.replaceAllMapped(
+    RegExp(r'\\xrightarrow(?:\[([^\]]*)\])?\{([^}]*)\}'),
+    (m) {
+      final below = m.group(1) ?? '';
+      final above = m.group(2) ?? '';
+      return ' $_kChemArrowPrefix$above|$below|right$_kChemArrowSuffix ';
+    },
+  );
+
+  clean = clean.replaceAllMapped(
+    RegExp(r'\\xleftarrow(?:\[([^\]]*)\])?\{([^}]*)\}'),
+    (m) {
+      final below = m.group(1) ?? '';
+      final above = m.group(2) ?? '';
+      return ' $_kChemArrowPrefix$above|$below|left$_kChemArrowSuffix ';
+    },
+  );
+
+  clean = clean.replaceAllMapped(
+    RegExp(r'\\overset\{([^}]*)\}\{(?:\\rightleftharpoons|\\leftrightharpoons|\<=\>|\<-\>|⇌|⇄)\}'),
+    (m) {
+      final above = m.group(1) ?? '';
+      return ' $_kChemArrowPrefix$above||bi$_kChemArrowSuffix ';
+    },
+  );
+
+  clean = clean.replaceAllMapped(
+    RegExp(r'\\overset\{([^}]*)\}\{(?:\\longrightarrow|\\rightarrow|\\to|\-\>|\=\>|→)\}'),
+    (m) {
+      final above = m.group(1) ?? '';
+      return ' $_kChemArrowPrefix$above||right$_kChemArrowSuffix ';
+    },
+  );
+
+  // 2. Un-escape \text{...}, \mathrm{...}, \textbf{...}, \textit{...}
   clean = clean.replaceAllMapped(
     RegExp(r'\\(?:text|mathrm|textbf|textit)\{([^}]*)\}'),
     (m) => m.group(1)!,
   );
 
-  // 2. Un-escape LaTeX spacing commands
+  // 3. Un-escape LaTeX spacing commands
   clean = clean
       .replaceAll(r'\,', ' ')
       .replaceAll(r'\;', ' ')
@@ -29,13 +97,26 @@ String _unwrapBengaliMathContent(String inner) {
       .replaceAll(r'\ ', ' ')
       .replaceAll('~', ' ');
 
-  // 3. Re-wrap math constructs within this mixed text
+  // 4. Fractions with Bengali text: \frac{ভর}{আয়তন} -> (ভর / আয়তন)
+  clean = clean.replaceAllMapped(
+    RegExp(r'\\frac\{([^}]*[\u0980-\u09FF][^}]*)\}\{([^}]*)\}'),
+    (m) => '(${m.group(1)} / ${m.group(2)})',
+  );
+  clean = clean.replaceAllMapped(
+    RegExp(r'\\frac\{([^}]*)\}\{([^}]*[\u0980-\u09FF][^}]*)\}'),
+    (m) => '(${m.group(1)} / ${m.group(2)})',
+  );
+
+  // 5. Re-wrap pure math/formula constructs within this mixed text
   final tokenRegex = RegExp(
     r'(\\[a-zA-Z]+(?:\{[^{}]*\}|\[[^\[\]]*\])*|[a-zA-Z0-9]+(?:\^|\_)\{?[a-zA-Z0-9\-\+]+\}?)',
   );
 
   clean = clean.replaceAllMapped(tokenRegex, (m) {
     final token = m.group(0)!;
+    if (token.startsWith(_kChemArrowPrefix)) return token;
+    // Don't wrap if token contains Bengali
+    if (RegExp(r'[\u0980-\u09FF]').hasMatch(token)) return token;
     return '\$$token\$';
   });
 
@@ -45,7 +126,6 @@ String _unwrapBengaliMathContent(String inner) {
 String _cleanIntraSentenceNewlines(String text) {
   const placeholder = '___DBL_NL___';
   text = text.replaceAll(RegExp(r'\r\n|\r'), '\n');
-  // Preserve intentional double newlines (paragraphs)
   text = text.replaceAll(RegExp(r'\n\s*\n+'), placeholder);
 
   final lines = text.split('\n');
@@ -63,16 +143,26 @@ String _cleanIntraSentenceNewlines(String text) {
       continue;
     }
 
-    // Check if the line is an intentional list item or section header
+    // Check if the line is an intentional list item, section header, or equation line
     final isListItem = RegExp(
-      r'^(?:\([iIvVxX0-9a-zA-Z\u0980-\u09fa]+\)|[iIvVxX0-9a-zA-Z\u0980-\u09fa]+[\.\)]|\-|\*|\#|নিচের|উদ্দীপক)',
+      r'^(?:\([iIvVxX0-9a-zA-Z\u0980-\u09fa]+\)|[iIvVxX0-9a-zA-Z\u0980-\u09fa]+[\.\)]|\-|\*|\#|নিচের|উদ্দীপক|সুতরাং|অতএব|ধরি|দেওয়া আছে)',
     ).hasMatch(line);
 
-    // Check if line starts with punctuation that should attach to previous word
+    final isTableLine = line.startsWith('|') || line.endsWith('|');
+
+    final isEquationLine = line.contains(r'\xrightarrow') ||
+        line.contains(r'\xrightleftharpoons') ||
+        line.contains(_kChemArrowPrefix) ||
+        line.startsWith(r'$$') ||
+        line.contains('→') ||
+        line.contains('⟶') ||
+        line.contains('⇌') ||
+        line.contains('⇄');
+
     final isPunctuation = RegExp(r'^[।,\.\?\!:\;]').hasMatch(line);
 
-    if (isListItem) {
-      buffer.write('\n');
+    if (isListItem || isEquationLine || isTableLine) {
+      buffer.write('\n\n');
       buffer.write(line);
     } else if (isPunctuation) {
       buffer.write(line);
@@ -92,27 +182,95 @@ String _preprocess(String text) {
   final cached = _preprocessCache[text];
   if (cached != null) return cached;
 
-  // 1. Normalise literal \n and carriage returns
-  var processedText = text.replaceAll(r'\n', '\n').replaceAll(RegExp(r'\r\n|\r'), '\n');
+  var processedText =
+      text.replaceAll(r'\n', '\n').replaceAll(RegExp(r'\r\n|\r'), '\n');
 
-  // 2. Convert inline $$...$$ (short, single-line) into inline $...$
-  // In many question datasets, $23\text{ m}$ is authored as $$23\text{ m}$$ which forces a block break.
+  // 1. Convert chemical reaction and equilibrium arrows into custom tokens
+  processedText = processedText.replaceAllMapped(
+    RegExp(r'\\xrightleftharpoons(?:\[([^\]]*)\])?\{([^}]*)\}'),
+    (m) {
+      final below = m.group(1) ?? '';
+      final above = m.group(2) ?? '';
+      return ' $_kChemArrowPrefix$above|$below|bi$_kChemArrowSuffix ';
+    },
+  );
+
+  processedText = processedText.replaceAllMapped(
+    RegExp(r'\\xrightarrow(?:\[([^\]]*)\])?\{([^}]*)\}'),
+    (m) {
+      final below = m.group(1) ?? '';
+      final above = m.group(2) ?? '';
+      return ' $_kChemArrowPrefix$above|$below|right$_kChemArrowSuffix ';
+    },
+  );
+
+  processedText = processedText.replaceAllMapped(
+    RegExp(r'\\xleftarrow(?:\[([^\]]*)\])?\{([^}]*)\}'),
+    (m) {
+      final below = m.group(1) ?? '';
+      final above = m.group(2) ?? '';
+      return ' $_kChemArrowPrefix$above|$below|left$_kChemArrowSuffix ';
+    },
+  );
+
+  processedText = processedText.replaceAllMapped(
+    RegExp(
+      r'\\overset\{([^}]*)\}\{(?:\\rightleftharpoons|\\leftrightharpoons|\<=\>|\<-\>|⇌|⇄)\}',
+    ),
+    (m) {
+      final above = m.group(1) ?? '';
+      return ' $_kChemArrowPrefix$above||bi$_kChemArrowSuffix ';
+    },
+  );
+
+  processedText = processedText.replaceAllMapped(
+    RegExp(
+      r'\\overset\{([^}]*)\}\{(?:\\longrightarrow|\\rightarrow|\\to|\-\>|\=\>|→)\}',
+    ),
+    (m) {
+      final above = m.group(1) ?? '';
+      return ' $_kChemArrowPrefix$above||right$_kChemArrowSuffix ';
+    },
+  );
+
+  // Standalone equilibrium symbol conversion
+  processedText = processedText.replaceAll(r'\rightleftharpoons', ' ⇌ ');
+  processedText = processedText.replaceAll(r'\leftrightharpoons', ' ⇌ ');
+
+  // 2. Convert inline $$...$$ into inline $...$ if short and non-multiline
   processedText = processedText.replaceAllMapped(
     RegExp(r'\$\$([^\n]{1,80}?)\$\$'),
     (m) {
       final inner = m.group(1)!.trim();
-      // If it contains newline or is a long complex equation, keep it as display math
-      if (inner.contains('\n') || inner.length > 80) {
+      if (inner.contains('\n') || inner.length > 80 || inner.contains(r'\begin')) {
         return '\$\$$inner\$\$';
       }
       return '\$$inner\$';
     },
   );
 
-  // 3. Clean intra-sentence accidental newlines across the entire text
+  // 3. Clean intra-sentence accidental newlines
   processedText = _cleanIntraSentenceNewlines(processedText);
 
-  // 4. Split into math blocks ($$...$$ or $...$) and non-math segments
+  // 4. Format Roman-numeral list items "i. ", "ii. " with clean bullet spacing
+  processedText = processedText.replaceAllMapped(
+    RegExp(r'(?:\s+|^|-|\n)(i|ii|iii|iv|v)\.\s+([^\n]+)', caseSensitive: false),
+    (m) => '\n\n**${m.group(1)}.** ${m.group(2)}',
+  );
+
+  // Parenthetical roman numerals "(i) ", "(ii) "
+  processedText = processedText.replaceAllMapped(
+    RegExp(r'(?:\s+|^|-|\n)\((i|ii|iii|iv|v)\)\s+([^\n]+)', caseSensitive: false),
+    (m) => '\n\n**(${m.group(1)})** ${m.group(2)}',
+  );
+
+  // Common Bangla question concluding sentences
+  processedText = processedText.replaceAllMapped(
+    RegExp(r'(?:\s+|^|\n)(নিচের কোনটি সঠিক\?|কোনটি সঠিক\?|উদ্দীপকের আলোকে উত্তর দাও:|উদ্দীপকটি পড়ে নিচের প্রশ্নের উত্তর দাও:)'),
+    (m) => '\n\n${m.group(1)}',
+  );
+
+  // 5. Split into math blocks ($$...$$ or $...$) and non-math segments
   final mathPattern = RegExp(r'(\$\$[\s\S]*?\$\$|\$(?!\$)[^\n]*?\$)');
   final parts = <String>[];
   int lastIndex = 0;
@@ -128,7 +286,7 @@ String _preprocess(String text) {
     parts.add(processedText.substring(lastIndex));
   }
 
-  // 5. Process each segment safely
+  // 6. Process each segment safely
   final processedParts = parts.map((part) {
     if (part.startsWith(r'$')) {
       final isDisplay = part.startsWith(r'$$');
@@ -142,29 +300,30 @@ String _preprocess(String text) {
         (m) => '\\${m.group(1)}',
       );
 
-      // If the math block does NOT contain Bengali characters, keep it as pure intact LaTeX
+      // If math block does NOT contain Bengali, keep as pure LaTeX
       if (!RegExp(r'[\u0980-\u09FF]').hasMatch(cleanInner)) {
         return isDisplay ? '\$\$$cleanInner\$\$' : '\$$cleanInner\$';
       }
 
-      // If it contains Bengali text, unwrap the Bengali words
+      // If it contains Bengali, unwrap Bengali content safely
       return _unwrapBengaliMathContent(cleanInner);
     }
 
-    // It's a Non-Math Text Segment
+    // Non-Math Text Segment
     String t = part;
 
-    // Check if the segment is an un-delimited LaTeX formula or algebraic expression
-    final trimmed = t.trim();
-    final hasNoBengali = !RegExp(r'[\u0980-\u09FF]').hasMatch(trimmed);
-    final hasLatexCmd = trimmed.contains(r'\') && RegExp(r'\\[a-zA-Z]+').hasMatch(trimmed);
-    final hasMathExpr = RegExp(r'[a-zA-Z0-9]+(?:\^|\_)\{?[a-zA-Z0-9\-\+]+\}?').hasMatch(trimmed);
+    // Check for un-delimited chemical formula sequences like C_{12}H_{22}O_{11}+H_2O, Fe^{3+}, SO_4^{2-}
+    t = t.replaceAllMapped(
+      RegExp(r'\b([A-Z][a-z]?(?:_\{?\d+\}?|\^\{?[\d\+\-a-zA-Z]+\}?)+[\w\+\-\(\)\_\^\{\}\s=]*)\b'),
+      (m) {
+        final formula = m.group(0)!.trim();
+        if (formula.contains(_kChemArrowPrefix)) return formula;
+        if (RegExp(r'[\u0980-\u09FF]').hasMatch(formula)) return formula;
+        return '\$$formula\$';
+      },
+    );
 
-    if (hasNoBengali && trimmed.isNotEmpty && (hasLatexCmd || (hasMathExpr && trimmed.contains(RegExp(r'[=+\-*/<>()]'))))) {
-      return '\$$trimmed\$';
-    }
-
-    // Normalize isolated superscripts like ms^-1 or ms^{-1}
+    // Normalize isolated superscripts like ms^-1, ms^-2, m^3
     t = t.replaceAllMapped(
       RegExp(r'\b([a-zA-Z0-9]+)\^(-?[0-9]+)\b'),
       (m) => '\$${m.group(1)}^{${m.group(2)}}\$',
@@ -172,24 +331,6 @@ String _preprocess(String text) {
     t = t.replaceAllMapped(
       RegExp(r'\b([a-zA-Z0-9]+)\^\{(-?[0-9a-zA-Z]+)\}\b'),
       (m) => '\$${m.group(1)}^{${m.group(2)}}\$',
-    );
-
-    // Roman-numeral list items "i. " → "\ni. "
-    t = t.replaceAllMapped(
-      RegExp(r'(?:\s+|^|-)(i|ii|iii|iv|v)\.\s+', caseSensitive: false),
-      (m) => '\n${m.group(1)}. ',
-    );
-
-    // Parenthetical roman numerals "(i) " → "\n(i) "
-    t = t.replaceAllMapped(
-      RegExp(r'(?:\s+|^|-)\((i|ii|iii|iv|v)\)\s+', caseSensitive: false),
-      (m) => '\n(${m.group(1)}) ',
-    );
-
-    // Common Bangla question tail
-    t = t.replaceAll(
-      RegExp(r'(?:\s+|^)নিচের কোনটি সঠিক\?'),
-      '\n\nনিচের কোনটি সঠিক?',
     );
 
     return t;
@@ -206,16 +347,17 @@ String _preprocess(String text) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MATH INLINE-SYNTAX EXTENSION
-// Teaches the markdown parser to recognise $...$ and $$...$$ as math spans.
+// MARKDOWN EXTENSIONS & BUILDERS
 // ─────────────────────────────────────────────────────────────────────────────
-
-const _kInlineMath = 'inline-math';
-const _kDisplayMath = 'display-math';
 
 class _MathElement extends md.Element {
   _MathElement.inline(String latex) : super(_kInlineMath, [md.Text(latex)]);
   _MathElement.display(String latex) : super(_kDisplayMath, [md.Text(latex)]);
+}
+
+class _ChemArrowElement extends md.Element {
+  _ChemArrowElement(String above, String below, String dir)
+      : super(_kChemArrow, [md.Text('$above|$below|$dir')]);
 }
 
 class _InlineMathSyntax extends md.InlineSyntax {
@@ -240,9 +382,20 @@ class _DisplayMathSyntax extends md.InlineSyntax {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FLUTTER ELEMENT BUILDERS
-// ─────────────────────────────────────────────────────────────────────────────
+class _ChemArrowSyntax extends md.InlineSyntax {
+  _ChemArrowSyntax()
+      : super(r'@@CHEM_ARROW:([^|]*)\|([^|]*)\|([^@]*)@@',
+            caseSensitive: true);
+
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    final above = match.group(1) ?? '';
+    final below = match.group(2) ?? '';
+    final dir = match.group(3) ?? 'right';
+    parser.addNode(_ChemArrowElement(above, below, dir));
+    return true;
+  }
+}
 
 class _InlineMathBuilder extends MarkdownElementBuilder {
   final TextStyle? textStyle;
@@ -257,12 +410,20 @@ class _InlineMathBuilder extends MarkdownElementBuilder {
     TextStyle? parentStyle,
   ) {
     final latex = element.textContent;
-    final style = (textStyle ?? preferredStyle ?? parentStyle ?? const TextStyle()).copyWith(
+    final style =
+        (textStyle ?? preferredStyle ?? parentStyle ?? const TextStyle())
+            .copyWith(
       fontFamily: 'HindSiliguri',
     );
 
-    // Render directly as an inline Math widget without SingleChildScrollView/ConstrainedBox.
-    // SingleChildScrollView inside a WidgetSpan forces RenderParagraph to break lines.
+    // If string accidentally has Bengali, render as native text fallback
+    if (RegExp(r'[\u0980-\u09FF]').hasMatch(latex)) {
+      return Text(
+        _cleanConditionText(latex),
+        style: style,
+      );
+    }
+
     return Math.tex(
       latex,
       mathStyle: MathStyle.text,
@@ -288,9 +449,18 @@ class _DisplayMathBuilder extends MarkdownElementBuilder {
     TextStyle? parentStyle,
   ) {
     final latex = element.textContent;
-    final style = (textStyle ?? preferredStyle ?? const TextStyle()).copyWith(
+    final style =
+        (textStyle ?? preferredStyle ?? const TextStyle()).copyWith(
       fontFamily: 'HindSiliguri',
     );
+
+    if (RegExp(r'[\u0980-\u09FF]').hasMatch(latex)) {
+      return Text(
+        _cleanConditionText(latex),
+        style: style,
+      );
+    }
+
     return Align(
       alignment: Alignment.center,
       child: SingleChildScrollView(
@@ -312,6 +482,177 @@ class _DisplayMathBuilder extends MarkdownElementBuilder {
   }
 }
 
+class _ChemArrowBuilder extends MarkdownElementBuilder {
+  final TextStyle? textStyle;
+
+  _ChemArrowBuilder({this.textStyle});
+
+  @override
+  Widget? visitElementAfterWithContext(
+    BuildContext context,
+    md.Element element,
+    TextStyle? preferredStyle,
+    TextStyle? parentStyle,
+  ) {
+    final content = element.textContent;
+    final parts = content.split('|');
+    final above = parts.isNotEmpty ? parts[0] : '';
+    final below = parts.length > 1 ? parts[1] : '';
+    final dir = parts.length > 2 ? parts[2] : 'right';
+
+    final style =
+        (textStyle ?? preferredStyle ?? parentStyle ?? const TextStyle())
+            .copyWith(fontFamily: 'HindSiliguri');
+
+    return _ChemicalArrowWidget(
+      above: _cleanConditionText(above),
+      below: _cleanConditionText(below),
+      direction: dir,
+      style: style,
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHEMICAL REACTION ARROW WIDGET (Supports Forward, Backward & Equilibrium)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _ChemicalArrowWidget extends StatelessWidget {
+  final String above;
+  final String below;
+  final String direction; // 'right', 'left', 'bi'
+  final TextStyle style;
+
+  const _ChemicalArrowWidget({
+    required this.above,
+    required this.below,
+    this.direction = 'right',
+    required this.style,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textColor = style.color ?? const Color(0xFF0F172A);
+    final hasAbove = above.trim().isNotEmpty;
+    final hasBelow = below.trim().isNotEmpty;
+
+    // Approximate text width to dynamically scale the reaction arrow line
+    final longestLen = [above.length, below.length].reduce((a, b) => a > b ? a : b);
+    final arrowWidth = (longestLen * 7.5 + 34).clamp(44.0, 200.0);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (hasAbove)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 1.5),
+              child: Text(
+                above,
+                style: TextStyle(
+                  fontSize: ((style.fontSize ?? 14) * 0.78).clamp(10.0, 13.0),
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'HindSiliguri',
+                  color: textColor,
+                  height: 1.1,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+              ),
+            ),
+          SizedBox(
+            width: arrowWidth,
+            height: direction == 'bi' ? 14 : 12,
+            child: CustomPaint(
+              painter: _ChemicalArrowPainter(
+                color: textColor,
+                direction: direction,
+              ),
+            ),
+          ),
+          if (hasBelow)
+            Padding(
+              padding: const EdgeInsets.only(top: 1.5),
+              child: Text(
+                below,
+                style: TextStyle(
+                  fontSize: ((style.fontSize ?? 14) * 0.72).clamp(9.5, 12.0),
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'HindSiliguri',
+                  color: textColor.withValues(alpha: 0.85),
+                  height: 1.1,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ChemicalArrowPainter extends CustomPainter {
+  final Color color;
+  final String direction; // 'right', 'left', 'bi'
+
+  _ChemicalArrowPainter({required this.color, this.direction = 'right'});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    const arrowHeadSize = 4.0;
+
+    if (direction == 'bi') {
+      // Equilibrium half-arrows (Top forward, Bottom backward)
+      final yTop = size.height * 0.35;
+      final yBottom = size.height * 0.65;
+
+      // Top forward half-arrow
+      canvas.drawLine(Offset(0, yTop), Offset(size.width - arrowHeadSize, yTop), paint);
+      final pathTop = Path()
+        ..moveTo(size.width - arrowHeadSize - 2.5, yTop - arrowHeadSize)
+        ..lineTo(size.width, yTop);
+      canvas.drawPath(pathTop, paint);
+
+      // Bottom backward half-arrow
+      canvas.drawLine(Offset(arrowHeadSize, yBottom), Offset(size.width, yBottom), paint);
+      final pathBottom = Path()
+        ..moveTo(arrowHeadSize + 2.5, yBottom + arrowHeadSize)
+        ..lineTo(0, yBottom);
+      canvas.drawPath(pathBottom, paint);
+    } else if (direction == 'left') {
+      final y = size.height / 2;
+      canvas.drawLine(Offset(arrowHeadSize, y), Offset(size.width, y), paint);
+      final path = Path()
+        ..moveTo(arrowHeadSize + 3, y - arrowHeadSize)
+        ..lineTo(0, y)
+        ..lineTo(arrowHeadSize + 3, y + arrowHeadSize);
+      canvas.drawPath(path, paint);
+    } else {
+      // Right forward arrow
+      final y = size.height / 2;
+      canvas.drawLine(Offset(0, y), Offset(size.width - arrowHeadSize, y), paint);
+      final path = Path()
+        ..moveTo(size.width - arrowHeadSize - 3, y - arrowHeadSize)
+        ..lineTo(size.width, y)
+        ..lineTo(size.width - arrowHeadSize - 3, y + arrowHeadSize);
+      canvas.drawPath(path, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ChemicalArrowPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.direction != direction;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // PUBLIC WIDGET
 // ─────────────────────────────────────────────────────────────────────────────
@@ -326,15 +667,13 @@ class LatexText extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final effectiveStyle = (style ?? DefaultTextStyle.of(context).style)
-        .copyWith(
-          fontFamily: style?.fontFamily ?? 'HindSiliguri',
-          fontSize: style?.fontSize,
-          color:
-              style?.color ??
-              (isDark ? const Color(0xFFF5F5F5) : const Color(0xFF111827)),
-          height: style?.height ?? 1.45,
-        );
+    final effectiveStyle = (style ?? DefaultTextStyle.of(context).style).copyWith(
+      fontFamily: style?.fontFamily ?? 'HindSiliguri',
+      fontSize: style?.fontSize ?? 16,
+      color: style?.color ??
+          (isDark ? const Color(0xFFF5F5F5) : const Color(0xFF111827)),
+      height: style?.height ?? 1.5,
+    );
 
     final bool hasSpecialSyntax = text.contains(r'$') ||
         text.contains('*') ||
@@ -343,6 +682,10 @@ class LatexText extends StatelessWidget {
         text.contains('`') ||
         text.contains('\n') ||
         text.contains(r'\') ||
+        text.contains('|') ||
+        text.contains('⇌') ||
+        text.contains('⇄') ||
+        text.contains('→') ||
         text.contains('^');
 
     if (!hasSpecialSyntax) {
@@ -356,58 +699,78 @@ class LatexText extends StatelessWidget {
 
     return MarkdownBody(
       data: processed,
-      inlineSyntaxes: [_DisplayMathSyntax(), _InlineMathSyntax()],
+      inlineSyntaxes: [
+        _ChemArrowSyntax(),
+        _DisplayMathSyntax(),
+        _InlineMathSyntax(),
+      ],
       builders: {
+        _kChemArrow: _ChemArrowBuilder(textStyle: effectiveStyle),
         _kInlineMath: _InlineMathBuilder(textStyle: effectiveStyle),
         _kDisplayMath: _DisplayMathBuilder(textStyle: effectiveStyle),
       },
       styleSheet: MarkdownStyleSheet(
-          textAlign: WrapAlignment.start,
-          p: effectiveStyle,
-          pPadding: EdgeInsets.zero,
-          blockSpacing: 6.0,
-          strong: effectiveStyle.copyWith(fontWeight: FontWeight.bold),
-          em: effectiveStyle.copyWith(fontStyle: FontStyle.italic),
-          code: effectiveStyle.copyWith(
-            fontFamily: 'monospace',
-            backgroundColor: isDark
-                ? const Color(0xFF1C1C1E)
-                : const Color(0xFFF5F5F5),
-          ),
-          codeblockDecoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          listBullet: effectiveStyle,
-          blockquote: effectiveStyle.copyWith(
-            color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
-            fontStyle: FontStyle.italic,
-          ),
-          blockquoteDecoration: BoxDecoration(
-            border: Border(
-              left: BorderSide(
-                color: isDark ? const Color(0xFF27272A) : const Color(0xFFD4D4D4),
-                width: 3,
-              ),
+        textAlign: WrapAlignment.start,
+        p: effectiveStyle,
+        pPadding: EdgeInsets.zero,
+        blockSpacing: 8.0,
+        strong: effectiveStyle.copyWith(fontWeight: FontWeight.w700),
+        em: effectiveStyle.copyWith(fontStyle: FontStyle.italic),
+        code: effectiveStyle.copyWith(
+          fontFamily: 'monospace',
+          backgroundColor:
+              isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
+        ),
+        codeblockDecoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F5),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        listBullet: effectiveStyle,
+        listBulletPadding: const EdgeInsets.only(right: 6),
+        listIndent: 16.0,
+        blockquote: effectiveStyle.copyWith(
+          color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
+          fontStyle: FontStyle.italic,
+        ),
+        blockquoteDecoration: BoxDecoration(
+          border: Border(
+            left: BorderSide(
+              color: isDark
+                  ? const Color(0xFF27272A)
+                  : const Color(0xFFD4D4D4),
+              width: 3,
             ),
           ),
-          h1: effectiveStyle.copyWith(
-            fontSize: (effectiveStyle.fontSize ?? 14) * 1.5,
-            fontWeight: FontWeight.bold,
-          ),
-          h2: effectiveStyle.copyWith(
-            fontSize: (effectiveStyle.fontSize ?? 14) * 1.3,
-            fontWeight: FontWeight.bold,
-          ),
-          h3: effectiveStyle.copyWith(
-            fontSize: (effectiveStyle.fontSize ?? 14) * 1.1,
-            fontWeight: FontWeight.bold,
-          ),
         ),
-        softLineBreak: true,
-        selectable: false,
-        shrinkWrap: true,
-      );
+        tableHead: effectiveStyle.copyWith(fontWeight: FontWeight.w700),
+        tableBody: effectiveStyle,
+        tableHeadAlign: TextAlign.center,
+        tableBorder: TableBorder.all(
+          color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0),
+          width: 1,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        tableColumnWidth: const FlexColumnWidth(),
+        tableCellsPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        tableCellsDecoration: BoxDecoration(
+          color: isDark ? const Color(0xFF18181B) : const Color(0xFFF8FAFC),
+        ),
+        h1: effectiveStyle.copyWith(
+          fontSize: (effectiveStyle.fontSize ?? 16) * 1.4,
+          fontWeight: FontWeight.bold,
+        ),
+        h2: effectiveStyle.copyWith(
+          fontSize: (effectiveStyle.fontSize ?? 16) * 1.25,
+          fontWeight: FontWeight.bold,
+        ),
+        h3: effectiveStyle.copyWith(
+          fontSize: (effectiveStyle.fontSize ?? 16) * 1.1,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      softLineBreak: true,
+      selectable: false,
+      shrinkWrap: true,
+    );
   }
 }
-

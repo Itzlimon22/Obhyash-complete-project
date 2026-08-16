@@ -283,19 +283,38 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     });
     try {
       final supabase = Supabase.instance.client;
-      final data = await supabase
+      dynamic data = await supabase
           .from('chapters')
           .select('id, name')
           .eq('subject_id', subjectId)
           .limit(200);
+
+      if (data == null || (data as List).isEmpty) {
+        final cleanId = subjectId.replaceAll('hsc_', '').replaceAll('ssc_', '');
+        data = await supabase
+            .from('chapters')
+            .select('id, name')
+            .or('subject_id.ilike.%$cleanId%,subject_id.ilike.%$subjectId%')
+            .limit(200);
+      }
+
       if (mounted) {
+        final rawList = ((data as List?) ?? [])
+            .map(
+              (e) =>
+                  ChapterItem(id: e['id'].toString(), name: e['name'] ?? ''),
+            )
+            .toList();
+
+        // Canonical textbook chapter sorting
+        rawList.sort((a, b) {
+          final idxA = BanglaNameHelper.getChapterSortIndex(a.name, a.id);
+          final idxB = BanglaNameHelper.getChapterSortIndex(b.name, b.id);
+          return idxA.compareTo(idxB);
+        });
+
         setState(() {
-          _chapters = (data as List)
-              .map(
-                (e) =>
-                    ChapterItem(id: e['id'].toString(), name: e['name'] ?? ''),
-              )
-              .toList();
+          _chapters = rawList;
         });
       }
     } catch (e) {
@@ -404,9 +423,11 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
     }
     setState(() => _isStarting = true);
 
+    final selectedSub = _subjects.firstWhere((s) => s.id == _selectedSubject);
+
     final config = ExamConfig(
-      subject: _subjects.firstWhere((s) => s.id == _selectedSubject).name,
-      subjectLabel: _subjects.firstWhere((s) => s.id == _selectedSubject).label,
+      subject: selectedSub.name,
+      subjectLabel: selectedSub.id,
       examType: _examTypes.join('+'),
       chapters: _chapters
           .where((c) => _selectedChapters.contains(c.id))

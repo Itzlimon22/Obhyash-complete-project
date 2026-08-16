@@ -1,204 +1,133 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import {
   Users,
   FileQuestion,
-  CheckCircle,
-  AlertTriangle,
-  Radio,
-  TrendingUp,
   Activity,
+  Radio,
   PlusCircle,
   UploadCloud,
   Layers,
   ArrowUpRight,
   ShieldCheck,
   Zap,
-  BarChart3,
-  Calendar,
-  BookOpen,
+  TrendingUp,
+  RefreshCw,
+  Crown,
+  AlertTriangle,
+  MessageSquare,
+  Sparkles,
 } from 'lucide-react';
-import { createClient } from '@/utils/supabase/client';
+import { SystemControlsCard, AppConfig } from '@/components/admin/dashboard/system-controls-card';
+import { UserSpotlightSearchBar } from '@/components/admin/dashboard/user-spotlight-modal';
+import { LearningTrendsChart } from '@/components/admin/dashboard/learning-trends-chart';
+import { ActionAlertsHub } from '@/components/admin/dashboard/action-alerts-hub';
 
-interface DashboardMetrics {
-  totalUsers: number;
-  totalQuestions: number;
-  totalExams: number;
-  activeLiveExams: number;
-  pendingReports: number;
-  todayExams: number;
+interface DashboardData {
+  metrics: {
+    totalUsers: number;
+    proUsers: number;
+    totalQuestions: number;
+    pendingQuestions: number;
+    totalExams: number;
+    todayExams: number;
+    yesterdayExams: number;
+    examGrowthPercent: number;
+    activeLiveExams: number;
+    pendingReports: number;
+    pendingComplaints: number;
+  };
+  analytics: {
+    topSubjects: Array<{ name: string; count: number }>;
+    topChapters: Array<{ name: string; count: number }>;
+    hourlyActivity: number[];
+    todayTotal: number;
+  };
+  systemControls: AppConfig;
+  lastUpdated?: string;
 }
 
 export default function AdminDashboardPage() {
-  const [metrics, setMetrics] = useState<DashboardMetrics>({
-    totalUsers: 0,
-    totalQuestions: 0,
-    totalExams: 0,
-    activeLiveExams: 0,
-    pendingReports: 0,
-    todayExams: 0,
-  });
+  const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadDashboardData() {
-      try {
-        // Try server-side admin stats API first
-        const apiRes = await fetch('/api/admin/stats');
-        if (apiRes.ok) {
-          const json = await apiRes.json();
-          if (json.success && json.data && isMounted) {
-            setMetrics(json.data);
-            setIsLoading(false);
-            return;
-          }
-        }
-
-        const supabase = createClient();
-        const todayStart = new Date();
-        todayStart.setHours(0, 0, 0, 0);
-
-        // Safe async query helpers with timeout protection
-        async function safeQuery<T>(promise: PromiseLike<T>, fallback: T, ms = 6000): Promise<T> {
-          let timer: any;
-          const timeout = new Promise<T>((resolve) => {
-            timer = setTimeout(() => resolve(fallback), ms);
-          });
-          try {
-            return await Promise.race([Promise.resolve(promise), timeout]);
-          } catch {
-            return fallback;
-          } finally {
-            clearTimeout(timer);
-          }
-        }
-
-        const getUsersCount = () =>
-          safeQuery(
-            supabase.from('users').select('*', { count: 'exact', head: true }).then((r) => r.count || 0),
-            0
-          );
-
-        const getQuestionsCount = () =>
-          safeQuery(
-            supabase.from('questions').select('*', { count: 'exact', head: true }).then((r) => r.count || 0),
-            0
-          );
-
-        const getExamsCount = () =>
-          safeQuery(
-            supabase.from('exam_results').select('*', { count: 'exact', head: true }).then((r) => r.count || 0),
-            0
-          );
-
-        const getTodayExamsCount = () =>
-          safeQuery(
-            supabase
-              .from('exam_results')
-              .select('*', { count: 'exact', head: true })
-              .gte('created_at', todayStart.toISOString())
-              .then((r) => r.count || 0),
-            0
-          );
-
-        const getLiveExamsCount = () =>
-          safeQuery(
-            supabase
-              .from('live_exams')
-              .select('*', { count: 'exact', head: true })
-              .eq('status', 'live')
-              .then((r) => r.count || 0),
-            0
-          );
-
-        const getReportsCount = () =>
-          safeQuery(
-            supabase
-              .from('reports')
-              .select('*', { count: 'exact', head: true })
-              .in('status', ['Pending', 'pending'])
-              .then((r) => r.count || 0),
-            0
-          );
-
-        const [
-          totalUsers,
-          totalQuestions,
-          totalExams,
-          todayExams,
-          activeLiveExams,
-          pendingReports,
-        ] = await Promise.all([
-          getUsersCount(),
-          getQuestionsCount(),
-          getExamsCount(),
-          getTodayExamsCount(),
-          getLiveExamsCount(),
-          getReportsCount(),
-        ]);
-
-        if (isMounted) {
-          setMetrics({
-            totalUsers,
-            totalQuestions,
-            totalExams,
-            todayExams,
-            activeLiveExams,
-            pendingReports,
-          });
-          setIsLoading(false);
-        }
-      } catch (err) {
-        console.error('Error loading admin dashboard metrics:', err);
-        if (isMounted) {
-          setIsLoading(false);
+  const fetchOverview = useCallback(async (forceRefresh = false) => {
+    if (forceRefresh) setIsRefreshing(true);
+    try {
+      const res = await fetch(
+        `/api/admin/dashboard-overview${forceRefresh ? '?refresh=true' : ''}`,
+      );
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          setData(json.data);
         }
       }
+    } catch (err) {
+      console.error('Failed to load dashboard overview:', err);
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
     }
-
-    loadDashboardData();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
+
+  useEffect(() => {
+    fetchOverview();
+  }, [fetchOverview]);
+
+  const metrics = data?.metrics || {
+    totalUsers: 0,
+    proUsers: 0,
+    totalQuestions: 0,
+    pendingQuestions: 0,
+    totalExams: 0,
+    todayExams: 0,
+    yesterdayExams: 0,
+    examGrowthPercent: 0,
+    activeLiveExams: 0,
+    pendingReports: 0,
+    pendingComplaints: 0,
+  };
 
   const statCards = [
     {
       title: 'মোট নিবন্ধিত শিক্ষার্থী',
       value: metrics.totalUsers,
-      subtext: 'সক্রিয় ইউজার বেস',
+      subtext: `${metrics.proUsers} জন প্রো/পেইড মেম্বার`,
       icon: Users,
       color: 'emerald',
       href: '/admin/user-management',
-      badge: 'Active Base',
+      badge: 'Active Students',
     },
     {
       title: 'প্রশ্ন ব্যাংক ভাণ্ডার',
       value: metrics.totalQuestions,
-      subtext: 'যাচাইকৃত বহুর্নির্বাচনী প্রশ্ন',
+      subtext: `${metrics.pendingQuestions} টি অনুমোদনের অপেক্ষায়`,
       icon: FileQuestion,
       color: 'blue',
       href: '/admin/question-management',
       badge: 'Verified MCQs',
     },
     {
-      title: 'মোট সম্পন্ন পরীক্ষা',
-      value: metrics.totalExams,
-      subtext: `আজকের সম্পন্ন: ${metrics.todayExams}`,
+      title: 'আজকের সম্পন্ন পরীক্ষা',
+      value: metrics.todayExams,
+      subtext: `মোট পরীক্ষা: ${metrics.totalExams.toLocaleString()}`,
+      growth: metrics.examGrowthPercent,
       icon: Activity,
       color: 'purple',
       href: '/admin/analytics',
-      badge: 'Live Submissions',
+      badge: 'Daily Submissions',
     },
     {
       title: 'লাইভ প্রতিযোগিতা',
       value: metrics.activeLiveExams,
-      subtext: metrics.activeLiveExams > 0 ? 'লাইভ চলছে' : 'বর্তমানে কোনো লাইভ নেই',
+      subtext:
+        metrics.activeLiveExams > 0
+          ? 'লাইভ সেশন সক্রিয় রয়েছে'
+          : 'বর্তমানে কোনো লাইভ নেই',
       icon: Radio,
       color: 'amber',
       href: '/admin/live-exams',
@@ -209,16 +138,16 @@ export default function AdminDashboardPage() {
   const quickShortcuts = [
     {
       title: 'নতুন প্রশ্ন যোগ করুন',
-      desc: 'প্রশ্ন ব্যাংকে একক প্রশ্ন তৈরি',
+      desc: 'LaTeX ও ডায়াগ্রাম দিয়ে একক প্রশ্ন তৈরি',
       icon: PlusCircle,
-      href: '/admin/question-management',
+      href: '/admin/questions/new',
       color: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
     },
     {
       title: 'বাল্ক প্রশ্ন আপলোড',
-      desc: 'JSON বা Excel ফাইল থেকে এক ক্লিকে আমদানি',
+      desc: 'এক ক্লিকে ৩০০০+ প্রশ্ন ও R2 ইমেজ আপলোড',
       icon: UploadCloud,
-      href: '/admin/question-management',
+      href: '/admin/questions/bulk-upload',
       color: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
     },
     {
@@ -239,42 +168,51 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-300">
-      {/* ── Top Header Bar ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-neutral-200 dark:border-zinc-800">
+      {/* ── Top Master Header Bar ── */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-neutral-200 dark:border-zinc-800">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase">
-              সুপার অ্যাডমিন কমান্ড সেন্টার
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase">
+              সুপার অ্যাডমিন কমান্ড সেন্টার • Master Control
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white tracking-tight">
             ড্যাশবোর্ড ওভারভিউ
           </h1>
-          <p className="text-xs sm:text-sm text-neutral-500 dark:text-zinc-400 mt-1">
-            অভ্যাস প্ল্যাটফর্মের সামগ্রিক পারফরম্যান্স, প্রশ্নভাণ্ডার এবং শিক্ষার্থী ট্র্যাকিং কন্ট্রোলার
+          <p className="text-xs sm:text-sm text-neutral-500 dark:text-zinc-400 mt-0.5">
+            অভ্যাস প্ল্যাটফর্মের রিয়েল-টাইম পারফরম্যান্স, শিক্ষার্থী ট্র্যাকিং ও এমার্জেন্সি কন্ট্রোলার
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/admin/question-management"
-            className="px-4 py-2.5 bg-[#004633] hover:bg-[#005a42] text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-emerald-950/20 flex items-center gap-2"
+        {/* Header Right: Instant User Search & Fast Actions */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <UserSpotlightSearchBar />
+
+          <button
+            onClick={() => fetchOverview(true)}
+            disabled={isRefreshing}
+            className="px-3.5 py-2 bg-neutral-100 dark:bg-zinc-800 hover:bg-neutral-200 dark:hover:bg-zinc-700 text-neutral-800 dark:text-zinc-200 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 border border-neutral-200 dark:border-zinc-700/60"
+            title="Force refresh database cache"
           >
-            <PlusCircle size={15} />
-            <span>প্রশ্ন যোগ করুন</span>
-          </Link>
-          <Link
-            href="/admin/live-exams"
-            className="px-4 py-2.5 bg-neutral-100 hover:bg-neutral-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-neutral-800 dark:text-zinc-200 text-xs font-bold rounded-xl transition-all border border-neutral-300/60 dark:border-zinc-700/60 flex items-center gap-2"
-          >
-            <Radio size={15} className="text-amber-500" />
-            <span>লাইভ এক্সাম কন্ট্রোলার</span>
-          </Link>
+            <RefreshCw
+              size={14}
+              className={isRefreshing ? 'animate-spin text-emerald-500' : ''}
+            />
+            <span>রিফ্রেশ</span>
+          </button>
         </div>
       </div>
 
-      {/* ── Key Metrics Grid ── */}
+      {/* ── Action Required Alert Center ── */}
+      <ActionAlertsHub
+        pendingQuestions={metrics.pendingQuestions}
+        pendingReports={metrics.pendingReports}
+        pendingComplaints={metrics.pendingComplaints}
+        activeLiveExams={metrics.activeLiveExams}
+      />
+
+      {/* ── Key Metrics Grid (4 Main Cards) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {statCards.map((card, idx) => {
           const Icon = card.icon;
@@ -294,18 +232,28 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="space-y-1">
-                <div className="text-3xl font-black text-neutral-900 dark:text-white font-mono">
+                <div className="text-3xl font-black text-neutral-900 dark:text-white font-mono flex items-baseline gap-2">
                   {isLoading ? (
                     <div className="h-8 w-20 bg-neutral-200 dark:bg-zinc-800 animate-pulse rounded-lg" />
                   ) : (
                     card.value.toLocaleString()
                   )}
+                  {card.growth !== undefined && card.growth !== 0 && (
+                    <span
+                      className={`text-xs font-bold font-sans flex items-center ${
+                        card.growth > 0 ? 'text-emerald-500' : 'text-rose-500'
+                      }`}
+                    >
+                      <TrendingUp size={12} className="mr-0.5" />
+                      {card.growth > 0 ? `+${card.growth}%` : `${card.growth}%`}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center justify-between pt-1">
-                  <span className="text-[11px] text-neutral-400 dark:text-zinc-500">
+                  <span className="text-[11px] text-neutral-400 dark:text-zinc-500 truncate pr-1">
                     {card.subtext}
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-zinc-400">
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-zinc-400 shrink-0">
                     {card.badge}
                   </span>
                 </div>
@@ -315,11 +263,29 @@ export default function AdminDashboardPage() {
         })}
       </div>
 
+      {/* ── Master Platform Controller & Live Broadcast ── */}
+      {data?.systemControls && (
+        <SystemControlsCard
+          initialConfig={data.systemControls}
+          onUpdate={() => fetchOverview(true)}
+        />
+      )}
+
+      {/* ── 24h Activity Graph & Top Learning Pulse ── */}
+      {data?.analytics && (
+        <LearningTrendsChart
+          hourlyActivity={data.analytics.hourlyActivity}
+          topSubjects={data.analytics.topSubjects}
+          topChapters={data.analytics.topChapters}
+          todayTotal={data.analytics.todayTotal}
+        />
+      )}
+
       {/* ── Quick Action Command Center ── */}
       <div className="space-y-4">
         <h2 className="text-base font-bold text-neutral-900 dark:text-zinc-100 flex items-center gap-2">
           <Zap size={16} className="text-amber-500" />
-          <span>কুইক অ্যাকশন শর্টকাট</span>
+          <span>কুইক ম্যানেজমেন্ট শর্টকাট</span>
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -332,7 +298,9 @@ export default function AdminDashboardPage() {
                 className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800/80 rounded-2xl p-4 sm:p-5 hover:border-emerald-500/40 hover:shadow-md transition-all group flex flex-col justify-between"
               >
                 <div className="flex items-start gap-3.5 mb-3">
-                  <div className={`p-2.5 rounded-xl border ${action.color} shrink-0`}>
+                  <div
+                    className={`p-2.5 rounded-xl border ${action.color} shrink-0`}
+                  >
                     <Icon size={20} />
                   </div>
                   <div>
@@ -354,9 +322,9 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* ── System Status & Live Modules ── */}
+      {/* ── Management Hub & Cloud Infrastructure Status ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Cols: Management Hub */}
+        {/* Left 2 Cols: Directory */}
         <div className="lg:col-span-2 bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800/80 rounded-2xl p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-extrabold text-neutral-900 dark:text-zinc-100 flex items-center gap-2">
@@ -419,35 +387,50 @@ export default function AdminDashboardPage() {
                 </span>
               </div>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/20">
-                {metrics.pendingReports} Pending
+                {metrics.pendingReports} Reports
               </span>
             </Link>
           </div>
         </div>
 
-        {/* Right 1 Col: Platform Health */}
+        {/* Right 1 Col: Platform Health & Cloud Infrastructure */}
         <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-zinc-800/80 rounded-2xl p-6 space-y-4 flex flex-col justify-between">
           <div>
             <h3 className="text-sm font-extrabold text-neutral-900 dark:text-zinc-100 flex items-center gap-2 mb-3">
               <ShieldCheck size={16} className="text-emerald-500" />
-              <span>নিরাপত্তা ও ডেটাবেজ স্থিতি</span>
+              <span>ক্লাউড অবকাঠামো স্থিতি (Infrastructure)</span>
             </h3>
             <p className="text-xs text-neutral-500 dark:text-zinc-400 leading-relaxed">
-              Supabase PostgreSQL ক্লাউড সিঙ্ক এবং Row Level Security (RLS) সক্রিয় রয়েছে। সমস্ত অ্যাডমিন অপারেশন সরাসরি ডেটাবেজে সংরক্ষিত হচ্ছে।
+              Supabase PostgreSQL ডাটাবেজ এবং Cloudflare R2 ইমেজ হোস্টিং সরাসরি সংযুক্ত রয়েছে।
             </p>
           </div>
 
-          <div className="space-y-2 pt-4 border-t border-neutral-100 dark:border-zinc-800">
+          <div className="space-y-2.5 pt-4 border-t border-neutral-100 dark:border-zinc-800">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-neutral-500 dark:text-zinc-400">ডাটাবেজ সংযোগ</span>
+              <span className="text-neutral-500 dark:text-zinc-400">
+                Supabase DB
+              </span>
               <span className="font-bold text-emerald-500 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                সক্রিয় (Healthy)
+                অনলাইন (Healthy)
               </span>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-neutral-500 dark:text-zinc-400">সুপার অ্যাডমিন সেশন</span>
-              <span className="font-bold text-neutral-800 dark:text-zinc-200">যাচাইকৃত (Active)</span>
+              <span className="text-neutral-500 dark:text-zinc-400">
+                Cloudflare R2 Storage
+              </span>
+              <span className="font-bold text-cyan-500 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+                সক্রিয় (Active)
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-neutral-500 dark:text-zinc-400">
+                ক্যাশ মেমোরি
+              </span>
+              <span className="font-bold text-neutral-800 dark:text-zinc-200">
+                45s Edge TTL
+              </span>
             </div>
           </div>
         </div>

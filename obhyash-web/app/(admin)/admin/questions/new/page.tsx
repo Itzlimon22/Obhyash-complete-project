@@ -23,6 +23,9 @@ import {
 } from '@/services/database';
 import { Question } from '@/lib/types';
 import { RichTextEditor } from '@/components/admin/questions/rich-text-editor';
+import { ImageUploader } from '@/components/admin/questions/image-uploader';
+import { InstituteWriterAutocomplete } from '@/components/admin/questions/institute-writer-autocomplete';
+import { MathRenderer } from '@/components/common/MathRenderer';
 
 type QuestionFormData = {
   question: string;
@@ -422,15 +425,26 @@ export default function NewQuestionPage() {
           {/* Editor */}
           <div className="space-y-6">
             {/* Question */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Question *
-              </label>
-              <RichTextEditor
-                value={formData.question}
-                onChange={(val) => handleChange('question', val)}
-                placeholder="Enter your question (supports LaTeX and formatting)..."
-              />
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Question *
+                </label>
+                <RichTextEditor
+                  value={formData.question}
+                  onChange={(val) => handleChange('question', val)}
+                  placeholder="Enter your question (supports LaTeX and formatting)..."
+                />
+              </div>
+
+              {/* Question Diagram/Image Upload */}
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                <ImageUploader
+                  value={formData.imageUrl}
+                  onChange={(url) => handleChange('imageUrl', url)}
+                  label="Question Diagram / Image (Optional)"
+                />
+              </div>
             </div>
 
             {/* Options */}
@@ -440,55 +454,98 @@ export default function NewQuestionPage() {
                   Options *
                 </label>
                 <button
+                  type="button"
                   onClick={addOption}
-                  className="flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700"
+                  className="flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700 font-semibold"
                 >
                   <Plus className="w-4 h-4" /> Add Option
                 </button>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {formData.options.map((option, idx) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    <button
-                      onClick={() => toggleCorrectAnswer(idx)}
-                      className={`p-2 rounded-full transition ${formData.correctAnswerIndices.includes(idx) ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-slate-600'}`}
-                    >
-                      <CheckCircle className="w-4 h-4" />
-                    </button>
-                    <div className="flex-1 w-full relative">
-                      <RichTextEditor
-                        value={option}
-                        onChange={(val) => handleOptionChange(idx, val)}
-                        placeholder={`Option ${idx + 1}`}
+                  <div
+                    key={idx}
+                    className="p-3.5 bg-slate-50/70 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700/80 rounded-xl space-y-2.5"
+                  >
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleCorrectAnswer(idx)}
+                        className={`p-2 rounded-full transition flex-shrink-0 ${
+                          formData.correctAnswerIndices.includes(idx)
+                            ? 'bg-emerald-500 text-white shadow-sm'
+                            : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
+                        }`}
+                        title={
+                          formData.correctAnswerIndices.includes(idx)
+                            ? 'Correct Answer'
+                            : 'Mark as Correct Answer'
+                        }
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                      </button>
+                      <div className="flex-1 w-full relative">
+                        <RichTextEditor
+                          value={option}
+                          onChange={(val) => handleOptionChange(idx, val)}
+                          placeholder={`Option ${String.fromCharCode(65 + idx)} text (LaTeX supported)...`}
+                        />
+                      </div>
+                      {formData.options.length > 2 && (
+                        <button
+                          type="button"
+                          onClick={() => removeOption(idx)}
+                          className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
+                          title="Remove this option"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Compact Option Image Attachment */}
+                    <div className="pl-11 flex items-center justify-between">
+                      <ImageUploader
+                        compact
+                        value={formData.optionImages?.[idx] || ''}
+                        onChange={(url) => {
+                          const newOptImgs = [...(formData.optionImages || [])];
+                          newOptImgs[idx] = url;
+                          setFormData((prev) => ({
+                            ...prev,
+                            optionImages: newOptImgs,
+                          }));
+                        }}
                       />
                     </div>
-                    {formData.options.length > 2 && (
-                      <button
-                        onClick={() => removeOption(idx)}
-                        className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
                   </div>
                 ))}
               </div>
-              <p className="mt-2 text-xs text-slate-500">
-                Click checkmark to mark correct answer(s). Multiple can be
-                selected.
+              <p className="mt-3 text-xs text-slate-500">
+                Click the checkmark circle to mark correct answer(s).
               </p>
             </div>
 
             {/* Explanation */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Explanation (Optional)
-              </label>
-              <RichTextEditor
-                value={formData.explanation}
-                onChange={(val) => handleChange('explanation', val)}
-                placeholder="Enter explanation (supports LaTeX and formatting)..."
-              />
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Explanation (Optional)
+                </label>
+                <RichTextEditor
+                  value={formData.explanation}
+                  onChange={(val) => handleChange('explanation', val)}
+                  placeholder="Enter explanation (supports LaTeX and formatting)..."
+                />
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                <ImageUploader
+                  value={formData.explanationImageUrl}
+                  onChange={(url) => handleChange('explanationImageUrl', url)}
+                  label="Explanation Diagram / Solution Image (Optional)"
+                />
+              </div>
             </div>
 
             {/* Metadata with Dropdowns */}
@@ -610,22 +667,13 @@ export default function NewQuestionPage() {
                   </select>
                 </div>
 
-                {/* Institutes */}
+                {/* Institutes & Textbook Writers with Auto-complete Chips */}
                 <div className="col-span-2">
-                  <label className="block text-xs text-slate-500 mb-1">
-                    Institutes (comma separated)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Dhaka College, Rajuk College"
-                    value={formData.institutes.join(', ')}
-                    onChange={(e) =>
-                      handleChange(
-                        'institutes',
-                        e.target.value.split(',').map((s) => s.trim()),
-                      )
+                  <InstituteWriterAutocomplete
+                    value={formData.institutes}
+                    onChange={(items) =>
+                      setFormData((prev) => ({ ...prev, institutes: items }))
                     }
-                    className={selectClassName}
                   />
                 </div>
 
@@ -690,57 +738,91 @@ export default function NewQuestionPage() {
                     </span>
                   </div>
 
-                  {/* Question Text */}
-                  <p className="text-lg font-medium text-slate-900 dark:text-white mb-6 whitespace-pre-wrap">
-                    {formData.question || 'Your question will appear here...'}
-                  </p>
+                  {/* Question Text with LaTeX & Image */}
+                  <div className="text-lg font-medium text-slate-900 dark:text-white mb-4">
+                    <MathRenderer
+                      text={
+                        formData.question || 'Your question will appear here...'
+                      }
+                    />
+                  </div>
+
+                  {formData.imageUrl && (
+                    <div className="mb-6 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 max-h-64 bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-2">
+                      <img
+                        src={formData.imageUrl}
+                        alt="Question Diagram"
+                        className="max-h-60 object-contain rounded"
+                      />
+                    </div>
+                  )}
 
                   {/* Options */}
                   <div className="space-y-3">
                     {formData.options
                       .filter((o) => o.trim())
-                      .map((opt, idx) => (
-                        <div
-                          key={idx}
-                          className={`p-4 rounded-lg border-2 transition ${
-                            formData.correctAnswerIndices.includes(idx)
-                              ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
-                              : 'border-slate-200 dark:border-slate-600'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span
-                              className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold ${
-                                formData.correctAnswerIndices.includes(idx)
-                                  ? 'bg-emerald-500 text-white'
-                                  : 'bg-slate-200 dark:bg-slate-600'
-                              }`}
-                            >
-                              {String.fromCharCode(65 + idx)}
-                            </span>
-                            <span
-                              className={
-                                formData.correctAnswerIndices.includes(idx)
-                                  ? 'font-medium text-emerald-700 dark:text-emerald-300'
-                                  : ''
-                              }
-                            >
-                              {opt}
-                            </span>
+                      .map((opt, idx) => {
+                        const isCorrect =
+                          formData.correctAnswerIndices.includes(idx);
+                        const optImg = formData.optionImages?.[idx];
+
+                        return (
+                          <div
+                            key={idx}
+                            className={`p-4 rounded-xl border-2 transition ${
+                              isCorrect
+                                ? 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/30 shadow-sm'
+                                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-850'
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <span
+                                className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold flex-shrink-0 mt-0.5 ${
+                                  isCorrect
+                                    ? 'bg-emerald-500 text-white'
+                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                                }`}
+                              >
+                                {String.fromCharCode(65 + idx)}
+                              </span>
+                              <div className="flex-1 text-sm font-medium">
+                                <MathRenderer text={opt} />
+                                {optImg && (
+                                  <div className="mt-2">
+                                    <img
+                                      src={optImg}
+                                      alt={`Option ${String.fromCharCode(65 + idx)}`}
+                                      className="h-20 object-contain rounded border border-slate-200 dark:border-slate-700 bg-white p-1"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                   </div>
 
                   {/* Explanation */}
-                  {formData.explanation && (
-                    <div className="mt-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                      <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200 mb-2">
+                  {(formData.explanation || formData.explanationImageUrl) && (
+                    <div className="mt-6 p-4 bg-amber-50/50 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-900/40">
+                      <p className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider mb-2">
                         Explanation
                       </p>
-                      <p className="text-sm text-emerald-700 dark:text-emerald-300 whitespace-pre-wrap">
-                        {formData.explanation}
-                      </p>
+                      {formData.explanation && (
+                        <div className="text-sm text-slate-800 dark:text-slate-200">
+                          <MathRenderer text={formData.explanation} />
+                        </div>
+                      )}
+                      {formData.explanationImageUrl && (
+                        <div className="mt-3 rounded-lg overflow-hidden border border-amber-200 dark:border-amber-900 bg-white p-1 max-h-48 flex items-center justify-center">
+                          <img
+                            src={formData.explanationImageUrl}
+                            alt="Explanation Diagram"
+                            className="max-h-44 object-contain rounded"
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
 

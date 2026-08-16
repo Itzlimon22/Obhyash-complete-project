@@ -130,38 +130,55 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           ? null
           : config.examType.split('+').map((e) => e.trim()).toList();
 
+      // Generate all possible subject spellings/encodings (e.g. য় vs য+়, slug, label)
+      final subjectVariants = <String>{};
+      subjectVariants.add(config.subject);
+      if (config.subjectLabel.isNotEmpty) {
+        subjectVariants.add(config.subjectLabel);
+      }
+      for (final s in subjectVariants.toList()) {
+        subjectVariants.add(s.replaceAll('\u09df', '\u09af\u09bc')); // য় -> য+়
+        subjectVariants.add(s.replaceAll('\u09af\u09bc', '\u09df')); // য+় -> য়
+        subjectVariants.add(s.replaceAll('২য়', '২য়'));
+        subjectVariants.add(s.replaceAll('২য়', '২য়'));
+        subjectVariants.add(s.replaceAll('১ম', '১ম'));
+      }
+
       List<Question> generatedQuestions = [];
 
-      // 1. Try distributed RPC
-      try {
-        final data = await supabase.rpc(
-          'get_distributed_exam_questions',
-          params: {
-            'p_user_id': supabase.auth.currentUser?.id,
-            'p_subject': config.subject,
-            'p_subject_name': config.subjectLabel,
-            'p_total': config.questionCount,
-            'p_chapters': chaptersList,
-            'p_topics': topicsList,
-            'p_difficulties': difficultiesList,
-            'p_exam_types': examTypesList,
-          },
-        );
-        final qList = (data as List<dynamic>?) ?? [];
-        if (qList.isNotEmpty) {
-          final parsed = qList
-              .map((e) => Question.fromJson(e as Map<String, dynamic>))
-              .toList();
-          generatedQuestions = OfflineQuestionBankService.balanceQuestionsByChapter(
-            parsed,
-            config.questionCount,
-            chaptersList,
+      // 1. Try distributed RPC across subject variants
+      for (final sVar in subjectVariants) {
+        if (generatedQuestions.isNotEmpty) break;
+        try {
+          final data = await supabase.rpc(
+            'get_distributed_exam_questions',
+            params: {
+              'p_user_id': supabase.auth.currentUser?.id,
+              'p_subject': sVar,
+              'p_subject_name': sVar,
+              'p_total': config.questionCount,
+              'p_chapters': chaptersList,
+              'p_topics': topicsList,
+              'p_difficulties': difficultiesList,
+              'p_exam_types': examTypesList,
+            },
+          );
+          final qList = (data as List<dynamic>?) ?? [];
+          if (qList.isNotEmpty) {
+            final parsed = qList
+                .map((e) => Question.fromJson(e as Map<String, dynamic>))
+                .toList();
+            generatedQuestions = OfflineQuestionBankService.balanceQuestionsByChapter(
+              parsed,
+              config.questionCount,
+              chaptersList,
+            );
+          }
+        } catch (rpcErr) {
+          debugPrint(
+            '[ExamProvider] RPC get_distributed_exam_questions error for $sVar: $rpcErr',
           );
         }
-      } catch (rpcErr) {
-        debugPrint(
-          '[ExamProvider] RPC get_distributed_exam_questions error: $rpcErr',
-        );
       }
 
       // 2. Fallback: Direct query from questions table
@@ -173,7 +190,7 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
           var query = supabase
               .from('questions')
               .select('*')
-              .eq('subject', config.subject);
+              .inFilter('subject', subjectVariants.toList());
 
           if (chaptersList != null && chaptersList.isNotEmpty) {
             query = query.inFilter('chapter', chaptersList);

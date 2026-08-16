@@ -126,6 +126,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => _fadeRoute(const SignupView(), state),
       ),
       GoRoute(
+        path: '/dashboard',
+        parentNavigatorKey: _rootNavigatorKey,
+        redirect: (context, state) => '/',
+      ),
+      GoRoute(
         path: '/exam',
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) =>
