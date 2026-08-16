@@ -220,11 +220,13 @@ export async function autoAssignQuestionsToLiveExam(
     .select("id")
     .or("status.eq.Approved,status.eq.published");
 
-  if (subject) query = query.eq("subject", subject);
-  if (chapter) query = query.eq("chapter", chapter);
+  if (subject) {
+    query = query.or(`subject.eq.${subject},subject_id.eq.${subject},subject.ilike.%${subject}%`);
+  }
+  if (chapter) query = query.ilike("chapter", `%${chapter}%`);
   if (difficulty) query = query.eq("difficulty", difficulty);
 
-  const { data: candidates, error } = await query.limit(100);
+  const { data: candidates, error } = await query.limit(200);
 
   if (error) {
     console.error("Error fetching candidate questions for auto-assign:", error);
@@ -284,7 +286,10 @@ export async function getLiveExamLeaderboard(examId: string): Promise<any[]> {
       `
       *,
       users (
+        id,
         name,
+        email,
+        phone,
         avatarUrl:avatar_url,
         avatarColor:avatar_color,
         institute
@@ -302,4 +307,27 @@ export async function getLiveExamLeaderboard(examId: string): Promise<any[]> {
   }
 
   return data;
+}
+
+export async function resetLiveExamAttempt(attemptId: string): Promise<void> {
+  const { error } = await supabase
+    .from("live_exam_attempts")
+    .delete()
+    .eq("id", attemptId);
+
+  if (error) {
+    console.error("Error resetting live exam attempt:", error);
+    throw error;
+  }
+}
+
+export async function getLiveExamOngoingCount(examId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from("live_exam_attempts")
+    .select("id", { count: "exact", head: true })
+    .eq("live_exam_id", examId)
+    .eq("status", "ongoing");
+
+  if (error) return 0;
+  return count || 0;
 }

@@ -15,77 +15,36 @@ class LiveExamSlider extends ConsumerWidget {
     final liveExamsAsync = ref.watch(dashboardLiveExamsProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final displayExams = liveExamsAsync.when(
-      data: (exams) => exams.isNotEmpty ? exams : _getDemoExams(),
-      loading: () => _getDemoExams(),
-      error: (_, _) => _getDemoExams(),
-    );
+    return liveExamsAsync.when(
+      data: (exams) {
+        if (exams.isEmpty) {
+          return const SizedBox.shrink();
+        }
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 8, bottom: 0),
-      child: CarouselSlider(
-        options: CarouselOptions(
-          height: 155.0,
-          autoPlay: displayExams.length > 1,
-          autoPlayInterval: const Duration(seconds: 5),
-          enlargeCenterPage: true,
-          viewportFraction: 0.92,
-          aspectRatio: 2.3,
-        ),
-        items: displayExams.map((exam) {
-          return Builder(
-            builder: (BuildContext context) {
-              return _buildExamCard(context, exam, isDark);
-            },
-          );
-        }).toList(),
-      ),
+        return Padding(
+          padding: const EdgeInsets.only(top: 8, bottom: 0),
+          child: CarouselSlider(
+            options: CarouselOptions(
+              height: 155.0,
+              autoPlay: exams.length > 1,
+              autoPlayInterval: const Duration(seconds: 5),
+              enlargeCenterPage: true,
+              viewportFraction: 0.92,
+              aspectRatio: 2.3,
+            ),
+            items: exams.map((exam) {
+              return Builder(
+                builder: (BuildContext context) {
+                  return _buildExamCard(context, exam, isDark);
+                },
+              );
+            }).toList(),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
-  }
-
-  static List<LiveExam> _getDemoExams() {
-    final now = DateTime.now();
-    return [
-      LiveExam(
-        id: 'demo-1',
-        title: 'HSC পদার্থবিজ্ঞান ১ম পত্র পূর্ণাঙ্গ লাইভ মক',
-        description: 'অধ্যায় ১-১০ সমন্বিত স্পেশাল মডেল টেস্ট',
-        startTime: now.subtract(const Duration(minutes: 30)),
-        endTime: now.add(const Duration(hours: 3)),
-        durationMinutes: 45,
-        totalQuestions: 50,
-        totalMarks: 50,
-        negativeMarking: 0.25,
-        status: 'published',
-        category: 'HSC',
-      ),
-      LiveExam(
-        id: 'demo-2',
-        title: 'SSC সাধারণ গণিত ও বিজ্ঞান মডেল টেস্ট',
-        description: 'বীজগাণিতিক রাশি, গতি ও বল সমন্বিত স্পেশাল টেস্ট',
-        startTime: now.add(const Duration(hours: 4)),
-        endTime: now.add(const Duration(hours: 9)),
-        durationMinutes: 40,
-        totalQuestions: 40,
-        totalMarks: 40,
-        negativeMarking: 0.25,
-        status: 'published',
-        category: 'SSC Science',
-      ),
-      LiveExam(
-        id: 'demo-3',
-        title: 'HSC রসায়ন ২য় পত্র: জৈব রসায়ন স্পেশাল এক্সাম',
-        description: 'জৈব যৌগ ও পরিবেশ রসায়ন অধ্যায়ভিত্তিক পরীক্ষা',
-        startTime: now.add(const Duration(days: 1, hours: 2)),
-        endTime: now.add(const Duration(days: 1, hours: 6)),
-        durationMinutes: 30,
-        totalQuestions: 30,
-        totalMarks: 30,
-        negativeMarking: 0.25,
-        status: 'published',
-        category: 'HSC Science',
-      ),
-    ];
   }
 
   Widget _buildExamCard(BuildContext context, LiveExam exam, bool isDark) {

@@ -54,42 +54,6 @@ export async function getStudentLiveExamDetails(
   examId: string,
   userId: string
 ): Promise<{ exam: LiveExam; attempt: LiveExamAttempt | null }> {
-  if (examId.startsWith("mock-")) {
-    const isTaken = examId.includes("mock-taken");
-    const categoryTitle = examId.replace("mock-untaken-", "").replace("mock-taken-", "");
-    const now = Date.now();
-    return {
-      exam: {
-        id: examId,
-        category: categoryTitle,
-        title: `[Mock] ${categoryTitle} - ${isTaken ? 'Taken' : 'Untaken'}`,
-        description: "This is a mock exam for testing.",
-        start_time: new Date(now - 1000 * 60 * 60 * (isTaken ? 48 : 24)).toISOString(),
-        end_time: new Date(now + 1000 * 60 * 60 * 24 * 7).toISOString(),
-        duration_minutes: isTaken ? 60 : 45,
-        total_marks: isTaken ? 100 : 50,
-        negative_marking: 0.25,
-        status: "published",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        created_by: "system",
-        total_questions: isTaken ? 100 : 50,
-      },
-      attempt: isTaken ? {
-        id: "mock-attempt-1",
-        live_exam_id: examId,
-        user_id: userId,
-        status: "submitted",
-        score: 85,
-        correct_count: 85,
-        wrong_count: 0,
-        user_answers: {},
-        start_time: new Date(now - 1000 * 60 * 60).toISOString(),
-        submit_time: new Date(now - 1000 * 60 * 30).toISOString(),
-      } as LiveExamAttempt : null
-    };
-  }
-
   // Fetch exam
   const { data: examData, error: examError } = await supabase
     .from("live_exams")
@@ -131,22 +95,6 @@ export async function startLiveExam(
   examId: string,
   userId: string
 ): Promise<{ attemptId: string; questions: Question[] }> {
-  if (examId.startsWith("mock-")) {
-    const mockQuestions: Question[] = Array(5).fill(0).map((_, i) => ({
-      id: `mock-q-${i}`,
-      question: `<p>Mock question ${i + 1} for this exam</p>`,
-      options: ["Option A", "Option B", "Option C", "Option D"],
-      correctAnswerIndex: 0,
-      points: 10,
-      subject: "Mock Subject",
-      chapter: "Mock Chapter",
-      topic: "Mock Topic",
-      difficulty: "medium",
-      examType: "live",
-      status: "published",
-    } as unknown as Question));
-    return { attemptId: `mock-attempt-${Date.now()}`, questions: mockQuestions };
-  }
 
   // 1. Create or get existing "ongoing" attempt
   const { data: attemptData, error: attemptError } = await supabase

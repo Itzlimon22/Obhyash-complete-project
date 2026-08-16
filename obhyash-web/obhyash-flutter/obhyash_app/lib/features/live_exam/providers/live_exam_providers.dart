@@ -104,49 +104,6 @@ final liveExamsProvider = FutureProvider.autoDispose<List<LiveExam>>((
     }
   }
 
-  // Adding mock exams for visual testing just like the web app
-  final now = DateTime.now();
-  final isHSC = category.toLowerCase().contains('hsc') || category.contains('এইচএসসি');
-
-  exams.addAll([
-    LiveExam(
-      id: 'mock-untaken-$category',
-      category: category,
-      title: isHSC
-          ? 'পদার্থবিজ্ঞান ১ম পত্র: অধ্যায় ২ (ভেক্টর) ও অধ্যায় ৩ (গতিবিদ্যা)'
-          : 'পদার্থবিজ্ঞান: অধ্যায় ২ (গতি) ও অধ্যায় ৩ (বল)',
-      description: isHSC
-          ? 'HSC বোর্ড পরীক্ষার স্ট্যান্ডার্ড অধ্যায়ভিত্তিক পূর্ণাঙ্গ লাইভ মডেল টেস্ট।'
-          : 'SSC বোর্ড পরীক্ষার পূর্ণাঙ্গ প্রস্তুতিমূলক বিশেষ লাইভ টেস্ট।',
-      startTime: now.subtract(const Duration(days: 1)),
-      endTime: now.add(const Duration(days: 7)),
-      durationMinutes: 45,
-      totalQuestions: 50,
-      totalMarks: 50,
-      negativeMarking: 0.25,
-      status: 'published',
-      userAttemptStatus: null,
-    ),
-    LiveExam(
-      id: 'mock-taken-$category',
-      category: category,
-      title: isHSC
-          ? 'রসায়ন ১ম পত্র: গুণগত রসায়ন ও পর্যায়বৃত্ত ধর্ম'
-          : 'সাধারণ গণিত: অধ্যায় ২ (সেট ও ফাংশন) ও অধ্যায় ৩',
-      description: isHSC
-          ? 'HSC বোর্ড ভিত্তিক গুণগত রসায়ন ও পর্যায়বৃত্ত ধর্ম স্পেশাল মডেল টেস্ট।'
-          : 'SSC বোর্ড স্ট্যান্ডার্ড বীজগাণিতিক রাশি ও ফাংশন লাইভ টেস্ট।',
-      startTime: now.subtract(const Duration(days: 2)),
-      endTime: now.add(const Duration(days: 7)),
-      durationMinutes: 60,
-      totalQuestions: 100,
-      totalMarks: 100,
-      negativeMarking: 0.25,
-      status: 'published',
-      userAttemptStatus: 'submitted',
-    ),
-  ]);
-
   return exams;
 });
 
@@ -172,7 +129,7 @@ final filteredLiveExamsProvider = Provider.autoDispose<List<LiveExam>>((ref) {
       }).toList();
     },
     loading: () => [],
-    error: (_, __) => [],
+    error: (_, _) => [],
   );
 });
 
@@ -181,44 +138,6 @@ final liveExamDetailsProvider = FutureProvider.autoDispose.family<
     ({LiveExam exam, LiveExamAttempt? attempt}), String>((ref, examId) async {
   final supabase = Supabase.instance.client;
   final user = supabase.auth.currentUser;
-
-  if (examId.startsWith('mock-')) {
-    final isTaken = examId.contains('mock-taken');
-    final category = examId.replaceAll('mock-untaken-', '').replaceAll('mock-taken-', '');
-    final now = DateTime.now();
-
-    final mockExam = LiveExam(
-      id: examId,
-      category: category,
-      title: '[Mock] $category - ${isTaken ? 'Taken' : 'Untaken'}',
-      description: 'This is a mock exam for testing.',
-      startTime: now.subtract(Duration(hours: isTaken ? 48 : 24)),
-      endTime: now.add(const Duration(days: 7)),
-      durationMinutes: isTaken ? 60 : 45,
-      totalQuestions: isTaken ? 100 : 50,
-      totalMarks: isTaken ? 100 : 50,
-      negativeMarking: 0.25,
-      status: 'published',
-      userAttemptStatus: isTaken ? 'submitted' : null,
-    );
-
-    final mockAttempt = isTaken
-        ? LiveExamAttempt(
-            id: 'mock-attempt-1',
-            liveExamId: examId,
-            userId: user?.id ?? 'mock-user',
-            status: 'submitted',
-            score: 85,
-            correctCount: 85,
-            wrongCount: 0,
-            userAnswers: {},
-            startTime: now.subtract(const Duration(hours: 1)),
-            submitTime: now.subtract(const Duration(minutes: 30)),
-          )
-        : null;
-
-    return (exam: mockExam, attempt: mockAttempt);
-  }
 
   // 1. Fetch Exam
   final examData = await supabase
@@ -250,66 +169,6 @@ final liveExamDetailsProvider = FutureProvider.autoDispose.family<
 // Questions for Live Exam Engine
 final liveExamQuestionsProvider =
     FutureProvider.autoDispose.family<List<Question>, String>((ref, examId) async {
-  if (examId.startsWith('mock-')) {
-    return [
-      Question(
-        id: 'mock-q-0',
-        subject: 'পদার্থবিজ্ঞান',
-        chapter: 'ভৌত জগত ও পরিমাপ',
-        question: 'নিচের কোন বলটি প্রকৃতির সবচেয়ে শক্তিশালী মৌলিক বল?',
-        explanation: 'প্রকৃতির চারটি মৌলিক বলের মধ্যে সবল নিউক্লীয় বল সবচেয়ে শক্তিশালী।',
-        options: [
-          'সবল নিউক্লীয় বল',
-          'তড়িৎ চৌম্বক বল',
-          'দুর্বল নিউক্লীয় বল',
-          'মহাকর্ষ বল'
-        ],
-        correctAnswerIndex: 0,
-        points: 1,
-      ),
-      Question(
-        id: 'mock-q-1',
-        subject: 'পদার্থবিজ্ঞান',
-        chapter: 'গতিবিদ্যা',
-        question: 'একটি বস্তুকে খাড়া উপরের দিকে 49 m/s বেগে নিক্ষেপ করলে এটি সর্বোচ্চ কত উচ্চতায় পৌঁছাবে?',
-        explanation: 'সর্বোচ্চ উচ্চতা H = u² / (2g) = 122.5 m।',
-        options: ['122.5 m', '245 m', '98 m', '49 m'],
-        correctAnswerIndex: 0,
-        points: 1,
-      ),
-      Question(
-        id: 'mock-q-2',
-        subject: 'জীববিজ্ঞান',
-        chapter: 'রক্ত ও সংবহন',
-        question: 'মানবদেহের স্বাভাবিক রক্তচাপ কত?',
-        explanation: 'স্বাভাবিক সিস্টোলিক ১২০ ও ডায়াস্টোলিক ৮০ mmHg।',
-        options: ['120/80 mmHg', '140/90 mmHg', '100/70 mmHg', '130/85 mmHg'],
-        correctAnswerIndex: 0,
-        points: 1,
-      ),
-      Question(
-        id: 'mock-q-3',
-        subject: 'উচ্চতর গণিত',
-        chapter: 'অন্তরীকরণ',
-        question: 'lim (x->0) (sin 5x / x) এর মান কত?',
-        explanation: 'মান হবে 5।',
-        options: ['5', '1', '0', 'অসীম'],
-        correctAnswerIndex: 0,
-        points: 1,
-      ),
-      Question(
-        id: 'mock-q-4',
-        subject: 'রসায়ন',
-        chapter: 'পর্যায়বৃত্ত ধর্ম ও রাসায়নিক বন্ধন',
-        question: 'নিচের কোন যৌগে sp² সংকরায়ণ বিদ্যমান?',
-        explanation: 'ইথিন (C₂H₄) অণুতে sp² সংকরায়ণ ঘটে।',
-        options: ['C₂H₄ (ইথিন)', 'CH₄ (মিথেন)', 'C₂H₂ (ইথাইন)', 'C₂H₆ (ইথেন)'],
-        correctAnswerIndex: 0,
-        points: 1,
-      ),
-    ];
-  }
-
   final supabase = Supabase.instance.client;
   final res = await supabase
       .from('live_exam_questions')
@@ -330,61 +189,6 @@ final liveExamQuestionsProvider =
 // Leaderboard Provider
 final liveExamLeaderboardProvider = FutureProvider.autoDispose
     .family<List<LiveExamLeaderboardEntry>, String>((ref, examId) async {
-  if (examId.startsWith('mock-')) {
-    return [
-      LiveExamLeaderboardEntry(
-        id: 'lb-1',
-        score: 95,
-        correctCount: 95,
-        wrongCount: 0,
-        userName: 'রাকিবুল হাসান',
-        userInstitute: 'ঢাকা কলেজ',
-        avatarColor: '#f59e0b',
-        submitTime: DateTime.now().subtract(const Duration(minutes: 20)),
-      ),
-      LiveExamLeaderboardEntry(
-        id: 'lb-2',
-        score: 85,
-        correctCount: 85,
-        wrongCount: 0,
-        userName: 'সাদিয়া আক্তার',
-        userInstitute: 'ভিকারুননিসা নূন স্কুল ও কলেজ',
-        avatarColor: '#10b981',
-        submitTime: DateTime.now().subtract(const Duration(minutes: 30)),
-      ),
-      LiveExamLeaderboardEntry(
-        id: 'lb-3',
-        score: 80,
-        correctCount: 82,
-        wrongCount: 8,
-        userName: 'তানভীর আহমেদ',
-        userInstitute: 'নটর ডেম কলেজ',
-        avatarColor: '#3b82f6',
-        submitTime: DateTime.now().subtract(const Duration(minutes: 40)),
-      ),
-      LiveExamLeaderboardEntry(
-        id: 'lb-4',
-        score: 76.25,
-        correctCount: 78,
-        wrongCount: 7,
-        userName: 'মেহজাবিন চৌধুরী',
-        userInstitute: 'রাজউক উত্তরা মডেল কলেজ',
-        avatarColor: '#8b5cf6',
-        submitTime: DateTime.now().subtract(const Duration(minutes: 45)),
-      ),
-      LiveExamLeaderboardEntry(
-        id: 'lb-5',
-        score: 72.5,
-        correctCount: 75,
-        wrongCount: 10,
-        userName: 'আহনাফ রহমান',
-        userInstitute: 'আইডিয়াল কলেজ',
-        avatarColor: '#ec4899',
-        submitTime: DateTime.now().subtract(const Duration(minutes: 50)),
-      ),
-    ];
-  }
-
   final supabase = Supabase.instance.client;
   final data = await supabase
       .from('live_exam_attempts')
