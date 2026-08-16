@@ -12,18 +12,35 @@ import { useAuth } from '@/components/auth/AuthProvider';
  *
  * @returns An object containing user data, loading states, filter controls, and action handlers.
  */
+const USERS_CACHE_KEY = 'obhyash_admin_users_cache';
+
+function getInitialCachedUsers(): { users: User[]; totalUsers: number } | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = sessionStorage.getItem(USERS_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && Array.isArray(parsed.users) && parsed.users.length > 0) {
+      return parsed;
+    }
+  } catch {}
+  return null;
+}
+
 export function useUserManagement() {
   const { user } = useAuth();
+  const initialCache = getInitialCachedUsers();
+
   // --- State Management ---
 
   /** Full list of users fetched from the database */
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>(() => initialCache?.users || []);
 
   /** Filtered list of users based on search and filter criteria */
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>(() => initialCache?.users || []);
 
   /** Loading state for initial fetch */
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => !initialCache);
 
   /** Loading state for manual refresh */
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -31,7 +48,7 @@ export function useUserManagement() {
   // Pagination State
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
-  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalUsers, setTotalUsers] = useState(() => initialCache?.totalUsers || 0);
 
   /** Search query string (name, email, phone) */
   const [searchQuery, setSearchQuery] = useState('');
@@ -216,6 +233,15 @@ export function useUserManagement() {
 
       setFilteredUsers(clientFiltered);
       if (count !== null) setTotalUsers(count);
+
+      if (page === 1 && searchQuery === '' && roleFilter === 'all' && statusFilter === 'all') {
+        try {
+          sessionStorage.setItem(
+            USERS_CACHE_KEY,
+            JSON.stringify({ users: mappedUsers, totalUsers: count || mappedUsers.length }),
+          );
+        } catch {}
+      }
 
       if (showToast) toast.success('Users refreshed successfully');
     } catch (error) {

@@ -1,1 +1,117 @@
-[]
+[
+  {
+    "title": "ডিগ্রি ও রেডিয়ানের সম্পর্ক",
+    "latex": "\\frac{D}{180} = \\frac{R}{\\pi}",
+    "description": "ডিগ্রি (D) এবং রেডিয়ান (R) এর মধ্যে রূপান্তরের সূত্র। মনে রাখতে হবে, 1 রেডিয়ান ≈ 57.29° এবং π রেডিয়ান = 180°।"
+  },
+  {
+    "title": "বৃত্তচাপের দৈর্ঘ্য ও বৃত্তকলার ক্ষেত্রফল",
+    "latex": "s = r\\theta, \\quad \\text{Area} = \\frac{1}{2}r^2\\theta = \\frac{1}{2}rs",
+    "description": "r ব্যাসার্ধের বৃত্তে s দৈর্ঘ্যের চাপ কেন্দ্রে θ কোণ উৎপন্ন করলে। সতর্কতা: এখানে θ এর মান অবশ্যই রেডিয়ান এককে বসাতে হবে।"
+  },
+  {
+    "title": "চতুর্ভাগ ও চিহ্নের নিয়ম (ASTC Rule)",
+    "latex": "\\text{1st: All (+)}, \\quad \\text{2nd: Sin/Csc (+)}, \\quad \\text{3rd: Tan/Cot (+)}, \\quad \\text{4th: Cos/Sec (+)}",
+    "description": "All Students Take Calculus (ASTC) রুল। কোন চতুর্ভাগে কোন ত্রিকোণমিতিক অনুপাত ধনাত্মক হবে তা নির্ণয়ের শর্টকাট।"
+  },
+  {
+    "title": "ঋণাত্মক কোণের ত্রিকোণমিতিক অনুপাত",
+    "latex": "\\cos(-\\theta) = \\cos\\theta, \\quad \\sec(-\\theta) = \\sec\\theta",
+    "description": "Cos এবং Sec বাদে বাকি সবার ক্ষেত্রে ঋণাত্মক কোণের মাইনাস (-) চিহ্নটি অনুপাতের সামনে চলে আসে (যেমন: sin(-θ) = -sinθ)।"
+  },
+  {
+    "title": "কোণ রূপান্তরের নিয়ম (n × 90° ± θ)",
+    "latex": "\\text{If } n \\text{ is odd: } \\sin \\leftrightarrow \\cos, \\; \\tan \\leftrightarrow \\cot, \\; \\sec \\leftrightarrow \\csc",
+    "description": "n জোড় হলে অনুপাত একই থাকে, বিজোড় হলে পরিবর্তিত হয়। আর চিহ্ণ (+) বা (-) নির্ধারিত হয় মূল অনুপাতটি কোন চতুর্ভাগে পড়েছে তার ওপর ভিত্তি করে।"
+  },
+  {
+    "title": "ত্রিকোণমিতিক ফাংশনের পর্যায়কাল (Period Shortcut)",
+    "latex": "\\sin(bx), \\cos(bx) \\to T = \\frac{2\\pi}{|b|}; \\quad \\tan(bx), \\cot(bx) \\to T = \\frac{\\pi}{|b|}",
+    "description": "MCQ এর জন্য অত্যন্ত গুরুত্বপূর্ণ। x এর সহগ দিয়ে মূল ফাংশনের পর্যায়কালকে ভাগ করলেই নতুন পর্যায়কাল পাওয়া যায়।"
+  },
+  {
+    "title": "সর্বোচ্চ ও সর্বনিম্ন মান নির্ণয় (Max & Min Value)",
+    "latex": "f(\\theta) = a\\sin\\theta + b\\cos\\theta \\implies \\text{Max} = \\sqrt{a^2+b^2}, \\quad \\text{Min} = -\\sqrt{a^2+b^2}",
+    "description": "যেকোনো a sinθ + b cosθ আকারের রাশির সর্বোচ্চ ও সর্বনিম্ন মান দ্রুত নির্ণয় করার এডমিশন হ্যাক।"
+  },
+  {
+    "title": "যৌগিক কোণের সূত্র (Compound Angles)",
+    "latex": "\\sin(A \\pm B) = \\sin A \\cos B \\pm \\cos A \\sin B",
+    "description": "Sin এর ক্ষেত্রে মাঝের চিহ্ণ একই থাকে (+ থাকলে +, - থাকলে -) এবং অনুপাত মিক্সড (sin, cos) হয়।"
+  },
+  {
+    "title": "Cos এর যৌগিক সূত্র",
+    "latex": "\\cos(A \\pm B) = \\cos A \\cos B \\mp \\sin A \\sin B",
+    "description": "Cos এর ক্ষেত্রে অনুপাতগুলো জোড়ায় জোড়ায় থাকে (cos cos, sin sin) এবং মাঝের চিহ্ণ উল্টে যায় (+ থাকলে -, - থাকলে +)।"
+  },
+  {
+    "title": "Tan এর যৌগিক সূত্র",
+    "latex": "\\tan(A \\pm B) = \\frac{\\tan A \\pm \\tan B}{1 \\mp \\tan A \\tan B}",
+    "description": "উপরে যে চিহ্ণ থাকে, নিচে তার বিপরীত চিহ্ণ বসে। tan 75° বা tan 15° এর মান বের করতে এটি প্রচুর কাজে লাগে।"
+  },
+  {
+    "title": "যৌগিক কোণের গুণফল শর্টকাট",
+    "latex": "\\sin(A+B)\\sin(A-B) = \\sin^2 A - \\sin^2 B = \\cos^2 B - \\cos^2 A",
+    "description": "দুটি Sin এর গুণফল স্কয়ারের বিয়োগফলে পরিণত হয়। cos(A+B)cos(A-B) = cos² A - sin² B (এখানে মিক্সড থাকে)।"
+  },
+  {
+    "title": "গুণফল থেকে যোগ/বিয়োগে রূপান্তর (2AB)",
+    "latex": "2\\sin A \\cos B = \\sin(A+B) + \\sin(A-B)",
+    "description": "2 cosA sinB হলে মাঝে মাইনাস হবে। 2 cosA cosB = cos(A+B) + cos(A-B)।"
+  },
+  {
+    "title": "বিপজ্জনক গুণফল সূত্র (Danger Formula)",
+    "latex": "2\\sin A \\sin B = \\cos(A-B) - \\cos(A+B)",
+    "description": "এখানে ব্যতিক্রম হিসেবে (A-B) আগে বসে এবং (A+B) পরে বসে। এটিতে স্টুডেন্টরা সবচেয়ে বেশি ভুল করে।"
+  },
+  {
+    "title": "যোগ/বিয়োগ থেকে গুণফলে রূপান্তর (C ও D এর সূত্র)",
+    "latex": "\\sin C + \\sin D = 2\\sin\\frac{C+D}{2}\\cos\\frac{C-D}{2}",
+    "description": "sinC - sinD হলে cos আগে এবং sin পরে বসবে। cosC + cosD = 2cos(C+D)/2 cos(C-D)/2।"
+  },
+  {
+    "title": "Cos C - Cos D এর বিশেষ সূত্র",
+    "latex": "\\cos C - \\cos D = 2\\sin\\frac{C+D}{2}\\sin\\frac{D-C}{2}",
+    "description": "এখানে শেষের পদটি (C-D)/2 এর পরিবর্তে (D-C)/2 হয়। এটি পরীক্ষার হলে ভুল হওয়ার অন্যতম প্রধান জায়গা।"
+  },
+  {
+    "title": "গুণিতক কোণ: Sin 2A",
+    "latex": "\\sin 2A = 2\\sin A \\cos A = \\frac{2\\tan A}{1+\\tan^2 A}",
+    "description": "Sin 2A এর দুটি রূপই ম্যাথে প্রচুর ব্যবহৃত হয়, বিশেষ করে ইন্টিগ্রেশন ও ডিফারেন্সিয়েশনে রূপান্তরের সময়।"
+  },
+  {
+    "title": "গুণিতক কোণ: Cos 2A এর ৪টি রূপ (Most Important)",
+    "latex": "\\cos 2A = \\cos^2 A - \\sin^2 A = 2\\cos^2 A - 1 = 1 - 2\\sin^2 A = \\frac{1-\\tan^2 A}{1+\\tan^2 A}",
+    "description": "ক্যালকুলাস এবং ত্রিকোণমিতির যেকোনো প্রমাণ মেলানোর জন্য Cos 2A এর এই ৪টি রূপ জানা ফরজ।"
+  },
+  {
+    "title": "ঘাত কমানোর সূত্র (Power Reduction Shortcut)",
+    "latex": "1 + \\cos 2A = 2\\cos^2 A, \\quad 1 - \\cos 2A = 2\\sin^2 A",
+    "description": "স্কয়ার (ঘাত ২) থেকে সাধারণ রূপে (ঘাত ১) যাওয়ার একমাত্র উপায়। 1 এর সাথে cos প্লাস থাকলে cos² হয়, মাইনাস থাকলে sin² হয়।"
+  },
+  {
+    "title": "গুণিতক কোণ: Tan 2A",
+    "latex": "\\tan 2A = \\frac{2\\tan A}{1 - \\tan^2 A}",
+    "description": "Sin 2A এর tan সূত্রের সাথে এর পার্থক্য শুধু নিচে। Sin 2A তে নিচে (+) থাকে, আর Tan 2A তে নিচে (-) থাকে।"
+  },
+  {
+    "title": "3A এর সূত্রসমূহ (Sin 3A & Cos 3A)",
+    "latex": "\\sin 3A = 3\\sin A - 4\\sin^3 A, \\quad \\cos 3A = 4\\cos^3 A - 3\\cos A",
+    "description": "শর্টকাট মনে রাখার ট্রিক: Sin এর ক্ষেত্রে 34 (3sin - 4sin³) এবং Cos এর ক্ষেত্রে 43 (4cos³ - 3cos)।"
+  },
+  {
+    "title": "ত্রিভুজের সাইন সূত্র (Sine Rule)",
+    "latex": "\\frac{a}{\\sin A} = \\frac{b}{\\sin B} = \\frac{c}{\\sin C} = 2R",
+    "description": "যেকোনো ত্রিভুজের বাহুগুলো তাদের বিপরীত কোণের Sine এর সমানুপাতিক। এখানে R হলো ত্রিভুজটির পরিবৃত্তের ব্যাসার্ধ।"
+  },
+  {
+    "title": "ত্রিভুজের কোসাইন সূত্র (Cosine Rule)",
+    "latex": "\\cos A = \\frac{b^2 + c^2 - a^2}{2bc}",
+    "description": "ত্রিভুজের তিনটি বাহু দেওয়া থাকলে যেকোনো কোণ বের করার সূত্র। যে কোণ বের করব, তার বিপরীত বাহুর স্কয়ার বিয়োগ করতে হয়।"
+  },
+  {
+    "title": "ত্রিভুজের ক্ষেত্রফল (Area of Triangle)",
+    "latex": "\\Delta = \\frac{1}{2}ab\\sin C = \\frac{1}{2}bc\\sin A = \\frac{1}{2}ca\\sin B",
+    "description": "দুটি বাহু এবং তাদের মধ্যবর্তী কোণ দেওয়া থাকলে ত্রিভুজের ক্ষেত্রফল নির্ণয়ের সূত্র।"
+  }
+]

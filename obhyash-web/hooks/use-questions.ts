@@ -17,7 +17,31 @@ export interface UseQuestionsOptions {
   initialPage?: number;
   initialPageSize?: number;
   initialFilters?: QuestionFilters;
-  baseFilters?: QuestionFilters; // Added baseFilters to enforce restrictions
+  baseFilters?: QuestionFilters;
+}
+
+const QUESTIONS_CACHE_KEY = 'obhyash_admin_questions_cache';
+
+interface CachedQuestionsPayload {
+  questions: Question[];
+  totalCount: number;
+  approvedCount: number;
+  pendingCount: number;
+  rejectedCount: number;
+  totalPages: number;
+}
+
+function getInitialCachedQuestions(): CachedQuestionsPayload | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = sessionStorage.getItem(QUESTIONS_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
+      return parsed;
+    }
+  } catch {}
+  return null;
 }
 
 export const useQuestions = (options: UseQuestionsOptions = {}) => {
@@ -28,16 +52,18 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
     baseFilters = {}, // Default to empty object
   } = options;
 
+  const initialCache = getInitialCachedQuestions();
+
   // State
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [questions, setQuestions] = useState<Question[]>(() => initialCache?.questions || []);
+  const [isLoading, setIsLoading] = useState(() => !initialCache);
   const [page, setPage] = useState(initialPage);
   const [pageSize, setPageSize] = useState(initialPageSize);
-  const [totalCount, setTotalCount] = useState(0);
-  const [approvedCount, setApprovedCount] = useState(0);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [rejectedCount, setRejectedCount] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+  const [totalCount, setTotalCount] = useState(() => initialCache?.totalCount || 0);
+  const [approvedCount, setApprovedCount] = useState(() => initialCache?.approvedCount || 0);
+  const [pendingCount, setPendingCount] = useState(() => initialCache?.pendingCount || 0);
+  const [rejectedCount, setRejectedCount] = useState(() => initialCache?.rejectedCount || 0);
+  const [totalPages, setTotalPages] = useState(() => initialCache?.totalPages || 0);
   // Initialize filters with baseFilters
   const [filters, setFilters] = useState<QuestionFilters>({
     ...initialFilters,
@@ -51,7 +77,10 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
 
   // Fetch questions with pagination
   const fetchQuestions = useCallback(async () => {
-    setIsLoading(true);
+    // Only show full loading spinner if there's no data already visible
+    if (questions.length === 0) {
+      setIsLoading(true);
+    }
     try {
       const response = await getQuestionsPage(
         page,
@@ -67,14 +96,32 @@ export const useQuestions = (options: UseQuestionsOptions = {}) => {
       setPendingCount(response.pendingCount);
       setRejectedCount(response.rejectedCount);
       setTotalPages(response.totalPages);
+
+      if (page === 1 && (!filters || Object.keys(filters).length === 0)) {
+        try {
+          sessionStorage.setItem(
+            QUESTIONS_CACHE_KEY,
+            JSON.stringify({
+              questions: response.questions,
+              totalCount: response.totalCount,
+              approvedCount: response.approvedCount,
+              pendingCount: response.pendingCount,
+              rejectedCount: response.rejectedCount,
+              totalPages: response.totalPages,
+            }),
+          );
+        } catch {}
+      }
     } catch (err) {
       console.error('Fetch error:', err);
       toast.error(getErrorMessage(err));
-      setQuestions([]);
+      if (questions.length === 0) {
+        setQuestions([]);
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [page, pageSize, filters, sortBy, sortOrder]); // filters already contains baseFilters due to state initialization and updates
+  }, [page, pageSize, filters, sortBy, sortOrder, questions.length]); // filters already contains baseFilters due to state initialization and updates
 
   // Pagination controls
   const goToPage = useCallback((newPage: number) => {

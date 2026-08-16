@@ -84,7 +84,7 @@ export async function updateSession(request: NextRequest) {
     '/leaderboard/user', // /leaderboard/user/[userId]
   ];
   const isStudentRoute = STUDENT_TAB_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'));
-  const isProtectedRoute = isAdminRoute || isStudentRoute || isTeacherRoute;
+  const isProtectedRoute = isStudentRoute || isTeacherRoute;
 
 
   // SCENARIO A: Not logged in and trying to access a protected route
@@ -175,17 +175,7 @@ export async function updateSession(request: NextRequest) {
       return response;
     }
 
-    // Role-based route protection: only redirect if profile was definitively retrieved and is NOT an admin
-    if (isAdminRoute && profile && role !== 'admin') {
-      const response = NextResponse.redirect(
-        new URL('/dashboard', request.url),
-      );
-      supabaseResponse.cookies.getAll().forEach((cookie) => {
-        response.cookies.set({ ...cookie, path: cookie.path ?? '/' });
-      });
-      return response;
-    }
-
+    // Role-based route protection for teachers
     if (isTeacherRoute && profile && role !== 'teacher') {
       const response = NextResponse.redirect(
         new URL('/dashboard', request.url),

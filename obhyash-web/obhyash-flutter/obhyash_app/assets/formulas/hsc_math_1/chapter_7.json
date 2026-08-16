@@ -1,1 +1,117 @@
-[]
+[
+  {
+    "title": "যৌগিক কোণের সূত্র (Compound Angles - 7B)",
+    "latex": "\\sin(A \\pm B) = \\sin A \\cos B \\pm \\cos A \\sin B, \\quad \\cos(A \\pm B) = \\cos A \\cos B \\mp \\sin A \\sin B",
+    "description": "Sin এর ক্ষেত্রে অনুপাত মিক্সড (sin, cos) হয় এবং চিহ্ণ একই থাকে। Cos এর ক্ষেত্রে অনুপাত জোড়ায় জোড়ায় (cos cos, sin sin) থাকে এবং মাঝের চিহ্ণ উল্টে যায় (+ থাকলে -, - থাকলে +)।"
+  },
+  {
+    "title": "Tan ও Cot এর যৌগিক সূত্র",
+    "latex": "\\tan(A \\pm B) = \\frac{\\tan A \\pm \\tan B}{1 \\mp \\tan A \\tan B}, \\quad \\cot(A \\pm B) = \\frac{\\cot A \\cot B \\mp 1}{\\cot B \\pm \\cot A}",
+    "description": "Tan এর ক্ষেত্রে উপরে যে চিহ্ণ থাকে, নিচে তার বিপরীত চিহ্ণ বসে। Cot এর ক্ষেত্রে উল্টো দিক থেকে (B আগে, A পরে) শুরু করতে হয়, যা স্টুডেন্টরা প্রায়ই ভুল করে।"
+  },
+  {
+    "title": "যৌগিক কোণের গুণফল (Admission Shortcut)",
+    "latex": "\\sin(A+B)\\sin(A-B) = \\sin^2 A - \\sin^2 B, \\quad \\cos(A+B)\\cos(A-B) = \\cos^2 A - \\sin^2 B",
+    "description": "দুটি Sin এর গুণফল স্কয়ারের বিয়োগফলে পরিণত হয়। কিন্তু Cos এর গুণফলে প্রথমটি Cos এবং দ্বিতীয়টি Sin হয়। এটি প্রমাণ ও MCQ তে সরাসরি ব্যবহার করা যায়।"
+  },
+  {
+    "title": "গুণফল থেকে যোগ/বিয়োগে রূপান্তর (7C)",
+    "latex": "2\\sin A \\cos B = \\sin(A+B) + \\sin(A-B), \\quad 2\\cos A \\sin B = \\sin(A+B) - \\sin(A-B)",
+    "description": "2AB এর সূত্র। sin আগে থাকলে মাঝে (+), আর cos আগে থাকলে মাঝে (-) বসে।"
+  },
+  {
+    "title": "Cos এর 2AB সূত্র (বিপজ্জনক সূত্রসহ)",
+    "latex": "2\\cos A \\cos B = \\cos(A+B) + \\cos(A-B), \\quad 2\\sin A \\sin B = \\cos(A-B) - \\cos(A+B)",
+    "description": "2 cos cos হলে মাঝে (+)। কিন্তু 2 sin sin এর সূত্রটি ব্যতিক্রম (Danger Formula): এখানে (A-B) আগে বসে এবং (A+B) পরে বসে। এটি ক্যালকুলাসে প্রচুর ভুল হয়।"
+  },
+  {
+    "title": "যোগ/বিয়োগ থেকে গুণফলে রূপান্তর (C ও D এর সূত্র)",
+    "latex": "\\sin C + \\sin D = 2\\sin\\frac{C+D}{2}\\cos\\frac{C-D}{2}",
+    "description": "sinC - sinD হলে cos আগে এবং sin পরে বসবে। cosC + cosD = 2cos(C+D)/2 cos(C-D)/2।"
+  },
+  {
+    "title": "Cos C - Cos D এর বিশেষ সূত্র",
+    "latex": "\\cos C - \\cos D = 2\\sin\\frac{C+D}{2}\\sin\\frac{D-C}{2}",
+    "description": "এখানে শেষের পদটি (C-D)/2 এর পরিবর্তে (D-C)/2 হয়। এটি পরীক্ষার হলে ভুল হওয়ার অন্যতম প্রধান জায়গা।"
+  },
+  {
+    "title": "গুণিতক কোণ: Sin 2A ও Tan 2A (7D)",
+    "latex": "\\sin 2A = \\frac{2\\tan A}{1+\\tan^2 A}, \\quad \\tan 2A = \\frac{2\\tan A}{1 - \\tan^2 A}",
+    "description": "উভয় সূত্রের লব একই (2tanA)। শুধু পার্থক্য হলো হরে: Sin 2A তে নিচে (+) থাকে, আর Tan 2A তে নিচে (-) থাকে।"
+  },
+  {
+    "title": "গুণিতক কোণ: Cos 2A এর ৪টি রূপ (Most Important)",
+    "latex": "\\cos 2A = \\cos^2 A - \\sin^2 A = 2\\cos^2 A - 1 = 1 - 2\\sin^2 A = \\frac{1-\\tan^2 A}{1+\\tan^2 A}",
+    "description": "ইন্টিগ্রেশন ও ডিফারেন্সিয়েশনের যেকোনো ম্যাথ মেলানোর জন্য Cos 2A এর এই ৪টি রূপ জানা ফরজ।"
+  },
+  {
+    "title": "ঘাত কমানোর সূত্র (Power Reduction Shortcut)",
+    "latex": "1 + \\cos 2A = 2\\cos^2 A, \\quad 1 - \\cos 2A = 2\\sin^2 A",
+    "description": "স্কয়ার (ঘাত ২) থেকে সাধারণ রূপে (ঘাত ১) যাওয়ার একমাত্র উপায়। 1 এর সাথে cos প্লাস থাকলে cos² হয়, মাইনাস থাকলে sin² হয়।"
+  },
+  {
+    "title": "3A এর সূত্রসমূহ (Sin 3A & Cos 3A)",
+    "latex": "\\sin 3A = 3\\sin A - 4\\sin^3 A, \\quad \\cos 3A = 4\\cos^3 A - 3\\cos A",
+    "description": "শর্টকাট মনে রাখার ট্রিক: Sin এর ক্ষেত্রে 34 (3sin - 4sin³) এবং Cos এর ক্ষেত্রে 43 (4cos³ - 3cos)।"
+  },
+  {
+    "title": "tan 3A এর সূত্র",
+    "latex": "\\tan 3A = \\frac{3\\tan A - \\tan^3 A}{1 - 3\\tan^2 A}",
+    "description": "৩য় ঘাতের এই সূত্রটি এডমিশন টেস্টের অনেক ম্যাথে ডিরেক্ট বসিয়ে প্রমাণ মেলাতে হয়।"
+  },
+  {
+    "title": "অংশ কোণ বা Sub-multiple Angles (7E)",
+    "latex": "\\sin A = 2\\sin\\frac{A}{2}\\cos\\frac{A}{2}, \\quad 1 + \\cos A = 2\\cos^2\\frac{A}{2}",
+    "description": "গুণিতক কোণের (7D) সূত্রগুলোতে A এর স্থলে A/2 বসালে এই সূত্রগুলো পাওয়া যায়। ক্যালকুলাসে লিমিটের ম্যাথে এগুলো সবচেয়ে বেশি লাগে।"
+  },
+  {
+    "title": "গুরুত্বপূর্ণ কোণের মান (Admission Hacks)",
+    "latex": "\\sin 15^\\circ = \\frac{\\sqrt{3}-1}{2\\sqrt{2}}, \\quad \\sin 18^\\circ = \\frac{\\sqrt{5}-1}{4}, \\quad \\cos 36^\\circ = \\frac{\\sqrt{5}+1}{4}",
+    "description": "এই মানগুলো মুখস্থ থাকলে DU বা BUET প্রিলিমিনারিতে সরাসরি উত্তর দাগানো যায়। sin 15° = cos 75° এবং sin 18° = cos 72°।"
+  },
+  {
+    "title": "শর্তসাপেক্ষ অভেদ (Conditional Identities - 7F)",
+    "latex": "A+B+C = \\pi \\implies \\tan A + \\tan B + \\tan C = \\tan A \\tan B \\tan C",
+    "description": "ত্রিভুজের তিন কোণের সমষ্টি ১৮০° হলে, তাদের tan এর যোগফল তাদের tan এর গুণফলের সমান হয়। MCQ এর জন্য সুপার ট্রিক।"
+  },
+  {
+    "title": "Cot এর শর্তসাপেক্ষ অভেদ",
+    "latex": "A+B+C = \\pi \\implies \\cot A \\cot B + \\cot B \\cot C + \\cot C \\cot A = 1",
+    "description": "যদি শর্ত A+B+C = π/2 হয়, তবে Tan এর ক্ষেত্রে এই একই রূপ (গুণফলের যোগফল = 1) প্রযোজ্য হবে।"
+  },
+  {
+    "title": "ত্রিভুজের সাইন সূত্র (Sine Rule - 7G)",
+    "latex": "\\frac{a}{\\sin A} = \\frac{b}{\\sin B} = \\frac{c}{\\sin C} = 2R",
+    "description": "যেকোনো ত্রিভুজের বাহুগুলো তাদের বিপরীত কোণের Sine এর সমানুপাতিক। এখানে R হলো ত্রিভুজটির পরিবৃত্তের ব্যাসার্ধ (Circumradius)।"
+  },
+  {
+    "title": "ত্রিভুজের কোসাইন সূত্র (Cosine Rule - 7G)",
+    "latex": "\\cos A = \\frac{b^2 + c^2 - a^2}{2bc}",
+    "description": "ত্রিভুজের তিনটি বাহু দেওয়া থাকলে যেকোনো কোণ বের করার সূত্র। যে কোণ বের করব, তার বিপরীত বাহুর স্কয়ার বিয়োগ করতে হয়।"
+  },
+  {
+    "title": "লম্ব অভিক্ষেপ সূত্র (Projection Rule - 7G)",
+    "latex": "a = b\\cos C + c\\cos B, \\quad b = c\\cos A + a\\cos C",
+    "description": "যেকোনো একটি বাহুর দৈর্ঘ্য অপর দুটি বাহু এবং তাদের বিপরীত কোণগুলোর লম্ব অভিক্ষেপের যোগফলের সমান।"
+  },
+  {
+    "title": "অর্ধ-কোণের সূত্র (Half-angle formulas for Triangles)",
+    "latex": "\\sin\\frac{A}{2} = \\sqrt{\\frac{(s-b)(s-c)}{bc}}, \\quad \\cos\\frac{A}{2} = \\sqrt{\\frac{s(s-a)}{bc}}, \\quad \\tan\\frac{A}{2} = \\sqrt{\\frac{(s-b)(s-c)}{s(s-a)}}",
+    "description": "যেখানে s = (a+b+c)/2 (অর্ধ-পরিসীমা)। কোণের মান না দিয়ে শুধু বাহুর দৈর্ঘ্য দেওয়া থাকলে এই সূত্রগুলো দিয়ে সরাসরি অর্ধেক কোণ বের করা যায়।"
+  },
+  {
+    "title": "ত্রিভুজের ক্ষেত্রফল (Area of Triangle)",
+    "latex": "\\Delta = \\frac{1}{2}ab\\sin C = \\sqrt{s(s-a)(s-b)(s-c)} = \\frac{abc}{4R} = rs",
+    "description": "বাহু ও কোণ থাকলে ১মটি, শুধু বাহু থাকলে ২য়টি (হিরনের সূত্র), পরিবৃত্তের ব্যাসার্ধ (R) থাকলে ৩য়টি এবং অন্তর্বৃত্তের ব্যাসার্ধ (r) থাকলে ৪র্থ সূত্রটি ব্যবহার করতে হয়।"
+  },
+  {
+    "title": "সর্বোচ্চ ও সর্বনিম্ন মান নির্ণয় শর্টকাট (Max/Min)",
+    "latex": "f(\\theta) = a\\sin\\theta + b\\cos\\theta \\implies \\text{Max} = +\\sqrt{a^2+b^2}, \\quad \\text{Min} = -\\sqrt{a^2+b^2}",
+    "description": "যেমন: 3sinθ + 4cosθ এর সর্বোচ্চ মান √(3² + 4²) = 5 এবং সর্বনিম্ন মান -5। MCQ এর জন্য ৫ সেকেন্ডের শর্টকাট।"
+  },
+  {
+    "title": "বর্গের ধারার সমষ্টি শর্টকাট (Series Summation Shortcut)",
+    "latex": "\\sin^2 10^\\circ + \\sin^2 20^\\circ + \\dots + \\sin^2 80^\\circ = \\frac{\\text{পদসংখ্যা}}{2}",
+    "description": "ত্রিকোণমিতিক ধারার প্রথম ও শেষ কোণের যোগফল ৯০° হলে (যেমন 10°+80°=90°), মোট পদসংখ্যাকে ২ দিয়ে ভাগ করলেই উত্তর চলে আসে।"
+  }
+]
