@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/lib/error-utils';
-import { submitComplaint, getComplaints } from '@/services/complaint-service';
+import { submitComplaint, getComplaints, getUserComplaints } from '@/services/complaint-service';
 import { ComplaintType, AppComplaint, ComplaintStatus } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -108,7 +108,7 @@ export const ComplaintView: React.FC = () => {
 
     const fetchMyComplaints = async () => {
       if (isMounted) setIsLoadingComplaints(true);
-      const data = await getComplaints(false);
+      const data = await getUserComplaints();
       if (isMounted) {
         setMyComplaints(data);
         setIsLoadingComplaints(false);
@@ -124,7 +124,7 @@ export const ComplaintView: React.FC = () => {
 
   const handleRefreshComplaints = async () => {
     setIsLoadingComplaints(true);
-    const data = await getComplaints(false);
+    const data = await getUserComplaints();
     setMyComplaints(data);
     setIsLoadingComplaints(false);
   };

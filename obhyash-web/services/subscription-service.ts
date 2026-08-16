@@ -250,50 +250,6 @@ export const getUserActiveSubscription =
     const user = session?.user;
     if (!user) return null;
 
-    const { data, error } = await supabase
-      .from('subscription_history')
-      .select('*, plan:subscription_plans(*)')
-      .eq('user_id', user.id)
-      .eq('is_active', true)
-      .gt('expires_at', new Date().toISOString())
-      .order('expires_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Failed to fetch active subscription:', error);
-      throw error;
-    }
-
-    if (data && data.plan) {
-      const plan = (
-        Array.isArray(data.plan) ? data.plan[0] : data.plan
-      ) as DbSubscriptionPlan;
-      return {
-        id: plan.id,
-        name: plan.display_name,
-        price: plan.price,
-        currency: plan.currency || '৳',
-        billingCycle:
-          plan.duration_days >= 365
-            ? 'Yearly'
-            : plan.duration_days >= 90
-              ? 'Quarterly'
-              : plan.duration_days >= 30
-                ? 'Monthly'
-                : `${plan.duration_days} Days`,
-        features: plan.features || [],
-        colorTheme: plan.display_name.toLowerCase().includes('year')
-          ? 'emerald'
-          : plan.price > 0
-            ? 'indigo'
-            : 'slate',
-        isPopular: plan.display_name.toLowerCase().includes('offer'),
-        expiresAt: data.expires_at, // Include expiry date from subscription_history
-      };
-    }
-
-    // Fallback: Check user profile for referral rewards or direct subscriptions
     try {
       const { data: userProfile } = await supabase
         .from('users')
@@ -304,20 +260,20 @@ export const getUserActiveSubscription =
       if (userProfile) {
         const sub = userProfile.subscription as any;
         const status = sub?.status || userProfile.subscription_status;
-        const expiry = sub?.expiry || userProfile.subscription_expires_at;
+        const expiry = sub?.expiry || sub?.expires_at || userProfile.subscription_expires_at;
         const isSub =
           userProfile.is_subscribed ||
           (status && String(status).toLowerCase() === 'active');
 
-        if (isSub) {
+        if (isSub && sub?.plan && sub.plan !== 'Free') {
           const expDate = expiry ? new Date(expiry) : null;
           if (!expDate || expDate > new Date()) {
             return {
-              id: 'referral_reward',
-              name: sub?.plan || 'রেফারেল রিওয়ার্ড প্ল্যান',
+              id: 'user_active_plan',
+              name: sub?.plan || 'প্রিমিয়াম প্ল্যান',
               price: 0,
               currency: '৳',
-              billingCycle: 'Referral Bonus',
+              billingCycle: 'Active Plan',
               features: [
                 'সকল প্রিমিয়াম ফিচার আনলকড',
                 'লাইভ এক্সাম ও আনলিমিটেড প্র্যাকটিস',
@@ -331,7 +287,7 @@ export const getUserActiveSubscription =
         }
       }
     } catch (e) {
-      console.warn('Fallback subscription check failed:', e);
+      console.warn('Subscription check failed:', e);
     }
 
     return null;

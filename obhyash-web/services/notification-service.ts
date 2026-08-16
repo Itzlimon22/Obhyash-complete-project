@@ -277,6 +277,33 @@ export const broadcastNotification = async (
     metadata?: Record<string, unknown>;
   },
 ): Promise<{ success: number; failed: number }> => {
+  if (typeof window !== 'undefined') {
+    try {
+      const res = await fetch('/api/admin/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'broadcast',
+          title,
+          message,
+          type,
+          priority: options?.priority || 'normal',
+          target: userIds === 'all' ? 'all' : 'specific',
+          userIds: userIds === 'all' ? [] : userIds,
+        }),
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          return { success: json.count || 1, failed: 0 };
+        }
+      }
+    } catch (e) {
+      console.warn('API broadcastNotification error, falling back to direct:', e);
+    }
+  }
+
   if (isSupabaseConfigured() && supabase) {
     try {
       // ✅ 1. Optimized Broadcast to All (Database Server-Side)

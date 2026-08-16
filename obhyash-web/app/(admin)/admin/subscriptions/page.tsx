@@ -133,117 +133,53 @@ export default function SubscriptionsPage() {
   }, [reqPage, subPage, statusFilter, searchQuery]); // Re-fetch when pagination or filters change
 
   const fetchData = async (showToast = false) => {
-
-    const supabase = createClient();
-
     try {
-      // 1. Payment Requests Query
-      let reqQuery = supabase
-        .from('payment_requests')
-        .select(
-          `*, user:users!payment_requests_user_id_fkey(name, email, phone)`,
-          { count: 'exact' },
-        );
+      const res = await fetch('/api/admin/subscriptions');
+      if (!res.ok) throw new Error('Failed to fetch subscriptions data');
+      const json = await res.json();
+      if (!json.success || !json.data) throw new Error(json.error || 'Invalid response');
 
+      let requests = json.data.paymentRequests || [];
       if (statusFilter !== 'All') {
-        reqQuery = reqQuery.eq('status', statusFilter);
+        requests = requests.filter((r: any) => r.status === statusFilter);
       }
-
-      // Note: Full text search across joined tables is complex in simple Supabase client.
-      // We will rely on simple local filtering for `searchQuery` if we don't implement an RPC,
-      // OR we can implement server-side search for transaction_id.
       if (searchQuery) {
-        reqQuery = reqQuery.ilike('transaction_id', `%${searchQuery}%`);
+        const query = searchQuery.toLowerCase();
+        requests = requests.filter((r: any) => 
+          (r.transaction_id && r.transaction_id.toLowerCase().includes(query)) ||
+          (r.user?.name && r.user.name.toLowerCase().includes(query)) ||
+          (r.user?.email && r.user.email.toLowerCase().includes(query)) ||
+          (r.user?.phone && r.user.phone.includes(query))
+        );
       }
 
+      setReqTotal(requests.length);
       const reqFrom = (reqPage - 1) * pageSize;
-      const reqTo = reqFrom + pageSize - 1;
+      setPaymentRequests(requests.slice(reqFrom, reqFrom + pageSize));
 
-      const {
-        data: requestsData,
-        error: requestsError,
-        count: reqCount,
-      } = await reqQuery
-        .order('requested_at', { ascending: false })
-        .range(reqFrom, reqTo);
-
-      if (requestsError) {
-        console.error('Payment requests error:', requestsError);
-        throw requestsError;
+      let subs = json.data.subscriptions || [];
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        subs = subs.filter((s: any) => 
+          (s.user?.name && s.user.name.toLowerCase().includes(query)) ||
+          (s.user?.email && s.user.email.toLowerCase().includes(query)) ||
+          (s.user?.phone && s.user.phone.includes(query))
+        );
       }
-
-      // 2. Subscriptions Query
-      let subQuery = supabase
-        .from('subscription_history')
-        .select(`*, user:users(name, email), plan:subscription_plans(*)`, {
-          count: 'exact',
-        });
-
-      // Note: To search by user name/email server-side requires more complex joins/RPC.
-      // For now we just paginate the history based on creation date.
+      setSubTotal(subs.length);
       const subFrom = (subPage - 1) * pageSize;
-      const subTo = subFrom + pageSize - 1;
+      setSubscriptions(subs.slice(subFrom, subFrom + pageSize));
 
-      const {
-        data: subsData,
-        error: subsError,
-        count: subCount,
-      } = await subQuery
-        .order('created_at', { ascending: false })
-        .range(subFrom, subTo);
-
-      if (subsError) {
-        console.error('Subscription history error:', subsError);
-        throw subsError;
-      }
-
-      // Fetch subscription plans
-      const { data: plansData, error: plansError } = await supabase
-        .from('subscription_plans')
-        .select('*')
-        .order('price', { ascending: true });
-
-      if (plansError) {
-        console.error('Subscription plans error:', plansError);
-        throw plansError;
-      }
-
-      setPaymentRequests(requestsData || []);
-      if (reqCount !== null) setReqTotal(reqCount);
-
-      setSubscriptions(subsData || []);
-      if (subCount !== null) setSubTotal(subCount);
-
-      setPlans(plansData || []);
+      setPlans(json.data.plans || []);
 
       if (showToast) {
         toast.success('Data refreshed successfully');
       }
     } catch (error: unknown) {
       console.error('Failed to fetch data:', error);
-
-      // Show specific error message
       const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Failed to load subscription data';
+        error instanceof Error ? error.message : 'Failed to load subscription data';
       toast.error(errorMessage);
-
-      // If tables don't exist, show helpful message
-      if (
-        (error instanceof Object &&
-          'code' in error &&
-          error.code === '42P01') ||
-        errorMessage.includes('relation') ||
-        errorMessage.includes('does not exist')
-      ) {
-        toast.error(
-          'Database tables not found. Please run the SQL migration first.',
-          {
-            duration: 5000,
-          },
-        );
-      }
     } finally {
       setIsLoading(false);
     }
@@ -252,70 +188,20 @@ export default function SubscriptionsPage() {
   const handleReviewPayment = async () => {
     if (!reviewingRequest) return;
 
-    const supabase = createClient();
-
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
-
-      // Update payment request
-      const { error: updateError } = await supabase
-        .from('payment_requests')
-        .update({
+      const res = await fetch('/api/admin/subscriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'review_payment',
+          requestId: reviewingRequest.id,
           status: reviewAction === 'approve' ? 'Approved' : 'Rejected',
-          admin_notes: adminNotes,
-          reviewed_at: new Date().toISOString(),
-          reviewed_by: user.id,
-        })
-        .eq('id', reviewingRequest.id);
+          adminNotes,
+        }),
+      });
 
-      if (updateError) throw updateError;
-
-      // If approved, create subscription and update user
-      if (reviewAction === 'approve') {
-        // Find the plan
-        const plan = plans.find(
-          (p) => p.display_name === reviewingRequest.plan_name,
-        );
-
-        if (plan) {
-          const startDate = new Date();
-          const expiryDate = new Date(startDate);
-          expiryDate.setDate(expiryDate.getDate() + plan.duration_days);
-
-          // Create subscription history
-          const { error: historyError } = await supabase
-            .from('subscription_history')
-            .insert({
-              user_id: reviewingRequest.user_id,
-              plan_id: plan.id,
-              payment_request_id: reviewingRequest.id,
-              started_at: startDate.toISOString(),
-              expires_at: expiryDate.toISOString(),
-              is_active: true,
-            });
-
-          if (historyError) throw historyError;
-
-          // Update user subscription in users table
-          const { error: userUpdateError } = await supabase
-            .from('users')
-            .update({
-              subscription: {
-                plan: plan.display_name.includes('Yearly')
-                  ? 'Premium'
-                  : 'Premium',
-                status: 'Active',
-                expires_at: expiryDate.toISOString(),
-              },
-            })
-            .eq('id', reviewingRequest.user_id);
-
-          if (userUpdateError) throw userUpdateError;
-        }
-      }
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Failed to review payment');
 
       toast.success(
         `Payment ${reviewAction === 'approve' ? 'approved' : 'rejected'} successfully`,
@@ -324,54 +210,37 @@ export default function SubscriptionsPage() {
       setReviewingRequest(null);
       setAdminNotes('');
       fetchData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to review payment:', error);
-      toast.error('Failed to process payment review');
+      toast.error(error.message || 'Failed to process payment review');
     }
   };
 
   const handleExtendSubscription = async () => {
     if (!extendingSubscription) return;
 
-    const supabase = createClient();
     try {
-      const currentExpiry = new Date(extendingSubscription.expires_at);
-      const newExpiry = new Date(
-        currentExpiry.getTime() + extensionDays * 24 * 60 * 60 * 1000,
-      );
+      const res = await fetch('/api/admin/subscriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'extend_subscription',
+          userId: extendingSubscription.user_id,
+          extensionDays,
+        }),
+      });
 
-      const { error } = await supabase
-        .from('subscription_history')
-        .update({
-          expires_at: newExpiry.toISOString(),
-          is_active: true,
-        })
-        .eq('id', extendingSubscription.id);
-
-      if (error) throw error;
-
-      // Also update user profile
-      await supabase
-        .from('users')
-        .update({
-          subscription: {
-            plan: extendingSubscription.plan?.display_name.includes('Yearly')
-              ? 'Premium'
-              : 'Premium',
-            status: 'Active',
-            expires_at: newExpiry.toISOString(),
-          },
-        })
-        .eq('id', extendingSubscription.user_id);
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Failed to extend subscription');
 
       toast.success(`Subscription extended by ${extensionDays} days`);
       setShowExtendModal(false);
       setExtendingSubscription(null);
       setExtensionDays(30);
       fetchData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to extend subscription:', error);
-      toast.error('Failed to extend subscription');
+      toast.error(error.message || 'Failed to extend subscription');
     }
   };
 
@@ -386,44 +255,20 @@ export default function SubscriptionsPage() {
       return;
     }
 
-    const supabase = createClient();
-
     try {
-      if (editingPlan.id) {
-        // Update existing plan
-        const { error } = await supabase
-          .from('subscription_plans')
-          .update({
-            display_name: editingPlan.display_name,
-            price: editingPlan.price,
-            duration_days: editingPlan.duration_days,
-            features: editingPlan.features,
-            is_active: editingPlan.is_active,
-            is_popular: editingPlan.is_popular,
-            color_theme: editingPlan.color_theme,
-          })
-          .eq('id', editingPlan.id);
+      const res = await fetch('/api/admin/subscriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_plan',
+          plan: editingPlan,
+        }),
+      });
 
-        if (error) throw error;
-        toast.success('Plan updated successfully');
-      } else {
-        // Create new plan
-        const { error } = await supabase.from('subscription_plans').insert({
-          name: editingPlan.name,
-          display_name: editingPlan.display_name,
-          price: editingPlan.price,
-          currency: editingPlan.currency,
-          duration_days: editingPlan.duration_days,
-          features: editingPlan.features,
-          is_active: editingPlan.is_active,
-          is_popular: editingPlan.is_popular,
-          color_theme: editingPlan.color_theme,
-        });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Failed to save plan');
 
-        if (error) throw error;
-        toast.success('Plan created successfully');
-      }
-
+      toast.success(editingPlan.id ? 'Plan updated successfully' : 'Plan created successfully');
       setShowPlanModal(false);
       setEditingPlan({
         currency: 'BDT',
@@ -433,32 +278,33 @@ export default function SubscriptionsPage() {
         color_theme: 'border-neutral-200',
       });
       fetchData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save plan:', error);
-      toast.error('Failed to save subscription plan');
+      toast.error(error.message || 'Failed to save subscription plan');
     }
   };
 
   const handleDeletePlan = async (planId: string) => {
     if (!confirm('Are you sure you want to delete this plan?')) return;
 
-    const supabase = createClient();
-
     try {
-      const { error } = await supabase
-        .from('subscription_plans')
-        .delete()
-        .eq('id', planId);
+      const res = await fetch('/api/admin/subscriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete_plan',
+          planId,
+        }),
+      });
 
-      if (error) throw error;
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Failed to delete plan');
 
       toast.success('Plan deleted successfully');
       fetchData();
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Failed to delete plan:', error);
-      toast.error(
-        error instanceof Error ? error.message : 'Failed to delete plan',
-      );
+      toast.error(error.message || 'Failed to delete plan');
     }
   };
 

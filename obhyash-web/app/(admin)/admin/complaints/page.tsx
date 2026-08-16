@@ -36,6 +36,13 @@ export default function AdminComplaintsPage() {
 
   const [selectedComplaint, setSelectedComplaint] =
     useState<AppComplaint | null>(null);
+  const [serverStats, setServerStats] = useState<{
+    total: number;
+    pending: number;
+    inProgress: number;
+    resolved: number;
+    dismissed: number;
+  }>({ total: 0, pending: 0, inProgress: 0, resolved: 0, dismissed: 0 });
 
   useEffect(() => {
     // Reset page to 1 when search or filter changes
@@ -50,58 +57,13 @@ export default function AdminComplaintsPage() {
   }, [page, statusFilter, searchQuery]);
 
   const fetchComplaints = async (showToast = false) => {
-    const supabase = createClient();
-
     try {
-      let query = supabase
-        .from('app_complaints')
-        .select('*', { count: 'exact' });
-
-      if (statusFilter !== 'All') {
-        query = query.eq('status', statusFilter);
+      const res = await getComplaints(statusFilter, page, pageSize, searchQuery);
+      setComplaints(res.complaints || []);
+      setTotalComplaints(res.count || 0);
+      if (res.stats) {
+        setServerStats(res.stats);
       }
-
-      if (searchQuery) {
-        query = query.ilike('description', `%${searchQuery}%`);
-      }
-
-      const from = (page - 1) * pageSize;
-      const to = from + pageSize - 1;
-
-      const {
-        data: complaintsData,
-        error: complaintsError,
-        count,
-      } = await query.order('created_at', { ascending: false }).range(from, to);
-
-      if (complaintsError) throw complaintsError;
-
-      // 3. Combine complaints with user info
-      const userIds = Array.from(new Set((complaintsData || []).map((c: any) => c.user_id).filter(Boolean)));
-      let usersMap: Record<string, any> = {};
-      
-      if (userIds.length > 0) {
-        const { data: usersData } = await supabase
-          .from('users')
-          .select('id, name, email')
-          .in('id', userIds);
-          
-        if (usersData) {
-          usersMap = usersData.reduce((acc, user) => {
-            acc[user.id] = user;
-            return acc;
-          }, {} as Record<string, any>);
-        }
-      }
-
-      const mappedComplaints = (complaintsData || []).map((c: any) => ({
-        ...c,
-        user: usersMap[c.user_id] || { name: 'Unknown', email: '' },
-      }));
-
-      setComplaints(mappedComplaints);
-      if (count !== null) setTotalComplaints(count);
-
       if (showToast) toast.success('Complaints list updated');
     } catch (error) {
       console.error('Failed to fetch complaints:', error);
@@ -116,7 +78,7 @@ export default function AdminComplaintsPage() {
       case 'Pending':
         return 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400';
       case 'In Progress':
-        return 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400';
+        return 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400';
       case 'Resolved':
         return 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400';
       case 'Dismissed':
@@ -141,8 +103,6 @@ export default function AdminComplaintsPage() {
     }
   };
 
-  // Stats (total across all pages, pending/resolved only for current page for purely visual cues, or omit if inaccurate)
-
   return (
     <div className="min-h-screen bg-white dark:bg-black p-4 lg:p-8 text-neutral-900 dark:text-neutral-100">
       <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
@@ -166,17 +126,24 @@ export default function AdminComplaintsPage() {
                 </div>
                 <div>
                   <p className="text-[8px] text-red-600/70 font-black uppercase tracking-tight">
-                    Pending
+                    Pending ({serverStats.pending})
                   </p>
-                  <p className="text-[8px] text-emerald-600/70 font-black uppercase tracking-tight">
-                    Page
-                  </p>
-                  <p className="text-sm font-black text-emerald-600 dark:text-emerald-400 leading-none">
-                    {page}
+                  <p className="text-sm font-black text-red-600 dark:text-red-400 leading-none">
+                    Total: {serverStats.total}
                   </p>
                 </div>
               </div>
             </div>
+            <button
+              onClick={() => fetchComplaints(true)}
+              className="p-2 rounded-xl border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              title="Refresh"
+            >
+              <RefreshCw
+                size={18}
+                className={`text-neutral-500 ${isLoading ? 'animate-spin' : ''}`}
+              />
+            </button>
           </div>
         </div>
 

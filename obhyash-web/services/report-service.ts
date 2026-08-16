@@ -55,20 +55,50 @@ export const submitReport = async (data: SubmitReportData) => {
 };
 
 export const getReports = async (
-  statusFilter?: ReportStatus,
+  statusFilter?: ReportStatus | 'All',
   page: number = 1,
   pageSize: number = 20,
   searchQuery: string = '',
-): Promise<{ reports: Report[]; count: number }> => {
+): Promise<{ reports: Report[]; count: number; stats?: { total: number; pending: number; resolved: number; ignored: number } }> => {
+  // 1. Try server-side admin API endpoint first
+  if (typeof window !== 'undefined') {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        pageSize: pageSize.toString(),
+      });
+      if (statusFilter && (statusFilter as string) !== 'All') {
+        params.set('status', statusFilter);
+      }
+      if (searchQuery) {
+        params.set('search', searchQuery);
+      }
+
+      const res = await fetch(`/api/admin/reports?${params.toString()}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          return {
+            reports: json.data.reports || [],
+            count: json.data.count || 0,
+            stats: json.data.stats,
+          };
+        }
+      }
+    } catch (apiErr) {
+      console.warn('Reports API fetch error, falling back to direct query:', apiErr);
+    }
+  }
+
+  // 2. Fallback direct client query
   try {
     let query = supabase.from('reports').select('*', { count: 'exact' });
 
-    if (statusFilter) {
+    if (statusFilter && (statusFilter as string) !== 'All') {
       query = query.eq('status', statusFilter);
     }
 
     if (searchQuery) {
-      // Allows searching by reporter id or reporting reason
       query = query.or(
         `reporter_id.ilike.%${searchQuery}%,reason.ilike.%${searchQuery}%,reporter_name.ilike.%${searchQuery}%`,
       );
@@ -86,7 +116,6 @@ export const getReports = async (
     const reports = data || [];
     if (reports.length === 0) return { reports: [], count: count || 0 };
 
-    // Manually fetch questions to avoid Foreign Key relation errors
     const questionIds = Array.from(
       new Set(reports.map((r: Report) => r.question_id).filter(Boolean)),
     );
@@ -101,22 +130,12 @@ export const getReports = async (
 
       if (questionsData) {
         const questionMap = new Map(
-          questionsData.map(
-            (q: {
-              id: number;
-              question: string;
-              options: string[];
-              correct_answer_indices: number[];
-              explanation: string;
-              subject: string;
-            }) => [q.id, q],
-          ),
+          questionsData.map((q: any) => [String(q.id), q]),
         );
 
-        // Map questions back to reports
         const mappedReports = reports.map((report: Report) => ({
           ...report,
-          question: questionMap.get(Number(report.question_id)) || null,
+          question: report.question_id ? questionMap.get(String(report.question_id)) || null : null,
         })) as unknown as Report[];
 
         return { reports: mappedReports, count: count || 0 };
@@ -135,8 +154,38 @@ export const resolveReport = async (
   action: 'Accept' | 'Reject',
   adminComment?: string,
 ) => {
+  if (typeof window !== 'undefined') {
+    try {
+      const res = await fetch('/api/admin/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'resolve',
+          reportId,
+          resolution: action,
+          adminComment,
+        }),
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          if (action === 'Accept') {
+            toast.success(
+              'রিপোর্ট গ্রহণ করা হয়েছে এবং শিক্ষার্থীকে ১ দিনের সাবস্ক্রিপশন উপহার দেওয়া হয়েছে!',
+            );
+          } else {
+            toast.info('রিপোর্ট বাতিল করা হয়েছে।');
+          }
+          return { success: true };
+        }
+      }
+    } catch (e) {
+      console.warn('API resolveReport error, falling back:', e);
+    }
+  }
+
   try {
-    // 1. Update Report Status
     const status: ReportStatus = action === 'Accept' ? 'Resolved' : 'Ignored';
     const { data: report, error: updateError } = await supabase
       .from('reports')
@@ -151,7 +200,6 @@ export const resolveReport = async (
 
     if (updateError) throw updateError;
 
-    // 2. If Accepted, Reward User (+1 Day Subscription)
     if (action === 'Accept' && report) {
       await extendSubscription(report.reporter_id, 1);
       toast.success(

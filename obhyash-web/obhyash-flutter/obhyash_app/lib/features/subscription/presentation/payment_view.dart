@@ -136,9 +136,8 @@ class _PaymentViewState extends State<PaymentView>
           'plan_name': widget.plan.name,
           'amount': widget.plan.price,
           'currency': 'BDT',
-          'payment_method': _selectedMethod,
+          'payment_method': '$_selectedMethod ($sender)',
           'transaction_id': trxId,
-          'sender_number': sender,
           'status': 'Pending',
           'requested_at': DateTime.now().toIso8601String(),
         });

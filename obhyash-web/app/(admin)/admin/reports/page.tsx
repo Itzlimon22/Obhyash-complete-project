@@ -29,12 +29,18 @@ export default function AdminReportsPage() {
 
   const [selectedReport, setSelectedReport] = useState<any | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [serverStats, setServerStats] = useState<{
+    total: number;
+    pending: number;
+    resolved: number;
+    ignored: number;
+  }>({ total: 0, pending: 0, resolved: 0, ignored: 0 });
 
   const fetchReports = async () => {
     setLoading(true);
     try {
       const status = filterStatus === 'All' ? undefined : filterStatus;
-      const { reports: data, count } = await getReports(
+      const { reports: data, count, stats } = await getReports(
         status,
         page,
         pageSize,
@@ -42,6 +48,9 @@ export default function AdminReportsPage() {
       );
       setReports(data || []);
       setTotalReports(count || 0);
+      if (stats) {
+        setServerStats(stats);
+      }
     } catch (error) {
       console.error('Error fetching reports:', error);
       toast.error('রিপোর্ট লোড করতে সমস্যা হয়েছে।');
@@ -79,10 +88,9 @@ export default function AdminReportsPage() {
     }
   };
 
-  // Current Page Stats
-  const stats = {
-    total:
-      filterStatus === 'All' && !searchQuery ? totalReports : reports.length,
+  // Current Stats
+  const stats = serverStats.total > 0 ? serverStats : {
+    total: totalReports,
     pending: reports.filter((r) => r.status === 'Pending').length,
     resolved: reports.filter((r) => r.status === 'Resolved').length,
     ignored: reports.filter((r) => r.status === 'Ignored').length,

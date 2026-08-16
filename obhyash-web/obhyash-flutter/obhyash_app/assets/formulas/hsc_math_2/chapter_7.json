@@ -1,1 +1,87 @@
-[]
+[
+  {
+    "title": "বিপরীত ত্রিকোণমিতিক ফাংশনের ডোমেইন ও মুখ্য মান (Domain & Principal Ranges)",
+    "latex": "\\sin^{-1}x: [-1,1] \\to [-\\frac{\\pi}{2}, \\frac{\\pi}{2}], \\quad \\cos^{-1}x: [-1,1] \\to [0, \\pi], \\quad \\tan^{-1}x: \\mathbb{R} \\to (-\\frac{\\pi}{2}, \\frac{\\pi}{2})",
+    "description": "সকল বিপরীত ত্রিকোণমিতিক ফাংশনের ডোমেইন এবং মুখ্য মানের রেঞ্জ। বিশেষ করে cot⁻¹x এর রেঞ্জ (0, π), sec⁻¹x এর রেঞ্জ [0, π] - {π/2} এবং csc⁻¹x এর রেঞ্জ [-π/2, π/2] - {0} মুখস্থ থাকা আবশ্যক।"
+  },
+  {
+    "title": "ঋণাত্মক কোণের বিপরীত ফাংশন (Negative Argument Properties)",
+    "latex": "\\sin^{-1}(-x) = -\\sin^{-1}x, \\quad \\cos^{-1}(-x) = \\pi - \\cos^{-1}x, \\quad \\tan^{-1}(-x) = -\\tan^{-1}x",
+    "description": "Cos, Sec এবং Cot এর ক্ষেত্রে মাইনাস (-) চিহ্ন বাইরে আসার সময় সামনে একটি 'π' (পাই) যোগ হয়। বাকি তিনটির ক্ষেত্রে সরাসরি মাইনাস সামনে চলে আসে।"
+  },
+  {
+    "title": "ব্যস্তানুপাতিক সম্পর্ক (Reciprocal Relations)",
+    "latex": "\\sin^{-1}\\left(\\frac{1}{x}\\right) = \\csc^{-1}x \\quad (x \\ge 1 \\text{ বা } x \\le -1)",
+    "description": "একইভাবে cos⁻¹(1/x) = sec⁻¹x এবং tan⁻¹(1/x) = cot⁻¹x (যখন x > 0)। x এর মান ঋণাত্মক হলে cot⁻¹ এর ক্ষেত্রে π যোগ করতে হয়।"
+  },
+  {
+    "title": "পূরক কোণের সম্পর্ক (Complementary Relations)",
+    "latex": "\\sin^{-1}x + \\cos^{-1}x = \\frac{\\pi}{2}, \\quad \\tan^{-1}x + \\cot^{-1}x = \\frac{\\pi}{2}, \\quad \\sec^{-1}x + \\csc^{-1}x = \\frac{\\pi}{2}",
+    "description": "ত্রিকোণমিতি এবং ক্যালকুলাসের ইন্টিগ্রেশন বা ডিফারেন্সিয়েশনে এই সূত্রগুলো বিশাল সমীকরণকে এক নিমিষেই π/2 তে রূপান্তর করতে সাহায্য করে।"
+  },
+  {
+    "title": "পারস্পরিক রূপান্তর (Inter-conversion of Inverse Functions)",
+    "latex": "\\sin^{-1}x = \\cos^{-1}\\sqrt{1-x^2} = \\tan^{-1}\\frac{x}{\\sqrt{1-x^2}} = \\sec^{-1}\\frac{1}{\\sqrt{1-x^2}}",
+    "description": "সমকোণী ত্রিভুজের অনুপাত (লম্ব, ভূমি, অতিভুজ) কল্পনা করে যেকোনো একটি বিপরীত ত্রিকোণমিতিক ফাংশনকে অন্য যেকোনোটিতে রূপান্তর করা যায়। সিকিউ (CQ) এর প্রমাণে এটি সবচেয়ে বেশি ব্যবহৃত হয়।"
+  },
+  {
+    "title": "Sin ও Cos এর যোগ ও বিয়োগ সূত্র",
+    "latex": "\\sin^{-1}x \\pm \\sin^{-1}y = \\sin^{-1}\\left(x\\sqrt{1-y^2} \\pm y\\sqrt{1-x^2}\\right)",
+    "description": "Cos এর ক্ষেত্রে: \\cos^{-1}x \\pm \\cos^{-1}y = \\cos^{-1}\\left(xy \\mp \\sqrt{1-x^2}\\sqrt{1-y^2}\\right)। খেয়াল রাখতে হবে যে Cos এর মাঝে প্লাস থাকলে সূত্রে মাইনাস হয় এবং মাইনাস থাকলে প্লাস হয়।"
+  },
+  {
+    "title": "Tan এর যোগ ও বিয়োগ সূত্র (Most Important)",
+    "latex": "\\tan^{-1}x \\pm \\tan^{-1}y = \\tan^{-1}\\left( \\frac{x \\pm y}{1 \\mp xy} \\right)",
+    "description": "বোর্ড পরীক্ষার সিকিউতে সবচেয়ে বেশি আসা সূত্র। শর্ত: xy < 1 হলে প্লাসের সূত্র সরাসরি বসে, xy > 1 এবং x,y > 0 হলে সূত্রের সাথে π যোগ করতে হয়, আর xy < 0 ও x < 0 হলে -π যোগ করতে হয়।"
+  },
+  {
+    "title": "তিনটি Tan এর যোগফল ও শর্তসাপেক্ষ অভেদ",
+    "latex": "\\tan^{-1}x + \\tan^{-1}y + \\tan^{-1}z = \\tan^{-1}\\left( \\frac{x+y+z-xyz}{1-xy-yz-zx} \\right)",
+    "description": "বিশেষ শর্টকাট: x+y+z = xyz হলে এই তিনটির যোগফল সর্বদা \\pi (বা π এর গুণিতক) হয়। আর xy+yz+zx = 1 হলে যোগফল \\frac{\\pi}{2} হয়।"
+  },
+  {
+    "title": "দ্বিগুণ কোণের বিপরীত সূত্র (2 tan⁻¹x)",
+    "latex": "2\\tan^{-1}x = \\sin^{-1}\\left(\\frac{2x}{1+x^2}\\right) = \\cos^{-1}\\left(\\frac{1-x^2}{1+x^2}\\right) = \\tan^{-1}\\left(\\frac{2x}{1-x^2}\\right)",
+    "description": "ক্যালকুলাস ও ত্রিকোণমিতির যেকোনো প্রমাণ মেলানোর জন্য এই ৩টি রূপের ব্যবহার অপরিহার্য। এটি পুরো গণিত ২য় পত্রের অন্যতম গুরুত্বপূর্ণ সূত্র।"
+  },
+  {
+    "title": "তিনগুণ কোণের বিপরীত সূত্র (3x Formulas)",
+    "latex": "3\\sin^{-1}x = \\sin^{-1}(3x - 4x^3), \\quad 3\\cos^{-1}x = \\cos^{-1}(4x^3 - 3x), \\quad 3\\tan^{-1}x = \\tan^{-1}\\left(\\frac{3x - x^3}{1 - 3x^2}\\right)",
+    "description": "ত্রিঘাত মূল বা বড় ইনভার্স ত্রিকোণমিতিক সমীকরণ সমাধান করার সময় এই সূত্রগুলো দিয়ে খুব সহজে ছোট করে ফেলা যায়।"
+  },
+  {
+    "title": "বিপরীত ফাংশনের যোগফলের শর্তযুক্ত সমীকরণ (Solving Inverse Equations)",
+    "latex": "\\tan^{-1}x + \\tan^{-1}y = \\alpha \\implies \\frac{x+y}{1-xy} = \\tan\\alpha",
+    "description": "উভয়পক্ষে tan নিয়ে বিপরীত ফাংশন তোলার সাধারণ কৌশল। সমীকরণ সমাধানের সময় প্রাপ্ত x এর মানগুলো মূল সমীকরণে বসিয়ে সিদ্ধ করে কি না (Extraneous roots) তা যাচাই করতে হবে।"
+  },
+  {
+    "title": "ত্রিকোণমিতিক সমীকরণ: মৌলিক সমাধান (Basic General Solutions)",
+    "latex": "\\sin\\theta = 0 \\implies \\theta = n\\pi, \\quad \\cos\\theta = 0 \\implies \\theta = (2n+1)\\frac{\\pi}{2}, \\quad \\tan\\theta = 0 \\implies \\theta = n\\pi",
+    "description": "যেখানে n যেকোনো পূর্ণসংখ্যা (n \\in \\mathbb{Z})। সমীকরণ সমাধানের একদম বেসিক শর্ত।"
+  },
+  {
+    "title": "সাধারণ সমাধান: নির্দিষ্ট মান α এর জন্য",
+    "latex": "\\sin\\theta = \\sin\\alpha \\implies \\theta = n\\pi + (-1)^n\\alpha, \\quad \\cos\\theta = \\cos\\alpha \\implies \\theta = 2n\\pi \\pm \\alpha",
+    "description": "tan\\theta = tan\\alpha হলে সাধারণ সমাধান হবে \\theta = n\\pi + \\alpha। বোর্ড পরীক্ষার 'গ' নাম্বারে এই সূত্র ব্যবহার করে নির্দিষ্ট রেঞ্জের মধ্যে মান বের করতে হয়।"
+  },
+  {
+    "title": "বর্গ বা স্কয়ারযুক্ত সমীকরণের সাধারণ সমাধান",
+    "latex": "\\sin^2\\theta = \\sin^2\\alpha \\quad \\text{অথবা} \\quad \\cos^2\\theta = \\cos^2\\alpha \\quad \\text{অথবা} \\quad \\tan^2\\theta = \\tan^2\\alpha \\implies \\theta = n\\pi \\pm \\alpha",
+    "description": "যেকোনো ত্রিকোণমিতিক অনুপাতের ওপর স্কয়ার থাকলে তাদের সবার জন্য একটিমাত্র কমন সাধারণ সমাধান প্রযোজ্য।"
+  },
+  {
+    "title": "Sin ও Cos এর মান 1 বা -1 হলে শর্টকাট",
+    "latex": "\\sin\\theta = 1 \\implies \\theta = (4n+1)\\frac{\\pi}{2}, \\quad \\cos\\theta = -1 \\implies \\theta = (2n+1)\\pi",
+    "description": "sin\\theta = -1 হলে \\theta = (4n-1)\\frac{\\pi}{2} এবং cos\\theta = 1 হলে \\theta = 2n\\pi। সাধারণ সূত্রে না ফেলে সরাসরি এই শর্টকাট ব্যবহার করলে সময় বাঁচে।"
+  },
+  {
+    "title": "সহকারী কোণ পদ্ধতি (Auxiliary Angle Method for Equations)",
+    "latex": "a\\cos\\theta + b\\sin\\theta = c \\implies \\text{Divide by } \\sqrt{a^2+b^2}",
+    "description": "উভয়পক্ষকে \\sqrt{a^2+b^2} দিয়ে ভাগ করে cos(A-B) বা sin(A+B) এর সূত্রে ফেলতে হয়। বাস্তব সমাধান থাকার শর্ত হলো: c^2 \\le a^2 + b^2।"
+  },
+  {
+    "title": "গুণিতক ও রূপান্তরভিত্তিক সমীকরণ সমাধান",
+    "latex": "\\cos 2\\theta + \\cos 4\\theta = 0 \\implies 2\\cos 3\\theta \\cos \\theta = 0",
+    "description": "যোগ বা বিয়োগকে গুণফলের সূত্রে (C ও D এর সূত্র) রূপান্তর করে উৎপাদকে বিশ্লেষণ (Factorization) করার মাধ্যমে প্রতিটি উৎপাদককে আলাদাভাবে শূন্য ধরে সমাধান করতে হয়।"
+  }
+]
