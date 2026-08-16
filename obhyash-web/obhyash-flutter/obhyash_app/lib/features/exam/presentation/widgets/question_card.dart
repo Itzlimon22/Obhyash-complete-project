@@ -554,31 +554,31 @@ class _ExplanationPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ── Modern Sleek Blackish Theme Tokens for Explanation Panel ──
-    // Header (clean dark tone)
+    // ── Explanation Panel Theme Tokens (Warm Book Page for Light, Sleek Blackish for Dark) ──
+    // Header
     final headerBg = isDark
         ? const Color(0xFF141416)
-        : const Color(0xFFF4F4F5);
+        : const Color(0xFFF3ECE4);
     final headerTextColor = isDark
         ? const Color(0xFFF4F4F5)
-        : const Color(0xFF18181B);
+        : const Color(0xFF42352B);
     final headerBorderColor = isDark
         ? const Color(0xFF27272A)
-        : const Color(0xFFE4E4E7);
+        : const Color(0xFFE2D7C9);
     final chevronBg = isDark
         ? const Color(0xFF1E1E22)
-        : const Color(0xFFE4E4E7);
+        : const Color(0xFFE7DDD0);
 
-    // Below body (deeper sleek blackish background with crisp contrast)
+    // Below body
     final bodyBg = isDark
         ? const Color(0xFF09090B)
-        : const Color(0xFFFAFAFA);
+        : const Color(0xFFFAF7F2);
     final bodyTextColor = isDark
         ? const Color(0xFFF4F4F5)
-        : const Color(0xFF18181B);
+        : const Color(0xFF2E2621);
     final dividerColor = isDark
         ? const Color(0xFF27272A)
-        : const Color(0xFFE4E4E7);
+        : const Color(0xFFE8DFD3);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
