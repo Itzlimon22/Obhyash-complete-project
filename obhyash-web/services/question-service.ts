@@ -102,25 +102,8 @@ export const getQuestionsPage = async (
       const to = from + pageSize - 1;
       query = query.range(from, to);
 
-      // Concurrent fetches: paginated data + status counts via single RPC
-      // The RPC replaces 3 separate COUNT queries, reducing DB round-trips from 4 to 2.
-      let approvedCount = 0;
-      let pendingCount = 0;
-      let rejectedCount = 0;
-
-      const [queryResult, countsResult] = await Promise.all([
-        query,
-        supabase.rpc("get_question_status_counts", {
-          p_subject: filters.subject || null,
-          p_chapter: filters.chapter || null,
-          p_topic: filters.topic || null,
-          p_difficulty: filters.difficulty || null,
-          p_author: filters.author || null,
-          p_search: filters.search?.trim() || null,
-        }),
-      ]);
-
-      const { data, error, count } = queryResult;
+      // 1. Fetch paginated data
+      const { data, error, count } = await query;
 
       if (error) {
         console.error("Error fetching questions page:", error);
@@ -128,14 +111,42 @@ export const getQuestionsPage = async (
       }
 
       const totalCount = count || 0;
-      const statusCounts = countsResult.data as {
-        approved: number;
-        pending: number;
-        rejected: number;
-      } | null;
-      approvedCount = statusCounts?.approved || 0;
-      pendingCount = statusCounts?.pending || 0;
-      rejectedCount = statusCounts?.rejected || 0;
+      let approvedCount = 0;
+      let pendingCount = 0;
+      let rejectedCount = 0;
+
+      // 2. Fetch status counts with graceful fallback if RPC does not exist
+      try {
+        const countsResult = await supabase.rpc("get_question_status_counts", {
+          p_subject: filters.subject || null,
+          p_chapter: filters.chapter || null,
+          p_topic: filters.topic || null,
+          p_difficulty: filters.difficulty || null,
+          p_author: filters.author || null,
+          p_search: filters.search?.trim() || null,
+        });
+
+        if (countsResult && countsResult.data) {
+          const statusCounts = countsResult.data as {
+            approved: number;
+            pending: number;
+            rejected: number;
+          };
+          approvedCount = statusCounts?.approved || 0;
+          pendingCount = statusCounts?.pending || 0;
+          rejectedCount = statusCounts?.rejected || 0;
+        } else {
+          // Fallback: estimate from current page or total count
+          approvedCount = totalCount;
+          pendingCount = 0;
+          rejectedCount = 0;
+        }
+      } catch (rpcErr) {
+        console.warn("Status counts RPC not available, using fallback counts:", rpcErr);
+        approvedCount = totalCount;
+        pendingCount = 0;
+        rejectedCount = 0;
+      }
 
       // Map snake_case to camelCase
       const mappedQuestions: Question[] = (data || []).map(
