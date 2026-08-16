@@ -103,9 +103,9 @@ class AppColors {
   static const primaryAccent = Color(0xFF6366F1); // Indigo 500
   static const secondaryAccent = Color(0xFF8B5CF6); // Violet 500
   
-  static const darkBg = Color(0xFF0F172A); // Slate 900
-  static const darkSurface = Color(0xFF1C1C1E); // Slate 800
-  static const darkBorder = Color(0xFF334155); // Slate 700
+  static const darkBg = Color(0xFF0C0A09); // Deep Pure Black (matches app theme)
+  static const darkSurface = Color(0xFF141416); // Clean dark card surface
+  static const darkBorder = Color(0xFF262626); // Subtle dark border
   
   static const lightBg = Color(0xFFF8FAFC); // Slate 50
   static const lightSurface = Color(0xFFFFFFFF);

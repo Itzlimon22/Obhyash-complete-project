@@ -1,10 +1,9 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import '../../../../core/services/download_notification_service.dart';
 
 class RoutineItemModel {
   final String id;
@@ -263,42 +262,12 @@ class LiveExamRoutineSheet extends StatelessWidget {
     final fileName = 'Obhyash_${isHSC ? 'HSC' : 'SSC'}_Live_Exam_Routine.pdf';
 
     try {
-      Directory? dir;
-      if (Platform.isAndroid) {
-        dir = Directory('/storage/emulated/0/Download');
-        if (!await dir.exists()) {
-          dir = await getExternalStorageDirectory();
-        }
-      } else {
-        dir = await getApplicationDocumentsDirectory();
-      }
-
-      final saveDir = dir ?? await getApplicationDocumentsDirectory();
-      final file = File('${saveDir.path}/$fileName');
-      await file.writeAsBytes(bytes);
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: const Color(0xFF0B6B42),
-            content: Row(
-              children: [
-                const Icon(LucideIcons.checkCircle, color: Colors.white, size: 20),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'রুটিন PDF ডাউনলোড সম্পন্ন হয়েছে!\nসংরক্ষিত: $fileName',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
+      await DownloadNotificationService().savePdfAndNotify(
+        bytes: bytes,
+        rawFileName: fileName,
+        notificationTitle: 'লাইভ পরীক্ষার রুটিন ডাউনলোড সম্পন্ন হয়েছে ✅',
+        context: context,
+      );
     } catch (_) {
       // Fallback share if file system writing is restricted
       await Printing.sharePdf(bytes: bytes, filename: fileName);

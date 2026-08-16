@@ -36,9 +36,14 @@ export default function BlogBookmarkButton({
     mutate({ slugs: next }, false);
 
     try {
+      const token = typeof window !== 'undefined' ? (window as any)._obhyashToken : null;
+      
       const res = await fetch('/api/blog/bookmarks', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ slug }),
       });
       if (res.status === 401) {

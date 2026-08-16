@@ -179,6 +179,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           );
         },
       ),
+      GoRoute(
+        path: '/blog',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) =>
+            _fadeRoute(const BlogView(), state),
+      ),
+      GoRoute(
+        path: '/profile/blog',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) =>
+            _fadeRoute(const BlogView(), state),
+      ),
       // Stateful shell route for bottom tabs and drawer items
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -347,10 +359,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'faq',
                     builder: (context, state) => const FaqView(),
-                  ),
-                  GoRoute(
-                    path: 'blog',
-                    builder: (context, state) => const BlogView(),
                   ),
                   GoRoute(
                     path: 'referral',

@@ -274,8 +274,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
           waitingForInitialSession = true;
           return; // Exit early — INITIAL_SESSION takes over from here.
         }
-      } catch (error) {
-        console.error("Auth initialization sequence failed:", error);
+      } catch (error: any) {
+        if (error?.name !== 'AbortError') {
+          console.error("Auth initialization sequence failed:", error);
+        }
       } finally {
         // Skip if we are waiting for INITIAL_SESSION to provide the real session.
         // In that case INITIAL_SESSION handler is solely responsible for setLoading(false).

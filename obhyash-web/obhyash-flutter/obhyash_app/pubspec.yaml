@@ -61,6 +61,9 @@ dependencies:
   scratcher: ^2.5.0
   supabase: ^2.16.0
   image_picker: ^1.2.3
+  flutter_local_notifications: ^22.3.0
+  open_filex: ^4.7.0
+  permission_handler: ^13.0.1
 
 dev_dependencies:
   flutter_test:
@@ -127,3 +130,6 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+dependency_overrides:
+  permission_handler_android: ^12.0.0

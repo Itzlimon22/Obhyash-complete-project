@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
+import '../../../core/services/download_notification_service.dart';
 import '../../../core/utils/app_popups.dart';
 import '../domain/exam_models.dart';
 
@@ -11,7 +12,7 @@ class PdfDownloadService {
     BuildContext context,
   ) async {
     final filename =
-        '${result.subjectLabel ?? result.subject}_Question_Paper.pdf';
+        '${result.subjectLabel ?? result.subject}_Question_Paper';
     final htmlContent = _generateQuestionPaperHtml(result);
 
     try {
@@ -19,15 +20,18 @@ class PdfDownloadService {
         format: PdfPageFormat.a4,
         html: htmlContent,
       );
-      await Printing.sharePdf(
+
+      await DownloadNotificationService().savePdfAndNotify(
         bytes: pdfBytes,
-        filename: filename,
+        rawFileName: filename,
+        notificationTitle: 'প্রশ্নপত্র PDF ডাউনলোড সম্পন্ন হয়েছে ✅',
+        context: context,
       );
     } catch (e) {
-      debugPrint('[PdfDownloadService] sharePdf failed: $e. Falling back to layoutPdf...');
+      debugPrint('[PdfDownloadService] downloadQuestionPaper failed: $e. Falling back to layoutPdf...');
       try {
         await Printing.layoutPdf(
-          name: filename,
+          name: '$filename.pdf',
           format: PdfPageFormat.a4,
           onLayout: (PdfPageFormat format) async {
             return await Printing.convertHtml(
@@ -55,7 +59,7 @@ class PdfDownloadService {
     BuildContext context,
   ) async {
     final filename =
-        '${result.subjectLabel ?? result.subject}_Result_Explanation.pdf';
+        '${result.subjectLabel ?? result.subject}_Result_Explanation';
     final htmlContent = _generateResultHtml(result);
 
     try {
@@ -63,15 +67,18 @@ class PdfDownloadService {
         format: PdfPageFormat.a4,
         html: htmlContent,
       );
-      await Printing.sharePdf(
+
+      await DownloadNotificationService().savePdfAndNotify(
         bytes: pdfBytes,
-        filename: filename,
+        rawFileName: filename,
+        notificationTitle: 'ফলাফল ও ব্যাখ্যা PDF ডাউনলোড সম্পন্ন হয়েছে ✅',
+        context: context,
       );
     } catch (e) {
-      debugPrint('[PdfDownloadService] sharePdf failed: $e. Falling back to layoutPdf...');
+      debugPrint('[PdfDownloadService] downloadResultWithExplanations failed: $e. Falling back to layoutPdf...');
       try {
         await Printing.layoutPdf(
-          name: filename,
+          name: '$filename.pdf',
           format: PdfPageFormat.a4,
           onLayout: (PdfPageFormat format) async {
             return await Printing.convertHtml(

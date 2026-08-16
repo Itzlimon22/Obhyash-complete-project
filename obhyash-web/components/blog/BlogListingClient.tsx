@@ -477,7 +477,7 @@ export default function BlogListingClient({
       </section>
 
       {/* ─── CTA Banner ─── */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+      <section id="blog-cta-banner" className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
         <div className="relative overflow-hidden rounded-2xl bg-slate-50 dark:bg-[#1a1a1a] border border-slate-200 dark:border-[#383838] p-8 sm:p-12 text-center shadow-sm">
           <div className="relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 mb-5 bg-white/50 dark:bg-[#2a2a2a] text-slate-600 dark:text-slate-300 text-[11px] font-bold rounded-full uppercase tracking-wider border border-slate-200 dark:border-[#383838]">

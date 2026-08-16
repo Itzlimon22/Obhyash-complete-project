@@ -1,6 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { rateLimitResponse } from '@/lib/utils/rate-limit';
+
+function getDbClient(token?: string | null) {
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } },
+    );
+  }
+  if (token) {
+    return createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        global: { headers: { Authorization: `Bearer ${token}` } },
+        auth: { persistSession: false },
+      },
+    );
+  }
+  return null;
+}
+
+async function getAuthUserAndToken(request: NextRequest, supabase: any) {
+  const authHeader =
+    request.headers.get('authorization') ||
+    request.headers.get('Authorization');
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.substring(7).trim();
+    if (token) {
+      const { data, error } = await supabase.auth.getUser(token);
+      if (data?.user && !error) return { user: data.user, token };
+    }
+  }
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return { user: user ?? null, token: null };
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,28 +54,26 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
+    const { user, token } = await getAuthUserAndToken(request, supabase);
+    const db = getDbClient(token) || supabase;
 
     // 1. Get total likes count
-    const { count, error: countError } = await supabase
+    const { count, error: countError } = await db
       .from('blog_likes')
       .select('*', { count: 'exact', head: true })
       .eq('post_slug', slug);
 
     if (countError) throw countError;
 
-    // 2. Check if the current user has liked it (if logged in)
+    // 2. Check if current user liked
     let hasLiked = false;
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     if (user) {
-      const { data: userLike } = await supabase
+      const { data: userLike } = await db
         .from('blog_likes')
         .select('id')
         .eq('post_slug', slug)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (userLike) hasLiked = true;
     }
@@ -57,14 +94,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
+    const { user, token } = await getAuthUserAndToken(request, supabase);
 
-    // Verify authentication
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json(
         { error: 'You must be logged in to like posts' },
         { status: 401 },
@@ -76,38 +108,35 @@ export async function POST(request: NextRequest) {
     if (rl.limited) return rl.response;
 
     const { slug } = await request.json();
-
     if (!slug) {
       return NextResponse.json({ error: 'Slug is required' }, { status: 400 });
     }
 
-    // Check if the like already exists
-    const { data: existingLike } = await supabase
+    const db = getDbClient(token) || supabase;
+
+    // Check if like exists
+    const { data: existingLike } = await db
       .from('blog_likes')
       .select('id')
       .eq('post_slug', slug)
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (existingLike) {
-      // Unlike (Delete the record)
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = await db
         .from('blog_likes')
         .delete()
         .eq('id', existingLike.id);
 
       if (deleteError) throw deleteError;
-
       return NextResponse.json({ hasLiked: false });
     } else {
-      // Like (Insert a new record)
-      const { error: insertError } = await supabase.from('blog_likes').insert({
+      const { error: insertError } = await db.from('blog_likes').insert({
         post_slug: slug,
         user_id: user.id,
       });
 
       if (insertError) throw insertError;
-
       return NextResponse.json({ hasLiked: true });
     }
   } catch (error: any) {

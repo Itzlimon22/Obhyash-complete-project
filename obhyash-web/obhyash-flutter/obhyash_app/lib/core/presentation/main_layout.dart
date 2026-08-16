@@ -199,9 +199,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
   }
 
   void _onTabChange(String tab) {
-    if (tab == 'blog') {
-      widget.navigationShell.goBranch(4);
-      context.go('/profile/blog');
+    if (tab == 'blog' || tab == 'profile/blog') {
+      context.push('/blog');
       return;
     }
 

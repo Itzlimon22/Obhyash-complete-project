@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'core/services/download_notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router.dart';
 import 'core/providers/shared_prefs_provider.dart';
@@ -14,6 +15,9 @@ void main() async {
 
   // Initialize SharedPreferences
   final prefs = await SharedPreferences.getInstance();
+
+  // Initialize Download Notifications
+  await DownloadNotificationService().init();
 
   // Initialize Supabase with real keys
   await Supabase.initialize(
