@@ -10,6 +10,7 @@ import '../../../core/providers/theme_provider.dart';
 import '../../auth/providers/auth_controller.dart';
 import 'personal_details_view.dart';
 import 'widgets/account_info_modal.dart';
+import 'widgets/delete_account_modal.dart';
 import '../../../core/presentation/widgets/user_avatar.dart';
 
 // ─── Data model ──────────────────────────────────────────────────────────────
@@ -178,6 +179,14 @@ class SettingsView extends ConsumerWidget {
             actionId: 'logout',
             danger: true,
           ),
+          _SettingsItem(
+            label: 'অ্যাকাউন্ট মুছুন',
+            description: 'স্থায়ীভাবে তোমার অ্যাকাউন্ট ও ডেটা ডিলিট করো',
+            icon: LucideIcons.trash2,
+            type: _ItemType.action,
+            actionId: 'deleteAccount',
+            danger: true,
+          ),
         ],
       ),
     ];
@@ -203,6 +212,8 @@ class SettingsView extends ConsumerWidget {
       case _ItemType.action:
         if (item.actionId == 'accountInfo') {
           AccountInfoModal.show(context, user);
+        } else if (item.actionId == 'deleteAccount') {
+          DeleteAccountModal.show(context, user);
         } else if (item.actionId == 'toggleTheme') {
           ref.read(themeModeProvider.notifier).toggle();
         } else if (item.actionId == 'logout') {

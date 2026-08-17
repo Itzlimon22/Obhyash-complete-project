@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
+import '../../exam/domain/exam_models.dart';
+import '../../exam/presentation/widgets/question_card.dart';
 
 // ─── Models ──────────────────────────────────────────────────────────────────────
 class ReportQuestionData {
@@ -547,6 +549,21 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
     if (report.question == null) return;
     final q = report.question!;
 
+    final correctIndex = (q.correctAnswerIndices != null && q.correctAnswerIndices!.isNotEmpty)
+        ? q.correctAnswerIndices!.first
+        : 0;
+
+    final questionObj = Question(
+      id: report.id,
+      subject: q.subject,
+      chapter: '',
+      question: q.question,
+      options: q.options,
+      correctAnswerIndex: correctIndex,
+      explanation: q.explanation,
+      points: 1,
+    );
+
     showModalBottomSheet(
       context: context,
       useRootNavigator: true,
@@ -555,39 +572,64 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
       builder: (ctx) {
         return Container(
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(ctx).size.height * 0.72,
+            maxHeight: MediaQuery.of(ctx).size.height * 0.52,
           ),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF18181B) : Colors.white,
+            color: isDark ? const Color(0xFF13151F) : const Color(0xFFF8FAFC),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.35),
+                blurRadius: 16,
+                offset: const Offset(0, -3),
+              ),
+            ],
           ),
           child: SafeArea(
             top: false,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Top drag pill
                 Container(
                   margin: const EdgeInsets.only(top: 8, bottom: 2),
-                  width: 32,
+                  width: 36,
                   height: 3.5,
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE4E4E7),
+                    color: isDark ? Colors.white24 : Colors.black12,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 10, 6),
+                  padding: const EdgeInsets.fromLTRB(16, 2, 8, 4),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'সম্পূর্ণ প্রশ্ন',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          fontFamily: 'Anek Bangla',
-                          color: isDark ? Colors.white : const Color(0xFF18181B),
-                        ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              LucideIcons.helpCircle,
+                              size: 15,
+                              color: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'সম্পূর্ণ প্রশ্ন',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'HindSiliguri',
+                              color: isDark ? Colors.white : const Color(0xFF0F172A),
+                            ),
+                          ),
+                        ],
                       ),
                       IconButton(
                         icon: const Icon(LucideIcons.x, size: 18),
@@ -600,152 +642,23 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                 ),
                 Divider(
                   height: 1,
-                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFF4F4F5),
+                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
                 ),
                 Flexible(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
-                          decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            _subjectName(q.subject),
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'Anek Bangla',
-                              color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF047857),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          q.question,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'Anek Bangla',
-                            color: isDark ? Colors.white : const Color(0xFF18181B),
-                            height: 1.35,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        ...List.generate(q.options.length, (idx) {
-                          final isCorrect = q.correctAnswerIndices?.contains(idx) ?? false;
-                          
-                          Color boxBg = isDark ? const Color(0xFF27272A) : const Color(0xFFF8FAFC);
-                          Color boxBorder = isDark ? const Color(0xFF3F3F46) : const Color(0xFFE2E8F0);
-                          Color bulletBg = Colors.transparent;
-                          Color bulletBorder = isDark ? const Color(0xFF52525B) : const Color(0xFFCBD5E1);
-                          Color bulletText = isDark ? const Color(0xFFD4D4D8) : const Color(0xFF64748B);
-                          Color optionTextColor = isDark ? const Color(0xFFE4E4E7) : const Color(0xFF1E293B);
-                          bool boldText = false;
-
-                          if (isCorrect) {
-                            boxBg = isDark ? const Color(0xFF059669).withValues(alpha: 0.15) : const Color(0xFFECFDF5);
-                            boxBorder = isDark ? const Color(0xFF059669) : const Color(0xFFA7F3D0);
-                            bulletBg = const Color(0xFF059669);
-                            bulletBorder = const Color(0xFF059669);
-                            bulletText = Colors.white;
-                            optionTextColor = isDark ? const Color(0xFF34D399) : const Color(0xFF047857);
-                            boldText = true;
-                          }
-
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: boxBg,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: boxBorder),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 24,
-                                  height: 24,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: bulletBg,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: bulletBorder),
-                                  ),
-                                  child: Text(
-                                    String.fromCharCode(65 + idx),
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                      color: bulletText,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    q.options[idx],
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: optionTextColor,
-                                      fontWeight: boldText ? FontWeight.w800 : FontWeight.w600,
-                                      fontFamily: 'Anek Bangla',
-                                      height: 1.3,
-                                    ),
-                                  ),
-                                ),
-                                if (isCorrect)
-                                  const Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 18),
-                              ],
-                            ),
-                          );
-                        }),
-                        if (q.explanation != null && q.explanation!.isNotEmpty) ...[
-                          const SizedBox(height: 10),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1E293B).withValues(alpha: 0.5) : const Color(0xFFF0F9FF),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFBAE6FD)),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.lightbulb_outline_rounded, size: 16, color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7)),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      'ব্যাখ্যা',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13,
-                                        fontFamily: 'Anek Bangla',
-                                        color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  q.explanation!,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
-                                    fontFamily: 'Anek Bangla',
-                                    height: 1.4,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ],
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+                    child: QuestionCard(
+                      question: questionObj,
+                      serialNumber: 1,
+                      selectedOptionIndex: correctIndex,
+                      showAnswer: true,
+                      showFeedback: true,
+                      initiallyExpanded: false,
+                      readOnly: true,
+                      isFlagged: false,
+                      onSelectOption: (_) {},
+                      onToggleFlag: () {},
+                      onReport: () {},
                     ),
                   ),
                 ),

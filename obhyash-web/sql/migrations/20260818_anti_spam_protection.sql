@@ -790,6 +790,149 @@ BEGIN
 END $$;
 
 
+-- ==============================================================================
+-- 11. Enterprise-Grade Account Deletion & Anti-Abuse System
+-- ==============================================================================
+
+-- 1. Create audit table to track deleted accounts (Anti-Spam & Anti-Referral-Farming)
+CREATE TABLE IF NOT EXISTS public.deleted_accounts_audit (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID,
+    email_hash TEXT NOT NULL,
+    phone_hash TEXT,
+    student_id TEXT,
+    had_active_subscription BOOLEAN DEFAULT FALSE,
+    reason TEXT,
+    deleted_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.deleted_accounts_audit ENABLE ROW LEVEL SECURITY;
+-- Only service_role can access audit logs
+
+-- 2. Secure RPC function to execute account deletion with full safety checks
+CREATE OR REPLACE FUNCTION public.delete_user_account(p_reason TEXT DEFAULT NULL)
+RETURNS JSONB AS $$
+DECLARE
+    v_user_id UUID;
+    v_user RECORD;
+    v_has_active_exam BOOLEAN := FALSE;
+    v_has_active_sub BOOLEAN := FALSE;
+    v_email TEXT;
+    v_phone TEXT;
+BEGIN
+    -- Identify the calling user
+    v_user_id := auth.uid();
+    IF v_user_id IS NULL THEN
+        RAISE EXCEPTION 'অননুমোদিত অনুরোধ। অনুগ্রহ করে পুনরায় লগইন করো।' USING ERRCODE = 'P0001';
+    END IF;
+
+    -- Fetch user profile
+    SELECT * INTO v_user FROM public.users WHERE id = v_user_id;
+    IF v_user IS NULL THEN
+        RAISE EXCEPTION 'ব্যবহারকারীর অ্যাকাউন্ট খুঁজে পাওয়া যায়নি।' USING ERRCODE = 'P0002';
+    END IF;
+
+    -- Protection 1: Admin & Teacher cannot self-delete from client
+    IF v_user.role IN ('Admin', 'Teacher') THEN
+        RAISE EXCEPTION 'অ্যাডমিন বা শিক্ষক অ্যাকাউন্ট স্বয়ংক্রিয়ভাবে মুছে ফেলা সম্ভব নয়। অনুগ্রহ করে সুপার অ্যাডমিনের সাথে যোগাযোগ করো।' USING ERRCODE = 'P0003';
+    END IF;
+
+    -- Protection 2: Suspended / Banned users cannot evade ban by self-deleting
+    IF v_user.status = 'Suspended' THEN
+        RAISE EXCEPTION 'তোমার অ্যাকাউন্টটি বর্তমানে পর্যালোচনায় রয়েছে। অ্যাকাউন্ট সংক্রান্ত যেকোনো বিষয়ের জন্য সাপোর্টে যোগাযোগ করো।' USING ERRCODE = 'P0004';
+    END IF;
+
+    -- Protection 3: Check for ongoing live exam in the last 1 hour
+    IF EXISTS (
+        SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'exam_results'
+    ) THEN
+        SELECT EXISTS (
+            SELECT 1 FROM public.exam_results 
+            WHERE user_id = v_user_id 
+              AND status = 'ongoing' 
+              AND started_at > NOW() - INTERVAL '1 hour'
+        ) INTO v_has_active_exam;
+
+        IF v_has_active_exam THEN
+            RAISE EXCEPTION 'তোমার একটি চলমান পরীক্ষা রয়েছে। পরীক্ষা সমাপ্ত করার পর অ্যাকাউন্ট মুছে ফেলার অনুরোধ করো।' USING ERRCODE = 'P0005';
+        END IF;
+    END IF;
+
+    -- Check active subscription state
+    IF (v_user.is_subscribed = TRUE OR v_user.subscription_status = 'active' OR (v_user.subscription->>'status') = 'active') THEN
+        v_has_active_sub := TRUE;
+    END IF;
+
+    -- Get email and phone from auth.users
+    SELECT email, phone INTO v_email, v_phone FROM auth.users WHERE id = v_user_id;
+
+    -- Protection 4: Log to audit table for anti-referral-farming & anti-abuse detection
+    INSERT INTO public.deleted_accounts_audit (
+        user_id,
+        email_hash,
+        phone_hash,
+        student_id,
+        had_active_subscription,
+        reason,
+        deleted_at
+    ) VALUES (
+        v_user_id,
+        encode(digest(COALESCE(LOWER(TRIM(v_email)), ''), 'sha256'), 'hex'),
+        encode(digest(COALESCE(TRIM(v_phone), ''), 'sha256'), 'hex'),
+        v_user.student_id,
+        v_has_active_sub,
+        p_reason,
+        NOW()
+    );
+
+    -- 5. Hard purge user data across all tables
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user_answers') THEN
+        DELETE FROM public.user_answers WHERE user_id = v_user_id;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'exam_results') THEN
+        DELETE FROM public.exam_results WHERE user_id = v_user_id;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'bookmarks') THEN
+        DELETE FROM public.bookmarks WHERE user_id = v_user_id;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'notes') THEN
+        DELETE FROM public.notes WHERE user_id = v_user_id;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'scratch_cards') THEN
+        DELETE FROM public.scratch_cards WHERE user_id = v_user_id;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'referral_attempt_logs') THEN
+        DELETE FROM public.referral_attempt_logs WHERE user_id = v_user_id;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'app_complaints') THEN
+        DELETE FROM public.app_complaints WHERE user_id = v_user_id;
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'app_feature_requests') THEN
+        DELETE FROM public.app_feature_requests WHERE user_id = v_user_id;
+    END IF;
+
+    -- Delete from public.users
+    DELETE FROM public.users WHERE id = v_user_id;
+
+    -- Delete from auth.users (permanently revoking login)
+    DELETE FROM auth.users WHERE id = v_user_id;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'message', 'তোমার অ্যাকাউন্ট এবং সমস্ত তথ্য স্থায়ীভাবে মুছে ফেলা হয়েছে।'
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+
 
 
 

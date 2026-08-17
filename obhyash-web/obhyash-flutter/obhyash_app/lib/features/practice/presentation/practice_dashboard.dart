@@ -10,6 +10,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import '../../../core/presentation/widgets/latex_text.dart';
 import '../../../core/providers/auth_provider.dart';
+import '../../dashboard/providers/dashboard_providers.dart';
+import '../../../core/presentation/widgets/pro_upgrade_modal.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/services/local_exam_cache_service.dart';
 import '../providers/practice_providers.dart';
@@ -486,6 +488,22 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     if (uid == null) return;
 
     final isMarked = _bookmarkedIds.contains(qid);
+
+    if (!isMarked) {
+      final profile = ref.read(userProfileProvider).value;
+      final isPro = profile?.isPro ?? false;
+      if (!isPro && _totalBookmarks >= 25) {
+        ProUpgradeModal.show(
+          context,
+          title: 'বুকমার্ক লিমিট শেষ 📌',
+          message: 'ফ্রি অ্যাকাউন্টে সর্বোচ্চ ২৫টি প্রশ্ন বুকমার্ক করা যাবে। আনলিমিটেড বুকমার্ক ও স্টাডি নোটের জন্য প্রো সাবস্ক্রিপশন নাও।',
+          featurePill: 'বুকমার্ক লিমিট: ২৫/২৫',
+          icon: LucideIcons.bookmark,
+        );
+        return;
+      }
+    }
+
     setState(() {
       if (isMarked) {
         _bookmarkedIds.remove(qid);

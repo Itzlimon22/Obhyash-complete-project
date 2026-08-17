@@ -501,44 +501,90 @@ class _PricingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isEmerald = plan.colorTheme == 'emerald';
-    final bool isPopular = plan.durationDays >= 90;
+    final bool isMasterPro = plan.durationDays >= 180;
+    final bool isTopRankers = plan.durationDays >= 90 && plan.durationDays < 180;
 
-    final Color primaryColor = isEmerald ? const Color(0xFF10B981) : const Color(0xFFF43F5E);
-    final Color accentGreen = const Color(0xFF059669);
+    // Accent Colors
+    final Color accentColor = isMasterPro
+        ? const Color(0xFFD97706) // Amber / Gold
+        : isTopRankers
+            ? const Color(0xFF059669) // Emerald
+            : const Color(0xFF4F46E5); // Indigo
 
+    // Gradient Card Background
     final cardGradient = isDark
         ? LinearGradient(
-            colors: isPopular
-                ? [const Color(0xFF1A2621), const Color(0xFF131A17)]
-                : [const Color(0xFF18181B), const Color(0xFF121215)],
+            colors: isMasterPro
+                ? [const Color(0xFF261D0F), const Color(0xFF18130B)]
+                : isTopRankers
+                    ? [const Color(0xFF142921), const Color(0xFF0E1A15)]
+                    : [const Color(0xFF18181B), const Color(0xFF121215)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           )
         : LinearGradient(
-            colors: isPopular
-                ? [const Color(0xFFF0FDF4), Colors.white]
-                : [Colors.white, const Color(0xFFFAFAFA)],
+            colors: isMasterPro
+                ? [const Color(0xFFFFFBEB), Colors.white]
+                : isTopRankers
+                    ? [const Color(0xFFF0FDF4), Colors.white]
+                    : [Colors.white, const Color(0xFFFAFAFA)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           );
 
-    final borderColor = isPopular
-        ? accentGreen.withValues(alpha: isDark ? 0.7 : 0.5)
-        : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0));
+    final borderColor = isMasterPro
+        ? const Color(0xFFD97706).withValues(alpha: isDark ? 0.8 : 0.6)
+        : isTopRankers
+            ? const Color(0xFF059669).withValues(alpha: isDark ? 0.8 : 0.6)
+            : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0));
+
+    // Badge configuration
+    String? badgeText;
+    IconData? badgeIcon;
+    List<Color>? badgeColors;
+
+    if (isMasterPro) {
+      badgeText = 'মেগা সেভার 👑 ৫০% সাশ্রয়';
+      badgeIcon = LucideIcons.crown;
+      badgeColors = const [Color(0xFFB45309), Color(0xFFD97706)];
+    } else if (isTopRankers) {
+      badgeText = 'জনপ্রিয় 🌟 ৪১% সাশ্রয়';
+      badgeIcon = LucideIcons.sparkles;
+      badgeColors = const [Color(0xFF064E3B), Color(0xFF059669)];
+    } else {
+      badgeText = 'স্টার্টার ⚡';
+      badgeIcon = LucideIcons.zap;
+      badgeColors = const [Color(0xFF312E81), Color(0xFF4F46E5)];
+    }
+
+    // Monthly breakdown calculation
+    String monthlyCostText;
+    if (isMasterPro) {
+      monthlyCostText = 'প্রতি মাসে মাত্র ৳৯৯ • সেরা লং-টার্ম ভ্যালু!';
+    } else if (isTopRankers) {
+      monthlyCostText = 'প্রতি মাসে মাত্র ৳১১৬ • সিজন স্পেশাল!';
+    } else {
+      monthlyCostText = '৩০ দিন ফুল এক্সেস • এককালীন পেমেন্ট';
+    }
 
     return Container(
       decoration: BoxDecoration(
         gradient: cardGradient,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: borderColor,
-          width: isPopular ? 1.6 : 1.2,
+          width: (isMasterPro || isTopRankers) ? 1.6 : 1.2,
         ),
         boxShadow: [
-          if (isPopular)
+          if (isMasterPro)
             BoxShadow(
-              color: accentGreen.withValues(alpha: isDark ? 0.22 : 0.1),
+              color: const Color(0xFFD97706).withValues(alpha: isDark ? 0.25 : 0.12),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
+            )
+          else if (isTopRankers)
+            BoxShadow(
+              color: const Color(0xFF059669).withValues(alpha: isDark ? 0.25 : 0.12),
               blurRadius: 24,
               offset: const Offset(0, 8),
             )
@@ -552,43 +598,41 @@ class _PricingCard extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          if (isPopular)
-            Positioned(
-              top: 16,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF004633), Color(0xFF059669)],
+          // Top-right dynamic badge
+          Positioned(
+            top: 16,
+            right: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: badgeColors),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: accentColor.withValues(alpha: 0.35),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: accentGreen.withValues(alpha: 0.35),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(badgeIcon, size: 12, color: Colors.white),
+                  const SizedBox(width: 4),
+                  Text(
+                    badgeText,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'HindSiliguri',
                     ),
-                  ],
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(LucideIcons.sparkles, size: 12, color: Colors.white),
-                    SizedBox(width: 4),
-                    Text(
-                      'জনপ্রিয়',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                        fontFamily: 'HindSiliguri',
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
+          ),
           Padding(
             padding: const EdgeInsets.all(22),
             child: Column(
@@ -631,16 +675,26 @@ class _PricingCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 4),
+                Text(
+                  monthlyCostText,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'HindSiliguri',
+                    color: accentColor,
+                  ),
+                ),
+                const SizedBox(height: 16),
                 Divider(
                   height: 1,
                   thickness: 0.8,
                   color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
                 ...plan.features.map(
                   (feature) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.only(bottom: 11),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -649,16 +703,14 @@ class _PricingCard extends StatelessWidget {
                           height: 22,
                           margin: const EdgeInsets.only(top: 1),
                           decoration: BoxDecoration(
-                            color: isEmerald
-                                ? const Color(0xFF059669).withValues(alpha: isDark ? 0.22 : 0.12)
-                                : const Color(0xFFF43F5E).withValues(alpha: isDark ? 0.22 : 0.12),
+                            color: accentColor.withValues(alpha: isDark ? 0.22 : 0.12),
                             shape: BoxShape.circle,
                           ),
                           child: Center(
                             child: Icon(
                               LucideIcons.check,
                               size: 13,
-                              color: primaryColor,
+                              color: accentColor,
                             ),
                           ),
                         ),
@@ -667,7 +719,7 @@ class _PricingCard extends StatelessWidget {
                           child: Text(
                             feature,
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14.5,
                               height: 1.35,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'HindSiliguri',
@@ -675,8 +727,6 @@ class _PricingCard extends StatelessWidget {
                                   ? const Color(0xFFE4E4E7)
                                   : const Color(0xFF334155),
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -691,29 +741,31 @@ class _PricingCard extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isCurrent
                           ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB))
-                          : (isPopular
-                              ? const Color(0xFF004633)
-                              : (isDark ? const Color(0xFF27272A) : const Color(0xFF0F172A))),
+                          : (isMasterPro
+                              ? const Color(0xFFB45309)
+                              : isTopRankers
+                                  ? const Color(0xFF004633)
+                                  : const Color(0xFF3730A3)),
                       foregroundColor: isCurrent
                           ? (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A))
                           : Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
-                        side: !isPopular && !isCurrent
+                        side: !isMasterPro && !isTopRankers && !isCurrent
                             ? BorderSide(
-                                color: isDark ? const Color(0xFF3F3F46) : const Color(0xFF0F172A),
+                                color: isDark ? const Color(0xFF3F3F46) : const Color(0xFF4338CA),
                                 width: 1,
                               )
                             : BorderSide.none,
                       ),
-                      elevation: isPopular ? 3 : 0,
-                      shadowColor: isPopular ? accentGreen.withValues(alpha: 0.35) : Colors.transparent,
+                      elevation: (isMasterPro || isTopRankers) ? 3 : 0,
+                      shadowColor: accentColor.withValues(alpha: 0.35),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          isCurrent ? 'বর্তমান প্ল্যান' : 'আপগ্রেড করো',
+                          isCurrent ? 'বর্তমান প্ল্যান' : 'এই প্ল্যানটি নাও',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w900,
@@ -726,7 +778,7 @@ class _PricingCard extends StatelessWidget {
                         if (!isCurrent) ...[
                           const SizedBox(width: 8),
                           Icon(
-                            isPopular ? LucideIcons.sparkles : LucideIcons.arrowRight,
+                            (isMasterPro || isTopRankers) ? LucideIcons.sparkles : LucideIcons.arrowRight,
                             size: 16,
                             color: Colors.white,
                           ),

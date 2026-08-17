@@ -322,6 +322,7 @@ export interface SubscriptionPlan {
   name: string;
   price: number;
   billingCycle: string;
+  duration_days?: number;
   currency: string;
   features: string[];
   isPopular?: boolean;

@@ -10,6 +10,7 @@ import '../../dashboard/providers/dashboard_providers.dart';
 import 'package:obhyash_app/core/utils/app_popups.dart';
 import '../../../core/presentation/widgets/latex_text.dart';
 import '../../../core/presentation/widgets/obhyash_tooltip.dart';
+import '../../../core/presentation/widgets/pro_upgrade_modal.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 
 // --- Domain Models ---
@@ -361,6 +362,51 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
       );
       return;
     }
+
+    final profile = ref.read(userProfileProvider).value;
+    final isPro = profile?.isPro ?? false;
+
+    // Gatekeeper 1: 50+ Questions limit for free users
+    if (_questionCount > 50 && !isPro) {
+      ProUpgradeModal.show(
+        context,
+        title: '৫০+ প্রশ্ন আনলক করো ⚡',
+        message: 'ফ্রি অ্যাকাউন্টে সর্বোচ্চ ৫০টি প্রশ্ন দিয়ে পরীক্ষা তৈরি করা যায়। ৭৫ বা ১০০ প্রশ্নের পূর্ণাঙ্গ মডেল টেস্ট দিতে প্রো সাবস্ক্রিপশন নাও।',
+        featurePill: 'প্রো ফিচার',
+      );
+      return;
+    }
+
+    // Gatekeeper 2: Daily 2 free exams quota
+    if (!isPro) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        final now = DateTime.now().toUtc();
+        final startOfDay = DateTime.utc(now.year, now.month, now.day).toIso8601String();
+        try {
+          final List res = await Supabase.instance.client
+              .from('exam_results')
+              .select('id')
+              .eq('user_id', user.id)
+              .gte('created_at', startOfDay);
+          if (res.length >= 2) {
+            if (mounted) {
+              ProUpgradeModal.show(
+                context,
+                title: 'আজকের ফ্রি কোটা শেষ 🎯',
+                message: 'তুমি আজকের ২টি ফ্রি পরীক্ষা সম্পন্ন করে ফেলেছ! প্রতিদিন আনলিমিটেড পরীক্ষা দিতে প্রো সাবস্ক্রিপশন নাও।',
+                featurePill: 'দৈনিক ফ্রি কোটা: ২/২',
+                icon: LucideIcons.calendarCheck,
+              );
+            }
+            return;
+          }
+        } catch (e) {
+          debugPrint('[ExamSetupView] Quota check error: $e');
+        }
+      }
+    }
+
     setState(() => _isStarting = true);
 
     final selectedSub = _subjects.firstWhere((s) => s.id == _selectedSubject);
@@ -1031,6 +1077,17 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                         step: 5,
                         isDark: isDark,
                         onChanged: (val) {
+                          final profile = ref.read(userProfileProvider).value;
+                          final isPro = profile?.isPro ?? false;
+                          if (val > 50 && !isPro) {
+                            ProUpgradeModal.show(
+                              context,
+                              title: '৫০+ প্রশ্ন আনলক করো ⚡',
+                              message: 'ফ্রি অ্যাকাউন্টে সর্বোচ্চ ৫০টি প্রশ্ন দিয়ে পরীক্ষা তৈরি করা যায়। ৭৫ বা ১০০ প্রশ্নের পূর্ণাঙ্গ মডেল টেস্ট দিতে প্রো সাবস্ক্রিপশন নাও।',
+                              featurePill: 'প্রো ফিচার',
+                            );
+                            return;
+                          }
                           HapticFeedback.lightImpact();
                           setState(() {
                             _questionCount = val;
@@ -1053,6 +1110,17 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                             isSelected: isSelected,
                             isDark: isDark,
                             onTap: () {
+                              final profile = ref.read(userProfileProvider).value;
+                              final isPro = profile?.isPro ?? false;
+                              if (count > 50 && !isPro) {
+                                ProUpgradeModal.show(
+                                  context,
+                                  title: '৫০+ প্রশ্ন আনলক করো ⚡',
+                                  message: 'ফ্রি অ্যাকাউন্টে সর্বোচ্চ ৫০টি প্রশ্ন দিয়ে পরীক্ষা তৈরি করা যায়। ১০০ প্রশ্নের পূর্ণাঙ্গ মডেল টেস্ট দিতে প্রো সাবস্ক্রিপশন নাও।',
+                                  featurePill: 'প্রো ফিচার',
+                                );
+                                return;
+                              }
                               HapticFeedback.selectionClick();
                               setState(() {
                                 _questionCount = count;

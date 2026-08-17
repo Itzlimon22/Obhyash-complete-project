@@ -12,6 +12,7 @@ import 'widgets/exam_scope_header.dart';
 import '../services/pdf_download_service.dart';
 import '../../../core/utils/app_popups.dart';
 import '../../../core/presentation/widgets/obhyash_tooltip.dart';
+import '../../../core/presentation/widgets/pro_upgrade_modal.dart';
 
 class ResultView extends StatefulWidget {
   final ExamResult result;
@@ -78,6 +79,38 @@ class _ResultViewState extends State<ResultView> {
 
   void _toggleBookmark(String id) {
     final wasBookmarked = _bookmarkedIds.contains(id);
+
+    if (!wasBookmarked && _bookmarkedIds.length >= 25) {
+      final supabase = Supabase.instance.client;
+      final uid = supabase.auth.currentUser?.id;
+      if (uid != null) {
+        supabase.from('users').select('is_subscribed, subscription_status').eq('id', uid).maybeSingle().then((userRow) {
+          final isSub = (userRow?['is_subscribed'] == true) || (userRow?['subscription_status'] == 'active');
+          if (!isSub) {
+            if (mounted) {
+              ProUpgradeModal.show(
+                context,
+                title: 'বুকমার্ক লিমিট শেষ 📌',
+                message: 'ফ্রি অ্যাকাউন্টে সর্বোচ্চ ২৫টি প্রশ্ন বুকমার্ক করা যাবে। আনলিমিটেড বুকমার্ক ও স্টাডি নোটের জন্য প্রো সাবস্ক্রিপশন নাও।',
+                featurePill: 'বুকমার্ক লিমিট: ২৫/২৫',
+                icon: LucideIcons.bookmark,
+              );
+            }
+            return;
+          }
+          _executeToggleBookmark(id, wasBookmarked, uid);
+        }).catchError((_) {
+          _executeToggleBookmark(id, wasBookmarked, uid);
+        });
+        return;
+      }
+    }
+
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    _executeToggleBookmark(id, wasBookmarked, uid);
+  }
+
+  void _executeToggleBookmark(String id, bool wasBookmarked, String? uid) {
     setState(() {
       if (wasBookmarked) {
         _bookmarkedIds.remove(id);
@@ -87,7 +120,6 @@ class _ResultViewState extends State<ResultView> {
     });
     // Persist to Supabase bookmarks table
     final supabase = Supabase.instance.client;
-    final uid = supabase.auth.currentUser?.id;
     if (uid != null) {
       if (wasBookmarked) {
         supabase

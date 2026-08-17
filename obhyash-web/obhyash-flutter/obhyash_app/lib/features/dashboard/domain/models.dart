@@ -166,6 +166,9 @@ class UserProfile {
   final int dailyExamsGoal;
   final bool admissionTrackInterest;
   final String? lastStreakDate;
+  final bool isSubscribed;
+  final String? subscriptionStatus;
+  final String? subscriptionExpiresAt;
 
   UserProfile({
     required this.id,
@@ -194,7 +197,21 @@ class UserProfile {
     this.dailyExamsGoal = 3,
     this.admissionTrackInterest = false,
     this.lastStreakDate,
+    this.isSubscribed = false,
+    this.subscriptionStatus,
+    this.subscriptionExpiresAt,
   });
+
+  bool get isPro {
+    if (isSubscribed) return true;
+    if (subscriptionStatus == 'active') return true;
+    if (level != null && level!.toLowerCase().contains('pro')) return true;
+    if (subscriptionExpiresAt != null) {
+      final exp = DateTime.tryParse(subscriptionExpiresAt!);
+      if (exp != null && exp.isAfter(DateTime.now())) return true;
+    }
+    return false;
+  }
 
   String get displayStudentId {
     if (studentId != null && studentId!.isNotEmpty) {
@@ -207,6 +224,14 @@ class UserProfile {
   }
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
+    final subJson = json['subscription'] as Map<String, dynamic>?;
+    final bool isSub = (json['is_subscribed'] == true) ||
+        (subJson != null && subJson['status'] == 'active') ||
+        (json['subscription_status'] == 'active');
+    final rawExp = subJson?['expiry'] as String? ??
+        subJson?['expires_at'] as String? ??
+        json['subscription_expires_at'] as String?;
+
     return UserProfile(
       id: json['id'] as String,
       studentId: json['student_id'] as String?,
@@ -238,6 +263,9 @@ class UserProfile {
       admissionTrackInterest:
           json['admission_track_interest'] as bool? ?? false,
       lastStreakDate: json['last_streak_date'] as String?,
+      isSubscribed: isSub,
+      subscriptionStatus: subJson?['status'] as String? ?? json['subscription_status'] as String?,
+      subscriptionExpiresAt: rawExp,
     );
   }
 }

@@ -56,6 +56,9 @@ UserProfile _profileFromJson(Map<String, dynamic> json) {
     dailyExamsGoal: profile.dailyExamsGoal,
     admissionTrackInterest: profile.admissionTrackInterest,
     lastStreakDate: profile.lastStreakDate,
+    isSubscribed: profile.isSubscribed,
+    subscriptionStatus: profile.subscriptionStatus,
+    subscriptionExpiresAt: profile.subscriptionExpiresAt,
   );
 }
 

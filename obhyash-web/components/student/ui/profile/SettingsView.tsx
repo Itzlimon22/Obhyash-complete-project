@@ -28,10 +28,13 @@ import {
   Mail,
   Phone,
   X,
+  Trash2,
 } from 'lucide-react';
 import UserAvatar from '../common/UserAvatar';
 import { UserProfile } from '@/lib/types';
 import PersonalDetailsPanel from './settings/PersonalDetailsPanel';
+import { createClient } from '@/utils/supabase/client';
+import { toast } from 'sonner';
 
 import ReportsPanel from './settings/ReportsPanel';
 import MySubscriptionPanel from './settings/MySubscriptionPanel';
@@ -219,6 +222,14 @@ const GROUPS: SettingsGroup[] = [
         Icon: LogOut,
         danger: true,
       },
+      {
+        type: 'action',
+        id: 'deleteAccount',
+        label: 'অ্যাকাউন্ট মুছুন',
+        description: 'স্থায়ীভাবে তোমার অ্যাকাউন্ট ও ডেটা ডিলিট করো',
+        Icon: Trash2,
+        danger: true,
+      },
     ],
   },
 ];
@@ -310,6 +321,9 @@ export default function SettingsView({
 }: SettingsViewProps) {
   const [activeSection, setActiveSection] = useState<PanelSection | null>(null);
   const [showAccountInfo, setShowAccountInfo] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const desktopSection: PanelSection = activeSection ?? 'personal';
 
@@ -342,6 +356,31 @@ export default function SettingsView({
     setTimeout(() => setCopiedField(null), 2500);
   };
 
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmation.trim() !== 'DELETE') {
+      toast.error('অ্যাকাউন্ট মুছতে নিশ্চিতকরণ বক্সে "DELETE" লিখো।');
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.rpc('delete_user_account', {
+        p_reason: 'User requested deletion',
+      });
+
+      if (error) throw error;
+
+      await supabase.auth.signOut();
+      toast.success('তোমার অ্যাকাউন্টটি স্থায়ীভাবে মুছে ফেলা হয়েছে।');
+      window.location.href = '/login';
+    } catch (err: unknown) {
+      setIsDeleting(false);
+      const msg = err instanceof Error ? err.message : 'অ্যাকাউন্ট মুছতে সমস্যা হয়েছে।';
+      toast.error(msg.replace('Exception:', '').trim());
+    }
+  };
+
   const handleItem = (item: SettingsItem) => {
     if (item.type === 'panel') {
       setActiveSection(item.id);
@@ -358,6 +397,10 @@ export default function SettingsView({
     if (item.type === 'action') {
       if (item.id === 'accountInfo') {
         setShowAccountInfo(true);
+        return;
+      }
+      if (item.id === 'deleteAccount') {
+        setShowDeleteModal(true);
         return;
       }
       if (item.id === 'logout') {
@@ -712,6 +755,97 @@ export default function SettingsView({
                 </>
               )}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Delete Account Modal ────────────────────────────────────────── */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-md bg-neutral-900 rounded-3xl p-6 border border-red-900/50 shadow-2xl space-y-5 animate-in zoom-in-95">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-red-950/80 border border-red-800/60 flex items-center justify-center text-red-500">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-red-400 font-anek">
+                    অ্যাকাউন্ট মুছুন (Delete Account)
+                  </h3>
+                  <p className="text-xs text-neutral-400 font-anek">
+                    এই প্রক্রিয়াটি অপরিবর্তনীয় ও স্থায়ী
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="p-1 rounded-full text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Pro Warning */}
+            {user.subscription?.plan === 'Pro' && (
+              <div className="p-3.5 bg-amber-950/50 border border-amber-800/60 rounded-2xl flex items-start gap-2.5">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-200 font-anek font-semibold leading-relaxed">
+                  সতর্কতা: তোমার অ্যাকাউন্টে প্রো সাবস্ক্রিপশন সক্রিয় আছে। অ্যাকাউন্ট মুছে ফেললে সাবস্ক্রিপশন বাতিল হবে এবং কোনো রিফান্ড প্রযোজ্য হবে না।
+                </p>
+              </div>
+            )}
+
+            {/* Warning Points */}
+            <div className="space-y-2 text-xs text-neutral-300 font-anek bg-neutral-950/60 p-4 rounded-2xl border border-neutral-800">
+              <p className="font-bold text-neutral-200 mb-1">অ্যাকাউন্ট মুছে ফেললে:</p>
+              <p className="flex items-center gap-2 text-neutral-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                সমস্ত ব্যক্তিগত প্রোফাইল ও লগইন চিরতরে ডিলিট হবে।
+              </p>
+              <p className="flex items-center gap-2 text-neutral-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                পরীক্ষার ইতিহাস, স্কোর, স্ট্রিক ও ফলাফল মুছে যাবে।
+              </p>
+              <p className="flex items-center gap-2 text-neutral-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                সংরক্ষিত বুকমার্ক ও স্ক্র্যাচ কার্ড নষ্ট হবে।
+              </p>
+            </div>
+
+            {/* Confirm Type */}
+            <div>
+              <label className="block text-xs font-bold text-neutral-200 font-anek mb-1.5">
+                নিশ্চিত করতে নিচে &quot;DELETE&quot; লিখো:
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmation}
+                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                placeholder="DELETE"
+                className="w-full px-3.5 py-2.5 bg-neutral-800/80 border border-red-800/60 rounded-xl text-sm font-mono font-bold tracking-widest text-red-400 placeholder:text-neutral-600 focus:outline-none focus:border-red-500 uppercase"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setShowDeleteModal(false)}
+                className="flex-1 py-3 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-2xl font-bold font-anek text-sm transition-colors"
+              >
+                বাতিল করো
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting || deleteConfirmation.trim() !== 'DELETE'}
+                onClick={handleDeleteAccount}
+                className="flex-1 py-3 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-bold font-anek text-sm shadow-lg shadow-red-950/50 transition-all active:scale-[0.98]"
+              >
+                {isDeleting ? 'মুছে ফেলা হচ্ছে...' : 'হ্যাঁ, মুছে ফেলো'}
+              </button>
+            </div>
           </div>
         </div>
       )}

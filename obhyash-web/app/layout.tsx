@@ -9,6 +9,7 @@ import SWRProvider from "@/components/providers/SWRProvider";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import ReferralCatcher from "@/components/ReferralCatcher";
+import NetworkStatusListener from "@/components/common/NetworkStatusListener";
 
 // ✅ Configure Inter (English text)
 const inter = Inter({
@@ -101,6 +102,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <AuthProvider>
             <ReferralCatcher />
+            <NetworkStatusListener />
             <SWRProvider>
               {children}
 

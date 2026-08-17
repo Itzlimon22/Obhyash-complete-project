@@ -25,38 +25,61 @@ CREATE TABLE IF NOT EXISTS subscription_plans (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Remove all old plans for a clean slate
-DELETE FROM subscription_plans WHERE name IN ('Basic', 'Monthly', 'Quarterly', 'free', 'exam_ready', 'pro', 'session', 'annual');
+-- Enable Row Level Security (RLS)
+ALTER TABLE subscription_plans ENABLE ROW LEVEL SECURITY;
 
--- Insert the 4 launch plans.
--- NOTE: All features are available to everyone during the launch window.
---       Paywall enforcement is not active yet -- these plans are display-only.
+-- Allow everyone (authenticated & anon students) to view active subscription plans
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies 
+        WHERE tablename = 'subscription_plans' 
+        AND policyname = 'Public can view active subscription plans'
+    ) THEN
+        CREATE POLICY "Public can view active subscription plans"
+        ON subscription_plans FOR SELECT
+        USING (is_active = true);
+    END IF;
+END $$;
+
+-- Remove all old plans for a clean slate
+DELETE FROM subscription_plans WHERE name IN ('Basic', 'Monthly', 'Quarterly', 'free', 'exam_ready', 'pro', 'session', 'annual', 'booster', 'top_rankers', 'master_pro');
+
+-- Insert the 4 plans (Free + 1, 3, 6 Month Packages)
 INSERT INTO subscription_plans (display_name, name, price, duration_days, features, is_popular, color_theme) VALUES
 (
   'ফ্রি (Free)',
   'free',
   0,
   36500,
-  '["প্রতিদিন ১টি ফ্রি এক্সাম","বেসিক লিডারবোর্ড","সীমিত প্রশ্ন ব্যাংক","বেসিক পারফরম্যান্স ট্র্যাকিং"]'::jsonb,
+  '["প্রতিদিন ২টি ফ্রি এক্সাম","সর্বোচ্চ ৫০টি প্রশ্নের এক্সাম সেটআপ","সর্বোচ্চ ২৫টি বুকমার্ক সংরক্ষণ","লাইভ এক্সামে পূর্ণ এক্সেস","স্ট্রিক ও বেসিক লিডারবোর্ড"]'::jsonb,
   false,
   'border-neutral-200'
 ),
 (
-  'এক্সাম রেডি',
+  'বুস্টার প্যাক (১ মাস)',
   'exam_ready',
   149,
   30,
-  '["আনলিমিটেড মক এক্সাম","AI ব্যাখ্যাসহ সমাধান","অ্যাডভান্সড এনালাইসিস","বিজ্ঞাপনমুক্ত অভিজ্ঞতা"]'::jsonb,
+  '["আনলিমিটেড মক টেস্ট ও প্র্যাকটিস","প্রতিটি প্রশ্নের বিস্তারিত ব্যাখ্যা ও সমাধান","৫০+ ও ১০০ প্রশ্নের ফুল মডেল টেস্ট","আনলিমিটেড বুকমার্ক ও রিভিশন লিস্ট","বিষয়ভিত্তিক দুর্বলতা ট্র্যাকার ও গ্রাফ","সম্পূর্ণ বিজ্ঞাপনমুক্ত প্রিমিয়াম অভিজ্ঞতা"]'::jsonb,
   false,
   'border-indigo-500'
 ),
 (
-  'প্রো',
+  'টপ র‍্যাঙ্কার্স (৩ মাস)',
   'pro',
   349,
   90,
-  '["এক্সাম রেডির সব সুবিধা","৩ মাসে ২৮% সাশ্রয়","বিষয়ভিত্তিক দুর্বলতা রিপোর্ট","প্রায়োরিটি কাস্টমার সাপোর্ট","নতুন ফিচারে আর্লি এক্সেস"]'::jsonb,
+  '["আনলিমিটেড মক টেস্ট ও প্র্যাকটিস","প্রতিটি প্রশ্নের বিস্তারিত ব্যাখ্যা ও সমাধান","৫০+ ও ১০০ প্রশ্নের ফুল মডেল টেস্ট","আনলিমিটেড বুকমার্ক ও রিভিশন লিস্ট","বিষয়ভিত্তিক দুর্বলতা ট্র্যাকার ও গ্রাফ","সম্পূর্ণ বিজ্ঞাপনমুক্ত প্রিমিয়াম অভিজ্ঞতা"]'::jsonb,
   true,
-  'border-rose-500'
-
+  'border-emerald-500'
+),
+(
+  'মাস্টার প্রো (৬ মাস)',
+  'master_pro',
+  599,
+  180,
+  '["আনলিমিটেড মক টেস্ট ও প্র্যাকটিস","প্রতিটি প্রশ্নের বিস্তারিত ব্যাখ্যা ও সমাধান","৫০+ ও ১০০ প্রশ্নের ফুল মডেল টেস্ট","আনলিমিটেড বুকমার্ক ও রিভিশন লিস্ট","বিষয়ভিত্তিক দুর্বলতা ট্র্যাকার ও গ্রাফ","সম্পূর্ণ বিজ্ঞাপনমুক্ত প্রিমিয়াম অভিজ্ঞতা"]'::jsonb,
+  false,
+  'border-amber-500'
 );

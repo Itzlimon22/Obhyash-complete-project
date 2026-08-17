@@ -12,6 +12,7 @@ import 'core/providers/theme_provider.dart';
 import 'core/providers/app_config_provider.dart';
 import 'core/presentation/screens/force_update_screen.dart';
 import 'core/presentation/screens/maintenance_screen.dart';
+import 'core/presentation/widgets/offline_banner_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -80,7 +81,9 @@ class ObhyashApp extends ConsumerWidget {
           );
         }
 
-        return child ?? const SizedBox.shrink();
+        return OfflineBannerWrapper(
+          child: child ?? const SizedBox.shrink(),
+        );
       },
     );
   }

@@ -1,4 +1,4 @@
-﻿class SubscriptionPlan {
+class SubscriptionPlan {
   final String id;
   final String name;
   final int price;
@@ -29,6 +29,8 @@
     String cycle;
     if (days >= 365) {
       cycle = 'Yearly';
+    } else if (days >= 180) {
+      cycle = 'Half-Yearly';
     } else if (days >= 90) {
       cycle = 'Quarterly';
     } else {
@@ -41,6 +43,13 @@
     } else {
       features = [];
     }
+    String theme = 'indigo';
+    if (days >= 180) {
+      theme = 'amber';
+    } else if (days >= 90) {
+      theme = 'emerald';
+    }
+
     return SubscriptionPlan(
       id: j['id']?.toString() ?? '',
       name: (j['display_name'] ?? j['name'])?.toString() ?? '',
@@ -49,7 +58,7 @@
       durationDays: days,
       currency: (j['currency'] as String?)?.replaceAll('BDT', '৳') ?? '৳',
       features: features,
-      colorTheme: days >= 90 ? 'rose' : 'emerald',
+      colorTheme: theme,
       expiresAt: expiresAt,
     );
   }

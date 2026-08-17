@@ -26,17 +26,3 @@ export const generateExamQuestions = async (
   console.warn('AI Question Generation is currently disabled.');
   throw new Error('AI Question Generation is no longer supported.');
 };
-
-/**
- * DEPRECATED: OMR AI Evaluation is disabled.
- * Throws an error to prevent Gemini Vision API calls.
- */
-export const evaluateOMRScript = async (
-  base64Image: string,
-  questions: Pick<Question, 'id'>[],
-): Promise<UserAnswers> => {
-  console.warn('OMR AI Evaluation is currently disabled.');
-  throw new Error(
-    'AI OMR Evaluation is no longer supported. Please use manual grading.',
-  );
-};
