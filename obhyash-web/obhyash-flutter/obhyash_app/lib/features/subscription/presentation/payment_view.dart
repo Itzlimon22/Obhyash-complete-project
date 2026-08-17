@@ -50,11 +50,109 @@ class _PaymentViewState extends State<PaymentView>
 
   static const _merchantNumber = '01946855793';
 
+  bool _hasPendingPayment = false;
+  String? _pendingTrxId;
+  String? _pendingRequestId;
+  bool _isCancellingPending = false;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _fetchSavedMethods();
+    _checkPendingPayment();
+  }
+
+  Future<void> _checkPendingPayment() async {
+    try {
+      final supabase = Supabase.instance.client;
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) return;
+
+      final pending = await supabase
+          .from('payment_requests')
+          .select('id, transaction_id, plan_name, requested_at')
+          .eq('user_id', userId)
+          .eq('status', 'Pending')
+          .maybeSingle();
+
+      if (mounted && pending != null) {
+        setState(() {
+          _hasPendingPayment = true;
+          _pendingTrxId = pending['transaction_id']?.toString();
+          _pendingRequestId = pending['id']?.toString();
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _cancelPendingPayment() async {
+    if (_pendingRequestId == null || _isCancellingPending) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text(
+          'আবেদন বাতিল করবেন?',
+          style: TextStyle(
+            fontFamily: 'HindSiliguri',
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: const Text(
+          'ভুল তথ্য দেওয়া হয়ে থাকলে বর্তমান আবেদনটি বাতিল করে আপনি নতুন সঠিক TrxID ও মোবাইল নম্বর দিয়ে পুনরায় আবেদন করতে পারবেন।',
+          style: TextStyle(fontFamily: 'HindSiliguri'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('না, থাক'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('হ্যাঁ, বাতিল করো'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    setState(() => _isCancellingPending = true);
+    try {
+      final supabase = Supabase.instance.client;
+      await supabase
+          .from('payment_requests')
+          .update({'status': 'Cancelled'})
+          .eq('id', _pendingRequestId!)
+          .eq('status', 'Pending');
+
+      if (mounted) {
+        HapticFeedback.mediumImpact();
+        setState(() {
+          _hasPendingPayment = false;
+          _pendingTrxId = null;
+          _pendingRequestId = null;
+          _isCancellingPending = false;
+        });
+        AppPopups.success(
+          context,
+          message: 'পূর্বের আবেদন বাতিল করা হয়েছে। এখন সঠিক তথ্য দিয়ে সাবমিট করুন।',
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isCancellingPending = false);
+        AppPopups.error(
+          context,
+          message: 'আবেদন বাতিল করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।',
+        );
+      }
+    }
   }
 
   Future<void> _fetchSavedMethods() async {
@@ -103,23 +201,54 @@ class _PaymentViewState extends State<PaymentView>
   }
 
   Future<void> _submit() async {
-    final sender = _senderController.text.trim();
-    final trxId = _trxController.text.trim().toUpperCase();
-
-    final phoneRegex = RegExp(r'^01\d{9}$');
-    if (!phoneRegex.hasMatch(sender)) {
+    if (_hasPendingPayment) {
       AppPopups.warning(
         context,
-        message: 'সঠিক মোবাইল নম্বর দাও (১১ ডিজিট, শুরু হতে হবে ০১ দিয়ে)',
+        message: 'আপনার একটি পেমেন্ট রিকোয়েস্ট (TrxID: ${_pendingTrxId ?? ""}) ইতিমধ্যে প্রক্রিয়াধীন আছে। সেটি যাচাই সম্পন্ন হওয়া পর্যন্ত অপেক্ষা করুন।',
       );
       return;
     }
 
-    final trxRegex = RegExp(r'^[A-Z0-9]{5,20}$');
+    final sender = _senderController.text.trim();
+    final trxId = _trxController.text.trim().toUpperCase();
+
+    // 1. Phone number validation (exact 11-digit BD mobile starting with 013-019)
+    final phoneRegex = RegExp(r'^01[3-9]\d{8}$');
+    if (!phoneRegex.hasMatch(sender)) {
+      AppPopups.warning(
+        context,
+        message: 'সঠিক মোবাইল নম্বর দিন (১১ ডিজিটের বাংলাদেশী মোবাইল নম্বর)',
+      );
+      return;
+    }
+
+    // 2. TrxID Format validation (6 to 25 alphanumeric chars)
+    final trxRegex = RegExp(r'^[A-Z0-9]{6,25}$');
     if (!trxRegex.hasMatch(trxId)) {
       AppPopups.warning(
         context,
-        message: 'সঠিক ট্রানজেকশন আইডি দাও (কমপক্ষে ৫ অক্ষর)',
+        message: 'সঠিক ট্রানজেকশন আইডি দিন (ন্যূনতম ৬ ও সর্বোচ্চ ২৫ অক্ষর)',
+      );
+      return;
+    }
+
+    // 3. Block known dummy / fake TrxIDs
+    const dummyTrx = {
+      '123456',
+      '12345678',
+      '00000000',
+      'AAAAAAAA',
+      'TEST1234',
+      'ASDFGHJK',
+      'ABCDEF1234',
+      '11111111',
+      '1234567890',
+      'TRANSACTION',
+    };
+    if (dummyTrx.contains(trxId)) {
+      AppPopups.warning(
+        context,
+        message: 'অনুগ্রহ করে পেমেন্ট করার পর প্রাপ্ত আসল ট্রানজেকশন আইডি (TrxID) দিন।',
       );
       return;
     }
@@ -128,26 +257,47 @@ class _PaymentViewState extends State<PaymentView>
     try {
       final supabase = Supabase.instance.client;
       final userId = supabase.auth.currentUser?.id;
-      if (userId != null) {
-        await supabase.from('payment_requests').insert({
-          'user_id': userId,
-          'plan_name': widget.plan.name,
-          'amount': widget.plan.price,
-          'currency': 'BDT',
-          'payment_method': '$_selectedMethod ($sender)',
-          'transaction_id': trxId,
-          'status': 'Pending',
-          'requested_at': DateTime.now().toIso8601String(),
-        });
+      if (userId == null) throw Exception('User not logged in');
+
+      // 4. Duplicate TrxID check
+      final dup = await supabase
+          .from('payment_requests')
+          .select('id')
+          .eq('transaction_id', trxId)
+          .inFilter('status', ['Approved', 'Pending'])
+          .maybeSingle();
+
+      if (dup != null) {
+        if (mounted) {
+          setState(() => _isSubmitting = false);
+          AppPopups.warning(
+            context,
+            message: 'এই ট্রানজেকশন আইডিটি (TrxID) ইতিপূর্বে ব্যবহার করা হয়েছে। সঠিক TrxID দিন।',
+          );
+        }
+        return;
       }
 
-      // Simulate validation delay for UI effect like web
-      await Future.delayed(const Duration(milliseconds: 1500));
+      await supabase.from('payment_requests').insert({
+        'user_id': userId,
+        'plan_name': widget.plan.name,
+        'amount': widget.plan.price,
+        'currency': 'BDT',
+        'payment_method': '$_selectedMethod ($sender)',
+        'transaction_id': trxId,
+        'status': 'Pending',
+        'requested_at': DateTime.now().toIso8601String(),
+      });
+
+      // Simulate validation delay for UI effect
+      await Future.delayed(const Duration(milliseconds: 1200));
 
       if (mounted) {
         setState(() {
           _isSubmitting = false;
           _showSuccess = true;
+          _hasPendingPayment = true;
+          _pendingTrxId = trxId;
         });
 
         AppPopups.success(
@@ -164,10 +314,15 @@ class _PaymentViewState extends State<PaymentView>
     } catch (e) {
       if (mounted) {
         setState(() => _isSubmitting = false);
-        AppPopups.error(
-          context,
-          message: 'পেমেন্ট রিকোয়েস্ট জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
-        );
+        final err = e.toString();
+        if (err.contains('ইতিমধ্যে') || err.contains('সীমা') || err.contains('সঠিক')) {
+          AppPopups.warning(context, message: err.replaceAll('Exception:', '').trim());
+        } else {
+          AppPopups.error(
+            context,
+            message: 'পেমেন্ট রিকোয়েস্ট জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
+          );
+        }
       }
     }
   }
@@ -635,7 +790,7 @@ class _PaymentViewState extends State<PaymentView>
                   ),
                 ),
               );
-            }).toList(),
+            }),
             const SizedBox(height: 16),
           ],
 
@@ -696,22 +851,140 @@ class _PaymentViewState extends State<PaymentView>
           ),
           const SizedBox(height: 24),
 
+          // Pending Payment Status Alert
+          if (_hasPendingPayment) ...[
+            Container(
+              padding: const EdgeInsets.all(14),
+              margin: const EdgeInsets.only(bottom: 18),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF451A03).withValues(alpha: 0.4)
+                    : const Color(0xFFFFFBEB),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isDark
+                      ? const Color(0xFFD97706).withValues(alpha: 0.4)
+                      : const Color(0xFFFDE68A),
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    LucideIcons.clock,
+                    size: 20,
+                    color: Color(0xFFD97706),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'পেমেন্ট যাচাই প্রক্রিয়াধীন',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'HindSiliguri',
+                            color: Color(0xFFD97706),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'আপনার পূর্বে পাঠানো TrxID (${_pendingTrxId ?? "..."}) যাচাই করা হচ্ছে। অনুমোদিত হলে স্বয়ংক্রিয়ভাবে প্ল্যান চালু হবে।',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'HindSiliguri',
+                            color: isDark
+                                ? const Color(0xFFFDE68A)
+                                : const Color(0xFF92400E),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        InkWell(
+                          onTap: _isCancellingPending
+                              ? null
+                              : _cancelPendingPayment,
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFFD97706).withValues(alpha: 0.2)
+                                  : const Color(0xFFFEF3C7),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: isDark
+                                    ? const Color(0xFFD97706).withValues(alpha: 0.5)
+                                    : const Color(0xFFFCD34D),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (_isCancellingPending)
+                                  const SizedBox(
+                                    width: 12,
+                                    height: 12,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Color(0xFFD97706),
+                                    ),
+                                  )
+                                else
+                                  const Icon(
+                                    LucideIcons.refreshCw,
+                                    size: 13,
+                                    color: Color(0xFFD97706),
+                                  ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _isCancellingPending
+                                      ? 'বাতিল হচ্ছে...'
+                                      : 'ভুল তথ্য দিয়েছেন? বাতিল করে পুনরায় দিন',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    fontFamily: 'HindSiliguri',
+                                    color: isDark
+                                        ? const Color(0xFFFDE68A)
+                                        : const Color(0xFF92400E),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
           // Submit button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _isSubmitting ? null : _submit,
+              onPressed: (_isSubmitting || _hasPendingPayment) ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF059669),
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: const Color(
-                  0xFF059669,
-                ).withValues(alpha: 0.5),
+                backgroundColor: _hasPendingPayment
+                    ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0))
+                    : const Color(0xFF059669),
+                foregroundColor: _hasPendingPayment
+                    ? (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8))
+                    : Colors.white,
+                disabledBackgroundColor: _hasPendingPayment
+                    ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0))
+                    : const Color(0xFF059669).withValues(alpha: 0.5),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
-                elevation: 4,
+                elevation: _hasPendingPayment ? 0 : 4,
                 shadowColor: const Color(0xFF059669).withValues(alpha: 0.4),
               ),
               child: _isSubmitting
@@ -736,11 +1009,17 @@ class _PaymentViewState extends State<PaymentView>
                         ),
                       ],
                     )
-                  : const Text(
-                      'Verify Payment',
+                  : Text(
+                      _hasPendingPayment
+                          ? 'পেমেন্ট যাচাই প্রক্রিয়াধীন'
+                          : 'Verify Payment',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
+                        fontFamily: 'HindSiliguri',
+                        color: _hasPendingPayment
+                            ? (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8))
+                            : Colors.white,
                       ),
                     ),
             ),

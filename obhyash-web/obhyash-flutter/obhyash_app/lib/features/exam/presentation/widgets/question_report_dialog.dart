@@ -27,12 +27,40 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
   final _commentController = TextEditingController();
   String _selectedReason = 'ভুল উত্তর';
   bool _isSubmitting = false;
+  bool _alreadyReported = false;
 
   // 6 options structured as 2 rows × 3 columns
   final List<List<String>> _reasonRows = [
     ['ভুল উত্তর', 'প্রশ্ন অসম্পূর্ণ', 'অপশনে ত্রুটি'],
     ['ব্যাখ্যা ভুল', 'বানান ভুল', 'অন্যান্য সমস্যা'],
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _checkExistingReport();
+  }
+
+  Future<void> _checkExistingReport() async {
+    try {
+      final sb = Supabase.instance.client;
+      final user = sb.auth.currentUser;
+      if (user == null) return;
+
+      dynamic qId = int.tryParse(widget.questionId) ?? widget.questionId;
+      final existing = await sb
+          .from('reports')
+          .select('id')
+          .eq('reporter_id', user.id)
+          .eq('question_id', qId)
+          .eq('status', 'Pending')
+          .maybeSingle();
+
+      if (mounted && existing != null) {
+        setState(() => _alreadyReported = true);
+      }
+    } catch (_) {}
+  }
 
   @override
   void dispose() {
@@ -42,6 +70,15 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
 
   Future<void> _submitReport() async {
     if (_isSubmitting) return;
+
+    if (_alreadyReported) {
+      AppPopups.warning(
+        context,
+        message: 'এই প্রশ্নটিতে আপনার রিপোর্ট ইতিমধ্যে পেন্ডিং রয়েছে। আমাদের টিম এটি যাচাই করছে।',
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
 
     try {
@@ -67,6 +104,7 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
       });
 
       if (mounted) {
+        HapticFeedback.mediumImpact();
         AppPopups.show(
           context,
           message: 'রিপোর্ট সফলভাবে জমা নেওয়া হয়েছে। ধন্যবাদ!',
@@ -77,11 +115,16 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
     } catch (e) {
       debugPrint('[QuestionReportDialog] Submit error: $e');
       if (mounted) {
-        AppPopups.show(
-          context,
-          message: 'রিপোর্ট জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।',
-          isError: true,
-        );
+        final err = e.toString();
+        if (err.contains('পেন্ডিং') || err.contains('অপেক্ষা') || err.contains('দৈনিক')) {
+          AppPopups.warning(context, message: err.replaceAll('Exception:', '').trim());
+        } else {
+          AppPopups.show(
+            context,
+            message: 'রিপোর্ট জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।',
+            isError: true,
+          );
+        }
       }
     } finally {
       if (mounted) {
@@ -154,7 +197,39 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
+
+              if (_alreadyReported) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF451A03).withValues(alpha: 0.4) : const Color(0xFFFFFBEB),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isDark ? const Color(0xFFD97706).withValues(alpha: 0.4) : const Color(0xFFFDE68A),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.clock, size: 15, color: Color(0xFFD97706)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'এই প্রশ্নটিতে আপনার রিপোর্ট ইতিমধ্যে পর্যালোচনায় আছে।',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'HindSiliguri',
+                            color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 14),
 
               // 6 options as 2 rows × 3 columns
               Column(
@@ -168,10 +243,12 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 4.0),
                             child: InkWell(
-                              onTap: () {
-                                HapticFeedback.selectionClick();
-                                setState(() => _selectedReason = reason);
-                              },
+                              onTap: _alreadyReported
+                                  ? null
+                                  : () {
+                                      HapticFeedback.selectionClick();
+                                      setState(() => _selectedReason = reason);
+                                    },
                               borderRadius: BorderRadius.circular(12),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 150),
@@ -240,6 +317,7 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                 controller: _commentController,
                 maxLines: 2,
                 maxLength: 200,
+                enabled: !_alreadyReported,
                 style: TextStyle(
                   fontSize: 13,
                   fontFamily: 'HindSiliguri',
@@ -321,10 +399,14 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                     child: SizedBox(
                       height: 46,
                       child: ElevatedButton(
-                        onPressed: _isSubmitting ? null : _submitReport,
+                        onPressed: (_isSubmitting || _alreadyReported) ? null : _submitReport,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF004633),
-                          foregroundColor: Colors.white,
+                          backgroundColor: _alreadyReported
+                              ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0))
+                              : const Color(0xFF004633),
+                          foregroundColor: _alreadyReported
+                              ? (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8))
+                              : Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -339,13 +421,15 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
-                                'রিপোর্ট পাঠাও',
+                            : Text(
+                                _alreadyReported ? 'ইতিমধ্যে জমা হয়েছে' : 'রিপোর্ট পাঠাও',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'HindSiliguri',
-                                  color: Colors.white,
+                                  color: _alreadyReported
+                                      ? (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8))
+                                      : Colors.white,
                                 ),
                               ),
                       ),

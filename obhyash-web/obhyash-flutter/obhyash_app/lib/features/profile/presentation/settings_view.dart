@@ -9,6 +9,7 @@ import '../../dashboard/domain/models.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../auth/providers/auth_controller.dart';
 import 'personal_details_view.dart';
+import 'widgets/account_info_modal.dart';
 import '../../../core/presentation/widgets/user_avatar.dart';
 
 // ─── Data model ──────────────────────────────────────────────────────────────
@@ -156,6 +157,13 @@ class SettingsView extends ConsumerWidget {
         title: 'অ্যাকাউন্ট ও সেটিংস',
         items: [
           _SettingsItem(
+            label: 'অ্যাকাউন্ট ইনফো',
+            description: 'ইউজার আইডি ও সাপোর্টে দেওয়ার জরুরি তথ্য',
+            icon: LucideIcons.fingerprint,
+            type: _ItemType.action,
+            actionId: 'accountInfo',
+          ),
+          _SettingsItem(
             label: themeMode == ThemeMode.dark ? 'লাইট মোড চালু করো' : 'ডার্ক মোড চালু করো',
             description: 'অ্যাপের কালার থিম পরিবর্তন করো',
             icon: themeMode == ThemeMode.dark ? LucideIcons.sun : LucideIcons.moon,
@@ -193,7 +201,9 @@ class SettingsView extends ConsumerWidget {
           }
         }
       case _ItemType.action:
-        if (item.actionId == 'toggleTheme') {
+        if (item.actionId == 'accountInfo') {
+          AccountInfoModal.show(context, user);
+        } else if (item.actionId == 'toggleTheme') {
           ref.read(themeModeProvider.notifier).toggle();
         } else if (item.actionId == 'logout') {
           final confirmed = await showDialog<bool>(

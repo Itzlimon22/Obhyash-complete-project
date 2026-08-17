@@ -79,30 +79,19 @@ export const getUserInvoices = async (): Promise<Invoice[]> => {
   const user = session?.user;
 
   if (user) {
-    const { data, error } = await supabase
+    const invoices: Invoice[] = [];
+
+    // 1. Payment Requests
+    const { data: payData } = await supabase
       .from('payment_requests')
       .select('*')
       .eq('user_id', user.id)
-      .in('status', ['Pending', 'Approved', 'Rejected']) // Fetch all relevant statuses
+      .in('status', ['Pending', 'Approved', 'Rejected'])
       .order('requested_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching invoices:', error);
-      throw error;
-    }
-
-    if (data) {
-      return data.map(
-        (req: {
-          id: string;
-          requested_at: string;
-          amount: number;
-          currency?: string;
-          plan_name: string;
-          status: string;
-          transaction_id?: string;
-          payment_method?: string;
-        }) => ({
+    if (payData) {
+      for (const req of payData) {
+        invoices.push({
           id: req.id,
           date: new Date(req.requested_at).toLocaleDateString('en-GB', {
             day: 'numeric',
@@ -111,7 +100,6 @@ export const getUserInvoices = async (): Promise<Invoice[]> => {
           }),
           amount: req.amount,
           currency: req.currency || '৳',
-          // Map DB status to Frontend Invoice status
           status:
             req.status === 'Approved'
               ? 'valid'
@@ -122,9 +110,91 @@ export const getUserInvoices = async (): Promise<Invoice[]> => {
           downloadUrl: '#',
           transactionId: req.transaction_id || 'N/A',
           paymentMethod: req.payment_method || 'N/A',
-        }),
-      );
+        });
+      }
     }
+
+    // 2. Referral Rewards History
+    try {
+      const { data: myRef } = await supabase
+        .from('referrals')
+        .select('id')
+        .eq('owner_id', user.id)
+        .maybeSingle();
+
+      const myRefId = myRef?.id;
+      const refQuery = supabase
+        .from('referral_history')
+        .select('id, redeemed_at, admin_status, reward_given, redeemed_by, referral_id');
+
+      const { data: refHist } = myRefId
+        ? await refQuery.or(`redeemed_by.eq.${user.id},referral_id.eq.${myRefId}`).eq('reward_given', true).limit(20)
+        : await refQuery.eq('redeemed_by', user.id).eq('reward_given', true).limit(20);
+
+      if (refHist) {
+        for (const r of refHist) {
+          invoices.push({
+            id: r.id,
+            date: new Date(r.redeemed_at).toLocaleDateString('en-GB', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            }),
+            amount: 0,
+            currency: '৳',
+            status: 'valid',
+            planName: '🎁 রেফারেল রিওয়ার্ড বোনাস (১ মাস)',
+            downloadUrl: '#',
+            transactionId: 'REFERRAL_REWARD',
+            paymentMethod: 'Referral Bonus',
+          });
+        }
+      }
+    } catch (_) {}
+
+    // 3. Scratch Card Gifts
+    try {
+      const { data: cards } = await supabase
+        .from('scratch_cards')
+        .select('id, scratched_at, reward_type, is_scratched')
+        .eq('user_id', user.id)
+        .eq('is_scratched', true)
+        .order('scratched_at', { ascending: false })
+        .limit(20);
+
+      if (cards) {
+        for (const c of cards) {
+          let label = '🎁 স্ক্র্যাচ কার্ড গিফট বোনাস';
+          if (c.reward_type === '1_month_free') {
+            label = '🎁 স্ক্র্যাচ কার্ড গিফট (১ মাস ফ্রি)';
+          } else if (c.reward_type === '2_months_free') {
+            label = '🎁 স্ক্র্যাচ কার্ড গিফট (২ মাস ফ্রি)';
+          } else if (c.reward_type === '3_months_free') {
+            label = '🎁 স্ক্র্যাচ কার্ড গিফট (৩ মাস ফ্রি)';
+          } else if (c.reward_type === '50_percent_off') {
+            label = '🎁 স্ক্র্যাচ কার্ড গিফট (৫০% ছাড় কুপন)';
+          }
+
+          invoices.push({
+            id: c.id,
+            date: new Date(c.scratched_at).toLocaleDateString('en-GB', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            }),
+            amount: 0,
+            currency: '৳',
+            status: 'valid',
+            planName: label,
+            downloadUrl: '#',
+            transactionId: 'SCRATCH_GIFT',
+            paymentMethod: 'Gift Reward',
+          });
+        }
+      }
+    } catch (_) {}
+
+    return invoices;
   }
 
   return [];
@@ -339,13 +409,58 @@ export const submitManualPayment = async (
     throw new Error('Database configuration missing');
   }
 
+  const cleanTrx = (data.transactionId || '').trim().toUpperCase();
+
+  // 1. Validate TrxID format & block dummy TrxIDs
+  const dummyTrx = new Set([
+    '123456',
+    '12345678',
+    '00000000',
+    'AAAAAAAA',
+    'TEST1234',
+    'ASDFGHJK',
+    'ABCDEF1234',
+    '11111111',
+    '1234567890',
+    'TRANSACTION',
+  ]);
+  if (!cleanTrx || cleanTrx.length < 6 || dummyTrx.has(cleanTrx)) {
+    throw new Error('অনুগ্রহ করে পেমেন্ট করার পর প্রাপ্ত সঠিক ট্রানজেকশন আইডি (TrxID) দিন।');
+  }
+
+  // 2. Check if user already has an active pending payment
+  const { data: pendingReq } = await supabase
+    .from('payment_requests')
+    .select('id, transaction_id')
+    .eq('user_id', data.userId)
+    .eq('status', 'Pending')
+    .maybeSingle();
+
+  if (pendingReq) {
+    throw new Error(
+      'আপনার একটি পেমেন্ট রিকোয়েস্ট ইতিমধ্যে প্রক্রিয়াধীন আছে। সেটি যাচাই সম্পন্ন হওয়া পর্যন্ত অপেক্ষা করুন।',
+    );
+  }
+
+  // 3. Check if TrxID is already used globally
+  const { data: dupTrx } = await supabase
+    .from('payment_requests')
+    .select('id')
+    .eq('transaction_id', cleanTrx)
+    .in('status', ['Approved', 'Pending'])
+    .maybeSingle();
+
+  if (dupTrx) {
+    throw new Error('এই ট্রানজেকশন আইডিটি (TrxID) ইতিমধ্যে ব্যবহার করা হয়েছে। অনুগ্রহ করে সঠিক TrxID দিন।');
+  }
+
   const { error } = await supabase.from('payment_requests').insert({
     user_id: data.userId,
     plan_name: data.planName,
     amount: data.amount,
     currency: 'BDT',
     payment_method: `${data.paymentMethod} (${data.senderNumber})`,
-    transaction_id: data.transactionId,
+    transaction_id: cleanTrx,
     status: 'Pending',
     requested_at: data.submittedAt || new Date().toISOString(),
   });

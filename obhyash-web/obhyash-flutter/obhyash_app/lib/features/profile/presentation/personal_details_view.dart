@@ -257,7 +257,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
     return AppDropdown<String>(
       label: label,
       value: safeValue,
-      icon: LucideIcons.chevronDown,
+      fontSize: 14.5,
       options: items.map((e) => AppDropdownOption(value: e, label: e)).toList(),
       onChanged: onChanged,
     );

@@ -92,13 +92,17 @@ function ReplyForm({
           parentId,
         }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'রিপ্লাই পোস্ট করতে সমস্যা হয়েছে।');
+      }
+
       await mutate();
       setContent('');
       onDone();
       toast.success('রিপ্লাই সফলভাবে পোস্ট করা হয়েছে!');
-    } catch {
-      toast.error('রিপ্লাই পোস্ট করতে সমস্যা হয়েছে।');
+    } catch (err: any) {
+      toast.error(err.message || 'রিপ্লাই পোস্ট করতে সমস্যা হয়েছে।');
     } finally {
       setIsSubmitting(false);
     }
@@ -260,9 +264,21 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
   const getReplies = (id: string) =>
     allComments.filter((c) => c.parent_id === id);
 
+  const [cooldown, setCooldown] = useState(0);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!content.trim() || !isAuthed) return;
+    const trimmed = content.trim();
+    if (!trimmed || trimmed.length < 3) {
+      toast.error('মতামত অন্তত ৩ অক্ষরের হতে হবে।');
+      return;
+    }
+
+    if (cooldown > 0) {
+      toast.warning(`অনুগ্রহ করে পরবর্তী মন্তব্যের জন্য ${cooldown} সেকেন্ড অপেক্ষা করুন।`);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const token = typeof window !== 'undefined' ? (window as any)._obhyashToken : null;
@@ -272,14 +288,30 @@ export default function CommentSection({ postSlug }: CommentSectionProps) {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ slug: postSlug, content: content.trim() }),
+        body: JSON.stringify({ slug: postSlug, content: trimmed }),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'মতামত পোস্ট করতে সমস্যা হয়েছে।');
+      }
+
       await mutate();
       setContent('');
       toast.success('আপনার মতামত সফলভাবে পোস্ট করা হয়েছে!');
-    } catch {
-      toast.error('মতামত পোস্ট করতে সমস্যা হয়েছে।');
+      
+      // Start 20-second cooldown
+      setCooldown(20);
+      const timer = setInterval(() => {
+        setCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err: any) {
+      toast.error(err.message || 'মতামত পোস্ট করতে সমস্যা হয়েছে।');
     } finally {
       setIsSubmitting(false);
     }

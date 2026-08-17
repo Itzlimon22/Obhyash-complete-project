@@ -21,6 +21,13 @@ import {
   Bookmark,
   MessageSquare,
   Sparkles,
+  Fingerprint,
+  Copy,
+  Check,
+  Hash,
+  Mail,
+  Phone,
+  X,
 } from 'lucide-react';
 import UserAvatar from '../common/UserAvatar';
 import { UserProfile } from '@/lib/types';
@@ -87,6 +94,13 @@ const GROUPS: SettingsGroup[] = [
         label: 'ব্যক্তিগত তথ্য',
         description: 'নাম, ছবি, একাডেমিক তথ্য',
         Icon: User,
+      },
+      {
+        type: 'action',
+        id: 'accountInfo',
+        label: 'অ্যাকাউন্ট ইনফো',
+        description: 'ইউজার আইডি ও সাপোর্টে দেওয়ার তথ্য',
+        Icon: Fingerprint,
       },
     ],
   },
@@ -295,7 +309,31 @@ export default function SettingsView({
   isDarkMode,
 }: SettingsViewProps) {
   const [activeSection, setActiveSection] = useState<PanelSection | null>(null);
+  const [showAccountInfo, setShowAccountInfo] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
   const desktopSection: PanelSection = activeSection ?? 'personal';
+
+  const handleCopy = (label: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(label);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const handleCopyAll = () => {
+    const lines = [
+      '📋 Obhyash Account Info:',
+      `• User Name: ${user.name || 'N/A'}`,
+      `• User ID: ${user.id || 'N/A'}`,
+      user.email ? `• Email: ${user.email}` : null,
+      user.phone ? `• Phone: ${user.phone}` : null,
+      user.stream ? `• Stream: ${user.stream}${user.batch ? ` (${user.batch})` : ''}` : null,
+      user.institute ? `• Institute: ${user.institute}` : null,
+    ].filter(Boolean);
+
+    navigator.clipboard.writeText(lines.join('\n'));
+    setCopiedField('all');
+    setTimeout(() => setCopiedField(null), 2500);
+  };
 
   const handleItem = (item: SettingsItem) => {
     if (item.type === 'panel') {
@@ -310,9 +348,15 @@ export default function SettingsView({
       window.open(item.href, '_blank', 'noopener');
       return;
     }
-    if (item.type === 'action' && item.id === 'logout') {
-      onLogout?.();
-      return;
+    if (item.type === 'action') {
+      if (item.id === 'accountInfo') {
+        setShowAccountInfo(true);
+        return;
+      }
+      if (item.id === 'logout') {
+        onLogout?.();
+        return;
+      }
     }
   };
 
@@ -516,6 +560,154 @@ export default function SettingsView({
           </div>
         )}
       </div>
+
+      {/* ── Account Info Modal ── */}
+      {showAccountInfo && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+          onClick={() => setShowAccountInfo(false)}
+        >
+          <div
+            className="w-full max-w-md bg-[#13151F] text-white rounded-3xl p-6 shadow-2xl border border-neutral-800 space-y-6 animate-scaleIn relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowAccountInfo(false)}
+              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-neutral-800/80 hover:bg-neutral-700 flex items-center justify-center text-neutral-400 hover:text-white transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Header */}
+            <div className="text-center">
+              <h2 className="text-xl font-black font-serif-exam tracking-wide text-white">
+                অ্যাকাউন্ট ইনফো
+              </h2>
+              <p className="text-xs text-neutral-400 mt-1">
+                সাপোর্ট বা অ্যাডমিন সহায়তার জন্য প্রয়োজনীয় তথ্য
+              </p>
+            </div>
+
+            {/* Rows */}
+            <div className="space-y-4 pt-2">
+              {/* User Name */}
+              <div
+                onClick={() => handleCopy('name', user.name || '')}
+                className="flex items-center gap-4 p-2 rounded-2xl hover:bg-neutral-800/40 cursor-pointer transition-colors group"
+              >
+                <div className="w-12 h-12 rounded-full bg-teal-600 flex items-center justify-center shrink-0 shadow-lg shadow-teal-900/30">
+                  <User className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-neutral-400">
+                    User Name
+                  </p>
+                  <p className="text-base font-bold text-white truncate">
+                    {user.name || 'N/A'}
+                  </p>
+                </div>
+                {copiedField === 'name' ? (
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                ) : (
+                  <Copy className="w-4 h-4 text-neutral-500 group-hover:text-neutral-300 shrink-0" />
+                )}
+              </div>
+
+              {/* User ID */}
+              <div
+                onClick={() => handleCopy('id', user.id || '')}
+                className="flex items-center gap-4 p-2 rounded-2xl hover:bg-neutral-800/40 cursor-pointer transition-colors group"
+              >
+                <div className="w-12 h-12 rounded-full bg-teal-600 flex items-center justify-center shrink-0 shadow-lg shadow-teal-900/30">
+                  <Hash className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-neutral-400">
+                    User ID
+                  </p>
+                  <p className="text-base font-mono font-bold text-white truncate">
+                    {user.id || 'N/A'}
+                  </p>
+                </div>
+                {copiedField === 'id' ? (
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                ) : (
+                  <Copy className="w-4 h-4 text-neutral-500 group-hover:text-neutral-300 shrink-0" />
+                )}
+              </div>
+
+              {/* Email */}
+              {user.email && (
+                <div
+                  onClick={() => handleCopy('email', user.email || '')}
+                  className="flex items-center gap-4 p-2 rounded-2xl hover:bg-neutral-800/40 cursor-pointer transition-colors group"
+                >
+                  <div className="w-12 h-12 rounded-full bg-teal-600 flex items-center justify-center shrink-0 shadow-lg shadow-teal-900/30">
+                    <Mail className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-neutral-400">
+                      Email
+                    </p>
+                    <p className="text-base font-bold text-white truncate">
+                      {user.email}
+                    </p>
+                  </div>
+                  {copiedField === 'email' ? (
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  ) : (
+                    <Copy className="w-4 h-4 text-neutral-500 group-hover:text-neutral-300 shrink-0" />
+                  )}
+                </div>
+              )}
+
+              {/* Phone */}
+              {user.phone && (
+                <div
+                  onClick={() => handleCopy('phone', user.phone || '')}
+                  className="flex items-center gap-4 p-2 rounded-2xl hover:bg-neutral-800/40 cursor-pointer transition-colors group"
+                >
+                  <div className="w-12 h-12 rounded-full bg-teal-600 flex items-center justify-center shrink-0 shadow-lg shadow-teal-900/30">
+                    <Phone className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-neutral-400">
+                      Phone
+                    </p>
+                    <p className="text-base font-bold text-white truncate">
+                      {user.phone}
+                    </p>
+                  </div>
+                  {copiedField === 'phone' ? (
+                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  ) : (
+                    <Copy className="w-4 h-4 text-neutral-500 group-hover:text-neutral-300 shrink-0" />
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Bottom Copy All Button */}
+            <button
+              onClick={handleCopyAll}
+              className="w-full py-3.5 px-4 bg-emerald-700 hover:bg-emerald-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40 transition-all active:scale-[0.98]"
+            >
+              {copiedField === 'all' ? (
+                <>
+                  <Check className="w-5 h-5" />
+                  <span>কপি হয়েছে!</span>
+                </>
+              ) : (
+                <>
+                  <span>Copy</span>
+                  <Copy className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

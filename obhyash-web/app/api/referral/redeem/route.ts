@@ -32,83 +32,33 @@ export const POST = async (req: Request) => {
     );
   }
 
-  // Look up referral
-  const { data: referral, error: refErr } = await supabaseAdmin
-    .from('referrals')
-    .select('*')
-    .eq('code', code.trim().toUpperCase())
-    .single();
-
-  if (refErr || !referral) {
-    return NextResponse.json(
-      { error: 'Invalid referral code' },
-      { status: 404 },
-    );
-  }
-
-  // Use atomic stored procedure for redemption checks and history insertion
-  const { error: txnError } = await supabaseAdmin.rpc('redeem_referral_tx', {
-    p_referral_id: referral.id,
-    p_redeemer_id: targetUserId,
-  });
+  // Use atomic stored procedure with anti-brute-force rate limiting (3 failed attempts = 10 min lockout)
+  const { data: redeemRes, error: txnError } = await supabaseAdmin.rpc(
+    'redeem_referral_by_code',
+    {
+      p_code: code.trim().toUpperCase(),
+      p_user_id: targetUserId,
+    },
+  );
 
   if (txnError) {
-    // Map known error codes to appropriate HTTP status
-    const statusMap: Record<string, number> = {
-      P0002: 400, // self‑referral
-      P0003: 400, // already redeemed
-      P0004: 400, // monthly limit reached
-    };
-    const status = statusMap[txnError.code] ?? 500;
-    return NextResponse.json({ error: txnError.message }, { status });
+    return NextResponse.json({ error: txnError.message }, { status: 400 });
   }
 
-  // Record history as Pending
-  const { error: insertErr } = await supabaseAdmin
-    .from('referral_history')
-    .insert({
-      referral_id: referral.id,
-      redeemed_by: targetUserId,
-      redeemed_at: new Date().toISOString(),
-      admin_status: 'Pending',
-      reward_given: false,
+  // Notify the user that they successfully redeemed
+  try {
+    await supabaseAdmin.from('notifications').insert({
+      user_id: targetUserId,
+      title: 'রেফারেল কোড গৃহীত!',
+      message:
+        'আপনি সফলভাবে রেফারেল কোড ক্লেইম করেছেন এবং ১ মাসের ফ্রি প্রিমিয়াম অ্যাক্টিভ হয়েছে!',
+      type: 'system',
+      is_read: false,
     });
-
-  if (insertErr) {
-    console.error('Insert History Error:', insertErr);
-    return NextResponse.json(
-      { error: 'Failed to record referral: ' + insertErr.message },
-      { status: 500 },
-    );
-  }
-
-  // Notify the referrer that someone used their code
-  const { error: notifErr } = await supabaseAdmin.from('notifications').insert({
-    user_id: referral.owner_id,
-    title: 'নতুন রেফারেল!',
-    message:
-      'আপনার রেফারেল কোড ব্যবহার করে একজন নতুন ইউজার যুক্ত হয়েছে। অ্যাডমিন রিভিউ করার পর তুমি ১ মাসের ফ্রি প্রিমিয়াম পাবেন।',
-    type: 'system',
-    is_read: false,
-  });
-
-  if (notifErr) {
-    console.error('Insert Notification Error:', notifErr);
-    // Even if notification fails, the referral succeeded, so we don't throw 500, but log it.
-  }
-
-  // Notify the new user that they successfully used a code
-  await supabaseAdmin.from('notifications').insert({
-    user_id: targetUserId,
-    title: 'রেফারেল কোড গৃহীত!',
-    message:
-      'আপনি সফলভাবে একটি রেফারেল কোড ব্যবহার করে সাইনআপ করেছেন। অ্যাডমিন এপ্রুভালের পর তুমি ১ মাসের ফ্রি প্রিমিয়াম পাবেন।',
-    type: 'system',
-    is_read: false,
-  });
+  } catch (_) {}
 
   return NextResponse.json({
     success: true,
-    message: 'রেফারেল কোড গৃহীত হয়েছে! অ্যাডমিন এপ্রুভালের পর বোনাস পাবেন।',
+    message: 'রেফারেল কোড সফলভাবে যুক্ত হয়েছে! ১ মাসের প্রিমিয়াম বোনাস যুক্ত হয়েছে।',
   });
 };

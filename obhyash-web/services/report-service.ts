@@ -34,6 +34,23 @@ export const submitReport = async (data: SubmitReportData) => {
     const reporterId =
       data.reporterId === 'guest' || !data.reporterId ? null : data.reporterId;
 
+    if (reporterId) {
+      const { data: existingReport } = await supabase
+        .from('reports')
+        .select('id')
+        .eq('reporter_id', reporterId)
+        .eq('question_id', data.questionId)
+        .eq('status', 'Pending')
+        .maybeSingle();
+
+      if (existingReport) {
+        return {
+          success: false,
+          error: 'এই প্রশ্নটিতে আপনার রিপোর্ট ইতিমধ্যে পেন্ডিং রয়েছে। আমাদের টিম এটি যাচাই করছে।',
+        };
+      }
+    }
+
     const { error: insertError } = await supabase.from('reports').insert({
       question_id: data.questionId,
       reporter_id: reporterId,
@@ -48,9 +65,10 @@ export const submitReport = async (data: SubmitReportData) => {
     if (insertError) throw insertError;
 
     return { success: true };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Submit Report Error Details:', error);
-    throw error;
+    const msg = error instanceof Error ? error.message : 'রিপোর্ট জমা দিতে সমস্যা হয়েছে';
+    return { success: false, error: msg };
   }
 };
 

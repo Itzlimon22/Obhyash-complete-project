@@ -14,6 +14,31 @@ import '../../../dashboard/providers/dashboard_providers.dart';
 import 'avatar_crop_dialog.dart';
 
 /// Modal bottom sheet for changing profile image (Upload custom photo with crop or select DiceBear preset)
+class _AvatarCategory {
+  final String id;
+  final String label;
+  final IconData icon;
+
+  const _AvatarCategory({
+    required this.id,
+    required this.label,
+    required this.icon,
+  });
+}
+
+class _PresetItem {
+  final String url;
+  final String title;
+  final String categoryId;
+
+  const _PresetItem({
+    required this.url,
+    required this.title,
+    required this.categoryId,
+  });
+}
+
+/// Modal bottom sheet for changing profile image (Upload custom photo with crop or select DiceBear preset)
 class AvatarPickerModal extends ConsumerStatefulWidget {
   final UserProfile user;
 
@@ -37,35 +62,172 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
   late String? _selectedAvatarUrl;
   bool _isUploading = false;
   final ImagePicker _picker = ImagePicker();
+  String _selectedCategory = 'all';
 
-  // Curated list of DiceBear cartoon presets matching the web app
-  late final List<String> _presets;
+  static const List<_AvatarCategory> _categories = [
+    _AvatarCategory(id: 'all', label: 'সব', icon: LucideIcons.sparkles),
+    _AvatarCategory(id: 'boys', label: 'ছাত্র', icon: LucideIcons.user),
+    _AvatarCategory(id: 'girls', label: 'ছাত্রী', icon: LucideIcons.userCheck),
+    _AvatarCategory(id: 'scholars', label: 'টপার ও স্কলার', icon: LucideIcons.glasses),
+    _AvatarCategory(id: 'anime', label: 'অ্যানিমে', icon: LucideIcons.zap),
+    _AvatarCategory(id: 'mascots', label: 'ম্যাসকট ও বট', icon: LucideIcons.bot),
+  ];
+
+  late final List<_PresetItem> _allPresets;
 
   @override
   void initState() {
     super.initState();
     _selectedAvatarUrl = widget.user.avatarUrl;
-    _presets = _generatePresets();
+    _allPresets = _buildStudentPresets();
   }
 
-  List<String> _generatePresets() {
-    final seedBase = widget.user.id.isNotEmpty ? widget.user.id.substring(0, 4) : 'obhyash';
-    final gender = (widget.user.gender ?? 'other').toLowerCase();
+  List<_PresetItem> _buildStudentPresets() {
+    final seedBase = widget.user.id.isNotEmpty ? widget.user.id.substring(0, 4) : 'obh';
+    final userGender = (widget.user.gender ?? 'other').toLowerCase();
 
-    final list = <String>[];
+    final presets = <_PresetItem>[];
 
-    // Primary gender-based styles
-    final styles = gender == 'female'
-        ? ['lorelei', 'adventurer', 'avataaars', 'personas', 'fun-emoji', 'micah', 'bottts']
-        : ['adventurer', 'lorelei', 'avataaars', 'personas', 'fun-emoji', 'micah', 'bottts'];
-
-    for (int i = 0; i < styles.length; i++) {
-      final style = styles[i];
-      list.add('https://api.dicebear.com/7.x/$style/svg?seed=${seedBase}_$i&scale=120&radius=0&backgroundColor=b6e3f4,c0aede,d1d4f9');
-      list.add('https://api.dicebear.com/7.x/$style/svg?seed=${seedBase}_alt_$i&scale=120&radius=0&backgroundColor=ffd5dc,ffdfbf,d1d4f9');
+    // 1. Personalized User Dynamic Presets
+    if (userGender == 'female') {
+      presets.add(_PresetItem(
+        url: 'https://api.dicebear.com/7.x/lorelei/svg?seed=${seedBase}_u1&scale=115&radius=0&backgroundColor=ffd5dc',
+        title: 'তোমার বিশেষ ১',
+        categoryId: 'girls',
+      ));
+      presets.add(_PresetItem(
+        url: 'https://api.dicebear.com/7.x/personas/svg?seed=${seedBase}_u2&scale=115&radius=0&backgroundColor=b6e3f4',
+        title: 'তোমার বিশেষ ২',
+        categoryId: 'girls',
+      ));
+    } else {
+      presets.add(_PresetItem(
+        url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=${seedBase}_u1&scale=115&radius=0&backgroundColor=b6e3f4',
+        title: 'তোমার বিশেষ ১',
+        categoryId: 'boys',
+      ));
+      presets.add(_PresetItem(
+        url: 'https://api.dicebear.com/7.x/personas/svg?seed=${seedBase}_u2&scale=115&radius=0&backgroundColor=d1d4f9',
+        title: 'তোমার বিশেষ ২',
+        categoryId: 'boys',
+      ));
     }
 
-    return list;
+    // 2. Student Boys Collection (ছাত্র)
+    final boys = [
+      ('Felix', 'adventurer', 'স্মার্ট ছাত্র', 'b6e3f4'),
+      ('Liam', 'personas', 'কলেজ বয়', 'd1d4f9'),
+      ('Alexander', 'adventurer', 'কুল স্টুডেন্ট', 'c0aede'),
+      ('Ethan', 'micah', 'মডার্ন লুক', 'ffdfbf'),
+      ('Aiden', 'adventurer', 'হাসিখুশি', 'bbf7d0'),
+      ('Lucas', 'personas', 'ব্রাইট বয়', 'ffd5dc'),
+      ('Oliver', 'avataaars', 'স্টাডি বয়', 'b6e3f4'),
+      ('Jack', 'adventurer', 'অ্যাক্টিভ ছাত্র', 'd1d4f9'),
+      ('Noah', 'personas', 'ভদ্র ছাত্র', 'ffdfbf'),
+      ('Leo', 'micah', 'মেধাবী বয়', 'c0aede'),
+      ('Caleb', 'adventurer', 'ক্যাম্পাস বয়', 'ffd5dc'),
+      ('Ryan', 'personas', 'স্কুল বয়', 'b6e3f4'),
+    ];
+
+    for (final (seed, style, title, bg) in boys) {
+      presets.add(_PresetItem(
+        url: 'https://api.dicebear.com/7.x/$style/svg?seed=$seed&scale=115&radius=0&backgroundColor=$bg',
+        title: title,
+        categoryId: 'boys',
+      ));
+    }
+
+    // 3. Student Girls Collection (ছাত্রী)
+    final girls = [
+      ('Sophia', 'lorelei', 'স্মার্ট ছাত্রী', 'ffd5dc'),
+      ('Emma', 'personas', 'কলেজ গার্ল', 'ffdfbf'),
+      ('Mia', 'adventurer', 'অ্যাডভেঞ্চারাস', 'b6e3f4'),
+      ('Olivia', 'lorelei', 'ব্রিলিয়ান্ট', 'd1d4f9'),
+      ('Ava', 'micah', 'কিউট ছাত্রী', 'bbf7d0'),
+      ('Isabella', 'personas', 'টপার গার্ল', 'ffd5dc'),
+      ('Amelia', 'lorelei', 'মেধাবী ছাত্রী', 'c0aede'),
+      ('Harper', 'avataaars', 'স্টুডেন্ট গার্ল', 'b6e3f4'),
+      ('Evelyn', 'lorelei', 'শান্ত ছাত্রী', 'ffdfbf'),
+      ('Emily', 'adventurer', 'হাসিখুশি', 'd1d4f9'),
+      ('Maya', 'lorelei', 'ক্যাম্পাস কুইন', 'bbf7d0'),
+      ('Lily', 'personas', 'স্বপ্নবাজ', 'c0aede'),
+    ];
+
+    for (final (seed, style, title, bg) in girls) {
+      presets.add(_PresetItem(
+        url: 'https://api.dicebear.com/7.x/$style/svg?seed=$seed&scale=115&radius=0&backgroundColor=$bg',
+        title: title,
+        categoryId: 'girls',
+      ));
+    }
+
+    // 4. Scholars & Toppers (টপার ও স্কলার - চশমা ও সিরিয়াস স্টাডি লুক)
+    final scholars = [
+      ('Zoe', 'lorelei', 'স্কলার গার্ল', 'b6e3f4', true),
+      ('Mason', 'adventurer', 'স্কলার বয়', 'ffd5dc', true),
+      ('Daniel', 'personas', 'ক্লাস টপার', 'd1d4f9', false),
+      ('James', 'avataaars', 'বুকওয়ার্ম', 'c0aede', false),
+      ('Chloe', 'micah', 'সাইন্স ফ্যান', 'bbf7d0', true),
+      ('Grace', 'personas', 'স্টাডি স্টার', 'ffdfbf', false),
+      ('Benjamin', 'adventurer', 'ম্যাথ জিনিয়াস', 'b6e3f4', true),
+      ('Hannah', 'lorelei', 'রিসার্চার', 'ffd5dc', true),
+    ];
+
+    for (final (seed, style, title, bg, glasses) in scholars) {
+      final extra = glasses ? '&glassesProbability=100' : '';
+      presets.add(_PresetItem(
+        url: 'https://api.dicebear.com/7.x/$style/svg?seed=$seed$extra&scale=115&radius=0&backgroundColor=$bg',
+        title: title,
+        categoryId: 'scholars',
+      ));
+    }
+
+    // 5. Anime & Stylized (অ্যানিমে ও স্টাইলিশ)
+    final anime = [
+      ('Kaito', 'adventurer', 'অ্যানিমে হিরো', 'd1d4f9'),
+      ('Sakura', 'lorelei', 'সাকুরা', 'ffd5dc'),
+      ('Ren', 'adventurer', 'অ্যানিমে রেন', 'c0aede'),
+      ('Sunny', 'big-smile', 'স্মাইলি স্টার', 'ffdfbf'),
+      ('Joy', 'big-smile', 'জয়ফুল', 'bbf7d0'),
+      ('Luna', 'adventurer', 'লুনা', 'b6e3f4'),
+      ('Kenji', 'adventurer', 'অ্যাকশন বয়', 'ffd5dc'),
+      ('Hinata', 'lorelei', 'হিনাটা', 'd1d4f9'),
+    ];
+
+    for (final (seed, style, title, bg) in anime) {
+      presets.add(_PresetItem(
+        url: 'https://api.dicebear.com/7.x/$style/svg?seed=$seed&scale=115&radius=0&backgroundColor=$bg',
+        title: title,
+        categoryId: 'anime',
+      ));
+    }
+
+    // 6. Mascots & Bots (ম্যাসকট ও বট)
+    final mascots = [
+      ('StudyBot', 'bottts', 'স্টাডি বট', 'b6e3f4'),
+      ('QuizMaster', 'bottts', 'কুইজ মাস্টার', 'd1d4f9'),
+      ('StarStudent', 'fun-emoji', 'স্টার ইমোজি', 'ffd5dc'),
+      ('Genius', 'fun-emoji', 'জিনিয়াস', 'ffdfbf'),
+      ('CyberChamp', 'bottts', 'সাইবার চ্যাম্প', 'c0aede'),
+      ('Champ', 'fun-emoji', 'চ্যাম্পিয়ন', 'bbf7d0'),
+    ];
+
+    for (final (seed, style, title, bg) in mascots) {
+      presets.add(_PresetItem(
+        url: 'https://api.dicebear.com/7.x/$style/svg?seed=$seed&scale=115&radius=0&backgroundColor=$bg',
+        title: title,
+        categoryId: 'mascots',
+      ));
+    }
+
+    return presets;
+  }
+
+  List<_PresetItem> get _filteredPresets {
+    if (_selectedCategory == 'all') {
+      return _allPresets;
+    }
+    return _allPresets.where((p) => p.categoryId == _selectedCategory).toList();
   }
 
   void _generateRandomAvatar() {
@@ -162,45 +324,67 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final filtered = _filteredPresets;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: screenHeight * 0.88,
+      ),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF0F0F11) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: SafeArea(
         top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Drag Handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Drag Handle
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
+            ),
 
-              // Title Row
-              Row(
+            // Header Row
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 12, 10),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'প্রোফাইল ছবি পরিবর্তন',
-                    style: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'HindSiliguri',
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF059669).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          LucideIcons.sparkles,
+                          size: 18,
+                          color: Color(0xFF059669),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'অবতার ও প্রোফাইল ছবি',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          fontFamily: 'HindSiliguri',
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        ),
+                      ),
+                    ],
                   ),
                   IconButton(
                     onPressed: () => Navigator.pop(context),
@@ -209,184 +393,332 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+            ),
 
-              // Current Preview with Glow
-              Center(
-                child: Stack(
-                  alignment: Alignment.center,
+            // Scrollable Content
+            Flexible(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Container(
-                      width: 96,
-                      height: 96,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF059669).withValues(alpha: isDark ? 0.35 : 0.15),
-                            blurRadius: 20,
-                            offset: const Offset(0, 4),
+                    // Current Preview with Glow & Active Badge
+                    Center(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 92,
+                            height: 92,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF059669).withValues(alpha: isDark ? 0.4 : 0.2),
+                                  blurRadius: 22,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: UserAvatar(
+                              avatarUrl: _selectedAvatarUrl,
+                              name: widget.user.name,
+                              gender: widget.user.gender,
+                              id: widget.user.id,
+                              size: 92,
+                              showBorder: true,
+                              borderColor: const Color(0xFF059669),
+                              borderWidth: 3,
+                            ),
                           ),
+                          if (_isUploading)
+                            Container(
+                              width: 92,
+                              height: 92,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black.withValues(alpha: 0.5),
+                              ),
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
+                              ),
+                            ),
                         ],
                       ),
-                      child: UserAvatar(
-                        avatarUrl: _selectedAvatarUrl,
-                        name: widget.user.name,
-                        gender: widget.user.gender,
-                        id: widget.user.id,
-                        size: 96,
-                        showBorder: true,
-                        borderColor: const Color(0xFF059669),
-                        borderWidth: 3,
-                      ),
                     ),
-                    if (_isUploading)
-                      Container(
-                        width: 96,
-                        height: 96,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.black.withValues(alpha: 0.5),
-                        ),
-                        child: const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.5,
+                    const SizedBox(height: 14),
+
+                    // Action Buttons Row (Upload Custom Photo & Random Avatar)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _ActionButton(
+                            icon: LucideIcons.camera,
+                            label: 'কাস্টম ছবি আপলোড',
+                            isDark: isDark,
+                            onTap: _isUploading ? null : () => _pickImage(ImageSource.gallery),
                           ),
                         ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _ActionButton(
+                            icon: LucideIcons.dices,
+                            label: 'র‍্যান্ডম জেনারেট',
+                            isDark: isDark,
+                            onTap: _isUploading ? null : _generateRandomAvatar,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+
+                    // Category Filter Section Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'শিক্ষার্থী অবতার কালেকশন:',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'HindSiliguri',
+                            color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
+                          ),
+                        ),
+                        Text(
+                          '${filtered.length} টি অবতার',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'HindSiliguri',
+                            color: const Color(0xFF059669),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Horizontal Category Chips
+                    SizedBox(
+                      height: 36,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: _categories.length,
+                        separatorBuilder: (_, i) => const SizedBox(width: 8),
+                        itemBuilder: (context, idx) {
+                          final cat = _categories[idx];
+                          final isSelected = _selectedCategory == cat.id;
+
+                          return InkWell(
+                            onTap: () => setState(() => _selectedCategory = cat.id),
+                            borderRadius: BorderRadius.circular(20),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? const Color(0xFF059669)
+                                    : (isDark ? const Color(0xFF18181B) : const Color(0xFFF1F5F9)),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? const Color(0xFF059669)
+                                      : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    cat.icon,
+                                    size: 14,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B)),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    cat.label,
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                      fontFamily: 'HindSiliguri',
+                                      color: isSelected
+                                          ? Colors.white
+                                          : (isDark ? const Color(0xFFE4E4E7) : const Color(0xFF334155)),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Avatar Grid Gallery
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        mainAxisSpacing: 14,
+                        crossAxisSpacing: 14,
+                        childAspectRatio: 1.0,
+                      ),
+                      itemCount: filtered.length,
+                      itemBuilder: (context, index) {
+                        final preset = filtered[index];
+                        final isSelected = _selectedAvatarUrl == preset.url;
+
+                        return Center(
+                          child: GestureDetector(
+                            onTap: _isUploading
+                                ? null
+                                : () {
+                                    setState(() => _selectedAvatarUrl = preset.url);
+                                  },
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? const Color(0xFF059669)
+                                          : (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0)),
+                                      width: isSelected ? 3.0 : 1.5,
+                                    ),
+                                    boxShadow: isSelected
+                                        ? [
+                                            BoxShadow(
+                                              color: const Color(0xFF059669).withValues(alpha: 0.35),
+                                              blurRadius: 10,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ]
+                                        : null,
+                                  ),
+                                  child: UserAvatar(
+                                    avatarUrl: preset.url,
+                                    name: widget.user.name,
+                                    size: 58,
+                                    showBorder: false,
+                                  ),
+                                ),
+                                // Selected Checkmark Badge
+                                if (isSelected)
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(3),
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFF059669),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        LucideIcons.check,
+                                        size: 11,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 14),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+            ),
 
-              // Action Buttons Row (Upload Image & Random Avatar)
-              Row(
-                children: [
-                  Expanded(
-                    child: _ActionButton(
-                      icon: LucideIcons.image,
-                      label: 'ছবি আপলোড করো',
-                      isDark: isDark,
-                      onTap: _isUploading ? null : () => _pickImage(ImageSource.gallery),
+            // Bottom Save Bar
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF0F0F11) : Colors.white,
+                border: Border(
+                  top: Border(
+                    top: BorderSide(
+                      color: isDark ? const Color(0xFF1E1E24) : const Color(0xFFF1F5F9),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _ActionButton(
-                      icon: LucideIcons.sparkles,
-                      label: 'র‍্যান্ডম কার্টুন',
-                      isDark: isDark,
-                      onTap: _isUploading ? null : _generateRandomAvatar,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-
-              // Cartoon Presets Title
-              Text(
-                'অথবা কার্টুন ছবি বেছে নাও:',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'HindSiliguri',
-                  color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
+                  ).top,
                 ),
               ),
-              const SizedBox(height: 10),
-
-              // Preset Avatars Grid
-              SizedBox(
-                height: 72,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: _presets.length,
-                  separatorBuilder: (_, index) => const SizedBox(width: 10),
-                  itemBuilder: (context, index) {
-                    final presetUrl = _presets[index];
-                    final isSelected = _selectedAvatarUrl == presetUrl;
-
-                    return GestureDetector(
-                      onTap: _isUploading
-                          ? null
-                          : () {
-                              setState(() => _selectedAvatarUrl = presetUrl);
-                            },
-                      child: Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected ? const Color(0xFF059669) : Colors.transparent,
-                            width: 2.5,
-                          ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: _isUploading ? null : () => _saveAvatarToDatabase(_selectedAvatarUrl),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF059669),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
                         ),
-                        child: UserAvatar(
-                          avatarUrl: presetUrl,
-                          name: widget.user.name,
-                          size: 58,
-                          showBorder: false,
+                        elevation: 0,
+                      ),
+                      child: _isUploading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(LucideIcons.checkCircle2, size: 18, color: Colors.white),
+                                SizedBox(width: 8),
+                                Text(
+                                  'অবতার সেভ করো',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                    fontFamily: 'HindSiliguri',
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+                  if (_selectedAvatarUrl != null) ...[
+                    const SizedBox(height: 6),
+                    TextButton(
+                      onPressed: _isUploading ? null : () => _saveAvatarToDatabase(null),
+                      child: const Text(
+                        'ছবি মুছে ফেলো (নামের প্রথম অক্ষরে রিসেট)',
+                        style: TextStyle(
+                          color: Color(0xFFEF4444),
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'HindSiliguri',
                         ),
                       ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 22),
-
-              // Save Selected Button
-              SizedBox(
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _isUploading ? null : () => _saveAvatarToDatabase(_selectedAvatarUrl),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF059669),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
                     ),
-                    elevation: 0,
-                  ),
-                  child: _isUploading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Text(
-                          'প্রোফাইল ছবি সেভ করো',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            fontFamily: 'HindSiliguri',
-                            color: Colors.white,
-                          ),
-                        ),
-                ),
+                  ],
+                ],
               ),
-
-              // Optional: Reset to initials
-              if (_selectedAvatarUrl != null) ...[
-                const SizedBox(height: 8),
-                TextButton(
-                  onPressed: _isUploading ? null : () => _saveAvatarToDatabase(null),
-                  child: const Text(
-                    'ছবি মুছে ফেলো (রিসেট)',
-                    style: TextStyle(
-                      color: Color(0xFFEF4444),
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'HindSiliguri',
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -412,7 +744,7 @@ class _ActionButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 10),
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF18181B) : const Color(0xFFFAFAFA),
           borderRadius: BorderRadius.circular(14),
@@ -429,7 +761,7 @@ class _ActionButton extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 12.5,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF1E293B),

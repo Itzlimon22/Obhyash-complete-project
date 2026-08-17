@@ -41,7 +41,7 @@ async function getAuthUserAndToken(request: NextRequest, supabase: any) {
   return { user: user ?? null, token: null };
 }
 
-const MAX_COMMENT_LENGTH = 2000;
+const MAX_COMMENT_LENGTH = 1000;
 
 export async function GET(request: NextRequest) {
   try {
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error('Error fetching comments:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch comments' },
+      { error: error.message || 'Failed to fetch comments' },
       { status: 500 },
     );
   }
@@ -107,13 +107,13 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: 'You must be logged in to comment' },
+        { error: 'কমেন্ট করতে প্রথমে লগইন করো।' },
         { status: 401 },
       );
     }
 
-    // Rate limit: 20 comments per minute per user
-    const rl = rateLimitResponse(`comments:${user.id}`, 20, 60_000);
+    // Rate limit: 10 comments per minute per user
+    const rl = rateLimitResponse(`comments:${user.id}`, 10, 60_000);
     if (rl.limited) return rl.response;
 
     const { slug, content, parentId } = await request.json();
@@ -123,9 +123,9 @@ export async function POST(request: NextRequest) {
     }
 
     const trimmed = (content ?? '').trim();
-    if (!trimmed) {
+    if (!trimmed || trimmed.length < 3) {
       return NextResponse.json(
-        { error: 'Comment content cannot be empty' },
+        { error: 'কমেন্ট অন্তত ৩ অক্ষরের হতে হবে।' },
         { status: 400 },
       );
     }
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
     if (trimmed.length > MAX_COMMENT_LENGTH) {
       return NextResponse.json(
         {
-          error: `Comment must be at most ${MAX_COMMENT_LENGTH} characters`,
+          error: `কমেন্ট সর্বোচ্চ ${MAX_COMMENT_LENGTH} অক্ষরের মধ্যে হতে হবে।`,
         },
         { status: 400 },
       );
@@ -164,10 +164,10 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    console.error('Error posting comment:', error);
+    console.error('Error adding comment:', error);
     return NextResponse.json(
-      { error: 'Failed to post comment' },
-      { status: 500 },
+      { error: error.message || 'কমেন্ট পোস্ট করতে সমস্যা হয়েছে।' },
+      { status: 400 },
     );
   }
 }

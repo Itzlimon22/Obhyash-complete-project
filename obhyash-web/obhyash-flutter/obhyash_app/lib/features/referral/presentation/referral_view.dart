@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,10 +26,45 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
   List<Map<String, dynamic>> _leaderboard = [];
   int _totalReferrals = 0;
 
+  // Referral Claim & Anti-Brute-Force Lockout State
+  final TextEditingController _claimCodeController = TextEditingController();
+  bool _isClaiming = false;
+  bool _hasUsedReferral = true;
+  Timer? _lockoutTimer;
+  int _lockoutSeconds = 0;
+  int _remainingAttempts = 3;
+
   @override
   void initState() {
     super.initState();
     _loadReferral();
+  }
+
+  @override
+  void dispose() {
+    _lockoutTimer?.cancel();
+    _claimCodeController.dispose();
+    super.dispose();
+  }
+
+  void _startLockoutTimer(int seconds) {
+    _lockoutTimer?.cancel();
+    setState(() => _lockoutSeconds = seconds);
+    _lockoutTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_lockoutSeconds <= 1) {
+        timer.cancel();
+        setState(() {
+          _lockoutSeconds = 0;
+          _remainingAttempts = 3;
+        });
+      } else {
+        setState(() => _lockoutSeconds--);
+      }
+    });
   }
 
   Future<void> _loadReferral() async {
@@ -38,6 +75,35 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
         setState(() => _isLoading = false);
         return;
       }
+
+      // Check if user already used a referral code
+      final usedCheck = await sb
+          .from('referral_history')
+          .select('id')
+          .eq('redeemed_by', uid)
+          .maybeSingle();
+
+      // Check existing lockout or attempt logs
+      try {
+        final log = await sb
+            .from('referral_attempt_logs')
+            .select('failed_attempts, locked_until')
+            .eq('user_id', uid)
+            .maybeSingle();
+
+        if (log != null) {
+          final lockedUntilStr = log['locked_until']?.toString();
+          if (lockedUntilStr != null) {
+            final lockedUntil = DateTime.tryParse(lockedUntilStr);
+            if (lockedUntil != null && lockedUntil.isAfter(DateTime.now())) {
+              final diff = lockedUntil.difference(DateTime.now()).inSeconds;
+              _startLockoutTimer(diff);
+            }
+          }
+          final failed = (log['failed_attempts'] as num?)?.toInt() ?? 0;
+          _remainingAttempts = (3 - failed).clamp(1, 3);
+        }
+      } catch (_) {}
 
       // Try fetching existing code
       final existing = await sb
@@ -129,14 +195,82 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
         setState(() {
           _code = code;
           _history = enriched;
+          _hasUsedReferral = usedCheck != null;
           _scratchCards = (cards as List).cast<Map<String, dynamic>>();
           _leaderboard = (leaderboardRes as List).cast<Map<String, dynamic>>();
-          _totalReferrals = countRes.count ?? 0;
+          _totalReferrals = countRes.count;
           _isLoading = false;
         });
       }
     } catch (_) {
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleClaimReferral() async {
+    final input = _claimCodeController.text.trim().toUpperCase();
+    if (input.isEmpty) {
+      AppPopups.warning(context, message: 'রেফারেল কোডটি লিখুন');
+      return;
+    }
+
+    if (_lockoutSeconds > 0) {
+      final min = _lockoutSeconds ~/ 60;
+      final sec = _lockoutSeconds % 60;
+      AppPopups.warning(
+        context,
+        message: 'ভুল কোড দেওয়ার কারণে ইনপুট সাময়িকভাবে লক আছে। আর $min মিনিট $sec সেকেন্ড অপেক্ষা করুন।',
+      );
+      return;
+    }
+
+    setState(() => _isClaiming = true);
+    try {
+      final sb = Supabase.instance.client;
+      final uid = sb.auth.currentUser?.id;
+      if (uid == null) throw Exception('User not logged in');
+
+      final res = await sb.rpc('redeem_referral_by_code', params: {
+        'p_code': input,
+        'p_user_id': uid,
+      });
+
+      if (mounted) {
+        HapticFeedback.mediumImpact();
+        _claimCodeController.clear();
+        setState(() {
+          _hasUsedReferral = true;
+          _isClaiming = false;
+          _remainingAttempts = 3;
+        });
+        AppPopups.success(
+          context,
+          message: (res != null && res['message'] != null)
+              ? res['message'].toString()
+              : 'রেফারেল কোড সফলভাবে ক্লেইম করা হয়েছে! 🎉',
+        );
+        _loadReferral();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isClaiming = false);
+        final err = e.toString();
+        if (err.contains('১০ মিনিট') || err.contains('লক')) {
+          _startLockoutTimer(600); // 10 mins lockout
+          AppPopups.error(
+            context,
+            message: 'পর পর ৩ বার ভুল কোড দেওয়া হয়েছে! আগামী ১০ মিনিটের জন্য রেফারেল ক্লেইম লক করা হলো।',
+          );
+        } else if (err.contains('চেষ্টা করা যাবে')) {
+          final match = RegExp(r'আর (\d+) বার').firstMatch(err);
+          if (match != null) {
+            setState(() => _remainingAttempts = int.tryParse(match.group(1)!) ?? 1);
+          }
+          AppPopups.warning(context, message: err.replaceAll('Exception:', '').trim());
+        } else {
+          AppPopups.warning(context, message: err.replaceAll('Exception:', '').trim());
+        }
+      }
     }
   }
 
@@ -269,6 +403,203 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                   ),
 
                   const SizedBox(height: 16),
+
+                  // ── Claim Friend's Referral Code Card (If not used yet) ──
+                  if (!_hasUsedReferral) ...[
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: card,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: isDark
+                              ? const Color(0xFF059669).withValues(alpha: 0.3)
+                              : const Color(0xFFA7F3D0),
+                        ),
+                        boxShadow: isDark
+                            ? []
+                            : [
+                                const BoxShadow(
+                                  color: Color(0x06000000),
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(7),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? const Color(0xFF064E3B).withValues(alpha: 0.4)
+                                      : const Color(0xFFECFDF5),
+                                  borderRadius: BorderRadius.circular(9),
+                                ),
+                                child: const Icon(
+                                  LucideIcons.gift,
+                                  size: 16,
+                                  color: Color(0xFF059669),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'বন্ধুর রেফারেল কোড ক্লেইম করো',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: textPrimary,
+                                        fontFamily: 'HindSiliguri',
+                                      ),
+                                    ),
+                                    Text(
+                                      '১ মাসের ফ্রি প্রিমিয়াম উপভোগ করো',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: textSecondary,
+                                        fontFamily: 'HindSiliguri',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Lockout Banner if user reached 3 attempts
+                          if (_lockoutSeconds > 0) ...[
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              margin: const EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? const Color(0xFF451A03).withValues(alpha: 0.4)
+                                    : const Color(0xFFFFFBEB),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isDark
+                                      ? const Color(0xFFD97706).withValues(alpha: 0.4)
+                                      : const Color(0xFFFDE68A),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(LucideIcons.lock, size: 16, color: Color(0xFFD97706)),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      '৩ বার ভুল কোড দেওয়ায় ইনপুট লক করা হয়েছে। আর ${_lockoutSeconds ~/ 60}:${(_lockoutSeconds % 60).toString().padLeft(2, '0')} মিনিট অপেক্ষা করো।',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: 'HindSiliguri',
+                                        color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ] else ...[
+                            Text(
+                              '⚠️ সর্বোচ্চ ৩ বার ভুল কোড দেওয়া যাবে (অবশিষ্ট: $_remainingAttempts টি চেষ্টা)',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'HindSiliguri',
+                                color: _remainingAttempts < 3 ? const Color(0xFFD97706) : textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFFAFAF9),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5),
+                                    ),
+                                  ),
+                                  child: TextField(
+                                    controller: _claimCodeController,
+                                    textCapitalization: TextCapitalization.characters,
+                                    enabled: _lockoutSeconds == 0 && !_isClaiming,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 2,
+                                      fontFamily: 'monospace',
+                                      color: textPrimary,
+                                    ),
+                                    decoration: InputDecoration(
+                                      hintText: 'CODE1234',
+                                      hintStyle: TextStyle(
+                                        fontSize: 13,
+                                        letterSpacing: 1,
+                                        fontFamily: 'monospace',
+                                        color: isDark ? const Color(0xFF52525B) : const Color(0xFFA1A1AA),
+                                      ),
+                                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              SizedBox(
+                                height: 48,
+                                child: ElevatedButton(
+                                  onPressed: (_lockoutSeconds > 0 || _isClaiming)
+                                      ? null
+                                      : _handleClaimReferral,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF059669),
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  ),
+                                  child: _isClaiming
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : const Text(
+                                          'ক্লেইম করো',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'HindSiliguri',
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
 
                   // ── Referral Code Card ───────────────────────────────────
                   Container(
@@ -1033,7 +1364,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: _leaderboard.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (context, index) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final user = _leaderboard[index];
                       final rank = index + 1;

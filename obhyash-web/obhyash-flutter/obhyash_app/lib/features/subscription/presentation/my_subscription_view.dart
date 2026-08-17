@@ -151,7 +151,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
             : await query.eq('redeemed_by', userId).eq('reward_given', true).limit(20);
 
         for (final r in refHistList) {
-          final m = r as Map<String, dynamic>;
+          final m = r;
           final rawDate = m['redeemed_at']?.toString() ?? '';
           final dateStr = rawDate.length >= 10 ? rawDate.substring(0, 10) : rawDate;
           invoices.add(Invoice(
@@ -161,6 +161,42 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
             currency: '৳',
             status: 'paid',
             planName: '🎁 রেফারেল রিওয়ার্ড বোনাস (১ মাস)',
+          ));
+        }
+      } catch (_) {}
+
+      // Scratch card gifts history
+      try {
+        final cardRes = await supabase
+            .from('scratch_cards')
+            .select('id, scratched_at, reward_type, is_scratched')
+            .eq('user_id', userId)
+            .eq('is_scratched', true)
+            .order('scratched_at', ascending: false)
+            .limit(20);
+
+        for (final c in (cardRes as List)) {
+          final m = c as Map<String, dynamic>;
+          final rawDate = m['scratched_at']?.toString() ?? '';
+          final dateStr = rawDate.length >= 10 ? rawDate.substring(0, 10) : rawDate;
+          final rewardType = m['reward_type']?.toString() ?? '';
+          String label = '🎁 স্ক্র্যাচ কার্ড গিফট বোনাস';
+          if (rewardType == '1_month_free') {
+            label = '🎁 স্ক্র্যাচ কার্ড গিফট (১ মাস ফ্রি)';
+          } else if (rewardType == '2_months_free') {
+            label = '🎁 স্ক্র্যাচ কার্ড গিফট (২ মাস ফ্রি)';
+          } else if (rewardType == '3_months_free') {
+            label = '🎁 স্ক্র্যাচ কার্ড গিফট (৩ মাস ফ্রি)';
+          } else if (rewardType == '50_percent_off') {
+            label = '🎁 স্ক্র্যাচ কার্ড গিফট (৫০% ছাড় কুপন)';
+          }
+          invoices.add(Invoice(
+            id: m['id']?.toString() ?? '',
+            date: dateStr,
+            amount: 0,
+            currency: '৳',
+            status: 'paid',
+            planName: label,
           ));
         }
       } catch (_) {}

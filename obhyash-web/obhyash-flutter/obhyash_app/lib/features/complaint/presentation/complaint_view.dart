@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +8,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/providers/auth_provider.dart';
+import '../../../core/providers/shared_prefs_provider.dart';
 import '../../../core/utils/app_popups.dart';
 
 // ─── Domain Models ────────────────────────────────────────────────────────────
@@ -144,16 +147,64 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
   List<AppComplaint> _myComplaints = [];
   bool _isLoadingComplaints = false;
 
+  Timer? _cooldownTimer;
+  int _cooldownSeconds = 0;
+
   final supabase = Supabase.instance.client;
 
   @override
   void initState() {
     super.initState();
+    _descriptionController.addListener(_onDescriptionChanged);
     _fetchMyComplaints();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initCooldown());
   }
+
+  void _onDescriptionChanged() {
+    setState(() {});
+  }
+
+  void _initCooldown() {
+    try {
+      final prefs = ref.read(sharedPreferencesProvider);
+      final lastSubmit = prefs.getInt('last_complaint_submit_time') ?? 0;
+      final elapsedMs = DateTime.now().millisecondsSinceEpoch - lastSubmit;
+      if (elapsedMs < 180000) {
+        _startCooldownTimer((180000 - elapsedMs) ~/ 1000);
+      }
+    } catch (_) {}
+  }
+
+  void _startCooldownTimer(int seconds) {
+    _cooldownTimer?.cancel();
+    setState(() => _cooldownSeconds = seconds);
+    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_cooldownSeconds <= 1) {
+        timer.cancel();
+        setState(() => _cooldownSeconds = 0);
+      } else {
+        setState(() => _cooldownSeconds--);
+      }
+    });
+  }
+
+  int get _pendingCount =>
+      _myComplaints.where((c) => c.status == 'Pending' || c.status == 'In Progress').length;
+
+  int get _dailyCount =>
+      _myComplaints.where((c) => DateTime.now().difference(c.createdAt).inHours < 24).length;
+
+  bool get _isPendingLimitReached => _pendingCount >= 3;
+  bool get _isDailyLimitReached => _dailyCount >= 5;
 
   @override
   void dispose() {
+    _cooldownTimer?.cancel();
+    _descriptionController.removeListener(_onDescriptionChanged);
     _descriptionController.dispose();
     super.dispose();
   }
@@ -185,6 +236,36 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
   }
 
   Future<void> _handleSubmit() async {
+    // 1. Pending Limit Check
+    if (_isPendingLimitReached) {
+      AppPopups.warning(
+        context,
+        message: 'আপনার ৩টি আবেদন বর্তমানে প্রক্রিয়াধীন আছে। নতুন বার্তা পাঠানোর পূর্বে সেগুলোর সমাধান হওয়া পর্যন্ত অপেক্ষা করুন।',
+      );
+      return;
+    }
+
+    // 2. Daily Limit Check
+    if (_isDailyLimitReached) {
+      AppPopups.warning(
+        context,
+        message: 'আজকের জন্য আপনার আবেদনের দৈনিক সীমা (৫টি) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করুন।',
+      );
+      return;
+    }
+
+    // 3. Cooldown Check
+    if (_cooldownSeconds > 0) {
+      final min = _cooldownSeconds ~/ 60;
+      final sec = _cooldownSeconds % 60;
+      AppPopups.warning(
+        context,
+        message: 'পরবর্তী বার্তা পাঠানোর জন্য আর $min মিনিট $sec সেকেন্ড অপেক্ষা করুন।',
+      );
+      return;
+    }
+
+    // 4. Type Selection Check
     if (_selectedType == null) {
       AppPopups.warning(
         context,
@@ -192,10 +273,34 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       );
       return;
     }
-    if (_descriptionController.text.trim().length < 10) {
+
+    // 5. Min/Max Length Validation
+    final desc = _descriptionController.text.trim();
+    if (desc.length < 15) {
       AppPopups.warning(
         context,
-        message: 'অনুগ্রহ করে বিস্তারিত মতামত লেখো (কমপক্ষে ১০ অক্ষর)',
+        message: 'অনুগ্রহ করে বিস্তারিত মতামত লেখো (কমপক্ষে ১৫ অক্ষর আবশ্যক)',
+      );
+      return;
+    }
+    if (desc.length > 1000) {
+      AppPopups.warning(
+        context,
+        message: 'মতামতের বিবরণ সর্বোচ্চ ১০০০ অক্ষরের মধ্যে লেখো',
+      );
+      return;
+    }
+
+    // 6. Duplicate Text Detection in last 7 days
+    final isDuplicate = _myComplaints.any(
+      (c) =>
+          c.description.trim().toLowerCase() == desc.toLowerCase() &&
+          DateTime.now().difference(c.createdAt).inDays < 7,
+    );
+    if (isDuplicate) {
+      AppPopups.warning(
+        context,
+        message: 'আপনি ইতিপূর্বে হুবহু একই বিবরণ পাঠিয়েছেন! নতুন কোনো তথ্য থাকলে তা উল্লেখ করুন।',
       );
       return;
     }
@@ -209,9 +314,16 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       await supabase.from('app_complaints').insert({
         'user_id': user.id,
         'type': _selectedType,
-        'description': _descriptionController.text.trim(),
+        'description': desc,
         'status': 'Pending',
       });
+
+      // Save cooldown timestamp in preferences
+      try {
+        final prefs = ref.read(sharedPreferencesProvider);
+        await prefs.setInt('last_complaint_submit_time', DateTime.now().millisecondsSinceEpoch);
+        _startCooldownTimer(180);
+      } catch (_) {}
 
       if (mounted) {
         HapticFeedback.mediumImpact();
@@ -224,10 +336,16 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       }
     } catch (e) {
       if (mounted) {
-        AppPopups.error(
-          context,
-          message: 'মতামত পাঠাতে সমস্যা হয়েছে। ইন্টারনেট সংযোগ চেক করো।',
-        );
+        final errMsg = e.toString();
+        // Check if database trigger exception message is returned
+        if (errMsg.contains('অপেক্ষা') || errMsg.contains('সীমা') || errMsg.contains('প্রক্রিয়াধীন')) {
+          AppPopups.warning(context, message: errMsg.replaceAll('Exception:', '').trim());
+        } else {
+          AppPopups.error(
+            context,
+            message: 'মতামত পাঠাতে সমস্যা হয়েছে। ইন্টারনেট সংযোগ চেক করো।',
+          );
+        }
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -329,6 +447,9 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
   // ─── New Complaint Form ─────────────────────────────────────────────────────
 
   Widget _buildNewComplaintForm(bool isDark) {
+    final charCount = _descriptionController.text.trim().length;
+    final isBlocked = _isPendingLimitReached || _isDailyLimitReached || _cooldownSeconds > 0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -391,6 +512,97 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             ],
           ),
         ),
+
+        // Anti-Spam / Rate Limit Status Alert
+        if (_isPendingLimitReached) ...[
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF451A03).withValues(alpha: 0.4) : const Color(0xFFFFFBEB),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? const Color(0xFFD97706).withValues(alpha: 0.4) : const Color(0xFFFDE68A),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.alertTriangle, size: 18, color: Color(0xFFD97706)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'আপনার ৩টি আবেদন ইতিমধ্যে প্রক্রিয়াধীন আছে। নতুন আবেদন জমা দেওয়ার পূর্বে আগেরগুলোর সমাধানের অপেক্ষা করুন।',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'HindSiliguri',
+                      color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ] else if (_isDailyLimitReached) ...[
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF451A03).withValues(alpha: 0.4) : const Color(0xFFFFFBEB),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? const Color(0xFFD97706).withValues(alpha: 0.4) : const Color(0xFFFDE68A),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.shieldAlert, size: 18, color: Color(0xFFD97706)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'আজকের জন্য আপনার আবেদনের সর্বোচ্চ সীমা (৫টি/দিন) পূর্ণ হয়েছে। অনুগ্রহ করে আগামীকাল চেষ্টা করুন।',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'HindSiliguri',
+                      color: isDark ? const Color(0xFFFDE68A) : const Color(0xFF92400E),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ] else if (_cooldownSeconds > 0) ...[
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E1B4B).withValues(alpha: 0.4) : const Color(0xFFEEF2FF),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? const Color(0xFF6366F1).withValues(alpha: 0.4) : const Color(0xFFC7D2FE),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.clock, size: 18, color: Color(0xFF6366F1)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'স্প্যামিং প্রতিরোধে পরবর্তী বার্তা পাঠাতে আর ${_cooldownSeconds ~/ 60}:${(_cooldownSeconds % 60).toString().padLeft(2, '0')} মিনিট অপেক্ষা করুন।',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'HindSiliguri',
+                      color: isDark ? const Color(0xFFC7D2FE) : const Color(0xFF3730A3),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
         const SizedBox(height: 20),
 
         // Step 1 — Issue Type
@@ -405,10 +617,12 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
           return Padding(
             padding: EdgeInsets.only(bottom: index < _complaintTypes.length - 1 ? 8 : 0),
             child: GestureDetector(
-              onTap: () {
-                HapticFeedback.selectionClick();
-                setState(() => _selectedType = cat['id'] as String);
-              },
+              onTap: isBlocked
+                  ? null
+                  : () {
+                      HapticFeedback.selectionClick();
+                      setState(() => _selectedType = cat['id'] as String);
+                    },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeOut,
@@ -552,7 +766,27 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
         const SizedBox(height: 20),
 
         // Step 2 — Description
-        _buildStepLabel('২', 'বিস্তারিত বিবরণ লেখো', isDark),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildStepLabel('২', 'বিস্তারিত বিবরণ লেখো', isDark),
+            Text(
+              '$charCount / ১০০০ অক্ষর',
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'HindSiliguri',
+                color: charCount == 0
+                    ? (isDark ? const Color(0xFF71717A) : const Color(0xFF9CA3AF))
+                    : (charCount < 15
+                        ? const Color(0xFFD97706)
+                        : (charCount <= 1000
+                            ? const Color(0xFF059669)
+                            : const Color(0xFFEF4444))),
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 10),
 
         Container(
@@ -573,6 +807,9 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
           child: TextField(
             controller: _descriptionController,
             maxLines: 5,
+            maxLength: 1000,
+            buildCounter: (_, {required currentLength, required isFocused, maxLength}) => null,
+            enabled: !isBlocked,
             style: TextStyle(
               fontSize: 14,
               fontFamily: 'HindSiliguri',
@@ -580,7 +817,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               color: isDark ? Colors.white : Colors.black87,
             ),
             decoration: InputDecoration(
-              hintText: 'সমস্যাটি কীভাবে ঘটেছে বা কোথায় দেখা দিয়েছে তা লেখো…',
+              hintText: 'সমস্যাটি কীভাবে ঘটেছে বা কোথায় দেখা দিয়েছে তা লেখো (কমপক্ষে ১৫ অক্ষর)…',
               hintStyle: TextStyle(
                 fontSize: 13,
                 fontFamily: 'HindSiliguri',
@@ -611,10 +848,14 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
         SizedBox(
           height: 52,
           child: ElevatedButton(
-            onPressed: _isLoading ? null : _handleSubmit,
+            onPressed: (_isLoading || isBlocked) ? null : _handleSubmit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF059669),
-              foregroundColor: Colors.white,
+              backgroundColor: isBlocked
+                  ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0))
+                  : const Color(0xFF059669),
+              foregroundColor: isBlocked
+                  ? (isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8))
+                  : Colors.white,
               elevation: 0,
               shadowColor: Colors.transparent,
               shape: RoundedRectangleBorder(
@@ -630,15 +871,24 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                       color: Colors.white,
                     ),
                   )
-                : const Row(
+                : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(LucideIcons.send, size: 16),
-                      SizedBox(width: 10),
+                      Icon(
+                        isBlocked ? LucideIcons.lock : LucideIcons.send,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 10),
                       Text(
-                        'সাপোর্ট টিকেট জমা দাও',
-                        style: TextStyle(
-                          fontSize: 16,
+                        _isPendingLimitReached
+                            ? 'আগের ৩টি আবেদনের সমাধানের অপেক্ষা করো'
+                            : (_isDailyLimitReached
+                                ? 'আজকের সাবমিশন সীমা পূর্ণ (৫/৫)'
+                                : (_cooldownSeconds > 0
+                                    ? 'অপেক্ষা করুন (${_cooldownSeconds ~/ 60}:${(_cooldownSeconds % 60).toString().padLeft(2, '0')})'
+                                    : 'সাপোর্ট টিকেট জমা দাও')),
+                        style: const TextStyle(
+                          fontSize: 15,
                           fontWeight: FontWeight.w700,
                           fontFamily: 'HindSiliguri',
                         ),
