@@ -21,6 +21,7 @@ import '../providers/theme_provider.dart';
 import '../providers/title_provider.dart';
 import 'widgets/obhyash_tooltip.dart';
 import '../../features/dashboard/presentation/widgets/countdown_banner.dart';
+import '../../features/practice/providers/practice_providers.dart';
 
 final _unreadNotifCountProvider = FutureProvider.autoDispose<int>((ref) async {
   final user = ref.watch(authProvider);
@@ -74,8 +75,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/leaderboard')) return 'leaderboard';
     if (location.startsWith('/analysis')) return 'analysis';
     if (location.startsWith('/my-reports')) return 'my-reports';
-    if (location.startsWith('/profile/my-subscription'))
-      return 'my-subscription';
+    if (location.startsWith('/profile/my-subscription')) return 'my-subscription';
     if (location.startsWith('/profile/subscription')) return 'subscription';
     if (location.startsWith('/profile/complaint')) return 'complaint';
     if (location.startsWith('/profile/about')) return 'about';
@@ -172,6 +172,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         return 'সাবস্ক্রিপশন';
       case 'complaint':
         return 'অভিযোগ';
+      case 'feature-requests':
+        return 'ফিচার প্রস্তাব';
       case 'about':
         return 'পরিচিতি';
       case 'privacy':
@@ -648,6 +650,50 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                 ),
                               ),
                             ],
+                          )
+                        else if (activeTab == 'practice')
+                          Consumer(
+                            builder: (context, ref, _) {
+                              final currentPracticeTab = ref.watch(practiceTabProvider);
+                              return Container(
+                                height: 36,
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? const Color(0xFF1E1E1E)
+                                      : const Color(0xFFF3F4F6),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isDark
+                                        ? const Color(0xFF2E2E2E)
+                                        : const Color(0xFFE5E7EB),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    _HeaderTabBtn(
+                                      label: 'ভুলসমূহ',
+                                      active: currentPracticeTab == 'mistakes',
+                                      isDark: isDark,
+                                      onTap: () {
+                                        HapticFeedback.lightImpact();
+                                        ref.read(practiceTabProvider.notifier).setTab('mistakes');
+                                      },
+                                    ),
+                                    _HeaderTabBtn(
+                                      label: 'বুকমার্ক',
+                                      active: currentPracticeTab == 'bookmarks',
+                                      isDark: isDark,
+                                      onTap: () {
+                                        HapticFeedback.lightImpact();
+                                        ref.read(practiceTabProvider.notifier).setTab('bookmarks');
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                       ],
                     ),
@@ -1049,6 +1095,63 @@ class _ProfileSheet extends StatelessWidget {
             ),
             const SizedBox(height: 8),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeaderTabBtn extends StatelessWidget {
+  final String label;
+  final bool active;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _HeaderTabBtn({
+    required this.label,
+    required this.active,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        height: 30,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          gradient: active
+              ? const LinearGradient(
+                  colors: [Color(0xFF004633), Color(0xFF00664B)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          borderRadius: BorderRadius.circular(9),
+          boxShadow: active
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.25),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'HindSiliguri',
+            color: active
+                ? Colors.white
+                : (isDark ? const Color(0xFFA3A3A3) : const Color(0xFF6B7280)),
+          ),
         ),
       ),
     );

@@ -33,6 +33,7 @@ const ROUTE_TITLES: Record<string, string> = {
   '/admin/subscriptions': 'সাবস্ক্রিপশন ও পেমেন্টস',
   '/admin/reports': 'প্রশ্ন এরর রিপোর্ট সমাধান',
   '/admin/complaints': 'অভিযোগ ও মতামত কেন্দ্র',
+  '/admin/feature-requests': 'ফিচার প্রস্তাবনা ও রোডম্যাপ',
   '/admin/notifications': 'সিস্টেম নোটিফিকেশন ব্রডকাস্ট',
   '/admin/blog-management': 'ব্লগ ও কনটেন্ট ম্যানেজমেন্ট',
   '/admin/settings': 'সিস্টেম ও সিকিউরিটি সেটিংস',

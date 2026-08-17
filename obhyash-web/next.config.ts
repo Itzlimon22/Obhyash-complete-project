@@ -182,7 +182,7 @@ const nextConfig: NextConfig = {
       // Authenticated student routes — all contain user-specific content
       {
         source:
-          '/(dashboard|practice|profile|settings|history|notifications|subscription|analysis|complaint|referral|setup|leaderboard)(.*)',
+          '/(dashboard|practice|profile|settings|history|notifications|subscription|analysis|complaint|feature-requests|referral|setup|leaderboard)(.*)',
         headers: [
           { key: 'Cache-Control', value: 'private, no-store' },
           { key: 'Pragma', value: 'no-cache' },

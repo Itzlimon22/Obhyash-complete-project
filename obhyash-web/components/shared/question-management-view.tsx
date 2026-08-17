@@ -204,7 +204,15 @@ export default function QuestionManagementView({
 
           {/* Statistics Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-            <div className="bg-white dark:bg-neutral-900 rounded-[1.25rem] border border-neutral-200/60 dark:border-neutral-800/60 p-3.5 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
+            <button
+              type="button"
+              onClick={() => updateFilters({ ...filters, status: null })}
+              className={`rounded-[1.25rem] border p-3.5 md:p-5 text-left transition-all cursor-pointer ${
+                !filters.status
+                  ? 'bg-blue-50/70 dark:bg-blue-950/30 border-blue-300 dark:border-blue-800/80 shadow-sm ring-1 ring-blue-400/30'
+                  : 'bg-white dark:bg-neutral-900 border-neutral-200/60 dark:border-neutral-800/60 hover:border-blue-300'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] md:text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-[0.1em] opacity-80">
@@ -221,9 +229,22 @@ export default function QuestionManagementView({
                   />
                 </div>
               </div>
-            </div>
+            </button>
 
-            <div className="bg-white dark:bg-neutral-900 rounded-[1.25rem] border border-emerald-200/50 dark:border-emerald-900/30 p-3.5 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
+            <button
+              type="button"
+              onClick={() =>
+                updateFilters({
+                  ...filters,
+                  status: filters.status === 'Approved' ? null : 'Approved',
+                })
+              }
+              className={`rounded-[1.25rem] border p-3.5 md:p-5 text-left transition-all cursor-pointer ${
+                filters.status === 'Approved'
+                  ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-400 dark:border-emerald-700 shadow-sm ring-1 ring-emerald-500/30'
+                  : 'bg-white dark:bg-neutral-900 border-emerald-200/50 dark:border-emerald-900/30 hover:border-emerald-400'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] md:text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.1em] opacity-80">
@@ -240,9 +261,22 @@ export default function QuestionManagementView({
                   />
                 </div>
               </div>
-            </div>
+            </button>
 
-            <div className="bg-white dark:bg-neutral-900 rounded-[1.25rem] border border-amber-200/50 dark:border-amber-900/30 p-3.5 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
+            <button
+              type="button"
+              onClick={() =>
+                updateFilters({
+                  ...filters,
+                  status: filters.status === 'Pending' ? null : 'Pending',
+                })
+              }
+              className={`rounded-[1.25rem] border p-3.5 md:p-5 text-left transition-all cursor-pointer ${
+                filters.status === 'Pending'
+                  ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-400 dark:border-amber-700 shadow-sm ring-1 ring-amber-500/30'
+                  : 'bg-white dark:bg-neutral-900 border-amber-200/50 dark:border-amber-900/30 hover:border-amber-400'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] md:text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-[0.1em] opacity-80">
@@ -256,9 +290,22 @@ export default function QuestionManagementView({
                   <Clock size={18} className="text-amber-600 dark:text-amber-400" />
                 </div>
               </div>
-            </div>
+            </button>
 
-            <div className="bg-white dark:bg-neutral-900 rounded-[1.25rem] border border-rose-200/50 dark:border-rose-900/30 p-3.5 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-md transition-shadow">
+            <button
+              type="button"
+              onClick={() =>
+                updateFilters({
+                  ...filters,
+                  status: filters.status === 'Rejected' ? null : 'Rejected',
+                })
+              }
+              className={`rounded-[1.25rem] border p-3.5 md:p-5 text-left transition-all cursor-pointer ${
+                filters.status === 'Rejected'
+                  ? 'bg-rose-50/70 dark:bg-rose-950/30 border-rose-400 dark:border-rose-700 shadow-sm ring-1 ring-rose-500/30'
+                  : 'bg-white dark:bg-neutral-900 border-rose-200/50 dark:border-rose-900/30 hover:border-rose-400'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] md:text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-[0.1em] opacity-80">
@@ -275,7 +322,7 @@ export default function QuestionManagementView({
                   />
                 </div>
               </div>
-            </div>
+            </button>
           </div>
 
           {/* Filters */}

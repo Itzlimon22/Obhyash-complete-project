@@ -10,33 +10,39 @@ import '../../../core/utils/app_popups.dart';
 
 // ─── Domain Models ────────────────────────────────────────────────────────────
 
-class AppComplaint {
+class AppFeatureRequest {
   final String id;
   final String userId;
-  final String type;
+  final String title;
+  final String category;
   final String description;
   final String status;
   final String? adminFeedback;
+  final int upvotesCount;
   final DateTime createdAt;
 
-  const AppComplaint({
+  const AppFeatureRequest({
     required this.id,
     required this.userId,
-    required this.type,
+    required this.title,
+    required this.category,
     required this.description,
     required this.status,
     this.adminFeedback,
+    this.upvotesCount = 0,
     required this.createdAt,
   });
 
-  factory AppComplaint.fromJson(Map<String, dynamic> json) {
-    return AppComplaint(
+  factory AppFeatureRequest.fromJson(Map<String, dynamic> json) {
+    return AppFeatureRequest(
       id: json['id']?.toString() ?? '',
       userId: json['user_id']?.toString() ?? '',
-      type: json['type']?.toString() ?? 'Technical',
+      title: json['title']?.toString() ?? '',
+      category: json['category']?.toString() ?? 'Other',
       description: json['description']?.toString() ?? '',
-      status: json['status']?.toString() ?? 'Pending',
+      status: json['status']?.toString() ?? 'Under Review',
       adminFeedback: json['admin_feedback']?.toString(),
+      upvotesCount: (json['upvotes_count'] as num?)?.toInt() ?? 0,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now()
           : DateTime.now(),
@@ -46,76 +52,94 @@ class AppComplaint {
 
 // ─── Configurations ───────────────────────────────────────────────────────────
 
-final _complaintTypes = [
+final _featureCategories = [
   {
-    'id': 'Technical',
-    'label': 'কারিগরি সমস্যা',
-    'subLabel': 'Technical Issue',
+    'id': 'Exam & Practice',
+    'label': 'এক্সাম ও প্র্যাকটিস',
+    'subLabel': 'Exam & Practice',
     'icon': LucideIcons.zap,
     'color': const Color(0xFFECFDF5),
     'darkColor': const Color(0x33059669),
     'iconColor': const Color(0xFF059669),
     'darkIconColor': const Color(0xFF34D399),
-    'description': 'অ্যাপ ক্র্যাশ, লোডিং সমস্যা বা এরর',
+    'description': 'নতুন এক্সাম মোড, ওএমআর বা প্র্যাকটিস অপশন',
   },
   {
-    'id': 'UX',
-    'label': 'ডিজাইন ও অভিজ্ঞতা',
-    'subLabel': 'UX / Design',
-    'icon': LucideIcons.smile,
+    'id': 'Analytics & Tracking',
+    'label': 'অ্যানালিটিক্স ও ট্র্যাকিং',
+    'subLabel': 'Analytics & Insights',
+    'icon': LucideIcons.barChart2,
     'color': const Color(0xFFEFF6FF),
     'darkColor': const Color(0x332563EB),
     'iconColor': const Color(0xFF2563EB),
     'darkIconColor': const Color(0xFF60A5FA),
-    'description': 'ইন্টারফেস বা ব্যবহারের সুবিধা নিয়ে পরামর্শ',
+    'description': 'স্কোর অ্যানালাইসিস, দুর্বলতা ট্র্যাকিং ও প্রগ্রেস',
   },
   {
-    'id': 'Bug',
-    'label': 'বাগ রিপোর্ট',
-    'subLabel': 'Bug Report',
-    'icon': LucideIcons.bug,
-    'color': const Color(0xFFFEF2F2),
-    'darkColor': const Color(0x33DC2626),
-    'iconColor': const Color(0xFFDC2626),
-    'darkIconColor': const Color(0xFFF87171),
-    'description': 'কোনো ফিচার ঠিকমতো কাজ করছে না',
-  },
-  {
-    'id': 'Feature Request',
-    'label': 'নতুন ফিচার প্রস্তাব',
-    'subLabel': 'Feature Request',
-    'icon': LucideIcons.alertCircle,
+    'id': 'Study Tools',
+    'label': 'স্টাডি টুলস ও মোড',
+    'subLabel': 'Smart Study Tools',
+    'icon': LucideIcons.bookOpen,
     'color': const Color(0xFFFFFBEB),
     'darkColor': const Color(0x33D97706),
     'iconColor': const Color(0xFFD97706),
     'darkIconColor': const Color(0xFFFBBF24),
-    'description': 'নতুন কোনো সুবিধা বা ফিচার যোগ করার আইডিয়া',
+    'description': 'ফ্ল্যাশকার্ড, নোট ও ফর্মুলা রিভিশন সুবিধা',
+  },
+  {
+    'id': 'UI & Theme',
+    'label': 'ইন্টারফেস ও থিম',
+    'subLabel': 'UI & Customization',
+    'icon': LucideIcons.palette,
+    'color': const Color(0xFFFAF5FF),
+    'darkColor': const Color(0x339333EA),
+    'iconColor': const Color(0xFF9333EA),
+    'darkIconColor': const Color(0xFFC084FC),
+    'description': 'ডিজাইন পরিবর্তন, ফন্ট সাইজ বা কাস্টম কালার থিম',
+  },
+  {
+    'id': 'Other',
+    'label': 'অন্যান্য আইডিয়া',
+    'subLabel': 'Other Cool Ideas',
+    'icon': LucideIcons.layers,
+    'color': const Color(0xFFF4F4F5),
+    'darkColor': const Color(0xFF27272A),
+    'iconColor': const Color(0xFF71717A),
+    'darkIconColor': const Color(0xFFA1A1AA),
+    'description': 'তোমার মাথায় থাকা যেকোনো দারুণ নতুন আইডিয়া',
   },
 ];
 
 final _statusConfig = {
-  'Pending': {
-    'label': 'অপেক্ষমাণ',
+  'Under Review': {
+    'label': 'বিবেচনাধীন',
     'icon': LucideIcons.clock,
     'color': const Color(0xFFFEF3C7),
     'darkColor': const Color(0x3378350F),
     'iconColor': const Color(0xFFD97706),
   },
-  'In Progress': {
-    'label': 'প্রক্রিয়াধীন',
-    'icon': LucideIcons.refreshCcw,
+  'Planned': {
+    'label': 'পরিকল্পিত',
+    'icon': LucideIcons.compass,
     'color': const Color(0xFFDBEAFE),
     'darkColor': const Color(0x331E3A8A),
     'iconColor': const Color(0xFF2563EB),
   },
-  'Resolved': {
-    'label': 'সমাধান হয়েছে',
+  'In Progress': {
+    'label': 'কাজ চলছে',
+    'icon': LucideIcons.refreshCcw,
+    'color': const Color(0xFFEDE9FE),
+    'darkColor': const Color(0x335B21B6),
+    'iconColor': const Color(0xFF7C3AED),
+  },
+  'Completed': {
+    'label': 'যুক্ত হয়েছে',
     'icon': LucideIcons.checkCheck,
     'color': const Color(0xFFECFDF5),
     'darkColor': const Color(0x33064E3B),
     'iconColor': const Color(0xFF059669),
   },
-  'Dismissed': {
+  'Declined': {
     'label': 'বাতিল',
     'icon': LucideIcons.xCircle,
     'color': const Color(0xFFF4F4F5),
@@ -124,78 +148,127 @@ final _statusConfig = {
   },
 };
 
+final _upcomingRoadmap = [
+  {
+    'title': 'AI স্মার্ট ব্যাখ্যা ও দুর্বলতা বিশ্লেষণ',
+    'category': 'AI Powered',
+    'status': 'কাজ চলছে',
+    'statusColor': const Color(0xFF059669),
+    'statusBg': const Color(0xFFECFDF5),
+    'icon': LucideIcons.sparkles,
+    'description': 'প্রতিটি ভুল উত্তরের জন্য এআই ভিত্তিক স্টেপ-বাই-স্টেপ সমাধান ও ব্যক্তিগত গাইডেন্স।',
+  },
+  {
+    'title': 'লাইভ ১v১ কুইজ ব্যাটল ও মাল্টিপ্লেয়ার',
+    'category': 'Gamification',
+    'status': 'পরিকল্পিত',
+    'statusColor': const Color(0xFF2563EB),
+    'statusBg': const Color(0xFFEFF6FF),
+    'icon': LucideIcons.flame,
+    'description': 'বন্ধুদের সাথে সরাসরি রিয়েল-টাইমে লাইভ চ্যালেঞ্জ এবং দ্রুত উত্তর দেওয়ার প্রতিযোগিতা।',
+  },
+  {
+    'title': 'অফলাইন রিভিশন মোড',
+    'category': 'Offline Tool',
+    'status': 'পরিকল্পিত',
+    'statusColor': const Color(0xFF2563EB),
+    'statusBg': const Color(0xFFEFF6FF),
+    'icon': LucideIcons.smartphone,
+    'description': 'ইন্টারনেট কানেকশন ছাড়াই সেভ করা প্র্যাকটিস সেট ও বুকমার্কড প্রশ্ন ঝালাইয়ের সুবিধা।',
+  },
+  {
+    'title': 'অডিও ব্যাখ্যা ও পডকাস্ট লার্নিং',
+    'category': 'Audio Prep',
+    'status': 'বিবেচনাধীন',
+    'statusColor': const Color(0xFFD97706),
+    'statusBg': const Color(0xFFFFFBEB),
+    'icon': LucideIcons.volume2,
+    'description': 'চলাফেরার সময় বা বিশ্রামের সময় সহজে শোনার মাধ্যমে কঠিন টপিক রিভিশন।',
+  },
+];
+
 // ─── Main View ────────────────────────────────────────────────────────────────
 
-class ComplaintView extends ConsumerStatefulWidget {
-  const ComplaintView({super.key});
+class FeatureRequestsView extends ConsumerStatefulWidget {
+  const FeatureRequestsView({super.key});
 
   @override
-  ConsumerState<ComplaintView> createState() => _ComplaintViewState();
+  ConsumerState<FeatureRequestsView> createState() =>
+      _FeatureRequestsViewState();
 }
 
-class _ComplaintViewState extends ConsumerState<ComplaintView> {
+class _FeatureRequestsViewState extends ConsumerState<FeatureRequestsView> {
   String _activeTab = 'new';
-  String? _selectedType;
+  String? _selectedCategory;
+  final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
   bool _isLoading = false;
   bool _isSuccess = false;
 
-  List<AppComplaint> _myComplaints = [];
-  bool _isLoadingComplaints = false;
+  List<AppFeatureRequest> _myRequests = [];
+  bool _isLoadingRequests = false;
 
   final supabase = Supabase.instance.client;
 
   @override
   void initState() {
     super.initState();
-    _fetchMyComplaints();
+    _fetchMyRequests();
   }
 
   @override
   void dispose() {
+    _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
 
-  Future<void> _fetchMyComplaints() async {
+  Future<void> _fetchMyRequests() async {
     final user = supabase.auth.currentUser;
     if (user == null) return;
 
-    setState(() => _isLoadingComplaints = true);
+    setState(() => _isLoadingRequests = true);
     try {
       final response = await supabase
-          .from('app_complaints')
+          .from('app_feature_requests')
           .select()
           .eq('user_id', user.id)
           .order('created_at', ascending: false);
 
       if (mounted) {
         setState(() {
-          _myComplaints = (response as List)
-              .map((e) => AppComplaint.fromJson(e))
+          _myRequests = (response as List)
+              .map((e) => AppFeatureRequest.fromJson(e))
               .toList();
         });
       }
     } catch (e) {
-      debugPrint('[ComplaintView] Error fetching complaints: $e');
+      debugPrint('[FeatureRequestsView] Error fetching requests: $e');
     } finally {
-      if (mounted) setState(() => _isLoadingComplaints = false);
+      if (mounted) setState(() => _isLoadingRequests = false);
     }
   }
 
   Future<void> _handleSubmit() async {
-    if (_selectedType == null) {
+    if (_selectedCategory == null) {
       AppPopups.warning(
         context,
-        message: 'অনুগ্রহ করে মতামতের ধরণ নির্বাচন করো',
+        message: 'অনুগ্রহ করে ফিচারের ক্যাটাগরি নির্বাচন করো',
+      );
+      return;
+    }
+    if (_titleController.text.trim().length < 4) {
+      AppPopups.warning(
+        context,
+        message: 'ফিচারের একটি সংক্ষিপ্ত শিরোনাম লেখো (কমপক্ষে ৪ অক্ষর)',
       );
       return;
     }
     if (_descriptionController.text.trim().length < 10) {
       AppPopups.warning(
         context,
-        message: 'অনুগ্রহ করে বিস্তারিত মতামত লেখো (কমপক্ষে ১০ অক্ষর)',
+        message: 'অনুগ্রহ করে ফিচারের বিস্তারিত বিবরণ লেখো (কমপক্ষে ১০ অক্ষর)',
       );
       return;
     }
@@ -206,27 +279,28 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       final user = supabase.auth.currentUser;
       if (user == null) throw Exception('No user logged in');
 
-      await supabase.from('app_complaints').insert({
+      await supabase.from('app_feature_requests').insert({
         'user_id': user.id,
-        'type': _selectedType,
+        'category': _selectedCategory,
+        'title': _titleController.text.trim(),
         'description': _descriptionController.text.trim(),
-        'status': 'Pending',
+        'status': 'Under Review',
       });
 
       if (mounted) {
         HapticFeedback.mediumImpact();
         setState(() => _isSuccess = true);
-        _fetchMyComplaints();
+        _fetchMyRequests();
         AppPopups.success(
           context,
-          message: 'তোমার বার্তা আমরা পেয়েছি! দ্রুতই ব্যবস্থা নেওয়া হবে। 🚀',
+          message: 'তোমার চমৎকার প্রস্তাবের জন্য ধন্যবাদ! 🚀',
         );
       }
     } catch (e) {
       if (mounted) {
         AppPopups.error(
           context,
-          message: 'মতামত পাঠাতে সমস্যা হয়েছে। ইন্টারনেট সংযোগ চেক করো।',
+          message: 'প্রস্তাব পাঠাতে সমস্যা হয়েছে। ইন্টারনেট সংযোগ চেক করো।',
         );
       }
     } finally {
@@ -237,7 +311,8 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
   void _handleReset() {
     setState(() {
       _isSuccess = false;
-      _selectedType = null;
+      _selectedCategory = null;
+      _titleController.clear();
       _descriptionController.clear();
     });
   }
@@ -247,20 +322,22 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     ref.listen(authProvider, (prev, next) {
-      if (next != null && prev == null) _fetchMyComplaints();
+      if (next != null && prev == null) _fetchMyRequests();
     });
 
     if (_isSuccess) {
       return Scaffold(
-        backgroundColor: isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAFA),
+        backgroundColor:
+            isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAFA),
         body: _buildSuccessState(isDark),
       );
     }
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAFA),
+      backgroundColor:
+          isDark ? const Color(0xFF09090B) : const Color(0xFFFAFAFA),
       body: RefreshIndicator(
-        onRefresh: _fetchMyComplaints,
+        onRefresh: _fetchMyRequests,
         color: const Color(0xFF059669),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -287,22 +364,22 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _buildTabButton(
-                        label: 'নতুন অভিযোগ / পরামর্শ',
-                        icon: LucideIcons.send,
+                        label: 'নতুন ফিচার প্রস্তাব',
+                        icon: LucideIcons.sparkles,
                         isActive: _activeTab == 'new',
                         onTap: () => setState(() => _activeTab = 'new'),
                         isDark: isDark,
                       ),
                       _buildTabButton(
-                        label: _myComplaints.isEmpty
-                            ? 'আমার তালিক'
-                            : 'আমার তালিক (${_myComplaints.length})',
+                        label: _myRequests.isEmpty
+                            ? 'আমার প্রস্তাবসমূহ'
+                            : 'আমার প্রস্তাবসমূহ (${_myRequests.length})',
                         icon: LucideIcons.clipboardList,
                         isActive: _activeTab == 'my',
                         onTap: () {
                           setState(() {
                             _activeTab = 'my';
-                            _fetchMyComplaints();
+                            _fetchMyRequests();
                           });
                         },
                         isDark: isDark,
@@ -314,9 +391,14 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               const SizedBox(height: 20),
 
               if (_activeTab == 'new')
-                _buildNewComplaintForm(isDark)
+                _buildNewRequestForm(isDark)
               else
-                _buildMyComplaintsList(isDark),
+                _buildMyRequestsList(isDark),
+
+              const SizedBox(height: 32),
+
+              // ── Bottom Roadmap Section ───────────────────────────────────
+              _buildUpcomingRoadmapSection(isDark),
 
               const SizedBox(height: 40),
             ],
@@ -326,9 +408,9 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
     );
   }
 
-  // ─── New Complaint Form ─────────────────────────────────────────────────────
+  // ─── New Request Form ───────────────────────────────────────────────────────
 
-  Widget _buildNewComplaintForm(bool isDark) {
+  Widget _buildNewRequestForm(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -369,13 +451,13 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      LucideIcons.messageSquare,
+                      LucideIcons.sparkles,
                       color: Colors.white,
                       size: 13,
                     ),
                     SizedBox(width: 6),
                     Text(
-                      'ফিডব্যাক ও সাপোর্ট সেন্টার',
+                      'ফিচার রিকোয়েস্ট ও আইডিয়া বক্স',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12.5,
@@ -388,7 +470,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               ),
               const SizedBox(height: 14),
               const Text(
-                'কিছু বলতে চাও?\nআমরা শুনছি।',
+                'কিছু নতুন দেখতে চাও?\nআমরা শুনছি।',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 26,
@@ -399,7 +481,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
               ),
               const SizedBox(height: 8),
               const Text(
-                '‘অভ্যাস’ প্ল্যাটফর্মকে আরও উন্নত করতে তোমার যেকোনো সমস্যা, বাগ বা ফিচারের পরামর্শ পাঠাও। দ্রুতই ব্যবস্থা নেওয়া হবে।',
+                'তোমার পড়াশোনাকে আরও আনন্দদায়ক ও কার্যকর করতে কী কী ফিচার যুক্ত করলে ভালো হয়? তোমার আইডিয়া শেয়ার করো!',
                 style: TextStyle(
                   color: Color(0xFFD1FAE5),
                   fontSize: 14.5,
@@ -414,7 +496,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
 
         // ── Step 1: Category Selection ────────────────────────────────────
         const Text(
-          '১. অভিযোগের ধরণ নির্বাচন করো',
+          '১. ফিচারের ক্যাটাগরি নির্বাচন করো',
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.bold,
@@ -423,14 +505,14 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
         ),
         const SizedBox(height: 12),
         Column(
-          children: _complaintTypes.map((type) {
-            final isSelected = _selectedType == type['id'];
+          children: _featureCategories.map((cat) {
+            final isSelected = _selectedCategory == cat['id'];
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: GestureDetector(
                 onTap: () {
                   HapticFeedback.selectionClick();
-                  setState(() => _selectedType = type['id'] as String);
+                  setState(() => _selectedCategory = cat['id'] as String);
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
@@ -468,16 +550,16 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? (type['darkColor'] as Color)
-                              : (type['color'] as Color),
+                              ? (cat['darkColor'] as Color)
+                              : (cat['color'] as Color),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
-                          type['icon'] as IconData,
+                          cat['icon'] as IconData,
                           size: 20,
                           color: isDark
-                              ? (type['darkIconColor'] as Color)
-                              : (type['iconColor'] as Color),
+                              ? (cat['darkIconColor'] as Color)
+                              : (cat['iconColor'] as Color),
                         ),
                       ),
                       const SizedBox(width: 14),
@@ -488,7 +570,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                             Row(
                               children: [
                                 Text(
-                                  type['label'] as String,
+                                  cat['label'] as String,
                                   style: TextStyle(
                                     fontSize: 15.5,
                                     fontWeight: FontWeight.bold,
@@ -502,7 +584,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  type['subLabel'] as String,
+                                  cat['subLabel'] as String,
                                   style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -513,7 +595,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              type['description'] as String,
+                              cat['description'] as String,
                               style: TextStyle(
                                 fontSize: 13,
                                 fontFamily: 'HindSiliguri',
@@ -560,9 +642,57 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
         ),
         const SizedBox(height: 20),
 
-        // ── Step 2: Description Textarea ───────────────────────────────────
+        // ── Step 2: Title Input ────────────────────────────────────────────
         const Text(
-          '২. বিস্তারিত লেখো',
+          '২. ফিচারের শিরোনাম',
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'HindSiliguri',
+          ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF18181B) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: TextField(
+            controller: _titleController,
+            style: TextStyle(
+              fontSize: 15,
+              fontFamily: 'HindSiliguri',
+              color: isDark ? Colors.white : const Color(0xFF0F172A),
+            ),
+            decoration: InputDecoration(
+              hintText: 'যেমন: ডার্ক মোডে কাস্টম ফন্ট সাইজ বা ওএমআর অপশন...',
+              hintStyle: TextStyle(
+                fontSize: 14.5,
+                fontFamily: 'HindSiliguri',
+                color:
+                    isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              border: InputBorder.none,
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // ── Step 3: Description Textarea ───────────────────────────────────
+        const Text(
+          '৩. বিস্তারিত বিবরণ',
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.bold,
@@ -587,18 +717,20 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
           ),
           child: TextField(
             controller: _descriptionController,
-            maxLines: 6,
+            maxLines: 5,
             style: TextStyle(
               fontSize: 15,
               fontFamily: 'HindSiliguri',
               color: isDark ? Colors.white : const Color(0xFF0F172A),
             ),
             decoration: InputDecoration(
-              hintText: 'তোমার সমস্যা বা পরামর্শ সম্পর্কে বিস্তারিত লেখো (কমপক্ষে ১০ অক্ষর)...',
+              hintText:
+                  'ফিচারটি কীভাবে কাজ করবে এবং এটি কেন দরকার তা বিস্তারিত লেখো (কমপক্ষে ১০ অক্ষর)...',
               hintStyle: TextStyle(
                 fontSize: 14.5,
                 fontFamily: 'HindSiliguri',
-                color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
+                color:
+                    isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
               ),
               contentPadding: const EdgeInsets.all(16),
               border: InputBorder.none,
@@ -634,7 +766,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     Icon(LucideIcons.send, size: 18, color: Colors.white),
                     SizedBox(width: 8),
                     Text(
-                      'জমা দাও',
+                      'প্রস্তাব জমা দাও',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -644,25 +776,14 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                   ],
                 ),
         ),
-        const SizedBox(height: 12),
-        const Center(
-          child: Text(
-            'তোমার প্রতিটি মতামত আমাদের জন্য অত্যন্ত মূল্যবান ❤️',
-            style: TextStyle(
-              fontSize: 13,
-              fontFamily: 'HindSiliguri',
-              color: Color(0xFFA3A3A3),
-            ),
-          ),
-        ),
       ],
     );
   }
 
-  // ─── My Complaints List ─────────────────────────────────────────────────────
+  // ─── My Requests List ───────────────────────────────────────────────────────
 
-  Widget _buildMyComplaintsList(bool isDark) {
-    if (_isLoadingComplaints) {
+  Widget _buildMyRequestsList(bool isDark) {
+    if (_isLoadingRequests) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 60),
         child: Center(
@@ -671,7 +792,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
       );
     }
 
-    if (_myComplaints.isEmpty) {
+    if (_myRequests.isEmpty) {
       return Container(
         margin: const EdgeInsets.only(top: 20),
         padding: const EdgeInsets.all(36),
@@ -693,14 +814,14 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                     : const Color(0xFFF1F5F9),
               ),
               child: const Icon(
-                LucideIcons.inbox,
+                LucideIcons.sparkles,
                 size: 36,
                 color: Color(0xFFA3A3A3),
               ),
             ),
             const SizedBox(height: 16),
             Text(
-              'কোনো অভিযোগ জমা নেই',
+              'কোনো ফিচার প্রস্তাব জমা নেই',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -710,7 +831,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             ),
             const SizedBox(height: 6),
             const Text(
-              'তুমি এখনো কোনো অভিযোগ বা ফিডব্যাক জমা দাওনি।',
+              'তোমার মাথায় কোনো নতুন আইডিয়া থাকলে এখনই সাবমিট করতে পারো।',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
@@ -721,9 +842,10 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () => setState(() => _activeTab = 'new'),
-              icon: const Icon(LucideIcons.send, size: 16, color: Colors.white),
+              icon:
+                  const Icon(LucideIcons.send, size: 16, color: Colors.white),
               label: const Text(
-                'নতুন অভিযোগ করো',
+                'নতুন প্রস্তাব পাঠাও',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontFamily: 'HindSiliguri',
@@ -745,16 +867,16 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: _myComplaints.length,
+      itemCount: _myRequests.length,
       separatorBuilder: (context, index) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
-        final complaint = _myComplaints[index];
-        final typeInfo = _complaintTypes.firstWhere(
-          (t) => t['id'] == complaint.type,
-          orElse: () => _complaintTypes[0],
+        final req = _myRequests[index];
+        final catInfo = _featureCategories.firstWhere(
+          (t) => t['id'] == req.category,
+          orElse: () => _featureCategories[0],
         );
         final statusInfo =
-            _statusConfig[complaint.status] ?? _statusConfig['Pending']!;
+            _statusConfig[req.status] ?? _statusConfig['Under Review']!;
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -775,7 +897,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top row: Type and Status
+              // Top row: Category and Status
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -785,16 +907,16 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? (typeInfo['darkColor'] as Color)
-                              : (typeInfo['color'] as Color),
+                              ? (catInfo['darkColor'] as Color)
+                              : (catInfo['color'] as Color),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Icon(
-                          typeInfo['icon'] as IconData,
+                          catInfo['icon'] as IconData,
                           size: 16,
                           color: isDark
-                              ? (typeInfo['darkIconColor'] as Color)
-                              : (typeInfo['iconColor'] as Color),
+                              ? (catInfo['darkIconColor'] as Color)
+                              : (catInfo['iconColor'] as Color),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -802,19 +924,21 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            typeInfo['label'] as String,
+                            catInfo['label'] as String,
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 13,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'HindSiliguri',
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
+                              color: isDark
+                                  ? const Color(0xFFA3A3A3)
+                                  : const Color(0xFF64748B),
                             ),
                           ),
                           Text(
                             DateFormat('dd MMM yyyy, hh:mm a')
-                                .format(complaint.createdAt),
+                                .format(req.createdAt),
                             style: const TextStyle(
-                              fontSize: 12,
+                              fontSize: 11.5,
                               color: Color(0xFFA3A3A3),
                             ),
                           ),
@@ -854,22 +978,35 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
+
+              // Title
+              Text(
+                req.title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'HindSiliguri',
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                ),
+              ),
+              const SizedBox(height: 6),
 
               // Description
               Text(
-                complaint.description,
+                req.description,
                 style: TextStyle(
-                  fontSize: 14.5,
+                  fontSize: 14,
                   fontFamily: 'HindSiliguri',
-                  color: isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),
-                  height: 1.5,
+                  color:
+                      isDark ? const Color(0xFFD4D4D8) : const Color(0xFF334155),
+                  height: 1.45,
                 ),
               ),
 
               // Admin Feedback (if present)
-              if (complaint.adminFeedback != null &&
-                  complaint.adminFeedback!.trim().isNotEmpty) ...[
+              if (req.adminFeedback != null &&
+                  req.adminFeedback!.trim().isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -910,9 +1047,9 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        complaint.adminFeedback!,
+                        req.adminFeedback!,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13.5,
                           fontFamily: 'HindSiliguri',
                           color: isDark
                               ? const Color(0xFFE2E8F0)
@@ -928,6 +1065,159 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
           ),
         );
       },
+    );
+  }
+
+  // ─── Upcoming Roadmap Section ───────────────────────────────────────────────
+
+  Widget _buildUpcomingRoadmapSection(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Divider(height: 32),
+        const Row(
+          children: [
+            Icon(
+              LucideIcons.compass,
+              size: 16,
+              color: Color(0xFF059669),
+            ),
+            SizedBox(width: 6),
+            Text(
+              'আমাদের ভবিষ্যৎ পরিকল্পনা',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'HindSiliguri',
+                color: Color(0xFF059669),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'আসন্ন আকর্ষণীয় ফিচারসমূহ (Upcoming Features)',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w900,
+            fontFamily: 'HindSiliguri',
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
+          ),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          'তোমাদের প্রস্তুতির অভিজ্ঞতাকে অনন্য করতে যে ফিচারগুলোর উপর আমরা দ্রুত কাজ করছি:',
+          style: TextStyle(
+            fontSize: 13.5,
+            fontFamily: 'HindSiliguri',
+            color: Color(0xFFA3A3A3),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Column(
+          children: _upcomingRoadmap.map((item) {
+            final icon = item['icon'] as IconData;
+            final statusColor = item['statusColor'] as Color;
+            final statusBg = isDark
+                ? (item['statusColor'] as Color).withValues(alpha: 0.15)
+                : (item['statusBg'] as Color);
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF18181B) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isDark
+                      ? const Color(0xFF27272A)
+                      : const Color(0xFFE2E8F0),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF059669).withValues(alpha: 0.15)
+                          : const Color(0xFFECFDF5),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      icon,
+                      size: 20,
+                      color: const Color(0xFF059669),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                item['title'] as String,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'HindSiliguri',
+                                  color: isDark
+                                      ? Colors.white
+                                      : const Color(0xFF0F172A),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: statusBg,
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Text(
+                                item['status'] as String,
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'HindSiliguri',
+                                  color: statusColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          item['description'] as String,
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontFamily: 'HindSiliguri',
+                            color: isDark
+                                ? const Color(0xFFA3A3A3)
+                                : const Color(0xFF64748B),
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 
@@ -972,7 +1262,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             ),
             const SizedBox(height: 20),
             Text(
-              'বার্তা গৃহীত হয়েছে!',
+              'প্রস্তাব গৃহীত হয়েছে!',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
@@ -982,7 +1272,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'আমাদের টিম বিষয়টি গুরুত্ব সহকারে দেখছে। তোমার মতামতের জন্য ধন্যবাদ।',
+              'আমাদের টিম তোমার প্রস্তাবটি বিবেচনা করছে। ‘অভ্যাস’ কে সেরা প্ল্যাটফর্ম বানাতে তোমার প্রতিটি আইডিয়া অনেক মূল্যবান।',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14.5,
@@ -1025,7 +1315,7 @@ class _ComplaintViewState extends ConsumerState<ComplaintView> {
                       _handleReset();
                       setState(() {
                         _activeTab = 'my';
-                        _fetchMyComplaints();
+                        _fetchMyRequests();
                       });
                     },
                     style: ElevatedButton.styleFrom(

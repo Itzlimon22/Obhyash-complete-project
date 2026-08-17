@@ -1,3 +1,5 @@
+import 'package:obhyash_app/core/utils/question_formatter.dart';
+
 class ExamDetails {
   final String subject;
   final String? subjectLabel;
@@ -52,7 +54,9 @@ class Question {
   factory Question.fromJson(Map<String, dynamic> j) {
     List<String> validOptions = [];
     if (j['options'] is List) {
-      validOptions = (j['options'] as List).map((e) => e.toString()).toList();
+      validOptions = (j['options'] as List)
+          .map((e) => QuestionFormatter.format(e.toString()))
+          .toList();
     }
     List<String> validInstitutes = [];
     if (j['institutes'] is List) {
@@ -89,8 +93,10 @@ class Question {
       subject: j['subject']?.toString() ?? 'general',
       subjectLabel: j['subject_label']?.toString() ?? j['subject']?.toString(),
       chapter: j['chapter']?.toString() ?? '',
-      question: j['question']?.toString() ?? '',
-      explanation: j['explanation']?.toString(),
+      question: QuestionFormatter.format(j['question']?.toString() ?? ''),
+      explanation: j['explanation'] != null
+          ? QuestionFormatter.format(j['explanation'].toString())
+          : null,
       options: validOptions,
       correctAnswerIndex: (j['correct_answer_index'] as num?)?.toInt() ?? 0,
       points: (j['points'] as num?)?.toInt() ?? 1,

@@ -46,7 +46,7 @@ class ResultStats extends StatelessWidget {
             // Accuracy
             Expanded(
               child: ObhyashTooltip(
-                message: 'আপনার উত্তরের নির্ভুলতার হার (সঠিক উত্তর / দেওয়া মোট উত্তর)',
+                message: 'তোমার উত্তরের নির্ভুলতার হার (সঠিক উত্তর / দেওয়া মোট উত্তর)',
                 preferredPosition: TooltipPosition.top,
                 child: _CircularAccuracyCard(
                   title: 'সঠিকতা',

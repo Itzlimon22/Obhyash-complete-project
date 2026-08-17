@@ -15,13 +15,28 @@ export async function GET(request: NextRequest) {
     const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseServiceKey);
 
     if (id) {
-      const { data, error } = await supabaseAdmin
-        .from('live_exams')
-        .select('*, total_questions:live_exam_questions(count)')
-        .eq('id', id)
-        .single();
+      let data: any = null;
+      let error: any = null;
 
-      if (error) throw error;
+      try {
+        const res = await supabaseAdmin
+          .from('live_exams')
+          .select('*, total_questions:live_exam_questions(count)')
+          .eq('id', id)
+          .single();
+        if (res.error) throw res.error;
+        data = res.data;
+      } catch (idJoinErr) {
+        console.warn('ID join query failed, trying plain select:', idJoinErr);
+        const res = await supabaseAdmin
+          .from('live_exams')
+          .select('*')
+          .eq('id', id)
+          .single();
+        if (res.error) throw res.error;
+        data = res.data;
+      }
+
       return NextResponse.json({
         success: true,
         data: {
@@ -43,8 +58,30 @@ export async function GET(request: NextRequest) {
       query = query.eq('status', status);
     }
 
-    const { data, error } = await query;
-    if (error) throw error;
+    let data: any[] | null = null;
+
+    try {
+      const res = await query;
+      if (res.error) throw res.error;
+      data = res.data;
+    } catch (joinErr) {
+      console.warn('live_exams join query failed, falling back to plain select:', joinErr);
+      let plainQuery = supabaseAdmin
+        .from('live_exams')
+        .select('*')
+        .order('start_time', { ascending: false });
+
+      if (category && category !== 'all') {
+        plainQuery = plainQuery.eq('category', category);
+      }
+      if (status && status !== 'all') {
+        plainQuery = plainQuery.eq('status', status);
+      }
+
+      const plainRes = await plainQuery;
+      if (plainRes.error) throw plainRes.error;
+      data = plainRes.data;
+    }
 
     const mapped = (data || []).map((exam: any) => ({
       ...exam,

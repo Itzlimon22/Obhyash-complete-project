@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/providers/auth_provider.dart';
+import '../../../core/utils/app_popups.dart';
 import '../../../core/utils/bangla_name_helper.dart';
 import '../../dashboard/providers/dashboard_providers.dart';
 import '../../exam/domain/exam_models.dart';
@@ -829,6 +830,107 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
 
 
 
+  Future<void> _handleDeleteExam(_ExamRecord record) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(LucideIcons.trash2, color: Color(0xFFEF4444), size: 20),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'পরীক্ষার রেকর্ড মুছবে?',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  fontFamily: 'HindSiliguri',
+                  color: isDark ? Colors.white : const Color(0xFF111827),
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          '${BanglaNameHelper.formatSubject(record.subject, record.subjectLabel)} (${DateFormat('d MMM yyyy').format(record.createdAt)}) পরীক্ষার ফলাফলটি মুছে ফেলা হবে। তুমি কি নিশ্চিত?',
+          style: TextStyle(
+            fontSize: 14,
+            fontFamily: 'HindSiliguri',
+            color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF4B5563),
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(
+              'না, থাক',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontFamily: 'HindSiliguri',
+                color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFEF4444),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text(
+              'মুছে ফেলো',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontFamily: 'HindSiliguri',
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      final sb = Supabase.instance.client;
+      await sb.from('exam_results').delete().eq('id', record.id);
+      try {
+        await sb.from('exam_attempts').delete().eq('id', record.id);
+      } catch (_) {}
+
+      await LocalExamCacheService.deleteExamFromCache(record.id);
+
+      if (mounted) {
+        setState(() {
+          _history.removeWhere((r) => r.id == record.id);
+        });
+        AppPopups.success(context, message: 'পরীক্ষার ফলাফল সফলভাবে মুছে ফেলা হয়েছে');
+      }
+    } catch (e) {
+      debugPrint('[ExamHistory] delete exam error: $e');
+      await LocalExamCacheService.deleteExamFromCache(record.id);
+      if (mounted) {
+        setState(() {
+          _history.removeWhere((r) => r.id == record.id);
+        });
+        AppPopups.success(context, message: 'পরীক্ষার ফলাফল মুছে ফেলা হয়েছে');
+      }
+    }
+  }
+
   void _openPremiumDatePicker(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -1205,6 +1307,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                       hasMore: _hasMoreExams,
                       isLoadingMore: _isLoadingMoreExams,
                       onLoadMore: () => _fetchExams(refresh: false),
+                      onDeleteExam: _handleDeleteExam,
                     ),
 
               // Tab 2: Questions (Paginated with Load More using standard QuestionCard)
@@ -1246,6 +1349,7 @@ class _ExamsTab extends StatelessWidget {
   final bool hasMore;
   final bool isLoadingMore;
   final VoidCallback onLoadMore;
+  final ValueChanged<_ExamRecord> onDeleteExam;
 
   const _ExamsTab({
     required this.records,
@@ -1256,6 +1360,7 @@ class _ExamsTab extends StatelessWidget {
     required this.hasMore,
     required this.isLoadingMore,
     required this.onLoadMore,
+    required this.onDeleteExam,
   });
 
   @override
@@ -1342,7 +1447,11 @@ class _ExamsTab extends StatelessWidget {
           const SizedBox(height: 10),
 
           // Compact Exam Cards
-          ...records.map((r) => _ExamCard(record: r, isDark: isDark)),
+          ...records.map((r) => _ExamCard(
+                record: r,
+                isDark: isDark,
+                onDelete: onDeleteExam,
+              )),
           if (hasMore) ...[
             const SizedBox(height: 12),
             Center(
@@ -1460,8 +1569,13 @@ class _ExamsTab extends StatelessWidget {
 class _ExamCard extends StatefulWidget {
   final _ExamRecord record;
   final bool isDark;
+  final ValueChanged<_ExamRecord> onDelete;
 
-  const _ExamCard({required this.record, required this.isDark});
+  const _ExamCard({
+    required this.record,
+    required this.isDark,
+    required this.onDelete,
+  });
 
   @override
   State<_ExamCard> createState() => _ExamCardState();
@@ -1747,10 +1861,34 @@ class _ExamCardState extends State<_ExamCard> {
                     ],
                   ),
                 ),
-                Icon(
-                  LucideIcons.chevronRight,
-                  size: 18,
-                  color: isDark ? const Color(0xFF52525B) : const Color(0xFFA1A1AA),
+                // Trailing actions: Delete + Chevron
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () => widget.onDelete(record),
+                        child: Padding(
+                          padding: const EdgeInsets.all(6),
+                          child: Icon(
+                            LucideIcons.trash2,
+                            size: 16,
+                            color: isDark
+                                ? const Color(0xFFA1A1AA)
+                                : const Color(0xFF71717A),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    Icon(
+                      LucideIcons.chevronRight,
+                      size: 18,
+                      color: isDark ? const Color(0xFF52525B) : const Color(0xFFA1A1AA),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -2217,7 +2355,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'তারিখ নির্বাচন করুন',
+                          'তারিখ নির্বাচন করো',
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
@@ -2228,7 +2366,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                           ),
                         ),
                         Text(
-                          'নির্দিষ্ট দিনের পরীক্ষার ফলাফল ও প্রশ্নসমূহ দেখুন',
+                          'নির্দিষ্ট দিনের পরীক্ষার ফলাফল ও প্রশ্নসমূহ দেখো',
                           style: TextStyle(
                             fontSize: 12,
                             fontFamily: 'HindSiliguri',
@@ -2579,7 +2717,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
                         ).withValues(alpha: 0.3),
                       ),
                       child: const Text(
-                        'ফিল্টার প্রয়োগ করুন',
+                        'ফিল্টার প্রয়োগ করো',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

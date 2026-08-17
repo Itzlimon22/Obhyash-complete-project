@@ -83,6 +83,20 @@ class SettingsView extends ConsumerWidget {
             type: _ItemType.navigate,
             route: '/notifications',
           ),
+          _SettingsItem(
+            label: 'অভিযোগ ও মতামত',
+            description: 'অ্যাপের সমস্যা, বাগ বা ফিচারের পরামর্শ জানাও',
+            icon: LucideIcons.messageSquare,
+            type: _ItemType.navigate,
+            route: '/profile/complaint',
+          ),
+          _SettingsItem(
+            label: 'নতুন ফিচার প্রস্তাব',
+            description: 'অ্যাপের জন্য নতুন ফিচারের আইডিয়া পাঠাও',
+            icon: LucideIcons.sparkles,
+            type: _ItemType.navigate,
+            route: '/profile/feature-requests',
+          ),
         ],
       ),
       _SettingsGroup(

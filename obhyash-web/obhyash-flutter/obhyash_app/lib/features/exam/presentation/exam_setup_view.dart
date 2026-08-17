@@ -355,10 +355,9 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
 
   void _startExam() async {
     if (_selectedSubject == null) {
-      AppPopups.show(
+      AppPopups.warning(
         context,
-        message: 'অনুগ্রহ করে একটি বিষয় নির্বাচন করো',
-        isError: false,
+        message: 'অনুগ্রহ করে প্রথমে একটি বিষয় নির্বাচন করো',
       );
       return;
     }
@@ -393,10 +392,12 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
       if (success) {
         context.push('/exam');
       } else {
-        AppPopups.show(
+        final err = ref.read(examEngineProvider).errorDetails;
+        AppPopups.error(
           context,
-          message: 'প্রশ্ন প্রস্তুত করতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
-          isError: true,
+          message: err.isNotEmpty
+              ? err
+              : 'এই বিষয় বা অধ্যায়ে বর্তমানে পর্যাপ্ত প্রশ্ন নেই। অন্য অধ্যায় যুক্ত করো।',
         );
       }
     }

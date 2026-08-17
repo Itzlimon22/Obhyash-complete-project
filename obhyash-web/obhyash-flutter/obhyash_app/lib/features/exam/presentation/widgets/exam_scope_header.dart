@@ -78,6 +78,12 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
     final cleanChapters = widget.chapters
         .where((c) => c.trim().isNotEmpty && c.toLowerCase() != 'all')
         .toList();
+    cleanChapters.sort((a, b) {
+      final idxA = BanglaNameHelper.getChapterSortIndex(a, a);
+      final idxB = BanglaNameHelper.getChapterSortIndex(b, b);
+      if (idxA != idxB) return idxA.compareTo(idxB);
+      return a.compareTo(b);
+    });
     final cleanTopics = widget.topics
         .where((t) => t.trim().isNotEmpty && t.toLowerCase() != 'all')
         .toList();

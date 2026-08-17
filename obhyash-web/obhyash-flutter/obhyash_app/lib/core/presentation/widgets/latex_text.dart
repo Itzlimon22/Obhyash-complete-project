@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
 import 'package:markdown/markdown.dart' as md;
+import 'package:obhyash_app/core/utils/question_formatter.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PREPROCESSING (Chemical arrows, Equilibrium, Bengali un-wrapping, TeX sanitization)
@@ -214,15 +215,8 @@ String _cleanIntraSentenceNewlines(String text) {
   return buffer.toString().replaceAll(placeholder, '\n\n');
 }
 
-final Map<String, String> _preprocessCache = {};
-const int _kMaxPreprocessCache = 600;
-
 String _preprocess(String text) {
-  final cached = _preprocessCache[text];
-  if (cached != null) return cached;
-
-  var processedText =
-      text.replaceAll(r'\n', '\n').replaceAll(RegExp(r'\r\n|\r'), '\n');
+  var processedText = QuestionFormatter.format(text);
 
   // 0. Normalize any raw or spaced @@CHEM_ARROW tokens from database
   processedText = processedText.replaceAllMapped(
@@ -329,6 +323,47 @@ String _preprocess(String text) {
 
   // 3. Clean intra-sentence accidental newlines
   processedText = _cleanIntraSentenceNewlines(processedText);
+
+  // 3a. Scientific Compound Unit & Exponent Normalization (Physics / Chemistry)
+  // Handles: 5ms^-1, 5 ms^{-1}, 5 ms⁻¹, 8ms^-2, 20m/s^2, etc. with non-breaking spaces
+  processedText = processedText.replaceAllMapped(
+    RegExp(
+      r'(\d+(?:\.\d+)?)\s*(?:ms\^\{?\-?1\}?|ms\^?\-1|ms⁻¹|ms\^\{?\-?2\}?|ms\^?\-2|ms⁻²|m\/s\^?2|m\/s²|m\/s|km\/h|rad\/s|kg\s*m\/s|N\s*s)(?!\w)',
+      caseSensitive: false,
+    ),
+    (m) {
+      final num = m.group(1)!;
+      final full = m.group(0)!;
+      String unit = 'ms⁻¹';
+      if (full.contains('2') || full.contains('²')) {
+        unit = full.contains('m/s') ? 'm/s²' : 'ms⁻²';
+      } else if (full.contains('km/h')) {
+        unit = 'km/h';
+      } else if (full.contains('rad/s')) {
+        unit = 'rad/s';
+      } else if (full.contains('m/s')) {
+        unit = 'm/s';
+      } else if (full.contains('kg')) {
+        unit = 'kg m/s';
+      } else if (full.contains('N')) {
+        unit = 'N s';
+      }
+      return '$num\u00A0$unit';
+    },
+  );
+
+  // 3b. Standard Single Scientific Units with Non-Breaking Space
+  // Handles: 3s -> 3 s, 5 s -> 5 s, 10kg -> 10 kg, 20N -> 20 N, 50J -> 50 J, 5A -> 5 A, 10V -> 10 V
+  processedText = processedText.replaceAllMapped(
+    RegExp(
+      r'(\d+(?:\.\d+)?)\s*(s|sec|min|hr|kg|gm|mg|cm|mm|km|nm|pm|m|N|J|W|eV|MeV|kJ|kW|kWh|Pa|kPa|atm|Hz|kHz|MHz|GHz|V|mV|kV|A|mA|μA|Ω|kΩ|MΩ|F|μF|nF|pF|H|mH|μH|T|Wb|C|μC|K|mol|cal|kcal)(?![a-zA-Z\u0980-\u09FF0-9])',
+    ),
+    (m) {
+      final num = m.group(1)!;
+      final unit = m.group(2)!;
+      return '$num\u00A0$unit';
+    },
+  );
 
   // 4. Format Roman-numeral list items "i. ", "ii. " with clean bullet spacing
   processedText = processedText.replaceAllMapped(
@@ -459,14 +494,7 @@ String _preprocess(String text) {
     return t;
   }).toList();
 
-  final result = processedParts.join('');
-
-  if (_preprocessCache.length >= _kMaxPreprocessCache) {
-    _preprocessCache.clear();
-  }
-  _preprocessCache[text] = result;
-
-  return result;
+  return processedParts.join('');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -571,6 +599,24 @@ class _InlineMathBuilder extends MarkdownElementBuilder {
     if (RegExp(r'[\u0980-\u09FF]').hasMatch(latex)) {
       return Text(
         _cleanConditionText(latex),
+        style: style,
+      );
+    }
+
+    // If it's a simple scientific unit or simple exponent, render as native text with perfect baseline alignment
+    final trimmedLatex = latex.trim();
+    if (RegExp(r'^(?:ms\^?\{?\-?[123]\}?|ms⁻¹|ms⁻²|m\/s\^?2|m\/s²|m\/s|cm\^?3|m\^?[23]|km\/h|rad\/s|kg|gm|mg|cm|mm|km|nm|s|sec|N|J|W|V|A|K|Pa|Hz)$', caseSensitive: false).hasMatch(trimmedLatex)) {
+      String cleanUnit = trimmedLatex
+          .replaceAll(r'ms^{-1}', 'ms⁻¹')
+          .replaceAll('ms^-1', 'ms⁻¹')
+          .replaceAll(r'ms^{-2}', 'ms⁻²')
+          .replaceAll('ms^-2', 'ms⁻²')
+          .replaceAll(r'm/s^2', 'm/s²')
+          .replaceAll(r'm^2', 'm²')
+          .replaceAll(r'm^3', 'm³')
+          .replaceAll(r'cm^3', 'cm³');
+      return Text(
+        cleanUnit,
         style: style,
       );
     }
@@ -920,7 +966,7 @@ class LatexText extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      softLineBreak: true,
+      softLineBreak: false,
       selectable: false,
       shrinkWrap: true,
     );

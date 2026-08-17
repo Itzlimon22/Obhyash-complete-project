@@ -465,9 +465,9 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
       builder: (ctx) => AlertDialog(
         backgroundColor: isDark ? const Color(0xFF141416) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('পরীক্ষা বাতিল করবেন?', style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.bold)),
+        title: const Text('পরীক্ষা বাতিল করবে?', style: TextStyle(fontFamily: 'HindSiliguri', fontWeight: FontWeight.bold)),
         content: const Text(
-          'এখন বের হয়ে গেলে আপনার উত্তরপত্র জমা হবে না।',
+          'এখন বের হয়ে গেলে তোমার উত্তরপত্র জমা হবে না।',
           style: TextStyle(fontFamily: 'HindSiliguri'),
         ),
         actions: [

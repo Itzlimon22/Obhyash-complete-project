@@ -83,12 +83,6 @@ class _PracticeSummaryState extends State<PracticeSummary>
     super.dispose();
   }
 
-  String get _feedbackEmoji => _percentage >= 80
-      ? '🏆'
-      : _percentage >= 50
-      ? '🔥'
-      : '💡';
-
   String get _feedbackTitle => _percentage >= 80
       ? 'অসাধারণ!'
       : _percentage >= 50
@@ -120,30 +114,16 @@ class _PracticeSummaryState extends State<PracticeSummary>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // ── Emoji + title ──────────────────────────────────────────
+                      // ── Title & Message ─────────────────────────────────────────
                       Column(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1F2937) : Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: isDark ? Colors.black26 : const Color(0x14000000),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 10),
-                                ),
-                              ],
-                            ),
-                            child: Text(_feedbackEmoji, style: const TextStyle(fontSize: 40)),
-                          ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                           Text(
                             _feedbackTitle,
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w900,
+                              fontFamily: 'HindSiliguri',
                               letterSpacing: -0.5,
                               color: isDark ? Colors.white : const Color(0xFF111827),
                             ),
@@ -155,6 +135,7 @@ class _PracticeSummaryState extends State<PracticeSummary>
                             style: TextStyle(
                               fontSize: 14,
                               height: 1.5,
+                              fontFamily: 'HindSiliguri',
                               color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                             ),
                           ),
@@ -255,110 +236,6 @@ class _PracticeSummaryState extends State<PracticeSummary>
 
                       const Spacer(),
 
-                      // ── Struggling list ─────────────────────────────────────────
-                      if (_struggling.isNotEmpty) ...[
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: isDark ? Colors.black45 : const Color(0x0A000000),
-                                blurRadius: 24,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                            border: Border.all(
-                              color: isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6),
-                              width: 1.5,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFEF2F2),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Icon(
-                                      LucideIcons.alertCircle,
-                                      size: 16,
-                                      color: Color(0xFFDC2626),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      'ভুল করা প্রশ্নসমূহ (${_struggling.length})',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: isDark ? Colors.white : const Color(0xFF111827),
-                                      ),
-                                     maxLines: 1, overflow: TextOverflow.ellipsis),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              ..._struggling
-                                  .take(2)
-                                  .toList()
-                                  .asMap()
-                                  .entries
-                                  .map(
-                                    (e) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 8),
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '${e.key + 1}.',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: Text(
-                                              e.value.questionText,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                height: 1.4,
-                                                color: isDark ? const Color(0xFFD1D5DB) : const Color(0xFF374151),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                              if (_struggling.length > 2)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 2),
-                                  child: Text(
-                                    'এবং আরও ${_struggling.length - 2}টি...',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                      color: isDark ? const Color(0xFF6B7280) : const Color(0xFF9CA3AF),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        const Spacer(),
-                      ],
-
                       // ── Action buttons ──────────────────────────────────────────
                       if (_struggling.isNotEmpty)
                         GestureDetector(
@@ -367,14 +244,14 @@ class _PracticeSummaryState extends State<PracticeSummary>
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [Color(0xFFDC2626), Color(0xFF991B1B)],
+                                colors: [Color(0xFF059669), Color(0xFF047857)],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFFDC2626).withValues(alpha: 0.3),
+                                  color: const Color(0xFF059669).withValues(alpha: 0.3),
                                   blurRadius: 16,
                                   offset: const Offset(0, 6),
                                 ),
@@ -390,10 +267,11 @@ class _PracticeSummaryState extends State<PracticeSummary>
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'ভুলগুলো আবার পড়ুন (${_struggling.length})',
+                                  'ভুলগুলো আবার অনুশীলন করো (${_struggling.length})',
                                   style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
+                                    fontFamily: 'HindSiliguri',
                                     color: Colors.white,
                                     letterSpacing: 0.2,
                                   ),
@@ -427,10 +305,11 @@ class _PracticeSummaryState extends State<PracticeSummary>
                           ),
                           child: Center(
                             child: Text(
-                              'অনুশীলনে ফিরে যান',
+                              'অনুশীলনে ফিরে যাও',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
+                                fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white : const Color(0xFF111827),
                               ),
                             ),

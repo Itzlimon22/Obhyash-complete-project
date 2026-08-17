@@ -53,10 +53,9 @@ class PdfDownloadService {
       } catch (innerError) {
         debugPrint('[PdfDownloadService] layoutPdf error: $innerError');
         if (context.mounted) {
-          AppPopups.show(
+          AppPopups.error(
             context,
-            message: 'PDF তৈরি করতে সমস্যা হয়েছে: $innerError',
-            isError: true,
+            message: 'PDF তৈরি করতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
           );
         }
       }
@@ -108,10 +107,9 @@ class PdfDownloadService {
       } catch (innerError) {
         debugPrint('[PdfDownloadService] layoutPdf error: $innerError');
         if (context.mounted) {
-          AppPopups.show(
+          AppPopups.error(
             context,
-            message: 'PDF তৈরি করতে সমস্যা হয়েছে: $innerError',
-            isError: true,
+            message: 'PDF তৈরি করতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
           );
         }
       }

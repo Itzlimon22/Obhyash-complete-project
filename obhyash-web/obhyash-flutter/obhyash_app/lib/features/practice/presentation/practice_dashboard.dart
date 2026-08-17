@@ -8,8 +8,10 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/utils/bangla_name_helper.dart';
-import '../../../core/providers/auth_provider.dart';
 import '../../../core/presentation/widgets/latex_text.dart';
+import '../../../core/providers/auth_provider.dart';
+import '../../exam/domain/exam_models.dart';
+import '../providers/practice_providers.dart';
 import 'flashcard_mode.dart';
 import 'practice_summary.dart';
 
@@ -24,6 +26,8 @@ class PracticeQuestion {
   final int correctAnswerIndex;
   final String? explanation;
   final int points;
+  final List<String> institutes;
+  final List<int> years;
 
   const PracticeQuestion({
     required this.id,
@@ -34,12 +38,25 @@ class PracticeQuestion {
     required this.correctAnswerIndex,
     this.explanation,
     this.points = 1,
+    this.institutes = const [],
+    this.years = const [],
   });
 
   factory PracticeQuestion.fromJson(Map<String, dynamic> j) {
     List<String> opts = [];
     if (j['options'] is List) {
       opts = (j['options'] as List).map((e) => e.toString()).toList();
+    }
+    List<String> inst = [];
+    if (j['institutes'] is List) {
+      inst = (j['institutes'] as List).map((e) => e.toString()).toList();
+    }
+    List<int> yrs = [];
+    if (j['years'] is List) {
+      for (final y in (j['years'] as List)) {
+        final parsed = int.tryParse(y.toString());
+        if (parsed != null) yrs.add(parsed);
+      }
     }
     return PracticeQuestion(
       id: j['id']?.toString() ?? '',
@@ -53,13 +70,27 @@ class PracticeQuestion {
       correctAnswerIndex: (j['correct_answer_index'] as num?)?.toInt() ?? 0,
       explanation: j['explanation']?.toString(),
       points: (j['points'] as num?)?.toInt() ?? 1,
+      institutes: inst,
+      years: yrs,
+    );
+  }
+
+  Question toQuestion() {
+    return Question(
+      id: id,
+      subject: subject,
+      subjectLabel: subjectLabel,
+      chapter: '',
+      question: questionText,
+      explanation: explanation,
+      options: options,
+      correctAnswerIndex: correctAnswerIndex,
+      points: points,
+      institutes: institutes,
+      years: years,
     );
   }
 }
-
-// ─── View State ───────────────────────────────────────────────────────────────
-
-enum _PracticeView { list, flashcard, summary }
 
 // ─── View ─────────────────────────────────────────────────────────────────────
 
@@ -71,8 +102,6 @@ class PracticeDashboard extends ConsumerStatefulWidget {
 }
 
 class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
-  _PracticeView _view = _PracticeView.list;
-
   // List state
   String _activeTab = 'mistakes';
   String _subjectFilter = 'all';
@@ -91,10 +120,6 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
   static const int _reviewIntervalDays = 3;
   Map<String, DateTime> _reviewedAt = {};
   int _dueCount = 0;
-
-  // Flashcard / summary state
-  List<PracticeQuestion> _flashcardQuestions = [];
-  List<FlashcardResult> _flashcardResults = [];
 
   // Internal maps used by paginated mistakes fetch
   final Map<String, PracticeQuestion> _mistakeMap = {};
@@ -222,31 +247,37 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
 
         if ((bData as List).isNotEmpty) {
           final questionIds = bData
-              .map((b) => b['question_id'] as String)
+              .map((b) => b['question_id']?.toString() ?? '')
+              .where((id) => id.isNotEmpty)
               .toList();
-          final qData = await sb
-              .from('questions')
-              .select('*')
-              .inFilter('id', questionIds);
 
-          final qList = (qData as List).map((row) => PracticeQuestion.fromJson(row as Map<String, dynamic>)).toList();
-          final qMap = {for (final q in qList) q.id: q};
+          if (questionIds.isNotEmpty) {
+            final qData = await sb
+                .from('questions')
+                .select('*')
+                .inFilter('id', questionIds);
 
-          for (final qid in questionIds) {
-            final q = qMap[qid];
-            if (q != null) {
-              bList.add(q);
-              bIds.add(q.id);
-            } else {
-              orphanedCount++;
+            final qList = (qData as List)
+                .map((row) => PracticeQuestion.fromJson(row as Map<String, dynamic>))
+                .toList();
+            final qMap = {for (final q in qList) q.id: q};
+
+            for (final qid in questionIds) {
+              final q = qMap[qid];
+              if (q != null) {
+                bList.add(q);
+                bIds.add(q.id);
+              } else {
+                orphanedCount++;
+              }
             }
           }
         }
 
-        if (bData.length < _limit) {
+        if ((bData as List).length < _limit) {
           _bHasMore = false;
         }
-        _bOffset += bData.length;
+        _bOffset += (bData as List).length;
       }
 
       if (mounted) {
@@ -467,7 +498,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
     });
   }
 
-  void _launchFlashcard() {
+  Future<void> _launchFlashcard() async {
     final list = _currentList;
     var qs = list.where((q) => _selectedIds.contains(q.id)).toList();
     if (qs.isEmpty) return;
@@ -475,30 +506,21 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
 
     _markReviewed(qs.map((q) => q.id).toList());
     HapticFeedback.mediumImpact();
-    setState(() {
-      _flashcardQuestions = qs;
-      _flashcardResults = [];
-      _view = _PracticeView.flashcard;
-    });
-  }
 
-  void _onFlashcardComplete(List<FlashcardResult> results) {
-    setState(() {
-      _flashcardResults = results;
-      _view = _PracticeView.summary;
-    });
-  }
+    await Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute(
+        builder: (ctx) => _FlashcardSessionWrapper(
+          initialQuestions: qs,
+        ),
+      ),
+    );
 
-  void _onPracticeStruggling(List<PracticeQuestion> qs) {
-    setState(() {
-      _flashcardQuestions = qs;
-      _flashcardResults = [];
-      _view = _PracticeView.flashcard;
-    });
-  }
-
-  void _onSummaryBack() {
-    setState(() => _view = _PracticeView.list);
+    if (mounted) {
+      setState(() {
+        _selectedIds.clear();
+      });
+      _fetchData();
+    }
   }
 
   // ── Build ───────────────────────────────────────────────────────────────────
@@ -510,19 +532,12 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
       if (next != null && prev == null) _fetchData();
     });
 
-    if (_view == _PracticeView.flashcard) {
-      return FlashcardMode(
-        questions: _flashcardQuestions,
-        onComplete: _onFlashcardComplete,
-        onExit: () => setState(() => _view = _PracticeView.list),
-      );
-    }
-    if (_view == _PracticeView.summary) {
-      return PracticeSummary(
-        results: _flashcardResults,
-        onPracticeStruggling: _onPracticeStruggling,
-        onBack: _onSummaryBack,
-      );
+    // Synchronize tab with header toggle
+    final currentTabFromHeader = ref.watch(practiceTabProvider);
+    if (_activeTab != currentTabFromHeader) {
+      _activeTab = currentTabFromHeader;
+      _subjectFilter = 'all';
+      _selectedIds.clear();
     }
 
     return _buildListView();
@@ -538,87 +553,35 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             controller: _scrollController,
             slivers: [
               SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
-                      child: Row(
-                        children: [
-                          _StatBox(
-                            label: 'মোট ভুল',
-                            value: _mistakes.length,
-                            color: const Color(0xFFDC2626),
-                            isDark: isDark,
-                            icon: LucideIcons.xOctagon,
-                          ),
-                          const SizedBox(width: 8),
-                          _StatBox(
-                            label: 'বুকমার্ক',
-                            value: _totalBookmarks,
-                            color: const Color(0xFF16A34A),
-                            isDark: isDark,
-                            icon: LucideIcons.bookmark,
-                          ),
-                          const SizedBox(width: 8),
-                          _StatBox(
-                            label: 'রিভিউ বাকি',
-                            value: _dueCount,
-                            color: const Color(0xFF4F46E5),
-                            isDark: isDark,
-                            icon: LucideIcons.rotateCcw,
-                          ),
-                        ],
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                  child: Row(
+                    children: [
+                      _StatBox(
+                        label: 'মোট ভুল',
+                        value: _mistakes.length,
+                        color: const Color(0xFFDC2626),
+                        isDark: isDark,
+                        icon: LucideIcons.xOctagon,
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                      const SizedBox(width: 8),
+                      _StatBox(
+                        label: 'বুকমার্ক',
+                        value: _totalBookmarks,
+                        color: const Color(0xFF16A34A),
+                        isDark: isDark,
+                        icon: LucideIcons.bookmark,
                       ),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF000000)
-                                : const Color(0xFFF5F5F5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isDark
-                                  ? const Color(0xFF1C1C1E)
-                                  : const Color(0xFFE5E5E5),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _TabBtn(
-                                label: 'ভুল সমূহ (${_mistakes.length})',
-                                active: _activeTab == 'mistakes',
-                                isDark: isDark,
-                                onTap: () => setState(() {
-                                  _activeTab = 'mistakes';
-                                  _subjectFilter = 'all';
-                                  _selectedIds.clear();
-                                }),
-                              ),
-                              _TabBtn(
-                                label: 'বুকমার্ক ($_totalBookmarks)',
-                                active: _activeTab == 'bookmarks',
-                                isDark: isDark,
-                                onTap: () => setState(() {
-                                  _activeTab = 'bookmarks';
-                                  _subjectFilter = 'all';
-                                  _selectedIds.clear();
-                                }),
-                              ),
-                            ],
-                          ),
-                        ),
+                      const SizedBox(width: 8),
+                      _StatBox(
+                        label: 'রিভিউ বাকি',
+                        value: _dueCount,
+                        color: const Color(0xFF4F46E5),
+                        isDark: isDark,
+                        icon: LucideIcons.rotateCcw,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               if (_availableSubjects.isNotEmpty || list.isNotEmpty)
@@ -890,10 +853,11 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
               color: Colors.white,
             ),
             label: const Text(
-              '\u09b6\u09c1\u09b0\u09c1',
+              'শুরু',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'HindSiliguri',
                 fontSize: 15,
               ),
             ),
@@ -902,12 +866,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
       );
   }
 
-  String _toBn(int n) {
-    const m = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
-    return n.toString().split('').map((c) => m[c] ?? c).join();
-  }
-
-  // ── Question card ─────────────────────────────────────────────────────────
+  // ── Question card ───────────────────────────────────────────────────────────
 
   Widget _buildQuestionCard(PracticeQuestion q, int i, bool isDark) {
     final isSel = _selectedIds.contains(q.id);
@@ -992,7 +951,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             ),
             const SizedBox(height: 10),
             LatexText(
-              text: '**${_toBn(i + 1)}.** ${q.questionText}',
+              text: '**${BanglaNameHelper.toBanglaNumeral(i + 1)}.** ${q.questionText}',
               style: TextStyle(
                 fontSize: 15.5,
                 fontWeight: FontWeight.w600,
@@ -1077,20 +1036,25 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             ),
             const SizedBox(height: 16),
             Text(
-              '\u06a4\u09cb\u09a8\u09cb \u09a4\u09a5\u09cd\u09af \u09aa\u09be\u0993\u09af\u09bc\u09be \u09af\u09be\u09af\u09bc\u09a8\u09bf',
+              'কোনো তথ্য পাওয়া যায়নি',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF000000),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               _activeTab == 'mistakes'
-                  ? '\u0986\u09aa\u09a8\u09bf \u098f\u0996\u09a8\u09cb \u06a4\u09cb\u09a8\u09cb \u09aa\u09b0\u09c0\u0995\u09cd\u09b7\u09be\u09af\u09bc \u09ad\u09c1\u09b2 \u06a4\u09b0\u09c7\u09a8\u09a8\u09bf\u0964'
-                  : '\u0986\u09aa\u09a8\u09bf \u098f\u0996\u09a8\u09cb \u06a4\u09cb\u09a8\u09cb \u09aa\u09cd\u09b0\u09b6\u09cd\u09a8 \u09ac\u09c1\u06a4\u09ae\u09be\u09b0\u09cd\u06a4 \u06a4\u09b0\u09c7\u09a8\u09a8\u09bf\u0964',
+                  ? 'তুমি এখনো কোনো পরীক্ষায় ভুল করোনি।'
+                  : 'তুমি এখনো কোনো প্রশ্ন বুকমার্ক করোনি।',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 15, color: Color(0xFFA3A3A3)),
+              style: const TextStyle(
+                fontSize: 15,
+                fontFamily: 'HindSiliguri',
+                color: Color(0xFFA3A3A3),
+              ),
             ),
             const SizedBox(height: 24),
             GestureDetector(
@@ -1101,14 +1065,15 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFB91C1C),
+                  color: const Color(0xFF059669),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Text(
-                  '\u09a8\u09a4\u09c1\u09a8 \u09aa\u09b0\u09c0\u0995\u09cd\u09b7\u09be \u09a6\u09be\u0993',
+                  'নতুন পরীক্ষা দাও',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
+                    fontFamily: 'HindSiliguri',
                     color: Colors.white,
                   ),
                 ),
@@ -1190,53 +1155,6 @@ class _StatBox extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TabBtn extends StatelessWidget {
-  final String label;
-  final bool active;
-  final bool isDark;
-  final VoidCallback onTap;
-
-  const _TabBtn({
-    required this.label,
-    required this.active,
-    required this.isDark,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        decoration: BoxDecoration(
-          color: active
-              ? (isDark ? const Color(0xFF1C1C1E) : Colors.white)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: active && !isDark
-              ? [
-                  const BoxShadow(
-                    color: Color(0x0F000000),
-                    blurRadius: 10,
-                    offset: Offset(0, 2),
-                  ),
-                ]
-              : [],
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: active ? const Color(0xFF059669) : const Color(0xFFA3A3A3),
-          ),
         ),
       ),
     );
@@ -1364,5 +1282,61 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
     return oldDelegate.child != child ||
         oldDelegate.height != height ||
         oldDelegate.isDark != isDark;
+  }
+}
+
+// ── Fullscreen Flashcard Session Wrapper (Root Navigator) ──────────────────────
+
+class _FlashcardSessionWrapper extends StatefulWidget {
+  final List<PracticeQuestion> initialQuestions;
+
+  const _FlashcardSessionWrapper({required this.initialQuestions});
+
+  @override
+  State<_FlashcardSessionWrapper> createState() =>
+      _FlashcardSessionWrapperState();
+}
+
+class _FlashcardSessionWrapperState extends State<_FlashcardSessionWrapper> {
+  late List<PracticeQuestion> _questions;
+  List<FlashcardResult> _results = [];
+  bool _isSummary = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _questions = widget.initialQuestions;
+  }
+
+  void _onFlashcardComplete(List<FlashcardResult> results) {
+    setState(() {
+      _results = results;
+      _isSummary = true;
+    });
+  }
+
+  void _onPracticeStruggling(List<PracticeQuestion> qs) {
+    setState(() {
+      _questions = qs;
+      _results = [];
+      _isSummary = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isSummary) {
+      return PracticeSummary(
+        results: _results,
+        onPracticeStruggling: _onPracticeStruggling,
+        onBack: () => Navigator.of(context).pop(),
+      );
+    }
+
+    return FlashcardMode(
+      questions: _questions,
+      onComplete: _onFlashcardComplete,
+      onExit: () => Navigator.of(context).pop(),
+    );
   }
 }

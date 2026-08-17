@@ -652,6 +652,41 @@ export interface AppComplaint {
 }
 
 // ==========================================
+// 11B. FEATURE REQUESTS & ROADMAP
+// ==========================================
+
+export type FeatureCategory =
+  | 'Exam & Practice'
+  | 'Analytics & Tracking'
+  | 'Study Tools'
+  | 'UI & Theme'
+  | 'Other';
+
+export type FeatureRequestStatus =
+  | 'Under Review'
+  | 'Planned'
+  | 'In Progress'
+  | 'Completed'
+  | 'Declined';
+
+export interface AppFeatureRequest {
+  id: string;
+  user_id: string;
+  user?: {
+    name?: string;
+    email?: string;
+  };
+  title: string;
+  category: FeatureCategory;
+  description: string;
+  status: FeatureRequestStatus;
+  admin_feedback?: string;
+  upvotes_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// ==========================================
 // 12. BLOG & COMMUNITY
 // ==========================================
 

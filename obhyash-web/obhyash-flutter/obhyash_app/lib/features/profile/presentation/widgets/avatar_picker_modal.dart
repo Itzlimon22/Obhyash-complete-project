@@ -107,10 +107,9 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
     } catch (e) {
       debugPrint('Avatar upload error: $e');
       if (mounted) {
-        AppPopups.show(
+        AppPopups.error(
           context,
-          message: 'ছবি আপলোড করতে সমস্যা হয়েছে: $e',
-          isError: true,
+          message: 'ছবি আপলোড করতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
         );
       }
     } finally {
@@ -135,18 +134,16 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
 
       if (mounted) {
         Navigator.pop(context);
-        AppPopups.show(
+        AppPopups.success(
           context,
           message: 'প্রোফাইল ছবি সফলভাবে আপডেট করা হয়েছে!',
-          isError: false,
         );
       }
     } catch (e) {
       if (mounted) {
-        AppPopups.show(
+        AppPopups.error(
           context,
-          message: 'আপডেট ব্যর্থ হয়েছে: $e',
-          isError: true,
+          message: 'প্রোফাইল ছবি পরিবর্তন করা যায়নি। আবার চেষ্টা করো।',
         );
       }
     } finally {

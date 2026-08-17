@@ -200,10 +200,9 @@ class _ResultViewState extends State<ResultView> {
                           preferredPosition: TooltipPosition.top,
                           child: OutlinedButton.icon(
                             onPressed: () async {
-                              AppPopups.show(
+                              AppPopups.info(
                                 context,
-                                message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...',
-                                isError: false,
+                                message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করো...',
                               );
                               await PdfDownloadService.downloadQuestionPaper(
                                   widget.result, context);
@@ -237,10 +236,9 @@ class _ResultViewState extends State<ResultView> {
                           preferredPosition: TooltipPosition.top,
                           child: OutlinedButton.icon(
                             onPressed: () async {
-                              AppPopups.show(
+                              AppPopups.info(
                                 context,
-                                message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...',
-                                isError: false,
+                                message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করো...',
                               );
                               await PdfDownloadService.downloadResultWithExplanations(
                                   widget.result, context);

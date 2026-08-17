@@ -42,6 +42,7 @@ import SubjectReportView from "@/components/student/features/dashboard/SubjectRe
 import LeaderboardView from "@/components/student/features/dashboard/LeaderboardView";
 import UserProfileView from "@/components/student/features/dashboard/UserProfileView";
 import { ComplaintView } from "@/components/student/features/complaint/ComplaintView";
+import { FeatureRequestsView } from "@/components/student/features/feature_requests/FeatureRequestsView";
 import AnalysisView from "@/components/student/features/dashboard/AnalysisView";
 import { PracticeDashboard } from "@/components/student/features/practice/PracticeDashboard";
 import NotificationsView from "@/components/student/features/notifications/NotificationsView";
@@ -201,6 +202,7 @@ export default function StudentRoot({
     "leaderboard",
     "analysis",
     "complaint",
+    "feature-requests",
     "notifications",
     "about",
     "subscription",
@@ -918,6 +920,18 @@ export default function StudentRoot({
             title="অভিযোগ ও পরামর্শ"
           >
             <ComplaintView />
+          </AppLayout>
+        );
+      }
+
+      if (activeTab === "feature-requests") {
+        return (
+          <AppLayout
+            activeTab={activeTab}
+            {...commonLayoutProps}
+            title="নতুন ফিচার প্রস্তাব"
+          >
+            <FeatureRequestsView />
           </AppLayout>
         );
       }

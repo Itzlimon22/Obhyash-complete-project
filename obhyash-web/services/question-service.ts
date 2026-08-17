@@ -187,9 +187,42 @@ export const getQuestionsPage = async (
         }
       } catch (rpcErr) {
         console.warn("Status counts RPC not available, using fallback counts:", rpcErr);
-        approvedCount = totalCount;
-        pendingCount = 0;
-        rejectedCount = 0;
+        try {
+          const applyCommonFilters = (baseQ: any) => {
+            let q = baseQ;
+            if (filters.subject) q = q.eq('subject', filters.subject);
+            if (filters.chapter) q = q.eq('chapter', filters.chapter);
+            if (filters.topic) q = q.eq('topic', filters.topic);
+            if (filters.difficulty) q = q.eq('difficulty', filters.difficulty);
+            if (filters.author) q = q.eq('author', filters.author);
+            if (filters.search && filters.search.trim()) {
+              const searchTerm = filters.search.trim();
+              q = q.or(
+                `question.ilike.%${searchTerm}%,exam_type.ilike.%${searchTerm}%,institute.ilike.%${searchTerm}%`,
+              );
+            }
+            return q;
+          };
+
+          const [appRes, pendRes, rejRes] = await Promise.all([
+            applyCommonFilters(
+              supabase.from('questions').select('*', { count: 'exact', head: true }).eq('status', 'Approved')
+            ),
+            applyCommonFilters(
+              supabase.from('questions').select('*', { count: 'exact', head: true }).or('status.eq.Pending,status.is.null')
+            ),
+            applyCommonFilters(
+              supabase.from('questions').select('*', { count: 'exact', head: true }).eq('status', 'Rejected')
+            ),
+          ]);
+          approvedCount = appRes.count || 0;
+          pendingCount = pendRes.count || 0;
+          rejectedCount = rejRes.count || 0;
+        } catch {
+          approvedCount = totalCount;
+          pendingCount = 0;
+          rejectedCount = 0;
+        }
       }
 
       // Map snake_case to camelCase

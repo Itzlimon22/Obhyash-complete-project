@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:audioplayers/audioplayers.dart';
-import '../../../core/utils/bangla_name_helper.dart';
-import '../../../core/presentation/widgets/latex_text.dart';
+import '../../exam/presentation/widgets/question_card.dart';
+import '../../exam/presentation/widgets/question_report_dialog.dart';
 import 'practice_dashboard.dart';
 
 // ─── Models ────────────────────────────────────────────────────────────────
@@ -43,11 +43,8 @@ class _FlashcardModeState extends State<FlashcardMode> {
   int _currentIndex = 0;
   bool _isRevealed = false;
   int? _selectedIdx;
-  bool _isExplanationOpen = false;
   final List<FlashcardResult> _results = [];
   final AudioPlayer _audioPlayer = AudioPlayer();
-
-  static const _banglaIndices = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ'];
 
   @override
   void initState() {
@@ -109,7 +106,6 @@ class _FlashcardModeState extends State<FlashcardMode> {
       _currentIndex++;
       _isRevealed = false;
       _selectedIdx = null;
-      _isExplanationOpen = false;
     });
   }
 
@@ -121,51 +117,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
       _currentIndex--;
       _selectedIdx = prev.selectedIndex;
       _isRevealed = prev.selectedIndex != null;
-      _isExplanationOpen = false;
     });
-  }
-
-  // ── Option styling ──────────────────────────────────────────────────────────
-
-  Color _optionBg(int idx, bool isDark) {
-    if (_isRevealed) {
-      if (idx == current.correctAnswerIndex) {
-        return isDark ? const Color(0x3310B981) : const Color(0xFFECFDF5);
-      }
-      if (idx == _selectedIdx) {
-        return isDark ? const Color(0x33EF4444) : const Color(0xFFFEF2F2);
-      }
-      return isDark
-          ? const Color(0xFF1C1C1E).withValues(alpha: 0.6)
-          : const Color(0xFFF5F5F5).withValues(alpha: 0.6);
-    }
-    return isDark ? const Color(0xFF1C1C1E) : const Color(0xFFFAFAFA);
-  }
-
-  Color _optionBorder(int idx, bool isDark) {
-    if (_isRevealed) {
-      if (idx == current.correctAnswerIndex) return const Color(0xFF059669);
-      if (idx == _selectedIdx) return const Color(0xFFB91C1C);
-      return Colors.transparent;
-    }
-    return isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5);
-  }
-
-  // Returns (bg, borderColor, text) for the option bullet circle
-  (Color, Color, String) _bulletStyle(int idx) {
-    if (_isRevealed) {
-      if (idx == current.correctAnswerIndex) {
-        return (const Color(0xFF059669), const Color(0xFF059669), '✓');
-      }
-      if (idx == _selectedIdx) {
-        return (const Color(0xFFB91C1C), const Color(0xFFB91C1C), '✕');
-      }
-    }
-    return (
-      Colors.transparent,
-      const Color(0xFFA3A3A3),
-      idx < _banglaIndices.length ? _banglaIndices[idx] : '${idx + 1}',
-    );
   }
 
   // ── Progress dots ───────────────────────────────────────────────────────────
@@ -174,51 +126,50 @@ class _FlashcardModeState extends State<FlashcardMode> {
     return SizedBox(
       height: 20,
       child: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: List.generate(total, (i) {
-              final done = i < _currentIndex;
-              final active = i == _currentIndex;
-              final correct =
-                  done &&
-                  i < _results.length &&
-                  _results[i].grade == FlashcardGrade.gotIt;
-              final wrong =
-                  done &&
-                  i < _results.length &&
-                  _results[i].grade == FlashcardGrade.struggling;
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(total, (i) {
+            final done = i < _currentIndex;
+            final active = i == _currentIndex;
+            final correct =
+                done &&
+                i < _results.length &&
+                _results[i].grade == FlashcardGrade.gotIt;
+            final wrong =
+                done &&
+                i < _results.length &&
+                _results[i].grade == FlashcardGrade.struggling;
 
-              Color dotColor;
-              if (active) {
-                dotColor = const Color(0xFF059669);
-              } else if (correct) {
-                dotColor = const Color(0xFF059669);
-              } else if (wrong) {
-                dotColor = const Color(0xFFB91C1C);
-              } else {
-                dotColor = isDark
-                    ? const Color(0xFF27272A)
-                    : const Color(0xFFE5E5E5);
-              }
+            Color dotColor;
+            if (active) {
+              dotColor = const Color(0xFF059669);
+            } else if (correct) {
+              dotColor = const Color(0xFF059669);
+            } else if (wrong) {
+              dotColor = const Color(0xFFB91C1C);
+            } else {
+              dotColor = isDark
+                  ? const Color(0xFF27272A)
+                  : const Color(0xFFE5E5E5);
+            }
 
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                margin: const EdgeInsets.symmetric(horizontal: 2),
-                width: active ? 20 : 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: dotColor,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              );
-            }),
-          ),
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              margin: const EdgeInsets.symmetric(horizontal: 2.5),
+              width: active ? 16 : 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: dotColor,
+                borderRadius: BorderRadius.circular(100),
+              ),
+            );
+          }),
         ),
       ),
     );
   }
+
+  // ── Build ───────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -226,13 +177,11 @@ class _FlashcardModeState extends State<FlashcardMode> {
     final q = current;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? const Color(0xFF000000)
-          : const Color(0xFFF5F5F5),
+      backgroundColor: isDark ? const Color(0xFF000000) : const Color(0xFFFAFAFA),
       body: SafeArea(
         child: Column(
           children: [
-            // ── Top bar ──────────────────────────────────────────────────────
+            // ── Top status bar ────────────────────────────────────────────
             Container(
               color: isDark ? const Color(0xFF000000) : Colors.white,
               child: Column(
@@ -243,6 +192,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                       vertical: 10,
                     ),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         GestureDetector(
                           onTap: () {
@@ -250,6 +200,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                             widget.onExit();
                           },
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                 Icons.arrow_back,
@@ -264,6 +215,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
+                                  fontFamily: 'HindSiliguri',
                                   color: isDark
                                       ? const Color(0xFFA3A3A3)
                                       : const Color(0xFF525252),
@@ -272,16 +224,19 @@ class _FlashcardModeState extends State<FlashcardMode> {
                             ],
                           ),
                         ),
-                        const Spacer(),
-                        // Progress dots (max 14 shown)
-                        if (total <= 20) _buildProgressDots(isDark),
-                        const Spacer(),
-                        // Correct count
+                        if (total <= 12)
+                          Flexible(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: _buildProgressDots(isDark),
+                            ),
+                          ),
                         Text(
                           '$correctSoFar/$total সঠিক',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
+                            fontFamily: 'HindSiliguri',
                             color: isDark
                                 ? const Color(0xFF737373)
                                 : const Color(0xFF737373),
@@ -319,7 +274,26 @@ class _FlashcardModeState extends State<FlashcardMode> {
                       child: child,
                     ),
                   ),
-                  child: _buildCard(q, isDark),
+                  child: QuestionCard(
+                    key: ValueKey('${q.id}_$_currentIndex'),
+                    question: q.toQuestion(),
+                    serialNumber: _currentIndex + 1,
+                    selectedOptionIndex: _selectedIdx,
+                    isFlagged: false,
+                    onSelectOption: (idx) {
+                      if (!_isRevealed) {
+                        _handleSelect(idx);
+                      }
+                    },
+                    onToggleFlag: () {},
+                    onReport: () {
+                      QuestionReportDialog.show(context, q.id);
+                    },
+                    showFeedback: _isRevealed,
+                    readOnly: _isRevealed,
+                    showAnswer: _isRevealed,
+                    initiallyExpanded: true,
+                  ),
                 ),
               ),
             ),
@@ -328,295 +302,6 @@ class _FlashcardModeState extends State<FlashcardMode> {
             _buildBottomNav(isDark),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildCard(PracticeQuestion q, bool isDark) {
-    final correctQuestionIndex = _currentIndex + 1;
-    final borderColor = !_isRevealed
-        ? (isDark ? const Color(0xFF27272A) : const Color(0xFFE5E5E5))
-        : isCorrect
-        ? const Color(0xFF059669)
-        : const Color(0xFFB91C1C);
-
-    return Container(
-      key: ValueKey(_currentIndex),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF000000) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor, width: _isRevealed ? 2 : 1),
-        boxShadow: isDark
-            ? []
-            : [
-                const BoxShadow(
-                  color: Color(0x08000000),
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Card header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Row(
-              children: [
-                Text(
-                  'প্রশ্ন $correctQuestionIndex',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                    color: Color(0xFFA3A3A3),
-                  ),
-                ),
-                if (_isRevealed) ...[
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isCorrect
-                          ? const Color(0xFFECFDF5)
-                          : const Color(0xFFFEF2F2),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      isCorrect ? 'সঠিক' : 'ভুল',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: isCorrect
-                            ? const Color(0xFF059669)
-                            : const Color(0xFFB91C1C),
-                      ),
-                    ),
-                  ),
-                ],
-                if (q.subjectLabel.isNotEmpty) ...[
-                  const SizedBox(width: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF1C1C1E)
-                          : const Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      BanglaNameHelper.formatSubject(q.subject, q.subjectLabel),
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'HindSiliguri',
-                        color: Color(0xFFA3A3A3),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-
-          // Question text
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: LatexText(
-              text: q.questionText,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Anek Bangla',
-                height: 1.5,
-                color: isDark ? Colors.white : const Color(0xFF000000),
-              ),
-            ),
-          ),
-
-          // Options
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-            child: Column(
-              children: List.generate(q.options.length, (idx) {
-                final optionBg = _optionBg(idx, isDark);
-                final optionBorder = _optionBorder(idx, isDark);
-                final (bulletBg, bulletBorder, bulletText) = _bulletStyle(idx);
-                final isThisSelected = _selectedIdx == idx;
-                final isCorrectOption = idx == q.correctAnswerIndex;
-                final dimmed =
-                    _isRevealed && !isThisSelected && !isCorrectOption;
-
-                return GestureDetector(
-                  onTap: () => _handleSelect(idx),
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 200),
-                    opacity: dimmed ? 0.92 : 1.0,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: optionBg,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: optionBorder,
-                          width: optionBorder == Colors.transparent ? 1 : 1.5,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          // Bullet
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: bulletBg,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: bulletBorder,
-                                width: 1.5,
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                bulletText,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: bulletBg == Colors.transparent
-                                      ? bulletBorder
-                                      : Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          // Option text
-                          Expanded(
-                            child: LatexText(
-                              text: q.options[idx],
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'Anek Bangla',
-                                height: 1.4,
-                                color: isDark
-                                    ? const Color(0xFFE5E5E5)
-                                    : const Color(0xFF000000),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ),
-          ),
-
-          // Explanation panel (collapsible) — only when revealed and explanation exists
-          if (_isRevealed && q.explanation != null && q.explanation!.isNotEmpty)
-            _buildExplanationPanel(q, isDark),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExplanationPanel(PracticeQuestion q, bool isDark) {
-    final correctLabel = q.correctAnswerIndex < _banglaIndices.length
-        ? _banglaIndices[q.correctAnswerIndex]
-        : '${q.correctAnswerIndex + 1}';
-
-    return Container(
-      margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-      decoration: BoxDecoration(
-        color: _isExplanationOpen
-            ? (isDark
-                  ? const Color(0xFF059669).withValues(alpha: 0.08)
-                  : const Color(0xFFECFDF5))
-            : (isDark ? const Color(0xFF1C1C1C) : const Color(0xFFFAFAFA)),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _isExplanationOpen
-              ? const Color(0xFF059669).withValues(alpha: 0.4)
-              : (isDark ? const Color(0xFF333333) : const Color(0xFFE5E5E5)),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Toggle row
-          GestureDetector(
-            onTap: () =>
-                setState(() => _isExplanationOpen = !_isExplanationOpen),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              child: Row(
-                children: [
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF059669),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'সঠিক উত্তর : $correctLabel',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF059669),
-                    ),
-                  ),
-                  const Spacer(),
-                  AnimatedRotation(
-                    turns: _isExplanationOpen ? 0.5 : 0,
-                    duration: const Duration(milliseconds: 200),
-                    child: const Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: Color(0xFF059669),
-                      size: 20,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // Explanation text
-          AnimatedCrossFade(
-            duration: const Duration(milliseconds: 200),
-            crossFadeState: _isExplanationOpen
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
-            firstChild: const SizedBox.shrink(),
-            secondChild: Padding(
-              padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
-              child: LatexText(
-                text: q.explanation!,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontFamily: 'Anek Bangla',
-                  height: 1.6,
-                  color: isDark
-                      ? const Color(0xFFD4D4D4)
-                      : const Color(0xFF27272A),
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

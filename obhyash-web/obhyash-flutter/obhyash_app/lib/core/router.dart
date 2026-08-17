@@ -15,6 +15,7 @@ import '../features/profile/presentation/profile_stats_page.dart';
 import '../features/subscription/presentation/subscription_view.dart';
 import '../features/subscription/presentation/my_subscription_view.dart';
 import '../features/complaint/presentation/complaint_view.dart';
+import '../features/feature_requests/presentation/feature_requests_view.dart';
 import '../features/reports/presentation/student_report_view.dart';
 import '../features/user_profile/presentation/user_profile_view.dart';
 import '../features/subject_report/presentation/subject_report_view.dart';
@@ -348,6 +349,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'complaint',
                     builder: (context, state) => const ComplaintView(),
+                  ),
+                  GoRoute(
+                    path: 'feature-requests',
+                    builder: (context, state) => const FeatureRequestsView(),
                   ),
                   GoRoute(
                     path: 'about',

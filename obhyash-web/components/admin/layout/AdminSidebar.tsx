@@ -102,6 +102,12 @@ const ADMIN_NAVIGATION: NavSection[] = [
         href: '/admin/complaints',
       },
       {
+        id: 'feature-requests',
+        label: 'ফিচার প্রস্তাবনা',
+        icon: Sparkles,
+        href: '/admin/feature-requests',
+      },
+      {
         id: 'notifications',
         label: 'নোটিফিকেশন ব্রডকাস্ট',
         icon: Bell,

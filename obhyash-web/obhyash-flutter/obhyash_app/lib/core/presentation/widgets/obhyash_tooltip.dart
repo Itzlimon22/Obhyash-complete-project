@@ -90,12 +90,14 @@ class _ObhyashTooltipState extends State<ObhyashTooltip>
     final double spaceBelow = screenSize.height - (targetOffset.dy + targetSize.height);
 
     final bool showOnTop = widget.preferredPosition == TooltipPosition.top
-        ? (spaceAbove >= 80 || spaceAbove > spaceBelow)
-        : (spaceBelow < 80 && spaceAbove > spaceBelow);
+        ? (spaceAbove >= 90 || spaceAbove > spaceBelow)
+        : (spaceBelow < 90 && spaceAbove > spaceBelow);
 
     final double targetCenter = targetOffset.dx + (targetSize.width / 2);
-    final double leftPos = (targetCenter - (widget.maxWidth / 2))
-        .clamp(12.0, (screenSize.width - widget.maxWidth - 12.0).clamp(12.0, double.infinity));
+    final bool isLeft = targetCenter < screenSize.width / 2;
+    final Alignment animOrigin = showOnTop
+        ? (isLeft ? Alignment.bottomLeft : Alignment.bottomRight)
+        : (isLeft ? Alignment.topLeft : Alignment.topRight);
 
     _overlayEntry = OverlayEntry(
       builder: (overlayContext) {
@@ -110,18 +112,19 @@ class _ObhyashTooltipState extends State<ObhyashTooltip>
               ),
             ),
 
-            // Animated Tooltip Box (tightly positioned 4px from icon)
-            Positioned(
-              top: showOnTop ? null : targetOffset.dy + targetSize.height + 4,
-              bottom: showOnTop
-                  ? screenSize.height - targetOffset.dy + 4
-                  : null,
-              left: leftPos,
+            // Snug & Tight Tooltip Box right next to the icon button
+            CustomSingleChildLayout(
+              delegate: _TooltipPositionDelegate(
+                targetOffset: targetOffset,
+                targetSize: targetSize,
+                showOnTop: showOnTop,
+                maxWidth: widget.maxWidth,
+              ),
               child: Material(
                 color: Colors.transparent,
                 child: ScaleTransition(
                   scale: _scaleAnim,
-                  alignment: showOnTop ? Alignment.bottomCenter : Alignment.topCenter,
+                  alignment: animOrigin,
                   child: FadeTransition(
                     opacity: _fadeAnim,
                     child: _TooltipBubble(
@@ -185,6 +188,67 @@ class _ObhyashTooltipState extends State<ObhyashTooltip>
 }
 
 /// ─────────────────────────────────────────────────────────────────────────────
+/// ACCURATE SINGLE-CHILD LAYOUT DELEGATE (HUGS THE ICON BUTTON)
+/// ─────────────────────────────────────────────────────────────────────────────
+class _TooltipPositionDelegate extends SingleChildLayoutDelegate {
+  final Offset targetOffset;
+  final Size targetSize;
+  final bool showOnTop;
+  final double maxWidth;
+
+  _TooltipPositionDelegate({
+    required this.targetOffset,
+    required this.targetSize,
+    required this.showOnTop,
+    required this.maxWidth,
+  });
+
+  @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
+    return BoxConstraints(
+      maxWidth: maxWidth.clamp(0.0, constraints.maxWidth - 24.0),
+      maxHeight: constraints.maxHeight,
+    );
+  }
+
+  @override
+  Offset getPositionForChild(Size size, Size childSize) {
+    final double targetCenter = targetOffset.dx + (targetSize.width / 2);
+    final double screenMid = size.width / 2;
+
+    double x;
+    if (targetCenter < screenMid) {
+      // Left side: start the bubble right at the icon button (16px to left of icon center)
+      x = targetCenter - 16.0;
+    } else {
+      // Right side: end the bubble right at the icon button (16px to right of icon center)
+      x = targetCenter - childSize.width + 16.0;
+    }
+
+    // Keep 12px margin from screen edges
+    x = x.clamp(12.0, (size.width - childSize.width - 12.0).clamp(12.0, double.infinity));
+
+    // Tight 2px vertical gap right next to the button
+    double y;
+    if (showOnTop) {
+      y = targetOffset.dy - childSize.height - 2.0;
+    } else {
+      y = targetOffset.dy + targetSize.height + 2.0;
+    }
+
+    return Offset(x, y);
+  }
+
+  @override
+  bool shouldRelayout(_TooltipPositionDelegate oldDelegate) {
+    return targetOffset != oldDelegate.targetOffset ||
+        targetSize != oldDelegate.targetSize ||
+        showOnTop != oldDelegate.showOnTop ||
+        maxWidth != oldDelegate.maxWidth;
+  }
+}
+
+/// ─────────────────────────────────────────────────────────────────────────────
 /// TOOLTIP BUBBLE & ARROW
 /// ─────────────────────────────────────────────────────────────────────────────
 class _TooltipBubble extends StatelessWidget {
@@ -206,8 +270,8 @@ class _TooltipBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isDark ? const Color(0xFF141416) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF27272A) : const Color(0xFFE2E8F0);
+    final bgColor = isDark ? const Color(0xFF1E1E22) : Colors.white;
+    final borderColor = isDark ? const Color(0xFF333338) : const Color(0xFFCBD5E1);
     final textColor = isDark ? const Color(0xFFF4F4F5) : const Color(0xFF0F172A);
 
     return Container(
@@ -219,7 +283,7 @@ class _TooltipBubble extends StatelessWidget {
         border: Border.all(color: borderColor, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.12),
+            color: Colors.black.withValues(alpha: isDark ? 0.5 : 0.12),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),

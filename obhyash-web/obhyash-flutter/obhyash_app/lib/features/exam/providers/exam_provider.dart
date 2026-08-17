@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/providers/auth_provider.dart';
+import '../../../core/utils/bangla_name_helper.dart';
 import '../domain/exam_models.dart';
 import '../services/local_exam_cache_service.dart';
 import '../services/offline_question_bank_service.dart';
@@ -193,7 +194,11 @@ class ExamEngineNotifier extends Notifier<ExamEngineState> {
               .inFilter('subject', subjectVariants.toList());
 
           if (chaptersList != null && chaptersList.isNotEmpty) {
-            query = query.inFilter('chapter', chaptersList);
+            final allChapterVariants = <String>{};
+            for (final ch in chaptersList) {
+              allChapterVariants.addAll(BanglaNameHelper.getChapterSearchVariants(ch));
+            }
+            query = query.inFilter('chapter', allChapterVariants.toList());
           }
           if (topicsList != null && topicsList.isNotEmpty) {
             query = query.inFilter('topic', topicsList);

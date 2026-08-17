@@ -219,6 +219,25 @@ class LocalExamCacheService {
     }
   }
 
+  /// Delete an exam result from local storage and update history cache
+  static Future<void> deleteExamFromCache(String id) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('$_kExamPrefix$id');
+
+      List<String> ids = prefs.getStringList(_kSavedExamIdsKey) ?? [];
+      ids.remove(id);
+      await prefs.setStringList(_kSavedExamIdsKey, ids);
+
+      List<Map<String, dynamic>> current = await getCachedHistoryList() ?? [];
+      current.removeWhere((item) => item['id']?.toString() == id);
+      await prefs.setString(_kHistoryCacheKey, jsonEncode(current));
+      debugPrint('[LocalExamCacheService] Deleted exam $id from cache.');
+    } catch (e) {
+      debugPrint('[LocalExamCacheService] deleteExamFromCache error: $e');
+    }
+  }
+
   static const String _kActiveDraftKey = 'obhyash_active_exam_draft_v1';
 
   /// Save live active exam draft on the fly for crash / power-off recovery

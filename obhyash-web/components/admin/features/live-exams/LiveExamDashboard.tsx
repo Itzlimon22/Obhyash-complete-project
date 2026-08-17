@@ -219,11 +219,11 @@ export default function LiveExamDashboard() {
               ) : (
                 filteredExams.map((exam) => {
                   const now = new Date().getTime();
-                  const start = new Date(exam.start_time).getTime();
-                  const end = new Date(exam.end_time).getTime();
-                  const isLiveNow = now >= start && now <= end;
-                  const isUpcoming = now < start;
-                  const isEnded = now > end;
+                  const start = exam.start_time ? new Date(exam.start_time).getTime() : 0;
+                  const end = exam.end_time ? new Date(exam.end_time).getTime() : 0;
+                  const isLiveNow = start > 0 && end > 0 && now >= start && now <= end;
+                  const isUpcoming = start > 0 && now < start;
+                  const isEnded = end > 0 && now > end;
 
                   return (
                     <tr
@@ -257,23 +257,27 @@ export default function LiveExamDashboard() {
                         <div className="space-y-0.5 font-mono text-[11px]">
                           <p className="text-neutral-700 dark:text-zinc-300">
                             <span className="text-neutral-400">শুরু:</span>{' '}
-                            {new Date(exam.start_time).toLocaleString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              hour: 'numeric',
-                              minute: '2-digit',
-                              hour12: true,
-                            })}
+                            {exam.start_time
+                              ? new Date(exam.start_time).toLocaleString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: 'numeric',
+                                  minute: '2-digit',
+                                  hour12: true,
+                                })
+                              : 'নির্ধারিত নয়'}
                           </p>
                           <p className="text-neutral-500 dark:text-zinc-400">
                             <span className="text-neutral-400">শেষ:</span>{' '}
-                            {new Date(exam.end_time).toLocaleString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              hour: 'numeric',
-                              minute: '2-digit',
-                              hour12: true,
-                            })}
+                            {exam.end_time
+                              ? new Date(exam.end_time).toLocaleString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: 'numeric',
+                                  minute: '2-digit',
+                                  hour12: true,
+                                })
+                              : 'নির্ধারিত নয়'}
                           </p>
                         </div>
                       </td>

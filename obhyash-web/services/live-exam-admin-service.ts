@@ -26,34 +26,56 @@ export async function getLiveExams(
     }
   }
 
-  let query = supabase
-    .from("live_exams")
-    .select(
+  try {
+    let query = supabase
+      .from("live_exams")
+      .select(
+        `
+        *,
+        total_questions:live_exam_questions(count)
       `
-      *,
-      total_questions:live_exam_questions(count)
-    `
-    )
-    .order("start_time", { ascending: false });
+      )
+      .order("start_time", { ascending: false });
 
-  if (category) {
-    query = query.eq("category", category);
+    if (category && category !== "all") {
+      query = query.eq("category", category);
+    }
+    if (status && status !== "all") {
+      query = query.eq("status", status);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    return (data || []).map((exam) => ({
+      ...exam,
+      total_questions: exam.total_questions?.[0]?.count || 0,
+    })) as LiveExam[];
+  } catch (err) {
+    console.warn("Direct live_exams join failed, attempting plain select:", err);
+    let fallbackQuery = supabase
+      .from("live_exams")
+      .select("*")
+      .order("start_time", { ascending: false });
+
+    if (category && category !== "all") {
+      fallbackQuery = fallbackQuery.eq("category", category);
+    }
+    if (status && status !== "all") {
+      fallbackQuery = fallbackQuery.eq("status", status);
+    }
+
+    const { data, error } = await fallbackQuery;
+    if (error) {
+      console.error("Error fetching live exams fallback:", error);
+      throw error;
+    }
+
+    return (data || []).map((exam) => ({
+      ...exam,
+      total_questions: 0,
+    })) as LiveExam[];
   }
-  if (status) {
-    query = query.eq("status", status);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    console.error("Error fetching live exams:", error);
-    throw error;
-  }
-
-  return (data || []).map((exam) => ({
-    ...exam,
-    total_questions: exam.total_questions?.[0]?.count || 0,
-  })) as LiveExam[];
 }
 
 export async function getLiveExam(id: string): Promise<LiveExam | null> {
@@ -71,27 +93,45 @@ export async function getLiveExam(id: string): Promise<LiveExam | null> {
     }
   }
 
-  const { data, error } = await supabase
-    .from("live_exams")
-    .select(
+  try {
+    const { data, error } = await supabase
+      .from("live_exams")
+      .select(
+        `
+        *,
+        total_questions:live_exam_questions(count)
       `
-      *,
-      total_questions:live_exam_questions(count)
-    `
-    )
-    .eq("id", id)
-    .single();
+      )
+      .eq("id", id)
+      .single();
 
-  if (error) {
-    if (error.code === "PGRST116") return null; // Not found
-    console.error("Error fetching live exam:", error);
-    throw error;
+    if (error) {
+      if (error.code === "PGRST116") return null;
+      throw error;
+    }
+
+    return {
+      ...data,
+      total_questions: data.total_questions?.[0]?.count || 0,
+    } as LiveExam;
+  } catch (err) {
+    const { data, error } = await supabase
+      .from("live_exams")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") return null;
+      console.error("Error fetching live exam fallback:", error);
+      throw error;
+    }
+
+    return {
+      ...data,
+      total_questions: 0,
+    } as LiveExam;
   }
-
-  return {
-    ...data,
-    total_questions: data.total_questions?.[0]?.count || 0,
-  } as LiveExam;
 }
 
 export async function createLiveExam(

@@ -135,37 +135,52 @@ export async function GET(request: NextRequest) {
     const to = from + pageSize - 1;
     query = query.range(from, to);
 
-    // Optimize DB Reads: Only fetch separate status breakdown on page 1
-    const shouldFetchBreakdown = page === 1;
+    // Apply common non-status filters to count queries
+    const applyCommonFilters = (baseQ: any) => {
+      let q = baseQ;
+      if (subject) q = q.eq('subject', subject);
+      if (chapter) q = q.eq('chapter', chapter);
+      if (topic) q = q.eq('topic', topic);
+      if (difficulty) q = q.eq('difficulty', difficulty);
+      if (author) q = q.eq('author', author);
+      if (search && search.trim()) {
+        const searchTerm = search.trim();
+        q = q.or(
+          `question.ilike.%${searchTerm}%,exam_type.ilike.%${searchTerm}%,institute.ilike.%${searchTerm}%`,
+        );
+      }
+      return q;
+    };
 
-    let approvedCount = 0;
-    let pendingCount = 0;
-    let rejectedCount = 0;
+    const appQuery = applyCommonFilters(
+      supabaseAdmin
+        .from('questions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'Approved'),
+    );
+    const pendQuery = applyCommonFilters(
+      supabaseAdmin
+        .from('questions')
+        .select('*', { count: 'exact', head: true })
+        .or('status.eq.Pending,status.is.null'),
+    );
+    const rejQuery = applyCommonFilters(
+      supabaseAdmin
+        .from('questions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'Rejected'),
+    );
 
-    let pageRes;
-    if (shouldFetchBreakdown) {
-      const [pRes, appRes, pendRes, rejRes] = await Promise.all([
-        query,
-        supabaseAdmin
-          .from('questions')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'Approved'),
-        supabaseAdmin
-          .from('questions')
-          .select('*', { count: 'exact', head: true })
-          .or('status.eq.Pending,status.is.null'),
-        supabaseAdmin
-          .from('questions')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'Rejected'),
-      ]);
-      pageRes = pRes;
-      approvedCount = appRes.count || 0;
-      pendingCount = pendRes.count || 0;
-      rejectedCount = rejRes.count || 0;
-    } else {
-      pageRes = await query;
-    }
+    const [pageRes, appRes, pendRes, rejRes] = await Promise.all([
+      query,
+      appQuery,
+      pendQuery,
+      rejQuery,
+    ]);
+
+    const approvedCount = appRes.count || 0;
+    const pendingCount = pendRes.count || 0;
+    const rejectedCount = rejRes.count || 0;
 
     if (pageRes.error) {
       console.error('Error fetching questions:', pageRes.error);

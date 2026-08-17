@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/utils/bangla_name_helper.dart';
+import '../../../core/utils/app_popups.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/presentation/widgets/question_card.dart';
 import '../../exam/presentation/widgets/question_report_dialog.dart';
@@ -122,12 +123,13 @@ class _BookmarksViewState extends State<BookmarksView> {
       setState(() {
         _bookmarks.removeWhere((b) => b.question.id == questionId);
       });
+      if (mounted) {
+        AppPopups.success(context, message: 'বুকমার্ক থেকে সরানো হয়েছে');
+      }
     } catch (e) {
       debugPrint('[BookmarksView] _removeBookmark error: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('বুকমার্ক রিমুভ করতে সমস্যা হয়েছে!')),
-        );
+        AppPopups.error(context, message: 'বুকমার্ক সরাতে সমস্যা হয়েছে');
       }
     }
   }

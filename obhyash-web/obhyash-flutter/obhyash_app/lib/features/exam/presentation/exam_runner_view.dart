@@ -127,7 +127,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'আপনি পরীক্ষা চলাকালীন অ্যাপ থেকে বের হয়ে গিয়েছিলেন। এটি পরীক্ষার নিয়ম-বহির্ভূত কাজ। এরপর পুনরায় অ্যাপ থেকে বের হলে আপনার পরীক্ষাটি স্বয়ংক্রিয়ভাবে বাতিল ও সাবমিট হয়ে যাবে।',
+                  'তুমি পরীক্ষা চলাকালীন অ্যাপ থেকে বের হয়ে গিয়েছিলে। এটি পরীক্ষার নিয়ম-বহির্ভূত কাজ। এরপর পুনরায় অ্যাপ থেকে বের হলে তোমার পরীক্ষাটি স্বয়ংক্রিয়ভাবে বাতিল ও সাবমিট হয়ে যাবে।',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -677,10 +677,9 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                           preferredPosition: TooltipPosition.bottom,
                           child: InkWell(
                             onTap: () async {
-                              AppPopups.show(
+                              AppPopups.info(
                                 context,
-                                message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করুন...',
-                                isError: false,
+                                message: 'PDF তৈরি হচ্ছে, একটু অপেক্ষা করো...',
                               );
                               
                               final dummyResult = ExamResult(
@@ -904,7 +903,7 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
     final totalQ = details?.totalQuestions ?? widget.state.questions.length;
     final negMark = details?.negativeMarking ?? 0.0;
 
-    final chaptersList = (details?.chapters != null &&
+    final rawChapters = (details?.chapters != null &&
             details!.chapters!.trim().isNotEmpty &&
             details.chapters != 'All')
         ? details.chapters!
@@ -917,6 +916,15 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
             .where((c) => c.isNotEmpty && c != 'All')
             .toSet()
             .toList();
+
+    // Sort chapters in canonical academic order (১ম অধ্যায় -> ২য় অধ্যায় -> ৩য় অধ্যায়)
+    rawChapters.sort((a, b) {
+      final idxA = BanglaNameHelper.getChapterSortIndex(a, a);
+      final idxB = BanglaNameHelper.getChapterSortIndex(b, b);
+      if (idxA != idxB) return idxA.compareTo(idxB);
+      return a.compareTo(b);
+    });
+    final chaptersList = rawChapters;
 
     final topicsList = (details?.topics != null &&
             details!.topics!.trim().isNotEmpty &&

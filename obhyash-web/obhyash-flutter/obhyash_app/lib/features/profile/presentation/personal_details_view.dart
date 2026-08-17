@@ -126,10 +126,9 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
 
     if (_newPasswordController.text.isNotEmpty &&
         _newPasswordController.text != _confirmPasswordController.text) {
-      AppPopups.show(
+      AppPopups.warning(
         context,
         message: 'পাসওয়ার্ড দুটি মিলছে না!',
-        isError: true,
       );
       return;
     }
@@ -165,10 +164,9 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           UserAttributes(password: _newPasswordController.text),
         );
         if (mounted) {
-          AppPopups.show(
+          AppPopups.success(
             context,
             message: 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!',
-            isError: false,
           );
         }
       }
@@ -183,20 +181,18 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
       ref.invalidate(userProfileProvider);
 
       if (mounted) {
-        AppPopups.show(
+        AppPopups.success(
           context,
-          message: 'সেটিংস সফলভাবে সেভ করা হয়েছে!',
-          isError: false,
+          message: 'প্রোফাইল তথ্য সফলভাবে সেভ করা হয়েছে!',
         );
         _newPasswordController.clear();
         _confirmPasswordController.clear();
       }
     } catch (e) {
       if (mounted) {
-        AppPopups.show(
+        AppPopups.error(
           context,
-          message: e.toString(),
-          isError: true,
+          message: 'তথ্য আপডেট করতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
         );
       }
     } finally {

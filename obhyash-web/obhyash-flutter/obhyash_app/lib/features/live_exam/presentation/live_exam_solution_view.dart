@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../core/utils/app_popups.dart';
 import '../../exam/presentation/widgets/question_card.dart';
 import '../../exam/presentation/widgets/question_report_dialog.dart';
 import '../domain/models.dart';
@@ -30,9 +31,7 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
     final supabase = Supabase.instance.client;
     final user = supabase.auth.currentUser;
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('বুকমার্ক করতে লগইন করুন')),
-      );
+      AppPopups.warning(context, message: 'বুকমার্ক করতে লগইন করুন');
       return;
     }
 
@@ -53,9 +52,7 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
             .eq('user_id', user.id)
             .eq('question_id', questionId);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('রিভিশন তালিকা থেকে সরানো হয়েছে')),
-          );
+          AppPopups.success(context, message: 'রিভিশন তালিকা থেকে সরানো হয়েছে');
         }
       } else {
         await supabase.from('bookmarks').insert({
@@ -64,12 +61,7 @@ class _LiveExamSolutionViewState extends ConsumerState<LiveExamSolutionView> {
           'created_at': DateTime.now().toIso8601String(),
         });
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              backgroundColor: Color(0xFF0B6B42),
-              content: Text('রিভিশন তালিকায় যুক্ত হয়েছে'),
-            ),
-          );
+          AppPopups.success(context, message: 'রিভিশন তালিকায় যুক্ত হয়েছে');
         }
       }
     } catch (_) {}

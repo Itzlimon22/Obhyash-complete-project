@@ -98,7 +98,7 @@ class _PaymentViewState extends State<PaymentView>
   Future<void> _copyNumber() async {
     await Clipboard.setData(const ClipboardData(text: _merchantNumber));
     if (mounted) {
-      AppPopups.show(context, message: 'নম্বর কপি করা হয়েছে!', isError: false);
+      AppPopups.success(context, message: 'নম্বর কপি করা হয়েছে!');
     }
   }
 
@@ -108,20 +108,18 @@ class _PaymentViewState extends State<PaymentView>
 
     final phoneRegex = RegExp(r'^01\d{9}$');
     if (!phoneRegex.hasMatch(sender)) {
-      AppPopups.show(
+      AppPopups.warning(
         context,
         message: 'সঠিক মোবাইল নম্বর দাও (১১ ডিজিট, শুরু হতে হবে ০১ দিয়ে)',
-        isError: true,
       );
       return;
     }
 
     final trxRegex = RegExp(r'^[A-Z0-9]{5,20}$');
     if (!trxRegex.hasMatch(trxId)) {
-      AppPopups.show(
+      AppPopups.warning(
         context,
-        message: 'সঠিক ট্রানজেকশন আইডি দাও',
-        isError: true,
+        message: 'সঠিক ট্রানজেকশন আইডি দাও (কমপক্ষে ৫ অক্ষর)',
       );
       return;
     }
@@ -152,11 +150,10 @@ class _PaymentViewState extends State<PaymentView>
           _showSuccess = true;
         });
 
-        AppPopups.show(
+        AppPopups.success(
           context,
           message:
-              'পেমেন্ট তথ্য জমা নেওয়া হয়েছে। যাচাই করার পর ${widget.plan.name} প্ল্যান চালু হবে।',
-          isError: false,
+              'পেমেন্ট তথ্য জমা নেওয়া হয়েছে। দ্রুত যাচাই করে ${widget.plan.name} প্ল্যান চালু করা হবে।',
         );
 
         // Auto pop after a delay
@@ -167,10 +164,9 @@ class _PaymentViewState extends State<PaymentView>
     } catch (e) {
       if (mounted) {
         setState(() => _isSubmitting = false);
-        AppPopups.show(
+        AppPopups.error(
           context,
-          message: 'ত্রুটি হয়েছে। আবার চেষ্টা করো।',
-          isError: true,
+          message: 'পেমেন্ট রিকোয়েস্ট জমা দিতে সমস্যা হয়েছে। আবার চেষ্টা করো।',
         );
       }
     }

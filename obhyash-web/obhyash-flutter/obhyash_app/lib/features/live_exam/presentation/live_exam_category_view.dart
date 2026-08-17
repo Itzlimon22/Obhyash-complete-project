@@ -43,48 +43,7 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Search Bar
-            Container(
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                  color: isDark
-                      ? const Color(0xFF27272A)
-                      : const Color(0xFFE5E5E5),
-                ),
-                boxShadow: [
-                  if (!isDark)
-                    const BoxShadow(
-                      color: Color(0x0A000000),
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                ],
-              ),
-              child: TextField(
-                onChanged: (val) {
-                  ref.read(liveExamSearchProvider.notifier).updateSearch(val);
-                },
-                style: TextStyle(
-                  color: isDark ? Colors.white : const Color(0xFF000000),
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Search for exams...',
-                  hintStyle: const TextStyle(color: Color(0xFFA3A3A3)),
-                  prefixIcon: const Icon(
-                    LucideIcons.search,
-                    color: Color(0xFFA3A3A3),
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 14,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 8),
 
             // Filters & Actions
             Row(
@@ -166,7 +125,7 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
                         ),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? const Color(0xFF1E3A8A).withOpacity(0.3)
+                              ? const Color(0xFF1E3A8A).withValues(alpha: 0.3)
                               : const Color(0xFFE8F0FE),
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -260,7 +219,7 @@ class _LiveExamCard extends StatelessWidget {
         ? const Color(0xFF27272A)
         : const Color(0xFF000000); // blue
     Color statusBg = isDark
-        ? const Color(0xFF1E3A8A).withOpacity(0.3)
+        ? const Color(0xFF1E3A8A).withValues(alpha: 0.3)
         : const Color(0xFFEFF6FF);
 
     if (exam.isOngoing) {
@@ -269,7 +228,7 @@ class _LiveExamCard extends StatelessWidget {
           ? const Color(0xFF4ADE80)
           : const Color(0xFF2CA05A); // green
       statusBg = isDark
-          ? const Color(0xFF14532D).withOpacity(0.3)
+          ? const Color(0xFF14532D).withValues(alpha: 0.3)
           : const Color(0xFFEBFAEF);
     } else if (exam.isPast) {
       statusText = "Past";

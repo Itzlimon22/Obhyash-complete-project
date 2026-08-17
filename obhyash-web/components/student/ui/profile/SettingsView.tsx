@@ -19,6 +19,8 @@ import {
   Sun,
   Moon,
   Bookmark,
+  MessageSquare,
+  Sparkles,
 } from 'lucide-react';
 import UserAvatar from '../common/UserAvatar';
 import { UserProfile } from '@/lib/types';
@@ -111,6 +113,20 @@ const GROUPS: SettingsGroup[] = [
         label: 'নোটিফিকেশন',
         description: 'নতুন আপডেট ও বার্তা',
         Icon: Bell,
+      },
+      {
+        type: 'internal',
+        tab: 'complaint',
+        label: 'অভিযোগ ও মতামত',
+        description: 'অ্যাপের সমস্যা, বাগ বা ফিচারের পরামর্শ জানাও',
+        Icon: MessageSquare,
+      },
+      {
+        type: 'internal',
+        tab: 'feature-requests',
+        label: 'নতুন ফিচার প্রস্তাব',
+        description: 'অ্যাপের জন্য নতুন ফিচারের আইডিয়া পাঠাও',
+        Icon: Sparkles,
       },
     ],
   },
