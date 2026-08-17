@@ -9,6 +9,23 @@ export async function getLiveExams(
   category?: string,
   status?: string
 ): Promise<LiveExam[]> {
+  if (typeof window !== "undefined") {
+    try {
+      const params = new URLSearchParams();
+      if (category) params.set("category", category);
+      if (status) params.set("status", status);
+      const res = await fetch(`/api/admin/live-exams?${params.toString()}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          return json.data as LiveExam[];
+        }
+      }
+    } catch (apiErr) {
+      console.warn("API getLiveExams failed, falling back to direct query:", apiErr);
+    }
+  }
+
   let query = supabase
     .from("live_exams")
     .select(
@@ -33,13 +50,27 @@ export async function getLiveExams(
     throw error;
   }
 
-  return data.map((exam) => ({
+  return (data || []).map((exam) => ({
     ...exam,
     total_questions: exam.total_questions?.[0]?.count || 0,
   })) as LiveExam[];
 }
 
 export async function getLiveExam(id: string): Promise<LiveExam | null> {
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch(`/api/admin/live-exams?id=${id}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          return json.data as LiveExam;
+        }
+      }
+    } catch (apiErr) {
+      console.warn("API getLiveExam failed, falling back to direct query:", apiErr);
+    }
+  }
+
   const { data, error } = await supabase
     .from("live_exams")
     .select(
@@ -66,6 +97,24 @@ export async function getLiveExam(id: string): Promise<LiveExam | null> {
 export async function createLiveExam(
   exam: Partial<LiveExam>
 ): Promise<LiveExam> {
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/admin/live-exams", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "create", exam }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          return json.data as LiveExam;
+        }
+      }
+    } catch (apiErr) {
+      console.warn("API createLiveExam failed, falling back to direct query:", apiErr);
+    }
+  }
+
   const { data, error } = await supabase
     .from("live_exams")
     .insert([exam])
@@ -84,6 +133,24 @@ export async function updateLiveExam(
   id: string,
   updates: Partial<LiveExam>
 ): Promise<LiveExam> {
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/admin/live-exams", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update", id, updates }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          return json.data as LiveExam;
+        }
+      }
+    } catch (apiErr) {
+      console.warn("API updateLiveExam failed, falling back to direct query:", apiErr);
+    }
+  }
+
   const { data, error } = await supabase
     .from("live_exams")
     .update(updates)
@@ -100,6 +167,22 @@ export async function updateLiveExam(
 }
 
 export async function deleteLiveExam(id: string): Promise<void> {
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/admin/live-exams", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete", id }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) return;
+      }
+    } catch (apiErr) {
+      console.warn("API deleteLiveExam failed, falling back to direct query:", apiErr);
+    }
+  }
+
   const { error } = await supabase.from("live_exams").delete().eq("id", id);
 
   if (error) {
