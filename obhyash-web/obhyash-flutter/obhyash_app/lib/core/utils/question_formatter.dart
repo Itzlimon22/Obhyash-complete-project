@@ -18,6 +18,11 @@ class QuestionFormatter {
         .replaceAll(r'\r', '\n')
         .replaceAll(r'\n', '\n');
 
+    // Normalize corrupted/unescaped LaTeX arrows and equilibrium symbols (e.g. ightleftharpoons, \rightleftharpoons)
+    text = text.replaceAll(RegExp(r'\\?r?ightleftharpoons', caseSensitive: false), ' ⇌ ');
+    text = text.replaceAll(RegExp(r'\\?leftrightharpoons', caseSensitive: false), ' ⇌ ');
+    text = text.replaceAll(RegExp(r'\\?leftrightarrow', caseSensitive: false), ' ⇌ ');
+
     // 1. Convert short $$...$$ display math into inline $...$ so they flow naturally in sentences
     text = text.replaceAllMapped(
       RegExp(r'\$\$([^\n]{1,120}?)\$\$'),

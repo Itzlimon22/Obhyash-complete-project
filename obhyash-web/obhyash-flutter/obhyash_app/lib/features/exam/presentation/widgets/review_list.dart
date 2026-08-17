@@ -194,7 +194,7 @@ class _FilterButton extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: isSelected
                     ? color

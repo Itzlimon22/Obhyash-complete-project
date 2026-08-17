@@ -213,7 +213,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                               Text(
                                 'বাতিল',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'HindSiliguri',
                                   color: isDark
@@ -234,7 +234,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
                         Text(
                           '$correctSoFar/$total সঠিক',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'HindSiliguri',
                             color: isDark
@@ -392,7 +392,7 @@ class _FlashcardModeState extends State<FlashcardMode> {
               child: Text(
                 isCorrect ? '✓ সঠিক' : '✗ ভুল',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: isCorrect
                       ? const Color(0xFF059669)

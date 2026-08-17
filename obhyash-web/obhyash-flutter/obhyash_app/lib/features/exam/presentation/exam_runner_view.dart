@@ -391,7 +391,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                           Text(
                             '${_toBn(answeredQuestions)}/${_toBn(totalQuestions)}',
                             style: const TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF10B981),
                             ),
@@ -421,7 +421,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                           Text(
                             _toBn(remaining),
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: remaining > 0
                                   ? const Color(0xFFEF4444)
@@ -605,7 +605,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                         child: Text(
                           '$answeredCount / $totalCount',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.w900,
                             color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF475569),
                           ),
@@ -837,7 +837,7 @@ class _ExamRunnerViewState extends ConsumerState<ExamRunnerView> with WidgetsBin
                     'জমা দাও',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 14.5,
+                      fontSize: 16,
                       fontFamily: 'HindSiliguri',
                     ),
                   ),
@@ -1076,7 +1076,7 @@ class _ExamInstructionScreenState extends State<_ExamInstructionScreen>
                               Text(
                                 'গুরুত্বপূর্ণ নির্দেশনাবলী',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w900,
                                   fontFamily: 'HindSiliguri',
                                   color: textPrimary,
@@ -1350,7 +1350,7 @@ class _RuleItem extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 13.5,
+                      fontSize: 13,
                       fontWeight: FontWeight.w800,
                       fontFamily: 'HindSiliguri',
                       color: isWarning
@@ -1362,7 +1362,7 @@ class _RuleItem extends StatelessWidget {
                   Text(
                     desc,
                     style: TextStyle(
-                      fontSize: 12.5,
+                      fontSize: 12,
                       fontFamily: 'HindSiliguri',
                       color: textSub,
                       height: 1.45,

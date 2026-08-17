@@ -91,8 +91,8 @@ class SettingsView extends ConsumerWidget {
             route: '/profile/complaint',
           ),
           _SettingsItem(
-            label: 'নতুন ফিচার প্রস্তাব',
-            description: 'অ্যাপের জন্য নতুন ফিচারের আইডিয়া পাঠাও',
+            label: 'ফিচার রিকোয়েস্ট',
+            description: 'অ্যাপের জন্য নতুন ফিচারের প্রস্তাব ও আইডিয়া পাঠাও',
             icon: LucideIcons.sparkles,
             type: _ItemType.navigate,
             route: '/profile/feature-requests',
@@ -304,20 +304,21 @@ class SettingsView extends ConsumerWidget {
                           user.name,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
                             color: Colors.white,
-                            fontFamily: 'Anek Bangla',
+                            fontFamily: 'HindSiliguri',
                           ),
                         ),
                         if (user.email != null) ...[
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 3),
                           Text(
                             user.email!,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.white.withValues(alpha: 0.7),
+                              fontSize: 14,
+                              fontFamily: 'HindSiliguri',
+                              color: Colors.white.withValues(alpha: 0.8),
                             ),
                           ),
                         ],
@@ -425,21 +426,21 @@ class SettingsView extends ConsumerWidget {
               children: [
                 if (group.title.isNotEmpty)
                   Padding(
-                    padding: EdgeInsets.fromLTRB(20, gi == 0 ? 0 : 20, 20, 8),
+                    padding: EdgeInsets.fromLTRB(20, gi == 0 ? 0 : 18, 20, 8),
                     child: Text(
                       group.title,
                       style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.5,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'HindSiliguri',
                         color: isDark
-                            ? const Color(0xFF737373)
-                            : const Color(0xFFA3A3A3),
+                            ? const Color(0xFFA1A1AA)
+                            : const Color(0xFF71717A),
                       ),
                     ),
                   )
                 else
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -481,28 +482,28 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final iconColor = item.danger
         ? const Color(0xFFEF4444)
-        : (isDark ? const Color(0xFF34D399) : const Color(0xFF166534));
+        : (isDark ? const Color(0xFF34D399) : const Color(0xFF059669));
     final iconBg = item.danger
         ? const Color(0xFFEF4444).withValues(alpha: isDark ? 0.2 : 0.1)
         : (isDark
             ? const Color(0xFF059669).withValues(alpha: 0.2)
-            : const Color(0xFF166534).withValues(alpha: 0.1));
+            : const Color(0xFF059669).withValues(alpha: 0.1));
     final labelColor = item.danger
         ? const Color(0xFFEF4444)
-        : (isDark ? Colors.white : const Color(0xFF000000));
+        : (isDark ? Colors.white : const Color(0xFF111827));
 
     return Container(
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF18181B) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isDark ? const Color(0xFF27272A) : const Color(0xFFF0F0F0),
+          color: isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB),
         ),
         boxShadow: [
           BoxShadow(
-            color: isDark ? const Color(0x1A000000) : const Color(0x08000000),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: isDark ? const Color(0x1A000000) : const Color(0x05000000),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
@@ -510,9 +511,9 @@ class _NavItem extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
             child: Row(
               children: [
                 Container(
@@ -520,7 +521,7 @@ class _NavItem extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     color: iconBg,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(item.icon, color: iconColor, size: 20),
                 ),
@@ -529,10 +530,10 @@ class _NavItem extends StatelessWidget {
                   child: Text(
                     item.label,
                     style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                       color: labelColor,
-                      fontFamily: 'Anek Bangla',
+                      fontFamily: 'HindSiliguri',
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -540,9 +541,9 @@ class _NavItem extends StatelessWidget {
                 ),
                 if (item.type != _ItemType.action)
                   Container(
-                    padding: const EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF27272A) : const Color(0xFFF5F5F5),
+                      color: isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -552,7 +553,7 @@ class _NavItem extends StatelessWidget {
                       size: 15,
                       color: isDark
                           ? const Color(0xFFA1A1AA)
-                          : const Color(0xFF737373),
+                          : const Color(0xFF71717A),
                     ),
                   ),
               ],
@@ -580,19 +581,19 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6.5),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF27272A) : const Color(0xFFF5F5F5),
+        color: isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E5E5),
+          color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE5E7EB),
         ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(emoji, style: const TextStyle(fontSize: 14)),
+          Text(emoji, style: const TextStyle(fontSize: 13)),
           const SizedBox(width: 5),
           Flexible(
             child: Text(
@@ -600,10 +601,10 @@ class _InfoChip extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Anek Bangla',
-                color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                fontFamily: 'HindSiliguri',
+                color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF374151),
               ),
             ),
           ),
@@ -634,38 +635,38 @@ class _ActionBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     final bg = isAccent
         ? (isDark ? const Color(0x33881337) : const Color(0xFFFFF1F2))
-        : (isDark ? const Color(0xFF27272A) : const Color(0xFFF5F5F5));
+        : (isDark ? const Color(0xFF27272A) : const Color(0xFFF3F4F6));
     final fg = isAccent
         ? const Color(0xFFEF4444)
-        : (isDark ? const Color(0xFFE4E4E7) : const Color(0xFF27272A));
+        : (isDark ? const Color(0xFFE4E4E7) : const Color(0xFF374151));
 
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 3),
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 9),
           decoration: BoxDecoration(
             color: bg,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: isAccent
-                  ? (isDark ? const Color(0x887f1d1d) : const Color(0xFFfecdd3))
+                  ? (isDark ? const Color(0x887f1d1d) : const Color(0xFFFECDD3))
                   : (isDark
                         ? const Color(0xFF3F3F46)
-                        : const Color(0xFFE5E5E5)),
+                        : const Color(0xFFE5E7EB)),
             ),
           ),
           child: Column(
             children: [
-              Icon(icon, size: 18, color: fg),
-              const SizedBox(height: 4),
+              Icon(icon, size: 17, color: fg),
+              const SizedBox(height: 3),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Anek Bangla',
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'HindSiliguri',
                   color: fg,
                 ),
               ),

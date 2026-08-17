@@ -446,7 +446,7 @@ class _PaymentViewState extends State<PaymentView>
                           child: Text(
                             'bKash/Nagad (Send Money)',
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               fontWeight: FontWeight.w500,
                               color: isDark
                                   ? const Color(0xFFA3A3A3)
@@ -508,7 +508,7 @@ class _PaymentViewState extends State<PaymentView>
                           child: Text(
                             step,
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               color: isDark
                                   ? const Color(0xFFA3A3A3)
                                   : const Color(0xFF737373),
@@ -620,7 +620,7 @@ class _PaymentViewState extends State<PaymentView>
                               Text(
                                 method.number,
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   fontFamily: 'monospace',
                                   color: isDark
                                       ? const Color(0xFFA3A3A3)
@@ -643,7 +643,7 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             'Payment Method',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
             ),
@@ -664,7 +664,7 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             'Your Mobile Number',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
             ),
@@ -682,7 +682,7 @@ class _PaymentViewState extends State<PaymentView>
           Text(
             'Transaction ID (TrxID)',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
             ),
@@ -846,7 +846,7 @@ class _PaymentViewState extends State<PaymentView>
                             Text(
                               item.$3,
                               style: const TextStyle(
-                                fontSize: 15,
+                                fontSize: 16,
                                 color: Color(0xFFA3A3A3),
                               ),
                             ),
@@ -1096,7 +1096,7 @@ class _FaqTileState extends State<_FaqTile> {
                       widget.q,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 15,
+                        fontSize: 16,
                         color: widget.isDark
                             ? Colors.white
                             : const Color(0xFF000000),
@@ -1124,7 +1124,7 @@ class _FaqTileState extends State<_FaqTile> {
               child: Text(
                 widget.a,
                 style: const TextStyle(
-                  fontSize: 15,
+                  fontSize: 16,
                   color: Color(0xFFA3A3A3),
                   height: 1.6,
                 ),

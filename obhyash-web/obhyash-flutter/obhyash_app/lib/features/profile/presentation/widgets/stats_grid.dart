@@ -121,7 +121,7 @@ class StatsGrid extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 15, // sm:text-sm
+              fontSize: 16, // sm:text-sm
               fontWeight: FontWeight.bold,
               color: isDark
                   ? const Color(0xFFA3A3A3)

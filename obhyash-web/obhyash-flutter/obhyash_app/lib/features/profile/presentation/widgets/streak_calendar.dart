@@ -281,7 +281,7 @@ class _StreakCalendarState extends State<StreakCalendar> {
                       child: Text(
                         day,
                         style: TextStyle(
-                          fontSize: 15, // sm:text-sm
+                          fontSize: 16, // sm:text-sm
                           fontWeight: FontWeight.bold,
                           color: isDark
                               ? const Color(0xFFA3A3A3)
@@ -429,7 +429,7 @@ class _StreakCalendarState extends State<StreakCalendar> {
         Text(
           label,
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 16,
             color: isDark
                 ? const Color(0xFFA3A3A3)
                 : const Color(0xFF737373), // neutral-400 : neutral-500

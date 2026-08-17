@@ -456,7 +456,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                                       Text(
                                         notif.message,
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 16,
                                           height: 1.4,
                                           color: isDark ? const Color(0xFF737373) : const Color(0xFF737373),
                                         ),
@@ -529,7 +529,7 @@ class _FilterChip extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
             color: isSelected
                 ? Colors.white

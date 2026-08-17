@@ -241,14 +241,14 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                 maxLines: 2,
                 maxLength: 200,
                 style: TextStyle(
-                  fontSize: 13.5,
+                  fontSize: 13,
                   fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF18181B),
                 ),
                 decoration: InputDecoration(
                   hintText: 'মন্তব্য বা বিস্তারিত লেখো (ঐচ্ছিক)...',
                   hintStyle: TextStyle(
-                    fontSize: 12.5,
+                    fontSize: 12,
                     fontFamily: 'HindSiliguri',
                     color: isDark
                         ? const Color(0xFF71717A)
@@ -342,7 +342,7 @@ class _QuestionReportDialogState extends State<QuestionReportDialog> {
                             : const Text(
                                 'রিপোর্ট পাঠাও',
                                 style: TextStyle(
-                                  fontSize: 14.5,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'HindSiliguri',
                                   color: Colors.white,

@@ -435,7 +435,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
           label,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 14.5,
+            fontSize: 16,
             fontFamily: 'HindSiliguri',
             color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
           ),
@@ -474,7 +474,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                     child: Text(
                       value.isEmpty ? hint : value,
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 16,
                         fontFamily: 'HindSiliguri',
                         fontWeight: value.isEmpty
                             ? FontWeight.normal
@@ -627,7 +627,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
             child: Text(
               '$value $unit',
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: FontWeight.w900,
                 fontFamily: 'HindSiliguri',
                 color: isDark
@@ -695,7 +695,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 13.5,
+                fontSize: 13,
                 fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
                 fontFamily: 'HindSiliguri',
                 color: isSelected
@@ -780,7 +780,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
         Text(
           label,
           style: TextStyle(
-            fontSize: 12.5,
+            fontSize: 12,
             fontWeight: FontWeight.w700,
             fontFamily: 'HindSiliguri',
             color: isDark ? const Color(0xFFFEF3C7) : const Color(0xFF78350F),
@@ -877,7 +877,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                                           .label
                                     : 'বিষয় নির্বাচন করো...',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   fontFamily: 'HindSiliguri',
                                   fontWeight: FontWeight.bold,
                                   color: _selectedSubject != null
@@ -1015,7 +1015,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                       Text(
                         'মোট প্রশ্ন:',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontFamily: 'HindSiliguri',
                           fontWeight: FontWeight.bold,
                           color: isDark
@@ -1085,7 +1085,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                       Text(
                         'মোট সময়:',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontFamily: 'HindSiliguri',
                           fontWeight: FontWeight.bold,
                           color: isDark
@@ -1281,7 +1281,7 @@ class _ExamSetupViewState extends ConsumerState<ExamSetupView> {
                       'শুরু করো',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 17.5,
+                        fontSize: 18,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'HindSiliguri',
                       ),
@@ -1338,7 +1338,7 @@ class _CardContainer extends StatelessWidget {
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 16.5,
+                  fontSize: 17,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'HindSiliguri',
                   color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -1620,7 +1620,7 @@ class _SubjectDropdownModal extends StatelessWidget {
                                                 child: Text(
                                                   subject.label,
                                                   style: TextStyle(
-                                                    fontSize: 15.5,
+                                                    fontSize: 16,
                                                     fontWeight: isSelected
                                                         ? FontWeight.w900
                                                         : FontWeight.w600,
@@ -1818,7 +1818,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                           Text(
                             isAllSelected ? 'সব বাছাইকৃত' : 'সবগুলো',
                             style: TextStyle(
-                              fontSize: 12.5,
+                              fontSize: 12,
                               fontWeight: FontWeight.w700,
                               fontFamily: 'HindSiliguri',
                               color: isAllSelected
@@ -1868,7 +1868,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                           color: isDark
                               ? const Color(0xFFA1A1AA)
                               : const Color(0xFF64748B),
-                          fontSize: 15,
+                          fontSize: 16,
                           fontFamily: 'HindSiliguri',
                         ),
                       ),
@@ -1951,7 +1951,7 @@ class _MultiSelectDropdownModalState extends State<_MultiSelectDropdownModal> {
                                     child: LatexText(
                                       text: name,
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 16,
                                         fontFamily: 'HindSiliguri',
                                         fontWeight: isSelected
                                             ? FontWeight.bold
@@ -2210,7 +2210,7 @@ class _TopicCollapsibleSelectionModalState
                           Text(
                             isAllSelected ? 'সব বাছাইকৃত' : 'সবগুলো',
                             style: TextStyle(
-                              fontSize: 12.5,
+                              fontSize: 12,
                               fontWeight: FontWeight.w700,
                               fontFamily: 'HindSiliguri',
                               color: isAllSelected
@@ -2387,7 +2387,7 @@ class _TopicCollapsibleSelectionModalState
                                             LatexText(
                                               text: chapter.name,
                                               style: TextStyle(
-                                                fontSize: 15,
+                                                fontSize: 16,
                                                 fontWeight: FontWeight.w800,
                                                 fontFamily: 'HindSiliguri',
                                                 color: isDark
@@ -2546,7 +2546,7 @@ class _TopicCollapsibleSelectionModalState
                                               child: LatexText(
                                                 text: topic.name,
                                                 style: TextStyle(
-                                                  fontSize: 14.5,
+                                                  fontSize: 16,
                                                   fontFamily: 'HindSiliguri',
                                                   fontWeight: isSelected
                                                       ? FontWeight.bold

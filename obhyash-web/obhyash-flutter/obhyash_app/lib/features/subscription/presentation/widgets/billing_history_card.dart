@@ -187,7 +187,7 @@ class BillingHistoryCard extends StatelessWidget {
                     'তোমার পেমেন্ট ইতিহাস এখানে দেখা যাবে।',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       color: isDark
                           ? const Color(0xFFA3A3A3)
                           : const Color(
@@ -248,7 +248,7 @@ class BillingHistoryCard extends StatelessWidget {
                             Text(
                               inv.date,
                               style: TextStyle(
-                                fontSize: 15, // text-xs
+                                fontSize: 16, // text-xs
                                 color: isDark
                                     ? const Color(0xFFA3A3A3)
                                     : const Color(

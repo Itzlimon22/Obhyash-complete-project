@@ -294,7 +294,7 @@ class _TooltipBubble extends StatelessWidget {
             message,
             textAlign: TextAlign.start,
             style: TextStyle(
-              fontSize: 12.5,
+              fontSize: 12,
               height: 1.45,
               fontFamily: 'HindSiliguri',
               fontWeight: FontWeight.w600,

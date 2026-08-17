@@ -96,7 +96,7 @@ class AboutUsView extends StatelessWidget {
                   Text(
                     'স্মার্ট প্রস্তুতি, নিশ্চিত সাফল্য',
                     style: TextStyle(
-                      fontSize: 14.5,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'HindSiliguri',
                       color: const Color(0xFF10B981),
@@ -294,7 +294,7 @@ class AboutUsView extends StatelessWidget {
                   Text(
                     'Made with ❤️ for Bangladeshi Students',
                     style: TextStyle(
-                      fontSize: 11.5,
+                      fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFF059669),
                     ),
@@ -473,7 +473,7 @@ class _FeatureRow extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 14.5,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     fontFamily: 'HindSiliguri',
                     color: isDark ? Colors.white : const Color(0xFF0F172A),

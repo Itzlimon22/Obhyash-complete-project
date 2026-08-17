@@ -206,7 +206,7 @@ class RecentActivitySection extends StatelessWidget {
                                     Text(
                                       _formatDate(exam.createdAt),
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 16,
                                         color: isDark
                                             ? const Color(0xFFA3A3A3)
                                             : const Color(0xFF737373),
@@ -215,7 +215,7 @@ class RecentActivitySection extends StatelessWidget {
                                   Text(
                                     '${exam.totalQuestions} প্রশ্ন',
                                     style: TextStyle(
-                                      fontSize: 15,
+                                      fontSize: 16,
                                       color: isDark
                                           ? const Color(0xFFA3A3A3)
                                           : const Color(0xFF737373),

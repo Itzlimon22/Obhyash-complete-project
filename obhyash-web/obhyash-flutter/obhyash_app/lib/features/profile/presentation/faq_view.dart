@@ -169,7 +169,7 @@ class _FaqViewState extends State<FaqView> {
                     'প্রয়োজনীয় প্রশ্নের উত্তর বা সরাসরি সাহায্য নিতে নিচের অপশনগুলো দেখুন।',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 13.5,
+                      fontSize: 13,
                       fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF475569),
                     ),
@@ -190,7 +190,7 @@ class _FaqViewState extends State<FaqView> {
                       style: TextStyle(
                         fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
-                        fontSize: 14.5,
+                        fontSize: 16,
                       ),
                       decoration: InputDecoration(
                         hintText: 'প্রশ্ন খুঁজুন... (যেমন: ওএমআর, পেমেন্ট, রেজাল্ট)',
@@ -317,7 +317,7 @@ class _FaqViewState extends State<FaqView> {
                 child: Text(
                   'কোনো প্রশ্ন পাওয়া যায়নি!',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     fontFamily: 'HindSiliguri',
                     color: isDark ? const Color(0xFF71717A) : const Color(0xFF94A3B8),
                   ),
@@ -374,7 +374,7 @@ class _FaqViewState extends State<FaqView> {
                       title: Text(
                         item.question,
                         style: TextStyle(
-                          fontSize: 14.5,
+                          fontSize: 16,
                           fontWeight: FontWeight.w800,
                           fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -464,7 +464,7 @@ class _SupportActionCard extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 14.5,
+                fontSize: 16,
                 fontWeight: FontWeight.w800,
                 fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white : const Color(0xFF0F172A),

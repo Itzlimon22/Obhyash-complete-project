@@ -606,7 +606,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                               const Text(
                                 '© ${2026} Obhyash Exam Platform - Built for Excellence',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFFA3A3A3),
                                 ),
@@ -616,7 +616,7 @@ class _AboutUsViewState extends State<AboutUsView> {
                               const Text(
                                 'সর্বশেষ আপডেট: ০৪ ফেব্রুয়ারি, ২০২৬',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFFA3A3A3),
                                 ),

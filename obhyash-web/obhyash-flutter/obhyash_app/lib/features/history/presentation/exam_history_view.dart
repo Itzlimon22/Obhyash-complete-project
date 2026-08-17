@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -931,6 +932,104 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
     }
   }
 
+  Future<void> _handleDeleteSingleQuestion(Question q) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(LucideIcons.trash2, color: Color(0xFFEF4444), size: 20),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'প্রশ্নটি মুছে ফেলবে?',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  fontFamily: 'HindSiliguri',
+                  color: isDark ? Colors.white : const Color(0xFF111827),
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'এই প্রশ্নটি তোমার তালিকা থেকে সরানো হবে। তুমি কি নিশ্চিত?',
+          style: TextStyle(
+            fontSize: 14,
+            fontFamily: 'HindSiliguri',
+            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563),
+            height: 1.4,
+          ),
+        ),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(
+              'বাতিল',
+              style: TextStyle(
+                fontFamily: 'HindSiliguri',
+                fontWeight: FontWeight.w600,
+                color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFEF4444),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ),
+            child: const Text(
+              'মুছে ফেলো',
+              style: TextStyle(
+                fontFamily: 'HindSiliguri',
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      HapticFeedback.mediumImpact();
+      setState(() {
+        _questions.removeWhere((item) => item.id == q.id);
+      });
+      try {
+        final cached = await LocalExamCacheService.getCachedQuestionsList();
+        if (cached != null) {
+          final updated = cached.where((e) => e['id'] != q.id).toList();
+          await LocalExamCacheService.cacheQuestionsList(updated);
+        }
+      } catch (e) {
+        debugPrint('[ExamHistoryView] delete question cache update error: $e');
+      }
+
+      if (mounted) {
+        AppPopups.success(
+          context,
+          message: 'প্রশ্নটি তালিকা থেকে সরানো হয়েছে',
+        );
+      }
+    }
+  }
+
   void _openPremiumDatePicker(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -1324,6 +1423,7 @@ class _ExamHistoryViewState extends ConsumerState<ExamHistoryView>
                       questions: _questions,
                       bookmarkedIds: _bookmarkedIds,
                       onToggleBookmark: _toggleBookmark,
+                      onDeleteQuestion: _handleDeleteSingleQuestion,
                       onReport: _showReportDialog,
                       isDark: isDark,
                       hasMore: _hasMoreQuestions,
@@ -1761,7 +1861,7 @@ class _ExamCardState extends State<_ExamCard> {
                         label,
                         style: TextStyle(
                           fontWeight: FontWeight.w800,
-                          fontSize: 15.5,
+                          fontSize: 16,
                           fontFamily: 'HindSiliguri',
                           color: isDark ? Colors.white : const Color(0xFF111827),
                           height: 1.25,
@@ -1783,7 +1883,7 @@ class _ExamCardState extends State<_ExamCard> {
                           Text(
                             dateStr,
                             style: TextStyle(
-                              fontSize: 12.5,
+                              fontSize: 12,
                               fontWeight: FontWeight.w500,
                               fontFamily: 'HindSiliguri',
                               color: isDark
@@ -1904,6 +2004,7 @@ class _QuestionsTab extends StatelessWidget {
   final List<Question> questions;
   final Set<String> bookmarkedIds;
   final ValueChanged<String> onToggleBookmark;
+  final ValueChanged<Question> onDeleteQuestion;
   final ValueChanged<String> onReport;
   final bool isDark;
   final bool hasMore;
@@ -1915,6 +2016,7 @@ class _QuestionsTab extends StatelessWidget {
     required this.questions,
     required this.bookmarkedIds,
     required this.onToggleBookmark,
+    required this.onDeleteQuestion,
     required this.onReport,
     required this.isDark,
     required this.hasMore,
@@ -2025,6 +2127,7 @@ class _QuestionsTab extends StatelessWidget {
               onToggleFlag: () {},
               onReport: () => onReport(q.id),
               onToggleBookmark: () => onToggleBookmark(q.id),
+              onDelete: () => onDeleteQuestion(q),
             ),
           );
         },
@@ -2773,7 +2876,7 @@ class _PremiumDatePickerModalState extends State<_PremiumDatePickerModal> {
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 12.5,
+            fontSize: 12,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             fontFamily: 'HindSiliguri',
             color: isSelected

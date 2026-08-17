@@ -269,7 +269,7 @@ class _PracticeSummaryState extends State<PracticeSummary>
                                 Text(
                                   'ভুলগুলো আবার অনুশীলন করো (${_struggling.length})',
                                   style: const TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                     fontFamily: 'HindSiliguri',
                                     color: Colors.white,
@@ -307,7 +307,7 @@ class _PracticeSummaryState extends State<PracticeSummary>
                             child: Text(
                               'অনুশীলনে ফিরে যাও',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white : const Color(0xFF111827),

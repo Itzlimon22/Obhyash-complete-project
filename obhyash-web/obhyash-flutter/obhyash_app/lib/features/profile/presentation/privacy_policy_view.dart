@@ -99,7 +99,7 @@ class PrivacyPolicyView extends StatelessWidget {
                     child: Text(
                       'সর্বশেষ হালনাগাদ: ১৫ আগস্ট, ২০২৬',
                       style: TextStyle(
-                        fontSize: 11.5,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                         fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),

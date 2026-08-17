@@ -609,7 +609,7 @@ class _UserProfileViewState extends ConsumerState<UserProfileView> {
                         Text(
                           'তুলনা: তুমি vs ${user.name.split(' ').first}',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: isDark
                                 ? Colors.white

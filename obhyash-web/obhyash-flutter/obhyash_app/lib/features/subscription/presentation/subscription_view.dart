@@ -219,7 +219,7 @@ class _SubscriptionViewState extends State<SubscriptionView> {
           const Center(
             child: Text(
               'যেকোনো সময় বাতিল করা যাবে',
-              style: TextStyle(fontSize: 15, color: Color(0xFF737373)),
+              style: TextStyle(fontSize: 16, color: Color(0xFF737373)),
             ),
           ),
           const SizedBox(height: 24),
@@ -392,7 +392,7 @@ class _HeroBanner extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.85),
-              fontSize: 15,
+              fontSize: 16,
               height: 1.5,
             ),
           ),
@@ -459,7 +459,7 @@ class _ActiveSubscriptionBanner extends StatelessWidget {
                   'মেয়াদ: $daysRemaining দিন বাকি${expiresAt != null ? ' ($expiresAt)' : ''}',
                   style: const TextStyle(
                     color: Color(0xFF86EFAC),
-                    fontSize: 15,
+                    fontSize: 16,
                   ),
                 ),
               ],
@@ -580,7 +580,7 @@ class _PricingCard extends StatelessWidget {
                       'জনপ্রিয়',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 11.5,
+                        fontSize: 11,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'HindSiliguri',
                       ),
@@ -623,7 +623,7 @@ class _PricingCard extends StatelessWidget {
                     Text(
                       '/ ${plan.durationDays} দিন',
                       style: TextStyle(
-                        fontSize: 14.5,
+                        fontSize: 16,
                         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
                         fontWeight: FontWeight.w600,
                         fontFamily: 'HindSiliguri',
@@ -667,7 +667,7 @@ class _PricingCard extends StatelessWidget {
                           child: Text(
                             feature,
                             style: TextStyle(
-                              fontSize: 14.5,
+                              fontSize: 16,
                               height: 1.35,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'HindSiliguri',
@@ -715,7 +715,7 @@ class _PricingCard extends StatelessWidget {
                         Text(
                           isCurrent ? 'বর্তমান প্ল্যান' : 'আপগ্রেড করো',
                           style: TextStyle(
-                            fontSize: 15.5,
+                            fontSize: 16,
                             fontWeight: FontWeight.w900,
                             fontFamily: 'HindSiliguri',
                             color: isCurrent
@@ -875,7 +875,7 @@ class _ComparisonTable extends StatelessWidget {
                       child: Text(
                         'ফিচার',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w900,
                           color: textSub,
                         ),
@@ -886,7 +886,7 @@ class _ComparisonTable extends StatelessWidget {
                         child: Text(
                           'ফ্রি',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.w900,
                             color: textSub,
                           ),
@@ -899,7 +899,7 @@ class _ComparisonTable extends StatelessWidget {
                         child: Text(
                           'প্রিমিয়াম',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.w900,
                             color: const Color(0xFF059669),
                           ),
@@ -957,7 +957,7 @@ class _ComparisonTable extends StatelessWidget {
                         flex: 3,
                         child: Text(
                           label,
-                          style: TextStyle(fontSize: 15, color: textMain),
+                          style: TextStyle(fontSize: 16, color: textMain),
                          maxLines: 1, overflow: TextOverflow.ellipsis),
                       ),
                       Expanded(

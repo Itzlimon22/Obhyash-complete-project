@@ -134,7 +134,7 @@ class LiveExamRoutineSheet extends StatelessWidget {
                 '$categoryTitle - Routine & Syllabus',
                 style: pw.TextStyle(
                   font: boldFont,
-                  fontSize: 15,
+                  fontSize: 16,
                   color: PdfColors.black,
                 ),
               ),

@@ -335,7 +335,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                       'আগেই অ্যাকাউন্ট আছে? ',
                       style: TextStyle(
                         fontFamily: 'Anek Bangla',
-                        fontSize: 15,
+                        fontSize: 16,
                         color: isDark ? Colors.white70 : Colors.black87,
                       ),
                     ),
@@ -345,7 +345,7 @@ class _SignupViewState extends ConsumerState<SignupView>
                         'লগইন করো',
                         style: TextStyle(
                           fontFamily: 'Anek Bangla',
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFFB91C1C),
                         ),
@@ -712,7 +712,7 @@ class _SignupViewState extends ConsumerState<SignupView>
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
             fontFamily: 'Anek Bangla',
             color: isSelected

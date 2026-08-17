@@ -228,7 +228,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                     : const Color(0xFF71717A),
                 labelStyle: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 15,
+                  fontSize: 16,
                 ),
                 tabs: const [
                   Tab(text: 'বর্তমান প্ল্যান'),
@@ -347,7 +347,7 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
                     Text(
                       'পেমেন্ট রিসিট',
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 16,
                         color: isDark
                             ? const Color(0xFFA3A3A3)
                             : const Color(0xFF737373),
@@ -463,14 +463,14 @@ class _MySubscriptionViewState extends ConsumerState<MySubscriptionView>
         Text(
           label,
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 16,
             color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF737373),
           ),
         ),
         Text(
           value,
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color:
                 valueColor ?? (isDark ? Colors.white : const Color(0xFF000000)),
@@ -566,7 +566,7 @@ class _OverviewTab extends StatelessWidget {
                           '${activePlan!.currency} ${activePlan!.price} / ${activePlan!.billingCycle}',
                           style: const TextStyle(
                             color: Colors.white70,
-                            fontSize: 15,
+                            fontSize: 16,
                           ),
                         ),
                       ],
@@ -622,7 +622,7 @@ class _OverviewTab extends StatelessWidget {
                     expiresAt != null
                         ? 'মেয়াদ শেষ: ${expiresAt!.toLocal().toString().substring(0, 10)}'
                         : 'মেয়াদ অনির্ধারিত',
-                    style: const TextStyle(color: Colors.white70, fontSize: 15),
+                    style: const TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                 ],
               ),
@@ -655,7 +655,7 @@ class _OverviewTab extends StatelessWidget {
                               : 'মাত্র $daysLeft দিন বাকি! শীঘ্রই নবায়ন করো।',
                           style: const TextStyle(
                             color: Color(0xFFFCA5A5),
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                          maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -729,7 +729,7 @@ class _OverviewTab extends StatelessWidget {
                         child: Text(
                           e.value,
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             color: isDark
                                 ? Colors.white
                                 : const Color(0xFF000000),
@@ -1080,7 +1080,7 @@ class _InvoiceRow extends StatelessWidget {
                   Text(
                     invoice.planName,
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: isDark ? Colors.white : const Color(0xFF000000),
                     ),

@@ -306,8 +306,9 @@ String _preprocess(String text) {
   );
 
   // Standalone equilibrium symbol conversion
-  processedText = processedText.replaceAll(r'\rightleftharpoons', ' ⇌ ');
-  processedText = processedText.replaceAll(r'\leftrightharpoons', ' ⇌ ');
+  processedText = processedText.replaceAll(RegExp(r'\\?r?ightleftharpoons', caseSensitive: false), ' ⇌ ');
+  processedText = processedText.replaceAll(RegExp(r'\\?leftrightharpoons', caseSensitive: false), ' ⇌ ');
+  processedText = processedText.replaceAll(RegExp(r'\\?leftrightarrow', caseSensitive: false), ' ⇌ ');
 
   // 2. Convert inline $$...$$ into inline $...$ if short and non-multiline
   processedText = processedText.replaceAllMapped(

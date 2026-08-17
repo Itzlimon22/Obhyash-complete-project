@@ -30,7 +30,7 @@ class FormulaSubjectsView extends ConsumerWidget {
             Text(
               'বিষয় বেছে নিন',
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 16,
                 fontFamily: 'Anek Bangla',
                 color: isDark ? const Color(0xFF737373) : const Color(0xFF6B7280),
               ),

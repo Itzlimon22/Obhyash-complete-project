@@ -97,7 +97,7 @@ class _LiveExamCategoryViewState extends ConsumerState<LiveExamCategoryView> {
                           child: Text(
                             f,
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: isActive
                                   ? Colors.white
@@ -294,7 +294,7 @@ class _LiveExamCard extends StatelessWidget {
                 Text(
                   '${exam.durationMinutes} মিনিট',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: isDark
                         ? const Color(0xFFA3A3A3)
@@ -313,7 +313,7 @@ class _LiveExamCard extends StatelessWidget {
                 Text(
                   '${exam.totalQuestions} টি প্রশ্ন',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: isDark
                         ? const Color(0xFFA3A3A3)
@@ -353,7 +353,7 @@ class _LiveExamCard extends StatelessWidget {
                   Text(
                     timeDisplay,
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: isDark
                           ? const Color(0xFFE5E5E5)

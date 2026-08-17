@@ -238,7 +238,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
             const SizedBox(height: 8),
             const Text(
               'ইন্টারনেট সংযোগ পরীক্ষা করো এবং আবার চেষ্টা করো।',
-              style: TextStyle(fontSize: 15, color: Color(0xFFA3A3A3)),
+              style: TextStyle(fontSize: 16, color: Color(0xFFA3A3A3)),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -456,7 +456,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                                             ? 'তুমি এখন পর্যন্ত কোনো প্রশ্ন রিপোর্ট করোনি।\nপ্রশ্নে কোনো ভুল পেলে রিপোর্ট করতে পারো।'
                                             : 'এই ফিল্টারে কোনো রিপোর্ট পাওয়া যায়নি।',
                                         style: const TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 16,
                                           color: Color(0xFFA3A3A3),
                                           height: 1.5,
                                         ),
@@ -583,7 +583,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                       Text(
                         'সম্পূর্ণ প্রশ্ন',
                         style: TextStyle(
-                          fontSize: 16.5,
+                          fontSize: 17,
                           fontWeight: FontWeight.w800,
                           fontFamily: 'Anek Bangla',
                           color: isDark ? Colors.white : const Color(0xFF18181B),
@@ -617,7 +617,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                           child: Text(
                             _subjectName(q.subject),
                             style: TextStyle(
-                              fontSize: 11.5,
+                              fontSize: 11,
                               fontWeight: FontWeight.w700,
                               fontFamily: 'Anek Bangla',
                               color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF047857),
@@ -628,7 +628,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                         Text(
                           q.question,
                           style: TextStyle(
-                            fontSize: 15.5,
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
                             fontFamily: 'Anek Bangla',
                             color: isDark ? Colors.white : const Color(0xFF18181B),
@@ -690,7 +690,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                                   child: Text(
                                     q.options[idx],
                                     style: TextStyle(
-                                      fontSize: 14.5,
+                                      fontSize: 16,
                                       color: optionTextColor,
                                       fontWeight: boldText ? FontWeight.w800 : FontWeight.w600,
                                       fontFamily: 'Anek Bangla',
@@ -724,7 +724,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                                       'ব্যাখ্যা',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 13.5,
+                                        fontSize: 13,
                                         fontFamily: 'Anek Bangla',
                                         color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
                                       ),
@@ -735,7 +735,7 @@ class _StudentReportViewState extends ConsumerState<StudentReportView> {
                                 Text(
                                   q.explanation!,
                                   style: TextStyle(
-                                    fontSize: 13.5,
+                                    fontSize: 13,
                                     color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
                                     fontFamily: 'Anek Bangla',
                                     height: 1.4,
@@ -1058,14 +1058,14 @@ class _ReportCard extends StatelessWidget {
                                       TextSpan(
                                         text: 'কারণ: ',
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 16,
                                           color: isDark ? const Color(0xFF737373) : const Color(0xFFA3A3A3),
                                         ),
                                       ),
                                       TextSpan(
                                         text: report.reason,
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.w600,
                                           color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
                                         ),
@@ -1346,7 +1346,7 @@ class _ChatBubble extends StatelessWidget {
             child: Text(
               message,
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 16,
                 color: isUser
                     ? (isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155))
                     : isSystem

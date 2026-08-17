@@ -132,7 +132,7 @@ class ResultStats extends StatelessWidget {
                     Text(
                       'ফলাফল বিস্তারিত',
                       style: TextStyle(
-                        fontSize: 16.5,
+                        fontSize: 17,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -233,7 +233,7 @@ class ResultStats extends StatelessWidget {
                     Text(
                       'মোট প্রাপ্ত নম্বর',
                       style: TextStyle(
-                        fontSize: 15.5,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'HindSiliguri',
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -327,7 +327,7 @@ class _StatCard extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 12.5,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
               fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),
@@ -378,7 +378,7 @@ class _TableRow extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              fontSize: 13.5,
+              fontSize: 13,
               fontWeight: FontWeight.bold,
               fontFamily: 'HindSiliguri',
               color: valueColor ?? (isDark ? Colors.white : const Color(0xFF0F172A)),
@@ -446,7 +446,7 @@ class _CircularAccuracyCard extends StatelessWidget {
                   child: Text(
                     '${percentage.round()}%',
                     style: TextStyle(
-                      fontSize: 14.5,
+                      fontSize: 16,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'HindSiliguri',
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
@@ -460,7 +460,7 @@ class _CircularAccuracyCard extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 12.5,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
               fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),

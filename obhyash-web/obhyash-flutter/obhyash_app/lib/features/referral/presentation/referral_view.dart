@@ -259,7 +259,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                           'তোমার কোড দিয়ে কোনো বন্ধু যুক্ত হলে সে পাবে ১ মাসের ফ্রি প্রিমিয়াম, আর তুমি প্রতি ৩ জন বন্ধুর জন্য পাবে একটি দারুণ স্ক্র্যাচ কার্ড!',
                           style: TextStyle(
                             color: Colors.white70,
-                            fontSize: 15,
+                            fontSize: 16,
                             fontFamily: 'Anek Bangla',
                             height: 1.5,
                           ),
@@ -293,7 +293,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                         Text(
                           'তোমার রেফারেল কোড',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: textSecondary,
                             letterSpacing: 0.5,
@@ -364,7 +364,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                       Text(
                                         _isCopied ? 'কপি হয়েছে' : 'কপি করো',
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                           fontFamily: 'Anek Bangla',
                                           color: _isCopied
@@ -504,7 +504,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                     child: Text(
                                       item.$1,
                                       style: const TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w900,
                                         color: Color(0xFFB91C1C),
                                         fontFamily: 'Anek Bangla',
@@ -521,7 +521,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                       Text(
                                         item.$2,
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                           fontFamily: 'Anek Bangla',
                                           color: textPrimary,
@@ -531,7 +531,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                       Text(
                                         item.$3,
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 16,
                                           fontFamily: 'Anek Bangla',
                                           color: textSecondary,
                                           height: 1.5,
@@ -564,7 +564,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                         Text(
                           'কীভাবে শুরু করবে?',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 1,
                             fontFamily: 'Anek Bangla',
@@ -688,7 +688,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                           ? name[0].toUpperCase()
                                           : 'U',
                                       style: const TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                         color: Color(0xFFB91C1C),
                                       ),
@@ -703,7 +703,7 @@ class _ReferralViewState extends ConsumerState<ReferralView> {
                                         Text(
                                           name,
                                           style: TextStyle(
-                                            fontSize: 15,
+                                            fontSize: 16,
                                             fontWeight: FontWeight.w600,
                                             fontFamily: 'Anek Bangla',
                                             color: textPrimary,
@@ -1192,7 +1192,7 @@ class _StepBubble extends StatelessWidget {
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               fontFamily: 'Anek Bangla',
               color: textPrimary,

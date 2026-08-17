@@ -209,7 +209,7 @@ class MyProfileView extends ConsumerWidget {
                         Text(
                           _getRankName(user.xp),
                           style: const TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.white60,
                             letterSpacing: 1.5,
@@ -219,7 +219,7 @@ class MyProfileView extends ConsumerWidget {
                         Text(
                           _getNextRankName(user.xp),
                           style: const TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.white60,
                             letterSpacing: 1.5,
@@ -369,7 +369,7 @@ class _UserProfileCard extends StatelessWidget {
                   Text(
                     user.email!,
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       color: isDark
                           ? const Color(0xFFA3A3A3)
                           : const Color(0xFF737373),

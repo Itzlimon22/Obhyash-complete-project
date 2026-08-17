@@ -173,7 +173,7 @@ class _ExamTargetSheetState extends State<_ExamTargetSheet> {
                           t['label']!,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
                             color: isSelected
                                 ? Colors.white

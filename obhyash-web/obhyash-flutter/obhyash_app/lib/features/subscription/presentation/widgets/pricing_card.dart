@@ -361,7 +361,7 @@ class PricingCard extends StatelessWidget {
                     'সেরা অফার 🔥',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 15, // text-xs
+                      fontSize: 16, // text-xs
                       fontWeight: FontWeight.w900, // font-black
                       letterSpacing: 2, // tracking-widest
                     ),

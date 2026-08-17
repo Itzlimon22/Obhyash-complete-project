@@ -237,7 +237,7 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
                                 Text(
                                   'XP রিওয়ার্ড অর্জিত',
                                   style: TextStyle(
-                                    fontSize: 13.5,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w700,
                                     fontFamily: 'HindSiliguri',
                                     color: isDark
@@ -271,7 +271,7 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
                                 Text(
                                   '${BanglaNameHelper.toBanglaNumeral(result.correctCount)}টি সঠিক (+${BanglaNameHelper.toBanglaNumeral(result.correctCount * 10)}) · ${BanglaNameHelper.toBanglaNumeral(result.wrongCount)}টি ভুল (-${BanglaNameHelper.toBanglaNumeral(result.wrongCount * 2)})',
                                   style: TextStyle(
-                                    fontSize: 12.5,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                     fontFamily: 'HindSiliguri',
                                     color: isDark
@@ -356,7 +356,7 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
                                     Text(
                                       '🎉 নতুন অর্জন আনলকড: $unlockedAchievement',
                                       style: TextStyle(
-                                        fontSize: 13.5,
+                                        fontSize: 13,
                                         fontWeight: FontWeight.w800,
                                         fontFamily: 'HindSiliguri',
                                         color: isDark
@@ -441,7 +441,7 @@ class _ExamCelebrationViewState extends State<ExamCelebrationView>
             Text(
               label,
               style: TextStyle(
-                fontSize: 12.5,
+                fontSize: 12,
                 fontWeight: FontWeight.w700,
                 fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white70 : const Color(0xFF475569),

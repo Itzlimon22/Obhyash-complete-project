@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,8 +11,9 @@ import '../../../../core/providers/shared_prefs_provider.dart';
 import '../../../../core/utils/app_popups.dart';
 import '../../../dashboard/domain/models.dart';
 import '../../../dashboard/providers/dashboard_providers.dart';
+import 'avatar_crop_dialog.dart';
 
-/// Modal bottom sheet for changing avatar (Upload custom photo or select DiceBear preset)
+/// Modal bottom sheet for changing profile image (Upload custom photo with crop or select DiceBear preset)
 class AvatarPickerModal extends ConsumerStatefulWidget {
   final UserProfile user;
 
@@ -77,26 +80,31 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
     try {
       final XFile? picked = await _picker.pickImage(
         source: source,
-        maxWidth: 800,
-        maxHeight: 800,
-        imageQuality: 85,
+        maxWidth: 1600,
+        maxHeight: 1600,
+        imageQuality: 92,
       );
 
       if (picked == null) return;
+      final rawBytes = await picked.readAsBytes();
+
+      if (!mounted) return;
+      // Launch interactive crop & adjustment dialog
+      final Uint8List? croppedBytes = await AvatarCropDialog.show(context, rawBytes);
+
+      if (croppedBytes == null || !mounted) return;
 
       setState(() => _isUploading = true);
 
       final supabase = Supabase.instance.client;
       final userId = widget.user.id;
-      final fileBytes = await picked.readAsBytes();
-      final ext = picked.name.contains('.') ? picked.name.split('.').last : 'jpg';
-      final fileName = '${userId}_${DateTime.now().millisecondsSinceEpoch}.$ext';
+      final fileName = '${userId}_${DateTime.now().millisecondsSinceEpoch}.png';
 
-      // 1. Upload to Supabase Storage
+      // 1. Upload cropped bytes to Supabase Storage
       await supabase.storage.from('avatars').uploadBinary(
             fileName,
-            fileBytes,
-            fileOptions: const FileOptions(upsert: true, contentType: 'image/jpeg'),
+            croppedBytes,
+            fileOptions: const FileOptions(upsert: true, contentType: 'image/png'),
           );
 
       // 2. Get Public URL
@@ -258,7 +266,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                   Expanded(
                     child: _ActionButton(
                       icon: LucideIcons.image,
-                      label: 'Upload Image',
+                      label: 'ছবি আপলোড করো',
                       isDark: isDark,
                       onTap: _isUploading ? null : () => _pickImage(ImageSource.gallery),
                     ),
@@ -267,7 +275,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                   Expanded(
                     child: _ActionButton(
                       icon: LucideIcons.sparkles,
-                      label: 'Random Avatar',
+                      label: 'র‍্যান্ডম কার্টুন',
                       isDark: isDark,
                       onTap: _isUploading ? null : _generateRandomAvatar,
                     ),
@@ -278,7 +286,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
 
               // Cartoon Presets Title
               Text(
-                'অথবা কার্টুন অ্যাভাটার বেছে নাও:',
+                'অথবা কার্টুন ছবি বেছে নাও:',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -334,7 +342,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                 child: ElevatedButton(
                   onPressed: _isUploading ? null : () => _saveAvatarToDatabase(_selectedAvatarUrl),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF004633),
+                    backgroundColor: const Color(0xFF059669),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -350,10 +358,10 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                           ),
                         )
                       : const Text(
-                          'অ্যাভাটার সেভ করো',
+                          'প্রোফাইল ছবি সেভ করো',
                           style: TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.w900,
+                            fontWeight: FontWeight.w800,
                             fontFamily: 'HindSiliguri',
                             color: Colors.white,
                           ),
@@ -370,7 +378,7 @@ class _AvatarPickerModalState extends ConsumerState<AvatarPickerModal> {
                     'ছবি মুছে ফেলো (রিসেট)',
                     style: TextStyle(
                       color: Color(0xFFEF4444),
-                      fontSize: 13.5,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'HindSiliguri',
                     ),

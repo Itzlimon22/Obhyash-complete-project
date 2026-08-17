@@ -206,7 +206,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
 
   Widget _buildSectionHeader(String title, bool isDark) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
@@ -219,9 +219,10 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           Text(
             title,
             style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : const Color(0xFF1C1C1E),
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              fontFamily: 'HindSiliguri',
+              color: isDark ? Colors.white : const Color(0xFF111827),
             ),
           ),
         ],
@@ -231,13 +232,14 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
 
   Widget _buildLabel(String label, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 6),
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF525252),
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'HindSiliguri',
+          color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF4B5563),
         ),
       ),
     );
@@ -283,6 +285,8 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           onTap: onTap,
           validator: validator,
           style: TextStyle(
+            fontSize: 16,
+            fontFamily: 'HindSiliguri',
             color: readOnly
                 ? (isDark ? const Color(0xFF737373) : const Color(0xFFA3A3A3))
                 : (isDark ? Colors.white : Colors.black),
@@ -290,11 +294,13 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
           decoration: InputDecoration(
             hintText: placeholder,
             hintStyle: TextStyle(
+              fontSize: 14,
+              fontFamily: 'HindSiliguri',
               color: isDark ? const Color(0xFF525252) : const Color(0xFFA3A3A3),
             ),
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
+              horizontal: 14,
+              vertical: 11,
             ),
             filled: true,
             fillColor: readOnly
@@ -422,42 +428,43 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'প্রোফাইল অ্যাভাটার',
+                              'প্রোফাইল ছবি',
                               style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w800,
                                 fontFamily: 'HindSiliguri',
-                                color: isDark ? Colors.white : const Color(0xFF1F2937),
+                                color: isDark ? Colors.white : const Color(0xFF111827),
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'ছবি আপলোড করো বা কার্টুন অ্যাভাটার বেছে নাও',
+                              'ছবি আপলোড করো বা কার্টুন ছবি বেছে নাও',
                               style: TextStyle(
                                 fontSize: 13,
                                 fontFamily: 'HindSiliguri',
                                 color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF6B7280),
+                                height: 1.35,
                               ),
                             ),
                             const SizedBox(height: 10),
                             OutlinedButton.icon(
                               onPressed: () => AvatarPickerModal.show(context, widget.user),
-                              icon: const Icon(LucideIcons.edit3, size: 14, color: Color(0xFF059669)),
+                              icon: const Icon(LucideIcons.camera, size: 14, color: Color(0xFF059669)),
                               label: const Text(
-                                'অ্যাভাটার পরিবর্তন করো',
+                                'ছবি পরিবর্তন করো',
                                 style: TextStyle(
                                   fontSize: 13,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w700,
                                   fontFamily: 'HindSiliguri',
                                   color: Color(0xFF059669),
                                 ),
                               ),
                               style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Color(0xFF059669)),
+                                side: const BorderSide(color: Color(0xFF059669), width: 1.2),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                               ),
                             ),
                           ],
@@ -614,7 +621,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                                                     style: TextStyle(
                                                       fontFamily:
                                                           'Anek Bangla',
-                                                      fontSize: 15,
+                                                      fontSize: 16,
                                                       color: isDark
                                                           ? const Color(
                                                               0xFFE5E5E5,
@@ -827,7 +834,7 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             Text(
                               'পরিবর্তন করতে না চাইলে খালি রাখো',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 16,
                                 color: isDark
                                     ? const Color(0xFFA3A3A3)
                                     : const Color(0xFF737373),
@@ -902,10 +909,11 @@ class _PersonalDetailsViewState extends ConsumerState<PersonalDetailsView> {
                             ),
                           )
                         : const Text(
-                            'সব সেভ করো',
+                            'পরিবর্তন সংরক্ষণ করো',
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              fontFamily: 'HindSiliguri',
                             ),
                           ),
                   ),

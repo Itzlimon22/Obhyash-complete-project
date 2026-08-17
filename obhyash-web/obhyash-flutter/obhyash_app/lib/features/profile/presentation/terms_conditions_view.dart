@@ -99,7 +99,7 @@ class TermsConditionsView extends StatelessWidget {
                     child: Text(
                       'নিয়মাবলি কার্যকর: ২০২৩-২০২৬',
                       style: TextStyle(
-                        fontSize: 11.5,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                         fontFamily: 'HindSiliguri',
                         color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),

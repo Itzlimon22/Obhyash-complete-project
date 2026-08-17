@@ -439,7 +439,7 @@ class _ResultViewState extends State<ResultView> {
                       'আবার পরীক্ষা দাও',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 15,
+                        fontSize: 16,
                         fontFamily: 'HindSiliguri',
                         color: Colors.white,
                       ),
@@ -567,7 +567,7 @@ class _ResultFilterChip extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                fontSize: 13.5,
+                fontSize: 13,
                 fontWeight: isSelected ? FontWeight.w800 : FontWeight.normal,
                 fontFamily: 'HindSiliguri',
                 color: textColor,

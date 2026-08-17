@@ -8,6 +8,7 @@ import '../../../core/utils/app_popups.dart';
 import '../../exam/domain/exam_models.dart';
 import '../../exam/presentation/widgets/question_card.dart';
 import '../../exam/presentation/widgets/question_report_dialog.dart';
+import '../../exam/services/local_exam_cache_service.dart';
 
 
 class BookmarksView extends StatefulWidget {
@@ -54,13 +55,15 @@ class _BookmarksViewState extends State<BookmarksView> {
         return;
       }
 
+      // 1. Fetch all bookmarks for user
       final bData = await sb
           .from('bookmarks')
           .select('question_id, created_at')
           .eq('user_id', uid)
           .order('created_at', ascending: false);
 
-      if ((bData as List).isEmpty) {
+      final rawList = (bData as List);
+      if (rawList.isEmpty) {
         if (mounted) {
           setState(() {
             _bookmarks = [];
@@ -70,24 +73,92 @@ class _BookmarksViewState extends State<BookmarksView> {
         return;
       }
 
-      final qIds = bData.map((e) => e['question_id'].toString()).toList();
-      final dateMap = <String, DateTime>{};
-      for (final e in bData) {
-        dateMap[e['question_id'].toString()] = DateTime.tryParse(e['created_at'] ?? '') ?? DateTime.now();
-      }
+      final qIds = rawList
+          .map((e) => e['question_id']?.toString() ?? '')
+          .where((id) => id.isNotEmpty)
+          .toList();
 
-      final qData = await sb.from('questions').select().inFilter('id', qIds);
+      final dateMap = <String, DateTime>{};
+      for (final e in rawList) {
+        final qid = e['question_id']?.toString() ?? '';
+        if (qid.isNotEmpty) {
+          dateMap[qid] = DateTime.tryParse(e['created_at']?.toString() ?? '') ?? DateTime.now();
+        }
+      }
 
       final questionMap = <String, Question>{};
-      for (final q in (qData as List)) {
-        final parsed = Question.fromJson(q as Map<String, dynamic>);
-        questionMap[parsed.id] = parsed;
+
+      // 2. Fetch from 'questions' table in safe chunks of 50
+      for (var i = 0; i < qIds.length; i += 50) {
+        final end = (i + 50 > qIds.length) ? qIds.length : i + 50;
+        final chunk = qIds.sublist(i, end);
+        try {
+          final qData = await sb.from('questions').select().inFilter('id', chunk);
+          for (final q in (qData as List)) {
+            final parsed = Question.fromJson(q as Map<String, dynamic>);
+            if (parsed.id.isNotEmpty) {
+              questionMap[parsed.id] = parsed;
+            }
+          }
+        } catch (err) {
+          debugPrint('[BookmarksView] chunk fetch error: $err');
+        }
       }
 
+      // 3. Fallback: Search missing questions in user's exam_results
+      final missingIds = qIds.where((id) => !questionMap.containsKey(id)).toSet();
+      if (missingIds.isNotEmpty) {
+        try {
+          final examRes = await sb
+              .from('exam_results')
+              .select('questions')
+              .eq('user_id', uid)
+              .not('questions', 'is', null)
+              .order('created_at', ascending: false)
+              .limit(50);
+
+          for (final row in (examRes as List)) {
+            final qListRaw = row['questions'];
+            if (qListRaw is List) {
+              for (final item in qListRaw) {
+                if (item is Map<String, dynamic>) {
+                  final q = Question.fromJson(item);
+                  if (missingIds.contains(q.id)) {
+                    questionMap[q.id] = q;
+                  }
+                }
+              }
+            }
+          }
+        } catch (err) {
+          debugPrint('[BookmarksView] exam_results fallback error: $err');
+        }
+      }
+
+      // 4. Fallback: Search local cached questions
+      final stillMissing = qIds.where((id) => !questionMap.containsKey(id)).toSet();
+      if (stillMissing.isNotEmpty) {
+        try {
+          final cachedList = await LocalExamCacheService.getCachedQuestionsList();
+          if (cachedList != null) {
+            for (final item in cachedList) {
+              final q = Question.fromJson(item);
+              if (stillMissing.contains(q.id)) {
+                questionMap[q.id] = q;
+              }
+            }
+          }
+        } catch (_) {}
+      }
+
+      // 5. Build ordered bookmark list
       final orderedBookmarks = <_BookmarkItem>[];
       for (final id in qIds) {
         if (questionMap.containsKey(id)) {
-          orderedBookmarks.add(_BookmarkItem(questionMap[id]!, dateMap[id]!));
+          orderedBookmarks.add(_BookmarkItem(
+            questionMap[id]!,
+            dateMap[id] ?? DateTime.now(),
+          ));
         }
       }
 
@@ -211,7 +282,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                   hint: Text(
                     'বিষয়',
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFFA3A3A3),
                     ),
                   ),
@@ -225,7 +296,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                   items: [
                     const DropdownMenuItem<String>(
                       value: '',
-                      child: Text('সব বিষয়', style: TextStyle(fontSize: 15, fontFamily: 'HindSiliguri')),
+                      child: Text('সব বিষয়', style: TextStyle(fontSize: 16, fontFamily: 'HindSiliguri')),
                     ),
                     ...subjects.map(
                       (s) {
@@ -236,7 +307,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                           child: Text(
                             '$emoji $name',
                             style: const TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               fontFamily: 'HindSiliguri',
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -275,7 +346,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                   hint: Text(
                     'অধ্যায়',
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       fontFamily: 'HindSiliguri',
                       color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFFA3A3A3),
                     ),
@@ -290,14 +361,14 @@ class _BookmarksViewState extends State<BookmarksView> {
                   items: [
                     const DropdownMenuItem<String>(
                       value: '',
-                      child: Text('সব অধ্যায়', style: TextStyle(fontSize: 15, fontFamily: 'HindSiliguri')),
+                      child: Text('সব অধ্যায়', style: TextStyle(fontSize: 16, fontFamily: 'HindSiliguri')),
                     ),
                     ...chapters.map(
                       (c) => DropdownMenuItem<String>(
                         value: c,
                         child: Text(
                           BanglaNameHelper.formatChapter(c),
-                          style: const TextStyle(fontSize: 15, fontFamily: 'HindSiliguri'),
+                          style: const TextStyle(fontSize: 16, fontFamily: 'HindSiliguri'),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -358,7 +429,7 @@ class _BookmarksViewState extends State<BookmarksView> {
                         ? DateFormat('d/M').format(_filterDate!)
                         : 'তারিখ',
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: _filterDate != null
                           ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
@@ -398,13 +469,44 @@ class _BookmarksViewState extends State<BookmarksView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(LucideIcons.alertTriangle, size: 48, color: Colors.red.shade400),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(LucideIcons.alertTriangle, size: 40, color: Color(0xFFEF4444)),
+            ),
             const SizedBox(height: 16),
-            const Text('ডাটা লোড করতে সমস্যা হয়েছে!'),
+            Text(
+              'ডাটা লোড করতে সমস্যা হয়েছে!',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'HindSiliguri',
+                color: isDark ? Colors.white : const Color(0xFF1E293B),
+              ),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _fetchBookmarks,
-              child: const Text('আবার চেষ্টা করুন'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF059669),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'আবার চেষ্টা করো',
+                style: TextStyle(
+                  fontFamily: 'HindSiliguri',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
+              ),
             ),
           ],
         ),

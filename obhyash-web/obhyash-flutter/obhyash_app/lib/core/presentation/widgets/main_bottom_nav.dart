@@ -158,7 +158,7 @@ class MainBottomNav extends StatelessWidget {
                               Text(
                                 label,
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   fontFamily: 'Anek Bangla',
                                   fontWeight: FontWeight.bold,
                                   color: isActive ? activeColor : inactiveColor,
@@ -206,7 +206,7 @@ class MainBottomNav extends StatelessWidget {
                               Text(
                                 label,
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   fontFamily: 'Anek Bangla',
                                   fontWeight: isRealActive
                                       ? FontWeight.bold

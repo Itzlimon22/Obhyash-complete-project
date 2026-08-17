@@ -114,7 +114,7 @@ class DailyGoalCard extends StatelessWidget {
                       ? 'লক্ষ্য পূরণ হয়েছে! 🎉'
                       : '$completedToday / $goal পরীক্ষা সম্পন্ন',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: isDark
                         ? const Color(0xFFD4D4D4)
@@ -140,7 +140,7 @@ class DailyGoalCard extends StatelessWidget {
                 child: const Text(
                   'শুরু করো',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),

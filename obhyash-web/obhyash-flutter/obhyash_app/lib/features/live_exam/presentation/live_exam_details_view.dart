@@ -178,7 +178,7 @@ class LiveExamDetailsView extends ConsumerWidget {
                           Text(
                             'পরীক্ষার সময়সূচী',
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: isDark ? Colors.white : Colors.black87,
                             ),
@@ -436,7 +436,7 @@ class LiveExamDetailsView extends ConsumerWidget {
                       icon: const Icon(LucideIcons.rotateCcw, size: 18),
                       label: const Text(
                         'পুনরায় অনুশীলন করুন',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ] else ...[
@@ -624,7 +624,7 @@ class LiveExamDetailsView extends ConsumerWidget {
         Text(
           value,
           style: TextStyle(
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: isDark ? Colors.white : Colors.black87,
           ),

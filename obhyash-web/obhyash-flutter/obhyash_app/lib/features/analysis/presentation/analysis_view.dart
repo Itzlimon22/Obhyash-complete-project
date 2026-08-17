@@ -646,7 +646,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             label,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 13.5,
+              fontSize: 13,
               fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
               fontFamily: 'HindSiliguri',
               color: isSelected
@@ -708,7 +708,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 child: Text(
                   a.masteryTier,
                   style: const TextStyle(
-                    fontSize: 12.5,
+                    fontSize: 12,
                     fontWeight: FontWeight.w800,
                     fontFamily: 'HindSiliguri',
                     color: Colors.white,
@@ -768,7 +768,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
           Text(
             'মাস্টারি সূচক · ${a.masterySubtitle}',
             style: TextStyle(
-              fontSize: 13.5,
+              fontSize: 13,
               fontWeight: FontWeight.w500,
               fontFamily: 'HindSiliguri',
               color: Colors.white.withValues(alpha: 0.9),
@@ -871,7 +871,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 13.5,
+              fontSize: 13,
               fontWeight: FontWeight.w700,
               fontFamily: 'HindSiliguri',
               color: textSub,
@@ -949,7 +949,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 child: Text(
                   g.title,
                   style: TextStyle(
-                    fontSize: 15.5,
+                    fontSize: 16,
                     fontWeight: FontWeight.w800,
                     fontFamily: 'HindSiliguri',
                     color: textPrimary,
@@ -965,7 +965,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 child: Text(
                   g.tag,
                   style: TextStyle(
-                    fontSize: 11.5,
+                    fontSize: 11,
                     fontWeight: FontWeight.w800,
                     fontFamily: 'HindSiliguri',
                     color: g.color,
@@ -978,7 +978,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
           Text(
             g.description,
             style: TextStyle(
-              fontSize: 13.5,
+              fontSize: 13,
               fontWeight: FontWeight.w500,
               fontFamily: 'HindSiliguri',
               color: textSub,
@@ -1030,7 +1030,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                 child: Text(
                   'সর্বোচ্চ: ${BanglaNameHelper.toBanglaNumeral(a.highestScore.round())}%',
                   style: const TextStyle(
-                    fontSize: 12.5,
+                    fontSize: 12,
                     fontWeight: FontWeight.w800,
                     fontFamily: 'HindSiliguri',
                     color: AppColors.deepBlue,
@@ -1097,7 +1097,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                             child: Text(
                               a.timelineData[idx].label,
                               style: TextStyle(
-                                fontSize: 11.5,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 fontFamily: 'HindSiliguri',
                                 color: isDark ? Colors.white54 : Colors.black54,
@@ -1186,7 +1186,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               Text(
                 '${BanglaNameHelper.toBanglaNumeral(a.subjectData.length)}টি বিষয়',
                 style: TextStyle(
-                  fontSize: 12.5,
+                  fontSize: 12,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'HindSiliguri',
                   color: textSub,
@@ -1241,7 +1241,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                             child: Text(
                               s.displayName,
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w800,
                                 fontFamily: 'HindSiliguri',
                                 color: textPrimary,
@@ -1251,7 +1251,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
                           Text(
                             '${BanglaNameHelper.toBanglaNumeral(s.total)}টি প্রশ্ন  ·  ${BanglaNameHelper.toBanglaNumeral(pct)}%',
                             style: TextStyle(
-                              fontSize: 13.5,
+                              fontSize: 13,
                               fontWeight: FontWeight.w800,
                               fontFamily: 'HindSiliguri',
                               color: badgeColor,
@@ -1393,7 +1393,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               label,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 12.5,
+                fontSize: 12,
                 fontWeight: FontWeight.w700,
                 fontFamily: 'HindSiliguri',
                 color: isDark ? Colors.white70 : const Color(0xFF334155),
@@ -1549,7 +1549,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
             Text(
               'বিশ্লেষণ ও স্মার্ট গাইডলাইন দেখতে অন্তত একটি অনলাইন পরীক্ষা সম্পন্ন করো।',
               style: TextStyle(
-                fontSize: 14.5,
+                fontSize: 16,
                 fontWeight: FontWeight.w500,
                 fontFamily: 'HindSiliguri',
                 color: textSub,
@@ -1571,7 +1571,7 @@ class _AnalysisViewState extends ConsumerState<AnalysisView> {
               child: const Text(
                 'পরীক্ষা শুরু করো',
                 style: TextStyle(
-                  fontSize: 15.5,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'HindSiliguri',
                 ),

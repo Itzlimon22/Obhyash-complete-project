@@ -20,6 +20,7 @@ class QuestionCard extends StatefulWidget {
   final bool isBookmarked;
   final bool initiallyExpanded;
   final VoidCallback? onToggleBookmark;
+  final VoidCallback? onDelete;
 
   const QuestionCard({
     super.key,
@@ -36,6 +37,7 @@ class QuestionCard extends StatefulWidget {
     this.isBookmarked = false,
     this.initiallyExpanded = false,
     this.onToggleBookmark,
+    this.onDelete,
   });
 
   @override
@@ -154,7 +156,7 @@ class _QuestionCardState extends State<QuestionCard>
                 LatexText(
                   text: '**${_toBengaliNumeral(widget.serialNumber)}.** ${widget.question.question}',
                   style: TextStyle(
-                    fontSize: 16.5,
+                    fontSize: 17,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'HindSiliguri',
                     color: isDark
@@ -201,7 +203,7 @@ class _QuestionCardState extends State<QuestionCard>
                           child: Text(
                             sourceText,
                             style: TextStyle(
-                              fontSize: 11.5,
+                              fontSize: 11,
                               fontWeight: FontWeight.w700,
                               fontFamily: 'HindSiliguri',
                               color: isDark
@@ -263,6 +265,22 @@ class _QuestionCardState extends State<QuestionCard>
                                   : const Color(0xFF9CA3AF)),
                       ),
                     ),
+
+                    if (widget.onDelete != null) ...[
+                      const SizedBox(width: 2),
+                      // Delete button
+                      _IconBtn(
+                        onTap: widget.onDelete,
+                        tooltip: 'প্রশ্নটি মুছে ফেলো',
+                        child: Icon(
+                          LucideIcons.trash2,
+                          size: 17,
+                          color: isDark
+                              ? const Color(0xFFEF4444).withValues(alpha: 0.85)
+                              : const Color(0xFFDC2626),
+                        ),
+                      ),
+                    ],
 
                     if (widget.readOnly) ...[
                       const SizedBox(width: 2),
@@ -472,7 +490,7 @@ class _QuestionCardState extends State<QuestionCard>
                                     banglaIndex,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                      fontSize: 13.5,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.bold,
                                       fontFamily: 'HindSiliguri',
                                       color: bulletText,
@@ -610,7 +628,7 @@ class _ExplanationPanel extends StatelessWidget {
                   Text(
                     'ব্যাখ্যা',
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       fontWeight: FontWeight.w800,
                       fontFamily: 'HindSiliguri',
                       color: headerTextColor,

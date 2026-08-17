@@ -85,6 +85,8 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
     if (location.startsWith('/profile/blog')) return 'blog';
     if (location.startsWith('/profile/referral')) return 'referral';
     if (location.startsWith('/profile/stats')) return 'stats';
+    if (location.startsWith('/profile/bookmarks') || location.startsWith('/bookmarks')) return 'bookmarks';
+    if (location.startsWith('/profile/feature-requests')) return 'feature-requests';
     if (location.startsWith('/profile')) return 'settings';
     if (location.startsWith('/subject') || location.contains('/subject')) {
       try {
@@ -173,7 +175,7 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
       case 'complaint':
         return 'অভিযোগ';
       case 'feature-requests':
-        return 'ফিচার প্রস্তাব';
+        return 'ফিচার রিকোয়েস্ট';
       case 'about':
         return 'পরিচিতি';
       case 'privacy':
@@ -423,7 +425,38 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                               final dynamicTitle = ref.watch(locationTitleProvider)[currentLoc];
                               final titleText = dynamicTitle ?? _getTitle(activeTab);
                               final isSubRoute = dynamicTitle != null;
-                              final showBackButton = activeTab == 'setup' || isSubRoute || context.canPop();
+
+                              const settingsSubTabs = {
+                                'stats',
+                                'subscription',
+                                'my-subscription',
+                                'complaint',
+                                'feature-requests',
+                                'about',
+                                'privacy',
+                                'terms',
+                                'faq',
+                                'referral',
+                                'blog',
+                                'bookmarks',
+                                'my-reports',
+                                'notifications',
+                              };
+
+                              final isSettingsSubPage = settingsSubTabs.contains(activeTab) ||
+                                  (currentLoc.startsWith('/profile/') && currentLoc != '/profile') ||
+                                  currentLoc.startsWith('/bookmarks') ||
+                                  currentLoc.startsWith('/my-reports') ||
+                                  currentLoc.startsWith('/notifications');
+
+                              final showBackButton = isSettingsSubPage ||
+                                  activeTab == 'setup' ||
+                                  activeTab == 'practice' ||
+                                  activeTab == 'analysis' ||
+                                  activeTab == 'live_exam' ||
+                                  activeTab.startsWith('subject_') ||
+                                  isSubRoute ||
+                                  context.canPop();
 
                               return Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -434,6 +467,9 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
                                         HapticFeedback.lightImpact();
                                         if (context.canPop()) {
                                           context.pop();
+                                        } else if (isSettingsSubPage) {
+                                          widget.navigationShell.goBranch(4);
+                                          context.go('/profile');
                                         } else {
                                           widget.navigationShell.goBranch(0);
                                           context.go('/');
@@ -724,15 +760,18 @@ class _MainLayoutState extends ConsumerState<MainLayout> {
         child: widget.navigationShell,
       ),
 
-      bottomNavigationBar: activeTab == 'setup'
-          ? null
-          : MainBottomNav(
+      bottomNavigationBar: (activeTab == 'dashboard' ||
+              activeTab == 'history' ||
+              activeTab == 'leaderboard' ||
+              activeTab == 'settings')
+          ? MainBottomNav(
               activeTab: activeTab,
               onTabChange: _onTabChange,
               onMenuClick: () {
                 _scaffoldKey.currentState?.openDrawer();
               },
-            ),
+            )
+          : null,
     ),
   );
   }
@@ -882,7 +921,7 @@ class _ProfileSheet extends StatelessWidget {
                           Text(
                             userEmail,
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               color: textSecondary,
                             ),
                             maxLines: 1,
@@ -919,7 +958,7 @@ class _ProfileSheet extends StatelessWidget {
                     child: Text(
                       '$xp XP',
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF059669),
                       ),

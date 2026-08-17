@@ -280,7 +280,7 @@ class _SubjectReportViewState extends ConsumerState<SubjectReportView> {
                         f.$2,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: _filter == f.$1
                               ? Colors.white
@@ -677,7 +677,7 @@ class _SRChapterRow extends StatelessWidget {
               child: Text(
                 BanglaNameHelper.formatChapter(c.name),
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                   fontFamily: 'HindSiliguri',
                   color: isDark
@@ -691,7 +691,7 @@ class _SRChapterRow extends StatelessWidget {
             Text(
               '${c.accuracy}%',
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: bar,
               ),
@@ -826,7 +826,7 @@ class _SRWeakness extends StatelessWidget {
                         Text(
                           'কোনো দুর্বলতা নেই! চমৎকার।',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF059669),
                           ),
@@ -906,7 +906,7 @@ class _SRWeakness extends StatelessWidget {
                                   child: Text(
                                     '${weak.first.wrong}টি ভুল',
                                     style: const TextStyle(
-                                      fontSize: 15,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
@@ -930,7 +930,7 @@ class _SRWeakness extends StatelessWidget {
                                     child: Text(
                                       '"${weak.first.name == 'General' ? 'সাধারণ প্রশ্ন' : weak.first.name}" অধ্যায়টি পুনরায় রিভিশন ও অনুশীলন করলে তোমার স্কোর উল্লেখযোগ্যভাবে বাড়বে।',
                                       style: TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 16,
                                         color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
                                         height: 1.4,
                                       ),
@@ -986,7 +986,7 @@ class _SRWeakness extends StatelessWidget {
                                       child: Text(
                                         w.name == 'General' ? 'সাধারণ প্রশ্ন' : w.name,
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.w600,
                                           color: isDark ? const Color(0xFFD4D4D4) : const Color(0xFF27272A),
                                         ),
@@ -996,7 +996,7 @@ class _SRWeakness extends StatelessWidget {
                                     Text(
                                       '${w.wrong}টি ভুল',
                                       style: const TextStyle(
-                                        fontSize: 15,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                         color: Color(0xFFE11D48),
                                       ),
@@ -1064,7 +1064,7 @@ class _SREmpty extends StatelessWidget {
           const Text(
             'এই বিষয়ে পরীক্ষা দিলে বিস্তারিত রিপোর্ট দেখা যাবে।',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 15, color: Color(0xFFA3A3A3)),
+            style: TextStyle(fontSize: 16, color: Color(0xFFA3A3A3)),
           ),
         ],
       ),

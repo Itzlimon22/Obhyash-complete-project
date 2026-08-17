@@ -155,7 +155,7 @@ class PaymentMethodsCard extends StatelessWidget {
                   ), // hover:text-emerald-600
                   label: const Text(
                     'যুক্ত করো',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   style:
                       TextButton.styleFrom(
@@ -235,7 +235,7 @@ class PaymentMethodsCard extends StatelessWidget {
                     'bKash বা Nagad যুক্ত করো সহজ পেমেন্টের জন্য।',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       color: isDark
                           ? const Color(0xFFA3A3A3)
                           : const Color(
@@ -307,7 +307,7 @@ class PaymentMethodsCard extends StatelessWidget {
                                           method.number ??
                                               'Exp: ${method.expiry}',
                                           style: TextStyle(
-                                            fontSize: 15,
+                                            fontSize: 16,
                                             color: isDark
                                                 ? const Color(0xFFA3A3A3)
                                                 : const Color(

@@ -166,7 +166,7 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
                       child: Text(
                         widget.subjectName,
                         style: TextStyle(
-                          fontSize: 15.5,
+                          fontSize: 16,
                           fontWeight: FontWeight.w800,
                           fontFamily: 'HindSiliguri',
                           color: textColor,
@@ -283,7 +283,7 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
                             child: Text(
                               'সম্পূর্ণ সিলেবাসের সকল অধ্যায় থেকে প্রশ্ন অন্তর্ভুক্ত রয়েছে।',
                               style: TextStyle(
-                                fontSize: 12.5,
+                                fontSize: 12,
                                 fontFamily: 'HindSiliguri',
                                 color: isDark
                                     ? const Color(0xFF71717A)
@@ -370,7 +370,7 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
                               Text(
                                 'টপিকসমূহ (${_toBengaliNumber(cleanTopics.length)}টি)',
                                 style: TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                   fontFamily: 'HindSiliguri',
                                   color: isDark
@@ -404,7 +404,7 @@ class _ExamScopeHeaderState extends State<ExamScopeHeader>
                                 child: Text(
                                   topic,
                                   style: TextStyle(
-                                    fontSize: 11.5,
+                                    fontSize: 11,
                                     fontWeight: FontWeight.w600,
                                     fontFamily: 'HindSiliguri',
                                     color: isDark

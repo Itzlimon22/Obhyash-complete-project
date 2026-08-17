@@ -206,7 +206,7 @@ class SubjectsProgressSection extends StatelessWidget {
                               child: Text(
                                 '$examCount পরীক্ষা',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: isDark
                                       ? const Color(0xFFA3A3A3)
@@ -231,7 +231,7 @@ class SubjectsProgressSection extends StatelessWidget {
                         child: Text(
                           '$accuracy%',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: _getAccuracyTextColor(accuracy, isDark),
                           ),
@@ -277,7 +277,7 @@ class SubjectsProgressSection extends StatelessWidget {
                         label: const Text(
                           'বিস্তারিত রিপোর্ট',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Anek Bangla',
                           ),

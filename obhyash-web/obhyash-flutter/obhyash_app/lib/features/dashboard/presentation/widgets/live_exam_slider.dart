@@ -162,7 +162,7 @@ class LiveExamSlider extends ConsumerWidget {
                           formatter.format(isOngoing ? exam.endTime : exam.startTime),
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 12.5,
+                            fontSize: 12,
                             fontWeight: FontWeight.w700,
                           ),
                         ),

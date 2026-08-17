@@ -591,7 +591,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                             Text(
                               _formatTime(_secondsRemaining),
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w900,
                                 fontFamily: 'monospace',
                                 color: _secondsRemaining < 60
@@ -760,7 +760,7 @@ class _LiveExamSessionViewState extends ConsumerState<LiveExamSessionView> {
                       Text(
                         'উত্তরপত্র জমা দাও (${BanglaNameHelper.toBanglaNumeral(_userAnswers.length)}/${BanglaNameHelper.toBanglaNumeral(questions.length)})',
                         style: const TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w900,
                           fontFamily: 'HindSiliguri',
                           color: Colors.white,
@@ -796,7 +796,7 @@ class _LegendDot extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            fontSize: 11.5,
+            fontSize: 11,
             fontWeight: FontWeight.w600,
             fontFamily: 'HindSiliguri',
             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF64748B),

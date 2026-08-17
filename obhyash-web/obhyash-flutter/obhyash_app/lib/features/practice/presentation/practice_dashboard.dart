@@ -11,6 +11,7 @@ import '../../../core/utils/bangla_name_helper.dart';
 import '../../../core/presentation/widgets/latex_text.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../exam/domain/exam_models.dart';
+import '../../exam/services/local_exam_cache_service.dart';
 import '../providers/practice_providers.dart';
 import 'flashcard_mode.dart';
 import 'practice_summary.dart';
@@ -49,15 +50,44 @@ class PracticeQuestion {
     }
     List<String> inst = [];
     if (j['institutes'] is List) {
-      inst = (j['institutes'] as List).map((e) => e.toString()).toList();
+      inst = (j['institutes'] as List).map((e) => e.toString().trim()).where((s) => s.isNotEmpty).toList();
+    } else if (j['institute'] != null && j['institute'].toString().trim().isNotEmpty) {
+      inst = [j['institute'].toString().trim()];
+    } else if (j['institution'] != null && j['institution'].toString().trim().isNotEmpty) {
+      inst = [j['institution'].toString().trim()];
+    } else if (j['board'] != null && j['board'].toString().trim().isNotEmpty) {
+      inst = [j['board'].toString().trim()];
     }
+
     List<int> yrs = [];
     if (j['years'] is List) {
       for (final y in (j['years'] as List)) {
-        final parsed = int.tryParse(y.toString());
-        if (parsed != null) yrs.add(parsed);
+        if (y is num) {
+          yrs.add(y.toInt());
+        } else if (y != null) {
+          final digits = y.toString().replaceAll(RegExp(r'[^0-9]'), '');
+          final parsed = int.tryParse(digits);
+          if (parsed != null) yrs.add(parsed);
+        }
       }
+    } else if (j['year'] != null && j['year'].toString().trim().isNotEmpty) {
+      final digits = j['year'].toString().replaceAll(RegExp(r'[^0-9]'), '');
+      final parsed = int.tryParse(digits);
+      if (parsed != null) yrs.add(parsed);
     }
+
+    int correctIdx = 0;
+    if (j['correct_answer_index'] != null) {
+      correctIdx = (j['correct_answer_index'] as num).toInt();
+    } else if (j['correct_answer_indices'] is List &&
+        (j['correct_answer_indices'] as List).isNotEmpty) {
+      correctIdx = ((j['correct_answer_indices'] as List)[0] as num).toInt();
+    } else if (j['correct_answer'] != null) {
+      final ca = j['correct_answer'].toString();
+      final idx = opts.indexOf(ca);
+      if (idx != -1) correctIdx = idx;
+    }
+
     return PracticeQuestion(
       id: j['id']?.toString() ?? '',
       subject: j['subject']?.toString() ?? 'general',
@@ -67,7 +97,7 @@ class PracticeQuestion {
           'General',
       questionText: j['question']?.toString() ?? '',
       options: opts,
-      correctAnswerIndex: (j['correct_answer_index'] as num?)?.toInt() ?? 0,
+      correctAnswerIndex: correctIdx,
       explanation: j['explanation']?.toString(),
       points: (j['points'] as num?)?.toInt() ?? 1,
       institutes: inst,
@@ -127,8 +157,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
   final ScrollController _scrollController = ScrollController();
 
   // Bookmarks Pagination
-  int _bOffset = 0;
-  bool _bHasMore = true;
+  bool _bHasMore = false;
   bool _bIsLoadingMore = false;
   int _displayedBookmarksCount = 20;
 
@@ -212,7 +241,6 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
 
   Future<void> _fetchBookmarks({bool isRefresh = false}) async {
     if (isRefresh) {
-      _bOffset = 0;
       _bHasMore = true;
     }
 
@@ -221,81 +249,115 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
       final uid = sb.auth.currentUser?.id;
       if (uid == null) return;
 
-      // Fetch total count first (only on refresh)
-      if (isRefresh) {
-        final countResponse = await sb
-            .from('bookmarks')
-            .select('question_id')
-            .eq('user_id', uid)
-            .count(CountOption.exact);
+      // 1. Fetch bookmark records
+      final bData = await sb
+          .from('bookmarks')
+          .select('question_id, created_at')
+          .eq('user_id', uid)
+          .order('created_at', ascending: false);
+
+      final rawBookmarks = (bData as List);
+      if (mounted) {
+        setState(() => _totalBookmarks = rawBookmarks.length);
+      }
+
+      if (rawBookmarks.isEmpty) {
         if (mounted) {
-          setState(() => _totalBookmarks = countResponse.count);
+          setState(() {
+            _bookmarks = [];
+            _bookmarkedIds = {};
+          });
+        }
+        return;
+      }
+
+      final allBookmarkIds = rawBookmarks
+          .map((b) => b['question_id']?.toString() ?? '')
+          .where((id) => id.isNotEmpty)
+          .toList();
+
+      final bIdsSet = allBookmarkIds.toSet();
+      final Map<String, PracticeQuestion> questionMap = {};
+
+      // 2. Fetch from 'questions' table in safe chunks
+      for (var i = 0; i < allBookmarkIds.length; i += 50) {
+        final end = (i + 50 > allBookmarkIds.length) ? allBookmarkIds.length : i + 50;
+        final chunk = allBookmarkIds.sublist(i, end);
+        try {
+          final qData = await sb.from('questions').select().inFilter('id', chunk);
+          for (final row in (qData as List)) {
+            final q = PracticeQuestion.fromJson(row as Map<String, dynamic>);
+            if (q.id.isNotEmpty) questionMap[q.id] = q;
+          }
+        } catch (err) {
+          debugPrint('[PracticeDashboard] chunk fetch from questions table error: $err');
         }
       }
 
-      final bList = <PracticeQuestion>[];
-      final bIds = <String>{};
-      int orphanedCount = 0;
+      // 3. Fallback: For any question IDs not found in 'questions', search in user's exam_results
+      final missingIds = allBookmarkIds.where((id) => !questionMap.containsKey(id)).toSet();
+      if (missingIds.isNotEmpty) {
+        try {
+          final examRes = await sb
+              .from('exam_results')
+              .select('questions')
+              .eq('user_id', uid)
+              .not('questions', 'is', null)
+              .order('created_at', ascending: false)
+              .limit(50);
 
-      while (bList.length < _limit && _bHasMore) {
-        final bData = await sb
-            .from('bookmarks')
-            .select('question_id')
-            .eq('user_id', uid)
-            .order('created_at', ascending: false)
-            .range(_bOffset, _bOffset + _limit - 1);
-
-        if ((bData as List).isNotEmpty) {
-          final questionIds = bData
-              .map((b) => b['question_id']?.toString() ?? '')
-              .where((id) => id.isNotEmpty)
-              .toList();
-
-          if (questionIds.isNotEmpty) {
-            final qData = await sb
-                .from('questions')
-                .select('*')
-                .inFilter('id', questionIds);
-
-            final qList = (qData as List)
-                .map((row) => PracticeQuestion.fromJson(row as Map<String, dynamic>))
-                .toList();
-            final qMap = {for (final q in qList) q.id: q};
-
-            for (final qid in questionIds) {
-              final q = qMap[qid];
-              if (q != null) {
-                bList.add(q);
-                bIds.add(q.id);
-              } else {
-                orphanedCount++;
+          for (final row in (examRes as List)) {
+            final qListRaw = row['questions'];
+            if (qListRaw is List) {
+              for (final item in qListRaw) {
+                if (item is Map<String, dynamic>) {
+                  final q = PracticeQuestion.fromJson(item);
+                  if (missingIds.contains(q.id)) {
+                    questionMap[q.id] = q;
+                  }
+                }
               }
             }
           }
+        } catch (err) {
+          debugPrint('[PracticeDashboard] missing bookmark fallback error: $err');
         }
+      }
 
-        if ((bData as List).length < _limit) {
-          _bHasMore = false;
+      // 4. Fallback: check local cached questions
+      final stillMissing = allBookmarkIds.where((id) => !questionMap.containsKey(id)).toSet();
+      if (stillMissing.isNotEmpty) {
+        try {
+          final cachedList = await LocalExamCacheService.getCachedQuestionsList();
+          if (cachedList != null) {
+            for (final item in cachedList) {
+              final q = PracticeQuestion.fromJson(item);
+              if (stillMissing.contains(q.id)) {
+                questionMap[q.id] = q;
+              }
+            }
+          }
+        } catch (_) {}
+      }
+
+      // 5. Build ordered bookmark list matching user's bookmarks
+      final List<PracticeQuestion> finalBookmarks = [];
+      for (final id in allBookmarkIds) {
+        if (questionMap.containsKey(id)) {
+          finalBookmarks.add(questionMap[id]!);
         }
-        _bOffset += (bData as List).length;
       }
 
       if (mounted) {
         setState(() {
-          if (orphanedCount > 0) {
-             _totalBookmarks = (_totalBookmarks - orphanedCount).clamp(0, 999999);
-          }
-          if (isRefresh) {
-            _bookmarks = bList;
-            _bookmarkedIds = bIds;
-          } else {
-            _bookmarks.addAll(bList);
-            _bookmarkedIds.addAll(bIds);
-          }
+          _bookmarks = finalBookmarks;
+          _bookmarkedIds = bIdsSet;
+          _totalBookmarks = finalBookmarks.isNotEmpty ? finalBookmarks.length : rawBookmarks.length;
+          _bHasMore = false;
         });
       }
     } catch (e) {
-      debugPrint('[PracticeDashboard] _fetchBookmarks error: $e');
+      debugPrint('[PracticeDashboard] _fetchBookmarks global error: $e');
     }
   }
 
@@ -781,7 +843,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
           Text(
             '${_selectedIds.length} নির্বাচিত',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: isDark ? const Color(0xFFA3A3A3) : const Color(0xFF525252),
             ),
@@ -820,7 +882,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                         ? 'র‍্যান্ডম অন'
                         : 'র‍্যান্ডম',
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: _shuffle
                           ? const Color(0xFF059669)
@@ -858,7 +920,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'HindSiliguri',
-                fontSize: 15,
+                fontSize: 16,
               ),
             ),
           ),
@@ -953,7 +1015,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
             LatexText(
               text: '**${BanglaNameHelper.toBanglaNumeral(i + 1)}.** ${q.questionText}',
               style: TextStyle(
-                fontSize: 15.5,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'HindSiliguri',
                 color: isDark ? const Color(0xFFF4F4F5) : const Color(0xFF0F172A),
@@ -991,7 +1053,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                       child: LatexText(
                         text: q.options[q.correctAnswerIndex],
                         style: TextStyle(
-                          fontSize: 13.5,
+                          fontSize: 13,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'HindSiliguri',
                           color: isDark
@@ -1051,7 +1113,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                   : 'তুমি এখনো কোনো প্রশ্ন বুকমার্ক করোনি।',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 15,
+                fontSize: 16,
                 fontFamily: 'HindSiliguri',
                 color: Color(0xFFA3A3A3),
               ),
@@ -1071,7 +1133,7 @@ class _PracticeDashboardState extends ConsumerState<PracticeDashboard> {
                 child: const Text(
                   'নতুন পরীক্ষা দাও',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'HindSiliguri',
                     color: Colors.white,

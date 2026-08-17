@@ -635,7 +635,7 @@ class _CollegeLeaderboardBody extends StatelessWidget {
                   institute,
                   style: TextStyle(
                     fontFamily: 'Anek Bangla',
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w800,
                     color: isDark
                         ? const Color(0xFF059669)
@@ -663,7 +663,7 @@ class _CollegeLeaderboardBody extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Anek Bangla',
                       fontWeight: FontWeight.w700,
-                      fontSize: 15,
+                      fontSize: 16,
                       color: isDark
                           ? const Color(0xFF737373)
                           : const Color(0xFF9CA3AF),
@@ -675,7 +675,7 @@ class _CollegeLeaderboardBody extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Anek Bangla',
-                      fontSize: 15,
+                      fontSize: 16,
                       color: isDark
                           ? const Color(0xFF525252)
                           : const Color(0xFFBBBBBB),
@@ -756,7 +756,7 @@ class _InstituteRankingsBody extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Anek Bangla',
-                  fontSize: 15,
+                  fontSize: 16,
                   color: isDark
                       ? const Color(0xFF525252)
                       : const Color(0xFFBBBBBB),
@@ -826,7 +826,7 @@ class _InstituteRankingsBody extends StatelessWidget {
                             '$rank',
                             style: TextStyle(
                               fontFamily: 'Anek Bangla',
-                              fontSize: 15,
+                              fontSize: 16,
                               fontWeight: FontWeight.w900,
                               color: isDark
                                   ? const Color(0xFF4A4A4A)
@@ -846,7 +846,7 @@ class _InstituteRankingsBody extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontFamily: 'Anek Bangla',
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w800,
                           color: isMe
                               ? (isDark
@@ -896,7 +896,7 @@ class _InstituteRankingsBody extends StatelessWidget {
                         '${_numFmt.format(entry.avgXp)} XP',
                         style: TextStyle(
                           fontFamily: 'Anek Bangla',
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w900,
                           color: isMe
                               ? (isDark
@@ -1060,7 +1060,7 @@ class _LevelSelector extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'Anek Bangla',
                                 fontWeight: FontWeight.w900,
-                                fontSize: 15,
+                                fontSize: 16,
                                 height: 1.1, // Constrain vertical height
                                 color: isActive
                                     ? Colors.white
@@ -1326,7 +1326,7 @@ class _UserProgressCard extends StatelessWidget {
                 Text(
                   'পরবর্তী লেভেল: ${nextLvl.label.split(' ').first}',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: isDark
                         ? const Color(0xFF9CA3AF)
@@ -1336,7 +1336,7 @@ class _UserProgressCard extends StatelessWidget {
                 Text(
                   '${_numFmt.format(nextLvl.minXP - xp)} XP প্রয়োজন',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: isDark
                         ? const Color(0xFF9CA3AF)
@@ -1596,7 +1596,7 @@ class _LeaderboardTable extends StatelessWidget {
                                           child: Text(
                                             u.institute,
                                             style: const TextStyle(
-                                              fontSize: 15,
+                                              fontSize: 16,
                                               color: Color(0xFFA3A3A3),
                                               fontFamily: 'Anek Bangla',
                                             ),

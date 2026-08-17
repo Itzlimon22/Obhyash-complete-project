@@ -109,7 +109,7 @@ class _DashboardActionCardState extends State<DashboardActionCard>
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: FontWeight.w800,
                   color: isDark ? Colors.white : const Color(0xFF18181B),
                   fontFamily: 'Anek Bangla',

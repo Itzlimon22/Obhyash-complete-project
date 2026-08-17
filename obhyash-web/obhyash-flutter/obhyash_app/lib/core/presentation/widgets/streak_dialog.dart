@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'user_avatar.dart';
+import 'obhyash_tooltip.dart';
 
 class StreakDialog extends StatefulWidget {
   final int currentStreak;
@@ -246,10 +247,12 @@ class _StreakDialogState extends State<StreakDialog> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Icon(
-                      LucideIcons.info,
+                    ObhyashTooltipIcon(
+                      message:
+                          'প্রতিদিন অন্তত একটি পরীক্ষা দিলে স্ট্রাইক বাড়তে থাকে।\nএকদিন বিরতি দিলে স্ট্রাইক রিসেট হয়ে যাবে।',
+                      icon: LucideIcons.info,
+                      preferredPosition: TooltipPosition.bottom,
                       size: 20,
-                      color: isDark ? Colors.white54 : Colors.black54,
                     ),
                   ],
                 ),
@@ -312,7 +315,7 @@ class _StreakDialogState extends State<StreakDialog> {
                                 Text(
                                   dayNames[index],
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 16,
                                     fontFamily: 'Anek Bangla',
                                     fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                                     color: isDark ? Colors.white70 : Colors.black87,
@@ -453,7 +456,7 @@ class _StreakDialogState extends State<StreakDialog> {
                                                   u['name'] ?? 'অজানা',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w800,
-                                                    fontSize: 15,
+                                                    fontSize: 16,
                                                     fontFamily: 'Anek Bangla',
                                                     color: isMe
                                                         ? (isDark ? const Color(0xFF6EE7B7) : const Color(0xFF047857))

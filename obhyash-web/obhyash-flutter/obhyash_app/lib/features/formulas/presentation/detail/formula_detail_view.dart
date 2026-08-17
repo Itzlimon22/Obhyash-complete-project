@@ -216,7 +216,7 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
                       decoration: InputDecoration(
                         hintText: 'সূত্র বা টপিক খুঁজুন...',
                         hintStyle: TextStyle(
-                          fontSize: 13.5,
+                          fontSize: 13,
                           fontFamily: 'Anek Bangla',
                           color: isDark ? const Color(0xFF737373) : const Color(0xFF9CA3AF),
                         ),
@@ -288,7 +288,7 @@ class _FormulaDetailViewState extends ConsumerState<FormulaDetailView> {
                           Text(
                             'কোনো সূত্র পাওয়া যায়নি',
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 16,
                               fontFamily: 'Anek Bangla',
                               color: isDark ? Colors.white60 : Colors.black54,
                             ),
@@ -469,7 +469,7 @@ class _FormulaCardState extends State<_FormulaCard> {
                       Text(
                         displayTitle,
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700,
                           fontFamily: 'Anek Bangla',
                           height: 1.3,
@@ -629,7 +629,7 @@ class _FormulaInsightView extends StatelessWidget {
                   child: LatexText(
                     text: sections.concept,
                     style: TextStyle(
-                      fontSize: 13.5,
+                      fontSize: 13,
                       fontFamily: 'HindSiliguri',
                       height: 1.55,
                       fontWeight: FontWeight.w500,
@@ -745,7 +745,7 @@ class _FormulaInsightView extends StatelessWidget {
                         const Text(
                           'শর্টকাট ও ট্রিকস',
                           style: TextStyle(
-                            fontSize: 11.5,
+                            fontSize: 11,
                             fontWeight: FontWeight.w700,
                             fontFamily: 'Anek Bangla',
                             color: Color(0xFFF59E0B),
@@ -800,7 +800,7 @@ class _FormulaInsightView extends StatelessWidget {
                         const Text(
                           'মনে রাখুন / পরীক্ষার সতর্কতা',
                           style: TextStyle(
-                            fontSize: 11.5,
+                            fontSize: 11,
                             fontWeight: FontWeight.w700,
                             fontFamily: 'Anek Bangla',
                             color: Color(0xFF059669),
